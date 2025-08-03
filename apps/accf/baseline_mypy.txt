@@ -1,4 +1,0 @@
-shared/openai_interfaces/responses_interface.py: error: Source file found twice under different module names: "ACCF.shared.openai_interfaces.responses_interface" and "shared.openai_interfaces.responses_interface"
-shared/openai_interfaces/responses_interface.py: note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#mapping-file-paths-to-modules for more info
-shared/openai_interfaces/responses_interface.py: note: Common resolutions include: a) adding `__init__.py` somewhere, b) using `--explicit-package-bases` or adjusting MYPYPATH
-Found 1 error in 1 file (errors prevented further checking)

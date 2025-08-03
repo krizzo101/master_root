@@ -1,1 +1,0 @@
-Given the symptoms or errors, create a table listing possible causes, diagnostic steps, and prioritized solutions. Ensure each row addresses one possible root cause.
