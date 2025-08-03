@@ -1,0 +1,20 @@
+# CREATE/UPDATE ADR OUTPUT TEMPLATE
+
+# This template defines the structure for an Architecture Decision Record (ADR) in YAML format.
+# It is used by the create_update_adr workflow to generate a new ADR for any major design decision.
+
+adr:
+  title: "[Short, descriptive title of the decision]"
+  status: "[Proposed | Accepted | Deprecated | Superseded]"
+  date: "[YYYY-MM-DD]"
+  context: |
+    [Background and context for the decision. What is the problem or issue?]
+  decision: |
+    [The decision that was made. What was chosen and why?]
+  consequences: |
+    [Consequences, trade-offs, and implications of this decision.]
+  participants:
+    - name: "[Decision maker or participant]"
+      role: "[Role or responsibility]"
+  references:
+    - "[Link or reference to related docs, issues, or discussions]"

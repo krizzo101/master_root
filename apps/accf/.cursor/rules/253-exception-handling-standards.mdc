@@ -1,0 +1,99 @@
+---
+description: "use when WRITING EXCEPTION HANDLING to PREVENT BARE EXCEPT STATEMENTS for CODE QUALITY"
+globs:
+alwaysApply: false
+---
+
+# Exception Handling Standards
+
+**Triggers**: Writing try-except blocks, error handling, logging errors
+**Principles**: Specific exception types, proper error context, exception chaining
+**Signatures**: Exception type specification, context logging, proper re-raising
+**Validation**: Exception type validation, error context completeness, chaining verification
+**Integration**: Logging systems, error monitoring, debugging tools
+
+## Mandatory Requirements
+
+### Exception Type Specification
+```python
+# ✅ CORRECT - Specific exception types
+try:
+    risky_operation()
+except ValueError as e:
+    logger.error(f"Invalid value: {e}")
+    raise RuntimeError("Operation failed") from e
+except FileNotFoundError as e:
+    logger.error(f"File not found: {e}")
+    raise
+except Exception as e:
+    logger.error(f"Unexpected error: {e}")
+    raise
+
+# ❌ INCORRECT - Bare except statements
+try:
+    risky_operation()
+except:  # Bare except - PROHIBITED
+    handle_error()
+```
+
+### Exception Chaining
+```python
+# ✅ CORRECT - Proper exception chaining
+try:
+    result = process_data(data)
+except ValueError as e:
+    logger.error(f"Data validation failed: {e}")
+    raise RuntimeError("Processing failed") from e
+
+# ❌ INCORRECT - Lost exception context
+try:
+    result = process_data(data)
+except ValueError as e:
+    logger.error(f"Data validation failed: {e}")
+    raise RuntimeError("Processing failed")  # Lost original exception
+```
+
+## Validation Framework
+
+### Exception Type Validation
+- **ruff**: Must pass E722 checks (no bare except)
+- **IDE**: Must show exception handling warnings
+- **Pre-commit**: Must catch bare except violations
+- **Code review**: Must verify exception types
+
+### Error Context Requirements
+- **LOGGING**: All exceptions must be logged with context
+- **MESSAGES**: Error messages must be descriptive
+- **CONTEXT**: Include relevant data in error messages
+- **TRACEBACK**: Preserve original exception information
+
+## Anti-Patterns
+
+### Prohibited Patterns
+```python
+# ❌ NEVER USE
+try:
+    operation()
+except:  # Bare except - E722 violation
+    pass
+
+try:
+    operation()
+except Exception as e:
+    raise RuntimeError("Failed")  # Lost original exception
+```
+
+### Common Mistakes
+- Using bare `except:` statements
+- Catching exceptions without logging
+- Losing original exception context
+- Catching too broad exception types
+- Silent exception handling
+
+## Success Indicators
+
+- **Zero bare except violations** (E722)
+- **All exceptions properly logged** with context
+- **Exception chaining preserved** when re-raising
+- **Specific exception types** used appropriately
+- **Error messages descriptive** and actionable

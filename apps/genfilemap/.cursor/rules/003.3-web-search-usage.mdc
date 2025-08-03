@@ -1,0 +1,16 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+### Web Search Usage
+
+- Use Cursor IDE’s native web search for any info that may be outdated or unclear.
+- Mandatory for checking current tech, best practices, compatibility, troubleshooting, and recent developments.
+- Make queries specific: include version, year (e.g., 2024/2025), technology, and unique error text.
+- Prioritize official docs, recent sources, and cross-verify critical info.
+- Analyze sources for date, authority, and consensus.
+- Log key findings and sources for future reference.
+- Refine queries as needed; start broad, then narrow focus.
+- Always cite sources and include verification dates for all recommendations.

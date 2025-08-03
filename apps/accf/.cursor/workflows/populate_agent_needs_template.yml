@@ -1,0 +1,149 @@
+# POPULATE AGENT NEEDS TEMPLATE WORKFLOW (ACCF-Optimized)
+
+expectation: agent_needs_template_populated_with_research_and_context
+autonomous_mode: true
+max_parallelism: true
+batching_enabled: true
+plan_ahead: true
+combine_and_chain_steps: true
+completion: agent_needs_template_and_research_reference_created
+
+directives:
+  - "This workflow must be followed exactly. Do not skip or improvise steps."
+  - "The agent must use online research as a required input for template population."
+  - "The output must strictly follow the template structure in /home/opsvi/agent_world/docs/research/what_an_agent_needs_to_excel__template_of_templates.md."
+  - "Reference the master document /home/opsvi/agent_world/docs/research/what_an_agent_needs_to_excel.md for context and rationale."
+  - "Each section must be ACCF-specific, actionable, and implementation-relevant."
+  - "If any section is too vague or generic, iterate and enrich before finalizing."
+  - "Include concrete examples, mapping to project goals/architecture, and practical implementation guidance."
+
+phases:
+  profile_initialization:
+    description: "Load agent profile and foundational rules."
+    tools: [read_file, fetch_rules, mcp_time_current_time]
+    steps:
+      - parallel_batch:
+          - tool: mcp_time_current_time
+            validation: time_checked
+          - tool: read_file
+            params:
+              target_file: .cursor/profiles/populate_agent_needs_template_agent_profile.yml
+            validation: agent_profile_loaded
+          - tool: fetch_rules
+            params:
+              rule_names:
+                - "002-tool-usage-and-optimize"
+                - "200-project-design-and-dev-process"
+                - "501-tool-operation-validation"
+                - "800-development-best-practices"
+                - "300-documentation-standards"
+            validation: foundational_rules_loaded
+    gates:
+      - time_checked
+      - agent_profile_loaded
+      - foundational_rules_loaded
+
+  intake:
+    description: "Capture the specific agent need, output path, and context."
+    tools: [fetch_rules]
+    steps:
+      - batch:
+          - intention_analysis → agent_need_identified
+          - context_capture → output_path_confirmed
+    gates:
+      - agent_need_identified
+      - output_path_confirmed
+
+  research_planning:
+    description: "Plan all research queries and sources in advance."
+    tools: [prompt_user]
+    steps:
+      - analyze_research_goals → research_plan_created
+      - batch_plan_research_queries
+    gates:
+      - research_plan_created
+
+  research:
+    description: "Batch all web searches, scraping, and synthesis."
+    tools: [mcp_web_search_brave_web_search, mcp_web_scraping_firecrawl_scrape, read_file, edit_file]
+    steps:
+      - batch_parallel_web_searches_and_scraping → all_sources_scraped
+      - synthesize_and_document_research_results → research_reference_created
+    gates:
+      - all_sources_scraped
+      - research_reference_created
+
+  template_population:
+    description: "Populate the agent needs template using the loaded structure, research, and master document context. Each section must be ACCF-specific, actionable, and implementation-relevant."
+    tools: [read_file, edit_file]
+    steps:
+      - load_template_structure → template_ready
+      - load_master_document_context → context_ready
+      - populate_each_section_with_research_and_context → template_populated
+      - validate_section_specificity_and_actionability → section_validation_passed
+      - if_section_too_generic → iterate_and_enrich_section → section_validation_passed
+      - include_examples_and_mapping_to_project_goals → examples_and_mapping_included
+    gates:
+      - template_ready
+      - context_ready
+      - template_populated
+      - section_validation_passed
+      - examples_and_mapping_included
+
+  review:
+    description: "Review the populated template for ACCF specificity, actionability, and implementation guidance."
+    tools: [read_file, fetch_rules]
+    steps:
+      - batch:
+          - tool: read_file
+            params:
+              target_file: [output_path]
+            validation: template_reviewed
+          - checklist_review:
+              - accf_specificity
+              - actionable_guidance
+              - concrete_examples
+              - mapping_to_project_goals
+              - implementation_relevance
+            validation: compliance_confirmed
+    gates:
+      - template_reviewed
+      - compliance_confirmed
+
+  iterative_refinement:
+    description: "Iterate and enrich the template until all validation criteria are met and further improvement yields diminishing returns."
+    tools: [read_file, edit_file]
+    steps:
+      - batch_review_and_update_until_diminishing_returns → template_refined_to_point_of_diminishing_returns
+    gates:
+      - template_refined_to_point_of_diminishing_returns
+
+  linting_and_documentation:
+    description: "Lint, document, and commit the final template."
+    tools: [run_terminal_cmd, edit_file]
+    steps:
+      - batch_lint_and_autofix_all_files
+      - tool: edit_file
+        params:
+          target_file: docs/standards/populate_agent_needs_template_workflow.md
+          code_edit: generated_workflow_doc_from_template
+        validation: workflow_doc_created
+      - tool: run_terminal_cmd
+        params:
+          command: "git add . && git commit -m 'Add/update agent needs template workflow, research, and documentation.'"
+          is_background: false
+        validation: git_commit_successful
+    gates:
+      - workflow_doc_created
+      - git_commit_successful
+
+  mermaid_diagram:
+    description: "Generate a high-contrast Mermaid diagram visualizing this workflow."
+    tools: [create_diagram]
+    steps:
+      - tool: create_diagram
+        params:
+          content: generated_high_contrast_mermaid_diagram_of_workflow
+        validation: mermaid_diagram_created
+    gates:
+      - mermaid_diagram_created

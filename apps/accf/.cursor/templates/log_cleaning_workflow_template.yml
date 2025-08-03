@@ -1,0 +1,105 @@
+# LOG CLEANING WORKFLOW (SCRIPT-GENERATING, ITERATIVE, VALIDATED)
+
+expectation: "Produce a Python script that generates a cleaned, standardized log file and a complete audit log of all removals/transformations, ready for downstream analytics or database ingestion. Results must be validated for repeatability and high-value retention."
+completion: "A Python script, cleaned log file, and audit log are generated, all steps validated, and the process is fully auditable, repeatable, and meets the 98% high-value retention threshold."
+
+directives:
+  - "This workflow is an explicit order. All steps must be executed as written. Do not improvise, skip, or treat steps as optional."
+  - "The time call is required to ensure the agent is aware of the real current date/time, not its model cutoff."
+  - "Load all relevant rules, standards, and compliance requirements before proceeding."
+  - "Research and planning must reference and align with the principles in docs/development/agentic_workflow_template_research.md, docs/development/python_log_extractor_research.md, and docs/development/log_cleaning_regex_patterns_and_heuristics.md."
+
+references:
+  Profile: .cursor/profiles/log_cleaning_agent_profile.yml
+  Output_Template: .cursor/templates/log_cleaning_output_template.yml
+  Research_Reference_Template: .cursor/templates/research_reference_template.md
+  Documentation: [docs/standards/log_cleaning_workflow.md]
+  Agentic_Workflow_Research: docs/development/agentic_workflow_template_research.md
+  Python_Extractor_Research: docs/development/python_log_extractor_research.md
+  Regex_Patterns_Heuristics: docs/development/log_cleaning_regex_patterns_and_heuristics.md
+  Standards: [803-python-dev-standards, 800-development-best-practices, 300-documentation-standards, 501-tool-operation-validation, 002-tool-usage-and-optimize]
+  Pattern_Catalog: config/log_cleaning_patterns.yml
+
+phases:
+  research_and_rule_loading:
+    description: "Before any development, perform comprehensive research on log files and load all relevant project rules and standards (Python, development, testing, documentation, validation, etc.). Research and planning must reference and align with the principles in docs/development/agentic_workflow_template_research.md, docs/development/python_log_extractor_research.md, and docs/development/log_cleaning_regex_patterns_and_heuristics.md."
+    tools: [read_file, fetch_rules, codebase_search]
+    steps:
+      - scan_log_files_in: .specstory/history/
+      - identify_high_and_low_value_patterns
+      - fetch_rules: [803-python-dev-standards, 800-development-best-practices, 300-documentation-standards, 501-tool-operation-validation, 002-tool-usage-and-optimize]
+      - document_findings_and_requirements
+      - crosscheck_with_agentic_workflow_research
+      - crosscheck_with_python_extractor_research
+      - crosscheck_with_regex_patterns_heuristics
+    gates: [patterns_identified, rules_loaded, requirements_documented, agentic_alignment_confirmed, python_extractor_alignment_confirmed, regex_patterns_alignment_confirmed]
+
+  plan_design_develop_test_loop:
+    description: "Iteratively plan, design, develop, test, and remediate the log cleaner script until results are validated and repeatable. Planning and design must align with agentic workflow template research, python log extractor research, and regex patterns/heuristics."
+    tools: [python, text_editor, pytest, codebase_search]
+    steps:
+      - plan_script_structure_and_cleaning_logic
+      - design_pattern_catalog_and_output_format
+      - implement_script_in: scripts/log_cleaner.py
+      - test_script_on_sample_logs
+      - validate_cleaned_logs:
+          - must retain ≥98% high-value content
+          - must minimize low-value content (blank lines, listings, diffs, install logs, chat artifacts, etc.)
+      - remediate_script_and_patterns_as_needed
+      - repeat_test_and_remediation_until_success
+      - crosscheck_with_agentic_workflow_research
+      - crosscheck_with_python_extractor_research
+      - crosscheck_with_regex_patterns_heuristics
+    gates: [script_validated, results_repeatable, success_criteria_met, agentic_alignment_confirmed, python_extractor_alignment_confirmed, regex_patterns_alignment_confirmed]
+
+  output_and_verification:
+    description: "Save cleaned logs to .cursor/import/, script to scripts/, and document the process and validation results."
+    tools: [write_file, edit_file]
+    steps:
+      - save_cleaned_logs_to: .cursor/import/
+      - save_script_to: scripts/log_cleaner.py
+      - document_process_and_validation
+      - verify_artifact_locations_and_naming
+    gates: [outputs_saved, documentation_complete, verification_passed]
+
+  linting:
+    description: "Lint and auto-fix any generated YAML/Markdown/JSON/Python files."
+    tools: [run_terminal_cmd]
+    steps:
+      - lint_and_autofix_output_files
+    gates: [linting_passed]
+
+  documentation:
+    description: "Document the workflow, its outputs, and any important findings using the documentation template."
+    tools: [edit_file]
+    steps:
+      - document_workflow_and_outputs
+      - validate_documentation
+    gates: [documentation_complete]
+
+failure_prevention:
+  avoid:
+    - "Skipping audit logging for any removal or transformation"
+    - "Proceeding without validating pattern catalog or inputs"
+    - "Allowing unknown patterns to pass without flagging"
+    - "Accepting script completion as success without validating results"
+  require:
+    - "Explicit audit log entry for every change"
+    - "Validation of all inputs and outputs"
+    - "Repeatable, deterministic process"
+    - "Results validated for high-value retention and low-value minimization"
+    - "Alignment with agentic workflow template research principles"
+    - "Alignment with python log extractor research principles"
+    - "Alignment with regex patterns and heuristics principles"
+
+success_validation:
+  before_completion:
+    - "All gates in every phase passed"
+    - "Agent has verified and documented that cleaned logs are in a standard state, with ≥98% high-value information retained and low-value minimized"
+    - "Results are repeatable and validated on multiple samples"
+    - "Alignment with agentic workflow template research principles confirmed"
+    - "Alignment with python log extractor research principles confirmed"
+    - "Alignment with regex patterns and heuristics principles confirmed"
+  output_requirements: ["Python script in scripts/", "Cleaned logs in .cursor/import/", "Complete audit log", "Documentation of process and validation", "Agentic workflow research alignment", "Python extractor research alignment", "Regex patterns and heuristics alignment"]
+
+# End of workflow

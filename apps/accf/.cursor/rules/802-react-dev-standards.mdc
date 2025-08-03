@@ -1,0 +1,48 @@
+---
+description: "use when BUILDING REACT APPLICATIONS to ENFORCE COMPONENT PATTERNS for PERFORMANCE AND ACCESSIBILITY"
+globs: ["*.js", "*.jsx", "*.ts", "*.tsx"]
+alwaysApply: false
+---
+# React Development Standards
+
+- Clarity & Directness: Use clear, imperative instructions.
+- Batching & Parallelization: Batch compatible development steps; execute in parallel where possible.
+- Multi-Step Planning: Plan several steps ahead, identify batching opportunities, and optimize for efficiency.
+- Persistent Autonomy: Continue until all objectives are met or explicitly told to stop; avoid unnecessary waiting for input.
+- Tool-First Mandate: Always use available tools for every operation, preferring tool-based actions.
+- Self-Review & Optimization: Review and revise plans for efficiency before acting.
+- Evidence-Based Completion: Present clear evidence of completion before considering a task done.
+
+# React & Next.js Guidelines
+
+## Components
+- Functional components only; use Hooks.
+- Filename **PascalCase** matches component name.
+
+## State
+| Scope | Tool |
+|-------|------|
+| Local | `useState`, `useReducer` |
+| Global | Zustand or React Context |
+
+## Styling
+- Tailwind CSS utilities; avoid inline styles.
+```tsx
+<button className="px-4 py-2 rounded bg-primary text-white hover:bg-primary/80">
+  Save
+</button>
+```
+
+## Data Fetching
+- Prefer server components (`async`) for fetch.
+- Client fetch: SWR or React Query.
+
+## Performance
+- Dynamic import heavy widgets:
+  ```tsx
+  const Chart = dynamic(() => import("./Chart"), { ssr: false })
+  ```
+- Memoise with `React.memo`, `useCallback`.
+
+## Accessibility
+- Semantic HTML, aria-* props, keyboard support.

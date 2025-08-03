@@ -1,0 +1,250 @@
+---
+description: WHEN developing with Node.js and TypeScript TO ensure high-quality applications YOU MUST follow established best practices for maintainability, performance, and security
+globs:
+alwaysApply: false
+---
+
+# TypeScript & Node.js Development Standards
+
+## Purpose
+
+This rule ensures that all TypeScript and Node.js code follows modern best practices, maintains high quality, and adheres to consistent patterns as outlined in the AI-Powered Development Research Plan.
+
+## Scope
+
+This rule applies to all TypeScript and Node.js development, including application code, testing, API development, and frontend components. It covers module systems, TypeScript configuration, concurrency patterns, and code organization.
+
+## Requirements
+
+### Module Systems & Project Structure
+
+1. **Module System Standardization**
+
+   - IMPLEMENT ESM (ECMAScript Modules) for all new TypeScript/Node.js projects
+   - CONFIGURE `package.json` with `"type": "module"`
+   - INCLUDE proper ESM entry points with `.mjs` or specify extensions
+   - AVOID mixing CommonJS and ESM in the same project
+   - IMPLEMENT dual package patterns only when needed for compatibility
+
+2. **TypeScript Configuration**
+
+   - ENABLE strict mode in `tsconfig.json` (`"strict": true`)
+   - SET target to ES2020 or later
+   - IMPLEMENT project references for large, multi-part projects
+   - CONFIGURE incremental builds for faster compilation
+   - USE path aliases for clean imports
+
+3. **Directory Structure**
+   - ORGANIZE code by feature or domain, not by technical type
+   - MAINTAIN clear boundaries between API layers, business logic, and data access
+   - PLACE tests alongside source files or in parallel structure
+   - SEPARATE infrastructure concerns from business logic
+   - INCLUDE dedicated types directory for shared TypeScript interfaces
+
+### TypeScript Best Practices
+
+1. **Type Safety**
+
+   - PREFER explicit types over `any`
+   - UTILIZE type inference where it provides clarity
+   - IMPLEMENT discriminated unions for complex state handling
+   - LEVERAGE generics for reusable components and functions
+   - AVOID type assertions except in testing or when dealing with external APIs
+
+2. **Advanced TypeScript Patterns**
+   - USE utility types (Pick, Omit, Partial, etc.) to derive types
+   - IMPLEMENT readonly properties for immutable data
+   - UTILIZE interface merging appropriately
+   - AVOID excessive type complexity that reduces readability
+   - DOCUMENT complex type patterns
+
+### Node.js Concurrency & Performance
+
+1. **Concurrency Management**
+
+   - IMPLEMENT worker threads for CPU-intensive operations
+   - UTILIZE clustered deployments for horizontal scaling
+   - USE asynchronous I/O operations with proper error handling
+   - IMPLEMENT proper stream handling for data processing
+   - AVOID blocking the event loop with long-running operations
+
+2. **Performance Optimization**
+   - PROFILE code with tools like `clinic.js` and `0x`
+   - IMPLEMENT caching strategies for expensive operations
+   - UTILIZE connection pooling for database access
+   - MANAGE memory usage to prevent leaks
+   - OPTIMIZE startup time for serverless deployments
+
+### Building & Bundling
+
+1. **Build Tools**
+
+   - UTILIZE `esbuild` or `swc` for faster compilation
+   - CONFIGURE appropriate minification for production builds
+   - IMPLEMENT tree-shaking to reduce bundle size
+   - SEPARATE vendor and application code for better caching
+   - GENERATE source maps for production debugging
+
+2. **Deployment Artifacts**
+   - CREATE Docker images with minimal dependencies
+   - IMPLEMENT multi-stage builds to reduce image size
+   - CONFIGURE appropriate NODE_ENV settings
+   - EXCLUDE development dependencies and source maps from production
+   - IMPLEMENT health checks for containerized applications
+
+### Testing Standards
+
+1. **Testing Framework**
+
+   - IMPLEMENT Jest with ts-jest for TypeScript testing
+   - ORGANIZE tests to mirror the source structure
+   - USE snapshot testing judiciously for UI components
+   - IMPLEMENT mock functions and services for external dependencies
+   - REQUIRE tests for all new functionality
+
+2. **Coverage Requirements**
+   - MAINTAIN minimum 85% code coverage
+   - FOCUS on testing business logic thoroughly
+   - IMPLEMENT integration tests for API endpoints
+   - USE end-to-end testing for critical user flows
+   - TEST error handling paths explicitly
+
+### Security Guidelines
+
+1. **Input Validation**
+
+   - VALIDATE all external inputs with Zod, Joi, or similar
+   - IMPLEMENT strict type checking on API boundaries
+   - SANITIZE any data used in database queries
+   - AVOID using `eval()` or dynamic code execution
+   - PREVENT path traversal in file operations
+
+2. **Dependency Security**
+   - SCAN dependencies regularly with `npm audit`
+   - USE `snyk` for deeper vulnerability scanning
+   - IMPLEMENT `helmet` for Express applications
+   - REVIEW new dependencies before adding to package.json
+   - UPDATE dependencies regularly to address security patches
+
+## Compliance Verification
+
+### Automated Verification
+
+- CI pipeline must include:
+  - Linting with ESLint including TypeScript rules
+  - Type checking with `tsc --noEmit`
+  - Formatting verification with Prettier
+  - Security scanning with `npm audit` and `snyk test`
+  - Test execution with coverage reporting
+
+### Manual Code Review Requirements
+
+- Verify correct module system usage
+- Ensure proper error handling for async operations
+- Confirm TypeScript types are properly implemented
+- Check that security guidelines are followed, especially for input handling
+
+## Examples
+
+### Proper ESM Module Structure
+
+```typescript
+// File: src/services/user-service.ts
+import { type User, type UserRepository } from "../types/user.js";
+import { createHash } from "crypto";
+
+export class UserService {
+  constructor(private userRepository: UserRepository) {}
+
+  async getUserById(id: string): Promise<User | null> {
+    try {
+      return await this.userRepository.findById(id);
+    } catch (error) {
+      console.error(`Error fetching user ${id}:`, error);
+      return null;
+    }
+  }
+
+  async createUser(userData: Omit<User, "id">): Promise<User> {
+    // Input validation and business logic
+    const passwordHash = createHash("sha256")
+      .update(userData.password)
+      .digest("hex");
+
+    const user: Omit<User, "id"> = {
+      ...userData,
+      password: passwordHash,
+      createdAt: new Date(),
+    };
+
+    return this.userRepository.create(user);
+  }
+}
+```
+
+### Proper Worker Thread Implementation
+
+```typescript
+// File: src/workers/image-processor.ts
+import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
+import { cpus } from "os";
+import { join } from "path";
+import type { ImageProcessingJob } from "../types/jobs.js";
+
+export function processImagesInParallel(
+  images: ImageProcessingJob[]
+): Promise<string[]> {
+  return new Promise((resolve, reject) => {
+    const cpuCount = cpus().length;
+    const workerCount = Math.min(cpuCount - 1, images.length);
+    const results: string[] = [];
+    let completedWorkers = 0;
+    let hasError = false;
+
+    // Distribute work among workers
+    for (let i = 0; i < workerCount; i++) {
+      const workerImages = images.filter(
+        (_, index) => index % workerCount === i
+      );
+      const worker = new Worker(join(__dirname, "image-processor.js"), {
+        workerData: { images: workerImages },
+      });
+
+      worker.on("message", (processedPaths) => {
+        results.push(...processedPaths);
+        completedWorkers++;
+
+        if (completedWorkers === workerCount) {
+          resolve(results);
+        }
+      });
+
+      worker.on("error", (err) => {
+        if (!hasError) {
+          hasError = true;
+          reject(new Error(`Worker error: ${err.message}`));
+        }
+      });
+    }
+  });
+}
+
+// Worker implementation (in the same file, runs when imported directly)
+if (!isMainThread) {
+  const { images } = workerData as { images: ImageProcessingJob[] };
+
+  // Process images in this worker
+  const processedPaths = images.map((image) => {
+    // Image processing logic
+    return `/processed/${image.id}.jpg`;
+  });
+
+  parentPort?.postMessage(processedPaths);
+}
+```
+
+## Version and Changelog
+
+- Version: 1.0
+- Created: April 27, 2025
+- Based on AI-Powered Development Research Plan v1.0

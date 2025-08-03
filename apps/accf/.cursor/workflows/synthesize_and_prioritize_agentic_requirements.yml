@@ -1,0 +1,155 @@
+# SYNTHESIZE AND PRIORITIZE AGENTIC REQUIREMENTS WORKFLOW
+
+expectation: prioritized_agentic_capabilities_dependency_map_gap_analysis
+completion: validated_outputs_and_documentation
+
+directives:
+  - "This workflow is an explicit order. All steps must be executed as written. Do not improvise, skip, or treat steps as optional."
+  - "The agent MUST operate in fully autonomous mode, planning several steps ahead, minimizing tool calls, and maximizing parallel and batched operations."
+  - "Batch all possible work and combine or chain steps to reduce the number of tool calls and responses."
+  - "The time call is required to ensure the agent is aware of the real current date/time, not its model cutoff."
+
+references:
+  Profile: .cursor/profiles/synthesize_and_prioritize_agentic_requirements_agent_profile.yml
+  Output_Template: .cursor/templates/synthesize_and_prioritize_agentic_requirements_output_template.yml
+  Research_Reference_Template: .cursor/templates/research_reference_template.md
+  Documentation: docs/applications/ACCF/standards/synthesize_and_prioritize_agentic_requirements_workflow.md
+  Standards: [300-documentation-standards, 501-tool-operation-validation, 800-development-best-practices]
+
+phases:
+  profile_initialization:
+    description: "Load the agent profile, perform a time check, and load foundational rules."
+    tools: [read_file, fetch_rules, mcp_time_current_time]
+    steps:
+      - tool: mcp_time_current_time
+        validation: time_checked
+      - tool: read_file
+        params:
+          target_file: .cursor/profiles/synthesize_and_prioritize_agentic_requirements_agent_profile.yml
+        validation: agent_profile_loaded
+      - tool: fetch_rules
+        params:
+          rule_names: ["002-tool-usage-and-optimize", "200-project-design-and-dev-process", "501-tool-operation-validation", "800-development-best-practices", "300-documentation-standards"]
+        validation: foundational_rules_loaded
+    gates: [time_checked, agent_profile_loaded, foundational_rules_loaded]
+
+  intake:
+    description: "Capture the workflow's purpose, scope, and requirements. Identify all agent needs templates as input."
+    tools: [list_dir, prompt_user]
+    steps:
+      - tool: list_dir
+        params:
+          relative_workspace_path: docs/applications/ACCF/research/
+        validation: agent_needs_templates_listed
+      - intention_analysis → workflow_request → workflow_purpose_identified
+      - context_capture → use_case_analysis → requirements_documented
+    gates: [agent_needs_templates_listed, workflow_purpose_identified, requirements_documented]
+
+  input_validation:
+    description: "Validate that all required agent needs templates are present and readable."
+    tools: [read_file]
+    steps:
+      - batch_read_all_agent_needs_templates → all_inputs_validated
+    gates: [all_inputs_validated]
+
+  extraction_and_normalization:
+    description: "Extract and normalize agentic capabilities from all input templates."
+    tools: [read_file, edit_file]
+    steps:
+      - extract_capabilities_from_templates → capabilities_extracted
+      - normalize_capabilities → capabilities_normalized
+    gates: [capabilities_extracted, capabilities_normalized]
+
+  prioritization:
+    description: "Prioritize agentic capabilities using MoSCoW, weighted scoring, or other best-practice methods."
+    tools: [edit_file]
+    steps:
+      - apply_prioritization_method → prioritized_capabilities_generated
+    gates: [prioritized_capabilities_generated]
+
+  dependency_mapping:
+    description: "Map dependencies between capabilities visually (Mermaid) and in tabular form."
+    tools: [create_diagram, edit_file]
+    steps:
+      - generate_dependency_table → dependency_table_created
+      - generate_mermaid_diagram → dependency_diagram_created
+    gates: [dependency_table_created, dependency_diagram_created]
+
+  gap_analysis:
+    description: "Analyze for missing, weak, or conflicting capabilities."
+    tools: [edit_file]
+    steps:
+      - perform_gap_analysis → gap_analysis_completed
+    gates: [gap_analysis_completed]
+
+  output_generation:
+    description: "Generate and save all outputs: prioritized list, dependency map, gap analysis, and research reference."
+    tools: [edit_file]
+    steps:
+      - save_prioritized_capabilities → prioritized_capabilities_saved
+      - save_dependency_map → dependency_map_saved
+      - save_gap_analysis → gap_analysis_saved
+      - tool: edit_file
+        params:
+          target_file: docs/applications/ACCF/research/synthesize_and_prioritize_agentic_requirements_research_reference.md
+          code_edit: generated_research_reference_doc_based_on_template
+        validation: research_reference_doc_saved
+    gates: [prioritized_capabilities_saved, dependency_map_saved, gap_analysis_saved, research_reference_doc_saved]
+
+  linting:
+    description: "Lint and auto-fix all generated files."
+    tools: [run_terminal_cmd]
+    steps:
+      - batch_lint_and_autofix_all_files
+    gates: [linting_passed]
+
+  documentation:
+    description: "Document the workflow, agent profile, and outputs. Commit all changes to git."
+    tools: [edit_file, run_terminal_cmd]
+    steps:
+      - tool: edit_file
+        params:
+          target_file: docs/applications/ACCF/standards/synthesize_and_prioritize_agentic_requirements_workflow.md
+          code_edit: generated_workflow_doc_from_template
+        validation: workflow_doc_created
+      - tool: run_terminal_cmd
+        params:
+          command: "git add . && git commit -m 'Add synthesize_and_prioritize_agentic_requirements workflow, agent profile, templates, and documentation.'"
+          is_background: false
+        validation: git_commit_successful
+    gates: [workflow_doc_created, git_commit_successful]
+
+  generation_report:
+    description: "Generate and save a summary report with a Mermaid diagram of the workflow structure."
+    tools: [edit_file, create_diagram]
+    steps:
+      - tool: edit_file
+        params:
+          target_file: docs/applications/ACCF/standards/synthesize_and_prioritize_agentic_requirements_generation_report.md
+          code_edit: generated_report_content_based_on_template
+        validation: generation_report_saved
+      - tool: create_diagram
+        params:
+          content: generated_high_contrast_mermaid_diagram_of_workflow
+        validation: mermaid_diagram_created
+    gates: [generation_report_saved, mermaid_diagram_created]
+
+failure_prevention:
+  avoid:
+    - missing_templates
+    - incomplete_extraction
+    - prioritization_errors
+    - undocumented_dependencies
+    - skipped_gap_analysis
+    - standards_noncompliance
+  require:
+    - all_templates_processed
+    - outputs_validated
+    - documentation_complete
+    - git_commit_successful
+
+success_validation:
+  before_completion:
+    - all_outputs_present
+    - validation_gates_passed
+  output_requirements: [prioritized_capabilities, dependency_map, gap_analysis, research_reference]

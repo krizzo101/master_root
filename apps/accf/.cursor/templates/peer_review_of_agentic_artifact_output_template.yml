@@ -1,0 +1,23 @@
+# PEER REVIEW OF AGENTIC ARTIFACT OUTPUT TEMPLATE
+
+expectation: review_comments_approval_and_improvement_suggestions
+completion: validated_outputs_and_documentation
+
+directives:
+  - "All outputs must be standards-compliant, actionable, and repeatable."
+  - "Review must include comments, approval/rejection, and improvement suggestions."
+  - "Outputs must be saved in docs/development/ or as review artifacts in the project tracker."
+
+outputs:
+  review_comments:
+    description: "Detailed review comments for the artifact."
+    format: [markdown, json]
+  approval_status:
+    description: "Approval or rejection decision with rationale."
+    format: [markdown, json]
+  improvement_suggestions:
+    description: "Actionable suggestions for improving the artifact."
+    format: [markdown, json]
+  research_reference:
+    description: "Summary of research and standards informing the review."
+    format: [markdown]

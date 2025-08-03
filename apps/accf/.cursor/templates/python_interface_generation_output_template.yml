@@ -1,0 +1,61 @@
+# Python Interface Generation Output Template
+
+## Interface Module Structure
+- One module per API spec or logical grouping
+- Each module contains:
+  - Classes/functions for each endpoint/type
+  - Type hints for all public methods
+  - Docstrings for all public methods/classes
+  - Error handling and input validation stubs
+  - Synchronous and asynchronous variants (if relevant)
+  - Dependency injection/adapters for HTTP client
+  - Example usage/tests for each interface
+  - Markdown documentation following project standards
+
+## Example (OpenAPI endpoint)
+```python
+class PetApiClient:
+    """Client for Pet API endpoints."""
+    def __init__(self, http_client):
+        self.http_client = http_client
+
+    def get_pet(self, pet_id: int) -> dict:
+        """Get pet by ID.
+        Args:
+            pet_id (int): The ID of the pet.
+        Returns:
+            dict: Pet data.
+        Raises:
+            ApiError: If the request fails.
+        """
+        # TODO: Implement method
+        pass
+
+    async def get_pet_async(self, pet_id: int) -> dict:
+        """Async version of get_pet."""
+        # TODO: Implement method
+        pass
+```
+
+## Example Usage/Test
+```python
+def test_get_pet():
+    client = PetApiClient(http_client=MockHttpClient())
+    result = client.get_pet(123)
+    assert isinstance(result, dict)
+```
+
+## Markdown Documentation Example
+```markdown
+# PetApiClient
+
+## Methods
+- `get_pet(pet_id: int) -> dict`: Get pet by ID
+- `get_pet_async(pet_id: int) -> dict`: Async get pet by ID
+
+## Usage
+```python
+client = PetApiClient(http_client=HttpClient())
+pet = client.get_pet(123)
+```
+```

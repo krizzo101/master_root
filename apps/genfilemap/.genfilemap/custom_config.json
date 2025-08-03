@@ -1,0 +1,26 @@
+{
+    "api": {
+        "vendor": "openai",
+        "model": "gpt-4o-mini",
+        "api_key_var": "OPENAI_API_KEY",
+        "max_tokens": 2000
+    },
+    "file_processing": {
+        "recursive": true,
+        "include_extensions": [
+            ".py",
+            ".md",
+            ".js"
+        ],
+        "exclude_extensions": [
+            ".pyc",
+            ".min.js"
+        ],
+        "min_lines": 20,
+        "ignore_file": ".fileignore"
+    },
+    "system_prompts": {
+        "code_system_message": "You are an expert file mapper specialized for code analysis. Your task is to create precise, detailed file maps in JSON format that help AI systems understand code structure. Analyze the file carefully to identify all major sections, key components like functions and classes, and provide accurate line numbers accounting for the insertion of the file map at the top of the document. Return only valid JSON following the required schema.",
+        "documentation_system_message": "You are an expert file mapper specialized for documentation analysis. Your task is to create precise, detailed file maps in JSON format that help AI systems understand document structure. Analyze the document thoroughly to identify all sections based on headings, key concepts, and important examples. Provide accurate line numbers accounting for the insertion of the file map at the top of the document. Return only valid JSON following the required schema."
+    }
+}

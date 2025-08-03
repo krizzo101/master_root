@@ -1,0 +1,147 @@
+# PROMPT TO DESIGN SPEC WORKFLOW
+
+expectation: comprehensive_design_spec_from_vague_prompt
+completion: design_spec_in_standard_location
+
+directives:
+  - "This workflow is an explicit order. All steps must be executed as written. Do not improvise, skip, or treat steps as optional."
+  - "The time call is required to ensure the agent is aware of the real current date/time, not its model cutoff."
+  - "Load all relevant rules, standards, and compliance requirements before proceeding."
+
+references:
+  Profile: .cursor/profiles/prompt_to_design_spec_agent_profile.yml
+  Output_Template: .cursor/templates/prompt_to_design_spec_output_template.yml
+  Documentation: [docs/standards/prompt_to_design_spec_workflow.md]
+
+phases:
+  profile_initialization:
+    description: "Load the agent profile, perform a time check, and load foundational rules and standards."
+    tools: [read_file, fetch_rules, mcp_time_current_time]
+    steps:
+      - tool: mcp_time_current_time
+        validation: time_checked
+      - tool: read_file
+        params:
+          target_file: .cursor/profiles/prompt_to_design_spec_agent_profile.yml
+        validation: agent_profile_loaded
+      - tool: fetch_rules
+        params:
+          rule_names: ["002-tool-usage-and-optimize", "200-project-design-and-dev-process", "501-tool-operation-validation", "800-development-best-practices", "300-documentation-standards"]
+        validation: foundational_rules_loaded
+    gates: [time_checked, agent_profile_loaded, foundational_rules_loaded]
+
+  intake:
+    description: "Capture the user's vague prompt and intended outcome. Clarify ambiguities and gather context."
+    tools: [prompt_user]
+    steps:
+      - prompt_intake → prompt_clarification → context_documented
+    gates: [context_documented]
+
+  intent_extraction:
+    description: "Analyze the prompt to extract core objectives, constraints, and context. Expand intent into actionable requirements."
+    tools: [edit_file]
+    steps:
+      - intent_analysis → core_intent_documented
+      - requirements_expansion → requirements_documented
+    gates: [core_intent_documented, requirements_documented]
+
+  decomposition:
+    description: "Break down the expanded prompt into logical components, modules, and requirement categories (technical, functional, non-functional)."
+    tools: [edit_file]
+    steps:
+      - prompt_decomposition → components_documented
+      - requirements_categorization → categories_documented
+    gates: [components_documented, categories_documented]
+
+  enrichment:
+    description: "Add missing details, examples, edge cases, and domain-specific context to the design prompt and requirements."
+    tools: [edit_file]
+    steps:
+      - add_examples_and_edge_cases → enrichment_validated
+      - add_domain_context → domain_context_validated
+    gates: [enrichment_validated, domain_context_validated]
+
+  multidimensional_prompt_generation:
+    description: "Generate a comprehensive, multi-dimensional technical design prompt from the enriched requirements."
+    tools: [edit_file]
+    steps:
+      - multidimensional_prompt_drafting → multidimensional_prompt_created
+    gates: [multidimensional_prompt_created]
+
+  requirements_and_spec_extraction:
+    description: "Extract and structure detailed technical, functional, and non-functional requirements/specifications from the design prompt."
+    tools: [edit_file]
+    steps:
+      - requirements_extraction → requirements_structured
+      - spec_drafting → specs_documented
+    gates: [requirements_structured, specs_documented]
+
+  design_spec_generation:
+    description: "Generate the comprehensive design specification, including architecture diagrams, interface definitions, and traceability to requirements."
+    tools: [edit_file, create_diagram]
+    steps:
+      - design_spec_drafting → design_spec_draft_created
+      - architecture_diagram_generation → diagrams_created
+      - requirements_traceability_matrix → traceability_documented
+    gates: [design_spec_draft_created, diagrams_created, traceability_documented]
+
+  validation:
+    description: "Validate the design spec for completeness, testability, standards compliance, and alignment with the original prompt and requirements."
+    tools: [edit_file]
+    steps:
+      - design_spec_validation → validation_report_created
+      - testability_check → testability_validated
+      - standards_compliance_check → standards_compliance_validated
+    gates: [validation_report_created, testability_validated, standards_compliance_validated]
+
+  documentation:
+    description: "Document the workflow, agent profile, and all generated artifacts. Commit all changes to git."
+    tools: [edit_file, run_terminal_cmd]
+    steps:
+      - tool: edit_file
+        params:
+          target_file: docs/standards/prompt_to_design_spec_workflow.md
+          code_edit: generated_workflow_doc_from_template
+        validation: workflow_doc_created
+      - tool: run_terminal_cmd
+        params:
+          command: "git add . && git commit -m 'Add prompt-to-design-spec workflow, agent profile, templates, and documentation.'"
+          is_background: false
+        validation: git_commit_successful
+    gates: [workflow_doc_created, git_commit_successful]
+
+failure_prevention:
+  avoid:
+    - unclear_purpose
+    - missing_phases
+    - incomplete_validation
+    - undocumented_workflow
+    - standards_noncompliance
+    - vague_queries
+    - ambiguous_paths
+    - uncommitted_changes
+    - skipped_steps
+    - missing_time_call
+    - insufficient_iteration
+  require:
+    - purpose_clearly_defined
+    - phases_and_steps_mapped
+    - validation_criteria_explicit
+    - workflow_documented
+    - standards_compliance
+    - actionable_queries
+    - explicit_paths
+    - git_commit_successful
+    - workflow_refined_to_point_of_diminishing_returns
+
+success_validation:
+  before_completion:
+    - multidimensional_prompt_created
+    - specs_documented
+    - design_spec_draft_created
+    - diagrams_created
+    - traceability_documented
+    - validation_report_created
+    - workflow_doc_created
+    - git_commit_successful
+  output_requirements: design_spec_in_standard_location

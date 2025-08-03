@@ -1,0 +1,25 @@
+---
+description: WHEN creating or modifying Cursor rule files TO ensure compliance with system constraints and style guide enforcement YOU MUST create and edit rule files as .md in the .cursor/ directory, then move and rename to .mdc in .cursor/rules/ when finalized
+globs:
+alwaysApply: false
+---
+
+{
+"title": "Core Rule Creation Process",
+"rule_creation_process": [
+"1. To create a new rule: create or edit a .md file in the .cursor/ directory.",
+"2. To edit an existing rule: copy the .mdc file from .cursor/rules/ to .cursor/ as a .md, and make a backup in .cursor/backup/rules/<original filename>.<timestamp> before editing.",
+"3. Ensure the file follows the style guide ([000-cursor-rules-style-guide.mdc](mdc:.cursor/rules/000-cursor-rules-style-guide.mdc)) and passes all validation (the style guide is auto-applied to .cursor/\*.md).",
+"4. Once finalized, move and rename the file to .cursor/rules/ with a .mdc extension.",
+"5. Do not attempt to edit .mdc files in .cursor/rules/ directly, as changes may not persist due to system restrictions.",
+"6. This process ensures that the style guide ([000-cursor-rules-style-guide.mdc](mdc:.cursor/rules/000-cursor-rules-style-guide.mdc)) is always enforced and that rule files are reliably created and maintained."
+],
+"rationale": "Direct editing of .mdc files in .cursor/rules/ is unreliable due to IDE/system restrictions. This process ensures style guide enforcement and reliable rule creation for all agents. Always reference and follow the style guide ([000-cursor-rules-style-guide.mdc](mdc:.cursor/rules/000-cursor-rules-style-guide.mdc)) by direct link to ensure discoverability and compliance.",
+"validation_criteria": [
+"All new or modified rule files must be created as .md in .cursor/.",
+"The style guide must be enforced on all .md files in .cursor/.",
+"Finalized rule files must be moved and renamed to .mdc in .cursor/rules/.",
+"No direct edits to .mdc files in .cursor/rules/ are permitted.",
+"All edits to existing rules must be backed up in .cursor/backup/rules/ with a timestamp before modification."
+]
+}

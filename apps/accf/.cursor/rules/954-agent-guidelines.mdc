@@ -1,0 +1,451 @@
+---
+description: "use when DESIGNING AGENT PROMPTS to ENFORCE STRUCTURED REASONING for AUTONOMOUS EXECUTION"
+alwaysApply: false
+---
+# Agent Prompt Blueprint (2025)
+
+## MANDATORY PRE-RESPONSE PROTOCOL
+
+**EVERY AGENT MUST EXECUTE BEFORE ANY RESPONSE**:
+
+### 1. **TIME AND DATE CHECK (MANDATORY)**
+```python
+# REQUIRED: Check current time/date at the start of EVERY response
+from mcp_time_current_time import current_time
+current_datetime = current_time(format="YYYY-MM-DD HH:mm:ss")
+print(f"🕒 Session Time: {current_datetime}")
+```
+
+### 2. **ONLINE RESEARCH REQUIREMENT (MANDATORY)**
+**Triggers**: EVERY task, EVERY technology reference, EVERY implementation
+**Principles**: Agent knowledge is SEVERELY outdated, research EVERYTHING
+**Validation**: No assumptions allowed, all information must be verified
+
+- **CRITICAL UNDERSTANDING**: Agent training data is FAR in the past
+- **RESEARCH EVERYTHING**: Technologies, syntax, code, libraries, VERSIONS, best practices
+- **VERIFY CURRENT STATE**: Latest documentation, recent changes, standards
+- **NO EXCEPTIONS**: Even basic concepts must be researched for current accuracy
+
+```python
+# ✅ MANDATORY PATTERN - Research before any technical action
+# 1. Web search for latest information
+# 2. Verify current syntax/versions
+# 3. Confirm best practices
+# 4. Only then proceed with implementation
+```
+
+### 3. **THINKING TOOL USAGE (MANDATORY)**
+**Triggers**: Complex problems, planning, uncertainty, multi-step reasoning, ALL major decisions
+**Principles**: Use mcp_thinking_sequentialthinking regularly for structured analysis
+**Validation**: Thinking documented, reasoning chains established
+**Integration**: Before major decisions, during planning, for complex analysis
+
+```python
+# ✅ REQUIRED PATTERN - Use thinking tool early and often
+mcp_thinking_sequentialthinking(
+    thought="Analyzing the requirements and planning approach...",
+    nextThoughtNeeded=True,
+    thoughtNumber=1,
+    totalThoughts=5
+)
+```
+
+### 4. **PLANNING BEFORE ACTING (MANDATORY)**
+**Triggers**: ANY implementation, ANY code change, ANY significant action
+**Principles**: PLAN first, then ACT, NEVER ad-hoc or knee-jerk changes
+**Validation**: Plan documented before implementation, systematic approach
+**Integration**: All development work, system modifications, architectural decisions
+
+**REQUIRED SEQUENCE**:
+1. **THINK** - Use thinking tool to analyze
+2. **RESEARCH** - Verify current information
+3. **PLAN** - Document step-by-step approach
+4. **IMPLEMENT** - Execute the planned changes
+5. **VALIDATE** - Confirm successful completion
+
+### 5. **EVIDENCE-BASED DECISIONS (MANDATORY)**
+**Triggers**: ALL decisions, conclusions, assumptions, technical choices
+**Principles**: Base ALL decisions on EVIDENCE and FACTS, NEVER assume
+**Validation**: Evidence provided for all claims, no unsupported statements
+**Integration**: Technical decisions, implementation choices, architectural judgments
+
+- **NO ASSUMPTIONS**: Every claim must be backed by evidence
+- **VERIFY FACTS**: Cross-reference multiple sources
+- **DOCUMENT REASONING**: Explain why decisions were made
+- **SHOW PROOF**: Provide evidence for all technical assertions
+
+### 6. **GIT COMMIT DISCIPLINE (MANDATORY)**
+**Triggers**: ANY file changes, ANY modifications, THROUGHOUT development process
+**Principles**: Early and frequent commits, descriptive messages, change tracking
+**Validation**: All changes committed, proper versioning maintained
+**Integration**: All development workflows, continuous integration
+
+**MANDATORY PATTERN**:
+```bash
+# BEFORE starting work
+git add . && git commit -m "Before: [planned changes description]"
+
+# DURING work (frequent commits)
+git add . && git commit -m "Progress: [specific change made]"
+
+# AFTER completion
+git add . && git commit -m "Completed: [final state description]"
+```
+
+### 7. **TOOL LEVERAGING AND PARALLEL EXECUTION (MANDATORY)**
+**Triggers**: Multiple operations, information gathering, batch processing
+**Principles**: Work smart and efficiently, batch changes, parallel execution
+**Validation**: Maximum efficiency achieved, parallel operations utilized
+**Integration**: All multi-step workflows, research phases, implementation tasks
+
+**OPTIMIZATION PATTERNS**:
+- **Batch Operations**: Group related tasks for simultaneous execution
+- **Parallel Tool Calls**: Execute independent operations concurrently
+- **Think Ahead**: Plan several steps in advance for batching opportunities
+- **Efficient Workflows**: Minimize redundant operations
+
+## MODEL-SPECIFIC PROMPTING TECHNIQUES (2025)
+
+### **O3/O3-MINI PROMPTING BEST PRACTICES**
+
+**Core Principles**: O3 models excel with minimal, clear guidance - they handle reasoning internally
+
+#### **1. CLEAR AND MINIMAL PROMPTS**
+```python
+# ✅ CORRECT for O3 - Direct and focused
+prompt = "Build a Python app that maps user questions to database answers."
+
+# ❌ AVOID for O3 - Overly complex/leading
+prompt = "In this challenging task, I'd like you to carefully reason through each step..."
+```
+
+#### **2. AVOID UNNECESSARY FEW-SHOT EXAMPLES**
+```python
+# ✅ CORRECT for O3 - Zero-shot or minimal examples
+# O3 models perform WORSE with multiple examples
+example_count = 0  # Preferred
+example_count = 1  # Maximum if format unclear
+
+# ❌ PROHIBITED for O3 - Multiple examples degrade performance
+example_count = 3  # Hurts O3 performance
+```
+
+#### **3. LEVERAGE DEVELOPER MESSAGES FOR ROLE/FORMAT**
+```python
+# ✅ CORRECT - Use developer messages for high-priority instructions
+developer_message = {
+    "role": "developer",
+    "content": "You are a coding assistant. Output only clean code with minimal comments."
+}
+
+user_message = {
+    "role": "user",
+    "content": "Create a FastAPI endpoint for user authentication"
+}
+```
+
+#### **4. CONTROL VERBOSITY EXPLICITLY**
+```python
+# ✅ For detailed output
+instruction = "Show your step-by-step reasoning in the answer"
+
+# ✅ For concise output
+instruction = "Provide only the final solution in 2-3 paragraphs"
+
+# ✅ For O3-mini - Use reasoning effort parameter
+reasoning_effort = "high"  # thorough analysis
+reasoning_effort = "low"   # faster responses
+```
+
+#### **5. AVOID CHAIN-OF-THOUGHT PROMPTING**
+```python
+# ❌ PROHIBITED for O3 - They already reason internally
+"Think step by step..."
+"Let's break this down..."
+"Reason through this carefully..."
+
+# ✅ CORRECT for O3 - Direct task focus
+"Implement the authentication system."
+"Analyze the database schema."
+```
+
+### **GPT-4.1 PROMPTING BEST PRACTICES**
+
+**Core Principles**: GPT-4.1 benefits from precise, explicit instructions and guided reasoning
+
+#### **1. SYSTEM PROMPT REMINDERS**
+```python
+system_prompt = """
+## PERSISTENCE
+You are an agent - keep going until the user's query is completely resolved.
+Only terminate when you are sure the problem is solved.
+
+## TOOL CALLING
+Use tools to read files and gather information: do NOT guess or make up answers.
+
+## PLANNING
+Plan extensively before each function call, and reflect on outcomes.
+DO NOT rely solely on function calls - think insightfully.
+"""
+```
+
+#### **2. CHAIN-OF-THOUGHT PROMPTING**
+```python
+# ✅ BENEFICIAL for GPT-4.1 - Explicit reasoning guidance
+prompt += "First, think carefully step by step about what documents are needed. Then, format the IDs into a list."
+
+# ✅ Advanced reasoning strategy
+prompt += """
+Approach this systematically:
+1. Analyze the requirements
+2. Break down into sub-problems
+3. Consider edge cases
+4. Implement solution
+5. Validate results
+"""
+```
+
+#### **3. LONG CONTEXT OPTIMIZATION**
+```python
+# ✅ OPTIMAL CONTEXT ORGANIZATION for GPT-4.1
+prompt_structure = """
+[CRITICAL INSTRUCTIONS] - Top placement
+[CONTEXT AND DATA] - Middle section
+[CRITICAL INSTRUCTIONS REPEATED] - Bottom placement
+"""
+
+# ✅ Use XML delimiters for clarity
+context = """
+<requirements>
+[Critical requirements here]
+</requirements>
+
+<context_data>
+[Relevant data here]
+</context_data>
+
+<task>
+[Task restatement]
+</task>
+"""
+```
+
+#### **4. EXPLICIT INSTRUCTION FOLLOWING**
+```python
+# ✅ PRECISE SPECIFICATIONS for GPT-4.1
+instructions = """
+## Response Rules
+- Output must be valid Python code
+- Use type hints for all functions
+- Include docstrings following Google style
+- Handle errors with try/catch blocks
+- Return structured data as Pydantic models
+
+## Forbidden Actions
+- Do not use deprecated libraries
+- Do not hardcode sensitive data
+- Do not skip error handling
+"""
+```
+
+## LATEST API PATTERNS (2025)
+
+### **RESPONSES API (PREFERRED)**
+```python
+# ✅ LATEST PATTERN - Use Responses API
+from openai import OpenAI
+client = OpenAI()
+
+response = client.responses.create(
+    model="o3-mini",  # or "gpt-4.1-mini"
+    instructions="You are a helpful coding assistant.",
+    input="Build a FastAPI endpoint for user authentication",
+    text_format=ResponseSchema  # Structured outputs
+)
+```
+
+### **MESSAGE ROLE HIERARCHY**
+```python
+# ✅ PRIORITY ORDER: developer > user > assistant
+messages = [
+    {
+        "role": "developer",  # HIGHEST PRIORITY
+        "content": "You are a senior developer. Follow coding standards."
+    },
+    {
+        "role": "user",       # MEDIUM PRIORITY
+        "content": "Create an authentication endpoint"
+    },
+    {
+        "role": "assistant",  # LOWEST PRIORITY
+        "content": "I'll help you with that..."
+    }
+]
+```
+
+### **STRUCTURED OUTPUTS**
+```python
+# ✅ STRUCTURED OUTPUT PATTERN
+from pydantic import BaseModel
+
+class CodeResponse(BaseModel):
+    code: str
+    explanation: str
+    dependencies: list[str]
+
+response = client.responses.create(
+    model="gpt-4.1-mini",
+    input="Create a user model with validation",
+    text_format=CodeResponse
+)
+```
+
+### **REUSABLE PROMPTS WITH VARIABLES**
+```python
+# ✅ PROMPT TEMPLATE PATTERN
+response = client.responses.create(
+    model="o3-mini",
+    prompt={
+        "id": "pmpt_coding_assistant",
+        "version": "2",
+        "variables": {
+            "task_type": "API endpoint",
+            "technology": "FastAPI",
+            "requirements": "authentication with JWT"
+        }
+    }
+)
+```
+
+## AGENT BLUEPRINT TEMPLATE (UPDATED 2025)
+
+### **MODEL-ADAPTIVE SYSTEM PROMPT**:
+```python
+def create_system_prompt(model_type: str, role: str, task_complexity: str):
+    base_prompt = f"You are {role}. Complete the goal autonomously using mandatory protocols."
+
+    if model_type.startswith("o3"):
+        # O3-specific: Clear, minimal, role-focused
+        return f"""
+{base_prompt}
+
+ROLE CLARITY: {role}
+OUTPUT FORMAT: [Specify exact format needed]
+BOUNDARIES: [When to use tools vs internal knowledge]
+
+MANDATORY SEQUENCE:
+1. TIME CHECK - Record current date/time
+2. RESEARCH - Verify technical information online
+3. THINK - Use thinking tool for analysis
+4. PLAN - Document approach (concise)
+5. IMPLEMENT - Execute efficiently
+6. VALIDATE - Confirm with evidence
+"""
+
+    elif model_type.startswith("gpt-4.1"):
+        # GPT-4.1-specific: Detailed, explicit, reasoning-guided
+        return f"""
+{base_prompt}
+
+PERSISTENCE: Keep going until task completely resolved
+TOOL CALLING: Use tools for information - do NOT guess
+PLANNING: Plan extensively, reflect on outcomes
+
+DETAILED SEQUENCE:
+1. TIME CHECK - Record current date/time
+2. RESEARCH - Comprehensive online verification
+3. THINK - Multi-step reasoning with thinking tool
+4. ANALYZE - Break down complex problems systematically
+5. PLAN - Document step-by-step approach with reasoning
+6. IMPLEMENT - Execute with explicit error handling
+7. REFLECT - Analyze outcomes and adjust if needed
+8. VALIDATE - Provide evidence-based completion proof
+
+REASONING STRATEGY:
+First, think carefully step by step about the requirements.
+Then, consider edge cases and potential failures.
+Finally, implement with comprehensive validation.
+"""
+```
+
+### **RESPONSE FORMAT PATTERNS**:
+
+#### **For O3/O3-mini Models**:
+```
+🕒 Time: [current datetime]
+🔍 Research: [concise findings]
+🧠 Analysis: [thinking tool output]
+📋 Plan: [clear steps]
+⚡ Implementation: [efficient execution]
+✅ Result: [evidence of completion]
+```
+
+#### **For GPT-4.1 Models**:
+```
+🕒 Time: [current datetime]
+🔍 Comprehensive Research: [detailed findings with sources]
+🧠 Systematic Analysis: [thinking tool output with reasoning chains]
+📊 Problem Breakdown: [sub-problems and dependencies]
+📋 Detailed Plan: [step-by-step with contingencies]
+🔧 Implementation: [code/actions with error handling]
+🔄 Reflection: [outcome analysis and adjustments]
+✅ Validation: [comprehensive evidence and testing]
+```
+
+## COMPLIANCE VALIDATION (UPDATED)
+
+**EVERY RESPONSE MUST DEMONSTRATE**:
+- [ ] Time/date checked and recorded
+- [ ] Online research conducted for technical elements
+- [ ] Thinking tool used for analysis/planning
+- [ ] Model-appropriate prompting technique used
+- [ ] Plan documented before implementation
+- [ ] Evidence-based decisions with supporting facts
+- [ ] Git commits made before and after changes
+- [ ] Efficient tool usage and parallel execution
+- [ ] Systematic approach followed throughout
+- [ ] **NEW**: Structured outputs used when applicable
+- [ ] **NEW**: Appropriate API patterns (Responses API preferred)
+- [ ] **NEW**: Model-specific optimization applied
+
+**MODEL-SPECIFIC VALIDATION**:
+
+**For O3/O3-mini Tasks**:
+- [ ] Prompts are clear and minimal
+- [ ] No unnecessary few-shot examples
+- [ ] No chain-of-thought prompting used
+- [ ] Role and format specified clearly
+- [ ] Reasoning effort parameter set appropriately
+
+**For GPT-4.1 Tasks**:
+- [ ] Detailed, explicit instructions provided
+- [ ] Chain-of-thought prompting used appropriately
+- [ ] System prompt reminders included
+- [ ] Long context optimized (instructions top & bottom)
+- [ ] Precise specifications and examples provided
+
+**VIOLATION CONSEQUENCES**:
+- **Missing time check**: Response rejected
+- **No research conducted**: Response rejected
+- **Wrong prompting technique for model**: Response rejected
+- **No planning phase**: Response rejected
+- **Assumptions without evidence**: Response rejected
+- **Missing git commits**: Response rejected
+- **Ad-hoc changes**: Response rejected
+- **Outdated API patterns**: Response rejected
+
+## INTEGRATION WITH PROJECT RULES
+
+**Mandatory Rule Compliance**:
+- **Rule 002**: MCP tool usage optimization with parallel execution
+- **Rule 953**: OpenAI API standards with latest patterns (2025)
+- **Rule 955**: LangGraph architecture with model-specific considerations
+- **Rule 997/998/999**: Enforcement protocols and validation
+
+**Universal Application**:
+- All agent types (reasoning, execution, coordination)
+- All model types (O3, O3-mini, GPT-4.1)
+- All project phases (development, testing, deployment)
+- All complexity levels (simple tasks to complex workflows)
+
+**ZERO TOLERANCE FOR NON-COMPLIANCE**

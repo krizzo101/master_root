@@ -1,0 +1,183 @@
+---
+description: "use when EXECUTING NATIVE and MCP TOOLS to OPTIMIZE RESULTS and PERFORMANCE for PARALLEL EFFICIENCY"
+alwaysApply: false
+---
+# MCP TOOL USAGE OPTIMIZATION
+
+**OPERATE AUTONOMOUSLY, Make Decisions, Operate Continously**
+
+**Validation**: "Rule 002 Protocol Active"
+
+## MANDATORY PRE-RESPONSE REQUIREMENTS
+
+**BEFORE EVERY RESPONSE, AGENT MUST**:
+
+### 1. **TIME AND DATE CHECK**
+```python
+# MANDATORY: Check current time/date at response start
+from mcp_time_current_time import current_time
+current_time = current_time(format="YYYY-MM-DD HH:mm:ss")
+```
+
+### 2. **ONLINE RESEARCH REQUIREMENT**
+**Triggers**: ANY task, ANY technology reference, ANY implementation
+**Principles**: Knowledge cutoff is outdated, research EVERYTHING, verify current information
+**Signatures**: Web search before action, technology validation, version confirmation
+**Validation**: Current information confirmed, no assumptions made
+**Integration**: All technical decisions, library usage, syntax verification
+
+- **ASSUME KNOWLEDGE IS WRONG**: Agent training data is severely outdated
+- **RESEARCH EVERYTHING**: Technologies, syntax, libraries, versions, best practices
+- **VERIFY CURRENT STATE**: Latest documentation, recent changes, current standards
+- **NO EXCEPTIONS**: Even seemingly basic concepts must be researched
+
+### 3. **THINKING TOOL USAGE**
+**Triggers**: Complex problems, planning, uncertainty, multi-step reasoning
+**Principles**: Use mcp_thinking_sequentialthinking for analysis
+**Signatures**: Regular cognitive processing, planning validation, decision reasoning
+**Validation**: Structured thinking documented, reasoning chains established
+**Integration**: Before major decisions, during planning, for complex analysis
+
+### 4. **PLANNING BEFORE ACTING**
+**Triggers**: ANY implementation, ANY code change, ANY significant action
+**Principles**: PLAN first, then ACT, never ad-hoc changes
+**Signatures**: Documented planning phase, step-by-step approach, evidence-based decisions
+**Validation**: Plan exists before implementation, changes are systematic
+**Integration**: All development work, system modifications, architectural decisions
+
+### 5. **EVIDENCE-BASED DECISIONS**
+**Triggers**: ALL decisions, conclusions, assumptions
+**Principles**: Base ALL decisions on FACTS, never assume, verify claims
+**Signatures**: Documented evidence, fact-checking, validation of assumptions
+**Validation**: Evidence provided for all claims, no unsupported statements
+**Integration**: Technical decisions, implementation choices, architectural judgments
+
+## MANDATORY SHELL EXECUTION
+
+**Triggers**: ANY terminal access, ANY command execution, ANY system operation
+**Principles**: EXCLUSIVE use of mcp_shell_shell_exec, NO EXCEPTIONS
+**Signatures**: mcp_shell_shell_exec tool usage ONLY
+**Validation**: No other terminal tools used, proper shell execution patterns
+**Integration**: All system operations, git commands, build processes
+
+**ABSOLUTE REQUIREMENT**:
+```python
+# ✅ MANDATORY - Use ONLY this tool for shell operations
+mcp_shell_shell_exec(command="git status")
+
+# ❌ FORBIDDEN - NEVER use these tools
+run_terminal()        # PROHIBITED
+run_terminal_cmd()    # PROHIBITED
+```
+
+## GIT COMMIT REQUIREMENTS
+
+**Triggers**: ANY file changes, ANY code modifications, ANY system updates
+**Principles**: Early and frequent commits, before/after pattern, change tracking
+**Signatures**: Git commit before changes, git commit after changes, descriptive messages
+**Validation**: All changes committed, proper commit messages, version control maintained
+**Integration**: All development workflows, file modifications, system updates
+
+**MANDATORY PATTERN**:
+```bash
+# BEFORE any changes
+git add . && git commit -m "Before: [description of planned changes]"
+
+# Make changes...
+
+# AFTER changes
+git add . && git commit -m "After: [description of completed changes]"
+```
+
+## Database Operations Excellence
+
+**Triggers**: Data queries, knowledge storage, metrics tracking, multi-collection operations
+**Principles**: mcp_cognitive_tools_arango_* hierarchy, parallel searches, batch operations, validation patterns
+**Signatures**: search_type optimization, collection targeting, operation efficiency, connection validation
+**Validation**: success:true confirmation, result quality metrics, operation timing
+**Integration**: Knowledge base workflows, startup intelligence, operational enforcement
+
+- **Parallel Searches**: Multiple collections → simultaneous queries
+- **Tool Hierarchy**: mcp_cognitive_tools_arango_* > legacy alternatives
+- **Validation**: success:false = halt → analyze → retry
+- **Batch Operations**: Related queries → single operation
+
+## Web Research Excellence
+
+**Triggers**: Information gathering, research, analysis, multi-source validation
+**Patterns**:
+- **Chain**: brave_web_search → firecrawl_scrape → firecrawl_extract
+- **Parallel**: Multiple search types (web, news, papers) simultaneously
+- **Deep Research**: Complex queries → firecrawl_deep_research
+- **Quality**: Academic > technical > web source hierarchy
+- **MANDATORY**: Research ALL technologies before implementation
+
+## Technical Documentation
+
+**Triggers**: Library integration, API exploration, framework guidance
+**Patterns**:
+- **Always**: resolve-library-id → get-library-docs
+- **Context**: Specify topic parameter for focused results
+- **Efficiency**: Balance context depth with token consumption
+- **Verification**: Confirm current versions and syntax
+
+## Diagram Creation Excellence
+
+`create_diagram` tool usage
+
+**Triggers**: Visual representation, architecture diagrams, workflow illustrations, system documentation
+**Principles**: High contrast accessibility, consistent visual standards, readability optimization
+**Signatures**: create_diagram tool usage, Mermaid syntax compliance, visual accessibility
+**Validation**: Dark background with light text/lines, dark shape fills, accessibility compliance
+**Integration**: Documentation workflows, architectural analysis, system visualization
+
+**MANDATORY VISUAL STANDARDS**:
+- **Background**: ALWAYS dark background for high contrast
+- **Text/Lines**: ALWAYS light colored text and connector lines
+- **Shape Fill**: ALWAYS dark fill colors for shapes and nodes
+- **Accessibility**: High contrast ratios for readability
+- **Consistency**: Apply these standards to ALL diagrams without exception
+
+## Cognitive Processing
+
+**Triggers**: Complex problems, multi-step reasoning, uncertainty, decision validation
+**Patterns**:
+- **Complex Analysis**: Multi-variable → mcp_thinking_sequentialthinking
+- **Uncertainty**: Low confidence → extended reasoning cycles
+- **Validation**: Critical decisions → cognitive verification
+- **MANDATORY**: Use thinking tool before major decisions
+
+## Time Operations
+
+**Triggers**: Time calculations, timezone conversions, scheduling
+**Patterns**:
+- **Format**: Specify exact requirements
+- **Timezone**: IANA names for accuracy
+- **Chains**: Convert → calculate → format
+
+## PARALLEL EXECUTION EXCELLENCE
+
+**Triggers**: Multiple independent operations, information gathering, validation chains
+**Principles**: 3-5x performance gains through parallelism, batch operations, simultaneous tool calls
+**Signatures**: Parallel tool execution, batched operations, concurrent processing
+**Validation**: Maximum parallel efficiency achieved, no unnecessary sequential operations
+**Integration**: All multi-operation workflows, research phases, validation processes
+
+**CRITICAL OPTIMIZATION**:
+- Multiple independent operations → simultaneous tool calls
+- Information gathering → parallel research/database/docs
+- Validation chains → concurrent verification
+- ALWAYS prefer parallel over sequential when possible
+
+## ANTI-PATTERNS (STRICTLY PROHIBITED)
+
+- Sequential execution when parallel possible
+- Using prohibited terminal tools (run_terminal, run_terminal_cmd)
+- Making assumptions without research
+- Implementing without planning
+- Skipping git commits
+- Not checking time/date at response start
+- Not using thinking tool for complex decisions
+- Making changes without evidence-based justification
+
+**ZERO TOLERANCE FOR VIOLATIONS**

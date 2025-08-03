@@ -1,0 +1,130 @@
+# PROMPT OPTIMIZATION WORKFLOW
+
+expectation: optimized_llm_ready_prompt
+completion: optimized_prompt_in_standard_location
+
+directives:
+  - "This workflow is an explicit order. All steps must be executed as written. Do not improvise, skip, or treat steps as optional."
+  - "The time call is required to ensure the agent is aware of the real current date/time, not its model cutoff."
+  - "Load all relevant rules, standards, and compliance requirements before proceeding."
+
+references:
+  Profile: .cursor/profiles/prompt_optimization_agent_profile.yml
+  Output_Template: .cursor/templates/prompt_optimization_output_template.yml
+  Documentation: [docs/standards/prompt_optimization_workflow.md]
+
+phases:
+  profile_initialization:
+    description: "Load the agent profile, perform a time check, and load foundational rules and standards."
+    tools: [read_file, fetch_rules, mcp_time_current_time]
+    steps:
+      - tool: mcp_time_current_time
+        validation: time_checked
+      - tool: read_file
+        params:
+          target_file: .cursor/profiles/prompt_optimization_agent_profile.yml
+        validation: agent_profile_loaded
+      - tool: fetch_rules
+        params:
+          rule_names: ["002-tool-usage-and-optimize", "200-project-design-and-dev-process", "501-tool-operation-validation", "800-development-best-practices", "300-documentation-standards"]
+        validation: foundational_rules_loaded
+    gates: [time_checked, agent_profile_loaded, foundational_rules_loaded]
+
+  intake:
+    description: "Capture the user's initial prompt and intended outcome. Clarify ambiguities via targeted questions."
+    tools: [prompt_user]
+    steps:
+      - intention_analysis → prompt_request → prompt_purpose_identified
+      - context_capture → use_case_analysis → requirements_documented
+    gates: [prompt_purpose_identified, requirements_documented]
+
+  intent_extraction:
+    description: "Analyze the prompt to identify core objectives, constraints, and context."
+    tools: [edit_file]
+    steps:
+      - intent_analysis → core_intent_documented
+      - requirements_extraction → requirements_documented
+    gates: [core_intent_documented, requirements_documented]
+
+  decomposition:
+    description: "Break down the prompt into logical components, modules, and requirements."
+    tools: [edit_file]
+    steps:
+      - prompt_decomposition → components_documented
+      - modularization → modules_documented
+    gates: [components_documented, modules_documented]
+
+  enrichment:
+    description: "Add missing details, examples, edge cases, and domain-specific context."
+    tools: [edit_file]
+    steps:
+      - add_examples_and_edge_cases → enrichment_validated
+      - add_metadata_and_domain_context → metadata_validated
+    gates: [enrichment_validated, metadata_validated]
+
+  optimization:
+    description: "Refine for clarity, structure, and LLM-readiness. Reduce ambiguity and ensure completeness."
+    tools: [edit_file]
+    steps:
+      - clarity_enhancement → clarity_validated
+      - specificity_enhancement → specificity_validated
+      - structure_and_formatting_optimization → formatting_validated
+      - length_and_completeness_check → completeness_validated
+    gates: [clarity_validated, specificity_validated, formatting_validated, completeness_validated]
+
+  validation:
+    description: "Test the prompt for completeness, testability, and alignment with technical standards."
+    tools: [edit_file]
+    steps:
+      - prompt_validation → validation_report_created
+      - testability_check → testability_validated
+      - llm_readiness_check → llm_readiness_validated
+    gates: [validation_report_created, testability_validated, llm_readiness_validated]
+
+  documentation:
+    description: "Record the optimized prompt, workflow steps, and validation results for future reference. Commit all changes to git."
+    tools: [edit_file, run_terminal_cmd]
+    steps:
+      - tool: edit_file
+        params:
+          target_file: docs/standards/prompt_optimization_workflow.md
+          code_edit: generated_workflow_doc_from_template
+        validation: workflow_doc_created
+      - tool: run_terminal_cmd
+        params:
+          command: "git add . && git commit -m 'Add prompt optimization workflow, agent profile, templates, and documentation.'"
+          is_background: false
+        validation: git_commit_successful
+    gates: [workflow_doc_created, git_commit_successful]
+
+failure_prevention:
+  avoid:
+    - unclear_purpose
+    - missing_phases
+    - incomplete_validation
+    - undocumented_workflow
+    - standards_noncompliance
+    - vague_queries
+    - ambiguous_paths
+    - uncommitted_changes
+    - skipped_steps
+    - missing_time_call
+    - insufficient_iteration
+  require:
+    - purpose_clearly_defined
+    - phases_and_steps_mapped
+    - validation_criteria_explicit
+    - workflow_documented
+    - standards_compliance
+    - actionable_queries
+    - explicit_paths
+    - git_commit_successful
+    - workflow_refined_to_point_of_diminishing_returns
+
+success_validation:
+  before_completion:
+    - optimized_prompt_created
+    - validation_report_created
+    - workflow_doc_created
+    - git_commit_successful
+  output_requirements: optimized_prompt_in_standard_location

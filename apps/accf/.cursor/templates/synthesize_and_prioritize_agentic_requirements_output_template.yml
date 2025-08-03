@@ -1,0 +1,23 @@
+# SYNTHESIZE AND PRIORITIZE AGENTIC REQUIREMENTS OUTPUT TEMPLATE
+
+expectation: prioritized_agentic_capabilities_dependency_map_gap_analysis
+completion: validated_outputs_and_documentation
+
+directives:
+  - "All outputs must be standards-compliant, visual, and repeatable."
+  - "Dependency map must be provided in both Mermaid diagram and tabular format."
+  - "Gap analysis must clearly identify missing, weak, or conflicting capabilities."
+
+outputs:
+  prioritized_capabilities:
+    description: "Ordered list of agentic capabilities, with rationale and scoring."
+    format: [markdown_table, json]
+  dependency_map:
+    description: "Visual and tabular representation of capability dependencies."
+    format: [mermaid_diagram, markdown_table]
+  gap_analysis:
+    description: "Analysis of gaps, weaknesses, or conflicts in the requirements set."
+    format: [markdown, json]
+  research_reference:
+    description: "Summary of research and standards informing the outputs."
+    format: [markdown]

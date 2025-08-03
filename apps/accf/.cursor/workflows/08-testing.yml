@@ -1,0 +1,49 @@
+# TEST WORKFLOW
+
+keywords: [test, validate, verify, check]
+expectation: comprehensive_testing_with_coverage_analysis
+completion: validated_functionality_with_documented_results
+
+phases:
+  test_planning:
+    tools: [codebase_search, read_file, mcp_cognitive_tools_arango_search]
+    validation: test_strategy_defined
+    steps:
+      - coverage_analysis → existing_tests → gap_identification
+      - test_strategy → functionality_requirements → test_plan
+      - tool: mcp_cognitive_tools_arango_search
+        params:
+          search_type: content
+          collection: heuristics
+          content: testing_patterns
+          limit: 8
+    gates: [coverage_analyzed, strategy_defined, patterns_selected]
+
+  test_implementation:
+    tools: [edit_file, run_terminal_cmd]
+    validation: tests_created_and_passing
+    steps:
+      - test_creation → specifications → test_implementations
+      - test_execution → automated_testing → results_collection
+      - tool: run_terminal_cmd
+        params: {command: test_suite_execution}
+        validation: test_results_generated
+    gates: [tests_created, execution_successful, results_collected]
+
+  validation_reporting:
+    tools: [mcp_cognitive_tools_arango_modify]
+    validation: test_results_documented
+    steps:
+      - results_analysis → test_outcomes → coverage_metrics
+      - tool: mcp_cognitive_tools_arango_modify
+        params:
+          operation: insert
+          collection: metrics
+          document:
+            type: testing_complete
+            metric_type: "quality"
+            test_coverage: coverage_percentage
+            test_results: pass_fail_summary
+            issues_found: documented_problems
+            created: current_time
+    gates: [results_analyzed, metrics_stored]

@@ -1,0 +1,17 @@
+# ACCF Agent-to-Agent Messaging Fabric ("Agent Phone") Output Template
+
+outputs:
+  - path: src/shared/agent_phone/agent_phone.py
+    description: Python module for agent-to-agent messaging fabric
+    validation: Must implement synchronous/asynchronous messaging, task delegation, and context passing
+  - path: docs/applications/ACCF/standards/agent_phone_requirements.md
+    description: Requirements documentation for agent-to-agent messaging fabric
+    validation: Must reference all relevant standards and compliance requirements
+  - path: docs/applications/ACCF/architecture/adr/agent_phone_adrs.md
+    description: Architecture Decision Record for agent-to-agent messaging fabric
+    validation: Must document the decision, context, and consequences
+
+validation:
+  - All outputs must be standards-compliant and documented
+  - Code must be tested and reviewed
+  - Documentation must reference all applicable rules

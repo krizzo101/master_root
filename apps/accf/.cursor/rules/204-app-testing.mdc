@@ -1,0 +1,14 @@
+---
+description: "use when IMPLEMENTING TESTING to ENFORCE PYRAMID STANDARDS for COMPREHENSIVE COVERAGE"
+globs:
+alwaysApply: false
+---
+
+# Testing Rules
+
+- Unit tests in `tests/`, coverage ≥85%.
+- Integration tests use docker-compose services.
+- E2E tests with Playwright headless in CI.
+
+- Integration tests use docker-compose services.
+- E2E tests with Playwright headless in CI.

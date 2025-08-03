@@ -1,0 +1,23 @@
+# DECOMPOSE CAPABILITY INTO IMPLEMENTATION TASKS OUTPUT TEMPLATE
+
+expectation: actionable_tickets_with_dependencies_and_estimates
+completion: validated_outputs_and_documentation
+
+directives:
+  - "All outputs must be standards-compliant, actionable, and repeatable."
+  - "Tickets/stories must include clear descriptions, dependencies, and time/effort estimates."
+  - "Outputs must be saved in docs/development/ or as issues in the project tracker."
+
+outputs:
+  tickets:
+    description: "List of actionable tickets/stories for implementation."
+    format: [markdown_table, json, csv]
+  dependencies:
+    description: "Dependency map between tickets/stories."
+    format: [mermaid_diagram, markdown_table]
+  estimates:
+    description: "Time/effort estimates for each ticket/story."
+    format: [markdown_table, json]
+  research_reference:
+    description: "Summary of research and standards informing the outputs."
+    format: [markdown]

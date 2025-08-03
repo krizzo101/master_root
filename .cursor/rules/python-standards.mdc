@@ -1,0 +1,93 @@
+---
+description: "use when WRITING PYTHON CODE to ENFORCE STANDARDS for QUALITY"
+globs: ["**/*.py"]
+alwaysApply: false
+---
+
+# Python Standards for OPSVI
+
+## Package Management
+
+- Use **uv** for all Python package management
+- **Never** use pip, poetry, or conda
+- Add dependencies: `uv add package-name`
+- Add dev dependencies: `uv add --dev package-name`
+- Run scripts: `uv run script.py`
+- Sync workspace: `uv sync`
+
+## Code Style
+
+- **Formatting**: Use `ruff format` and `black` (configured in ruff.toml)
+- **Linting**: Use `ruff check` for all linting
+- **Type checking**: Use `mypy` with strict settings
+- **Line length**: 88 characters (Black default)
+- **Import sorting**: Use `ruff` with isort integration
+
+## Type Hints
+
+- **Always** use type hints for function parameters and return values
+- Use `from typing import` for complex types
+- Use `Optional[T]` instead of `Union[T, None]`
+- Use `list[T]`, `dict[K, V]` (Python 3.9+ syntax)
+- Use `@dataclass` for data containers
+
+## Documentation
+
+- **Docstrings**: Use Google-style docstrings for all public functions/classes
+- **Type hints**: Include in docstring parameters section
+- **Examples**: Include usage examples in docstrings
+- **README**: Update package README.md for all changes
+
+## Testing
+
+- **Framework**: Use pytest exclusively
+- **Coverage**: Aim for ≥90% test coverage
+- **Markers**: Use `@pytest.mark.unit`, `@pytest.mark.integration`
+- **Fixtures**: Use `conftest.py` for shared fixtures
+- **Async**: Use `pytest-asyncio` for async tests
+
+## Error Handling
+
+- Use **custom exceptions** from `opsvi_core.exceptions`
+- **Log errors** with structured logging: `logger.error("message", error=str(e))`
+- **Raise specific exceptions** with context
+- **Handle exceptions** at appropriate levels
+
+## Logging
+
+- Use **structured logging** with `opsvi_core.get_logger()`
+- **Log levels**: DEBUG, INFO, WARNING, ERROR, CRITICAL
+- **Include context**: Add relevant data to log messages
+- **Correlation IDs**: Use for request tracing
+
+## Performance
+
+- Use **async/await** for I/O operations
+- **Profile code** before optimization
+- **Cache expensive operations**
+- **Use generators** for large datasets
+- **Avoid premature optimization**
+
+## Security
+
+- **Validate inputs** with Pydantic models
+- **Use environment variables** for secrets
+- **Sanitize user inputs**
+- **Follow principle of least privilege**
+- **Use secure defaults**
+
+## Dependencies
+
+- **Pin versions** in pyproject.toml
+- **Use workspace dependencies** for local packages
+- **Keep dependencies updated** with `uv lock --upgrade`
+- **Audit dependencies** regularly
+- **Minimize dependencies** - prefer standard library
+
+## File Organization
+
+- **src layout**: Use `src/package_name/` structure
+- **__init__.py**: Export public API
+- **Tests**: Mirror source structure in tests/
+- **Config**: Use pyproject.toml for tool configuration
+- **Scripts**: Use `[project.scripts]` for CLI entry points

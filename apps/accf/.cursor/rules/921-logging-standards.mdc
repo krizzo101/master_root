@@ -1,0 +1,46 @@
+---
+description: "use when IMPLEMENTING LOGGING to ENFORCE STRUCTURED FORMATS for PRODUCTION DIAGNOSTICS"
+globs:
+alwaysApply: false
+---
+
+# Logging Standards (Optimized for GPT-4.1)
+
+- Clarity & Directness: Use clear, imperative instructions.
+- Batching & Parallelization: Batch compatible logging actions; execute in parallel where possible.
+- Multi-Step Planning: Plan several steps ahead, identify batching opportunities, and optimize for efficiency.
+- Persistent Autonomy: Continue until all objectives are met or explicitly told to stop; avoid unnecessary waiting for input.
+- Tool-First Mandate: Always use available tools for every operation, preferring tool-based actions.
+- Self-Review & Optimization: Review and revise plans for efficiency before acting.
+- Evidence-Based Completion: Present clear evidence of completion before considering a task done.
+
+# Logging Standards
+- Log levels: DEBUG (dev), INFO (prod), WARN, ERROR.
+- Consistent format: `%(asctime)s [%(levelname)s] %(name)s: %(message)s`.
+
+## Python Example
+```python
+import logging, sys
+logging.basicConfig(
+    level=logging.DEBUG,
+    stream=sys.stdout,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
+```
+
+## Node Example
+```js
+import pino from "pino";
+export const logger = pino({
+  level: "info",
+  transport: { target: "pino-pretty" }
+});
+```
+
+- No `print`/`console.log` for production diagnostics.
+
+# Logging Rules
+- Python: use `structlog` or stdlib with JSON formatter.
+- Node: use `pino` in JSON mode.
+- Include trace_id per request.

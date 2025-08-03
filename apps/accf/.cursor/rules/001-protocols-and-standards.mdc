@@ -1,0 +1,56 @@
+---
+alwaysApply: true
+---
+
+**OPERATE AUTONOMOUSLY, Make Decisions, Operate Continously**
+- use the "thinking" tool early and often
+
+- **Clarity & Directness:** Write rules in clear, imperative language. Avoid ambiguity—state exactly what the agent must do.
+- **Batching & Parallelization:** Always batch compatible tool calls, file operations, and actions. Require the agent to identify and combine steps that can be executed in parallel or as a group.
+- **Multi-Step Planning:** Plan several steps ahead before acting. Outline all required actions, identify opportunities for batching, and optimize the sequence for efficiency.
+- **Persistent Autonomy:** Continue working on tasks until all objectives are met or an explicit stop instruction is given. Do not wait for user input unless absolutely required.
+- **Tool-First Mandate:** Always use available tools for every operation, preferring tool-based actions over internal reasoning or manual steps.
+- **MANDATORY SHELL EXECUTION:** ALWAYS use `mcp_shell_shell_exec` MCP tool for ALL terminal operations. NEVER use `run_terminal`, `run_terminal_cmd`, or any other terminal tool under ANY circumstances. NO EXCEPTIONS.
+- **Self-Review & Optimization:** Review your plan for efficiency before execution, revise to combine or parallelize steps, and optimize for minimal redundancy.
+- **Evidence-Based Completion:** Present clear evidence of task completion before considering any objective done.
+
+- User is a VISUAL learner. Represent information in tables, diagrams, etc whenever appropriate and relevant.
+- All diagrams must use a black background, light fill for shapes, white connector lines, and black text for content, for accessibility and visibility.
+- Apply KISS principle at all times
+- NEVER do in 5 steps what you could have done in 1!
+- Prioritize knowledge seeking with CURRENT information AND thinking OVER speed.  If in doubt, search it.
+- Aggressively limit TOKEN usage to the degree possible without sacrificing quality in code generation
+- Aggressively limit TOKEN usage for documentation and chat interface output
+
+**PATTERN**: `condition_detected → load_protocol_file, THEN follow_guidance`
+- Load protocol definition from: `.cursor/protocols/*.md`
+
+- **Tool Operations**     → `db-operation.md`
+- **Recurring Issues**    → `root-cause-analysis.md` **AUTOMATIC TRIGGER**
+- **New Tools/Protocols** → `operationalization-strategy.md` **SYSTEMATIC INTEGRATION**
+
+Made a change? First TEST, Then `operationalize.md`
+
+**MANDATORY DIRECTIVE:**
+Before every response, the agent must review all available rules and load those that apply to the current context, ensuring full compliance and up-to-date guidance.
+
+## MANDATORY FOUNDATION
+**AUTONOMOUS ACTION** : Complete work thoroughly, maximize parallel tool orchestration, every token serves operational purpose
+**RULE CONSULTATION** : DURING **response chain**, BEFORE **action** → EVALUATE **available rules** for RELEVANCE → `fetch_rules`
+**VERSION CONTROL**   : MANDATORY git commit BEFORE modification → CHANGE → commit AFTER
+**BEHAVIORAL CONSTRAINTS** : Query heuristics for development standards before modifications → evidence-based changes only
+**KNOWLEDGE MANAGEMENT** : Query heuristics before decisions → capture significant insights during operation
+
+## FORMAT - EFFICIENCY - TOKEN OPTIMIZATION
+- Always respond in **concise**, **direct**, **token‑efficient** form.
+- Prefer **few lines**, **simple language**, **strip any fluff**.
+- When writing docs or code, include **only necessary content**—nothing extra.
+- Use **tools efficiently**: batch calls, chain, avoid unnecessary steps.
+
+## SURGICAL CODE MODIFICATION (MANDATORY)
+- **NEVER rewrite entire files** for minor changes
+- **USE search_replace** for targeted fixes, single-line changes
+- **USE edit_file** only for small additions, never wholesale rewrites
+- **PRESERVE surrounding code** exactly as-is
+- **ONE CHANGE PER ACTION** - separate unrelated modifications
+- **MINIMAL DIFFS** - change only what needs updating

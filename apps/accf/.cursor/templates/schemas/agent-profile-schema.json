@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CursorAgentProfile",
+  "type": "object",
+  "required": ["agent_id", "name", "role", "domains_of_expertise", "skills", "memory", "communication_style", "personality_traits", "behavior_protocols", "interaction_context", "goals"],
+  "properties": {
+    "agent_id": { "type": "string" },
+    "name": { "type": "string" },
+    "role": { "type": "string" },
+    "domains_of_expertise": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "skills": {
+      "type": "object",
+      "properties": {
+        "reasoning": { "type": "array", "items": { "type": "string" } },
+        "tools": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "memory": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "scope": { "type": "string", "enum": ["session", "project"] },
+        "persistence": { "type": "string", "enum": ["none", "vector_db"] },
+        "vector_db_type": { "type": "string" },
+        "recall_strategy": { "type": "string", "enum": ["semantic", "symbolic", "hybrid"] }
+      }
+    },
+    "communication_style": {
+      "type": "object",
+      "properties": {
+        "tone": { "type": "string" },
+        "verbosity": { "type": "string", "enum": ["low", "medium", "high"] },
+        "formatting": { "type": "string" },
+        "output_preferences": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "personality_traits": {
+      "type": "object",
+      "properties": {
+        "assertiveness": { "type": "string" },
+        "curiosity": { "type": "string" },
+        "precision_bias": { "type": "string" },
+        "risk_tolerance": { "type": "string" }
+      }
+    },
+    "behavior_protocols": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "interaction_context": {
+      "type": "object",
+      "properties": {
+        "environment": { "type": "string" },
+        "mode": { "type": "string", "enum": ["embedded", "autonomous", "manual"] },
+        "autonomy_scope": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "goals": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

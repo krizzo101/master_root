@@ -1,0 +1,146 @@
+# SYSTEM UNDERSTANDING WORKFLOW
+
+keywords: [understand, explore, discover, analyze, map]
+expectation: comprehensive_system_knowledge_with_documentation
+completion: system_understanding_documented_stored_accessible
+
+phases:
+  discovery_planning:
+    tools: [mcp_thinking_sequentialthinking]
+    validation: system_scope_identified_plan_established
+    steps:
+      - tool: mcp_thinking_sequentialthinking
+        params: {thought_process: system_analysis_planning, total_thoughts: 3}
+        validation: systematic_approach_planned
+      - system_identification → boundaries + scope + key_components
+      - discovery_strategy → exploration_approach + information_gathering
+      - exploration_boundaries → included_excluded_components
+    gates: [system_identified, scope_planned, boundaries_established]
+
+  information_gathering:
+    tools: [codebase_search, list_dir, read_file, grep_search, mcp_cognitive_tools_arango_search]
+    parallel: true
+    validation: comprehensive_system_knowledge_multiple_sources
+    steps:
+      - tool: codebase_search
+        params: {query: architectural_patterns, target_directories: relevant_system_directories}
+        validation: architectural_patterns_identified
+      - tool: list_dir
+        params: {relative_workspace_path: system_directory_structure}
+        validation: directory_organization_mapped
+      - tool: read_file
+        params: {target_file: configuration_files_documentation_files_key_components}
+        validation: configuration_documentation_analyzed
+      - tool: grep_search
+        params: {query: system_patterns, include_pattern: "*.py,*.js,*.yml,*.md"}
+        validation: code_patterns_identified
+      - tool: mcp_cognitive_tools_arango_search
+        params:
+          search_type: content
+          collection: research_docs
+          content: system_component_keywords system
+          limit: 20
+        validation: stored_system_knowledge_retrieved
+    gates: [patterns_identified, structure_mapped, documentation_analyzed, knowledge_retrieved]
+
+  analysis_synthesis:
+    tools: [relationship_mapper, mcp_cognitive_tools_arango_search]
+    validation: component_relationships_integration_points_documented
+    steps:
+      - component_analysis → individual_elements → functionality_purpose
+      - relationship_mapping → component_interactions + data_flows
+      - integration_point_identification → external_dependencies + interfaces
+      - tool: mcp_cognitive_tools_arango_search
+        params:
+          search_type: content
+          collection: research_docs
+          content: target_system architecture related
+        validation: related_architectural_knowledge_retrieved
+      - pattern_synthesis → architectural_patterns + design_decisions
+    gates: [components_analyzed, relationships_mapped, integration_identified, patterns_synthesized]
+
+  documentation_storage:
+    tools: [mcp_cognitive_tools_arango_modify, documentation_synthesis_engine]
+    validation: comprehensive_system_understanding_documented_stored
+    steps:
+      - understanding_synthesis → comprehensive_system_knowledge → structured_documentation
+      - knowledge_organization → categorized_information → searchable_format
+      - tool: mcp_cognitive_tools_arango_modify
+        params:
+          operation: insert
+          collection: research_docs
+          document:
+            type: system_analysis_complete
+            content_type: "understanding"
+            system_name: analyzed_system
+            architecture_summary: comprehensive_summary
+            components: detailed_component_list
+            relationships: interaction_mappings
+            integration_points: external_interfaces
+            patterns_identified: architectural_design_patterns
+            created: current_time
+        validation: system_understanding_stored_with_id
+      - accessibility_optimization → searchable_knowledge → future_reference
+    gates: [understanding_synthesized, knowledge_organized, system_stored, accessibility_optimized]
+
+failure_prevention:
+  avoid:
+    [
+      superficial_discovery,
+      single_source_analysis,
+      ignore_dependencies,
+      skip_integration_analysis,
+      incomplete_impact_assessment,
+    ]
+  require:
+    [
+      systematic_discovery_multiple_sources,
+      relationship_mapping_comprehensive,
+      integration_point_identification,
+      change_impact_boundaries_clear,
+    ]
+
+success_validation:
+  before_completion:
+    [
+      system_identified,
+      discovery_comprehensive,
+      relationships_mapped,
+      understanding_synthesized,
+    ]
+  output_requirements: stored_system_understanding_architecture_summary_dependency_map_integration_documentation
+
+# Critical enforcement points
+critical_mandatory:
+  - systematic_context_identification_before_discovery
+  - comprehensive_discovery_from_multiple_sources_parallel
+  - relationship_mapping_at_all_architectural_levels
+  - integration_point_identification_with_broader_project
+  - change_impact_assessment_with_clear_boundaries
+
+# System analysis frameworks by domain
+analysis_frameworks:
+  file_code_systems:
+    discovery: [directory_structure, naming_conventions, configuration_patterns]
+    analysis: [component_architecture, dependency_tree, usage_patterns]
+  database_systems:
+    discovery: [schema_structure, collections_relationships, usage_patterns]
+    analysis: [data_flow, query_patterns, integration_points]
+  plugin_systems:
+    discovery: [architecture_hooks, registration_configuration]
+    analysis: [plugin_lifecycle, integration_boundaries, extension_points]
+  workflow_systems:
+    discovery: [triggers_integration_points, file_conventions]
+    analysis: [execution_flow, dependency_chain, configuration_patterns]
+  service_systems:
+    discovery: [apis_protocols, dependencies_deployment]
+    analysis:
+      [service_architecture, communication_patterns, integration_contracts]
+
+# Quality standards
+quality_requirements:
+  evidence_based: support_findings_with_specific_examples
+  relationship_documentation: map_dependencies_integration_points_explicitly
+  impact_assessment: understand_change_boundaries_affected_components
+  validation_requirements: test_assumptions_through_exploration
+  pattern_recognition: identify_architectural_patterns_conventions

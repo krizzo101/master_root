@@ -1,0 +1,15 @@
+[Unit]
+Description=OPSVI Git Snapshot Timer for %i
+Requires=snapshot@%i.service
+
+[Timer]
+Unit=snapshot@%i.service
+OnBootSec=5min
+OnUnitActiveSec=12h
+Persistent=true
+
+# Randomize start time to avoid thundering herd
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

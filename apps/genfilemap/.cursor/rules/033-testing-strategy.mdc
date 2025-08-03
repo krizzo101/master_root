@@ -1,0 +1,334 @@
+---
+description: WHEN implementing testing infrastructure TO ensure comprehensive coverage and reliable test execution YOU MUST follow systematic testing strategies with appropriate mocking and coverage targets
+globs:
+alwaysApply: false
+---
+
+# Testing Strategy Standards
+
+## Purpose
+
+This rule ensures comprehensive and reliable testing infrastructure with appropriate mocking strategies, realistic coverage targets, and systematic test organization to prevent testing-related issues during development.
+
+## Scope
+
+This rule applies to all testing infrastructure including unit tests, integration tests, mocking strategies, and coverage measurement.
+
+## Requirements
+
+### Testing Infrastructure
+
+1. **Test Organization**
+   - ORGANIZE tests in logical hierarchies matching source structure
+   - SEPARATE unit, integration, and system tests
+   - IMPLEMENT proper test isolation and cleanup
+   - MAINTAIN test data factories and fixtures
+
+2. **Coverage Strategy**
+   - SET realistic coverage targets based on code complexity
+   - FOCUS on critical path coverage over percentage targets
+   - EXCLUDE appropriate files from coverage measurement
+   - IMPLEMENT coverage reporting and monitoring
+
+### Implementation Standards
+
+1. **Test Structure**
+   ```python
+   # tests/conftest.py
+   import pytest
+   from unittest.mock import Mock
+   from seai.llm.client import LLMClient
+
+   @pytest.fixture
+   def mock_openai_client():
+       """Provide a mock OpenAI client for testing."""
+       mock_client = Mock()
+       mock_response = Mock()
+       mock_response.output_text = "Test response"
+       mock_response.usage.total_tokens = 100
+       mock_response.usage.input_tokens = 50
+       mock_response.usage.output_tokens = 50
+
+       mock_client.responses.create.return_value = mock_response
+       return mock_client
+
+   @pytest.fixture
+   def llm_client(mock_openai_client):
+       """Provide a configured LLM client for testing."""
+       return LLMClient(client=mock_openai_client)
+   ```
+
+2. **Coverage Configuration**
+   ```toml
+   # pyproject.toml
+   [tool.coverage.run]
+   source = ["src"]
+   omit = [
+       "*/tests/*",
+       "*/test_*",
+       "archive/*",
+       "dev_prompts/*",
+       "*/__pycache__/*",
+       "*/migrations/*"
+   ]
+
+   [tool.coverage.report]
+   exclude_lines = [
+       "pragma: no cover",
+       "def __repr__",
+       "if self.debug:",
+       "if settings.DEBUG",
+       "raise AssertionError",
+       "raise NotImplementedError",
+       "if 0:",
+       "if __name__ == .__main__.:"
+   ]
+   # Realistic target based on code complexity
+   fail_under = 60
+   show_missing = true
+   ```
+
+3. **Test Categories**
+   ```python
+   # tests/unit/test_llm_client.py
+   import pytest
+   from unittest.mock import Mock, patch
+   from seai.llm.client import LLMClient, LLMConfig
+
+   class TestLLMClient:
+       """Unit tests for LLM client functionality."""
+
+       def test_client_initialization(self):
+           """Test client initializes with correct configuration."""
+           config = LLMConfig()
+           client = LLMClient(config)
+           assert client.config == config
+
+       @pytest.mark.asyncio
+       async def test_successful_completion(self, llm_client, mock_openai_client):
+           """Test successful completion request."""
+           result = await llm_client.complete("test prompt")
+
+           assert result == "Test response"
+           mock_openai_client.responses.create.assert_called_once()
+
+       @pytest.mark.asyncio
+       async def test_error_handling(self, llm_client, mock_openai_client):
+           """Test error handling in completion."""
+           mock_openai_client.responses.create.side_effect = Exception("API Error")
+
+           with pytest.raises(Exception):
+               await llm_client.complete("test prompt")
+   ```
+
+### Error Prevention
+
+1. **Common Testing Issues**
+   - Overly complex mocking leading to brittle tests
+   - Unrealistic coverage targets causing development friction
+   - Poor test isolation causing flaky tests
+   - Missing test data management
+
+2. **Mitigation Strategies**
+   - USE simple, focused mocks
+   - SET achievable coverage targets
+   - IMPLEMENT proper test cleanup
+   - CREATE reusable test fixtures
+
+## Validation Criteria
+
+- [ ] Tests are organized in logical hierarchies
+- [ ] Coverage targets are realistic and achievable
+- [ ] Mocking is simple and focused
+- [ ] Test isolation is properly implemented
+- [ ] Test data management is systematic
+
+## Examples
+
+### Compliant Testing Setup
+
+```python
+# tests/unit/test_config.py
+"""Unit tests for configuration management."""
+
+import os
+import pytest
+from unittest.mock import patch
+from seai.llm.config import LLMConfig
+
+class TestLLMConfig:
+    """Test LLM configuration functionality."""
+
+    def test_default_configuration(self):
+        """Test default configuration values."""
+        config = LLMConfig()
+        assert config.model == "gpt-4.1-mini"
+        assert config.timeout == 30
+        assert config.max_retries == 3
+
+    @patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"})
+    def test_api_key_from_environment(self):
+        """Test API key loading from environment."""
+        config = LLMConfig()
+        assert config.api_key == "test-key"
+
+    def test_missing_api_key_raises_error(self):
+        """Test that missing API key raises appropriate error."""
+        with patch.dict(os.environ, {}, clear=True):
+            with pytest.raises(ValueError, match="API key not found"):
+                LLMConfig()
+
+# tests/integration/test_llm_integration.py
+"""Integration tests for LLM functionality."""
+
+import pytest
+from unittest.mock import Mock
+from seai.llm.client import LLMClient
+from seai.llm.config import LLMConfig
+
+@pytest.mark.integration
+class TestLLMIntegration:
+    """Integration tests for LLM components."""
+
+    @pytest.fixture
+    def integration_client(self):
+        """Create client for integration testing."""
+        config = LLMConfig(api_key="test-key")
+        mock_client = Mock()
+        return LLMClient(config, client=mock_client)
+
+    @pytest.mark.asyncio
+    async def test_end_to_end_completion(self, integration_client):
+        """Test complete LLM completion workflow."""
+        # Setup mock response
+        mock_response = Mock()
+        mock_response.output_text = "Integration test response"
+        mock_response.usage.total_tokens = 150
+
+        integration_client._client.responses.create.return_value = mock_response
+
+        # Test completion
+        result = await integration_client.complete("test prompt")
+
+        # Verify result
+        assert result == "Integration test response"
+
+        # Verify client was called correctly
+        integration_client._client.responses.create.assert_called_once_with(
+            model="gpt-4.1-mini",
+            input="test prompt",
+            instructions="You are a helpful assistant.",
+            timeout=30000
+        )
+
+# tests/conftest.py
+"""Shared test configuration and fixtures."""
+
+import pytest
+from unittest.mock import Mock
+from seai.llm.config import LLMConfig
+
+@pytest.fixture
+def mock_llm_config():
+    """Provide a mock LLM configuration."""
+    return LLMConfig(
+        api_key="test-key",
+        model="gpt-4.1-mini",
+        timeout=30,
+        max_retries=3
+    )
+
+@pytest.fixture
+def mock_openai_response():
+    """Provide a mock OpenAI response."""
+    response = Mock()
+    response.output_text = "Mock response"
+    response.usage = Mock()
+    response.usage.total_tokens = 100
+    response.usage.input_tokens = 50
+    response.usage.output_tokens = 50
+    return response
+
+# Pytest configuration
+def pytest_configure(config):
+    """Configure pytest with custom markers."""
+    config.addinivalue_line(
+        "markers", "integration: mark test as integration test"
+    )
+    config.addinivalue_line(
+        "markers", "slow: mark test as slow running"
+    )
+
+def pytest_collection_modifyitems(config, items):
+    """Modify test collection to add markers."""
+    for item in items:
+        # Mark integration tests
+        if "integration" in str(item.fspath):
+            item.add_marker(pytest.mark.integration)
+
+        # Mark slow tests
+        if "slow" in item.keywords:
+            item.add_marker(pytest.mark.slow)
+```
+
+### Coverage Reporting Script
+
+```python
+#!/usr/bin/env python3
+"""Coverage reporting and analysis."""
+
+import subprocess
+import sys
+from pathlib import Path
+
+def run_coverage_analysis():
+    """Run comprehensive coverage analysis."""
+
+    # Run tests with coverage
+    print("🧪 Running tests with coverage...")
+    result = subprocess.run([
+        "python", "-m", "pytest",
+        "--cov=src",
+        "--cov-report=html",
+        "--cov-report=term-missing",
+        "--cov-fail-under=60"
+    ], capture_output=True, text=True)
+
+    if result.returncode != 0:
+        print("❌ Coverage target not met")
+        print(result.stdout)
+        print(result.stderr)
+        return False
+
+    print("✅ Coverage target achieved")
+
+    # Generate detailed report
+    print("📊 Generating detailed coverage report...")
+    coverage_dir = Path("htmlcov")
+    if coverage_dir.exists():
+        print(f"📁 Coverage report available at: {coverage_dir}/index.html")
+
+    return True
+
+if __name__ == "__main__":
+    success = run_coverage_analysis()
+    sys.exit(0 if success else 1)
+```
+
+### Non-Compliant Testing
+
+```python
+# Bad example: Overly complex mocking
+def test_complex_mock():
+    with patch('seai.llm.client.OpenAI') as mock_openai:
+        with patch('seai.llm.client.os.getenv') as mock_getenv:
+            with patch('seai.llm.client.logging') as mock_logging:
+                # Too many patches, brittle test
+                mock_getenv.return_value = "fake-key"
+                # ... complex setup
+                pass
+
+# Bad example: Unrealistic coverage target
+[tool.coverage.report]
+fail_under = 95  # Too high, causes development friction
+```

@@ -1,0 +1,19 @@
+---
+description: "use when PERFORMING LARGE REFACTORS to ENFORCE MICRO-COMMITS for SAFETY"
+globs:
+  - "**/*.py"
+  - "**/*.ts"
+alwaysApply: false
+---
+
+## Refactor Pattern
+
+**Triggers**: Large code changes, system restructuring, architectural modifications
+**Principles**: Incremental changes, continuous validation, safe rollback capability
+**Signatures**: Micro-commits, automated testing, PR workflow
+**Validation**: Test pass rate, commit size, rollback readiness
+**Integration**: Git workflow, CI/CD pipeline, team collaboration
+
+- Split work into micro-commits (<50 LOC) on AUTOSAVE.
+- After each commit run `ruff` + `pytest`; stop on first failure.
+- Raise a PR from `feat/<slug>` → MAIN when stable.

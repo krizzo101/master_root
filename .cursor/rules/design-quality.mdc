@@ -1,0 +1,20 @@
+---
+description: "use when WRITING CODE to ENFORCE DESIGN PRINCIPLES for QUALITY"
+globs:
+alwaysApply: true
+---
+
+## Design Quality Pattern
+
+**Triggers**: Code writing, module creation, system design
+**Principles**: Single Responsibility, configuration centralization, comprehensive documentation
+**Signatures**: SRP modules, debug logging, README documentation, early testing
+**Validation**: Code clarity, maintainability, accessibility compliance
+**Integration**: Consistent patterns across all modules and systems
+
+- **SRP modules** – one purpose per module; decouple via interfaces.
+- **Central config** – no hard-coded tunables.
+- Add **debug logs** for key steps & data.
+- Write **README + docs + ADRs** for every significant change.
+- **Test early** – unit, integration, E2E.
+- UX: clear CLI/UI errors; visuals meet accessibility (black bg, light fill).

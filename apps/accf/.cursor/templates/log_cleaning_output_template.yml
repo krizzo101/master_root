@@ -1,0 +1,19 @@
+# LOG CLEANING WORKFLOW OUTPUT TEMPLATE
+
+expectation: [expected_outcome]
+completion: [completion_criteria]
+
+directives:
+  - "This workflow is an explicit order. All steps must be executed as written. Do not improvise, skip, or treat steps as optional."
+  - "The time call is required to ensure the agent is aware of the real current date/time, not its model cutoff."
+  - "Load all relevant rules, standards, and compliance requirements before proceeding."
+
+references:
+  Profile: .cursor/profiles/log_cleaning_agent_profile.yml
+  Output_Template: .cursor/templates/log_cleaning_output_template.yml
+  Research_Reference_Template: .cursor/templates/research_reference_template.md
+  Documentation: [docs/standards/log_cleaning_workflow.md]
+  Standards: [300-documentation-standards, 501-tool-operation-validation, 800-development-best-practices]
+  Pattern_Catalog: config/log_cleaning_patterns.yml
+
+# Add additional output structure as needed for your workflow.

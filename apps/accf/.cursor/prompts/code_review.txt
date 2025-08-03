@@ -1,0 +1,1 @@
+Review the provided code for correctness, clarity, efficiency, and best practices. List issues and suggestions in a table. Then, output the improved code and a concise changelog summarizing the changes.

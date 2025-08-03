@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "opsvi-llm"
+version = "0.1.0"
+description = "LLM integration library for OPSVI"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "opsvi-core",
+    "openai>=1.23",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/opsvi"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src/opsvi" = "opsvi"

@@ -1,0 +1,148 @@
+---
+description: "use when CONFIGURING PLATFORM SERVICES to ENFORCE STANDARDS for OPERATIONS"
+globs: ["platform/**/*", "**/docker-compose.yml", "**/docker-compose.yaml"]
+alwaysApply: false
+---
+
+# Platform Services Management
+
+## Observability Stack
+
+### Services
+- **Grafana**: Port 3000 (admin/admin)
+- **Tempo**: Port 3200 (distributed tracing)
+- **OTEL Collector**: Ports 4317/4318 (OTLP)
+
+### Configuration
+- **Docker Compose**: `platform/observability/docker-compose.yml`
+- **OTEL Config**: `platform/observability/config/otel-collector-config.yaml`
+- **Tempo Config**: `platform/observability/config/tempo.yaml`
+- **Grafana Datasources**: `platform/observability/config/grafana/provisioning/datasources/`
+
+### Management Commands
+```bash
+# Start observability stack
+just up-obs
+
+# Stop observability stack
+just down-obs
+
+# Check status
+docker-compose -f platform/observability/docker-compose.yml ps
+```
+
+## RAG System
+
+### Services
+- **Qdrant**: Port 6333 (HTTP API), 6334 (gRPC API)
+- **Qdrant Web UI**: Port 8080 (optional)
+
+### Configuration
+- **Docker Compose**: `platform/rag/docker-compose.yml`
+- **Initialization**: `tools/rag_init.py`
+- **Default Collection**: `global__demo`
+
+### Management Commands
+```bash
+# Start RAG stack
+just up-rag
+
+# Stop RAG stack
+just down-rag
+
+# Initialize RAG system
+just init-rag
+
+# Initialize with custom collection
+uv run python tools/rag_init.py --collection my_collection
+```
+
+## MCP Registry
+
+### Configuration
+- **Registry Config**: `platform/mcp/registry.json`
+- **Environment Variables**: All credentials use `${ENV_VAR}` format
+- **Packages**: fs, git, openai-llm, qdrant-rag, search
+
+### Security
+- **Never commit secrets** to version control
+- **Use environment variables** for all credentials
+- **Validate configuration** before deployment
+- **Rotate tokens** regularly
+
+## Health Checks
+
+### Observability
+- **Grafana**: http://localhost:3000/api/health
+- **Tempo**: http://localhost:3200/ready
+- **OTEL Collector**: http://localhost:8888/health
+
+### RAG System
+- **Qdrant**: http://localhost:6333/health
+- **Qdrant Web UI**: http://localhost:8080
+
+### Monitoring
+- **Logs**: Check `docker-compose logs <service>`
+- **Metrics**: Use Grafana dashboards
+- **Alerts**: Configure in Grafana
+
+## Troubleshooting
+
+### Common Issues
+1. **Port conflicts**: Check if ports are already in use
+2. **Volume permissions**: Ensure Docker has access to volumes
+3. **Network issues**: Check Docker network connectivity
+4. **Resource limits**: Monitor CPU/memory usage
+
+### Debug Commands
+```bash
+# Check service logs
+docker-compose -f platform/observability/docker-compose.yml logs
+
+# Check service status
+docker-compose -f platform/observability/docker-compose.yml ps
+
+# Restart specific service
+docker-compose -f platform/observability/docker-compose.yml restart grafana
+
+# Check resource usage
+docker stats
+```
+
+## Development Workflow
+
+### Local Development
+1. **Start services**: `just up`
+2. **Initialize RAG**: `just init-rag`
+3. **Run tests**: `uv run pytest`
+4. **Check status**: `just status`
+
+### Production Deployment
+1. **Environment setup**: Configure all environment variables
+2. **Service startup**: Use systemd or Docker Compose
+3. **Health monitoring**: Set up monitoring and alerting
+4. **Backup strategy**: Regular backups of volumes
+
+## Best Practices
+
+### Configuration Management
+- **Use environment variables** for all configuration
+- **Validate configuration** on startup
+- **Use secrets management** for production
+- **Document configuration** in README files
+
+### Monitoring
+- **Set up dashboards** in Grafana
+- **Configure alerts** for critical services
+- **Monitor resource usage** (CPU, memory, disk)
+- **Track application metrics** with OTEL
+
+### Security
+- **Use secure defaults** for all services
+- **Implement authentication** where possible
+- **Regular security updates** for base images
+- **Network isolation** between services
+description:
+globs:
+alwaysApply: false
+---

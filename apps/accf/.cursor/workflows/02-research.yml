@@ -1,0 +1,92 @@
+# RESEARCH WORKFLOW
+
+keywords: [research, discover, explore, investigate]
+expectation: multi_source_research_with_knowledge_first_approach
+completion: research_stored_confidence_scores_source_attribution_recommendations
+
+phases:
+  knowledge_assessment:
+    tools: [mcp_cognitive_tools_arango_search]
+    validation: confidence_scores_calculated_strategy_selected
+    steps:
+      - topic_analysis → research_request → key_topics_subdomains
+      - tool: mcp_cognitive_tools_arango_search
+        params: {search_type: content, content: topic_keywords, limit: 20}
+        validation: existing_research_retrieved
+      - tool: mcp_cognitive_tools_arango_search
+        params: {search_type: recent, hours: 4320, limit: 10}
+        validation: recent_research_found
+      - quality_assessment → existing_research → [completeness, accuracy, recency] → scores_calculated
+      - strategy_decision → confidence_scores + thresholds → strategy_selected
+    gates: [existing_knowledge_assessed, confidence_scores_documented, strategy_justified]
+
+  external_research:
+    tools: [mcp_web_search_brave_web_search, mcp_web_scraping_firecrawl_scrape, mcp_research_papers_search_papers, mcp_tech_docs_resolve-library-id, mcp_web_scraping_firecrawl_deep_research]
+    parallel: true
+    validation: multi_source_research_rate_compliance
+    steps:
+      - tool: mcp_web_search_brave_web_search
+        params:
+          query: gap_based_queries
+          count: 15
+        validation: urls_sources_identified
+      - tool: mcp_web_scraping_firecrawl_scrape
+        params: {url: high_value_urls, formats: [markdown], waitFor: 4000}
+        validation: full_content_retrieved
+      - tool: mcp_tech_docs_resolve-library-id
+        params: {libraryName: technical_libraries}
+        validation: library_ids_resolved
+      - tool: mcp_research_papers_search_papers
+        params: {query: academic_queries, max_results: 10}
+        validation: papers_found
+      - tool: mcp_web_scraping_firecrawl_deep_research
+        params: {query: complex_synthesis_questions, maxDepth: 3, maxUrls: 20}
+        validation: synthesis_report_generated
+    gates: [rate_limits_respected, multi_source_completed, mandatory_cycles_completed]
+
+  synthesis_standardization:
+    tools: [synthesis_engine, mcp_cognitive_tools_arango_modify]
+    validation: standardized_output_source_attribution
+    steps:
+      - multi_source_synthesis → all_research_results → findings_consolidated
+      - standardized_output → research_synthesis_schema → schema_compliance
+      - source_attribution → all_sources + findings → sources_cited_reliability_scored
+      - cross_reference_generation → synthesis + knowledge_base → relationships_identified
+      - implementation_guidance → complete_synthesis → actionable_recommendations
+    gates: [schema_compliance, source_attribution_complete, recommendations_actionable]
+
+  quality_assurance:
+    tools: [quality_validation_engine]
+    validation: cross_source_validation_contradictions_identified
+    steps:
+      - source_reliability → all_sources → academic_technical_web_hierarchy → reliability_scores
+      - consistency_verification → cross_source_findings → contradictions_flagged
+      - evidence_strength → findings + source_reliability → confidence_levels
+      - gap_identification → comprehensive_research → missing_areas_documented
+    gates: [contradictions_identified, evidence_strength_assessed, gaps_documented]
+
+  knowledge_persistence:
+    tools: [mcp_cognitive_tools_arango_modify, relationship_mapper]
+    validation: research_stored_relationships_mapped_report_generated
+    steps:
+      - tool: mcp_cognitive_tools_arango_modify
+        params:
+          operation: insert
+          collection: research_docs
+          document:
+            type: "research_synthesis"
+            content_type: "synthesis"
+            content: standardized_output
+        validation: research_stored_id_generated
+      - relationship_mapping → stored_id + existing_knowledge → [supersedes, supplements, contradicts, validates]
+      - semantic_tagging → research_content → entities_concepts_extracted
+      - knowledge_graph_integration → entities + relationships → graph_connections
+      - results_reporting → complete_synthesis → comprehensive_report_delivered
+    gates: [storage_successful, relationships_mapped, report_comprehensive]
+
+quality_thresholds:
+  tech_topics: {recency: {6_months: 0.5, 1_year: 0.3}}
+  scientific_topics: {recency: {2_years: 0.7, 5_years: 0.5}}
+  general_topics: {recency: {1_year: 0.8, 2_years: 0.6}}
+    recency: {1_year: 0.8, 3_years: 0.6}
+  sufficiency_threshold: {completeness: 0.7, accuracy: 0.8}

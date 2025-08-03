@@ -1,0 +1,23 @@
+# GENERATE ARCHITECTURE DIAGRAM FOR CAPABILITY OUTPUT TEMPLATE
+
+expectation: architecture_diagram_interface_sketch_data_flow_diagram
+completion: validated_outputs_and_documentation
+
+directives:
+  - "All outputs must be standards-compliant, visual, and repeatable."
+  - "Diagrams must be provided in Mermaid or C4 format as appropriate."
+  - "All outputs must be saved in docs/architecture/ with clear, descriptive naming."
+
+outputs:
+  architecture_diagram:
+    description: "Mermaid or C4 diagram visualizing the architecture for the capability."
+    format: [mermaid, c4, png]
+  interface_sketch:
+    description: "Sketch of the main interface(s) for the capability."
+    format: [mermaid, markdown, png]
+  data_flow_diagram:
+    description: "Diagram showing data flow for the capability/module."
+    format: [mermaid, c4, png]
+  research_reference:
+    description: "Summary of research and standards informing the outputs."
+    format: [markdown]

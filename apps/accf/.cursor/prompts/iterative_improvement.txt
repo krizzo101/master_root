@@ -1,0 +1,1 @@
+Review your previous output. List all weaknesses, omissions, or unmet requirements. Revise the output to address these, providing a brief rationale for each change. Repeat this process until all requirements are fully satisfied.

@@ -1,0 +1,316 @@
+# MASTER WORKFLOW GENERATION WORKFLOW
+
+# Agents must perform all workflow steps silently unless a specific step explicitly requires output to the user.
+
+# WORKFLOW SYNTAX LEGEND:
+# - Steps written as: action_1 → action_2 → result
+#   are NOT scripts or commands to run.
+# - They describe the logical sequence of reasoning, actions, or validations the agent must perform.
+# - Each label is a behavioral directive, not a filename or executable.
+# - Example: intention_analysis → workflow_request → workflow_purpose_identified
+#   means: "Analyze the intention, process the workflow request, and ensure the workflow purpose is identified."
+
+expectation: validated_workflow_definition_documentation_profile_and_templates
+autonomous_mode: true
+max_parallelism: true
+batching_enabled: true
+plan_ahead: true
+combine_and_chain_steps: true
+completion: workflow_yaml_profile_templates_and_documentation_in_standard_locations
+
+directives:
+  - "This workflow is an explicit order. All steps must be executed as written. Do not improvise, skip, or treat steps as optional."
+  - "The agent MUST operate in fully autonomous mode, planning several steps ahead, minimizing tool calls, and maximizing parallel and batched operations."
+  - "Batch all possible work and combine or chain steps to reduce the number of tool calls and responses."
+  - "The time call is required to ensure the agent is aware of the real current date/time, not its model cutoff. This is critical for up-to-date research and standards compliance."
+
+references:
+  Workflow_Generation_Output_Template: .cursor/templates/workflow_generation_output_template.yml
+  Research_Reference_Template: .cursor/templates/research_reference_template.md
+  Workflow_Generation_Agent_Profile: .cursor/profiles/workflow_generation_agent_profile.yml
+  Workflow_Generation_Documentation: docs/standards/workflow_generation_workflow.md
+  Generation_Report: docs/applications/ACCF/standards/[workflow_name]_generation_report.md
+
+phases:
+  profile_initialization:
+    description: "Load and assume the workflow generation agent profile before any other steps. Perform a time check and load foundational rules for workflow generation. Batch all initializations in a single parallel step."
+    tools: [read_file, fetch_rules, mcp_time_current_time]
+    steps:
+      - parallel_batch:
+          - tool: mcp_time_current_time
+            validation: time_checked
+          - tool: read_file
+            params:
+              target_file: .cursor/profiles/workflow_generation_agent_profile.yml
+            validation: agent_profile_loaded
+          - tool: fetch_rules
+            params:
+              rule_names:
+                - "002-tool-usage-and-optimize"
+                - "200-project-design-and-dev-process"
+                - "501-tool-operation-validation"
+                - "800-development-best-practices"
+                - "300-documentation-standards"
+            validation: foundational_rules_loaded
+    gates:
+      - time_checked
+      - agent_profile_loaded
+      - foundational_rules_loaded
+
+  intake:
+    description: "Capture the purpose, scope, and requirements for the new workflow. Ask questions if anything is unclear, contradictory, or missing.  Skipping this step is a protocol violation. Plan and batch all context and requirements capture in a single step."
+    tools: [fetch_rules]
+    params:
+      rule_names:
+        - "002-tool-usage-and-optimize"
+        - "200-project-design-and-dev-process"
+        - "501-tool-operation-validation"
+        - "800-development-best-practices"
+        - "300-documentation-standards"
+        - plus all applicable rules
+    validation: rules_fetched
+    steps:
+      - batch:
+          - intention_analysis → workflow_request → workflow_purpose_identified
+          - context_capture → use_case_analysis → requirements_documented
+    gates:
+      - workflow_purpose_identified
+      - requirements_documented
+
+  think_and_plan_research:
+    description: "Pause to think and plan the research approach for each technology or focus area. Plan all research queries and batching in advance."
+    tools: [prompt_user]
+    steps:
+      - analyze_technologies_and_research_goals → research_plan_created
+      - batch_plan_research_queries_and_scraping
+    gates:
+      - research_plan_created
+
+  research:
+    description: |
+      For each technology or focus area identified, perform all web searches, scraping, and documentation in maximally parallel and batched fashion:
+        1. Batch all web searches (primary and secondary queries) in parallel.
+        2. Select and batch scrape up to 3 high-value URLs per search in parallel.
+        3. If code/APIs/technical standards are involved, batch tech_docs and research_papers queries.
+        4. Synthesize all findings and document them using the research reference template in a single step.
+    tools: [mcp_web_search_brave_web_search, mcp_web_scraping_firecrawl_scrape, tech_docs, research_papers, read_file, edit_file]
+    steps:
+      - batch_parallel_web_searches_and_scraping → all_sources_scraped
+      - batch_tech_docs_and_papers_if_needed → docs_and_papers_retrieved
+      - synthesize_and_document_research_results_in_one_step → comprehensive_reference_document_created
+      - tool: read_file
+        params:
+          target_file: .cursor/templates/research_reference_template.md
+        validation: research_reference_template_loaded
+      - tool: edit_file
+        params:
+          target_file: docs/applications/ACCF/research/[workflow_name]_research_reference.md
+          code_edit: generated_research_reference_doc_based_on_template
+        validation: research_reference_doc_saved
+    gates:
+      - all_sources_scraped
+      - docs_and_papers_retrieved
+      - comprehensive_reference_document_created
+      - research_reference_template_loaded
+      - research_reference_doc_saved
+
+  design:
+    description: "Map out the workflow phases, steps, and validation gates. Batch mapping and validation criteria definition."
+    tools: [fetch_rules, edit_file]
+    steps:
+      - batch:
+          - workflow_mapping → phases_and_steps_defined
+          - validation_criteria → gates_and_success_conditions_defined
+          - create_agent_profile_for_workflow → agent_profile_created
+    gates:
+      - phases_defined
+      - validation_criteria_defined
+      - agent_profile_created
+
+  drafting:
+    description: "Draft and save the agent profile, workflow YAML, and templates using explicit, standard locations. Batch all file creations and validations."
+    tools: [edit_file, read_file]
+    steps:
+      - batch_parallel_file_creations_and_validations:
+          - tool: edit_file
+            params:
+              target_file: .cursor/profiles/[workflow_name]_agent_profile.yml
+              code_edit: generated_agent_profile_yaml
+            validation: agent_profile_created
+          - tool: read_file
+            params:
+              target_file: .cursor/templates/[workflow_name]_output_template.yml
+            validation: workflow_output_template_loaded
+          - tool: edit_file
+            params:
+              target_file: .cursor/workflows/[workflow_name].yml
+              code_edit: generated_workflow_yaml_from_template_with_agent_profile_reference
+            validation: workflow_yaml_created
+          - tool: edit_file
+            params:
+              target_file: .cursor/templates/[workflow_name]_output_template.yml
+              code_edit: generated_output_template
+            validation: output_template_created
+          - tool: read_file
+            params:
+              target_file: .cursor/workflows/[workflow_name].yml
+            validation: workflow_yaml_loaded_for_reference_check
+          - validate_agent_profile_reference_in_workflow_yaml → agent_profile_reference_validated
+    gates:
+      - agent_profile_created
+      - workflow_output_template_loaded
+      - workflow_yaml_created
+      - output_template_created
+      - agent_profile_reference_validated
+
+  review:
+    description: "Review the workflow for completeness, clarity, and standards compliance. Batch review and compliance checks."
+    tools: [read_file, fetch_rules]
+    steps:
+      - batch:
+          - tool: read_file
+            params:
+              target_file: .cursor/workflows/[workflow_name].yml
+            validation: workflow_reviewed
+          - checklist_review:
+              - phases_present
+              - validation_gates
+              - actionable_steps
+              - template_used
+              - standards_referenced
+            validation: compliance_confirmed
+    gates:
+      - workflow_reviewed
+      - compliance_confirmed
+
+  iterative_refinement:
+    description: "Iteratively review and refine the workflow. Identify gaps, issues, and opportunities for improvement, and update the workflow accordingly. Repeat this process until further iteration would yield only minimal or diminishing improvements. Document the rationale for stopping iteration. Batch review and update cycles."
+    tools: [read_file, edit_file]
+    steps:
+      - batch_review_and_update_until_diminishing_returns → workflow_refined_to_point_of_diminishing_returns
+    gates:
+      - workflow_refined_to_point_of_diminishing_returns
+
+  linting:
+    description: "Validate YAML, Markdown, Python, shell, and JSON files for syntax and formatting. All linting tools must be run with auto-fix parameters where available. Batch all linting steps."
+    tools: [run_terminal_cmd]
+    steps:
+      - batch_lint_and_autofix_all_files
+    gates:
+      - yaml_linting_passed
+      - markdown_linting_passed
+      - python_linting_passed
+      - shell_linting_passed
+      - json_linting_passed
+
+  documentation:
+    description: "Document the workflow, agent profile, and any generated templates. Save documentation in docs/applications/ACCF/standards/ as [workflow_name]_workflow.md. Commit all changes to git. Batch documentation and commit."
+    tools: [edit_file, run_terminal_cmd, fetch_rules]
+    steps:
+      - batch:
+          - tool: edit_file
+            params:
+              target_file: docs/applications/ACCF/standards/[workflow_name]_workflow.md
+              code_edit: generated_workflow_doc_from_template
+            validation: workflow_doc_created
+          - tool: run_terminal_cmd
+            params:
+              command: "git add . && git commit -m 'Add new/updated workflow, agent profile, templates, and documentation.'"
+              is_background: false
+            validation: git_commit_successful
+    gates:
+      - workflow_doc_created
+      - git_commit_successful
+
+  generation_report:
+    description: "Generate and save a concise, human-readable Markdown report summarizing what was created, including all files, their purposes, and a Mermaid diagram of the workflow structure."
+    tools: [edit_file]
+    steps:
+      - tool: edit_file
+        params:
+          target_file: docs/applications/ACCF/standards/[workflow_name]_generation_report.md
+          code_edit: generated_report_content_based_on_template
+        validation: generation_report_saved
+    gates:
+      - generation_report_saved
+
+  mermaid_diagram:
+    description: "Generate a high-contrast Mermaid diagram that visualizes the workflow generated during execution."
+    tools: [create_diagram]
+    steps:
+      - tool: create_diagram
+        params:
+          content: generated_high_contrast_mermaid_diagram_of_workflow
+        validation: mermaid_diagram_created
+    gates:
+      - mermaid_diagram_created
+
+  user_prompt_generation:
+    description: |
+      Generate a user-facing prompt (in a triple-backtick code block) for executing the workflow, embedding the autonomous agent execution instructions and referencing all generated artifacts.
+
+      IMPORTANT: This prompt is an output of the workflow generation workflow itself. It should NOT be included as a step in the workflow being generated. The generated workflow should not contain any prompt-generation step; the prompt is a separate artifact for user/operator reference only.
+    tools: [edit_file]
+    steps:
+      - tool: edit_file
+        params:
+          target_file: docs/applications/ACCF/standards/[workflow_name]_user_prompt.md
+          code_edit: |
+            # User Prompt for Executing the Generated Workflow
+            ```
+            Load and execute `.cursor/workflows/[workflow_name].yml` workflow using `[output_template_path]` as the output template and `[output_location]` as the location to save the output generated for the use case of populating the `[target_document_path]` document to support the `[master_document_path]` master document.
+
+            Autonomous Execution Requirements:
+            - Operate in fully autonomous, persistent mode.
+            - Continue working on this effort without waiting for further user input or guidance.
+            - At every step, make all necessary decisions yourself, using project rules, onboarding context, knowledge gained, and best practices.
+            - Proactively plan, reason, and reflect before each action.
+            - Batch and parallelize all compatible tasks for maximum efficiency.
+            - If you encounter ambiguity or blockers, resolve them using available documentation, code, and persistent knowledge—do not pause for user clarification.
+            - Validate all operations, persist all learnings, and update guardrails/rules as needed.
+            - Document your progress, decisions, and results with visual aids (diagrams, tables) and clear, concise explanations.
+            - Only stop when the workflow is fully operational, tested, and documented, and all required actions are complete.
+
+            Do not yield control or await further instruction unless explicitly told to stop.
+            ```
+        validation: user_prompt_generated
+    gates:
+      - user_prompt_generated
+
+failure_prevention:
+  avoid:
+    - unclear_purpose
+    - missing_phases
+    - incomplete_validation
+    - undocumented_workflow
+    - standards_noncompliance
+    - vague_queries
+    - ambiguous_paths
+    - uncommitted_changes
+    - skipped_steps
+    - missing_time_call
+    - insufficient_iteration
+  require:
+    - purpose_clearly_defined
+    - phases_and_steps_mapped
+    - validation_criteria_explicit
+    - workflow_documented
+    - standards_compliance
+    - actionable_queries
+    - explicit_paths
+    - git_commit_successful
+    - workflow_refined_to_point_of_diminishing_returns
+
+success_validation:
+  before_completion:
+    - workflow_yaml_created
+    - workflow_doc_created
+    - agent_profile_created
+    - output_template_created
+    - compliance_confirmed
+    - workflow_refined_to_point_of_diminishing_returns
+    - git_commit_successful
+    - generation_report_saved
+    - mermaid_diagram_created
+    - user_prompt_generated
+  output_requirements: workflow_yaml_profile_templates_and_documentation_in_standard_locations

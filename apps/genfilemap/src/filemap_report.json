@@ -1,0 +1,74 @@
+{
+  "summary": {
+    "total_processed": 13,
+    "updated": 4,
+    "skipped": 9,
+    "errors": 0,
+    "api_calls": 0,
+    "api_tokens_estimated": 0,
+    "duration_seconds": 66.84120774269104
+  },
+  "detailed_logs": [
+    {
+      "file": "/home/opsvi/genFileMap/docs/file-map-format.md",
+      "action": "skipped",
+      "reason": "up-to-date"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/docs/ai-agent-guide.md",
+      "action": "skipped",
+      "reason": "up-to-date"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/docs/refactoring-plan.md",
+      "action": "skipped",
+      "reason": "up-to-date"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/docs/configuration.md",
+      "action": "skipped",
+      "reason": "up-to-date"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/docs/workflow-guide.md",
+      "action": "skipped",
+      "reason": "up-to-date"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/docs/development-guide.md",
+      "action": "skipped",
+      "reason": "up-to-date"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/docs/api-reference.md",
+      "action": "skipped",
+      "reason": "up-to-date"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/docs/installation.md",
+      "action": "skipped",
+      "reason": "up-to-date"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/docs/file-watcher.md",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/docs/README.md",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/docs/user-guide.md",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/docs/architecture.md",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/docs/examples/file-watcher-faq.md",
+      "action": "skipped",
+      "reason": "up-to-date"
+    }
+  ]
+}

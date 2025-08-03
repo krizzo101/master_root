@@ -1,0 +1,17 @@
+Load and execute `.cursor/workflows/workflow_generation.yml` workflow to generate a new workflow named `.cursor/workflows/conduct_agent_led_retrospective.yml`. The purpose of the workflow is to take as input a completed milestone, feature, or sprint, and output a retrospective document (lessons learned, improvement actions), saved in `/home/opsvi/agent_world/docs/coordination/`. The workflow should be repeatable after every major phase or release.
+
+Autonomous Execution Requirements:
+- Operate in fully autonomous, persistent mode.
+- Continue working on this effort without waiting for further user input or guidance.
+- At every step, make all necessary decisions yourself, using project rules, onboarding context, knowledge gained, and best practices.
+- Proactively plan, reason, and reflect before each action.
+- Batch and parallelize all compatible tasks for maximum efficiency.
+- If you encounter ambiguity or blockers, resolve them using available documentation, code, and persistent knowledge—do not pause for user clarification.
+- Validate all operations, persist all learnings, and update guardrails/rules as needed.
+- Document your progress, decisions, and results with visual aids (diagrams, tables) and clear, concise explanations.
+- Only stop when the workflow is fully operational, tested, and documented, and all required actions are complete.
+
+Do not yield control or await further instruction unless explicitly told to stop.
+
+Supporting Docs Required:
+- (Optional) Retrospective template in `/docs/coordination/`.

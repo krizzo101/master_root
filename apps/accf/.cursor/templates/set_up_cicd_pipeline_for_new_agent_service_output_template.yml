@@ -1,0 +1,24 @@
+# SET UP CICD PIPELINE FOR NEW AGENT SERVICE OUTPUT TEMPLATE
+
+expectation: cicd_config_lint_test_hooks_and_deployment_script
+completion: validated_outputs_and_documentation
+
+directives:
+  - "All outputs must be standards-compliant, secure, and repeatable."
+  - "CI/CD config must be compatible with GitHub Actions or equivalent."
+  - "Lint/test hooks and deployment scripts must be robust and documented."
+  - "Outputs must be saved in .github/workflows/ or equivalent."
+
+outputs:
+  cicd_config:
+    description: "CI/CD configuration file (e.g., GitHub Actions YAML)."
+    format: [yaml]
+  lint_test_hooks:
+    description: "Linting and testing hooks/scripts."
+    format: [sh, yaml, markdown]
+  deployment_script:
+    description: "Deployment script for the agent/service."
+    format: [sh, yaml, markdown]
+  research_reference:
+    description: "Summary of research and standards informing the outputs."
+    format: [markdown]

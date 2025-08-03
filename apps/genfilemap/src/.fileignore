@@ -1,0 +1,68 @@
+# GenFileMap ignore file
+#
+# This file works similarly to .gitignore - it specifies patterns for files
+# that should be ignored when processing with genfilemap.
+#
+# Lines starting with # are comments and are ignored.
+# Each line is a file pattern which tells genfilemap to ignore those files.
+# Empty lines are ignored.
+
+# Python virtual environments
+venv/
+.venv/
+env/
+.env/
+ENV/
+virtualenv/
+.virtualenv/
+.python-env/
+**/venv/
+**/.venv/
+
+# Compiled code
+*.pyc
+*.pyo
+*.class
+*.so
+*.o
+*.obj
+
+# Version control
+.git/
+.svn/
+.hg/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Build and distribution
+__pycache__/
+*.egg-info/
+dist/
+build/
+node_modules/
+
+# Generated files
+*.min.js
+*.min.css
+*.map
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+
+# Large data files
+*.csv
+*.json
+*.xml
+*.parquet
+*.avro
+*.pickle
+*.pkl
+
+# Add your own patterns below 

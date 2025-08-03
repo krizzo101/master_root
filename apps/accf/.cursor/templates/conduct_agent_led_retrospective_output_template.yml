@@ -1,0 +1,24 @@
+# CONDUCT AGENT-LED RETROSPECTIVE OUTPUT TEMPLATE
+
+# This template defines the structure for a retrospective document.
+# Use for any completed milestone, feature, or sprint.
+
+retrospective:
+  title: "[Retrospective Title]"
+  date: "[YYYY-MM-DD]"
+  milestone: "[Milestone/Feature/Sprint Name]"
+  participants:
+    - name: "[Participant Name]"
+      role: "[Role or responsibility]"
+  what_went_well:
+    - "[Positive outcome or success]"
+  what_didnt_go_well:
+    - "[Challenge or issue]"
+  lessons_learned:
+    - "[Key lesson or insight]"
+  improvement_actions:
+    - action: "[Action to improve]"
+      owner: "[Responsible person/agent]"
+      due_date: "[YYYY-MM-DD]"
+  follow_up_items:
+    - "[Item to revisit or monitor]"

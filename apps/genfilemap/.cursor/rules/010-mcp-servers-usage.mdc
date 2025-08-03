@@ -1,0 +1,155 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+{
+"title": "MCP Servers Usage Protocol",
+"sections": {
+"core_server_usage": {
+"depth": 1,
+"trigger": "mcp-server-usage",
+"rules": [
+{"name": "Server Selection Framework", "when": "choosing which MCP server to use", "to": "optimize for the specific task requirements", "you_must": "select the appropriate server based on the server decision matrix", "validation_criteria": ["Must evaluate task requirements against server capabilities", "Must select the most suitable server for the task", "Must document reason for server selection"], "decision_matrix": [{"task_type": "Persistent memory storage", "first_choice": "memory-bank", "second_choice": "knowledge-graph", "avoid": "N/A"}, {"task_type": "Complex reasoning problems", "first_choice": "sequential-thinking", "second_choice": "N/A", "avoid": "N/A"}, {"task_type": "Knowledge graph operations", "first_choice": "knowledge-graph", "second_choice": "memory-bank", "avoid": "N/A"}, {"task_type": "Library documentation lookup", "first_choice": "context7", "second_choice": "N/A", "avoid": "N/A"}], "compliant_example": "For storing information about the project architecture, I'll use the memory-bank MCP server since it provides persistent storage capabilities.", "non_compliant_example": "I'll use sequential-thinking to store project documentation.", "dependencies": []},
+
+        {"name": "Server Capability Awareness", "when": "implementing MCP server integration", "to": "leverage appropriate server functions", "you_must": "utilize the correct functions based on server capabilities and intended usage", "validation_criteria": ["Must identify available functions for each server", "Must match function to intended purpose", "Must properly format function parameters"], "compliant_example": "To store project context, I'll use mcp_memory-bank_update-memory-bank with properly structured content.", "non_compliant_example": "I'll use mcp_sequential-thinking_sequentialthinking to persist data long-term.", "dependencies": ["Server Selection Framework"]},
+
+        {"name": "Error Handling Protocol", "when": "calling MCP server functions", "to": "ensure robust operation", "you_must": "implement proper error detection and recovery strategies", "validation_criteria": ["Must check function results for errors", "Must implement fallback strategies", "Must inform users of critical failures", "Must retry failed operations when appropriate"], "compliant_example": "If the knowledge-graph operation fails, I'll retry once more before falling back to memory-bank storage and informing the user.", "non_compliant_example": "Calling the function without checking the result.", "dependencies": ["Server Capability Awareness"]}
+      ]
+    },
+    "memory_bank_usage": {
+      "depth": 2,
+      "trigger": "memory-bank-usage",
+      "rules": [
+        {"name": "Memory Bank Initialization", "when": "first using memory-bank MCP", "to": "ensure proper setup", "you_must": "verify memory bank existence and initialize if necessary", "validation_criteria": ["Must check memory bank status before use", "Must initialize memory bank if not present", "Must verify successful initialization"], "compliant_example": "I'll first check memory-bank status with mcp_memory-bank_memory-bank-status, then initialize if needed.", "non_compliant_example": "Directly writing to memory bank without checking initialization status.", "dependencies": ["Server Selection Framework"]},
+
+        {"name": "Memory Bank Content Structure", "when": "storing information in memory bank", "to": "ensure retrievability and context preservation", "you_must": "organize content with clear structure, metadata, and contextual relationships", "validation_criteria": ["Must include descriptive filenames", "Must organize content in logical categories", "Must include metadata for context", "Must establish clear relationships between memory files"], "compliant_example": "Storing project configuration in memory-bank/projectConfig.md with proper sections for database, API, and frontend configurations.", "non_compliant_example": "Storing unstructured information without clear organization or naming convention.", "dependencies": ["Memory Bank Initialization"]},
+
+        {"name": "Memory Bank Content Retrieval", "when": "accessing stored information", "to": "efficiently retrieve relevant data", "you_must": "use specific queries and properly process the retrieved information", "validation_criteria": ["Must use specific file paths when possible", "Must parse retrieved content appropriately", "Must verify content relevance before use"], "compliant_example": "Retrieving the specific file memory-bank/projectRequirements.md to answer user questions about project scope.", "non_compliant_example": "Retrieving all memory bank files regardless of relevance to the current query.", "dependencies": ["Memory Bank Content Structure"]},
+
+        {"name": "Memory Bank Update Protocol", "when": "modifying existing memory", "to": "maintain consistency and accuracy", "you_must": "follow the proper update procedure to ensure data integrity", "validation_criteria": ["Must retrieve existing content before updating", "Must preserve relevant existing information", "Must clearly mark updated content with timestamps", "Must verify update success"], "compliant_example": "First checking current content, then applying specific updates while preserving other sections, and verifying the update was successful.", "non_compliant_example": "Overwriting entire files without preserving existing context.", "dependencies": ["Memory Bank Content Retrieval"]}
+      ]
+    },
+    "sequential_thinking_usage": {
+      "depth": 2,
+      "trigger": "sequential-thinking-usage",
+      "rules": [
+        {"name": "Sequential Thinking Problem Analysis", "when": "using sequential thinking for complex problems", "to": "ensure thorough analysis", "you_must": "break down problems into logical sequential steps", "validation_criteria": ["Must identify appropriate problem complexity", "Must establish clear initial thought count", "Must structure thoughts in logical sequence"], "compliant_example": "Breaking down system architecture analysis into sequential thoughts, starting with requirements analysis, then component identification, followed by interaction patterns.", "non_compliant_example": "Creating a single thought that attempts to solve the entire problem at once.", "dependencies": ["Server Selection Framework"]},
+
+        {"name": "Thought Revision Management", "when": "refining thought processes", "to": "enable correction and improvement", "you_must": "appropriately mark revisions and branches in thought sequences", "validation_criteria": ["Must use isRevision parameter for corrections", "Must specify revisesThought when applicable", "Must use branchFromThought for alternative paths", "Must provide clear reasoning for revisions"], "compliant_example": "Creating a thought with isRevision=true and revisesThought=2 when correcting a flawed assumption in the second thought.", "non_compliant_example": "Creating contradictory thoughts without marking revisions or establishing relationships.", "dependencies": ["Sequential Thinking Problem Analysis"]},
+
+        {"name": "Thought Sequence Completion", "when": "concluding sequential thinking", "to": "ensure proper resolution", "you_must": "provide clear conclusion and set nextThoughtNeeded appropriately", "validation_criteria": ["Must summarize key insights in final thoughts", "Must set nextThoughtNeeded=false when complete", "Must ensure the thought sequence addresses original problem"], "compliant_example": "In the final thought, summarizing the analysis, providing a clear recommendation, and setting nextThoughtNeeded=false.", "non_compliant_example": "Ending thought sequence without conclusion or setting nextThoughtNeeded incorrectly.", "dependencies": ["Thought Revision Management"]}
+      ]
+    },
+    "knowledge_graph_usage": {
+      "depth": 2,
+      "trigger": "knowledge-graph-usage",
+      "rules": [
+        {"name": "Entity Creation Protocol", "when": "adding new entities to knowledge graph", "to": "ensure proper knowledge representation", "you_must": "define clear entity types, names, and observations", "validation_criteria": ["Must select appropriate entityType", "Must use descriptive, unique names", "Must include relevant observations", "Must verify entity creation success"], "compliant_example": "Creating a 'Project' entity with descriptive name and relevant observations about project scope, timeline, and requirements.", "non_compliant_example": "Creating entities with generic names and minimal observations.", "dependencies": ["Server Selection Framework"]},
+
+        {"name": "Relation Establishment", "when": "connecting entities in knowledge graph", "to": "create meaningful knowledge networks", "you_must": "define clear, directional relationships between entities", "validation_criteria": ["Must specify clear source and target entities", "Must use descriptive relation types in active voice", "Must ensure relation is directionally appropriate", "Must verify relation creation success"], "compliant_example": "Creating a relation where 'UserRequirement' 'requires' 'SystemFeature' with clear direction and meaning.", "non_compliant_example": "Creating vague relations like 'related to' or with unclear directionality.", "dependencies": ["Entity Creation Protocol"]},
+
+        {"name": "Knowledge Graph Query Strategy", "when": "retrieving information from knowledge graph", "to": "extract relevant knowledge efficiently", "you_must": "use specific, targeted queries to find needed information", "validation_criteria": ["Must use specific search terms for targeted queries", "Must open specific nodes when their names are known", "Must read full graph only when comprehensive view is needed", "Must process and synthesize retrieved information appropriately"], "compliant_example": "Using mcp_knowledge-graph_search_nodes with specific query terms related to the user's question about authentication features.", "non_compliant_example": "Always reading the entire graph regardless of query specificity.", "dependencies": ["Relation Establishment"]},
+
+        {"name": "Knowledge Graph Maintenance", "when": "managing knowledge graph over time", "to": "ensure accuracy and relevance", "you_must": "periodically review, update, and clean the knowledge structure", "validation_criteria": ["Must update observations when new information is available", "Must delete obsolete entities and relations", "Must verify graph consistency after modifications"], "compliant_example": "Updating existing entities with new observations when requirements change, and removing obsolete entities that no longer apply.", "non_compliant_example": "Creating duplicate entities instead of updating existing ones.", "dependencies": ["Knowledge Graph Query Strategy"]}
+      ]
+    },
+    "context7_usage": {
+      "depth": 2,
+      "trigger": "context7-usage",
+      "rules": [
+        {"name": "Library Identification Process", "when": "looking up library documentation", "to": "find correct documentation", "you_must": "first resolve the library name to a valid Context7 ID", "validation_criteria": ["Must use mcp_context7_resolve-library-id before get-library-docs", "Must provide accurate library name", "Must select appropriate library from results"], "compliant_example": "First calling mcp_context7_resolve-library-id with 'react' to get the exact Context7-compatible library ID before retrieving documentation.", "non_compliant_example": "Directly calling get-library-docs without first resolving the library ID.", "dependencies": ["Server Selection Framework"]},
+
+        {"name": "Documentation Retrieval Optimization", "when": "fetching library documentation", "to": "get relevant, focused information", "you_must": "optimize token usage and specify relevant topics when appropriate", "validation_criteria": ["Must use resolved library ID", "Must set appropriate token limit", "Must specify topic when focused documentation is needed", "Must handle retrieved documentation appropriately"], "compliant_example": "Using mcp_context7_get-library-docs with the resolved ID, a focused topic 'hooks', and appropriate token limit of 5000.", "non_compliant_example": "Requesting excessive tokens or not specifying a topic when looking for specific functionality.", "dependencies": ["Library Identification Process"]},
+
+        {"name": "Documentation Integration", "when": "using retrieved documentation", "to": "provide accurate implementation guidance", "you_must": "accurately reference and apply documentation in context", "validation_criteria": ["Must cite documentation source", "Must apply current best practices from documentation", "Must verify implementation against documentation"], "compliant_example": "Implementing React hooks based on the current documentation retrieved from Context7, with proper useEffect dependency arrays as specified in the docs.", "non_compliant_example": "Implementing features inconsistently with the retrieved documentation or using outdated patterns.", "dependencies": ["Documentation Retrieval Optimization"]}
+      ]
+    },
+    "error_handling": {
+      "depth": 1,
+      "trigger": "error-handling",
+      "rules": [
+        {"name": "MCP Server Error Detection", "when": "encountering MCP server errors", "to": "ensure reliable operation", "you_must": "identify error types and respond appropriately", "validation_criteria": ["Must detect connection failures", "Must identify function-specific errors", "Must log error details for diagnostics"], "compliant_example": "Detecting that the knowledge-graph server returned an empty result and logging the specific error condition.", "non_compliant_example": "Ignoring error conditions in server responses.", "dependencies": ["Server Capability Awareness"]},
+
+        {"name": "Error Recovery Strategy", "when": "handling MCP server failures", "to": "maintain functionality despite errors", "you_must": "implement appropriate fallback approaches", "validation_criteria": ["Must attempt reasonable retries when appropriate", "Must implement alternative approaches when primary fails", "Must inform users of significant failures"], "compliant_example": "When memory-bank update fails, retrying once, then falling back to storing critical information in chat context while informing the user.", "non_compliant_example": "Abandoning task entirely when first approach fails.", "dependencies": ["MCP Server Error Detection"]},
+
+        {"name": "Graceful Degradation", "when": "MCP server is unavailable", "to": "maintain core functionality", "you_must": "gracefully degrade capabilities while preserving essential functions", "validation_criteria": ["Must continue operation with limited capabilities", "Must clearly communicate limitations to user", "Must prioritize core functionalities"], "compliant_example": "If knowledge-graph server is unavailable, informing the user while continuing to provide assistance using available context and other MCP servers.", "non_compliant_example": "Refusing to continue task when one MCP server is unavailable.", "dependencies": ["Error Recovery Strategy"]}
+      ]
+    },
+    "implementation_decision_matrix": {
+      "depth": 3,
+      "matrix": [
+        {"server": "memory-bank", "primary_use_case": "Persistent storage of information", "key_functions": ["memory-bank-status", "process-memory-bank-request", "update-memory-bank"], "best_for": "Project context, requirements, progress tracking", "limitations": "Less structured than knowledge graph"},
+        {"server": "sequential-thinking", "primary_use_case": "Complex reasoning and problem-solving", "key_functions": ["sequentialthinking"], "best_for": "Algorithm design, architecture decisions, multi-step analysis", "limitations": "Not for persistent storage"},
+        {"server": "knowledge-graph", "primary_use_case": "Interconnected information storage", "key_functions": ["create_entities", "create_relations", "search_nodes", "read_graph"], "best_for": "Domain modeling, relationship mapping, semantic networks", "limitations": "Requires careful entity and relation design"},
+        {"server": "context7", "primary_use_case": "Library and API documentation", "key_functions": ["resolve-library-id", "get-library-docs"], "best_for": "Implementation guidance, API reference, code examples", "limitations": "Limited to available libraries in index"}
+      ]
+    },
+    "function_reference": {
+      "depth": 3,
+      "memory_bank_functions": [
+        {"function": "mcp_memory-bank_memory-bank-status", "purpose": "Check status of memory bank", "usage": "Use to verify memory bank existence and contents", "parameters": ["random_string (dummy parameter)"], "returns": "Status message and list of files in memory bank"},
+        {"function": "mcp_memory-bank_process-memory-bank-request", "purpose": "Process natural language requests for memory bank", "usage": "Use for querying memory bank with natural language", "parameters": ["random_string (with query embedded)"], "returns": "Results of memory bank query"},
+        {"function": "mcp_memory-bank_update-memory-bank", "purpose": "Update memory bank contents", "usage": "Use to create or modify memory bank files", "parameters": ["random_string (dummy parameter)"], "returns": "Confirmation of update"}
+      ],
+      "sequential_thinking_functions": [
+        {"function": "mcp_sequential-thinking_sequentialthinking", "purpose": "Structured thinking process", "usage": "Break down complex problems into sequential steps", "parameters": ["thought", "nextThoughtNeeded", "thoughtNumber", "totalThoughts", "isRevision (optional)", "revisesThought (optional)", "branchFromThought (optional)", "branchId (optional)", "needsMoreThoughts (optional)"], "returns": "Thought tracking information"}
+      ],
+      "knowledge_graph_functions": [
+        {"function": "mcp_knowledge-graph_create_entities", "purpose": "Add entities to knowledge graph", "usage": "Create new entities with observations", "parameters": ["entities (array of entity objects)"], "returns": "Created entities"},
+        {"function": "mcp_knowledge-graph_create_relations", "purpose": "Add relations between entities", "usage": "Create connections between entities", "parameters": ["relations (array of relation objects)"], "returns": "Created relations"},
+        {"function": "mcp_knowledge-graph_add_observations", "purpose": "Add observations to entities", "usage": "Update existing entities with new information", "parameters": ["observations (array of observation objects)"], "returns": "Updated observations"},
+        {"function": "mcp_knowledge-graph_delete_entities", "purpose": "Remove entities from graph", "usage": "Delete obsolete or incorrect entities", "parameters": ["entityNames (array of entity names)"], "returns": "Deletion confirmation"},
+        {"function": "mcp_knowledge-graph_delete_observations", "purpose": "Remove observations from entities", "usage": "Delete specific observations", "parameters": ["deletions (array of deletion objects)"], "returns": "Deletion confirmation"},
+        {"function": "mcp_knowledge-graph_delete_relations", "purpose": "Remove relations from graph", "usage": "Delete connections between entities", "parameters": ["relations (array of relation objects)"], "returns": "Deletion confirmation"},
+        {"function": "mcp_knowledge-graph_read_graph", "purpose": "Read entire knowledge graph", "usage": "Get complete graph contents", "parameters": ["random_string (dummy parameter)"], "returns": "Complete graph with all entities and relations"},
+        {"function": "mcp_knowledge-graph_search_nodes", "purpose": "Find nodes matching query", "usage": "Search for specific entities", "parameters": ["query (search string)"], "returns": "Matching entities"},
+        {"function": "mcp_knowledge-graph_open_nodes", "purpose": "Get specific nodes by name", "usage": "Retrieve known entities", "parameters": ["names (array of entity names)"], "returns": "Requested entities"}
+      ],
+      "context7_functions": [
+        {"function": "mcp_context7_resolve-library-id", "purpose": "Find Context7-compatible library ID", "usage": "Convert library name to valid ID", "parameters": ["libraryName (string)"], "returns": "Matching library IDs with metadata"},
+        {"function": "mcp_context7_get-library-docs", "purpose": "Retrieve library documentation", "usage": "Get documentation for implementation guidance", "parameters": ["context7CompatibleLibraryID (string)", "tokens (optional number)", "topic (optional string)"], "returns": "Library documentation"}
+      ]
+    },
+    "usage_patterns": {
+      "depth": 2,
+      "trigger": "usage-patterns",
+      "memory_bank_patterns": {
+        "initialization": "mcp_memory-bank_memory-bank-status → check if memory bank exists → create if needed",
+        "reading": "mcp_memory-bank_memory-bank-status → identify file of interest → process content",
+        "updating": "mcp_memory-bank_memory-bank-status → check current content → mcp_memory-bank_update-memory-bank with new/modified content",
+        "querying": "mcp_memory-bank_process-memory-bank-request with natural language query"
+      },
+      "sequential_thinking_patterns": {
+        "problem_analysis": "Identify problem complexity → estimate required thoughts → create initial thought",
+        "thought_sequence": "Create thoughts in logical order → thoughtNumber increases sequentially → set nextThoughtNeeded=true until complete",
+        "revision": "Create thought with isRevision=true → specify revisesThought → provide correction",
+        "branching": "Create thought with branchFromThought → specify branchId → explore alternative path",
+        "completion": "Provide conclusion in final thought → set nextThoughtNeeded=false"
+      },
+      "knowledge_graph_patterns": {
+        "initialization": "mcp_knowledge-graph_read_graph → check if empty → create foundational entities if needed",
+        "entity_creation": "mcp_knowledge-graph_create_entities with properly structured entity definitions",
+        "relation_creation": "mcp_knowledge-graph_create_relations with clear directional relationships",
+        "querying": "mcp_knowledge-graph_search_nodes for general search → mcp_knowledge-graph_open_nodes for known entities",
+        "maintenance": "Add observations to update → delete obsolete entities and relations"
+      },
+      "context7_patterns": {
+        "library_lookup": "mcp_context7_resolve-library-id with library name → select appropriate library from results",
+        "documentation_retrieval": "mcp_context7_get-library-docs with resolved ID, token limit, and optional topic",
+        "implementation_guidance": "Retrieve documentation → cite source → apply in implementation"
+      }
+    },
+    "workflow": {
+      "depth": 2,
+      "phases": [
+        {"name": "Server Selection Phase", "steps": ["Analyze task requirements", "Consult implementation decision matrix", "Select appropriate server(s)"]},
+        {"name": "Initialization Phase", "steps": ["Check server status", "Initialize if needed", "Verify initialization success"]},
+        {"name": "Operation Phase", "steps": ["Follow server-specific usage patterns", "Check operation results", "Handle errors appropriately"]},
+        {"name": "Integration Phase", "steps": ["Combine results from multiple servers when appropriate", "Present integrated information to user", "Document operations for future reference"]}
+      ]
+    }
+
+}
+}

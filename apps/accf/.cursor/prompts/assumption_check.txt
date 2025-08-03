@@ -1,0 +1,1 @@
+List all assumptions you are making as a numbered list. Clearly state that these require user confirmation before proceeding.

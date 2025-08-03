@@ -1,0 +1,26 @@
+# Doc Cleanup Workflow Output Template
+
+outputs:
+  - path: .cursor/workflows/doc_cleanup.yml
+    description: Generated workflow YAML for the documentation cleanup process
+    validation: Must define all workflow phases, steps, validation gates, and reference the agent profile
+
+  - path: .cursor/profiles/doc_cleanup_agent_profile.yml
+    description: Agent profile for the doc_cleanup workflow
+    validation: Must specify agent name, description, required capabilities, and compliance standards
+
+  - path: docs/standards/doc_cleanup_workflow.md
+    description: Documentation for the doc_cleanup workflow, including overview, phases, diagrams, and usage
+    validation: Must follow documentation standards, include Mermaid diagrams, and reference requirements/design
+
+  - path: docs/standards/doc_cleanup_generation_report.md
+    description: Generation report summarizing workflow creation, files generated, and workflow structure diagram
+    validation: Must summarize all outputs, their purposes, and include a Mermaid diagram of the workflow
+
+  - path: src/applications/doc_cleanup/requirements/cleanup_requirements.md
+    description: Requirements for the documentation cleanup application
+    validation: Must be referenced in workflow documentation and YAML
+
+  - path: src/applications/doc_cleanup/design/cleanup_workflow.md
+    description: Design and specifications for the documentation cleanup application
+    validation: Must be referenced in workflow documentation and YAML

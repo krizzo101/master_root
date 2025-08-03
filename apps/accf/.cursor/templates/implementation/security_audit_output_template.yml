@@ -1,0 +1,17 @@
+# ACCF Security, Audit, and Provenance Output Template
+
+outputs:
+  - path: src/shared/security/security_audit.py
+    description: Python module for security, audit, and provenance
+    validation: Must implement structured logging, access control, audit trail, and provenance tracking
+  - path: docs/applications/ACCF/standards/security_audit_requirements.md
+    description: Requirements documentation for security, audit, and provenance
+    validation: Must reference all relevant standards and compliance requirements
+  - path: docs/applications/ACCF/architecture/adr/security_audit_adrs.md
+    description: Architecture Decision Record for security, audit, and provenance
+    validation: Must document the decision, context, and consequences
+
+validation:
+  - All outputs must be standards-compliant and documented
+  - Code must be tested and reviewed
+  - Documentation must reference all applicable rules

@@ -1,0 +1,62 @@
+{
+  "mcpServers": {
+    "thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "tech_docs": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "web_search": {
+      "command": "npx",
+      "args": ["-y", "brave-search-mcp"],
+      "env": {
+        "BRAVE_API_KEY": "BSAqv6fii19i_ZRARk67Gs5udOHgxSN"
+      }
+    },
+    "sequential_thinking": {
+      "command": "npx",
+      "args": ["-y", "server-sequential-thinking"]
+    },
+    "time": {
+      "command": "npx",
+      "args": ["-y", "time-mcp"]
+    },
+    "calc": {
+      "command": "npx",
+      "args": ["-y", "@wrtnlabs/calculator-mcp"]
+    },
+    "research_papers": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": ["-m", "arxiv_mcp_server"]
+    },
+    "cognitive_tools": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "/home/opsvi/agent_world/src/applications/cognitive_interface/mcp_cog_tools_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "/home/opsvi/agent_world",
+        "ARANGO_URL": "http://127.0.0.1:8550",
+        "ARANGO_DB": "_system",
+        "ARANGO_USERNAME": "root",
+        "ARANGO_PASSWORD": "change_me",
+        "AGENT_IDE_MODE": "true",
+        "COLLECTIONS_MAPPING": "agent_ide"
+      }
+    },
+    "workflow_mcp": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "/home/opsvi/agent_world/src/applications/workflow_mcp/mcp_workflow_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "/home/opsvi/agent_world",
+        "ARANGO_URL": "http://127.0.0.1:8550",
+        "ARANGO_DB": "_system",
+        "ARANGO_USERNAME": "root",
+        "ARANGO_PASSWORD": "change_me"
+      }
+   }
+}

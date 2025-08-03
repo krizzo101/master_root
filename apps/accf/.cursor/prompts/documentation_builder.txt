@@ -1,0 +1,1 @@
+Create professional documentation with clear sections: Purpose, Usage, Configuration, and Extension Points. Use headings, bullet points, and code blocks where appropriate for clarity.

@@ -1,0 +1,86 @@
+{
+  "summary": {
+    "total_processed": 18,
+    "updated": 17,
+    "skipped": 1,
+    "errors": 0,
+    "api_calls": 0,
+    "api_tokens_estimated": 0,
+    "duration_seconds": 25.54551863670349
+  },
+  "detailed_logs": [
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/prompting/__init__.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/cli.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/__init__.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/config.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/utils/template_utils.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/utils/__init__.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/prompting/prompts.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/core.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/models/__init__.py",
+      "action": "skipped",
+      "reason": "too-short"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/api/__init__.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/utils/file_utils.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/api/openai.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/api/base.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/models/schemas.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/processors/__init__.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/processors/base.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/processors/code_processor.py",
+      "action": "updated"
+    },
+    {
+      "file": "/home/opsvi/genFileMap/src/genfilemap/processors/doc_processor.py",
+      "action": "updated"
+    }
+  ]
+}

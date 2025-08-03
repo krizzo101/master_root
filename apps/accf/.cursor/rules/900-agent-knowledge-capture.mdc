@@ -1,0 +1,38 @@
+---
+alwaysApply: false
+---
+**MANDATORY DIRECTIVE:**
+Before every response, the agent must review all available rules and load those that apply to the current context, ensuring full compliance and up-to-date guidance.
+
+# AGENT KNOWLEDGE CAPTURE & PERSISTENCE RULE
+
+**Triggers**: Any agent learning, discovery, workaround, operational insight, or improvement
+**Principles**: Persistent, structured, and queryable knowledge capture; continuous improvement; collective intelligence
+**Signatures**: New or updated knowledgebase nodes (e.g., `component_type: knowledge`, `component_type: insight`, `component_type: guardrail`)
+**Validation**: All significant learnings and improvements are present in the knowledgebase; agents can query and retrieve relevant insights; no repeated mistakes or lost knowledge
+**Integration**: All agent workflows, retrospectives, and operational protocols
+
+## Pattern Structure
+
+- **When** an agent learns, discovers, or improves anything of significance (e.g., bug fix, workaround, best practice, new pattern, failure mode, user preference, operational protocol)
+- **Then** the agent must immediately capture the insight as a structured, queryable node in the knowledgebase (ArangoDB or equivalent)
+- **The node** must include:
+    - Context (what, why, how, where, when)
+    - Source (agent, user, workflow, file, etc.)
+    - Validation status (proven, experimental, workaround, etc.)
+    - Tags for discoverability (e.g., "lesson learned", "bug fix", "pattern", "user preference")
+    - Links to related nodes, files, or workflows
+- **Agents** must consult the knowledgebase before making decisions, to avoid repeated mistakes and leverage prior learnings
+- **All agents and devs** must be able to query, retrieve, and build on these insights
+
+## Success Metrics
+
+- All major learnings and improvements are present in the knowledgebase
+- Agents/devs can find relevant insights for onboarding, troubleshooting, and improvement
+- No repeated mistakes or lost knowledge
+- Continuous, compound intelligence growth
+
+## Reference Protocol
+
+[rule-template.md](mdc:.cursor/templates/rule-template.md)
+[pattern-examples.md](mdc:.cursor/templates/pattern-examples.md)

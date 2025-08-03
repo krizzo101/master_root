@@ -1,0 +1,86 @@
+---
+description: "use when COMMITTING CODE to ENFORCE PRE-COMMIT VALIDATION for CODE QUALITY"
+globs:
+alwaysApply: false
+---
+
+# Pre-commit Validation Standards
+
+**Triggers**: Git commits, code reviews, deployment preparation
+**Principles**: Quality gates, automated validation, zero tolerance for violations
+**Signatures**: Pre-commit hook compliance, linting validation, type checking
+**Validation**: Hook execution success, error resolution, quality metrics
+**Integration**: Git workflow, CI/CD pipeline, development tools
+
+## Mandatory Requirements
+
+### Pre-commit Hook Execution
+```bash
+# ✅ CORRECT - Run pre-commit hooks
+git add .
+pre-commit run --all-files
+git commit -m "Feature: Add new functionality"
+
+# ❌ INCORRECT - Skip pre-commit validation
+git add .
+git commit -m "Feature: Add new functionality" --no-verify
+```
+
+### Quality Gates
+- **MANDATORY**: All pre-commit hooks must pass
+- **REQUIRED**: No linting errors (ruff, mypy)
+- **PROHIBITED**: Commits with validation failures
+- **EXCEPTION**: Only use `--no-verify` for emergency fixes
+
+### Automated Validation
+```bash
+# ✅ CORRECT - Comprehensive validation
+ruff check src/
+mypy src/
+bandit -r src/
+pre-commit run --all-files
+
+# ❌ INCORRECT - Incomplete validation
+git commit -m "Quick fix"  # No validation
+```
+
+## Validation Framework
+
+### Hook Success Requirements
+- **ruff**: Zero linting errors
+- **mypy**: Zero type checking errors
+- **bandit**: Zero security issues
+- **detect-secrets**: Zero secret leaks
+- **format**: Code properly formatted
+
+### Error Resolution Process
+1. **IDENTIFY**: Review all validation errors
+2. **FIX**: Address all auto-fixable issues
+3. **REVIEW**: Manually fix remaining issues
+4. **VERIFY**: Re-run validation until clean
+5. **COMMIT**: Only commit when all hooks pass
+
+## Anti-Patterns
+
+### Prohibited Patterns
+```bash
+# ❌ NEVER USE
+git commit --no-verify  # Skip validation
+git push --force  # Force push without validation
+# Commit without running pre-commit hooks
+```
+
+### Common Mistakes
+- Skipping pre-commit validation
+- Committing with known errors
+- Using `--no-verify` for non-emergencies
+- Not fixing auto-fixable issues
+- Ignoring validation warnings
+
+## Success Indicators
+
+- **100% pre-commit hook success** rate
+- **Zero validation errors** in commits
+- **Automated fixes applied** before commits
+- **Consistent code quality** across team
+- **Faster development cycles** with fewer interruptions

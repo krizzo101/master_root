@@ -1,0 +1,313 @@
+---
+description: WHEN setting up development environments TO ensure systematic and reliable setup YOU MUST follow incremental validation with rollback capabilities and comprehensive verification
+globs:
+alwaysApply: false
+---
+
+# Development Environment Setup Standards
+
+## Purpose
+
+This rule ensures systematic and reliable development environment setup with incremental validation, rollback capabilities, and comprehensive verification to prevent configuration conflicts and setup failures.
+
+## Scope
+
+This rule applies to all development environment setup processes including dependency installation, tool configuration, pre-commit hooks, and testing infrastructure.
+
+## Requirements
+
+### Incremental Setup Process
+
+1. **Phase-Based Setup**
+   - IMPLEMENT setup in discrete, testable phases
+   - VALIDATE each phase before proceeding to next
+   - PROVIDE rollback capability for each phase
+   - DOCUMENT phase dependencies and requirements
+
+2. **Validation at Each Step**
+   - VERIFY tool installation and configuration
+   - TEST tool functionality before proceeding
+   - CHECK for conflicts with existing setup
+   - VALIDATE configuration file integrity
+
+### Implementation Standards
+
+1. **Setup Script Structure**
+   ```python
+   # setup_environment.py
+   import subprocess
+   import sys
+   from pathlib import Path
+   from typing import List, Dict, Any
+
+   class EnvironmentSetup:
+       def __init__(self):
+           self.phases = [
+               ("dependencies", self.setup_dependencies),
+               ("tools", self.setup_tools),
+               ("pre_commit", self.setup_pre_commit),
+               ("testing", self.setup_testing)
+           ]
+           self.completed_phases = []
+
+       def run_setup(self) -> bool:
+           """Run complete setup with validation."""
+           for phase_name, phase_func in self.phases:
+               print(f"🔄 Starting phase: {phase_name}")
+
+               try:
+                   success = phase_func()
+                   if not success:
+                       print(f"❌ Phase {phase_name} failed")
+                       self.rollback_to_phase(len(self.completed_phases) - 1)
+                       return False
+
+                   self.completed_phases.append(phase_name)
+                   print(f"✅ Phase {phase_name} completed")
+
+               except Exception as e:
+                   print(f"❌ Phase {phase_name} error: {e}")
+                   self.rollback_to_phase(len(self.completed_phases) - 1)
+                   return False
+
+           return True
+   ```
+
+2. **Validation Functions**
+   ```python
+   def validate_python_version(self) -> bool:
+       """Validate Python version compatibility."""
+       version = sys.version_info
+       if version.major != 3 or version.minor < 11:
+           print(f"❌ Python {version.major}.{version.minor} not supported")
+           return False
+       return True
+
+   def validate_tool_installation(self, tool: str) -> bool:
+       """Validate tool is installed and working."""
+       try:
+           result = subprocess.run([tool, "--version"],
+                                 capture_output=True, text=True)
+           return result.returncode == 0
+       except FileNotFoundError:
+           return False
+   ```
+
+3. **Rollback Capabilities**
+   ```python
+   def rollback_to_phase(self, target_phase: int) -> None:
+       """Rollback to specified phase."""
+       if target_phase < 0:
+           print("🔄 Rolling back to clean state")
+           self.clean_environment()
+           return
+
+       print(f"🔄 Rolling back to phase: {self.completed_phases[target_phase]}")
+
+       # Rollback in reverse order
+       for i in range(len(self.completed_phases) - 1, target_phase, -1):
+           phase_name = self.completed_phases[i]
+           rollback_func = getattr(self, f"rollback_{phase_name}", None)
+           if rollback_func:
+               rollback_func()
+
+       self.completed_phases = self.completed_phases[:target_phase + 1]
+   ```
+
+### Error Prevention
+
+1. **Common Setup Issues**
+   - Tool version incompatibilities
+   - Configuration file corruption
+   - Dependency conflicts
+   - Missing environment variables
+
+2. **Mitigation Strategies**
+   - BACKUP configurations before changes
+   - VALIDATE each step before proceeding
+   - IMPLEMENT comprehensive rollback
+   - PROVIDE detailed error messages
+
+## Validation Criteria
+
+- [ ] Setup process is divided into discrete phases
+- [ ] Each phase has validation and rollback capability
+- [ ] Tool compatibility is verified before installation
+- [ ] Configuration integrity is validated
+- [ ] Comprehensive error handling is implemented
+
+## Examples
+
+### Compliant Setup Script
+
+```python
+#!/usr/bin/env python3
+"""Comprehensive development environment setup."""
+
+import os
+import shutil
+import subprocess
+import sys
+import toml
+from pathlib import Path
+from typing import Optional, List
+
+class DevEnvironmentSetup:
+    def __init__(self):
+        self.backup_dir = Path(".setup_backups")
+        self.backup_dir.mkdir(exist_ok=True)
+
+    def backup_file(self, file_path: Path) -> Optional[Path]:
+        """Backup a file before modification."""
+        if not file_path.exists():
+            return None
+
+        backup_path = self.backup_dir / f"{file_path.name}.backup"
+        shutil.copy2(file_path, backup_path)
+        return backup_path
+
+    def restore_file(self, file_path: Path, backup_path: Path) -> bool:
+        """Restore file from backup."""
+        try:
+            shutil.copy2(backup_path, file_path)
+            return True
+        except Exception as e:
+            print(f"Failed to restore {file_path}: {e}")
+            return False
+
+    def validate_pyproject_toml(self) -> bool:
+        """Validate pyproject.toml integrity."""
+        try:
+            with open("pyproject.toml", "r") as f:
+                toml.load(f)
+            return True
+        except Exception as e:
+            print(f"pyproject.toml validation failed: {e}")
+            return False
+
+    def setup_phase_dependencies(self) -> bool:
+        """Phase 1: Install dependencies."""
+        print("📦 Installing dependencies...")
+
+        # Backup pyproject.toml
+        backup = self.backup_file(Path("pyproject.toml"))
+
+        try:
+            # Install dependencies
+            result = subprocess.run(["poetry", "install"],
+                                  capture_output=True, text=True)
+            if result.returncode != 0:
+                print(f"Poetry install failed: {result.stderr}")
+                return False
+
+            # Validate installation
+            result = subprocess.run(["poetry", "check"],
+                                  capture_output=True, text=True)
+            return result.returncode == 0
+
+        except Exception as e:
+            print(f"Dependency setup failed: {e}")
+            if backup:
+                self.restore_file(Path("pyproject.toml"), backup)
+            return False
+
+    def setup_phase_tools(self) -> bool:
+        """Phase 2: Configure development tools."""
+        print("🔧 Configuring development tools...")
+
+        # Validate tool compatibility first
+        tools = ["black", "ruff", "mypy"]
+        for tool in tools:
+            if not self.validate_tool_installation(tool):
+                print(f"Tool {tool} not available")
+                return False
+
+        # Validate configuration consistency
+        return self.validate_pyproject_toml()
+
+    def setup_phase_pre_commit(self) -> bool:
+        """Phase 3: Setup pre-commit hooks."""
+        print("🪝 Setting up pre-commit hooks...")
+
+        try:
+            # Install pre-commit
+            result = subprocess.run(["pre-commit", "install"],
+                                  capture_output=True, text=True)
+            if result.returncode != 0:
+                return False
+
+            # Test pre-commit (on a subset of files)
+            result = subprocess.run(["pre-commit", "run", "--files", "validate_setup.py"],
+                                  capture_output=True, text=True)
+            # Note: pre-commit may return non-zero if it makes changes
+            # We just need to ensure it doesn't crash
+            return "error" not in result.stderr.lower()
+
+        except Exception as e:
+            print(f"Pre-commit setup failed: {e}")
+            return False
+
+    def setup_phase_testing(self) -> bool:
+        """Phase 4: Setup testing infrastructure."""
+        print("🧪 Setting up testing infrastructure...")
+
+        try:
+            # Run tests to validate setup
+            result = subprocess.run(["python", "-m", "pytest", "--version"],
+                                  capture_output=True, text=True)
+            if result.returncode != 0:
+                return False
+
+            # Run a quick test to validate environment
+            result = subprocess.run(["python", "validate_setup.py"],
+                                  capture_output=True, text=True)
+            return result.returncode == 0
+
+        except Exception as e:
+            print(f"Testing setup failed: {e}")
+            return False
+
+    def validate_tool_installation(self, tool: str) -> bool:
+        """Validate that a tool is installed and working."""
+        try:
+            result = subprocess.run([tool, "--version"],
+                                  capture_output=True, text=True)
+            return result.returncode == 0
+        except FileNotFoundError:
+            return False
+
+    def run_complete_setup(self) -> bool:
+        """Run the complete setup process."""
+        phases = [
+            ("dependencies", self.setup_phase_dependencies),
+            ("tools", self.setup_phase_tools),
+            ("pre_commit", self.setup_phase_pre_commit),
+            ("testing", self.setup_phase_testing)
+        ]
+
+        for phase_name, phase_func in phases:
+            print(f"\n🔄 Phase: {phase_name}")
+            if not phase_func():
+                print(f"❌ Setup failed at phase: {phase_name}")
+                return False
+            print(f"✅ Phase completed: {phase_name}")
+
+        print("\n🎉 Development environment setup completed successfully!")
+        return True
+
+if __name__ == "__main__":
+    setup = DevEnvironmentSetup()
+    success = setup.run_complete_setup()
+    sys.exit(0 if success else 1)
+```
+
+### Non-Compliant Setup
+
+```bash
+#!/bin/bash
+# Non-compliant: No validation or rollback
+poetry install
+pre-commit install
+python -m pytest
+echo "Setup complete"
+```

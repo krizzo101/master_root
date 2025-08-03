@@ -1,0 +1,99 @@
+---
+description: "use when EXECUTING GIT COMMANDS to PREVENT DESTRUCTIVE OPERATIONS for SAFETY"
+globs:
+alwaysApply: true
+---
+
+# Git Safety Rules
+
+## Destructive Commands
+
+- Before running destructive commands, **ask for human confirmation**
+- If tests fail, prefer `git revert` / new commit over history rewrite
+- After any shell command, *print* the working directory and `git status` for verification
+
+## Protected Branches
+
+- **MAIN**: Protected branch - never force push or reset
+- **AUTOSAVE**: Automatic backup branch - never delete or force push
+- Use **feature branches** for development work
+- Create **worktrees** for parallel development
+
+## Safe Git Operations
+
+### Allowed Commands
+- `git add`
+- `git commit`
+- `git push` (to feature branches)
+- `git pull`
+- `git merge` (via PR)
+- `git checkout`
+- `git branch`
+- `git worktree add`
+
+### Restricted Commands (require confirmation)
+- `git reset --hard`
+- `git push --force`
+- `git push --force-with-lease`
+- `git rebase`
+- `git worktree remove`
+- `git branch -D`
+
+## Worktree Safety
+
+- Always use `scripts/new_agent_worktree.sh` to create worktrees
+- Clean up worktrees when done: `git worktree remove <path>`
+- Don't delete worktree directories manually
+- Verify worktree status before removal
+
+## Commit Safety
+
+- Use **conventional commit messages**
+- Include **ticket/issue numbers** in commits
+- Write **descriptive commit messages**
+- Test changes before committing
+- Use **autosave** for frequent commits
+
+## Branch Protection
+
+- **MAIN** branch requires PR review
+- **AUTOSAVE** branch is auto-committed only
+- Feature branches can be force-pushed (with caution)
+- Use **branch naming conventions**:
+  - `feature/<name>`
+  - `bugfix/<name>`
+  - `hotfix/<name>`
+  - `agent/<name>`
+
+## Emergency Procedures
+
+If you need to recover from a destructive operation:
+
+1. **Don't panic** - autosave has your recent changes
+2. Check **AUTOSAVE** branch for recent commits
+3. Use **git reflog** to find lost commits
+4. Create **new branch** from safe commit
+5. **Never** force push to MAIN/AUTOSAVE
+
+## Verification Commands
+
+After any Git operation, run these verification commands:
+
+```bash
+# Check current status
+pwd
+git status
+git branch --show-current
+
+# Check recent commits
+git log --oneline -5
+
+# Check worktree status
+git worktree list
+```
+
+git log --oneline -5
+
+# Check worktree status
+git worktree list
+```

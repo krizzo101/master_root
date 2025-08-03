@@ -1,0 +1,29 @@
+[Unit]
+Description=OPSVI Git Autosave Service for %i
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+User=%i
+Group=%i
+Environment=HOME=/home/%i
+WorkingDirectory=/home/opsvi/master_root
+ExecStart=/home/opsvi/master_root/tools/autosave.sh
+Restart=no
+RestartSec=1
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=opsvi-autosave
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/opsvi/master_root /home/%i/.opsvi_logs
+
+[Install]
+WantedBy=default.target

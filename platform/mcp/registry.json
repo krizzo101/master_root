@@ -1,0 +1,82 @@
+{
+  "name": "opsvi-mcp-registry",
+  "version": "1.0.0",
+  "description": "OPSVI MCP Package Registry Configuration",
+  "registries": {
+    "opsvi-private": {
+      "url": "${MCP_REGISTRY_URL}",
+      "auth": {
+        "type": "basic",
+        "username": "${MCP_USERNAME}",
+        "password": "${MCP_PASSWORD}"
+      },
+      "default": false
+    },
+    "opsvi-public": {
+      "url": "${MCP_PUBLIC_URL}",
+      "auth": {
+        "type": "token",
+        "token": "${MCP_PUBLIC_TOKEN}"
+      },
+      "default": true
+    }
+  },
+  "packages": {
+    "fs": {
+      "name": "mcp-fs",
+      "version": "latest",
+      "registry": "opsvi-private",
+      "config": {
+        "root_path": "${MCP_FS_ROOT_PATH}",
+        "allowed_paths": ["${MCP_FS_ALLOWED_PATHS}"],
+        "read_only": "${MCP_FS_READ_ONLY:-false}"
+      }
+    },
+    "git": {
+      "name": "mcp-git",
+      "version": "latest",
+      "registry": "opsvi-private",
+      "config": {
+        "repo_path": "${MCP_GIT_REPO_PATH}",
+        "branch": "${MCP_GIT_BRANCH:-main}",
+        "auth_token": "${MCP_GIT_AUTH_TOKEN}"
+      }
+    },
+    "openai-llm": {
+      "name": "mcp-openai-llm",
+      "version": "latest",
+      "registry": "opsvi-private",
+      "config": {
+        "api_key": "${OPENAI_API_KEY}",
+        "model": "${OPENAI_MODEL:-gpt-4}",
+        "base_url": "${OPENAI_BASE_URL:-https://api.openai.com/v1}"
+      }
+    },
+    "qdrant-rag": {
+      "name": "mcp-qdrant-rag",
+      "version": "latest",
+      "registry": "opsvi-private",
+      "config": {
+        "url": "${QDRANT_URL:-http://localhost:6333}",
+        "api_key": "${QDRANT_API_KEY}",
+        "collection": "${QDRANT_COLLECTION:-global__demo}"
+      }
+    },
+    "search": {
+      "name": "mcp-search",
+      "version": "latest",
+      "registry": "opsvi-private",
+      "config": {
+        "engine": "${SEARCH_ENGINE:-brave}",
+        "api_key": "${SEARCH_API_KEY}",
+        "base_url": "${SEARCH_BASE_URL}"
+      }
+    }
+  },
+  "metadata": {
+    "created": "2025-01-15T00:00:00Z",
+    "updated": "2025-01-15T00:00:00Z",
+    "maintainer": "OPSVI Team <team@opsvi.ai>",
+    "documentation": "https://docs.opsvi.ai/mcp"
+  }
+}

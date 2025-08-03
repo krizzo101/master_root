@@ -1,0 +1,65 @@
+---
+description: "use when DEVELOPING PYTHON CODE to ENFORCE PEP8, TYPING, AND TESTING STANDARDS for MAINTAINABLE, ROBUST SOFTWARE"
+globs:
+alwaysApply: false
+---
+# Python Development Standard)
+
+- Clarity & Directness: Use clear, imperative instructions.
+- Batching & Parallelization: Batch compatible development steps; execute in parallel where possible.
+- Multi-Step Planning: Plan several steps ahead, identify batching opportunities, and optimize for efficiency.
+- Persistent Autonomy: Continue until all objectives are met or explicitly told to stop; avoid unnecessary waiting for input.
+- Tool-First Mandate: Always use available tools for every operation, preferring tool-based actions.
+- Self-Review & Optimization: Review and revise plans for efficiency before acting.
+- Evidence-Based Completion: Present clear evidence of completion before considering a task done.
+
+## Formatting
+- **Black** formatter (`line-length 88`, double quotes).
+- **isort** import groups: `stdlib`, `thirdparty`, `firstparty`, `local`.
+- Enforce via pre‑commit.
+
+## Typing
+- Full PEP 484 hints; validate with `mypy --strict`.
+- Use `typing.Annotated` for refined metadata when needed.
+
+## Logging
+```python
+import logging, sys
+logging.basicConfig(
+    level=logging.DEBUG,
+    stream=sys.stdout,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
+```
+
+## Error Handling
+- Never blanket‑catch; catch specific exception classes.
+- Re‑raise or log with stack trace (`logger.exception`).
+
+## Script Entry
+```python
+def main() -> None:
+    ...
+if __name__ == "__main__":  # pragma: no cover
+    main()
+```
+
+## Dependencies
+- Pin in `pyproject.toml`; lock via `poetry export` or `pip-tools`.
+- Audit with `pip-audit` in CI.
+
+## Testing
+- **pytest** + **coverage**; target ≥ 85 %.
+- Place tests in `tests/` mirroring package structure.
+
+## Import and Script Execution Policy
+- All Python imports must use absolute, project-rooted paths (e.g., 'from src.applications.oamat.agents...').
+- Relative imports (e.g., 'from .module import ...') are prohibited in all application code.
+- All Python scripts and entry points must be invoked using 'python -m module.path' from the project root (e.g., 'python -m src.applications.oamat.agents.researcher_agent').
+- This ensures consistent import resolution, avoids ambiguity, and supports robust, production-grade operation.
+
+
+## Testing
+- **pytest** + **coverage**; target ≥ 85 %.
+- Place tests in `tests/` mirroring package structure.

@@ -1,0 +1,1195 @@
+---
+description: WHEN implementing database functionality TO ensure performance and reliability YOU MUST follow established best practices for different database types
+globs:
+alwaysApply: false
+---
+
+# Database Standards for AI Applications
+
+## Purpose
+
+This rule ensures the proper implementation and usage of databases with a focus on SQLite and ChromaDB for AI-powered applications, as outlined in the AI-Powered Development Research Plan.
+
+## Scope
+
+This rule applies to all database operations, including schema design, query optimization, indexing, connection management, data validation, and error handling. It includes specific guidelines for relational databases (SQLite) and vector databases (ChromaDB).
+
+## Requirements
+
+### General Database Principles
+
+1. **Database Selection**
+
+   - USE SQLite for:
+     - Structured data with well-defined schemas
+     - Transactional data requiring ACID compliance
+     - Local application storage
+     - Configuration storage
+     - User profile and preference data
+     - Lightweight applications without high concurrency needs
+   - USE ChromaDB for:
+     - Vector embeddings storage
+     - Semantic search functionality
+     - RAG (Retrieval Augmented Generation) implementations
+     - Document similarity analysis
+     - AI model feature storage
+     - Multimodal content indexing
+
+2. **Connection Management**
+
+   - IMPLEMENT connection pooling for multi-user applications
+   - PROPERLY close connections after use
+   - USE context managers for database operations
+   - IMPLEMENT connection retry mechanisms
+   - HANDLE connection timeouts gracefully
+   - MONITOR connection health with heartbeats
+   - SET appropriate connection limits
+
+3. **Error Handling**
+   - CATCH specific database exceptions
+   - IMPLEMENT proper transaction rollbacks
+   - LOG database errors with appropriate context
+   - HANDLE network interruptions gracefully
+   - IMPLEMENT proper retry mechanisms
+   - AVOID exposing database errors to end users
+   - INCLUDE error monitoring and alerting
+
+### SQLite Implementation
+
+1. **Schema Design**
+
+   - NORMALIZE tables appropriately (aim for 3NF)
+   - USE appropriate data types for columns
+   - IMPLEMENT proper primary and foreign keys
+   - DEFINE constraints (NOT NULL, UNIQUE, CHECK)
+   - CREATE indexes for frequently queried columns
+   - DOCUMENT schema with comments
+   - IMPLEMENT versioned migrations
+   - USE INTEGER PRIMARY KEY for autoincrement
+   - AVOID NULL where possible, use sensible defaults
+
+2. **Query Optimization**
+
+   - USE prepared statements for all queries
+   - AVOID dynamic SQL where possible
+   - LIMIT result sets appropriately
+   - OPTIMIZE JOIN operations
+   - USE EXPLAIN QUERY PLAN for optimization
+   - AVOID SELECT \* in production code
+   - IMPLEMENT proper pagination
+   - USE appropriate indexes for frequent queries
+
+3. **SQLite Configuration**
+
+   - SET appropriate journal mode (WAL recommended)
+   - CONFIGURE proper cache size
+   - SET synchronous mode based on requirements
+   - IMPLEMENT regular ANALYZE for statistics
+   - CONFIGURE appropriate busy timeout
+   - IMPLEMENT proper locking strategy
+   - USE foreign key constraints
+
+4. **SQLite Security**
+   - PREVENT SQL injection with parameterized queries
+   - APPLY proper file permissions
+   - IMPLEMENT encryption for sensitive data
+   - USE secure temporary directories
+   - AVOID loading extensions from untrusted sources
+   - IMPLEMENT proper access controls
+   - SANITIZE all user inputs
+
+### ChromaDB Implementation
+
+1. **Collection Design**
+
+   - ORGANIZE embeddings in logical collections
+   - IMPLEMENT appropriate metadata schemas
+   - DEFINE consistent embedding dimensions
+   - DOCUMENT collection purposes and contents
+   - IMPLEMENT proper data partitioning
+   - USE appropriate distance metrics
+   - MAINTAIN consistent vector dimensions
+
+2. **Embedding Management**
+
+   - NORMALIZE vectors before storage
+   - IMPLEMENT consistent embedding generation
+   - DOCUMENT embedding model and parameters
+   - VERSION control embedding models
+   - HANDLE embedding model updates
+   - IMPLEMENT batch processing for efficiency
+   - PERSIST original data alongside embeddings
+   - DEFINE appropriate chunking strategies
+
+3. **Query Optimization**
+
+   - SET appropriate n_results for queries
+   - IMPLEMENT filters for narrowing search
+   - USE metadata for hybrid filtering
+   - OPTIMIZE embedding distance calculations
+   - IMPLEMENT proper pagination
+   - CACHE frequent queries
+   - IMPLEMENT background reindexing
+
+4. **ChromaDB Configuration**
+
+   - CHOOSE appropriate persistence location
+   - CONFIGURE proper cache settings
+   - SET appropriate similarity metrics
+   - IMPLEMENT regular backups
+   - MONITOR storage utilization
+   - CONFIGURE appropriate client settings
+   - IMPLEMENT proper authentication
+
+5. **Performance Considerations**
+   - BATCH similar operations
+   - IMPLEMENT proper indexing
+   - MONITOR query performance
+   - OPTIMIZE collection sizes
+   - IMPLEMENT caching for frequent queries
+   - SHARD collections for large datasets
+   - BALANCE between recall and performance
+
+### Data Migration and Versioning
+
+1. **Schema Migrations**
+
+   - IMPLEMENT versioned migration scripts
+   - TEST migrations in staging environment
+   - DOCUMENT schema changes
+   - IMPLEMENT rollback capabilities
+   - VERSION control migration scripts
+   - AUTOMATE migration process
+   - VALIDATE data integrity after migrations
+
+2. **Data Backup and Recovery**
+   - IMPLEMENT regular backups
+   - TEST recovery procedures
+   - DOCUMENT backup strategy
+   - ENCRYPT sensitive backup data
+   - IMPLEMENT point-in-time recovery
+   - VERIFY backup integrity
+   - STORE backups securely
+
+### RAG Implementation Guidelines
+
+1. **Document Processing**
+
+   - IMPLEMENT proper text chunking
+   - MAINTAIN document metadata
+   - PROCESS documents in batches
+   - HANDLE different document formats
+   - IMPLEMENT proper text extraction
+   - PRESERVE source information
+   - TRACK document versions
+
+2. **Embedding Generation**
+
+   - USE consistent embedding models
+   - CACHE embeddings for reuse
+   - DOCUMENT embedding parameters
+   - IMPLEMENT batched embedding generation
+   - VALIDATE embedding quality
+   - HANDLE embedding model updates
+   - OPTIMIZE embedding generation process
+
+3. **Retrieval Strategies**
+
+   - IMPLEMENT hybrid search (keyword + semantic)
+   - USE appropriate k values for retrieval
+   - RERANK results when necessary
+   - FILTER results by metadata
+   - IMPLEMENT proper diversity sampling
+   - MEASURE retrieval performance
+   - OPTIMIZE for both precision and recall
+
+4. **Integration with LLMs**
+   - FORMAT retrieved context appropriately
+   - IMPLEMENT context window optimization
+   - HANDLE context truncation properly
+   - TRACK source documents in responses
+   - IMPLEMENT context relevance scoring
+   - OPTIMIZE prompt construction
+   - IMPLEMENT fallback strategies
+
+## Compliance Verification
+
+### Automated Verification
+
+- Database schema validation tools
+- Query performance testing
+- Connection leak detection
+- Automated backup testing
+- Migration script validation
+- Security scanning for SQL injection
+- Data integrity validation
+
+### Manual Review Requirements
+
+- Schema design review for major changes
+- Query optimization for critical paths
+- Security review for authentication changes
+- Performance review for scaling considerations
+- Recovery procedure validation
+
+## Examples
+
+### Well-Structured SQLite Implementation
+
+```python
+"""
+SQLite database manager with proper connection handling,
+query optimization, and error management.
+"""
+import logging
+import sqlite3
+from contextlib import contextmanager
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+logger = logging.getLogger(__name__)
+
+class DatabaseManager:
+    """
+    SQLite database manager for handling connections and queries.
+    Implements connection pooling, error handling, and transaction management.
+    """
+
+    def __init__(self, db_path: Union[str, Path], migration_dir: Optional[Path] = None):
+        """
+        Initialize the database manager.
+
+        Args:
+            db_path: Path to the SQLite database file
+            migration_dir: Optional directory containing migration scripts
+        """
+        self.db_path = Path(db_path)
+        self.migration_dir = migration_dir
+        self._initialize_database()
+
+    def _initialize_database(self) -> None:
+        """
+        Initialize the database with proper configuration.
+        Creates the database if it doesn't exist and applies migrations.
+        """
+        # Ensure the directory exists
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Initialize database with proper settings
+        with self.get_connection() as conn:
+            # Enable foreign keys
+            conn.execute("PRAGMA foreign_keys = ON;")
+
+            # Set WAL journal mode for better concurrency
+            conn.execute("PRAGMA journal_mode = WAL;")
+
+            # Set synchronous mode to NORMAL for better performance
+            conn.execute("PRAGMA synchronous = NORMAL;")
+
+            # Set a reasonable cache size (8MB)
+            conn.execute("PRAGMA cache_size = -8000;")
+
+            # Check for and apply migrations if needed
+            if self.migration_dir:
+                self._apply_migrations(conn)
+
+    def _apply_migrations(self, conn: sqlite3.Connection) -> None:
+        """
+        Apply migration scripts to the database.
+
+        Args:
+            conn: SQLite connection object
+        """
+        try:
+            # Create migration tracking table if it doesn't exist
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS migrations (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT NOT NULL UNIQUE,
+                    applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+
+            # Get list of applied migrations
+            applied = {row[0] for row in conn.execute(
+                "SELECT name FROM migrations;"
+            ).fetchall()}
+
+            # Find and sort migration files
+            if not self.migration_dir.exists():
+                logger.warning(f"Migration directory not found: {self.migration_dir}")
+                return
+
+            migration_files = sorted(self.migration_dir.glob("*.sql"))
+
+            # Apply each migration in order
+            for migration_file in migration_files:
+                migration_name = migration_file.name
+
+                if migration_name in applied:
+                    logger.debug(f"Migration already applied: {migration_name}")
+                    continue
+
+                logger.info(f"Applying migration: {migration_name}")
+
+                # Read and execute migration script
+                with open(migration_file, "r") as f:
+                    script = f.read()
+
+                # Execute within a transaction
+                with conn:
+                    conn.executescript(script)
+                    conn.execute(
+                        "INSERT INTO migrations (name) VALUES (?);",
+                        (migration_name,)
+                    )
+
+                logger.info(f"Migration applied: {migration_name}")
+
+        except Exception as e:
+            logger.error(f"Migration error: {str(e)}")
+            raise
+
+    @contextmanager
+    def get_connection(self) -> sqlite3.Connection:
+        """
+        Get a database connection with proper configuration.
+
+        Returns:
+            Configured SQLite connection
+
+        Raises:
+            sqlite3.Error: If connection fails
+        """
+        conn = None
+        try:
+            # Connect with proper settings
+            conn = sqlite3.connect(
+                self.db_path,
+                timeout=30.0,  # 30 second timeout
+                isolation_level=None,  # Autocommit mode
+                detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
+            )
+
+            # Enable foreign keys for each connection
+            conn.execute("PRAGMA foreign_keys = ON;")
+
+            # Return connection for use
+            yield conn
+
+        except sqlite3.Error as e:
+            logger.error(f"Database connection error: {str(e)}")
+            raise
+
+        finally:
+            # Ensure connection is closed
+            if conn:
+                conn.close()
+
+    @contextmanager
+    def transaction(self) -> sqlite3.Connection:
+        """
+        Execute operations within a transaction.
+
+        Returns:
+            SQLite connection with active transaction
+
+        Raises:
+            sqlite3.Error: If transaction fails
+        """
+        with self.get_connection() as conn:
+            try:
+                # Begin transaction
+                conn.execute("BEGIN;")
+
+                # Yield connection for transactional operations
+                yield conn
+
+                # Commit if successful
+                conn.execute("COMMIT;")
+
+            except Exception as e:
+                # Rollback on error
+                logger.error(f"Transaction error, rolling back: {str(e)}")
+                conn.execute("ROLLBACK;")
+                raise
+
+    def execute(
+        self,
+        query: str,
+        parameters: Union[Tuple[Any, ...], Dict[str, Any], None] = None
+    ) -> sqlite3.Cursor:
+        """
+        Execute a query with proper error handling.
+
+        Args:
+            query: SQL query to execute
+            parameters: Query parameters
+
+        Returns:
+            SQLite cursor with query results
+
+        Raises:
+            sqlite3.Error: If query execution fails
+        """
+        with self.get_connection() as conn:
+            try:
+                cursor = conn.execute(query, parameters or ())
+                return cursor
+            except sqlite3.Error as e:
+                logger.error(f"Query execution error: {str(e)}, Query: {query}")
+                raise
+
+    def execute_many(
+        self,
+        query: str,
+        parameters_list: List[Union[Tuple[Any, ...], Dict[str, Any]]]
+    ) -> sqlite3.Cursor:
+        """
+        Execute a query multiple times with different parameters.
+
+        Args:
+            query: SQL query to execute
+            parameters_list: List of parameter sets
+
+        Returns:
+            SQLite cursor
+
+        Raises:
+            sqlite3.Error: If query execution fails
+        """
+        with self.get_connection() as conn:
+            try:
+                cursor = conn.executemany(query, parameters_list)
+                return cursor
+            except sqlite3.Error as e:
+                logger.error(f"Batch query execution error: {str(e)}, Query: {query}")
+                raise
+
+    def fetch_one(
+        self,
+        query: str,
+        parameters: Union[Tuple[Any, ...], Dict[str, Any], None] = None
+    ) -> Optional[Tuple[Any, ...]]:
+        """
+        Fetch a single row from the database.
+
+        Args:
+            query: SQL query to execute
+            parameters: Query parameters
+
+        Returns:
+            Single row as tuple or None if no result
+
+        Raises:
+            sqlite3.Error: If query execution fails
+        """
+        cursor = self.execute(query, parameters)
+        return cursor.fetchone()
+
+    def fetch_all(
+        self,
+        query: str,
+        parameters: Union[Tuple[Any, ...], Dict[str, Any], None] = None
+    ) -> List[Tuple[Any, ...]]:
+        """
+        Fetch all rows from the database.
+
+        Args:
+            query: SQL query to execute
+            parameters: Query parameters
+
+        Returns:
+            List of rows as tuples
+
+        Raises:
+            sqlite3.Error: If query execution fails
+        """
+        cursor = self.execute(query, parameters)
+        return cursor.fetchall()
+
+    def table_exists(self, table_name: str) -> bool:
+        """
+        Check if a table exists in the database.
+
+        Args:
+            table_name: Name of the table to check
+
+        Returns:
+            True if the table exists, False otherwise
+        """
+        query = """
+            SELECT name FROM sqlite_master
+            WHERE type='table' AND name=?;
+        """
+        result = self.fetch_one(query, (table_name,))
+        return result is not None
+
+    def create_backup(self, backup_path: Union[str, Path]) -> None:
+        """
+        Create a backup of the database.
+
+        Args:
+            backup_path: Path for the backup file
+
+        Raises:
+            sqlite3.Error: If backup fails
+        """
+        backup_path = Path(backup_path)
+        backup_path.parent.mkdir(parents=True, exist_ok=True)
+
+        try:
+            with self.get_connection() as source_conn:
+                # Open destination database
+                with sqlite3.connect(backup_path) as dest_conn:
+                    # Create backup
+                    source_conn.backup(dest_conn)
+
+            logger.info(f"Database backup created at {backup_path}")
+
+        except Exception as e:
+            logger.error(f"Backup failed: {str(e)}")
+            raise
+```
+
+### Well-Structured ChromaDB Implementation
+
+```python
+"""
+ChromaDB manager for vector storage and retrieval with proper
+configuration, error handling, and embedding management.
+"""
+import json
+import logging
+import os
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import chromadb
+from chromadb.config import Settings
+from chromadb.utils import embedding_functions
+from pydantic import BaseModel, Field
+
+logger = logging.getLogger(__name__)
+
+class DocumentMetadata(BaseModel):
+    """
+    Standard metadata for documents stored in ChromaDB.
+    """
+    source: str = Field(..., description="Source of the document")
+    title: Optional[str] = Field(None, description="Document title")
+    author: Optional[str] = Field(None, description="Document author")
+    created_at: Optional[str] = Field(None, description="Document creation date")
+    doc_type: str = Field(..., description="Document type (pdf, text, webpage, etc.)")
+    chunk_index: int = Field(..., description="Index of this chunk in the document")
+    total_chunks: int = Field(..., description="Total chunks in the document")
+    word_count: int = Field(..., description="Word count in this chunk")
+    tags: List[str] = Field(default_factory=list, description="Tags for the document")
+
+class ChromaManager:
+    """
+    ChromaDB manager for vector database operations.
+    Handles collection management, embedding storage, and retrieval.
+    """
+
+    def __init__(
+        self,
+        persist_directory: Union[str, Path],
+        embedding_function_name: str = "all-MiniLM-L6-v2",
+        collection_name: str = "documents"
+    ):
+        """
+        Initialize ChromaDB manager.
+
+        Args:
+            persist_directory: Directory to persist ChromaDB
+            embedding_function_name: Name of the embedding function to use
+            collection_name: Default collection name
+        """
+        self.persist_directory = Path(persist_directory)
+        self.embedding_function_name = embedding_function_name
+        self.default_collection_name = collection_name
+
+        # Create persist directory if it doesn't exist
+        self.persist_directory.mkdir(parents=True, exist_ok=True)
+
+        # Initialize ChromaDB client
+        self._init_client()
+
+        # Set up embedding function
+        self._init_embedding_function()
+
+        # Initialize or get collection
+        self.collection = self._get_or_create_collection(self.default_collection_name)
+
+    def _init_client(self) -> None:
+        """
+        Initialize ChromaDB client with proper settings.
+        """
+        try:
+            self.client = chromadb.PersistentClient(
+                path=str(self.persist_directory),
+                settings=Settings(
+                    anonymized_telemetry=False,
+                    allow_reset=False,
+                    is_persistent=True
+                )
+            )
+            logger.info(f"ChromaDB client initialized with persistence at {self.persist_directory}")
+        except Exception as e:
+            logger.error(f"Failed to initialize ChromaDB client: {str(e)}")
+            raise
+
+    def _init_embedding_function(self) -> None:
+        """
+        Initialize embedding function based on configuration.
+        """
+        try:
+            # Set up embedding function based on name
+            if self.embedding_function_name == "all-MiniLM-L6-v2":
+                self.embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(
+                    model_name="all-MiniLM-L6-v2"
+                )
+            elif self.embedding_function_name == "openai":
+                # Make sure API key is set in environment
+                if not os.environ.get("OPENAI_API_KEY"):
+                    raise ValueError("OPENAI_API_KEY environment variable not set")
+
+                self.embedding_function = embedding_functions.OpenAIEmbeddingFunction(
+                    api_key=os.environ.get("OPENAI_API_KEY"),
+                    model_name="text-embedding-ada-002"
+                )
+            else:
+                raise ValueError(f"Unsupported embedding function: {self.embedding_function_name}")
+
+            logger.info(f"Initialized embedding function: {self.embedding_function_name}")
+        except Exception as e:
+            logger.error(f"Failed to initialize embedding function: {str(e)}")
+            raise
+
+    def _get_or_create_collection(self, collection_name: str) -> chromadb.Collection:
+        """
+        Get or create a ChromaDB collection.
+
+        Args:
+            collection_name: Name of the collection
+
+        Returns:
+            ChromaDB collection
+        """
+        try:
+            # Check if collection exists
+            try:
+                collection = self.client.get_collection(
+                    name=collection_name,
+                    embedding_function=self.embedding_function
+                )
+                logger.info(f"Retrieved existing collection: {collection_name}")
+                return collection
+            except ValueError:
+                # Collection doesn't exist, create it
+                collection = self.client.create_collection(
+                    name=collection_name,
+                    embedding_function=self.embedding_function,
+                    metadata={"description": f"Collection for {collection_name}"}
+                )
+                logger.info(f"Created new collection: {collection_name}")
+                return collection
+
+        except Exception as e:
+            logger.error(f"Failed to get or create collection {collection_name}: {str(e)}")
+            raise
+
+    def add_documents(
+        self,
+        documents: List[str],
+        metadatas: List[Dict[str, Any]],
+        ids: Optional[List[str]] = None,
+        collection_name: Optional[str] = None,
+        batch_size: int = 100
+    ) -> List[str]:
+        """
+        Add documents to the collection with batching.
+
+        Args:
+            documents: List of document texts
+            metadatas: List of metadata for each document
+            ids: Optional list of IDs for the documents (generated if not provided)
+            collection_name: Optional collection name (uses default if not provided)
+            batch_size: Size of batches for adding documents
+
+        Returns:
+            List of document IDs
+
+        Raises:
+            ValueError: If documents and metadatas have different lengths
+        """
+        if len(documents) != len(metadatas):
+            raise ValueError("documents and metadatas must have the same length")
+
+        # Generate IDs if not provided
+        if ids is None:
+            import uuid
+            ids = [str(uuid.uuid4()) for _ in range(len(documents))]
+        elif len(ids) != len(documents):
+            raise ValueError("documents and ids must have the same length")
+
+        # Get appropriate collection
+        collection = self.collection
+        if collection_name and collection_name != self.default_collection_name:
+            collection = self._get_or_create_collection(collection_name)
+
+        # Process in batches
+        for i in range(0, len(documents), batch_size):
+            batch_end = min(i + batch_size, len(documents))
+
+            try:
+                collection.add(
+                    documents=documents[i:batch_end],
+                    metadatas=metadatas[i:batch_end],
+                    ids=ids[i:batch_end]
+                )
+                logger.debug(f"Added batch of {batch_end - i} documents")
+            except Exception as e:
+                logger.error(f"Error adding documents batch {i}:{batch_end}: {str(e)}")
+                raise
+
+        logger.info(f"Added {len(documents)} documents to collection {collection.name}")
+        return ids
+
+    def query(
+        self,
+        query_text: str,
+        collection_name: Optional[str] = None,
+        n_results: int = 5,
+        where: Optional[Dict[str, Any]] = None,
+        where_document: Optional[Dict[str, Any]] = None,
+        include: List[str] = ["documents", "metadatas", "distances"],
+    ) -> Dict[str, Any]:
+        """
+        Query the vector database.
+
+        Args:
+            query_text: Text to query
+            collection_name: Optional collection name (uses default if not provided)
+            n_results: Number of results to return
+            where: Optional filter on metadata fields
+            where_document: Optional filter on document content
+            include: What to include in the results
+
+        Returns:
+            Query results with documents, metadatas, and distances
+        """
+        # Get appropriate collection
+        collection = self.collection
+        if collection_name and collection_name != self.default_collection_name:
+            collection = self._get_or_create_collection(collection_name)
+
+        try:
+            results = collection.query(
+                query_texts=[query_text],
+                n_results=n_results,
+                where=where,
+                where_document=where_document,
+                include=include
+            )
+
+            logger.info(f"Query executed with {len(results.get('ids', [''])[0])} results")
+            return results
+
+        except Exception as e:
+            logger.error(f"Error querying collection {collection.name}: {str(e)}")
+            raise
+
+    def get_document(
+        self,
+        document_id: str,
+        collection_name: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Get a document by ID.
+
+        Args:
+            document_id: ID of the document to retrieve
+            collection_name: Optional collection name (uses default if not provided)
+
+        Returns:
+            Document data including content and metadata
+
+        Raises:
+            ValueError: If document not found
+        """
+        # Get appropriate collection
+        collection = self.collection
+        if collection_name and collection_name != self.default_collection_name:
+            collection = self._get_or_create_collection(collection_name)
+
+        try:
+            result = collection.get(
+                ids=[document_id],
+                include=["documents", "metadatas", "embeddings"]
+            )
+
+            if not result or not result["ids"]:
+                raise ValueError(f"Document not found: {document_id}")
+
+            return {
+                "id": result["ids"][0],
+                "document": result["documents"][0],
+                "metadata": result["metadatas"][0],
+                "embedding": result["embeddings"][0]
+            }
+
+        except Exception as e:
+            logger.error(f"Error retrieving document {document_id}: {str(e)}")
+            raise
+
+    def delete_document(
+        self,
+        document_id: str,
+        collection_name: Optional[str] = None
+    ) -> None:
+        """
+        Delete a document by ID.
+
+        Args:
+            document_id: ID of the document to delete
+            collection_name: Optional collection name (uses default if not provided)
+        """
+        # Get appropriate collection
+        collection = self.collection
+        if collection_name and collection_name != self.default_collection_name:
+            collection = self._get_or_create_collection(collection_name)
+
+        try:
+            collection.delete(ids=[document_id])
+            logger.info(f"Deleted document {document_id} from collection {collection.name}")
+
+        except Exception as e:
+            logger.error(f"Error deleting document {document_id}: {str(e)}")
+            raise
+
+    def create_backup(self, backup_dir: Union[str, Path]) -> None:
+        """
+        Create a backup of the ChromaDB database.
+
+        Args:
+            backup_dir: Directory to store the backup
+        """
+        backup_path = Path(backup_dir)
+        backup_path.mkdir(parents=True, exist_ok=True)
+
+        try:
+            # Use ChromaDB's built-in persistence
+            # First make sure all changes are persisted
+            self.client.persist()
+
+            # Then copy the persistence directory to the backup location
+            import shutil
+            shutil.copytree(
+                self.persist_directory,
+                backup_path / self.persist_directory.name,
+                dirs_exist_ok=True
+            )
+
+            logger.info(f"ChromaDB backup created at {backup_path / self.persist_directory.name}")
+
+        except Exception as e:
+            logger.error(f"ChromaDB backup failed: {str(e)}")
+            raise
+```
+
+### RAG Implementation Example
+
+```python
+"""
+RAG (Retrieval Augmented Generation) implementation with ChromaDB
+for document storage and retrieval integrated with LLM generation.
+"""
+import logging
+import textwrap
+from typing import Dict, List, Optional, Tuple, Union
+
+from langchain.chains import RetrievalQA
+from langchain.chat_models import ChatOpenAI
+from langchain.docstore.document import Document
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.prompts import PromptTemplate
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.vectorstores import Chroma
+
+logger = logging.getLogger(__name__)
+
+class RAGSystem:
+    """
+    RAG system for document ingestion, storage, retrieval, and generation.
+    Integrates document processing, embedding, storage, and LLM generation.
+    """
+
+    def __init__(
+        self,
+        persist_directory: str,
+        embedding_model_name: str = "text-embedding-ada-002",
+        llm_model_name: str = "gpt-4.1",
+        collection_name: str = "documents",
+        chunk_size: int = 1000,
+        chunk_overlap: int = 200,
+    ):
+        """
+        Initialize the RAG system.
+
+        Args:
+            persist_directory: Directory to persist vector store
+            embedding_model_name: Name of the embedding model
+            llm_model_name: Name of the LLM model
+            collection_name: Name of the document collection
+            chunk_size: Size of text chunks
+            chunk_overlap: Overlap between chunks
+        """
+        self.persist_directory = persist_directory
+        self.embedding_model_name = embedding_model_name
+        self.llm_model_name = llm_model_name
+        self.collection_name = collection_name
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+
+        # Initialize components
+        self._init_embeddings()
+        self._init_vectorstore()
+        self._init_llm()
+        self._init_text_splitter()
+        self._init_retriever()
+        self._init_qa_chain()
+
+    def _init_embeddings(self) -> None:
+        """Initialize the embedding model."""
+        try:
+            self.embeddings = OpenAIEmbeddings(model=self.embedding_model_name)
+            logger.info(f"Initialized embeddings with model {self.embedding_model_name}")
+        except Exception as e:
+            logger.error(f"Failed to initialize embeddings: {str(e)}")
+            raise
+
+    def _init_vectorstore(self) -> None:
+        """Initialize the vector store."""
+        try:
+            self.vectorstore = Chroma(
+                collection_name=self.collection_name,
+                embedding_function=self.embeddings,
+                persist_directory=self.persist_directory
+            )
+            logger.info(f"Initialized vector store at {self.persist_directory}")
+        except Exception as e:
+            logger.error(f"Failed to initialize vector store: {str(e)}")
+            raise
+
+    def _init_llm(self) -> None:
+        """Initialize the LLM model."""
+        try:
+            self.llm = ChatOpenAI(
+                model_name=self.llm_model_name,
+                temperature=0.2
+            )
+            logger.info(f"Initialized LLM with model {self.llm_model_name}")
+        except Exception as e:
+            logger.error(f"Failed to initialize LLM: {str(e)}")
+            raise
+
+    def _init_text_splitter(self) -> None:
+        """Initialize the text splitter."""
+        try:
+            self.text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=self.chunk_size,
+                chunk_overlap=self.chunk_overlap,
+                length_function=len,
+                separators=["\n\n", "\n", ". ", " ", ""]
+            )
+            logger.info(f"Initialized text splitter with chunk size {self.chunk_size} and overlap {self.chunk_overlap}")
+        except Exception as e:
+            logger.error(f"Failed to initialize text splitter: {str(e)}")
+            raise
+
+    def _init_retriever(self) -> None:
+        """Initialize the retriever."""
+        try:
+            self.retriever = self.vectorstore.as_retriever(
+                search_type="similarity",
+                search_kwargs={"k": 4}
+            )
+            logger.info("Initialized retriever")
+        except Exception as e:
+            logger.error(f"Failed to initialize retriever: {str(e)}")
+            raise
+
+    def _init_qa_chain(self) -> None:
+        """Initialize the QA chain."""
+        try:
+            qa_prompt = PromptTemplate.from_template(
+                """You are an AI assistant providing accurate information based on the given context.
+
+                Context:
+                {context}
+
+                Question: {question}
+
+                Provide a comprehensive answer using only the information from the context.
+                If the context doesn't contain enough information to fully answer the question,
+                say so clearly and explain what information is missing.
+
+                Answer:"""
+            )
+
+            self.qa_chain = RetrievalQA.from_chain_type(
+                llm=self.llm,
+                chain_type="stuff",
+                retriever=self.retriever,
+                chain_type_kwargs={"prompt": qa_prompt},
+                return_source_documents=True
+            )
+            logger.info("Initialized QA chain")
+        except Exception as e:
+            logger.error(f"Failed to initialize QA chain: {str(e)}")
+            raise
+
+    def add_documents(
+        self,
+        documents: List[Union[str, Dict]],
+        metadatas: Optional[List[Dict]] = None
+    ) -> None:
+        """
+        Add documents to the vector store.
+
+        Args:
+            documents: List of documents (strings or dicts with 'text' and 'metadata')
+            metadatas: List of metadata dicts (if documents are strings)
+        """
+        try:
+            # Process documents
+            docs_to_add = []
+
+            for i, doc in enumerate(documents):
+                if isinstance(doc, str):
+                    # Plain text document
+                    text = doc
+                    metadata = metadatas[i] if metadatas and i < len(metadatas) else {}
+                elif isinstance(doc, dict):
+                    # Document dict with text and metadata
+                    text = doc.get("text", "")
+                    metadata = doc.get("metadata", {})
+                else:
+                    logger.warning(f"Skipping document of unsupported type: {type(doc)}")
+                    continue
+
+                # Split text into chunks
+                chunks = self.text_splitter.split_text(text)
+
+                # Create documents with metadata
+                for j, chunk in enumerate(chunks):
+                    chunk_metadata = metadata.copy()
+                    chunk_metadata["chunk_index"] = j
+                    chunk_metadata["total_chunks"] = len(chunks)
+
+                    docs_to_add.append(Document(
+                        page_content=chunk,
+                        metadata=chunk_metadata
+                    ))
+
+            # Add to vector store
+            self.vectorstore.add_documents(docs_to_add)
+            self.vectorstore.persist()
+
+            logger.info(f"Added {len(docs_to_add)} document chunks to vector store")
+
+        except Exception as e:
+            logger.error(f"Error adding documents: {str(e)}")
+            raise
+
+    def query(
+        self,
+        query: str,
+        k: int = 4,
+        fetch_k: int = 20,
+        include_sources: bool = True
+    ) -> Dict:
+        """
+        Query the RAG system.
+
+        Args:
+            query: Query string
+            k: Number of documents to retrieve
+            fetch_k: Number of documents to initially fetch before reranking
+            include_sources: Whether to include source documents in response
+
+        Returns:
+            Dictionary with response and source documents if requested
+        """
+        try:
+            # Update retriever parameters
+            self.retriever.search_kwargs["k"] = k
+            if fetch_k > k:
+                self.retriever.search_kwargs["fetch_k"] = fetch_k
+
+            # Run the query
+            response = self.qa_chain({"query": query})
+
+            result = {
+                "answer": response["result"],
+            }
+
+            # Include sources if requested
+            if include_sources:
+                sources = []
+                for doc in response["source_documents"]:
+                    sources.append({
+                        "content": doc.page_content,
+                        "metadata": doc.metadata
+                    })
+                result["sources"] = sources
+
+            logger.info(f"Generated response for query: {query[:50]}...")
+            return result
+
+        except Exception as e:
+            logger.error(f"Error querying RAG system: {str(e)}")
+            raise
+
+    def retrieve_documents(
+        self,
+        query: str,
+        k: int = 4,
+        filter: Optional[Dict] = None
+    ) -> List[Document]:
+        """
+        Retrieve documents from the vector store without LLM generation.
+
+        Args:
+            query: Query string
+            k: Number of documents to retrieve
+            filter: Optional filter to apply to the search
+
+        Returns:
+            List of retrieved documents
+        """
+        try:
+            # Set up retriever with custom parameters
+            retriever = self.vectorstore.as_retriever(
+                search_type="similarity",
+                search_kwargs={"k": k, "filter": filter}
+            )
+
+            # Retrieve documents
+            docs = retriever.get_relevant_documents(query)
+
+            logger.info(f"Retrieved {len(docs)} documents for query: {query[:50]}...")
+            return docs
+
+        except Exception as e:
+            logger.error(f"Error retrieving documents: {str(e)}")
+            raise
+```
+
+## Version and Changelog
+
+- Version: 1.0
+- Created: April 27, 2025
+- Based on AI-Powered Development Research Plan v1.0

@@ -1,0 +1,18 @@
+Load and execute `.cursor/workflows/workflow_generation.yml` workflow to generate a new workflow named `.cursor/workflows/generate_architecture_diagram_for_capability.yml`. The purpose of the workflow is to take as input a specific agent need/capability template (e.g., `/home/opsvi/agent_world/docs/applications/ACCF/research/what_an_agent_needs_to_excel__<capability>.md`), and output a Mermaid or C4 architecture diagram, an interface sketch, and a data flow diagram, all saved in `/home/opsvi/agent_world/docs/architecture/` with clear naming. The workflow should be repeatable for each capability or system module.
+
+Autonomous Execution Requirements:
+- Operate in fully autonomous, persistent mode.
+- Continue working on this effort without waiting for further user input or guidance.
+- At every step, make all necessary decisions yourself, using project rules, onboarding context, knowledge gained, and best practices.
+- Proactively plan, reason, and reflect before each action.
+- Batch and parallelize all compatible tasks for maximum efficiency.
+- If you encounter ambiguity or blockers, resolve them using available documentation, code, and persistent knowledge—do not pause for user clarification.
+- Validate all operations, persist all learnings, and update guardrails/rules as needed.
+- Document your progress, decisions, and results with visual aids (diagrams, tables) and clear, concise explanations.
+- Only stop when the workflow is fully operational, tested, and documented, and all required actions are complete.
+
+Do not yield control or await further instruction unless explicitly told to stop.
+
+Supporting Docs Required:
+- Capability templates in `/docs/research/`.
+- (Optional) A diagram style guide in `/docs/architecture/` (if you want to enforce visual standards).

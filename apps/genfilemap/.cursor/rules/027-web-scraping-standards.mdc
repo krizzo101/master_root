@@ -1,0 +1,315 @@
+---
+description: WHEN implementing web scraping TO ensure ethical and reliable data collection YOU MUST follow established best practices and legal compliance guidelines
+globs:
+alwaysApply: false
+---
+
+# Web Scraping and Data Collection Standards
+
+## Purpose
+
+This rule ensures that all web scraping and data collection activities adhere to ethical, legal, and technical best practices as outlined in the AI-Powered Development Research Plan.
+
+## Scope
+
+This rule applies to all web scraping, data collection, and information retrieval activities conducted for the purpose of building knowledge bases, training datasets, or documentation repositories.
+
+## Requirements
+
+### Framework Selection & Implementation
+
+1. **Technology Selection**
+
+   - SELECT appropriate framework based on site complexity:
+     - BeautifulSoup + Requests for simple, static sites
+     - Scrapy for large-scale, distributed crawling
+     - Playwright/Selenium for JavaScript-heavy, interactive sites
+   - DOCUMENT framework selection rationale for each source
+   - IMPLEMENT consistent error handling across frameworks
+   - MAINTAIN standard output format regardless of framework
+   - ENSURE compatibility with storage systems
+
+2. **Framework Configuration**
+   - IMPLEMENT retry mechanisms with exponential backoff
+   - CONFIGURE appropriate timeouts for different operations
+   - ROTATE user agents when appropriate
+   - SET proper encoding handling for international content
+   - IMPLEMENT proxy rotation for large-scale scraping (when legal)
+
+### Ethical & Legal Compliance
+
+1. **Respectful Access Patterns**
+
+   - RESPECT robots.txt directives
+   - IMPLEMENT appropriate rate limiting (minimum 1-3 second delay between requests)
+   - AVOID concurrent requests to the same domain
+   - ADD identifiable user agent string with contact information
+   - CACHE results to minimize repeated requests
+
+2. **Data Attribution & Usage**
+
+   - MAINTAIN source attribution for all scraped content
+   - STORE original URL, access timestamp, and license information
+   - COMPLY with terms of service for each target site
+   - EXCLUDE or anonymize personal information
+   - DOCUMENT compliance checks for each source
+
+3. **Legal Considerations**
+   - VERIFY legal status of scraping target before implementation
+   - IMPLEMENT GDPR/CCPA compliance for stored data
+   - EXCLUDE password-protected or paywalled content
+   - RESPECT copyright and intellectual property restrictions
+   - MAINTAIN audit trail of authorization where applicable
+
+### Technical Implementation
+
+1. **Resilient Scraping**
+
+   - IMPLEMENT proper exception handling for network errors
+   - DETECT and handle CAPTCHA challenges appropriately
+   - MANAGE session state for authenticated scraping
+   - HANDLE site structure changes gracefully
+   - IMPLEMENT content validation to ensure quality
+
+2. **Data Extraction Quality**
+
+   - USE specific CSS/XPath selectors over broad patterns
+   - IMPLEMENT content cleaning and normalization
+   - VALIDATE extracted data against expected schema
+   - PRESERVE structural relationships in content
+   - EXTRACT metadata alongside content
+
+3. **Structured Data Handling**
+   - PRIORITIZE extraction of structured data (JSON-LD, microdata)
+   - PARSE tables into structured formats
+   - MAINTAIN hierarchy of headings and content
+   - PRESERVE code formatting and syntax
+   - EXTRACT semantic relationships when available
+
+### Storage & Processing Pipeline
+
+1. **Processing Pipeline**
+
+   - IMPLEMENT consistent data cleansing steps
+   - STANDARDIZE text normalization
+   - DETECT and handle duplicate content
+   - IMPLEMENT content categorization
+   - CREATE structured metadata schema
+
+2. **Storage Requirements**
+
+   - STORE raw HTML separately from processed content
+   - IMPLEMENT appropriate compression for raw data
+   - MAINTAIN version history of processed documents
+   - IMPLEMENT change detection for updates
+   - USE appropriate database schema for query efficiency
+
+3. **Incremental Updates**
+   - IMPLEMENT efficient change detection
+   - PRIORITIZE scraping of frequently updated sources
+   - MAINTAIN last checked timestamp for all sources
+   - UPDATE only changed content
+   - PRESERVE version history of significant changes
+
+### MCP Server Implementation
+
+1. **API Requirements**
+
+   - IMPLEMENT input validation for URLs and selectors
+   - PROVIDE granular error messages
+   - INCLUDE rate limiting and usage metrics
+   - DOCUMENT API endpoints and parameters
+   - IMPLEMENT appropriate authentication
+
+2. **Server Configuration**
+   - DEPLOY with appropriate resource allocation
+   - IMPLEMENT request queuing for concurrent usage
+   - CONFIGURE proper logging and monitoring
+   - IMPLEMENT caching layer for frequent requests
+   - ENSURE horizontal scalability for growing usage
+
+## Compliance Verification
+
+### Automated Verification
+
+- Robots.txt compliance checking
+- Rate limiting enforcement
+- Data validation against schema
+- Content quality metrics
+- Attribution verification
+
+### Manual Review Requirements
+
+- Legal compliance verification for new sources
+- Selector quality and resilience review
+- Ethical assessment of scraping targets
+- Output quality evaluation
+- Privacy impact assessment
+
+## Examples
+
+### Proper Rate-Limited Scraper
+
+```python
+import time
+import requests
+from bs4 import BeautifulSoup
+from urllib.robotparser import RobotFileParser
+import logging
+
+class EthicalScraper:
+    def __init__(self, base_url, delay=3):
+        self.base_url = base_url
+        self.delay = delay  # Seconds between requests
+        self.last_request = 0
+        self.session = requests.Session()
+        self.session.headers.update({
+            'User-Agent': 'AI-Research-Bot/1.0 (research@example.com; https://example.com/bot.html)'
+        })
+        self.robots_parser = self._get_robots_parser()
+        self.logger = logging.getLogger("EthicalScraper")
+
+    def _get_robots_parser(self):
+        """Set up robots.txt parser."""
+        robots_parser = RobotFileParser(url=f"{self.base_url}/robots.txt")
+        try:
+            robots_parser.read()
+            return robots_parser
+        except Exception as e:
+            self.logger.error(f"Failed to parse robots.txt: {e}")
+            # Conservative default - defer to standard crawl delay
+            return None
+
+    def _respect_rate_limits(self):
+        """Ensure we respect rate limits."""
+        elapsed = time.time() - self.last_request
+        if elapsed < self.delay:
+            time.sleep(self.delay - elapsed)
+        self.last_request = time.time()
+
+    def can_fetch(self, url):
+        """Check if we're allowed to fetch this URL."""
+        if self.robots_parser:
+            return self.robots_parser.can_fetch(
+                self.session.headers['User-Agent'], url
+            )
+        return True  # Conservative default
+
+    def fetch_page(self, url_path):
+        """Fetch a page respecting ethical guidelines."""
+        full_url = f"{self.base_url.rstrip('/')}/{url_path.lstrip('/')}"
+
+        if not self.can_fetch(full_url):
+            self.logger.warning(f"Robots.txt disallows fetching: {full_url}")
+            return None
+
+        self._respect_rate_limits()
+
+        try:
+            response = self.session.get(full_url, timeout=10)
+            response.raise_for_status()
+
+            # Store metadata with content
+            return {
+                "url": full_url,
+                "content": response.text,
+                "status_code": response.status_code,
+                "headers": dict(response.headers),
+                "scraped_at": time.time(),
+                "encoding": response.encoding
+            }
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Error fetching {full_url}: {e}")
+            return None
+
+    def extract_content(self, page_data, selectors):
+        """Extract structured content from page."""
+        if not page_data or not page_data["content"]:
+            return None
+
+        soup = BeautifulSoup(page_data["content"], 'html.parser')
+
+        result = {
+            "url": page_data["url"],
+            "scraped_at": page_data["scraped_at"],
+            "metadata": {}
+        }
+
+        # Extract metadata
+        meta_tags = soup.find_all("meta")
+        for tag in meta_tags:
+            name = tag.get("name") or tag.get("property")
+            if name and tag.get("content"):
+                result["metadata"][name] = tag.get("content")
+
+        # Extract content based on selectors
+        result["content"] = {}
+        for key, selector in selectors.items():
+            elements = soup.select(selector)
+            if elements:
+                if len(elements) == 1:
+                    result["content"][key] = elements[0].get_text(strip=True)
+                else:
+                    result["content"][key] = [el.get_text(strip=True) for el in elements]
+
+        # Extract structured data if available
+        structured_data = []
+        for script in soup.find_all("script", type="application/ld+json"):
+            try:
+                import json
+                data = json.loads(script.string)
+                structured_data.append(data)
+            except Exception as e:
+                self.logger.warning(f"Failed to parse structured data: {e}")
+
+        if structured_data:
+            result["structured_data"] = structured_data
+
+        return result
+```
+
+### MCP Server API Definition
+
+```typescript
+interface ScrapingRequest {
+  url: string;
+  selectors?: {
+    title?: string;
+    content?: string;
+    code?: string;
+    metadata?: string;
+  };
+  options?: {
+    depth: number;
+    maxPages: number;
+    delay: number;
+    respectRobotsTxt: boolean;
+  };
+}
+
+interface ScrapingResult {
+  url: string;
+  title: string;
+  content: string[];
+  codeBlocks: {
+    language: string;
+    code: string;
+    context: string;
+  }[];
+  metadata: {
+    author?: string;
+    publishDate?: string;
+    lastUpdated?: string;
+    license?: string;
+    sourceUrl: string;
+    scrapedAt: string;
+  };
+  childPages?: ScrapingResult[];
+}
+```
+
+## Version and Changelog
+
+- Version: 1.0
+- Created: April 27, 2025
+- Based on AI-Powered Development Research Plan v1.0

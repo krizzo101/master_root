@@ -1,0 +1,97 @@
+---
+description: "use when WRITING PYTHON FILES to ORGANIZE IMPORTS for CODE QUALITY"
+globs:
+alwaysApply: false
+---
+
+# Import Organization Standards
+
+**Triggers**: Adding imports to Python files, creating new modules
+**Principles**: Standard library first, third-party second, local last, explicit imports
+**Signatures**: Import order compliance, unused import prevention, explicit symbol imports
+**Validation**: Import order verification, unused import detection, circular import prevention
+**Integration**: Linting tools, IDE organization, pre-commit hooks
+
+## Mandatory Requirements
+
+### Import Order
+```python
+# ✅ CORRECT - Proper import order
+import os
+import sys
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Union
+
+from openai import OpenAI
+import pydantic
+
+from src.shared.logging import get_logger
+from src.config.config_manager import ConfigManager
+
+# ❌ INCORRECT - Mixed order
+import os
+from openai import OpenAI
+import sys
+from src.shared.logging import get_logger
+from typing import Any
+```
+
+### Import Categories
+1. **Standard Library**: Python built-in modules
+2. **Third-party**: External packages (openai, pydantic, etc.)
+3. **Local**: Project-specific modules (src.*)
+
+### Explicit Imports
+```python
+# ✅ CORRECT - Explicit imports
+from typing import Any, Callable, Dict, List, Union
+from src.shared.logging import get_logger, setup_logging
+
+# ❌ INCORRECT - Wildcard imports
+from typing import *
+from src.shared.logging import *
+```
+
+## Validation Framework
+
+### Import Order Verification
+- **ruff**: Must pass import order checks
+- **isort**: Must pass sorting validation
+- **IDE**: Must show proper import organization
+- **Pre-commit**: Must pass import-related hooks
+
+### Unused Import Detection
+- **MANDATORY**: No unused imports (F401 violations)
+- **AUTOMATION**: Use `ruff --fix` to remove unused imports
+- **VALIDATION**: All imports must be used in the file
+
+### Circular Import Prevention
+- **DETECTION**: Use tools to identify circular imports
+- **RESOLUTION**: Restructure imports to prevent cycles
+- **VALIDATION**: Import graph must be acyclic
+
+## Anti-Patterns
+
+### Prohibited Patterns
+```python
+# ❌ NEVER USE
+from typing import *                    # Wildcard imports
+import os, sys, pathlib                 # Multiple imports on one line
+from .module import *                   # Relative wildcard imports
+import module; from other import thing  # Multiple import statements
+```
+
+### Common Mistakes
+- Imports in the middle of files (E402 violations)
+- Unused imports left in code
+- Inconsistent import styles across files
+- Missing imports for used symbols
+
+## Success Indicators
+
+- **Zero import order violations** (E402)
+- **Zero unused import violations** (F401)
+- **Consistent import style** across codebase
+- **No circular import errors**
+- **IDE import organization** working correctly
+- **Pre-commit hooks passing** for imports

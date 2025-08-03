@@ -1,0 +1,101 @@
+# EXTERNAL INTERFACE GENERATION WORKFLOW
+
+keywords: [external_interface, interface_generation, api_integration, new_service, shared_interface]
+expectation: authoritative_spec_and_shared_interface_implementation
+completion: validated_interface_and_spec_documentation_in_shared_space
+
+phases:
+  intake:
+    description: "Capture the target external service/API and context for interface generation."
+    tools: [fetch_rules, mcp_time_current_time]
+    steps:
+      - intention_analysis → interface_request → target_service_identified
+      - context_capture → use_case_analysis → requirements_documented
+      - tool: fetch_rules
+        params: {rule_names: ["development-best-practices", "300-documentation-standards"]}
+        validation: standards_loaded
+      - tool: mcp_time_current_time
+        format: "YYYY-MM-DD HH:mm:ss"
+        validation: timestamp_recorded
+    gates: [service_identified, requirements_documented, standards_loaded]
+
+  research:
+    description: "Sequentially research available APIs/libraries for the target service, prioritize official documentation, and gather technical details."
+    tools: [mcp_web_search_brave_web_search, mcp_web_scraping_firecrawl_scrape, mcp_tech_docs_resolve-library-id, mcp_tech_docs_get-library-docs]
+    steps:
+      - tool: mcp_web_search_brave_web_search
+        params: {query: target_service_api_libraries, count: 10}
+        validation: candidate_apis_libraries_identified
+      - identify_and_prioritize_sources → web_search_results → official_and_high_value_urls
+      - tool: mcp_web_scraping_firecrawl_scrape
+        params: {url: prioritized_official_docs_urls, formats: [markdown], waitFor: 4000}
+        validation: full_content_scraped
+      - decide_on_libraries_apis → scraped_content → selected_library
+      - tool: mcp_tech_docs_resolve-library-id
+        params: {libraryName: selected_library}
+        validation: library_id_resolved
+      - tool: mcp_tech_docs_get-library-docs
+        params: {libraryId: resolved_library_id}
+        validation: latest_tech_docs_retrieved
+    gates: [apis_libraries_identified, docs_scraped, tech_docs_retrieved]
+
+  spec_generation:
+    description: "Aggregate research into a comprehensive markdown specification document using the docs/standards/EXTERNAL_INTERFACE_SPEC_TEMPLATE.md."
+    tools: [edit_file]
+    steps:
+      - synthesis → research_results → spec_outline_drafted
+      - standardization → spec_template → spec_sections_populated
+      - tool: edit_file
+        params: {target_file: spec_doc_path, code_edit: generated_spec_content}
+        validation: spec_doc_created
+      - cross_reference → related_specs → links_added
+    gates: [spec_doc_created, sections_complete, cross_references_added]
+
+  implementation:
+    description: "Develop the shared Python interface in src/shared/ using the spec as the authoritative reference. Document the interface in docs/interfaces/."
+    tools: [edit_file, fetch_rules]
+    steps:
+      - tool: fetch_rules
+        params: {rule_names: ["800-development-best-practices", "803-python-dev-standards"]}
+        validation: dev_standards_loaded
+      - interface_design → spec_reference → class_and_methods_defined
+      - code_implementation → python_interface → code_written
+      - tool: edit_file
+        params: {target_file: interface_file_path, code_edit: generated_interface_code}
+        validation: interface_file_created
+      - docstring_and_comments → codebase_standards → documentation_added
+      - interface_documentation → docs/interfaces/ → interface_doc_created
+      - tool: edit_file
+        params: {target_file: interface_doc_path, code_edit: generated_interface_doc}
+        validation: interface_doc_created
+    gates: [interface_file_created, code_complete, documentation_added, interface_doc_created]
+
+  validation:
+    description: "Test and validate the new interface and spec. Document results."
+    tools: [run_terminal_cmd, edit_file, mcp_cognitive_tools_arango_modify]
+    steps:
+      - test_case_generation → interface_methods → tests_written
+      - tool: run_terminal_cmd
+        command: "pytest path_to_tests --maxfail=2 --disable-warnings"
+        is_background: false
+        explanation: "Run interface tests and capture results."
+        validation: tests_executed
+      - results_analysis → test_outputs → issues_flagged
+      - tool: edit_file
+        params: {target_file: validation_report_path, code_edit: validation_report_content}
+        validation: validation_report_created
+      - tool: mcp_cognitive_tools_arango_modify
+        params: {operation: insert, collection: research_docs, document: {type: "interface_validation", content_type: "validation_report", content: validation_report_content}}
+        validation: validation_stored
+    gates: [tests_passed, validation_report_created, validation_stored]
+
+failure_prevention:
+  avoid:
+    [missing_official_docs, incomplete_spec, undocumented_code, untested_interface, standards_noncompliance]
+  require:
+    [official_docs_scraped, comprehensive_spec, code_documented, tests_written, standards_compliance, interface_doc_created]
+
+success_validation:
+  before_completion:
+    [spec_doc_created, interface_file_created, tests_passed, validation_report_created, standards_compliance, interface_doc_created]
+  output_requirements: validated_interface_and_spec_documentation_in_shared_space

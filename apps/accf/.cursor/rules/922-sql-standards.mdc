@@ -1,0 +1,24 @@
+---
+description: "use when WRITING SQL QUERIES to ENFORCE SECURITY PRACTICES for INJECTION PREVENTION"
+globs: ["*.sql"]
+alwaysApply: false
+---
+# SQL Standards (Optimized for GPT-4.1)
+
+- Clarity & Directness: Use clear, imperative instructions.
+- Batching & Parallelization: Batch compatible SQL operations and queries; execute in parallel where possible.
+- Multi-Step Planning: Plan several steps ahead, identify batching opportunities, and optimize for efficiency.
+- Persistent Autonomy: Continue until all objectives are met or explicitly told to stop; avoid unnecessary waiting for input.
+- Tool-First Mandate: Always use available tools for every operation, preferring tool-based actions.
+- Self-Review & Optimization: Review and revise plans for efficiency before acting.
+- Evidence-Based Completion: Present clear evidence of completion before considering a task done.
+
+# SQL Guidelines
+
+- **Parameterize** every query; never string‑concatenate user input.
+- Use **snake_case** for tables & columns.
+- Avoid `SELECT *`; list explicit columns.
+- Index foreign keys & frequently filtered columns.
+- Migrations must be **idempotent** & reversible.
+- Use transactions for multi‑step writes.
+- Prefer CTEs for readability over nested subqueries.

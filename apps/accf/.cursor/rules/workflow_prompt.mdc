@@ -1,0 +1,45 @@
+---
+description: "use when GENERATING WORKFLOW PROMPTS to ENFORCE INPUT VALIDATION AND AUTONOMOUS EXECUTION for REPRODUCIBLE WORKFLOWS"
+globs:
+alwaysApply: false
+---
+
+## Workflow Prompt Generation Pattern
+
+**Triggers**: Generating or updating prompts for workflow generation workflows (e.g., workflow_generation.yml)
+
+**Principles**:
+- All referenced input files (templates, requirements, ADRs, specs) must exist and be in the required format before running the workflow.
+- If an input file is missing, the prompt or plan must specify a prerequisite workflow to generate it, referencing canonical documentation.
+- Output templates and generated files must be parameterized by use-case or workflow name (e.g., `<use-case>_output_template.yml`).
+- All file paths and names must be canonical and standards-compliant.
+- Prompts must reference all relevant existing documentation, specs, and templates as context for the workflow being generated.
+- Prompts must include the full autonomous execution requirements block.
+- Prompts must specify explicit output locations and parameterized file names for all generated artifacts.
+
+**Signatures**:
+- Input existence checks or prerequisite generation steps
+- Parameterized template and output file names
+- Canonical referencing of requirements, ADRs, and specs
+- Autonomous execution requirements block
+- Explicit output locations
+
+**Validation**:
+- All referenced input files exist or are generated as a prerequisite
+- All file names and paths are parameterized and canonical
+- Prompts reference relevant documentation/specs
+- Autonomous execution requirements are present
+- Output locations are explicit and standards-compliant
+
+**Integration**:
+- Used in conjunction with workflow_generation.yml and related meta-workflows
+- Ensures all workflow prompts are robust, reproducible, and standards-compliant
+- Supports autonomous, persistent, and batched execution patterns
+
+**Reference Protocol**: `[workflow_prompt.mdc](mdc:.cursor/rules/workflow_prompt.mdc)`
+
+
+**Reference Protocol**: `[workflow_prompt.mdc](mdc:.cursor/rules/workflow_prompt.mdc)`
+
+
+**Reference Protocol**: `[workflow_prompt.mdc](mdc:.cursor/rules/workflow_prompt.mdc)`

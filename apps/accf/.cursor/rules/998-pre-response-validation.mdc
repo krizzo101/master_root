@@ -1,0 +1,187 @@
+---
+alwaysApply: false
+---
+# PRE-RESPONSE VALIDATION PROTOCOL
+
+**Validation**: "Rule 998 Auto-Execution Active"
+
+## AUTOMATIC ENFORCEMENT EXECUTION
+
+**Triggers**: Before ANY agent response, ANY file modification, ANY architectural discussion
+**Principles**: Zero-bypass validation, automatic enforcement, mandatory compliance checking
+**Signatures**: Auto-executed validation, pre-response blocking, mandatory fix requirements
+**Validation**: Enforcement guard execution, contract compliance verification, Send API validation
+**Integration**: Every agent response, all oamat_sd operations, universal project compliance
+
+## MANDATORY RESPONSE PROTOCOL
+
+**BEFORE EVERY RESPONSE, AGENT MUST**:
+
+### 1. **EXECUTE VALIDATION SCRIPT**
+```python
+# AUTOMATIC EXECUTION - NO BYPASS - COMPREHENSIVE CHECK
+try:
+    import os, glob, re
+    violations = []
+
+    # UNAUTHORIZED MODEL PATTERNS
+    FORBIDDEN_MODELS = [
+        r'gpt-4o["\']',               # GPT-4O series
+        r'gpt-4o-mini["\']',          # GPT-4O mini
+        r'gpt-4o-2024["\']',          # GPT-4O variants
+        r'claude-["\']',              # Claude models
+        r'anthropic/["\']',           # Anthropic models
+        r'gemini-["\']',              # Gemini models
+        r'google/["\']',              # Google models
+        r'llama-["\']',               # Llama models
+        r'mistral-["\']',             # Mistral models
+    ]
+
+    APPROVED_MODELS = {
+        "o3-mini", "o3", "gpt-4.1-mini",
+        "gpt-4.1", "gpt-4.1-nano"
+    }
+
+    # Check ALL Python files in oamat_sd application
+    oamat_files = glob.glob('src/applications/oamat_sd/**/*.py', recursive=True)
+    for file_path in oamat_files:
+        # Skip legitimate files
+        if any(skip in file_path for skip in ['performance_baseline.py', 'test_', '/tests/', '/archive/']):
+            continue
+        try:
+            with open(file_path) as f:
+                content = f.read()
+                lines = content.split('\n')
+                for line_num, line in enumerate(lines, 1):
+                    stripped = line.strip()
+
+                    # 🔐 CHECK FOR UNAUTHORIZED MODELS
+                    for forbidden_pattern in FORBIDDEN_MODELS:
+                        if re.search(forbidden_pattern, line, re.IGNORECASE):
+                            violations.append(f"🚨 UNAUTHORIZED MODEL in {file_path}:{line_num}: {line.strip()}")
+                            break
+
+                    # Check for actual asyncio.gather usage, not string references
+                    if ('asyncio.gather(' in line or 'await asyncio.gather' in line) and \
+                       not stripped.startswith('#') and not stripped.startswith('"') and \
+                       not stripped.startswith("'") and '"asyncio.gather"' not in line and \
+                       "'asyncio.gather'" not in line:
+                        violations.append(f"FORBIDDEN asyncio.gather in {file_path}:{line_num}")
+                        break  # Only report first violation per file
+        except Exception as e:
+            violations.append(f"ERROR reading {file_path}: {e}")
+
+    # Check Send API import
+    exec_file = "src/applications/oamat_sd/src/execution/execution_engine.py"
+    if os.path.exists(exec_file):
+        with open(exec_file) as f:
+            content = f.read()
+            if "from langgraph.constants import Send" not in content:
+                violations.append("REQUIRED Send API import missing")
+
+            # 🔐 ADDITIONAL MODEL CONSTRAINT CHECK
+            for forbidden_pattern in FORBIDDEN_MODELS:
+                if re.search(forbidden_pattern, content, re.IGNORECASE):
+                    violations.append(f"🚨 UNAUTHORIZED MODEL in {exec_file}")
+                    break
+
+    if violations:
+        for v in violations[:10]:
+            print(f"🚨 CONTRACT VIOLATION: {v}")
+        if len(violations) > 10:
+            print(f"🚨 ... and {len(violations)-10} more violations")
+        print("🔒 RESPONSE BLOCKED UNTIL ALL FIXED")
+        exit(1)
+except Exception as e:
+    print(f"❌ VALIDATION FAILED: {e}")
+    print("🔒 RESPONSE BLOCKED UNTIL FIXED")
+    exit(1)
+```
+
+### 2. **ACKNOWLEDGE ENFORCEMENT**
+**REQUIRED RESPONSE PREFIX**:
+```
+🛡️ RULE 998 VALIDATION: Checked oamat_sd compliance
+✅ Send API verification: [PASS/FAIL]
+✅ asyncio.gather check: [PASS/FAIL]
+✅ Command routing check: [PASS/FAIL]
+✅ 🔐 Model constraint check: [PASS/FAIL]
+✅ 🔐 Unauthorized model scan: [PASS/FAIL]
+```
+
+### 3. **VIOLATION RESPONSE PROTOCOL**
+**IF ANY VIOLATIONS FOUND**:
+- **BLOCK** current response
+- **REPORT** specific violations
+- **PROVIDE** exact fix requirements
+- **REFUSE** to proceed until fixed
+
+## AUTOMATIC COMPLIANCE CHECKING
+
+**SCRIPT EXECUTION**:
+```bash
+# AUTO-EXECUTED ON EVERY RESPONSE
+python -c "
+import os, sys, re
+execution_file = 'src/applications/oamat_sd/src/execution/execution_engine.py'
+
+# Define unauthorized model patterns
+forbidden_models = [
+    r'gpt-4o[\"\']', r'gpt-4o-mini[\"\']', r'gpt-4o-2024[\"\']',
+    r'claude-[\"\']', r'anthropic/[\"\']', r'gemini-[\"\']',
+    r'google/[\"\']', r'llama-[\"\']', r'mistral-[\"\']'
+]
+
+if os.path.exists(execution_file):
+    with open(execution_file) as f:
+        content = f.read()
+        violations = []
+
+        # Check technical violations
+        if 'asyncio.gather' in content:
+            violations.append('FORBIDDEN asyncio.gather usage detected')
+        if 'from langgraph.constants import Send' not in content:
+            violations.append('REQUIRED Send API import missing')
+
+        # 🔐 Check model constraints
+        for pattern in forbidden_models:
+            if re.search(pattern, content, re.IGNORECASE):
+                violations.append(f'🚨 UNAUTHORIZED MODEL detected: {pattern}')
+                break
+
+        if violations:
+            print('🚨 CONTRACT VIOLATIONS DETECTED:')
+            for v in violations: print(f'❌ {v}')
+            print('🔒 RESPONSE BLOCKED - FIX REQUIRED')
+            sys.exit(1)
+print('✅ OAMAT_SD COMPLIANCE VERIFIED')
+"
+```
+
+## RESPONSE BLOCKING MECHANISM
+
+**AUTOMATIC BLOCKS**:
+- Any response without validation acknowledgment
+- Any oamat_sd work without compliance check
+- Any architectural changes without enforcement verification
+- Any code modifications without Send API validation
+
+## MANDATORY FIX PROTOCOL
+
+**WHEN VIOLATIONS DETECTED**:
+1. **IMMEDIATE STOP** - No response permitted
+2. **VIOLATION REPORT** - Exact issues listed
+3. **FIX REQUIREMENTS** - Specific changes needed
+4. **RE-VALIDATION** - Must pass before proceeding
+5. **COMPLIANCE CONFIRMATION** - Full verification required
+
+## SUCCESS VALIDATION
+
+**RESPONSE PERMITTED ONLY AFTER**:
+- ✅ Enforcement script passes
+- ✅ No asyncio.gather detected
+- ✅ Send API properly imported
+- ✅ Command routing implemented
+- ✅ Full compliance confirmed
+
+**NO EXCEPTIONS - NO BYPASS - NO COMPROMISE**

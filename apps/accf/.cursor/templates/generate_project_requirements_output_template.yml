@@ -1,0 +1,146 @@
+# GENERATE PROJECT REQUIREMENTS WORKFLOW TEMPLATE
+
+expectation: validated_project_requirements_design_and_build_specifications
+completion: requirements_design_build_specs_in_standard_locations
+
+directives:
+  - "This workflow is an explicit order. All steps must be executed as written. Do not improvise, skip, or treat steps as optional."
+  - "The time call is required to ensure the agent is aware of the real current date/time, not its model cutoff."
+  - "Load all relevant rules, standards, and compliance requirements before proceeding."
+
+references:
+  Profile: .cursor/profiles/generate_project_requirements_agent_profile.yml
+  Output_Template: .cursor/templates/generate_project_requirements_output_template.yml
+  Research_Reference_Template: .cursor/templates/research_reference_template.md
+  Documentation: [docs/standards/generate_project_requirements_workflow.md]
+  Standards: [docs/standards/development-checklists.md, docs/standards/documentation-templates.md]
+
+phases:
+  profile_initialization:
+    description: "Load the agent profile, perform a time check, and load foundational rules and standards."
+    tools: [read_file, fetch_rules, mcp_time_current_time]
+    steps:
+      - tool: mcp_time_current_time
+        validation: time_checked
+      - tool: read_file
+        params:
+          target_file: .cursor/profiles/generate_project_requirements_agent_profile.yml
+        validation: agent_profile_loaded
+      - tool: fetch_rules
+        params:
+          rule_names: ["002-tool-usage-and-optimize", "200-project-design-and-dev-process", "501-tool-operation-validation", "800-development-best-practices", "300-documentation-standards"]
+        validation: foundational_rules_loaded
+    gates: [time_checked, agent_profile_loaded, foundational_rules_loaded]
+
+  intake:
+    description: "Capture the purpose, scope, and requirements for the project."
+    tools: [prompt_user]
+    steps:
+      - intention_analysis → project_request → project_purpose_identified
+      - context_capture → use_case_analysis → requirements_documented
+    gates: [project_purpose_identified, requirements_documented]
+
+  research:
+    description: "Gather and synthesize current best practices, standards, and frameworks for requirements, design, build, and agent compatibility. Document findings using the research reference template."
+    tools: [web_search, edit_file]
+    steps:
+      - perform_web_searches_and_scraping → findings_synthesized
+      - use_research_reference_template_to_capture_findings
+      - tool: edit_file
+        params:
+          target_file: docs/research/generate_project_requirements_research_reference.md
+          code_edit: captured_research_findings
+        validation: research_reference_doc_saved
+    gates: [findings_synthesized, research_reference_doc_saved]
+
+  requirements_specification:
+    description: "Generate clear, SMART requirements (functional, non-functional, security, compliance) in both human- and machine-readable formats."
+    tools: [edit_file]
+    steps:
+      - requirements_gathering → requirements_documented
+      - requirements_structured_in_yaml_json_markdown → requirements_validated
+    gates: [requirements_documented, requirements_validated]
+
+  design_specification:
+    description: "Document system architecture, data flows, and design using diagrams (Mermaid), tables, and narrative. Ensure agentic modularity and compliance."
+    tools: [edit_file, create_diagram]
+    steps:
+      - architecture_mapping → design_documented
+      - generate_mermaid_diagrams → diagrams_validated
+      - design_structured_for_agentic_patterns → design_validated
+    gates: [design_documented, diagrams_validated, design_validated]
+
+  build_specification:
+    description: "Define build, deployment, and automation specifications (CI/CD, version control, rollback, validation gates). Reference security and compliance frameworks."
+    tools: [edit_file]
+    steps:
+      - build_pipeline_defined → build_spec_documented
+      - ci_cd_and_automation_specified → automation_validated
+      - security_and_compliance_controls_included → compliance_validated
+    gates: [build_spec_documented, automation_validated, compliance_validated]
+
+  validation_and_review:
+    description: "Review all specifications for completeness, standards compliance, and agent compatibility. Document validation and review outcomes."
+    tools: [read_file, fetch_rules]
+    steps:
+      - review_requirements_design_build → review_documented
+      - checklist_review: [phases_present, validation_gates, actionable_steps, template_used, standards_referenced]
+        validation: compliance_confirmed
+    gates: [review_documented, compliance_confirmed]
+
+  linting:
+    description: "Lint and auto-fix all generated files (YAML, Markdown, JSON, Python, Shell)."
+    tools: [run_terminal_cmd]
+    steps:
+      - lint_and_autofix_all_outputs
+    gates: [linting_passed]
+
+  documentation:
+    description: "Document the workflow, agent profile, and all generated specifications. Commit all changes to git."
+    tools: [edit_file, run_terminal_cmd]
+    steps:
+      - tool: edit_file
+        params:
+          target_file: docs/standards/generate_project_requirements_workflow.md
+          code_edit: generated_workflow_doc_from_template
+        validation: workflow_doc_created
+      - tool: run_terminal_cmd
+        params:
+          command: "git add . && git commit -m 'Add project requirements/design/build workflow, agent profile, templates, and documentation.'"
+          is_background: false
+        validation: git_commit_successful
+    gates: [workflow_doc_created, git_commit_successful]
+
+failure_prevention:
+  avoid:
+    - unclear_purpose
+    - missing_phases
+    - incomplete_validation
+    - undocumented_workflow
+    - standards_noncompliance
+    - vague_queries
+    - ambiguous_paths
+    - uncommitted_changes
+    - skipped_steps
+    - missing_time_call
+    - insufficient_iteration
+  require:
+    - purpose_clearly_defined
+    - phases_and_steps_mapped
+    - validation_criteria_explicit
+    - workflow_documented
+    - standards_compliance
+    - actionable_queries
+    - explicit_paths
+    - git_commit_successful
+    - workflow_refined_to_point_of_diminishing_returns
+
+success_validation:
+  before_completion:
+    - requirements_validated
+    - design_validated
+    - build_spec_documented
+    - compliance_confirmed
+    - workflow_doc_created
+    - git_commit_successful
+  output_requirements: requirements_design_build_specs_in_standard_locations

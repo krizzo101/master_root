@@ -1,0 +1,45 @@
+---
+description: "Synthesize/document system-level integration, dependencies, and architecture."
+related_workflow: "Integration, Synthesis"
+status: "Active"
+last_updated: "2025-07-05"
+---
+# Canonical Output & Validation Instructions (MANDATORY)
+
+- All outputs MUST use snake_case filenames and be saved in the canonical directory for their artifact type:
+    - Architecture diagrams, integration maps: docs/architecture/
+    - Audit, review, and cleanup reports: docs/development/ or docs/standards/
+    - Documentation synthesis/finalization: docs/standards/ or docs/project/
+    - Deployment/operationalization docs: docs/deployment/
+    - Retrospectives: docs/coordination/
+- DO NOT use legacy or ambiguous folders (e.g., docs/research/, docs/documentation/, or root docs/).
+- Each output file must have a clear, descriptive name: <subject>_<artifact_type>.md/yml/mmd (e.g., system_integration_map.md, workflow_audit_report.md).
+- After generation, validate that:
+    - The file exists in the correct canonical location with the correct name.
+    - All cross-links in documentation are updated to reference the new file.
+    - Any duplicate, ambiguous, or legacy outputs are moved to docs/legacy_outputs/.
+- If a file already exists, append a version suffix (_v2, _2025-07-05, etc.) or update as appropriate.
+- Log all actions and validation results in a summary section at the end of the output.
+---
+# ACCF Batch Prompt: System Integration & Synthesis
+
+Execute the following workflows in sequence for the integrated ACCF system (not per-capability):
+
+1. **System Integration & Dependency Mapping**
+   - Map all integration points between agentic capabilities
+   - Document dependencies and data flows
+   - Validate with architecture diagrams and dependency maps
+
+2. **Architecture/Behavior Synthesis**
+   - Synthesize a comprehensive architecture summary
+   - Document system-wide behavior and configuration patterns
+   - Ensure all cross-capability interactions are covered
+
+3. **Change Impact Assessment**
+   - Analyze modification boundaries and change impacts
+   - Document affected components and integration risks
+
+**Instructions:**
+- Leverage all previously generated artifacts and diagrams
+- Save outputs in `docs/architecture/` and `docs/development/`
+- Validate for completeness, cross-linking, and actionable clarity

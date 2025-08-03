@@ -1,0 +1,99 @@
+---
+description: "use when AUTOMATING DEVELOPMENT WORKFLOWS to ENFORCE QUALITY STANDARDS for EFFICIENT TEAM COLLABORATION"
+globs:
+alwaysApply: false
+---
+
+# DEVELOPMENT AUTOMATION 2025
+
+**Validation**: "Rule 805 Protocol Active"
+
+## Automation-First Philosophy
+
+**Triggers**: Development workflow, quality checks, team collaboration, CI/CD integration
+**Principles**: Pre-commit enforcement, Makefile orchestration, script automation, zero-manual-checks
+**Signatures**: Pre-commit hooks, make commands, dev-tools.py orchestration, automated pipelines
+**Validation**: Automated quality enforcement, consistent team workflows, CI/CD success
+**Integration**: Git hooks, IDE integration, deployment pipelines, team onboarding
+
+## Pre-commit Hook Excellence
+
+**Mandatory Automation**:
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    hooks:
+      - id: mypy
+  - repo: https://github.com/PyCQA/bandit
+    hooks:
+      - id: bandit
+```
+
+**Activation Pattern**:
+```bash
+pre-commit install     # One-time setup
+git commit            # Automatic quality checks
+```
+
+## Makefile Orchestration
+
+**Standard Commands**:
+```bash
+make format      # Code formatting
+make lint        # Linting with auto-fix
+make type-check  # Static type checking
+make security    # Security scanning
+make test        # Test execution with coverage
+make all         # Complete quality suite
+make dev         # Start development session
+make pr-ready    # Complete PR preparation
+```
+
+## Script Automation
+
+**Dev Tools Orchestrator**:
+```python
+# scripts/dev-tools.py
+def run_all_checks(self) -> bool:
+    checks = [
+        ("Format", self.format_code),
+        ("Lint", self.lint_code),
+        ("Type Check", self.type_check),
+        ("Security", self.security_scan),
+        ("Tests", self.run_tests),
+    ]
+    return all(check() for _, check in checks)
+```
+
+## Quality Gate Enforcement
+
+**CI/CD Integration**:
+```yaml
+# GitHub Actions
+- name: Quality Checks
+  run: |
+    pre-commit run --all-files
+    make pr-ready
+```
+
+**Local Development**:
+```bash
+make commit      # Before every commit
+make pr-ready    # Before creating PR
+```
+
+## Success Indicators
+
+- ✅ **Zero manual** quality checks required
+- ✅ **Consistent enforcement** across team
+- ✅ **Fast feedback loops** (< 1 second)
+- ✅ **New developer onboarding** in minutes
+- ✅ **CI/CD integration** with automation
+
+[automation-patterns.md](mdc:.cursor/templates/automation-patterns.md)

@@ -1,0 +1,90 @@
+
+---
+description: "use when WORKING IN WORKSPACE to ENFORCE STANDARDS for CONSISTENT DEVELOPMENT"
+globs:
+alwaysApply: true
+---
+
+# OPSVI Master Workspace Rules
+
+## Git Workflow
+
+- **Commit** every ≤10 min to the AUTOSAVE branch using the autosave script
+- **Never** run `git reset --hard` or `git push --force` on MAIN/AUTOSAVE branches
+- For risky codegen, **create a worktree**: `git worktree add ../_worktrees/<name> AUTOSAVE`
+- Update snapshots with `tools/snapshot.sh` after large refactors
+- Use shared libraries (`opsvi.*`) instead of duplicating helpers
+
+## Code Standards
+
+- Use **uv** for Python package management
+- Follow **PEP 8** and **Black** formatting
+- Use **type hints** for all function parameters and return values
+- Write **docstrings** for all public functions and classes
+- Use **structured logging** with `opsvi_core.get_logger()`
+
+## Project Structure
+
+- **apps/**: Applications with CLI entry points
+- **libs/**: Shared libraries (opsvi-core, opsvi-rag, etc.)
+- **platform/**: Infrastructure services (observability, RAG, MCP)
+- **tools/**: Development and operational tools
+- **scripts/**: Utility scripts and automation
+
+## Development Workflow
+
+1. Create feature worktree: `./scripts/new_agent_worktree.sh <feature-name>`
+2. Make changes and commit frequently to AUTOSAVE
+3. Run tests: `uv run pytest`
+4. Format code: `uv run ruff format && uv run black .`
+5. Lint code: `uv run ruff check && uv run mypy .`
+6. Create PR from feature branch to MAIN
+
+## Dependencies
+
+- Use **workspace dependencies** in pyproject.toml: `{workspace = true}`
+- Add new dependencies to the appropriate package's pyproject.toml
+- Run `uv sync` after dependency changes
+- Keep dependencies up to date with `uv lock --upgrade`
+
+## Testing
+
+- Write **unit tests** for all new functionality
+- Use **pytest** for testing framework
+- Aim for **≥90% test coverage**
+- Run **integration tests** for platform services
+- Use **pytest markers** for test categorization
+
+## Documentation
+
+- Update **README.md** files for all packages
+- Write **docstrings** for all public APIs
+- Document **configuration** and **environment variables**
+- Keep **architecture decisions** in ADR/ directory
+
+## Security
+
+- Never commit **secrets** or **API keys**
+- Use **environment variables** for configuration
+- Validate **user inputs** and **API responses**
+- Follow **principle of least privilege**
+
+## Performance
+
+- Use **async/await** for I/O operations
+- Implement **caching** for expensive operations
+- Monitor **memory usage** and **response times**
+- Use **profiling** tools for optimization
+
+## Observability
+
+- Use **structured logging** with correlation IDs
+- Add **OpenTelemetry** instrumentation
+- Monitor **application metrics** and **health checks**
+- Set up **alerts** for critical failures
+
+
+- Use **structured logging** with correlation IDs
+- Add **OpenTelemetry** instrumentation
+- Monitor **application metrics** and **health checks**
+- Set up **alerts** for critical failures

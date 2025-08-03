@@ -1,0 +1,11 @@
+You are to generate a new workflow using the master workflow defined in `.cursor/workflows/workflow_generation.yml`.
+
+**Workflow Name:** [Insert name]
+**Purpose:** [Describe purpose/context]
+**Scope:** [Boundaries, systems, or processes]
+**Key Requirements:** [List requirements, constraints, or success criteria]
+**Intended Users:** [Who will use it?]
+**Special Considerations:** [Compliance, security, integrations, etc.]
+**Example Use Case:** [Optional]
+
+Follow all phases, standards, and validation gates as defined in the master workflow. Do not improvise output locations or formats.

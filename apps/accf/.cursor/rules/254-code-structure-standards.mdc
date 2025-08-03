@@ -1,0 +1,98 @@
+---
+description: "use when WRITING PYTHON CODE to OPTIMIZE CODE STRUCTURE for READABILITY"
+globs:
+alwaysApply: false
+---
+
+# Code Structure Standards
+
+**Triggers**: Writing conditional statements, creating loops, structuring functions
+**Principles**: Simplified logic, reduced nesting, improved readability
+**Signatures**: Combined conditions, merged checks, simplified expressions
+**Validation**: Structure complexity assessment, nesting depth verification, readability metrics
+**Integration**: Linting tools, code analysis, refactoring support
+
+## Mandatory Requirements
+
+### Nested If Simplification
+```python
+# ✅ CORRECT - Combined conditions
+if condition1 and condition2:
+    do_something()
+
+# ❌ INCORRECT - Nested if statements
+if condition1:
+    if condition2:
+        do_something()
+```
+
+### Multiple isinstance Merging
+```python
+# ✅ CORRECT - Merged isinstance checks
+if isinstance(x, (A, B)):
+    process(x)
+
+# ❌ INCORRECT - Multiple isinstance calls
+if isinstance(x, A) or isinstance(x, B):
+    process(x)
+```
+
+### Ternary Operator Usage
+```python
+# ✅ CORRECT - Ternary for simple conditions
+result = value1 if condition else value2
+
+# ❌ INCORRECT - Simple if-else chain
+if condition:
+    result = value1
+else:
+    result = value2
+```
+
+## Validation Framework
+
+### Structure Complexity Assessment
+- **ruff**: Must pass SIM102, SIM101, SIM108 checks
+- **IDE**: Must show structure optimization suggestions
+- **Pre-commit**: Must catch structure violations
+- **Code review**: Must verify structure quality
+
+### Readability Metrics
+- **NESTING**: Maximum 3 levels of nesting
+- **COMPLEXITY**: Cyclomatic complexity under 10
+- **LENGTH**: Functions under 50 lines
+- **CLARITY**: Logic must be immediately understandable
+
+## Anti-Patterns
+
+### Prohibited Patterns
+```python
+# ❌ NEVER USE
+if condition1:
+    if condition2:
+        if condition3:
+            do_something()  # Too much nesting
+
+if isinstance(x, A) or isinstance(x, B) or isinstance(x, C):
+    process(x)  # Multiple isinstance calls
+
+if condition:
+    result = value1
+else:
+    result = value2  # Simple if-else instead of ternary
+```
+
+### Common Mistakes
+- Excessive nesting levels
+- Multiple similar condition checks
+- Complex boolean expressions
+- Unnecessary if-else chains
+- Overly complex logic structures
+
+## Success Indicators
+
+- **Zero structure violations** (SIM102, SIM101, SIM108)
+- **Maximum 3 nesting levels** in all code
+- **Simplified conditional logic** throughout
+- **Improved code readability** scores
+- **Reduced cyclomatic complexity**

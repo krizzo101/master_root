@@ -1,0 +1,128 @@
+# CODE-DOC AUDIT WORKFLOW
+
+expectation: validated_code_doc_audit_workflow_package
+autonomous_mode: true
+max_parallelism: true
+batching_enabled: true
+plan_ahead: true
+combine_and_chain_steps: true
+completion: workflow_yaml_profile_templates_and_documentation_in_standard_locations
+
+references:
+  Agent_Profile: .cursor/profiles/code_doc_audit_agent_profile.yml
+  Output_Template: .cursor/templates/code_doc_audit_output_template.yml
+  Workflow_Documentation: docs/applications/ACCF/standards/code_doc_audit_workflow.md
+  Generation_Report: docs/applications/ACCF/standards/code_doc_audit_generation_report.md
+
+phases:
+  inventory:
+    description: "Inventory all code and documentation files in specified directories, excluding venv/, __pycache__/, and optionally shared/. Extract all public functions, classes, modules, APIs, and doc references."
+    tools: [run_terminal_cmd, edit_file]
+    steps:
+      - batch:
+          - code_inventory → code_entities_extracted
+          - doc_inventory → doc_entities_extracted
+    gates:
+      - code_entities_extracted
+      - doc_entities_extracted
+
+  mapping:
+    description: "Map code entities to documentation references. Identify undocumented code, docs referencing missing/outdated code, and mismatches."
+    tools: [edit_file, run_terminal_cmd]
+    steps:
+      - batch:
+          - map_code_to_docs → mapping_complete
+          - identify_gaps_and_mismatches → gaps_and_mismatches_identified
+    gates:
+      - mapping_complete
+      - gaps_and_mismatches_identified
+
+  analysis:
+    description: "Analyze mapping results using automated tools (pydocstyle, docstr-coverage, Sphinx autodoc, custom scripts, ripgrep/grep). Flag issues for review."
+    tools: [run_terminal_cmd, edit_file]
+    steps:
+      - batch:
+          - run_docstring_checkers → docstring_coverage_reported
+          - run_code_doc_matchers → code_doc_alignment_reported
+    gates:
+      - docstring_coverage_reported
+      - code_doc_alignment_reported
+
+  reporting:
+    description: "Generate a comprehensive report listing undocumented code, docs referencing missing/outdated code, and mismatches."
+    tools: [edit_file]
+    steps:
+      - generate_audit_report → audit_report_created
+    gates:
+      - audit_report_created
+
+  review:
+    description: "Support human review and annotation of flagged items. Allow reviewer to mark items for update, ignore, or further action."
+    tools: [edit_file]
+    steps:
+      - prepare_review_interface → review_interface_ready
+      - collect_reviewer_feedback → reviewer_feedback_collected
+    gates:
+      - review_interface_ready
+      - reviewer_feedback_collected
+
+  refinement:
+    description: "Iteratively refine the workflow and outputs based on reviewer feedback. Update mappings, reports, and documentation as needed."
+    tools: [edit_file]
+    steps:
+      - apply_reviewer_feedback → outputs_refined
+    gates:
+      - outputs_refined
+
+  documentation:
+    description: "Document the workflow, agent profile, and templates in standard locations."
+    tools: [edit_file]
+    steps:
+      - generate_workflow_documentation → workflow_doc_created
+    gates:
+      - workflow_doc_created
+
+  commit:
+    description: "Commit all generated artifacts to git and provide a summary report."
+    tools: [run_terminal_cmd]
+    steps:
+      - batch:
+          - git_add_and_commit_all_outputs → git_commit_successful
+          - generate_generation_report → generation_report_saved
+    gates:
+      - git_commit_successful
+      - generation_report_saved
+
+failure_prevention:
+  avoid:
+    - missing_inventory
+    - incomplete_mapping
+    - unflagged_gaps
+    - missing_report
+    - skipped_review
+    - insufficient_refinement
+    - undocumented_workflow
+    - uncommitted_changes
+  require:
+    - code_entities_extracted
+    - doc_entities_extracted
+    - mapping_complete
+    - gaps_and_mismatches_identified
+    - docstring_coverage_reported
+    - code_doc_alignment_reported
+    - audit_report_created
+    - reviewer_feedback_collected
+    - outputs_refined
+    - workflow_doc_created
+    - git_commit_successful
+    - generation_report_saved
+
+success_validation:
+  before_completion:
+    - audit_report_created
+    - reviewer_feedback_collected
+    - outputs_refined
+    - workflow_doc_created
+    - git_commit_successful
+    - generation_report_saved
+  output_requirements: workflow_yaml_profile_templates_and_documentation_in_standard_locations

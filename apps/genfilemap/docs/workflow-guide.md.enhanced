@@ -1,0 +1,679 @@
+# GenFileMap Workflow Guide
+
+## Introduction
+
+This guide provides a detailed explanation of the operational workflows in GenFileMap, from command invocation to file map generation. It's designed to help you understand how the tool processes commands, collects and filters files, generates file maps, and handles errors. Each section includes visual diagrams to illustrate the process.
+
+Understanding these workflows is valuable for:
+
+- Diagnosing issues when the tool doesn't behave as expected
+- Contributing to the codebase or extending its functionality
+- Optimizing your usage of the tool in different scenarios
+- Integrating GenFileMap with other tools or processes
+
+## Command Processing Flow
+
+When you run the GenFileMap command, the following sequence of operations occurs:
+
+1. **Command Invocation**: You invoke the command with arguments
+2. **Argument Parsing**: The CLI module parses your command-line arguments
+3. **Configuration Loading**: Configuration is loaded from multiple sources
+4. **Operation Mode Selection**: The system determines which mode to run (process, clean, project map)
+5. **Core Function Dispatch**: The appropriate core function is called
+6. **Result Handling**: Output is displayed and any reports are generated
+
+### Command Processing Diagram
+
+
+<!-- DIAGRAM_START: unknown (general diagram) -->
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#bb2528', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff' }}}%%
+flowchart TD
+    Start([Command Invocation]) --> ParseArgs[Parse Command-line Arguments]
+    ParseArgs --> CheckInit{Init Config?}
+
+    CheckInit -->|Yes| GenerateConfig[Generate Default Config]
+    GenerateConfig --> Exit1([Exit])
+
+    CheckInit -->|No| CheckPath{Path Provided?}
+    CheckPath -->|No| GetFromConfig[Try Get Path from Config]
+    GetFromConfig --> CheckPathAgain{Path Found?}
+    CheckPathAgain -->|No| ShowError[Display Error Message]
+    ShowError --> Exit2([Exit])
+
+    CheckPath -->|Yes| LoadConfig[Load Configuration]
+    CheckPathAgain -->|Yes| LoadConfig
+
+    LoadConfig --> CheckClean{Clean Mode?}
+    CheckClean -->|Yes| RunClean[Run Clean Operation]
+    RunClean --> GenerateReport[Generate Report]
+    GenerateReport --> Exit3([Exit])
+
+    CheckClean -->|No| CheckProjectMap{Project Map?}
+    CheckProjectMap -->|Yes| GenerateProjectMap[Generate Project Map]
+
+    CheckProjectMap -->|No| SkipProjectMap[Skip Project Map Generation]
+    GenerateProjectMap --> ProcessFiles[Process Files]
+    SkipProjectMap --> ProcessFiles
+
+    ProcessFiles --> GenerateReport2[Generate Report]
+    GenerateReport2 --> Exit4([Exit])
+
+    classDef blue fill:#3498db,stroke:#2980b9,color:#fff
+    classDef green fill:#006100,stroke:#004d00,color:#fff
+    classDef red fill:#bb2528,stroke:#7C0000,color:#fff
+    classDef yellow fill:#F8B229,stroke:#d9a331,color:#000
+    classDef gray fill:#444,stroke:#222,color:#fff
+
+    class Start,Exit1,Exit2,Exit3,Exit4 gray
+    class ParseArgs,LoadConfig blue
+    class CheckInit,CheckPath,CheckPathAgain,CheckClean,CheckProjectMap yellow
+    class GenerateConfig,RunClean,GenerateProjectMap,ProcessFiles green
+    class ShowError red
+    class GetFromConfig,SkipProjectMap,GenerateReport,GenerateReport2 blue
+```
+<!-- DIAGRAM_END -->
+
+
+## File Collection and Filtering
+
+The file collection and filtering process determines which files will be processed by GenFileMap. This process involves several steps:
+
+1. **Path Resolution**: Determine if the specified path is a file or directory
+2. **Recursion Handling**: If path is a directory and recursion is enabled, walk through all subdirectories
+3. **Extension Filtering**: Include or exclude files based on their extensions
+4. **Ignore Pattern Application**: Skip files matching patterns in the ignore file
+5. **Minimum Line Checking**: Filter files that don't meet the minimum line count requirement
+
+### File Collection Diagram
+
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor':
+<!-- DIAGRAM_START: unknown (general diagram) -->
+ '#bb2528', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff' }}}%%
+flowchart TD
+    Start([Begin Collection]) --> CheckPath{Path is File?}
+
+    CheckPath -->|Yes| SingleFile[Process Single File]
+    SingleFile --> CheckIgnoreSingle{Matches Ignore Pattern?}
+    CheckIgnoreSingle -->|Yes| SkipSingle[Skip File]
+    CheckIgnoreSingle -->|No| CheckMinLinesSingle{Meets Min Lines?}
+
+    CheckMinLinesSingle -->|No| SkipLinesTooShort[Skip - Too Few Lines]
+    CheckMinLinesSingle -->|Yes| AddToList1[Add to Files List]
+
+    CheckPath -->|No| CheckRecursive{Recursive Mode?}
+
+    CheckRecursive -->|Yes| WalkDir[Walk Directory Tree]
+    CheckRecursive -->|No| ListDir[List Directory Contents]
+
+    WalkDir --> FileLoop1[For Each File]
+    ListDir --> FileLoop2[For Each File]
+
+    FileLoop1 --> CheckIgnore1{Matches Ignore Pattern?}
+    FileLoop2 --> CheckIgnore2{Matches Ignore Pattern?}
+
+    CheckIgnore1 -->|Yes| Skip1[Skip File]
+    CheckIgnore1 -->|No| CheckInclude1{Extension in Include List?}
+
+    CheckIgnore2 -->|Yes| Skip2[Skip File]
+    CheckIgnore2 -->|No| CheckInclude2{Extension in Include List?}
+
+    CheckInclude1 -->|No, but Include List Exists| Skip3[Skip File]
+    CheckInclude1 -->|Yes or No Include List| CheckExclude1{Extension in Exclude List?}
+
+    CheckInclude2 -->|No, but Include List Exists| Skip4[Skip File]
+    CheckInclude2 -->|Yes or No Include List| CheckExclude2{Extension in Exclude List?}
+
+    CheckExclude1 -->|Yes| Skip5[Skip File]
+    CheckExclude1 -->|No| CheckMinLines1{Meets Min Lines?}
+
+    CheckExclude2 -->|Yes| Skip6[Skip File]
+    CheckExclude2 -->|No| CheckMinLines2{Meets Min Lines?}
+
+    CheckMinLines1 -->|No| SkipTooShort1[Skip - Too Few Lines]
+    CheckMinLines1 -->|Yes| AddToList2[Add to Files List]
+
+    CheckMinLines2 -->|No| SkipTooShort2[Skip - Too Few Lines]
+    CheckMinLines2 -->|Yes| AddToList3[Add to Files List]
+
+    AddToList1 --> Done([Complete Collection])
+    SkipSingle --> Done
+    SkipLinesTooShort --> Done
+
+    Skip1 --> NextFile1[Next File]
+    Skip3 --> NextFile1
+    Skip5 --> NextFile1
+    SkipTooShort1 --> NextFile1
+    AddToList2 --> NextFile1
+    NextFile1 -.-> FileLoop1
+
+    Skip2 --> NextFile2[Next File]
+    Skip4 --> NextFile2
+    Skip6 --> NextFile2
+    SkipTooShort2 --> NextFile2
+    AddToList3 --> NextFile2
+    NextFile2 -.-> FileLoop2
+
+    classDef blue fill:#3498db,stroke:#2980b9,color:#fff
+    classDef green fill:#006100,stroke:#004d00,color:#fff
+    classDef red fill:#bb2528,stroke:#7C0000,color:#fff
+    classDef yellow fill:#F8B229,stroke:#d9a331,color:#000
+    classDef gray fill:#444,stroke:#222,color:#fff
+
+    class Start,Done,NextFile1,NextFile2 gray
+    class CheckPath,CheckIgnoreSingle,CheckMinLinesSingle,CheckRecursive yellow
+    class CheckIgnore1,CheckIgnore2,CheckInclude1,CheckInclude2,CheckExclude1,CheckExclude2,CheckMinLines1,CheckMinLines2 yellow
+    class SingleFile,WalkDir,ListDir,FileLoop1,FileLoop2,AddToList1,AddToList2,AddToList3 green
+    class SkipSingle,Skip1,Skip2,Skip3,Skip4,Skip5,Skip6,SkipLinesTooShort,SkipTooShort1,SkipTooShort2 red
+```
+
+## File Map Generation Process
+
+Once a file has been selected for proce
+<!-- DIAGRAM_END -->
+ssing, the following steps occur to generate a file map:
+
+1. **File Reading**: The file content is read
+2. **Comment Style Detection**: The appropriate comment style is determined based on file type
+3. **Processor Selection**: The appropriate file processor is selected based on file type
+4. **Existing Map Extraction**: Any existing file map is extracted
+5. **Content Hash Calculation**: A hash is calculated to detect content changes since last processing
+6. **File Analysis**: The file's structure is analyzed to identify sections and key elements
+7. **LLM Prompt Construction**: A prompt is constructed for the language model
+8. **Map Generation**: The language model generates a file map JSON
+9. **Map Validation**: The generated map is validated for correctness
+10. **Map Formatting**: The map is formatted with appropriate comments
+11. **File Update**: The file is updated with the new file map
+
+### File Map Generation Diagram
+
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#bb2528', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 
+<!-- DIAGRAM_START: unknown (general diagram) -->
+'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff' }}}%%
+flowchart TD
+    Start([Start Generation])
+    ReadFile[Read File Content]
+    DetectComment[Detect Comment Style]
+    SelectProcessor[Select File Processor]
+    ExtractMap[Extract Existing Map]
+    CalcHash[Calculate Content Hash]
+    CheckHashFile{Hash File Exists?}
+    LoadOldHash[Load Old Hash]
+    CompareHash{Content Changed?}
+    ForceCheck{Force Regeneration?}
+    SkipGen[Skip Generation - No Changes]
+    AnalyzeFile[Analyze File Structure]
+    ComplexCheck{File Too Complex?}
+    SimplifyAnalysis[Simplify Analysis]
+    BuildBasicInfo[Build Basic Info Object]
+    ConstructPrompt[Construct LLM Prompt]
+    CallLLM[Call Language Model]
+    ParseResponse[Parse JSON Response]
+    ValidateMap[Validate Generated Map]
+    ValidationResult{Validation OK?}
+    RetryCheck{Max Retries Reached?}
+    AdjustPrompt[Adjust Prompt and Instructions]
+    FormatMap[Format Map with Comments]
+    UpdateFile[Update File with New Map]
+    End([End Generation])
+
+    Start --> ReadFile
+    ReadFile --> DetectComment
+    DetectComment --> SelectProcessor
+    SelectProcessor --> ExtractMap
+    ExtractMap --> CalcHash
+    CalcHash --> CheckHashFile
+
+    CheckHashFile -->|Yes| LoadOldHash
+    CheckHashFile -->|No| AnalyzeFile
+
+    LoadOldHash --> CompareHash
+    CompareHash -->|No Change| ForceCheck
+    CompareHash -->|Changed| AnalyzeFile
+
+    ForceCheck -->|Yes| AnalyzeFile
+    ForceCheck -->|No| SkipGen
+    SkipGen --> End
+
+    AnalyzeFile --> ComplexCheck
+    ComplexCheck -->|Yes| SimplifyAnalysis
+    ComplexCheck -->|No| BuildBasicInfo
+
+    SimplifyAnalysis --> BuildBasicInfo
+    BuildBasicInfo --> ConstructPrompt
+    ConstructPrompt --> CallLLM
+    CallLLM --> ParseResponse
+    ParseResponse --> ValidateMap
+    ValidateMap --> ValidationResult
+
+    ValidationResult -->|No| RetryCheck
+    ValidationResult -->|Yes| FormatMap
+
+    RetryCheck -->|No| AdjustPrompt
+    RetryCheck -->|Yes| End
+
+    AdjustPrompt --> CallLLM
+
+    FormatMap --> UpdateFile
+    UpdateFile --> End
+
+    classDef blue fill:#3498db,stroke:#2980b9,color:#fff
+    classDef green fill:#006100,stroke:#004d00,color:#fff
+    classDef red fill:#bb2528,stroke:#7C0000,color:#fff
+    classDef yellow fill:#F8B229,stroke:#d9a331,color:#000
+    classDef gray fill:#444,stroke:#222,color:#fff
+
+    class Start,End gray
+    class ReadFile,DetectComment,SelectProcessor,ExtractMap,CalcHash,LoadOldHash blue
+    class CheckHashFile,CompareHash,ForceCheck,ComplexCheck,ValidationResult,RetryCheck yellow
+    class AnalyzeFile,SimplifyAnalysis,BuildBasicInfo,ConstructPrompt,CallLLM,ParseResponse,ValidateMap,FormatMap green
+    class SkipGen,AdjustPrompt,UpdateFile red
+```
+
+## Concurrent Processing Model
+
+GenFileMap processes multiple files concurrently to improve performance. The concurrency model works as follows:
+<!-- DIAGRAM_END -->
+
+
+1. **Semaphore Creation**: A semaphore is created to limit concurrency to the configured level
+2. **Task Creation**: Asynchronous tasks are created for each file
+3. **Concurrent Execution**: Tasks are executed in parallel up to the semaphore limit
+4. **Result Collection**: Results are collected as tasks complete
+5. **Task Completion**: All tasks are awaited before generating the final report
+
+### Concurrent Processing Diagram
+
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#bb2528', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#f
+<!-- DIAGRAM_START: unknown (general diagram) -->
+ff' }}}%%
+sequenceDiagram
+    participant Core
+    participant Semaphore
+    participant Task1 as "Task 1"
+    participant Task2 as "Task 2"
+    participant Task3 as "Task 3"
+    participant Task4 as "Task 4"
+    participant Task5 as "Task 5"
+
+    Note over Core: Create semaphore with limit 3
+    Core->>Semaphore: Initialize(3)
+
+    Note over Core: Create tasks for all files
+    Core->>Task1: Create
+    Core->>Task2: Create
+    Core->>Task3: Create
+    Core->>Task4: Create
+    Core->>Task5: Create
+
+    Note over Core,Semaphore: Start execution with gather
+
+    Task1->>Semaphore: Acquire
+    Task2->>Semaphore: Acquire
+    Task3->>Semaphore: Acquire
+    Task4->>Semaphore: Attempt acquire (blocks)
+
+    Note over Task1,Semaphore: Tasks 1-3 run in parallel
+
+    Task1->>Task1: Process file
+    Task2->>Task2: Process file
+    Task3->>Task3: Process file
+
+    Note over Task1,Semaphore: Task 1 completes
+    Task1->>Semaphore: Release
+
+    Note over Task4,Semaphore: Task 4 acquires semaphore
+    Semaphore->>Task4: Acquire granted
+    Task4->>Task4: Process file
+
+    Note over Task2,Semaphore: Task 2 completes
+    Task2->>Semaphore: Release
+
+    Note over Task5,Semaphore: Task 5 acquires semaphore
+    Semaphore->>Task5: Acquire granted
+    Task5->>Task5: Process file
+
+    Note over Task3,Semaphore: Task 3 completes
+    Task3->>Semaphore: Release
+
+    Note over Task4,Semaphore: Task 4 completes
+    Task4->>Semaphore: Release
+
+    Note over Task5,Semaphore: Task 5 completes
+    Task5->>Semaphore: Release
+
+    Note over Core: All tasks have completed
+    Core->>Core: Generate report
+```
+
+## Configuration Resolution
+
+Configuration settings are resolved from multiple sources with a clear precedence order. This process ensures flexibility while maintaining predictable behavior:
+
+1. **Default Values**: Bu
+<!-- DIAGRAM_END -->
+ilt-in defaults are loaded first
+2. **Configuration File**: Values from configuration file override defaults
+3. **Environment Variables**: Environment variables with `GENFILEMAP_` prefix override file config
+4. **Command-line Arguments**: Command-line arguments have highest precedence and override everything else
+
+### Configuration Resolution Diagram
+
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#bb2528', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff' }}}%%
+flowchart LR
+    subgraph "Default Fallbacks"
+        DefaultMi
+<!-- DIAGRAM_START: unknown (general diagram) -->
+nLines["min_lines = 50"]
+        DefaultInclude["include_extensions = [.py, .js, ...]"]
+        DefaultConcurrency["concurrency = 5"]
+    end
+
+    subgraph "Config File"
+        FileMinLines["min_lines = 25"]
+        FileInclude["include_extensions = [.rs, .go, ...]"]
+    end
+
+    subgraph "Environment Variables"
+        EnvInclude["GENFILEMAP_FILE_PROCESSING_INCLUDE_EXTENSIONS=.tsx,.jsx"]
+    end
+
+    subgraph "Command Line"
+        CLIMinLines["--min-lines 100"]
+    end
+
+    subgraph "Resolved Configuration"
+        FinalMinLines["min_lines = 100"]
+        FinalInclude["include_extensions = [.tsx, .jsx]"]
+        FinalConcurrency["concurrency = 5"]
+    end
+
+    DefaultMinLines --> FileMinLines
+    FileMinLines --> FinalMinLines
+    CLIMinLines --> FinalMinLines
+
+    DefaultInclude --> FileInclude
+    FileInclude --> EnvInclude
+    EnvInclude --> FinalInclude
+
+    DefaultConcurrency --> FinalConcurrency
+
+    classDef blue fill:#3498db,stroke:#2980b9,color:#fff
+    classDef green fill:#006100,stroke:#004d00,color:#fff
+    classDef red fill:#bb2528,stroke:#7C0000,color:#fff
+    classDef yellow fill:#F8B229,stroke:#d9a331,color:#000
+    classDef gray fill:#444,stroke:#222,color:#fff
+
+    class DefaultMinLines,DefaultInclude,DefaultConcurrency gray
+    class FileMinLines,FileInclude blue
+    class EnvInclude green
+    class CLIMinLines red
+    class FinalMinLines,FinalInclude,FinalConcurrency yellow
+```
+
+## Error Handling and Reporting
+
+GenFileMap employs a robust error handling strategy to ensure that failures in processing individual files don't stop the entire operation. The reporting system tracks successes, failures, and skipped files:
+
+1. **Per-File Error Handling**: Each file is pro
+<!-- DIAGRAM_END -->
+cessed in a try-except block
+2. **Reporting Data Collection**: Processing statistics are collected in a central data structure
+3. **Summary Generation**: A summary report is generated after all processing is complete
+4. **JSON Report Option**: A detailed JSON report can be generated for machine consumption
+
+### Error Handling Diagram
+
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#bb2528', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff' }}}%%
+flowchart TD
+    Start([Start Processing])
+    InitReport[Initialize Report Data]
+    ProcessLoop[For Each File]
+    TryProcess[Try Proc
+<!-- DIAGRAM_START: unknown (general diagram) -->
+ess File]
+    ProcessCheck{Process Successful?}
+    ProcessError[Catch Error]
+    LogError[Log Error in Report]
+    CheckSkip{Skip Condition?}
+    IncrementSkip[Increment Skipped]
+    IncrementProc[Increment Processed]
+    NextFile[Next File]
+    AllProcessed{All Files Processed?}
+    GenerateReport[Generate Report Object]
+    CheckReportPath{Report Path Set?}
+    WriteJSONReport[Write JSON Report]
+    PrintSummary[Print Console Summary]
+    End([End Processing])
+
+    Start --> InitReport
+    InitReport --> ProcessLoop
+    ProcessLoop --> TryProcess
+    TryProcess --> ProcessCheck
+
+    ProcessCheck -->|Error| ProcessError
+    ProcessCheck -->|Success| CheckSkip
+
+    ProcessError --> LogError
+    LogError --> NextFile
+
+    CheckSkip -->|Yes| IncrementSkip
+    CheckSkip -->|No| IncrementProc
+
+    IncrementSkip --> NextFile
+    IncrementProc --> NextFile
+
+    NextFile --> AllProcessed
+    AllProcessed -->|No| ProcessLoop
+    AllProcessed -->|Yes| GenerateReport
+
+    GenerateReport --> CheckReportPath
+    CheckReportPath -->|Yes| WriteJSONReport
+    CheckReportPath -->|No| PrintSummary
+
+    WriteJSONReport --> PrintSummary
+    PrintSummary --> End
+
+    classDef blue fill:#3498db,stroke:#2980b9,color:#fff
+    classDef green fill:#006100,stroke:#004d00,color:#fff
+    classDef red fill:#bb2528,stroke:#7C0000,color:#fff
+    classDef yellow fill:#F8B229,stroke:#d9a331,color:#000
+    classDef gray fill:#444,stroke:#222,color:#fff
+
+    class Start,End gray
+    class InitReport,GenerateReport,WriteJSONReport,PrintSummary blue
+    class ProcessLoop,TryProcess,NextFile green
+    class ProcessCheck,CheckSkip,AllProcessed,CheckReportPath yellow
+    class ProcessError,LogError,IncrementSkip,IncrementProc red
+```
+
+## Project Map Generation
+
+The project map generation process creates a consolidated view of all files in a project and their file maps:
+
+1. **Path Resolution**: Determine the root path for the project
+2. **File Collection**: Collect all files matching the configured criteria
+3. **File Map Extraction**: Extract existing file maps from each file
+4. **Markdown Ge
+<!-- DIAGRAM_END -->
+neration**: Generate a markdown document with links to each file and its file map
+5. **Output Writing**: Write the project map to the configured output file
+
+### Project Map Generation Diagram
+
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#bb2528', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff' }}}%%
+flowchart TD
+    Start([Start Project Map])
+    ReadConfig[Read Configuration Settings]
+    CheckDir{Path is Directory?}
+    ErrorExit[Error - Not a Directory]
+    InitLines[Initialize Document Lines]
+    Writ
+<!-- DIAGRAM_START: unknown (general diagram) -->
+eHeader[Write Project Map Header]
+    CheckRecursive{Recursive Mode?}
+    WalkDir[Walk Directory Tree]
+    ListDir[List Directory Contents]
+    ProcessFiles[For Each File]
+    FilterFile{File Passes Filters?}
+    Skip[Skip File]
+    ReadFile[Read File Content]
+    ExtractMap[Extract Existing File Map]
+    CheckMapExists{File Map Exists?}
+    AddMapEntry[Add File Entry With Map]
+    AddNoMapEntry[Add File Entry Without Map]
+    JoinLines[Join All Lines]
+    WriteOutput[Write to Output File]
+    End([End Project Map])
+
+    Start --> ReadConfig
+    ReadConfig --> CheckDir
+    CheckDir -->|No| ErrorExit
+    ErrorExit --> End
+
+    CheckDir -->|Yes| InitLines
+    InitLines --> WriteHeader
+    WriteHeader --> CheckRecursive
+
+    CheckRecursive -->|Yes| WalkDir
+    CheckRecursive -->|No| ListDir
+
+    WalkDir --> ProcessFiles
+    ListDir --> ProcessFiles
+
+    ProcessFiles --> FilterFile
+
+    FilterFile -->|No| Skip
+    FilterFile -->|Yes| ReadFile
+
+    Skip --> ProcessFiles
+
+    ReadFile --> ExtractMap
+    ExtractMap --> CheckMapExists
+
+    CheckMapExists -->|Yes| AddMapEntry
+    CheckMapExists -->|No| AddNoMapEntry
+
+    AddMapEntry --> ProcessFiles
+    AddNoMapEntry --> ProcessFiles
+
+    ProcessFiles -->|All Processed| JoinLines
+    JoinLines --> WriteOutput
+    WriteOutput --> End
+
+    classDef blue fill:#3498db,stroke:#2980b9,color:#fff
+    classDef green fill:#006100,stroke:#004d00,color:#fff
+    classDef red fill:#bb2528,stroke:#7C0000,color:#fff
+    classDef yellow fill:#F8B229,stroke:#d9a331,color:#000
+    classDef gray fill:#444,stroke:#222,color:#fff
+
+    class Start,End gray
+    class ReadConfig,InitLines,WriteHeader,JoinLines,WriteOutput blue
+    class CheckDir,CheckRecursive,FilterFile,CheckMapExists yellow
+    class WalkDir,ListDir,ProcessFiles,ReadFile,ExtractMap green
+    class ErrorExit,Skip,AddMapEntry,AddNoMapEntry red
+```
+
+## Clean Operation Workflow
+
+The clean operation removes file maps and their associated hash files from a codebase:
+
+1. **Path Resolution**: Determine if the path is a file or directory
+2. **File Collection**: Collect all files matching the configured criteria
+3. **File Map Removal**: For each file, extract and remove the file map
+4. **Hash File Removal**: Delete the associated hash file if it exists
+5. **Report Generation**: Genera
+<!-- DIAGRAM_END -->
+te a report of the cleaning operation
+
+### Clean Operation Diagram
+
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#bb2528', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff' }}}%%
+flowchart TD
+    Start([Start Clean])
+    ReadConfig[Read Configuration Settings]
+    CheckPath{Path Exists?}
+    ErrorPath[Error - Path Not Found]
+    CheckFile{Is File?}
+    SingleFile[Process Single File]
+    CollectFiles[Collect Files]
+    InitCounters[Initialize Counters]
+    
+<!-- DIAGRAM_START: unknown (general diagram) -->
+CreateTasks[Create Clean Tasks]
+    ProcessConcurrent[Process Concurrently]
+    GatherResults[Gather Results]
+    ProcessFile[Clean Single File]
+    ReadFileContent[Read File Content]
+    CheckHasMap{Has File Map?}
+    SkipNoMap[Skip - No Map Found]
+    RemoveMap[Remove File Map]
+    GetHashFile[Get Hash File Path]
+    CheckHashExists{Hash File Exists?}
+    RemoveHash[Delete Hash File]
+    UpdateContent{Content Changed?}
+    WriteCleaned[Write Cleaned Content]
+    UpdateCounters[Update Counters]
+    GenerateReport[Generate Clean Report]
+    End([End Clean])
+
+    Start --> ReadConfig
+    ReadConfig --> CheckPath
+
+    CheckPath -->|No| ErrorPath
+    ErrorPath --> End
+
+    CheckPath -->|Yes| CheckFile
+
+    CheckFile -->|Yes| SingleFile
+    CheckFile -->|No| CollectFiles
+
+    SingleFile --> ProcessFile
+
+    CollectFiles --> InitCounters
+    InitCounters --> CreateTasks
+    CreateTasks --> ProcessConcurrent
+    ProcessConcurrent --> GatherResults
+    GatherResults --> GenerateReport
+
+    ProcessFile --> ReadFileContent
+    ReadFileContent --> CheckHasMap
+
+    CheckHasMap -->|No| SkipNoMap
+    CheckHasMap -->|Yes| RemoveMap
+
+    RemoveMap --> GetHashFile
+    GetHashFile --> CheckHashExists
+
+    CheckHashExists -->|Yes| RemoveHash
+    CheckHashExists -->|No| UpdateContent
+    RemoveHash --> UpdateContent
+
+    UpdateContent -->|Yes| WriteCleaned
+    UpdateContent -->|No| UpdateCounters
+
+    SkipNoMap --> UpdateCounters
+    WriteCleaned --> UpdateCounters
+    UpdateCounters --> End
+
+    classDef blue fill:#3498db,stroke:#2980b9,color:#fff
+    classDef green fill:#006100,stroke:#004d00,color:#fff
+    classDef red fill:#bb2528,stroke:#7C0000,color:#fff
+    classDef yellow fill:#F8B229,stroke:#d9a331,color:#000
+    classDef gray fill:#444,stroke:#222,color:#fff
+
+    class Start,End gray
+    class ReadConfig,InitCounters,GatherResults,GenerateReport blue
+    class CheckPath,CheckFile,CheckHasMap,CheckHashExists,UpdateContent yellow
+    class SingleFile,CollectFiles,CreateTasks,ProcessConcurrent,ProcessFile,ReadFileContent,GetHashFile green
+    class ErrorPath,SkipNoMap,RemoveMap,RemoveHash,WriteCleaned,UpdateCounters red
+```
+
+<!-- DIAGRAM_END -->

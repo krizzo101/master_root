@@ -1,0 +1,12 @@
+---
+description: "use when DESIGNING APPLICATIONS to ENFORCE ADRS, DIAGRAMS, AND API-FIRST PRINCIPLES for CONSISTENT ARCHITECTURE"
+globs:
+alwaysApply: false
+---
+
+# Design Guidelines
+
+- Every component change must create/update an ADR in `adr/`.
+- Use Mermaid or C4 for diagrams stored in `docs/architecture`.
+- All diagrams must use a black background, light fill for shapes, white connector lines, and black text for content, for accessibility and visibility.
+- Produce OpenAPI spec before implementing REST endpoints.

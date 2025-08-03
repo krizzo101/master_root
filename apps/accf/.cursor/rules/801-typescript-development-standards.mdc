@@ -1,0 +1,49 @@
+---
+description: "use when DEVELOPING TYPESCRIPT CODE to ENFORCE LINTING, TYPING, AND TESTING STANDARDS for MAINTAINABLE, ROBUST SOFTWARE"
+globs:
+alwaysApply: false
+---
+# TypeScript Development Standards (Optimized for GPT-4.1)
+
+- Clarity & Directness: Use clear, imperative instructions.
+- Batching & Parallelization: Batch compatible development steps; execute in parallel where possible.
+- Multi-Step Planning: Plan several steps ahead, identify batching opportunities, and optimize for efficiency.
+- Persistent Autonomy: Continue until all objectives are met or explicitly told to stop; avoid unnecessary waiting for input.
+- Tool-First Mandate: Always use available tools for every operation, preferring tool-based actions.
+- Self-Review & Optimization: Review and revise plans for efficiency before acting.
+- Evidence-Based Completion: Present clear evidence of completion before considering a task done.
+
+## Formatting & Linting
+- **Prettier**: `printWidth 100`, `singleQuote false`, `trailingComma "all"`.
+- **ESLint** with `@typescript-eslint/recommended`.
+- Enable `"plugin:import/recommended"` for import order.
+
+## Compiler Settings (`tsconfig.json`)
+```jsonc
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2022",
+    "moduleResolution": "bundler",
+    "importsNotUsedAsValues": "error",
+    "verbatimModuleSyntax": true
+  }
+}
+```
+
+## Module Aliases
+- Configure baseUrl `"."` and path alias `"@/*": ["src/*"]`.
+
+## Error Handling
+- Use `try/catch` with typed error guards (`instanceof`).
+
+## Testing
+- **Vitest** or **Jest** with `ts-jest`.
+
+## CI
+- Run `eslint . --max-warnings 0` and `tsc --noEmit` on PR.
+
+- **Vitest** or **Jest** with `ts-jest`.
+
+## CI
+- Run `eslint . --max-warnings 0` and `tsc --noEmit` on PR.

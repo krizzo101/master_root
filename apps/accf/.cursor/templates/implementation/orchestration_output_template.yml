@@ -1,0 +1,17 @@
+# ACCF Orchestration Logic Output Template
+
+outputs:
+  - path: src/applications/orchestrator/orchestration.py
+    description: Python module for agent orchestration logic
+    validation: Must implement agent coordination, task routing, lifecycle management, and error handling
+  - path: docs/applications/ACCF/standards/orchestration_requirements.md
+    description: Requirements documentation for orchestration logic
+    validation: Must reference all relevant standards and compliance requirements
+  - path: docs/applications/ACCF/architecture/adr/orchestration_adrs.md
+    description: Architecture Decision Record for orchestration logic
+    validation: Must document the decision, context, and consequences
+
+validation:
+  - All outputs must be standards-compliant and documented
+  - Code must be tested and reviewed
+  - Documentation must reference all applicable rules

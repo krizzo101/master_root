@@ -1,0 +1,50 @@
+---
+description: "use when SEARCHING ARXIV OR RESEARCH PAPERS to ENFORCE BEST PRACTICES for RELEVANT, HIGH-QUALITY RESULTS"
+globs:
+alwaysApply: false
+---
+### Best Practices for arXiv Search
+
+#### 1. Query Structure
+- Use topical keywords for broad searches (e.g., `deep learning`).
+- Use field tags for precision:
+  - `ti:` (title), `au:` (author), `abs:` (abstract), `cat:` (category), `all:` (all fields).
+- Combine terms with Boolean logic: `AND`, `OR`, `ANDNOT` (uppercase).
+- Use double quotes for exact phrase search (e.g., `abs:"chain of thought reasoning"`).
+- Use wildcards: `*` (multiple characters), `?` (single character, not first position).
+
+#### 2. Filters
+- Use the `categories` parameter with valid arXiv codes (see https://arxiv.org/category_taxonomy).
+- Use `date_from` and `date_to` in `YYYY-MM-DD` format for date filtering.
+- Use `max_results` to limit the number of results.
+
+#### 3. Best Practices
+- Start with broad queries, then refine with field tags, Boolean logic, or filters.
+- Avoid over-specific queries (e.g., full paper titles) unless necessary.
+- Always use valid category codes.
+- Combine fielded queries with category/date filters for best results.
+
+#### 4. Download and Storage (MANDATORY)
+- The agent **must** download and store the full text of every paper found in the search results, not just return metadata or links.
+- If a paper fails to convert (e.g., due to PDF structure), the agent must attempt alternative extraction or report the failure with details.
+- The agent must ensure all successfully converted papers are available for downstream use (summarization, analysis, etc.).
+- If any papers cannot be converted, the agent must log which ones failed and why, and suggest or attempt alternative extraction methods if possible.
+
+#### 5. Troubleshooting
+- **No results:** Broaden the query, check for typos, relax filters.
+- **Too many results:** Add field tags, Boolean logic, phrase search, or filters.
+- **Conversion errors:** Attempt alternative extraction, log the error, and report to the user.
+
+#### 6. Example Queries
+- `deep learning`
+- `ti:"quantum computing" AND abs:entanglement`
+- `abs:"chain of thought reasoning"`
+- `machine learning` with `categories=["cs.LG"]`
+- `deep learning` with `date_from="2024-01-01"`, `date_to="2024-12-31"`
+
+---
+
+### Enforcement
+- The agent must always load and apply this rule before using the `research_papers` tool or any arXiv-related search tool.
+- The agent must reflect on and optimize the query structure according to these guidelines before executing the search.
+- The agent must always download and store all found papers, and handle conversion errors or alternative extraction as described above.

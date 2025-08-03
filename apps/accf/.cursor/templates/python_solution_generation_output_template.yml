@@ -1,0 +1,19 @@
+# PYTHON SOLUTION GENERATION OUTPUT TEMPLATE
+
+expected_outputs:
+  - src/applications/<project_name>/main.py
+  - src/applications/<project_name>/README.md
+  - docs/standards/python_solution_generation_workflow.md
+  - .cursor/workflows/python_solution_generation.yml
+  - .cursor/profiles/python_solution_generation_agent_profile.yml
+  - .cursor/templates/python_solution_generation_output_template.yml
+  - docs/research/python_solution_generation_research_reference.md
+  - docs/standards/python_solution_generation_generation_report.md
+output_locations:
+  python_code: src/applications/<project_name>/main.py
+  documentation: src/applications/<project_name>/README.md
+  workflow_yaml: .cursor/workflows/python_solution_generation.yml
+  agent_profile: .cursor/profiles/python_solution_generation_agent_profile.yml
+  output_template: .cursor/templates/python_solution_generation_output_template.yml
+  research_reference: docs/research/python_solution_generation_research_reference.md
+  generation_report: docs/standards/python_solution_generation_generation_report.md

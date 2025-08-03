@@ -1,0 +1,53 @@
+# BUILD WORKFLOW
+
+keywords: [build, generate, create, implement]
+expectation: functional_code_generation_with_testing
+completion: working_implementation_with_validation
+
+phases:
+  preparation:
+    tools: [codebase_search, read_file, mcp_cognitive_tools_arango_search]
+    validation: requirements_understood
+    steps:
+      - requirements_analysis → specifications → implementation_plan
+      - tool: mcp_cognitive_tools_arango_search
+        params:
+          search_type: content
+          collection: heuristics
+          content: similar_implementations implementation
+          limit: 10
+      - architecture_planning → design_patterns → component_structure
+    gates: [requirements_clear, patterns_selected, architecture_planned]
+
+  implementation:
+    tools: [edit_file]
+    validation: functional_code_created
+    steps:
+      - code_generation → specifications → working_implementation
+      - integration_implementation → component_connections → system_integration
+      - command: build_and_test_commands
+        validation: build_successful
+    gates: [code_generated, integration_complete, build_successful]
+
+  validation:
+    tools: [mcp_cognitive_tools_arango_modify]
+    validation: implementation_verified
+    steps:
+      - functionality_testing → core_features → test_results
+      - tool: mcp_cognitive_tools_arango_modify
+        params:
+          operation: insert
+          collection: metrics
+          document:
+            type: build_complete
+            metric_type: "implementation"
+            build_result: success_status
+            components_created: implementation_list
+            test_results: validation_outcomes
+            created: current_time
+    gates: [testing_complete, results_documented]
+
+completion_criteria:
+  - "To be defined"
+
+notes: "This is a placeholder workflow that needs to be fully defined based on build/code generation requirements"

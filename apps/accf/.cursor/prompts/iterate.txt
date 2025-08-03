@@ -1,0 +1,1 @@
+Review your previous output for weaknesses, omissions, ambiguities, redundancies, or unmet requirements. List issues, propose targeted improvements, and revise the output. For each change, provide a concise rationale. Repeat until all requirements are fully satisfied. Return only the improved output and a concise changelog.

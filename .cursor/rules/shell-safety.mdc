@@ -1,0 +1,94 @@
+---
+alwaysApply: true
+---
+
+
+# Shell Safety Rules
+
+## Destructive Commands
+
+- **Never run** `rm -rf /` or destructive globs
+- **Prompt for confirmation** before any `curl | sh` commands
+- **After shell commands**, log `pwd` and `ls -a` for audit trail
+- **Ask for human confirmation** before destructive operations
+
+## Safe Shell Operations
+
+### Allowed Commands
+- `ls`, `pwd`, `cd`
+- `git` commands (with safety checks)
+- `uv` commands
+- `docker` commands (non-destructive)
+- `systemctl` commands (user level)
+
+### Restricted Commands (require confirmation)
+- `rm -rf` with globs
+- `curl | sh` or `curl | bash`
+- `sudo` commands
+- `chmod` with recursive flags
+- `dd` commands
+- `mkfs` or `fdisk` commands
+
+## Verification Protocol
+
+After any shell command:
+1. **Print working directory**: `pwd`
+2. **List current directory**: `ls -a`
+3. **Check git status**: `git status` (if in git repo)
+4. **Log command results** for audit trail
+
+## Emergency Procedures
+
+If destructive command is accidentally executed:
+1. **Stop immediately** - don't continue
+2. **Document what happened** - timestamp and command
+3. **Check for damage** - verify what was affected
+4. **Recover from backup** - use autosave or snapshots
+5. **Report incident** - document for future prevention
+4. **Recover from backup** - use autosave or snapshots
+5. **Report incident** - document for future prevention
+
+# Shell Safety Rules
+
+## Destructive Commands
+
+- **Never run** `rm -rf /` or destructive globs
+- **Prompt for confirmation** before any `curl | sh` commands
+- **After shell commands**, log `pwd` and `ls -a` for audit trail
+- **Ask for human confirmation** before destructive operations
+
+## Safe Shell Operations
+
+### Allowed Commands
+- `ls`, `pwd`, `cd`
+- `git` commands (with safety checks)
+- `uv` commands
+- `docker` commands (non-destructive)
+- `systemctl` commands (user level)
+
+### Restricted Commands (require confirmation)
+- `rm -rf` with globs
+- `curl | sh` or `curl | bash`
+- `sudo` commands
+- `chmod` with recursive flags
+- `dd` commands
+- `mkfs` or `fdisk` commands
+
+## Verification Protocol
+
+After any shell command:
+1. **Print working directory**: `pwd`
+2. **List current directory**: `ls -a`
+3. **Check git status**: `git status` (if in git repo)
+4. **Log command results** for audit trail
+
+## Emergency Procedures
+
+If destructive command is accidentally executed:
+1. **Stop immediately** - don't continue
+2. **Document what happened** - timestamp and command
+3. **Check for damage** - verify what was affected
+4. **Recover from backup** - use autosave or snapshots
+5. **Report incident** - document for future prevention
+4. **Recover from backup** - use autosave or snapshots
+5. **Report incident** - document for future prevention

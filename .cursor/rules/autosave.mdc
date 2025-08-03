@@ -1,0 +1,117 @@
+---
+description: "use when PERFORMING LARGE REFACTORS to ENFORCE MICRO-COMMITS for SAFETY"
+globs: ["**/*.py", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
+alwaysApply: false
+---
+
+# Autosave Rules for Large Refactors
+
+## Micro-Commit Strategy
+
+- Break refactor into **micro-commits** (<50 LOC) to AUTOSAVE
+- After each commit, run `ruff` and `pytest -q`; pause on first failure
+- When finished, open a PR from `feat/<slug>` into MAIN
+
+## Refactor Workflow
+
+### Before Starting
+1. Create worktree: `./scripts/new_agent_worktree.sh refactor-<name>`
+2. Switch to worktree directory
+3. Ensure autosave is enabled: `systemctl --user status autosave@opsvi.timer`
+
+### During Refactor
+1. **Make small, focused changes** (≤50 lines per commit)
+2. **Test frequently** - run tests after each logical change
+3. **Commit often** - let autosave handle the frequency
+4. **Check status** - verify working directory and git status
+
+### Commit Guidelines
+- **Conventional commits**: `feat:`, `fix:`, `refactor:`, `docs:`
+- **Descriptive messages**: explain what and why, not how
+- **Include scope**: `feat(core): add configuration validation`
+- **Reference issues**: `fix(rag): resolve collection creation error #123`
+
+### Quality Gates
+After each commit, run these checks:
+
+```bash
+# Code formatting
+uv run ruff format .
+uv run black .
+
+# Linting
+uv run ruff check .
+uv run mypy .
+
+# Tests
+uv run pytest -q
+
+# Build check
+uv build
+```
+
+### Pause Conditions
+Stop and fix immediately if:
+- **Tests fail** - fix before continuing
+- **Linting errors** - resolve all issues
+- **Build fails** - check dependencies and imports
+- **Import errors** - verify package structure
+
+## Large File Refactors
+
+### Python Files
+- **Split large files** into smaller modules
+- **Extract classes** to separate files
+- **Move utilities** to shared libraries
+- **Update imports** systematically
+
+### TypeScript Files
+- **Extract interfaces** to separate files
+- **Split components** into smaller pieces
+- **Move utilities** to shared modules
+- **Update type imports**
+
+## Dependency Changes
+
+When adding/removing dependencies:
+1. **Update pyproject.toml** in correct package
+2. **Run `uv sync`** to update lockfile
+3. **Test imports** work correctly
+4. **Update documentation** if needed
+5. **Commit dependency changes** separately
+
+## Breaking Changes
+
+For breaking changes:
+1. **Create migration guide** in docs/
+2. **Update version numbers** appropriately
+3. **Add deprecation warnings** for old APIs
+4. **Test backward compatibility** if possible
+5. **Update all dependent packages**
+
+## Completion Checklist
+
+Before opening PR:
+- [ ] All tests pass
+- [ ] All linting passes
+- [ ] Code is formatted
+- [ ] Documentation updated
+- [ ] Migration guide written (if breaking)
+- [ ] Dependencies updated
+- [ ] Version numbers bumped
+- [ ] Commit history is clean
+
+## Emergency Recovery
+
+If refactor goes wrong:
+1. **Check autosave branch** for recent commits
+2. **Create new worktree** from last good commit
+3. **Cherry-pick** good commits to new branch
+4. **Abandon problematic worktree**
+5. **Start fresh** with smaller changes
+
+1. **Check autosave branch** for recent commits
+2. **Create new worktree** from last good commit
+3. **Cherry-pick** good commits to new branch
+4. **Abandon problematic worktree**
+5. **Start fresh** with smaller changes

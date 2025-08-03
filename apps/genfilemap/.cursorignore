@@ -1,0 +1,42 @@
+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+
+# Python virtual environment
+venv/
+env/
+ENV/
+.env/
+.venv/
+
+# Build and distribution
+dist/
+build/
+*.egg-info/
+
+# Cache directories
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Dependencies
+node_modules/
+
+# Large data files
+*.csv
+*.json
+*.sqlite
+*.db
+
+# Log files
+*.log
+logs/
+
+# Environment files
+.env
+.env.local
+.python-version
+
+# System files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,612 @@
+---
+description: WHEN developing with Node.js and TypeScript TO ensure high-quality applications YOU MUST follow established best practices for maintainability, performance, and security
+globs:
+alwaysApply: false
+---
+
+# Node.js and TypeScript Development Standards
+
+## Purpose
+
+This rule ensures all Node.js and TypeScript code adheres to established best practices for quality, maintainability, performance, and security as outlined in the AI-Powered Development Research Plan.
+
+## Scope
+
+This rule applies to all Node.js and TypeScript code, including server applications, APIs, utilities, front-end JavaScript/TypeScript, and test code. It covers style guidelines, package management, testing standards, typing, documentation requirements, and security considerations.
+
+## Requirements
+
+### Code Style & Organization
+
+1. **Code Formatting**
+
+   - FOLLOW ESLint recommended rules
+   - USE Prettier for automatic code formatting
+   - MAINTAIN consistent indentation (2 spaces)
+   - ADHERE to naming conventions:
+     - camelCase for variables, functions, and methods
+     - PascalCase for classes, interfaces, and React components
+     - UPPER_CASE for constants
+   - LIMIT line length to 100 characters
+   - APPLY proper spacing around operators
+
+2. **Project Structure**
+
+   - ORGANIZE code in logical, modular structure
+   - SEPARATE concerns with appropriate module boundaries
+   - FOLLOW standard project layout:
+     ```
+     project_name/
+     ├── src/
+     │   ├── api/
+     │   ├── controllers/
+     │   ├── models/
+     │   ├── services/
+     │   └── utils/
+     ├── test/
+     ├── dist/ (gitignored)
+     ├── node_modules/ (gitignored)
+     ├── package.json
+     ├── tsconfig.json
+     └── README.md
+     ```
+   - MAINTAIN reasonable file sizes (<300 lines preferred)
+   - IMPLEMENT barrel exports (index.ts) for module organization
+
+3. **Dependency Management**
+   - USE npm or yarn with lock files
+   - SPECIFY semantic versioning for dependencies
+   - SEPARATE devDependencies from production dependencies
+   - REGULARLY audit and update dependencies
+   - MINIMIZE production dependencies
+   - PIN exact versions in critical infrastructure
+
+### TypeScript Implementation
+
+1. **Type Definitions**
+
+   - ENABLE strict type checking in tsconfig.json
+   - AVOID type assertions (as) except where necessary
+   - DEFINE interfaces for data structures
+   - USE union types for variables with multiple types
+   - IMPLEMENT generics for reusable components
+   - AVOID any type except as a last resort
+   - USE unknown instead of any for API responses
+   - DESCRIBE function parameters and return types
+
+2. **Compiler Configuration**
+
+   - ENABLE strictNullChecks
+   - ENABLE noImplicitAny
+   - ENABLE strictFunctionTypes
+   - IMPLEMENT isolatedModules for better build tools compatibility
+   - CONFIGURE paths for module resolution
+   - GENERATE declaration files for libraries
+   - SET appropriate target based on Node.js version
+
+3. **Advanced Typing**
+   - UTILIZE utility types (Partial, Pick, Omit, etc.)
+   - IMPLEMENT mapped types for transformed objects
+   - CREATE conditional types for complex type logic
+   - USE type guards for runtime type checking
+   - IMPLEMENT discriminated unions for state management
+   - APPLY index signatures appropriately
+   - DEFINE lookup types for reusing property types
+
+### Asynchronous Programming
+
+1. **Promise Management**
+
+   - USE async/await instead of raw Promises where appropriate
+   - HANDLE Promise rejections with try/catch
+   - IMPLEMENT proper error propagation
+   - AVOID nested Promise chains
+   - UTILIZE Promise.all for parallel execution
+   - APPLY Promise.allSettled for fault tolerance
+   - IMPLEMENT timeouts for long-running operations
+
+2. **Event Handling**
+   - USE typed event emitters
+   - PROPERLY clean up event listeners
+   - IMPLEMENT maximum listener warnings
+   - HANDLE errors in event callbacks
+   - DOCUMENT event contracts
+   - AVOID excessive event emitters
+   - IMPLEMENT proper debouncing/throttling
+
+### Testing Standards
+
+1. **Testing Framework**
+
+   - IMPLEMENT Jest or Mocha+Chai for testing
+   - MAINTAIN minimum 80% test coverage
+   - WRITE unit, integration and e2e tests
+   - USE test doubles (mocks, stubs, spies) appropriately
+   - IMPLEMENT snapshot testing for UI components
+   - RUN tests in CI/CD pipeline
+   - SEPARATE test fixtures from test logic
+
+2. **Test Structure**
+   - ORGANIZE tests with describe blocks
+   - FOCUS each test on a single behavior
+   - FOLLOW AAA pattern (Arrange, Act, Assert)
+   - IMPLEMENT test data factories
+   - AVOID test interdependencies
+   - PROPERLY clean up after tests
+   - IMPLEMENT proper test isolation
+
+### API Development
+
+1. **RESTful Design**
+
+   - FOLLOW REST resource naming conventions
+   - USE appropriate HTTP methods and status codes
+   - IMPLEMENT proper error response schema
+   - MAINTAIN API versioning strategy
+   - DOCUMENT APIs with OpenAPI/Swagger
+   - IMPLEMENT rate limiting and throttling
+   - VALIDATE request parameters
+
+2. **GraphQL Implementation**
+   - DEFINE schema using SDL or code-first approach
+   - IMPLEMENT proper resolver structure
+   - APPLY field-level authorization
+   - PREVENT overfetching/underfetching
+   - IMPLEMENT proper error handling
+   - OPTIMIZE N+1 query performance
+   - DOCUMENT schema properly
+
+### Performance & Efficiency
+
+1. **Performance Optimization**
+
+   - PROFILE code to identify bottlenecks
+   - IMPLEMENT proper caching strategies
+   - MINIMIZE synchronous operations
+   - OPTIMIZE database queries
+   - IMPLEMENT connection pooling
+   - MANAGE memory usage carefully
+   - AVOID blocking the event loop
+
+2. **Resource Management**
+   - PROPERLY close connections and resources
+   - IMPLEMENT graceful shutdown
+   - HANDLE process signals appropriately
+   - MANAGE file handles properly
+   - IMPLEMENT circuit breakers for external services
+   - APPLY appropriate timeouts
+   - MONITOR and log resource usage
+
+### Security
+
+1. **Input Validation**
+
+   - VALIDATE all inputs with schemas
+   - IMPLEMENT proper sanitization
+   - PREVENT injection attacks
+   - ENFORCE strict content types
+   - VALIDATE query parameters
+   - IMPLEMENT proper file upload protections
+   - USE parameterized queries
+
+2. **Authentication & Authorization**
+
+   - IMPLEMENT proper password hashing
+   - USE JWT with appropriate expiration
+   - APPLY CSRF protection
+   - IMPLEMENT proper session management
+   - ENFORCE least privilege principle
+   - ROTATE keys and secrets regularly
+   - VALIDATE security headers
+
+3. **Secrets Management**
+   - USE environment variables for configuration
+   - IMPLEMENT production secrets management
+   - AVOID hardcoded credentials
+   - PROTECT .env files
+   - IMPLEMENT key rotation mechanisms
+   - APPLY proper permission boundaries
+   - AUDIT and log access to secrets
+
+### Documentation
+
+1. **Code Documentation**
+   - USE TSDoc for documentation comments
+   - DOCUMENT public API methods and parameters
+   - MAINTAIN up-to-date README.md
+   - DOCUMENT non-obvious behavior
+   - EXPLAIN complex algorithms
+   - KEEP docs in sync with code changes
+   - GENERATE API documentation
+
+## Compliance Verification
+
+### Automated Verification
+
+- Linting with ESLint
+- Type checking with TypeScript compiler
+- Formatting with Prettier
+- Testing with Jest/Mocha
+- Security scanning with npm audit
+- Code coverage with Istanbul/NYC
+
+### Manual Review Requirements
+
+- Architecture reviews for significant changes
+- Security reviews for auth/auth changes
+- Performance reviews for critical paths
+- Documentation completeness check
+
+## Examples
+
+### Well-Structured TypeScript API Controller
+
+```typescript
+/**
+ * Product controller for managing product catalog operations
+ * with proper validation, error handling, and logging.
+ */
+import { NextFunction, Request, Response } from "express";
+import { body, param, validationResult } from "express-validator";
+import { StatusCodes } from "http-status-codes";
+import { Logger } from "winston";
+
+import { Product, ProductCreationAttributes } from "../models/product.model";
+import { ProductService } from "../services/product.service";
+import { ApiError } from "../utils/errors";
+import { asyncHandler } from "../utils/asyncHandler";
+
+export class ProductController {
+  /**
+   * Create a new ProductController instance
+   *
+   * @param productService - Service for product operations
+   * @param logger - Logger instance
+   */
+  constructor(
+    private readonly productService: ProductService,
+    private readonly logger: Logger
+  ) {}
+
+  /**
+   * Validation rules for creating a product
+   */
+  public createProductValidation = [
+    body("name")
+      .isString()
+      .trim()
+      .isLength({ min: 2, max: 100 })
+      .withMessage("Product name must be between 2 and 100 characters"),
+    body("description")
+      .optional()
+      .isString()
+      .trim()
+      .isLength({ max: 1000 })
+      .withMessage("Description cannot exceed 1000 characters"),
+    body("price")
+      .isNumeric()
+      .withMessage("Price must be a number")
+      .custom((value) => value >= 0)
+      .withMessage("Price cannot be negative"),
+    body("categoryId")
+      .isInt({ min: 1 })
+      .withMessage("Valid category ID is required"),
+    body("imageUrl")
+      .optional()
+      .isURL()
+      .withMessage("Image URL must be a valid URL"),
+    body("tags").optional().isArray().withMessage("Tags must be an array"),
+  ];
+
+  /**
+   * Validation rules for updating a product
+   */
+  public updateProductValidation = [
+    param("id").isInt({ min: 1 }).withMessage("Valid product ID is required"),
+    body("name")
+      .optional()
+      .isString()
+      .trim()
+      .isLength({ min: 2, max: 100 })
+      .withMessage("Product name must be between 2 and 100 characters"),
+    body("description")
+      .optional()
+      .isString()
+      .trim()
+      .isLength({ max: 1000 })
+      .withMessage("Description cannot exceed 1000 characters"),
+    body("price")
+      .optional()
+      .isNumeric()
+      .withMessage("Price must be a number")
+      .custom((value) => value >= 0)
+      .withMessage("Price cannot be negative"),
+    body("categoryId")
+      .optional()
+      .isInt({ min: 1 })
+      .withMessage("Valid category ID is required"),
+    body("imageUrl")
+      .optional()
+      .isURL()
+      .withMessage("Image URL must be a valid URL"),
+    body("tags").optional().isArray().withMessage("Tags must be an array"),
+  ];
+
+  /**
+   * Create a new product
+   */
+  public createProduct = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      // Validate request
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          "Validation error",
+          errors.array()
+        );
+      }
+
+      try {
+        const productData = req.body as ProductCreationAttributes;
+
+        // Create product
+        const product = await this.productService.createProduct(productData);
+
+        this.logger.info(`Product created: ${product.id}`, {
+          productId: product.id,
+          userId: req.user?.id,
+        });
+
+        // Return response
+        res.status(StatusCodes.CREATED).json({
+          success: true,
+          data: product,
+        });
+      } catch (error) {
+        // Log error details
+        this.logger.error("Error creating product", {
+          error: error instanceof Error ? error.message : String(error),
+          payload: req.body,
+          userId: req.user?.id,
+        });
+
+        // Handle specific errors
+        if (error instanceof ApiError) {
+          next(error);
+          return;
+        }
+
+        // Handle unexpected errors
+        next(
+          new ApiError(
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "Failed to create product"
+          )
+        );
+      }
+    }
+  );
+
+  /**
+   * Get all products with pagination and filtering
+   */
+  public getProducts = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        // Parse query parameters
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const categoryId = req.query.categoryId as string;
+        const searchTerm = req.query.search as string;
+
+        // Get products
+        const { products, total } = await this.productService.getProducts({
+          page,
+          limit,
+          categoryId: categoryId ? parseInt(categoryId) : undefined,
+          searchTerm,
+        });
+
+        // Calculate pagination info
+        const totalPages = Math.ceil(total / limit);
+
+        // Return response
+        res.status(StatusCodes.OK).json({
+          success: true,
+          data: products,
+          pagination: {
+            total,
+            page,
+            limit,
+            totalPages,
+          },
+        });
+      } catch (error) {
+        this.logger.error("Error fetching products", {
+          error: error instanceof Error ? error.message : String(error),
+          query: req.query,
+        });
+
+        next(
+          new ApiError(
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "Failed to fetch products"
+          )
+        );
+      }
+    }
+  );
+
+  /**
+   * Get a product by ID
+   */
+  public getProduct = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const productId = parseInt(req.params.id);
+
+        if (isNaN(productId) || productId < 1) {
+          throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid product ID");
+        }
+
+        const product = await this.productService.getProductById(productId);
+
+        if (!product) {
+          throw new ApiError(StatusCodes.NOT_FOUND, "Product not found");
+        }
+
+        res.status(StatusCodes.OK).json({
+          success: true,
+          data: product,
+        });
+      } catch (error) {
+        if (error instanceof ApiError) {
+          next(error);
+          return;
+        }
+
+        this.logger.error("Error fetching product", {
+          error: error instanceof Error ? error.message : String(error),
+          productId: req.params.id,
+        });
+
+        next(
+          new ApiError(
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "Failed to fetch product"
+          )
+        );
+      }
+    }
+  );
+
+  /**
+   * Update a product
+   */
+  public updateProduct = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      // Validate request
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          "Validation error",
+          errors.array()
+        );
+      }
+
+      try {
+        const productId = parseInt(req.params.id);
+        const updates = req.body;
+
+        // Check if product exists
+        const existingProduct = await this.productService.getProductById(
+          productId
+        );
+
+        if (!existingProduct) {
+          throw new ApiError(StatusCodes.NOT_FOUND, "Product not found");
+        }
+
+        // Update product
+        const updatedProduct = await this.productService.updateProduct(
+          productId,
+          updates
+        );
+
+        this.logger.info(`Product updated: ${productId}`, {
+          productId,
+          userId: req.user?.id,
+          changes: Object.keys(updates),
+        });
+
+        res.status(StatusCodes.OK).json({
+          success: true,
+          data: updatedProduct,
+        });
+      } catch (error) {
+        if (error instanceof ApiError) {
+          next(error);
+          return;
+        }
+
+        this.logger.error("Error updating product", {
+          error: error instanceof Error ? error.message : String(error),
+          productId: req.params.id,
+          payload: req.body,
+          userId: req.user?.id,
+        });
+
+        next(
+          new ApiError(
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "Failed to update product"
+          )
+        );
+      }
+    }
+  );
+
+  /**
+   * Delete a product
+   */
+  public deleteProduct = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const productId = parseInt(req.params.id);
+
+        if (isNaN(productId) || productId < 1) {
+          throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid product ID");
+        }
+
+        // Check if product exists
+        const existingProduct = await this.productService.getProductById(
+          productId
+        );
+
+        if (!existingProduct) {
+          throw new ApiError(StatusCodes.NOT_FOUND, "Product not found");
+        }
+
+        // Delete product
+        await this.productService.deleteProduct(productId);
+
+        this.logger.info(`Product deleted: ${productId}`, {
+          productId,
+          userId: req.user?.id,
+        });
+
+        res.status(StatusCodes.OK).json({
+          success: true,
+          message: "Product deleted successfully",
+        });
+      } catch (error) {
+        if (error instanceof ApiError) {
+          next(error);
+          return;
+        }
+
+        this.logger.error("Error deleting product", {
+          error: error instanceof Error ? error.message : String(error),
+          productId: req.params.id,
+          userId: req.user?.id,
+        });
+
+        next(
+          new ApiError(
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "Failed to delete product"
+          )
+        );
+      }
+    }
+  );
+}
+```
+
+## Version and Changelog
+
+- Version: 1.0
+- Created: April 27, 2025
+- Based on AI-Powered Development Research Plan v1.0

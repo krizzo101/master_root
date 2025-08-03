@@ -1,0 +1,124 @@
+---
+description: "use when GENERATING DOCUMENTATION to ENFORCE STRUCTURED CONTENT for ACCESSIBILITY STANDARDS"
+globs: ["**/*.md", "**/*.rst", "docs/**/*"]
+alwaysApply: false
+---
+
+# COMPREHENSIVE DOCUMENTATION STANDARDS
+
+**Validation**: "Rule 510 Documentation Standards Active"
+
+## Documentation Structure Pattern Recognition
+
+**Technical Documentation Triggers**: System architecture changes, process workflows, API modifications
+**Structure Signature**:
+
+```markdown
+# Title → ## Overview → ## Prerequisites → ## Implementation → ## Examples → ## Troubleshooting → ## References
+```
+
+**Code Documentation Patterns**:
+
+- Function docstrings with Args/Returns/Raises
+- Class documentation with purpose/attributes
+- Module-level documentation with usage examples
+- API documentation with request/response examples
+
+## Mermaid Diagram Requirements
+
+**Mandatory Diagram Triggers**:
+
+- System architecture → `graph TD` with component relationships
+- Process flows → `flowchart LR` with workflow steps
+- Database schemas → `erDiagram` with relationships
+- Interaction flows → `sequenceDiagram` with timing
+
+**High-Contrast, Accessible Color Scheme (Universal Standard)**:
+
+- All diagrams (in documentation and chat) must use:
+    - Black background
+    - Shapes with light fill color
+    - White connector lines between shapes
+    - Black text for any content inside shapes
+- This requirement overrides any previous color-coding guidance (e.g., phase/operation/decision colors).
+- This ensures maximum accessibility and visibility for all users.
+
+**Example:**
+
+```mermaid
+graph TD
+    A["User Input"] --> B["Validation"]
+    B --> C["Processing"]
+
+    %% Set black background
+    %% (Note: Some renderers require CSS or theme settings for background)
+    style A fill:#f8f9fa,stroke:#ffffff,stroke-width:3px,color:#000000
+    style B fill:#e9ecef,stroke:#ffffff,stroke-width:3px,color:#000000
+    style C fill:#dee2e6,stroke:#ffffff,stroke-width:3px,color:#000000
+    %% White connectors are default, but explicitly set if supported
+```
+
+**Accessibility Requirements**: High contrast only, clear labels, logical flow direction, consistent styling
+
+## Content Quality Patterns
+
+**Quality Indicators**:
+
+- Plain language usage
+- Complete coverage of essential aspects
+- Verified technical accuracy
+- Current information maintenance
+
+**Structure Standards**:
+
+- Logical information flow
+- Consistent markdown formatting
+- Cross-reference linking
+- Version control tracking
+
+## API Documentation Framework
+
+**Endpoint Documentation Pattern**:
+
+- Description/Parameters/Request Example/Response Example/Error Responses
+- Database schema with purpose/fields/relationships
+- Process workflows with objective/prerequisites/steps/validation
+
+**Quality Assurance Signature**:
+
+```python
+def validate_documentation_quality(document):
+    return all([
+        check_required_sections(document),
+        verify_visual_aids(document),
+        test_code_examples(document),
+        validate_cross_references(document),
+        check_accessibility_standards(document)
+    ])
+```
+
+## Behavioral Requirements
+
+**Mandatory Standards**:
+
+- Include Mermaid diagrams for technical processes
+- Ensure high contrast in visual elements
+- Validate examples before publication
+- Maintain currency through regular updates
+
+**Integration Points**:
+
+- Knowledge management system linkage
+- Version control workflow integration
+- Multiple output format support
+
+[documentation-templates.md](mdc:.cursor/templates/documentation-templates.md)
+
+# Documentation Standards
+- Clarity & Directness: Use clear, imperative instructions.
+- Batching & Parallelization: Batch compatible documentation steps; execute in parallel where possible.
+- Multi-Step Planning: Plan several steps ahead, identify batching opportunities, and optimize for efficiency.
+- Persistent Autonomy: Continue until all objectives are met or explicitly told to stop; avoid unnecessary waiting for input.
+- Tool-First Mandate: Always use available tools for every operation, preferring tool-based actions.
+- Self-Review & Optimization: Review and revise plans for efficiency before acting.
+- Evidence-Based Completion: Present clear evidence of completion before considering a task done.

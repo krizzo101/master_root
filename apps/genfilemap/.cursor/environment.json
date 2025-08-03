@@ -1,0 +1,21 @@
+{
+  "user": "ubuntu",
+  "install": "pip install -r requirements.txt",
+  "start": "",
+  "terminals": [
+    {
+      "name": "tests",
+      "command": "python -m pytest tests/ -v",
+      "description": "Runs the SEAI test suite"
+    },
+    {
+      "name": "seai-system",
+      "command": "python run_seai.py",
+      "description": "Runs the main SEAI system"
+    }
+  ],
+  "build": {
+    "context": ".",
+    "dockerfile": "Dockerfile"
+  }
+}

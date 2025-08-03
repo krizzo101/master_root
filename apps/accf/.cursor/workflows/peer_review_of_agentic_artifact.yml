@@ -1,0 +1,138 @@
+# PEER REVIEW OF AGENTIC ARTIFACT WORKFLOW
+
+expectation: review_comments_approval_and_improvement_suggestions
+completion: validated_outputs_and_documentation
+
+directives:
+  - "This workflow is an explicit order. All steps must be executed as written. Do not improvise, skip, or treat steps as optional."
+  - "The agent MUST operate in fully autonomous mode, planning several steps ahead, minimizing tool calls, and maximizing parallel and batched operations."
+  - "Batch all possible work and combine or chain steps to reduce the number of tool calls and responses."
+  - "The time call is required to ensure the agent is aware of the real current date/time, not its model cutoff."
+
+references:
+  Profile: .cursor/profiles/peer_review_of_agentic_artifact_agent_profile.yml
+  Output_Template: .cursor/templates/peer_review_of_agentic_artifact_output_template.yml
+  Research_Reference_Template: .cursor/templates/research_reference_template.md
+  Documentation: docs/applications/ACCF/standards/peer_review_of_agentic_artifact_workflow.md
+  Standards: [300-documentation-standards, 501-tool-operation-validation, 800-development-best-practices]
+
+phases:
+  profile_initialization:
+    description: "Load the agent profile, perform a time check, and load foundational rules."
+    tools: [read_file, fetch_rules, mcp_time_current_time]
+    steps:
+      - tool: mcp_time_current_time
+        validation: time_checked
+      - tool: read_file
+        params:
+          target_file: .cursor/profiles/peer_review_of_agentic_artifact_agent_profile.yml
+        validation: agent_profile_loaded
+      - tool: fetch_rules
+        params:
+          rule_names: ["002-tool-usage-and-optimize", "200-project-design-and-dev-process", "501-tool-operation-validation", "800-development-best-practices", "300-documentation-standards"]
+        validation: foundational_rules_loaded
+    gates: [time_checked, agent_profile_loaded, foundational_rules_loaded]
+
+  intake:
+    description: "Capture the workflow's purpose, scope, and requirements. Identify the artifact to review."
+    tools: [prompt_user]
+    steps:
+      - intention_analysis → workflow_request → workflow_purpose_identified
+      - context_capture → use_case_analysis → requirements_documented
+      - input_artifact_identification → input_artifact_path_captured
+    gates: [workflow_purpose_identified, requirements_documented, input_artifact_path_captured]
+
+  input_validation:
+    description: "Validate that the input artifact is present and readable."
+    tools: [read_file]
+    steps:
+      - read_input_artifact → input_artifact_validated
+    gates: [input_artifact_validated]
+
+  extraction_and_analysis:
+    description: "Extract relevant content, requirements, and standards from the artifact."
+    tools: [read_file, edit_file]
+    steps:
+      - extract_artifact_elements → elements_extracted
+      - analyze_for_review_criteria → analysis_completed
+    gates: [elements_extracted, analysis_completed]
+
+  peer_review:
+    description: "Perform peer review, generate review comments, approval/rejection, and improvement suggestions."
+    tools: [edit_file]
+    steps:
+      - generate_review_comments → review_comments_generated
+      - determine_approval_status → approval_status_generated
+      - generate_improvement_suggestions → improvement_suggestions_generated
+    gates: [review_comments_generated, approval_status_generated, improvement_suggestions_generated]
+
+  output_saving:
+    description: "Save all review outputs in docs/development/ or as review artifacts in the project tracker."
+    tools: [edit_file]
+    steps:
+      - save_review_comments → review_comments_saved
+      - save_approval_status → approval_status_saved
+      - save_improvement_suggestions → improvement_suggestions_saved
+      - tool: edit_file
+        params:
+          target_file: docs/applications/ACCF/research/peer_review_of_agentic_artifact_research_reference.md
+          code_edit: generated_research_reference_doc_based_on_template
+        validation: research_reference_doc_saved
+    gates: [review_comments_saved, approval_status_saved, improvement_suggestions_saved, research_reference_doc_saved]
+
+  linting:
+    description: "Lint and auto-fix all generated files."
+    tools: [run_terminal_cmd]
+    steps:
+      - batch_lint_and_autofix_all_files
+    gates: [linting_passed]
+
+  documentation:
+    description: "Document the workflow, agent profile, and outputs. Commit all changes to git."
+    tools: [edit_file, run_terminal_cmd]
+    steps:
+      - tool: edit_file
+        params:
+          target_file: docs/applications/ACCF/standards/peer_review_of_agentic_artifact_workflow.md
+          code_edit: generated_workflow_doc_from_template
+        validation: workflow_doc_created
+      - tool: run_terminal_cmd
+        params:
+          command: "git add . && git commit -m 'Add peer_review_of_agentic_artifact workflow, agent profile, templates, and documentation.'"
+          is_background: false
+        validation: git_commit_successful
+    gates: [workflow_doc_created, git_commit_successful]
+
+  generation_report:
+    description: "Generate and save a summary report with a Mermaid diagram of the workflow structure."
+    tools: [edit_file, create_diagram]
+    steps:
+      - tool: edit_file
+        params:
+          target_file: docs/applications/ACCF/standards/peer_review_of_agentic_artifact_generation_report.md
+          code_edit: generated_report_content_based_on_template
+        validation: generation_report_saved
+      - tool: create_diagram
+        params:
+          content: generated_high_contrast_mermaid_diagram_of_workflow
+        validation: mermaid_diagram_created
+    gates: [generation_report_saved, mermaid_diagram_created]
+
+failure_prevention:
+  avoid:
+    - missing_input_artifact
+    - incomplete_extraction
+    - review_errors
+    - undocumented_outputs
+    - standards_noncompliance
+  require:
+    - input_artifact_processed
+    - outputs_validated
+    - documentation_complete
+    - git_commit_successful
+
+success_validation:
+  before_completion:
+    - all_outputs_present
+    - validation_gates_passed
+  output_requirements: [review_comments, approval_status, improvement_suggestions, research_reference]

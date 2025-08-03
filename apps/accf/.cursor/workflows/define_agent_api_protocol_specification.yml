@@ -1,0 +1,111 @@
+# DEFINE AGENT API/PROTOCOL SPECIFICATION WORKFLOW
+
+expectation: api_or_protocol_spec_generated_and_saved_in_standard_format
+completion: api_or_protocol_file_created_and_committed
+
+directives:
+  - "This workflow must be followed exactly. Do not skip or improvise steps."
+  - "The agent must operate in fully autonomous, persistent mode."
+  - "All outputs must follow OpenAPI 3.0, JSON Schema, or protocol documentation standards and be saved in /home/opsvi/agent_world/docs/applications/ACCF/api/."
+  - "Validate all operations and document every major API or protocol specification."
+
+references:
+  Profile: .cursor/profiles/define_agent_api_protocol_specification_agent_profile.yml
+  Output_Template: .cursor/templates/define_agent_api_protocol_specification_output_template.yml
+  Standards: [https://swagger.io/specification/]
+
+phases:
+  profile_initialization:
+    description: "Load the agent profile, perform a time check, and load foundational rules."
+    tools: [read_file, fetch_rules, mcp_time_current_time]
+    steps:
+      - tool: mcp_time_current_time
+        validation: time_checked
+      - tool: read_file
+        params:
+          target_file: .cursor/profiles/define_agent_api_protocol_specification_agent_profile.yml
+        validation: agent_profile_loaded
+      - tool: fetch_rules
+        params:
+          rule_names:
+            - "002-tool-usage-and-optimize"
+            - "200-project-design-and-dev-process"
+            - "501-tool-operation-validation"
+            - "300-documentation-standards"
+        validation: foundational_rules_loaded
+    gates: [time_checked, agent_profile_loaded, foundational_rules_loaded]
+
+  intake:
+    description: "Capture the capability or integration need and intended output filename."
+    tools: [prompt_user]
+    steps:
+      - intention_analysis → api_protocol_request → api_protocol_context_identified
+      - context_capture → filename_analysis → api_protocol_filename_confirmed
+    gates: [api_protocol_context_identified, api_protocol_filename_confirmed]
+
+  input_validation:
+    description: "Validate the capability/integration need and filename."
+    tools: [prompt_user]
+    steps:
+      - validate_context_completeness → context_validated
+      - validate_filename_format → filename_validated
+    gates: [context_validated, filename_validated]
+
+  spec_generation:
+    description: "Generate the OpenAPI spec, JSON schema, or protocol documentation using the output template."
+    tools: [edit_file, read_file]
+    steps:
+      - tool: read_file
+        params:
+          target_file: .cursor/templates/define_agent_api_protocol_specification_output_template.yml
+        validation: output_template_loaded
+      - populate_template_with_context → spec_draft_created
+      - tool: edit_file
+        params:
+          target_file: /home/opsvi/agent_world/docs/applications/ACCF/api/[api_protocol_filename].yml
+          code_edit: generated_spec_content
+        validation: api_protocol_file_created
+    gates: [output_template_loaded, spec_draft_created, api_protocol_file_created]
+
+  review:
+    description: "Review the generated spec for completeness, standards compliance, and accuracy."
+    tools: [read_file, fetch_rules]
+    steps:
+      - tool: read_file
+        params:
+          target_file: /home/opsvi/agent_world/docs/applications/ACCF/api/[api_protocol_filename].yml
+        validation: spec_reviewed
+      - checklist_review:
+          - standard_format
+          - required_sections_present
+          - actionable_specification
+          - references_and_examples
+        validation: compliance_confirmed
+    gates: [spec_reviewed, compliance_confirmed]
+
+  linting:
+    description: "Lint and auto-fix the spec YAML file."
+    tools: [run_terminal_cmd]
+    steps:
+      - tool: run_terminal_cmd
+        params:
+          command: "prettier --write /home/opsvi/agent_world/docs/applications/ACCF/api/[api_protocol_filename].yml"
+          is_background: false
+        validation: linting_passed
+    gates: [linting_passed]
+
+  documentation:
+    description: "Document the workflow execution and commit the spec."
+    tools: [edit_file, run_terminal_cmd]
+    steps:
+      - tool: edit_file
+        params:
+          target_file: docs/applications/ACCF/standards/define_agent_api_protocol_specification_workflow.md
+          code_edit: generated_workflow_documentation
+        validation: workflow_doc_created
+      - tool: run_terminal_cmd
+        params:
+          command: "git add . && git commit -m 'Add/update API/protocol spec: [api_protocol_filename]'"
+          is_background: false
+        validation: git_commit_successful
+    gates: [workflow_doc_created, git_commit_successful]

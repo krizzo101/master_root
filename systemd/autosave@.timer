@@ -1,0 +1,15 @@
+[Unit]
+Description=OPSVI Git Autosave Timer for %i
+Requires=autosave@%i.service
+
+[Timer]
+Unit=autosave@%i.service
+OnBootSec=1min
+OnUnitActiveSec=10min
+Persistent=true
+
+# Randomize start time to avoid thundering herd
+RandomizedDelaySec=30
+
+[Install]
+WantedBy=timers.target

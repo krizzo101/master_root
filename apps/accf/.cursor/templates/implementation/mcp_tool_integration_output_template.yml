@@ -1,0 +1,17 @@
+# ACCF MCP Tool Integration Output Template
+
+outputs:
+  - path: src/shared/mcp_tools/mcp_tool_interface.py
+    description: Python module for MCP tool integration
+    validation: Must implement messaging, research, code execution, and validation support
+  - path: docs/applications/ACCF/standards/mcp_tool_integration_requirements.md
+    description: Requirements documentation for MCP tool integration
+    validation: Must reference all relevant standards and compliance requirements
+  - path: docs/applications/ACCF/architecture/adr/mcp_tool_integration_adrs.md
+    description: Architecture Decision Record for MCP tool integration
+    validation: Must document the decision, context, and consequences
+
+validation:
+  - All outputs must be standards-compliant and documented
+  - Code must be tested and reviewed
+  - Documentation must reference all applicable rules

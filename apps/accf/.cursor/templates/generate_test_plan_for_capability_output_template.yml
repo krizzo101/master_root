@@ -1,0 +1,35 @@
+# GENERATE TEST PLAN FOR CAPABILITY OUTPUT TEMPLATE
+
+# This template defines the structure for a test plan document.
+# Use for any capability or feature.
+
+test_plan:
+  title: "[Test Plan Title]"
+  date: "[YYYY-MM-DD]"
+  capability: "[Capability or Feature Name]"
+  objectives:
+    - "[Test objective or goal]"
+  test_types:
+    - type: "unit"
+      description: "[Unit test scope and purpose]"
+    - type: "integration"
+      description: "[Integration test scope and purpose]"
+    - type: "e2e"
+      description: "[E2E test scope and purpose]"
+  test_cases:
+    - id: "[Test Case ID]"
+      description: "[Test case description]"
+      type: "[unit|integration|e2e]"
+      steps:
+        - "[Step 1]"
+        - "[Step 2]"
+      expected_result: "[Expected outcome]"
+      validation_gate: "[Gate or criteria for passing]"
+      owner: "[Responsible person/agent]"
+  coverage:
+    - "[Area or requirement covered]"
+  risks:
+    - "[Risk or limitation]"
+  owners:
+    - name: "[Test owner or participant]"
+      role: "[Role or responsibility]"

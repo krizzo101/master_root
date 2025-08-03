@@ -1,0 +1,196 @@
+# PYTHON INTERFACE DEVELOPMENT WORKFLOW
+
+expectation: validated_python_interface_workflow_definition
+completion: workflow_yaml_profile_templates_and_documentation_in_standard_locations
+
+directives:
+  - "This workflow is an explicit order. All steps must be executed as written. Do not improvise, skip, or treat steps as optional."
+  - "The time call is required to ensure the agent is aware of the real current date/time, not its model cutoff."
+  - "Load all relevant rules, standards, and compliance requirements before proceeding."
+
+references:
+  Profile: .cursor/profiles/python_interface_development_agent_profile.yml
+  Output_Template: .cursor/templates/python_interface_development_output_template.yml
+  Research_Reference_Template: .cursor/templates/research_reference_template.md
+  Documentation: docs/standards/python_interface_development_workflow.md
+  Standards: [PEP8, PEP257, PEP484, flake8, black, mypy, pytest, Sphinx, GitHub Actions]
+
+phases:
+  profile_initialization:
+    description: "Load the workflow agent profile, perform a time check, and foundational rules for Python development."
+    tools: [read_file, fetch_rules, mcp_time_current_time]
+    steps:
+      - tool: mcp_time_current_time
+        validation: time_checked
+      - tool: read_file
+        params:
+          target_file: .cursor/profiles/python_interface_development_agent_profile.yml
+        validation: agent_profile_loaded
+      - tool: fetch_rules
+        params:
+          rule_names: [800-development-best-practices, 803-python-dev-standards, 300-documentation-standards, 501-tool-operation-validation]
+        validation: foundational_rules_loaded
+    gates: [time_checked, agent_profile_loaded, foundational_rules_loaded]
+
+  intake:
+    description: "Capture the purpose, scope, and requirements for collaborative Python interface development."
+    tools: [prompt_user]
+    steps:
+      - intention_analysis → workflow_request → workflow_purpose_identified
+      - context_capture → use_case_analysis → requirements_documented
+    gates: [workflow_purpose_identified, requirements_documented]
+
+  research:
+    description: "Research best practices and tools for Python interface design, type safety, linting, testing, documentation, and CI/CD. Capture findings using the research reference template."
+    tools: [web_search, tech_docs, research_papers, edit_file]
+    steps:
+      - batch_parallel_web_searches_and_scraping → all_sources_scraped
+      - batch_tech_docs_and_papers_if_needed → docs_and_papers_retrieved
+      - synthesize_and_document_research_results_in_one_step → comprehensive_reference_document_created
+      - tool: edit_file
+        params:
+          target_file: docs/research/python_interface_development_research_reference.md
+          code_edit: generated_research_reference_doc_based_on_template
+        validation: research_reference_doc_saved
+    gates: [all_sources_scraped, docs_and_papers_retrieved, comprehensive_reference_document_created, research_reference_doc_saved]
+
+  design:
+    description: "Map out workflow phases, steps, and validation gates for modular interface design, type safety, linting, testing, documentation, review, CI/CD, and artifact output."
+    tools: [fetch_rules, edit_file]
+    steps:
+      - workflow_mapping → phases_and_steps_defined
+      - validation_criteria → gates_and_success_conditions_defined
+      - create_agent_profile_for_workflow → agent_profile_created
+    gates: [phases_and_steps_defined, gates_and_success_conditions_defined, agent_profile_created]
+
+  drafting:
+    description: "Draft and save the agent profile, workflow YAML, and templates in standard locations."
+    tools: [edit_file, read_file]
+    steps:
+      - batch_parallel_file_creations_and_validations:
+          - tool: edit_file
+            params:
+              target_file: .cursor/profiles/python_interface_development_agent_profile.yml
+              code_edit: generated_agent_profile_yaml
+            validation: agent_profile_created
+          - tool: read_file
+            params:
+              target_file: .cursor/templates/python_interface_development_output_template.yml
+            validation: workflow_output_template_loaded
+          - tool: edit_file
+            params:
+              target_file: .cursor/workflows/python_interface_development.yml
+              code_edit: generated_workflow_yaml_from_template_with_agent_profile_reference
+            validation: workflow_yaml_created
+          - tool: edit_file
+            params:
+              target_file: .cursor/templates/python_interface_development_output_template.yml
+              code_edit: generated_output_template
+            validation: output_template_created
+          - tool: read_file
+            params:
+              target_file: .cursor/workflows/python_interface_development.yml
+            validation: workflow_yaml_loaded_for_reference_check
+          - validate_agent_profile_reference_in_workflow_yaml → agent_profile_reference_validated
+    gates: [agent_profile_created, workflow_output_template_loaded, workflow_yaml_created, output_template_created, agent_profile_reference_validated]
+
+  review:
+    description: "Review the workflow for completeness, clarity, and standards compliance. Batch review and compliance checks."
+    tools: [read_file, fetch_rules]
+    steps:
+      - batch:
+          - tool: read_file
+            params:
+              target_file: .cursor/workflows/python_interface_development.yml
+            validation: workflow_reviewed
+          - checklist_review:
+              - phases_present
+              - validation_gates
+              - actionable_steps
+              - template_used
+              - standards_referenced
+            validation: compliance_confirmed
+    gates: [workflow_reviewed, compliance_confirmed]
+
+  iterative_refinement:
+    description: "Iteratively review and refine the workflow. Identify gaps, issues, and opportunities for improvement, and update the workflow accordingly. Repeat until further iteration yields only minimal improvements. Document rationale for stopping."
+    tools: [read_file, edit_file]
+    steps:
+      - batch_review_and_update_until_diminishing_returns → workflow_refined_to_point_of_diminishing_returns
+    gates: [workflow_refined_to_point_of_diminishing_returns]
+
+  linting:
+    description: "Validate YAML, Markdown, Python, and JSON files for syntax and formatting. Run all linting tools with auto-fix where available. Batch all linting steps."
+    tools: [run_terminal_cmd]
+    steps:
+      - run: black .
+      - run: flake8 .
+      - run: mypy .
+      - run: pytest
+      - run: sphinx-build -b html docs/source docs/build
+      - run: prettier --write .
+      - run: markdownlint-cli2 --fix .
+    gates: [python_linting_passed, type_checking_passed, tests_passed, docs_built, yaml_linting_passed, markdown_linting_passed]
+
+  documentation:
+    description: "Document the workflow, agent profile, and any generated templates. Save documentation in docs/standards/. Commit all changes to git."
+    tools: [edit_file, run_terminal_cmd, fetch_rules]
+    steps:
+      - tool: edit_file
+        params:
+          target_file: docs/standards/python_interface_development_workflow.md
+          code_edit: generated_workflow_doc_from_template
+        validation: workflow_doc_created
+      - tool: run_terminal_cmd
+        params:
+          command: "git add . && git commit -m 'Add new/updated Python interface development workflow, agent profile, templates, and documentation.'"
+          is_background: false
+        validation: git_commit_successful
+    gates: [workflow_doc_created, git_commit_successful]
+
+  generation_report:
+    description: "Generate and save a concise, human-readable Markdown report summarizing what was created, including all files, their purposes, and a Mermaid diagram of the workflow structure."
+    tools: [edit_file]
+    steps:
+      - tool: edit_file
+        params:
+          target_file: docs/standards/python_interface_development_generation_report.md
+          code_edit: generated_report_content_based_on_template
+        validation: generation_report_saved
+    gates: [generation_report_saved]
+
+failure_prevention:
+  avoid:
+    - unclear_purpose
+    - missing_phases
+    - incomplete_validation
+    - undocumented_workflow
+    - standards_noncompliance
+    - vague_queries
+    - ambiguous_paths
+    - uncommitted_changes
+    - skipped_steps
+    - missing_time_call
+    - insufficient_iteration
+  require:
+    - purpose_clearly_defined
+    - phases_and_steps_mapped
+    - validation_criteria_explicit
+    - workflow_documented
+    - standards_compliance
+    - actionable_queries
+    - explicit_paths
+    - git_commit_successful
+    - workflow_refined_to_point_of_diminishing_returns
+
+success_validation:
+  before_completion:
+    - workflow_yaml_created
+    - workflow_doc_created
+    - agent_profile_created
+    - output_template_created
+    - compliance_confirmed
+    - workflow_refined_to_point_of_diminishing_returns
+    - git_commit_successful
+    - generation_report_saved
+  output_requirements: workflow_yaml_profile_templates_and_documentation_in_standard_locations

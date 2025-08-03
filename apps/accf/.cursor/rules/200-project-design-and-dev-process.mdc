@@ -1,0 +1,15 @@
+---
+description: "SDLC high‑level overview & checkpoints."
+globs:
+alwaysApply: false
+---
+
+# SDLC Golden Path
+1. Requirements
+2. Design
+3. Implementation
+4. Testing
+5. Security & Review
+6. Deployment
+7. Monitoring
+8. Iteration

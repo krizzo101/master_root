@@ -1,0 +1,447 @@
+.cursor/templates/INTERFACE_SCRIPT_TEMPLATE.py:10:7: SyntaxError: Expected an identifier
+   |
+ 8 | from typing import Any, Dict, Optional
+ 9 |
+10 | class [ServiceInterfaceName]:
+   |       ^
+11 |     """
+12 |     Interface for interacting with the [SERVICE/INTERFACE NAME] API.
+   |
+
+.reference/research_team/agents/research_agent.py:4:36: F401 [*] `..tools.mcp_arxiv_tool.MCPArxivTool` imported but unused
+  |
+2 | import logging
+3 |
+4 | from ..tools.mcp_arxiv_tool import MCPArxivTool
+  |                                    ^^^^^^^^^^^^ F401
+5 | from ..tools.mcp_context7_tool import MCPContext7Tool
+6 | from ..tools.mcp_firecrawl_tool import MCPFirecrawlTool
+  |
+  = help: Remove unused import: `..tools.mcp_arxiv_tool.MCPArxivTool`
+
+.reference/research_team/agents/research_agent.py:5:39: F401 [*] `..tools.mcp_context7_tool.MCPContext7Tool` imported but unused
+  |
+4 | from ..tools.mcp_arxiv_tool import MCPArxivTool
+5 | from ..tools.mcp_context7_tool import MCPContext7Tool
+  |                                       ^^^^^^^^^^^^^^^ F401
+6 | from ..tools.mcp_firecrawl_tool import MCPFirecrawlTool
+7 | from ..tools.mcp_search_tool import MCPSearchTool
+  |
+  = help: Remove unused import: `..tools.mcp_context7_tool.MCPContext7Tool`
+
+.reference/research_team/logging/__init__.py:3:30: F401 `.research_logger.get_logger` imported but unused; consider removing, adding to `__all__`, or using a redundant alias
+  |
+1 | # Logging for research_team
+2 |
+3 | from .research_logger import get_logger
+  |                              ^^^^^^^^^^ F401
+  |
+  = help: Use an explicit re-export: `get_logger as get_logger`
+
+.reference/research_team/mcp/context7_mcp_client.py:574:5: F841 Local variable `popular_parser` is assigned to but never used
+    |
+573 |     # Popular command
+574 |     popular_parser = subparsers.add_parser("popular", help="Show popular libraries")
+    |     ^^^^^^^^^^^^^^ F841
+575 |
+576 |     # Global options
+    |
+    = help: Remove assignment to unused variable `popular_parser`
+
+.reference/research_team/mcp/firecrawl_mcp_client.py:68:27: F401 `mcp.types.CallToolResult` imported but unused; consider using `importlib.util.find_spec` to test for availability
+   |
+66 |     from mcp import ClientSession, StdioServerParameters
+67 |     from mcp.client.stdio import stdio_client
+68 |     from mcp.types import CallToolResult, TextContent
+   |                           ^^^^^^^^^^^^^^ F401
+69 | except ImportError:
+70 |     print("Error: MCP Python SDK not installed.")
+   |
+   = help: Remove unused import: `mcp.types.CallToolResult`
+
+.reference/research_team/mcp/mcp_integration_template.py:556:5: F841 Local variable `example_parser` is assigned to but never used
+    |
+555 |     # Example command
+556 |     example_parser = subparsers.add_parser("example", help="Run example usage")
+    |     ^^^^^^^^^^^^^^ F841
+557 |
+558 |     args = parser.parse_args()
+    |
+    = help: Remove assignment to unused variable `example_parser`
+
+.reference/research_team/mcp/neo4j_mcp_client.py:48:27: F401 `mcp.types.CallToolResult` imported but unused; consider using `importlib.util.find_spec` to test for availability
+   |
+46 |     from mcp import ClientSession, StdioServerParameters
+47 |     from mcp.client.stdio import stdio_client
+48 |     from mcp.types import CallToolResult, TextContent
+   |                           ^^^^^^^^^^^^^^ F401
+49 | except ImportError:
+50 |     print("Error: MCP Python SDK not installed.")
+   |
+   = help: Remove unused import: `mcp.types.CallToolResult`
+
+.reference/research_team/mcp/neo4j_mcp_client.py:339:5: F841 Local variable `schema_parser` is assigned to but never used
+    |
+338 |     # Schema command
+339 |     schema_parser = subparsers.add_parser("schema", help="Get database schema")
+    |     ^^^^^^^^^^^^^ F841
+340 |
+341 |     # Search command
+    |
+    = help: Remove assignment to unused variable `schema_parser`
+
+.reference/research_team/mcp/research_workflow_tool.py:63:9: E722 Do not use bare `except`
+   |
+61 |         try:
+62 |             return urlparse(self.url).netloc
+63 |         except:
+   |         ^^^^^^ E722
+64 |             return ""
+   |
+
+.reference/research_team/mcp/research_workflow_tool.py:349:9: E722 Do not use bare `except`
+    |
+348 |             return domain
+349 |         except:
+    |         ^^^^^^ E722
+350 |             return url[:50] + "..." if len(url) > 50 else url
+    |
+
+.reference/research_team/mcp/research_workflow_tool.py:650:21: E722 Do not use bare `except`
+    |
+648 |                         )
+649 |                         result_data["reasoning"] = evaluation.reasoning
+650 |                     except:
+    |                     ^^^^^^ E722
+651 |                         result_data["reasoning"] = (
+652 |                             "Scored using intelligent LLM analysis"
+    |
+
+.reference/research_team/mcp/sequential_thinking_mcp_client.py:20:27: F401 `mcp.types.CallToolResult` imported but unused; consider using `importlib.util.find_spec` to test for availability
+   |
+18 |     from mcp import ClientSession, StdioServerParameters
+19 |     from mcp.client.stdio import stdio_client
+20 |     from mcp.types import CallToolResult, TextContent
+   |                           ^^^^^^^^^^^^^^ F401
+21 | except ImportError:
+22 |     print("Error: MCP Python SDK not installed.")
+   |
+   = help: Remove unused import: `mcp.types.CallToolResult`
+
+.reference/research_team/mcp/sequential_thinking_mcp_client.py:158:17: F841 Local variable `result` is assigned to but never used
+    |
+156 |         try:
+157 |             for i in range(1, max_thoughts + 1):
+158 |                 result = await self.think_step(
+    |                 ^^^^^^ F841
+159 |                     thought=current_thought,
+160 |                     thought_number=i,
+    |
+    = help: Remove assignment to unused variable `result`
+
+.reference/research_team/research_archived.py:251:13: F841 Local variable `output_preview` is assigned to but never used
+    |
+250 |             # Log final output preview
+251 |             output_preview = (
+    |             ^^^^^^^^^^^^^^ F841
+252 |                 formatted_output[:300] + "..."
+253 |                 if len(formatted_output) > 300
+    |
+    = help: Remove assignment to unused variable `output_preview`
+
+capabilities/check_me_agent.py:55:9: F841 Local variable `llm` is assigned to but never used
+   |
+53 |         )
+54 |
+55 |         llm = OpenAIResponsesInterface(api_key=self.api_key)
+   |         ^^^ F841
+56 |
+57 |         # For session management, we'll use a simple approach with the shared interface
+   |
+   = help: Remove assignment to unused variable `llm`
+
+capabilities/check_me_agent.py:95:16: F401 [*] `time` imported but unused
+   |
+93 |         """
+94 |         import json
+95 |         import time
+   |                ^^^^ F401
+96 |
+97 |         try:
+   |
+   = help: Remove unused import: `time`
+
+capabilities/check_me_agent.py:98:13: F841 Local variable `session` is assigned to but never used
+    |
+ 97 |         try:
+ 98 |             session = self._get_or_create_session(session_id)
+    |             ^^^^^^^ F841
+ 99 |             review_prompt = (
+100 |                 "You are a senior reviewer. Review the following for errors, omissions, or improvements. "
+    |
+    = help: Remove assignment to unused variable `session`
+
+capabilities/consult_agent.py:1:8: F401 [*] `os` imported but unused
+  |
+1 | import os
+  |        ^^ F401
+2 | import time
+3 | import json
+  |
+  = help: Remove unused import: `os`
+
+capabilities/consult_agent.py:3:8: F401 [*] `json` imported but unused
+  |
+1 | import os
+2 | import time
+3 | import json
+  |        ^^^^ F401
+4 | import logging
+  |
+  = help: Remove unused import: `json`
+
+capabilities/consult_agent.py:31:27: F541 [*] f-string without any placeholders
+   |
+29 |     def _log_api_call(self, model: str, prompt_length: int, context: str = ""):
+30 |         """Log every API call with detailed information."""
+31 |         self.logger.debug(f"=== API CALL START ===")
+   |                           ^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+32 |         self.logger.debug(f"Model: {model}")
+33 |         self.logger.debug(f"Prompt length: {prompt_length} characters")
+   |
+   = help: Remove extraneous `f` prefix
+
+capabilities/consult_agent.py:39:27: F541 [*] f-string without any placeholders
+   |
+37 |     def _log_api_response(self, response: dict, response_length: int):
+38 |         """Log every API response with detailed information."""
+39 |         self.logger.debug(f"=== API RESPONSE RECEIVED ===")
+   |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+40 |         self.logger.debug(f"Response length: {response_length} characters")
+41 |         self.logger.debug(f"Response keys: {list(response.keys())}")
+   |
+   = help: Remove extraneous `f` prefix
+
+capabilities/consult_agent.py:51:27: F541 [*] f-string without any placeholders
+   |
+49 |     ):
+50 |         """Log every critic API call with detailed information."""
+51 |         self.logger.debug(f"=== CRITIC API CALL START ===")
+   |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+52 |         self.logger.debug(f"Response to review length: {response_length} characters")
+53 |         self.logger.debug(f"Artifact type: {artifact_type}")
+   |
+   = help: Remove extraneous `f` prefix
+
+capabilities/consult_agent.py:60:27: F541 [*] f-string without any placeholders
+   |
+58 |     def _log_critic_response(self, critic_result: dict):
+59 |         """Log every critic response with detailed information."""
+60 |         self.logger.debug(f"=== CRITIC RESPONSE RECEIVED ===")
+   |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+61 |         self.logger.debug(f"Passed: {critic_result.get('passed', 'UNKNOWN')}")
+62 |         self.logger.debug(f"Feedback: {critic_result.get('feedback', 'NONE')}")
+   |
+   = help: Remove extraneous `f` prefix
+
+capabilities/consult_agent.py:821:35: F541 [*] f-string without any placeholders
+    |
+819 |                     f"ConsultAgent iteration {iteration_count} output length: {len(current_response)} characters"
+820 |                 )
+821 |                 self.logger.debug(f"=== CONSULT AGENT RESPONSE CONTENT ===")
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+822 |                 self.logger.debug(current_response)
+823 |                 self.logger.debug(f"=== END CONSULT AGENT RESPONSE CONTENT ===")
+    |
+    = help: Remove extraneous `f` prefix
+
+capabilities/consult_agent.py:823:35: F541 [*] f-string without any placeholders
+    |
+821 |                 self.logger.debug(f"=== CONSULT AGENT RESPONSE CONTENT ===")
+822 |                 self.logger.debug(current_response)
+823 |                 self.logger.debug(f"=== END CONSULT AGENT RESPONSE CONTENT ===")
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+824 |
+825 |                 # Critic review if enabled
+    |
+    = help: Remove extraneous `f` prefix
+
+capabilities/consult_agent.py:826:34: F541 [*] f-string without any placeholders
+    |
+825 |                 # Critic review if enabled
+826 |                 self.logger.info(f"=== CRITIC STATUS CHECK ===")
+    |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+827 |                 self.logger.info(f"Critic agent exists: {critic_agent is not None}")
+828 |                 self.logger.info(f"Critic enabled: {critic_enabled}")
+    |
+    = help: Remove extraneous `f` prefix
+
+capabilities/consult_agent.py:897:53: F541 [*] f-string without any placeholders
+    |
+895 | …                     # Add suggestions as comments/notes in the response
+896 | …                     if artifact_type == "code":
+897 | …                         current_response += f"\n\n# Critic Suggestions:\n"
+    |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+898 | …                         for suggestion in critic_result["suggestions"]:
+899 | …                             current_response += f"# {suggestion}\n"
+    |
+    = help: Remove extraneous `f` prefix
+
+capabilities/consult_agent.py:901:53: F541 [*] f-string without any placeholders
+    |
+899 | …                             current_response += f"# {suggestion}\n"
+900 | …                     else:
+901 | …                         current_response += f"\n\n## Critic Suggestions:\n"
+    |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+902 | …                         for suggestion in critic_result["suggestions"]:
+903 | …                             current_response += f"- {suggestion}\n"
+    |
+    = help: Remove extraneous `f` prefix
+
+capabilities/consult_agent.py:992:21: F541 [*] f-string without any placeholders
+    |
+990 |             if critic_enabled:
+991 |                 response_dict["details"].append(
+992 |                     f"Critic review enabled - quality control applied"
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+993 |                 )
+    |
+    = help: Remove extraneous `f` prefix
+
+capabilities/critic_agent.py:8:8: F401 [*] `os` imported but unused
+   |
+ 6 | """
+ 7 |
+ 8 | import os
+   |        ^^ F401
+ 9 | import time
+10 | import logging
+   |
+   = help: Remove unused import: `os`
+
+capabilities/critic_agent.py:33:26: F541 [*] f-string without any placeholders
+   |
+31 |         # Set up comprehensive debug logging
+32 |         self.logger.setLevel(logging.DEBUG)
+33 |         self.logger.info(f"=== CRITIC AGENT INITIALIZED WITH DEBUG LOGGING ===")
+   |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+34 |         self.logger.info(f"CriticAgent initialized with model: {self.MODEL}")
+   |
+   = help: Remove extraneous `f` prefix
+
+capabilities/critic_agent.py:40:27: F541 [*] f-string without any placeholders
+   |
+38 |     ):
+39 |         """Log every critic API call with detailed information."""
+40 |         self.logger.debug(f"=== CRITIC API CALL START ===")
+   |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+41 |         self.logger.debug(f"Model: {model}")
+42 |         self.logger.debug(f"Review prompt length: {prompt_length} characters")
+   |
+   = help: Remove extraneous `f` prefix
+
+capabilities/critic_agent.py:49:27: F541 [*] f-string without any placeholders
+   |
+47 |     def _log_critic_api_response(self, response: dict, response_length: int):
+48 |         """Log every critic API response with detailed information."""
+49 |         self.logger.debug(f"=== CRITIC API RESPONSE RECEIVED ===")
+   |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+50 |         self.logger.debug(f"Response length: {response_length} characters")
+51 |         self.logger.debug(f"Response keys: {list(response.keys())}")
+   |
+   = help: Remove extraneous `f` prefix
+
+capabilities/critic_agent.py:59:27: F541 [*] f-string without any placeholders
+   |
+57 |     def _log_parsed_result(self, result: dict):
+58 |         """Log the parsed critic result with detailed information."""
+59 |         self.logger.debug(f"=== CRITIC RESULT PARSED ===")
+   |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+60 |         self.logger.debug(f"Passed: {result.get('passed', 'UNKNOWN')}")
+61 |         self.logger.debug(f"Feedback: {result.get('feedback', 'NONE')}")
+   |
+   = help: Remove extraneous `f` prefix
+
+capabilities/critic_agent.py:106:31: F541 [*] f-string without any placeholders
+    |
+104 |                 artifact_type or "unknown",
+105 |             )
+106 |             self.logger.debug(f"=== CRITIC REVIEW PROMPT CONTENT ===")
+    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+107 |             self.logger.debug(review_prompt)
+108 |             self.logger.debug(f"=== END CRITIC REVIEW PROMPT CONTENT ===")
+    |
+    = help: Remove extraneous `f` prefix
+
+capabilities/critic_agent.py:108:31: F541 [*] f-string without any placeholders
+    |
+106 |             self.logger.debug(f"=== CRITIC REVIEW PROMPT CONTENT ===")
+107 |             self.logger.debug(review_prompt)
+108 |             self.logger.debug(f"=== END CRITIC REVIEW PROMPT CONTENT ===")
+    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+109 |
+110 |             # Use fast model for review
+    |
+    = help: Remove extraneous `f` prefix
+
+capabilities/critic_agent.py:129:31: F541 [*] f-string without any placeholders
+    |
+127 |             )
+128 |             self._log_critic_api_response(review_response, len(review_text))
+129 |             self.logger.debug(f"=== CRITIC REVIEW RESPONSE CONTENT ===")
+    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+130 |             self.logger.debug(review_text)
+131 |             self.logger.debug(f"=== END CRITIC REVIEW RESPONSE CONTENT ===")
+    |
+    = help: Remove extraneous `f` prefix
+
+capabilities/critic_agent.py:131:31: F541 [*] f-string without any placeholders
+    |
+129 |             self.logger.debug(f"=== CRITIC REVIEW RESPONSE CONTENT ===")
+130 |             self.logger.debug(review_text)
+131 |             self.logger.debug(f"=== END CRITIC REVIEW RESPONSE CONTENT ===")
+    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+132 |
+133 |             # Extract review result
+    |
+    = help: Remove extraneous `f` prefix
+
+capabilities/knowledge_agent.py:17:8: F401 [*] `os` imported but unused
+   |
+15 | """
+16 |
+17 | import os
+   |        ^^ F401
+18 | from typing import Any, Dict
+   |
+   = help: Remove unused import: `os`
+
+demo_vector_search.py:103:9: E722 Do not use bare `except`
+    |
+101 |             kg.close()
+102 |             print("✓ Database connection closed")
+103 |         except:
+    |         ^^^^^^ E722
+104 |             pass
+    |
+
+demo_vector_search.py:160:9: E722 Do not use bare `except`
+    |
+158 |         try:
+159 |             kg.close()
+160 |         except:
+    |         ^^^^^^ E722
+161 |             pass
+    |
+
+mcp_agent_server.py:341:1: E402 Module level import not at top of file
+    |
+340 | # Check if specific agent type is requested via environment variable
+341 | import os
+    | ^^^^^^^^^ E402
+342 |
+343 | agent_type = os.getenv("AGENT_TYPE", "").lower()
+    |
+
+Found 43 errors.
+[*] 25 fixable with the `--fix` option (7 hidden fixes can be enabled with the `--unsafe-fixes` option).

@@ -1,0 +1,42 @@
+---
+description: "use when IMPLEMENTING SECURITY MEASURES to ENFORCE OWASP STANDARDS for VULNERABILITY PREVENTION"
+alwaysApply: false
+---
+
+# Security Guidelines (Manual Include)
+
+## OWASP Top Ten
+- Prevent **SQLi**: parameterized queries / ORM placeholders.
+- Defend **XSS**: escape user input, use CSP headers.
+- Avoid **Broken Auth**: use JWT/OAuth2; rotate secrets.
+
+## Secret Management
+- Store secrets in vault (1Password, AWS Secrets Manager).
+- Access via env vars at runtime; never commit credentials.
+
+## Dependency Scanning
+- Enable `github/codeql` + `npm audit` + `pip-audit` in CI.
+
+## Secure Headers (Web)
+- `Strict-Transport-Security: max-age=63072000; includeSubDomains`
+- `Content-Security-Policy: default-src 'self'`
+
+## Infrastructure
+- Least-privilege IAM roles; no wildcard `*` policies.
+- Use TLS 1.2+ for internal services.
+
+## Logging
+- Mask tokens/PII: credit cards, SSN, auth headers.
+
+## Incident Response
+- Log aggregation, alert on 4xx/5xx spikes.
+
+# Security Standards (Optimized for GPT-4.1)
+
+- Clarity & Directness: Use clear, imperative instructions.
+- Batching & Parallelization: Batch compatible security checks and actions; execute in parallel where possible.
+- Multi-Step Planning: Plan several steps ahead, identify batching opportunities, and optimize for efficiency.
+- Persistent Autonomy: Continue until all objectives are met or explicitly told to stop; avoid unnecessary waiting for input.
+- Tool-First Mandate: Always use available tools for every operation, preferring tool-based actions.
+- Self-Review & Optimization: Review and revise plans for efficiency before acting.
+- Evidence-Based Completion: Present clear evidence of completion before considering a task done.
