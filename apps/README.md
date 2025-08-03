@@ -23,7 +23,7 @@ apps/
 
 intake/                # Staging area (git-ignored)
 ├── ACCF/              # Staged for future integration
-├── asea/              # Staged for future integration  
+├── asea/              # Staged for future integration
 ├── auto_forge/        # Staged for future integration
 ├── genFileMap/        # Staged for future integration
 └── project-intelligence/ # Staged for future integration
@@ -34,4 +34,4 @@ intake/                # Staging area (git-ignored)
 - Keep `apps/` clean and focused on active development
 - Use `intake/` for staging and preparation
 - Commit changes immediately when moving apps from `intake/` to `apps/`
-- Follow the established workflow to prevent confusion 
+- Follow the established workflow to prevent confusion
