@@ -17,11 +17,7 @@ services:
     networks:
       - opsvi-rag
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+
 
 volumes:
   qdrant-data:
