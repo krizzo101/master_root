@@ -1,0 +1,324 @@
+# CONSULT AGENT USAGE PROTOCOL
+
+**Validation**: "Rule 957 Protocol Active"
+
+## Pattern Recognition
+
+**Triggers**: Development tasks requiring expert guidance, complex implementation planning, or production-ready code generation
+**Principles**: Clear prompt engineering, appropriate artifact types, quality control through critic, iterative refinement
+**Signatures**: MCP tool calls with structured parameters, session management, artifact type specification
+**Validation**: Response quality, critic suggestions, iteration effectiveness, production readiness
+**Integration**: MCP server integration, autonomous agent workflows, development pipeline integration
+
+## Tool Interface
+
+**MCP Tool Name**: `mcp_consult_agent_consult`
+**Server Configuration**: ACCF MCP Agent Server with `AGENT_TYPE=consult`
+**Response Format**: Detailed, actionable prompts with critic suggestions and quality control
+
+## **🎯 Key Principle: Trust Auto-Selection**
+
+**The consult agent now uses intelligent model selection based on comprehensive SDLC testing. Agents should NOT specify the `model` parameter unless they have a specific reason to override the automatic selection.**
+
+## **📁 Knowledge File Management**
+
+**When creating knowledge files for consult agent research, always use the standardized location:**
+
+- **Create knowledge files in**: `.cursor/knowledge/` directory in the current project root
+- **File naming**: `knowledge_update_[topic]_[timestamp].md`
+- **Example path**: `.cursor/knowledge/knowledge_update_mcp_integration_20250715.md`
+- **Use absolute paths** when attaching files to consult agent calls
+
+**❌ DO NOT create knowledge files in hardcoded paths like `/home/opsvi/ACCF/`**
+
+## Parameter Optimization
+
+### Required Parameters
+```python
+{
+    "prompt": "string",           # Detailed development request
+    "session_id": "string"        # Unique session identifier
+}
+```
+
+### Optional Parameters
+```python
+{
+    "artifact_type": "string",    # Output type: "code", "plan", "test", "doc", "diagram", "workflow"
+    "iterate": "integer",         # Iterations: 1-3 (default: 1)
+    "critic_enabled": "boolean",  # Quality control: true/false (default: true)
+    "model": "string"             # AI model override: "o3", "gpt-4.1", "gpt-4.1-mini" (NOT RECOMMENDED - use auto-selection)
+}
+```
+
+## Prompt Engineering Patterns
+
+### Code Generation Prompts
+**Structure**: Technology + Functionality + Requirements + Constraints
+```python
+"Implement a {technology} {component} with {features}. Include {requirements}.
+Consider {constraints}. Follow {standards}."
+```
+
+**Example**:
+```python
+"Create a FastAPI REST API with JWT authentication, PostgreSQL database integration,
+comprehensive error handling, and OpenAPI documentation. Include user registration,
+login, and CRUD operations for a todo list application. Follow PEP 8 standards and
+include type hints throughout."
+```
+
+### Architecture Planning Prompts
+**Structure**: System + Scale + Requirements + Constraints + Success Criteria
+```python
+"Design a {architecture_type} for {system} supporting {scale}. Include {requirements}.
+Consider {constraints}. Define success criteria: {metrics}."
+```
+
+### Documentation Prompts
+**Structure**: Component + Audience + Depth + Examples + Standards
+```python
+"Generate comprehensive documentation for {component} targeting {audience}.
+Include {depth_level} with {examples}. Follow {documentation_standards}."
+```
+
+## Artifact Type Selection
+
+### Code Artifacts
+- **Use When**: Implementation tasks, function/component creation
+- **Best For**: Production-ready code with error handling, type hints, logging
+- **Example**: API endpoints, React components, utility functions
+
+### Plan Artifacts
+- **Use When**: Architecture design, project planning, system design
+- **Best For**: Structured project plans with timelines, resources, risks
+- **Example**: Microservices architecture, deployment strategies, migration plans
+
+### Test Artifacts
+- **Use When**: Testing strategies, quality assurance planning
+- **Best For**: Test frameworks, coverage strategies, testing methodologies
+- **Example**: Unit test suites, integration test plans, performance testing
+
+### Documentation Artifacts
+- **Use When**: User guides, API documentation, technical specifications
+- **Best For**: Comprehensive documentation with examples and best practices
+- **Example**: Component libraries, API references, user manuals
+
+### Diagram Artifacts
+- **Use When**: Visual architecture, system design, workflow visualization
+- **Best For**: System architecture diagrams, data flow charts, process flows
+- **Example**: Database schemas, service mesh diagrams, deployment architectures
+
+### Workflow Artifacts
+- **Use When**: Process automation, CI/CD pipelines, operational procedures
+- **Best For**: Automated workflows, deployment procedures, operational runbooks
+- **Example**: GitHub Actions workflows, deployment scripts, monitoring setups
+
+## Quality Control Strategies
+
+### Critic Integration
+- **Always Enable**: `critic_enabled: true` for production code
+- **Review Suggestions**: Pay attention to critic feedback for improvements
+- **Iterative Refinement**: Use multiple iterations for complex tasks
+
+### Iteration Patterns
+- **Single Iteration**: Simple tasks, quick prototypes
+- **Double Iteration**: Complex implementations, production code
+- **Triple Iteration**: Critical systems, enterprise-grade solutions
+
+### Model Selection
+**⚠️ IMPORTANT: DO NOT specify the `model` parameter unless you have a specific reason to override auto-selection**
+
+The consult agent now uses **intelligent model selection** based on comprehensive SDLC testing results:
+
+- **Auto-Selection (Recommended)**: Let the agent choose the optimal model based on task type
+  - `code_implementation` → `gpt-4.1-nano` (fastest for coding)
+  - `system_architecture` → `o3` (best for complex reasoning)
+  - `requirements_gathering` → `gpt-4.1-mini` (balanced approach)
+  - `testing_strategy` → `gpt-4.1-mini` (good for planning)
+  - `devops_deployment` → `gpt-4.1-nano` (fastest for infrastructure)
+
+- **Manual Override (Use Sparingly)**: Only specify `model` parameter when you need:
+  - `o3`: For complex reasoning tasks that require advanced problem-solving
+  - `gpt-4.1`: For balanced performance on general development tasks
+  - `gpt-4.1-mini`: For quick responses on simple tasks
+  - `gpt-4.1-nano`: For fastest execution on coding tasks
+
+### **When to Use Manual Override:**
+
+**✅ Use manual override ONLY in these specific cases:**
+
+1. **Complex Reasoning Required**: When you need o3's advanced reasoning for a task that might be misclassified
+   ```python
+   mcp_consult_agent_consult({
+       "prompt": "Analyze this complex architectural decision with multiple trade-offs...",
+       "session_id": "complex_analysis_001",
+       "model": "o3"  # Force o3 for advanced reasoning
+   })
+   ```
+
+2. **Performance Critical**: When you need the fastest possible response
+   ```python
+   mcp_consult_agent_consult({
+       "prompt": "Quick code review of this simple function...",
+       "session_id": "quick_review_001",
+       "model": "gpt-4.1-nano"  # Force fastest model
+   })
+   ```
+
+3. **Specific Model Requirements**: When your organization has specific model preferences
+   ```python
+   mcp_consult_agent_consult({
+       "prompt": "Generate documentation...",
+       "session_id": "org_docs_001",
+       "model": "gpt-4.1"  # Organization preference
+   })
+   ```
+
+**❌ DO NOT specify model for:**
+- Standard coding tasks (auto-selects gpt-4.1-nano)
+- Architecture planning (auto-selects o3)
+- Documentation (auto-selects gpt-4.1-mini)
+- Testing strategies (auto-selects gpt-4.1-mini)
+
+## Session Management
+
+### Session ID Patterns
+```python
+# Descriptive session naming
+"react_table_component_001"
+"microservices_architecture_001"
+"api_documentation_001"
+"testing_strategy_001"
+```
+
+### Session Continuity
+- **Reuse Session IDs**: For related tasks within same project
+- **Version Sessions**: Increment numbers for iterations
+- **Context Preservation**: Maintain session context across related calls
+
+## Integration Workflows
+
+### Development Pipeline Integration
+1. **Requirement Analysis**: Use consult agent for initial planning
+2. **Implementation**: Generate production-ready code
+3. **Testing**: Create comprehensive test strategies
+4. **Documentation**: Generate user and technical documentation
+5. **Deployment**: Plan deployment and operational procedures
+
+### Autonomous Agent Integration
+- **Prompt Generation**: Use consult agent to create detailed prompts for other agents
+- **Quality Assurance**: Leverage critic suggestions for validation
+- **Iterative Improvement**: Use multiple iterations for refinement
+
+## Anti-Patterns
+
+### Poor Prompt Practices
+- **Vague Requests**: "Build a web app" (too broad)
+- **Missing Context**: No technology stack or requirements specified
+- **Incomplete Requirements**: Missing error handling, security, or performance considerations
+
+### Inefficient Usage
+- **Over-Iteration**: Using 3 iterations for simple tasks
+- **Critic Disabled**: Missing quality control for production code
+- **Wrong Artifact Type**: Using "code" for architecture planning
+- **Unnecessary Model Override**: Specifying model parameter when auto-selection would work
+
+### Session Management Issues
+- **Generic Session IDs**: Using "test" or "session1"
+- **Session Pollution**: Mixing unrelated tasks in same session
+- **Context Loss**: Not maintaining session continuity
+
+## Success Metrics
+
+### Response Quality Indicators
+- **Completeness**: All requirements addressed
+- **Production Readiness**: Error handling, logging, type safety
+- **Best Practices**: Current standards and patterns
+- **Critic Approval**: Minimal or actionable critic suggestions
+
+### Efficiency Metrics
+- **Prompt Clarity**: Specific, actionable requests
+- **Iteration Effectiveness**: Meaningful improvements per iteration
+- **Session Continuity**: Logical task progression within sessions
+
+## Reference Examples
+
+### Code Generation Example
+```python
+mcp_consult_agent_consult({
+    "prompt": "Create a React component for a data table with sorting, filtering, pagination, and export functionality. Include TypeScript types, accessibility features, and comprehensive error handling. Follow React best practices and include unit tests.",
+    "session_id": "react_datatable_001",
+    "artifact_type": "code",
+    "iterate": 2,
+    "critic_enabled": true
+    # Note: No model specified - will auto-select gpt-4.1-nano for code implementation
+})
+```
+
+### Architecture Planning Example
+```python
+mcp_consult_agent_consult({
+    "prompt": "Design a microservices architecture for an e-commerce platform with user management, product catalog, order processing, and payment integration. Include service boundaries, data flow, deployment considerations, and scalability planning for 1M+ users.",
+    "session_id": "ecommerce_architecture_001",
+    "artifact_type": "plan",
+    "iterate": 2,
+    "critic_enabled": true
+    # Note: No model specified - will auto-select o3 for system architecture
+})
+```
+
+### Documentation Example
+```python
+mcp_consult_agent_consult({
+    "prompt": "Generate comprehensive documentation for a React component library with TypeScript, including usage examples, props documentation, best practices, and accessibility guidelines. Target intermediate to advanced React developers.",
+    "session_id": "component_library_docs_001",
+    "artifact_type": "doc",
+    "iterate": 1,
+    "critic_enabled": true
+    # Note: No model specified - will auto-select gpt-4.1-mini for documentation
+})
+```
+
+### Knowledge File Integration Example
+```python
+# First, create knowledge file in .cursor/knowledge/
+# File: .cursor/knowledge/knowledge_update_react_library_20250715.md
+
+# Then use with consult agent
+mcp_consult_agent_consult({
+    "prompt": "Based on the attached knowledge file, create a comprehensive implementation plan for the React component library.",
+    "session_id": "react_library_plan_001",
+    "artifact_type": "plan",
+    "file_paths": ["/home/opsvi/current_project/.cursor/knowledge/knowledge_update_react_library_20250715.md"],
+    "iterate": 2,
+    "critic_enabled": true
+    # Note: No model specified - will auto-select o3 for planning with knowledge context
+})
+```
+
+## Validation Framework
+
+### Pre-Execution Checklist
+- [ ] Clear, specific prompt with all requirements
+- [ ] Appropriate artifact type selected
+- [ ] Session ID follows naming convention
+- [ ] Quality control enabled for production code
+- [ ] Iteration count appropriate for task complexity
+
+### Post-Execution Validation
+- [ ] Response addresses all requirements
+- [ ] Critic suggestions reviewed and addressed
+- [ ] Production readiness confirmed
+- [ ] Best practices followed
+- [ ] Session continuity maintained
+
+### Quality Gates
+- **Code Quality**: Type safety, error handling, logging, tests
+- **Architecture Quality**: Scalability, maintainability, security
+- **Documentation Quality**: Completeness, clarity, examples
+- **Workflow Quality**: Automation, monitoring, operational readiness
+description:
+globs:
+alwaysApply: false
+---

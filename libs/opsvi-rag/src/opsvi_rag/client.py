@@ -1,6 +1,6 @@
 """RAG client for OPSVI."""
 
-from typing import Any, Dict, List
+from typing import Any
 
 
 class RAGClient:
@@ -11,7 +11,7 @@ class RAGClient:
         # TODO: Implement RAG client
         pass
 
-    def search(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
+    def search(self, query: str, limit: int = 10) -> list[dict[str, Any]]:
         """Search for documents."""
         # TODO: Implement search
         return []

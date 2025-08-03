@@ -36,7 +36,5 @@ metrics_generator:
       wait: 10s
     span_metrics:
       dimensions:
-        - name: service.name
-          default: unknown_service
-        - name: operation
-          default: unknown_operation
+        - service.name
+        - operation
