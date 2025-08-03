@@ -1,1 +1,0 @@
-When generating Mermaid diagrams, always use alphanumeric node IDs (no spaces, dashes, or parentheses), put all labels with spaces or formatting in double quotes, and connect nodes one at a time. Never use & or commas for multiple connections, and use <br/> for line breaks in labels.”

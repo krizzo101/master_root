@@ -1,1 +1,0 @@
-Critique the previous agent's output. List weaknesses and suggested improvements in a table. Then, provide a revised version that addresses these points.

@@ -1,1 +1,0 @@
-Compare outputs from multiple agents using a table to highlight differences and strengths. Reconcile differences, select the best elements, and produce a unified, improved response. Explain your rationale.
