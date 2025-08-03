@@ -27,7 +27,7 @@ services:
       - tempo-data:/tmp/tempo
     ports:
       - "3200:3200"   # Tempo HTTP
-      - "4318:4318"   # OTLP gRPC
+      - "4319:4318"   # OTLP gRPC (mapped to avoid conflict)
     networks:
       - opsvi-observability
     restart: unless-stopped
