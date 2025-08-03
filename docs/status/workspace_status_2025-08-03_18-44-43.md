@@ -94,8 +94,8 @@ Failed services:
 ```text
 Observability stack:
 opsvi-grafana          /run.sh                          Up           0.0.0.0:3000->3000/tcp,:::3000->3000/tcp
-opsvi-otel-collector   /otelcol --config=/etc/ote ...   Restarting                                           
-opsvi-tempo            /tempo -config.file=/etc/t ...   Exit 255                                             
+opsvi-otel-collector   /otelcol --config=/etc/ote ...   Restarting
+opsvi-tempo            /tempo -config.file=/etc/t ...   Exit 255
 
 RAG stack:
 opsvi-qdrant   ./entrypoint.sh   Up (unhealthy)   0.0.0.0:6333->6333/tcp,:::6333->6333/tcp, 0.0.0.0:6334->6334/tcp,:::6334->6334/tcp
@@ -106,14 +106,19 @@ Health check: Qdrant not up
 ## Cursor Rules Validation
 
 ```text
-Cursor rules directory contains 7 .mdc files:
-- 101-cursor-rules-generation-protocol.mdc
-- autosave.mdc
-- design-quality.mdc
-- git-safety.mdc
-- index.mdc
-- platform-services.mdc
-- python-standards.mdc
+Cursor rules directory contains 9 .mdc files:
+- 101-cursor-rules-generation-protocol.mdc (Cursor rules generation protocol)
+- autosave.mdc (Autosave workflow rules)
+- design-quality.mdc (Design quality patterns)
+- git-safety.mdc (Git safety rules)
+- index.mdc (Main workspace rules - always applied)
+- platform-services.mdc (Platform services standards)
+- python-standards.mdc (Python coding standards)
+- refactor.mdc (Refactoring guidelines)
+- shell-safety.mdc (Shell safety rules)
+
+Validation command produced no output (likely opened Cursor IDE window)
+Main index.mdc contains comprehensive workspace standards with alwaysApply: true
 ```
 
 ## Ruff & Pytest
@@ -128,4 +133,4 @@ Pytest: 5 errors during collection - import issues with ACCF modules and missing
 * **Systemd services failing**: All autosave and snapshot services are in failed state, indicating timer/service configuration issues
 * **Docker stack unhealthy**: Qdrant is unhealthy and Tempo has exited, suggesting platform stack needs attention
 * **Test suite broken**: Multiple import errors in ACCF tests due to missing modules and path issues
-* **Cursor rules present**: 7 .mdc files exist but validation command produced no output 
+* **Cursor rules present**: 7 .mdc files exist but validation command produced no output
