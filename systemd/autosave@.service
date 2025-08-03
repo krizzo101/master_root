@@ -5,9 +5,6 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=oneshot
-User=%i
-Group=%i
-Environment=HOME=/home/%i
 WorkingDirectory=/home/opsvi/master_root
 ExecStart=/home/opsvi/master_root/tools/autosave.sh
 Restart=no
@@ -23,7 +20,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=read-only
-ReadWritePaths=/home/opsvi/master_root /home/%i/.opsvi_logs
+ReadWritePaths=/home/opsvi/master_root /home/opsvi/.opsvi_logs
 
 [Install]
 WantedBy=default.target
