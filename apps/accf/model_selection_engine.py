@@ -12,11 +12,10 @@ Version: 1.0.0
 """
 
 import json
-import re
 import logging
-from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -32,7 +31,7 @@ class TaskContext:
     quality_requirement: str = "detailed"
     complexity_level: str = "moderate"
     prompt_text: str = ""
-    user_override: Optional[str] = None
+    user_override: str | None = None
 
 
 @dataclass
@@ -42,8 +41,8 @@ class ModelDecision:
     selected_model: str
     confidence_score: float
     reasoning: str
-    alternatives: List[str]
-    task_analysis: Dict[str, Any]
+    alternatives: list[str]
+    task_analysis: dict[str, Any]
 
 
 class ModelSelectionEngine:
@@ -59,14 +58,19 @@ class ModelSelectionEngine:
 
     def __init__(self, config_path: str = "model_selection_config.json"):
         """Initialize the model selection engine with configuration."""
-        self.config_path = Path(config_path)
+        # If config_path is relative, make it relative to this module's directory
+        if not Path(config_path).is_absolute():
+            module_dir = Path(__file__).parent
+            self.config_path = module_dir / config_path
+        else:
+            self.config_path = Path(config_path)
         self.config = self._load_config()
         self.valid_models = ["gpt-4.1-nano", "gpt-4.1-mini", "gpt-4.1", "o4-mini", "o3"]
 
-    def _load_config(self) -> Dict[str, Any]:
+    def _load_config(self) -> dict[str, Any]:
         """Load the model selection configuration from JSON file."""
         try:
-            with open(self.config_path, "r", encoding="utf-8") as f:
+            with open(self.config_path, encoding="utf-8") as f:
                 config = json.load(f)
             logger.info(f"Loaded model selection config: {config['version']}")
             return config
@@ -77,7 +81,7 @@ class ModelSelectionEngine:
             logger.error(f"Invalid JSON in configuration file: {e}")
             raise
 
-    def analyze_prompt(self, prompt_text: str) -> Dict[str, Any]:
+    def analyze_prompt(self, prompt_text: str) -> dict[str, Any]:
         """
         Analyze the prompt text to determine task characteristics.
 
@@ -396,7 +400,7 @@ class ModelSelectionEngine:
             },
         )
 
-    def _get_alternatives(self, context: TaskContext) -> List[str]:
+    def _get_alternatives(self, context: TaskContext) -> list[str]:
         """Get alternative models based on context."""
         alternatives = []
 
@@ -471,29 +475,29 @@ class ModelSelectionEngine:
 
         return " ".join(reasoning_parts)
 
-    def get_model_info(self, model_name: str) -> Dict[str, Any]:
+    def get_model_info(self, model_name: str) -> dict[str, Any]:
         """Get detailed information about a specific model."""
         if model_name in self.config["model_characteristics"]:
             return self.config["model_characteristics"][model_name]
         else:
             raise ValueError(f"Unknown model: {model_name}")
 
-    def list_available_models(self) -> List[str]:
+    def list_available_models(self) -> list[str]:
         """List all available models."""
         return list(self.config["model_characteristics"].keys())
 
-    def get_task_types(self) -> List[str]:
+    def get_task_types(self) -> list[str]:
         """List all available task types."""
         return list(self.config["decision_rules"]["task_types"].keys())
 
 
 def create_task_context(
     prompt_text: str,
-    task_type: Optional[str] = None,
-    time_constraint: Optional[str] = None,
-    quality_requirement: Optional[str] = None,
-    complexity_level: Optional[str] = None,
-    user_override: Optional[str] = None,
+    task_type: str | None = None,
+    time_constraint: str | None = None,
+    quality_requirement: str | None = None,
+    complexity_level: str | None = None,
+    user_override: str | None = None,
 ) -> TaskContext:
     """
     Create a TaskContext object with automatic prompt analysis.
@@ -531,11 +535,11 @@ def create_task_context(
 
 def select_optimal_model(
     prompt_text: str,
-    task_type: Optional[str] = None,
-    time_constraint: Optional[str] = None,
-    quality_requirement: Optional[str] = None,
-    complexity_level: Optional[str] = None,
-    user_override: Optional[str] = None,
+    task_type: str | None = None,
+    time_constraint: str | None = None,
+    quality_requirement: str | None = None,
+    complexity_level: str | None = None,
+    user_override: str | None = None,
     config_path: str = "model_selection_config.json",
 ) -> ModelDecision:
     """
