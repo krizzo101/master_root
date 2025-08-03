@@ -1,0 +1,97 @@
+{
+  "mcpServers": {
+    "thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "tech_docs": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ]
+    },
+    "mcp_web_search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "brave-search-mcp"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "BSAqv6fii19i_ZRARk67Gs5udOHgxSN"
+      }
+    },
+    "time": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "time-mcp"
+      ]
+    },
+    "shell": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mkusaka/mcp-shell-server",
+        "-w",
+        "/home/opsvi/ACCF"
+      ],
+      "env": {
+        "SHELL": "/bin/bash"
+      }
+    },
+    "calc": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@wrtnlabs/calculator-mcp"
+      ]
+    },
+    "research_papers": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "-m",
+        "arxiv_mcp_server"
+      ]
+    },
+    "consult_agent": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "-m",
+        "mcp_agent_server"
+      ],
+      "env": {
+        "OPENAI_API_KEY": "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",
+        "PYTHONPATH": "/home/opsvi/ACCF",
+        "AGENT_TYPE": "consult"
+      }
+    },
+    "research_agent": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "-m",
+        "mcp_agent_server"
+      ],
+      "env": {
+        "OPENAI_API_KEY": "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",
+        "PYTHONPATH": "/home/opsvi/ACCF",
+        "AGENT_TYPE": "research"
+      }
+    },
+    "neo4j-mcp": {
+      "command": "uvx",
+      "args": [
+        "mcp-neo4j-cypher",
+        "--db-url",
+        "bolt://localhost:7687",
+        "--user",
+        "neo4j",
+        "--password",
+        "autonomous-factory-password"
+      ]
+    }
+  }
+}

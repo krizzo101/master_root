@@ -22,7 +22,7 @@ SyslogIdentifier=opsvi-snapshot
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
-ProtectHome=true
+ProtectHome=read-only
 ReadWritePaths=/home/opsvi/master_root /home/%i/.opsvi_logs
 
 [Install]
