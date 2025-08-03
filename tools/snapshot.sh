@@ -9,7 +9,7 @@ set -euo pipefail
 WORKSPACE_PATH="${1:-/home/opsvi/master_root}"
 LOG_DIR="$HOME/.opsvi_logs"
 LOG_FILE="$LOG_DIR/snapshot.log"
-BRANCH="MAIN"
+BRANCH="main"
 SNAPSHOT_PREFIX="snapshot"
 
 # Ensure log directory exists
