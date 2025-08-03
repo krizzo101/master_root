@@ -23,20 +23,3 @@ storage:
       path: /tmp/tempo/wal
     local:
       path: /tmp/tempo/blocks
-
-metrics_generator:
-  registry:
-    external_labels:
-      source: tempo
-      cluster: opsvi
-  storage:
-    path: /tmp/tempo/generator/wal
-  processor:
-    service_graphs:
-      wait: 10s
-    span_metrics:
-      dimensions:
-        - name: service.name
-          default: unknown_service
-        - name: operation
-          default: unknown_operation
