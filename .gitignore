@@ -335,4 +335,14 @@ local/
 
 # System files
 .DS_Store
-Thumbs.db.cursor/mcp.json
+Thumbs.db
+
+# Project intake directories (exclude from project intelligence)
+intake/
+
+# Project intelligence cache
+.proj-intel/
+.cursor/project_intelligence_cache/
+
+# genFileMap directories
+.genfilemap/

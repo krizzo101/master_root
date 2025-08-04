@@ -1,0 +1,1285 @@
+# CONSULT AGENT USAGE PROTOCOL
+
+**Validation**: "Rule 957 Protocol Active"
+
+## Pattern Recognition
+
+**Triggers**: Development tasks requiring expert guidance, complex implementation planning, or production-ready code generation
+**Principles**: Clear prompt engineering, appropriate artifact types, quality control through critic, iterative refinement
+**Signatures**: MCP tool calls with structured parameters, session management, artifact type specification
+**Validation**: Response quality, critic suggestions, iteration effectiveness, production readiness
+**Integration**: MCP server integration, autonomous agent workflows, development pipeline integration
+
+## Tool Interface
+
+**MCP Tool Name**: `mcp_consult_agent_consult`
+**Server Configuration**: ACCF MCP Agent Server with `AGENT_TYPE=consult`
+**Response Format**: Detailed, actionable prompts with critic suggestions and quality control
+
+## **🚨 MANDATORY PRE-SUBMISSION RITUAL**
+
+**⚠️ CRITICAL: You MUST complete this thinking ritual BEFORE making ANY consult agent call. This is NOT optional.**
+
+### **🎯 Why This Ritual is Mandatory**
+
+The consult agent knows **NOTHING** about your project, your work, or your context. Without proper context, you'll get generic, unhelpful responses. This ritual ensures you:
+
+- **Stop and think systematically** about what you're asking
+- **Identify all necessary context** the consult agent needs
+- **Review your own work** for potential mistakes before asking for help
+- **Package everything properly** so the consult agent can provide informed advice
+- **Catch logical gaps** in your own thinking by explaining it to yourself
+
+### **🧠 MANDATORY THINKING TOOL RITUAL**
+
+**Before ANY consult agent call, you MUST use the thinking tool to answer these questions:**
+
+```python
+# MANDATORY PRE-SUBMISSION THINKING RITUAL
+mcp_thinking_sequentialthinking({
+    "thought": "I am about to make a consult agent call. Let me think through what I need to provide...",
+    "nextThoughtNeeded": True,
+    "thoughtNumber": 1,
+    "totalThoughts": 5
+})
+```
+
+#### **📋 MANDATORY CHECKLIST QUESTIONS**
+
+**You MUST answer these specific, concrete questions using the thinking tool before proceeding:**
+
+1. **🎯 REQUEST CLARITY**
+   - What exactly am I asking the consult agent to help with?
+   - What specific outcome do I want?
+   - Is my request clear and specific enough?
+   - What might I be missing in my request?
+   - What specific problem am I trying to solve?
+   - Have I provided all relevant context and constraints?
+
+2. **📊 PROJECT CONTEXT**
+   - What is the current state of the project/feature I'm working on?
+   - What have I already tried or implemented?
+   - What specific problem am I trying to solve?
+   - What are my current assumptions and conclusions?
+   - Have I considered previous attempts or alternative solutions?
+   - What assumptions am I making?
+
+3. **🔍 FILE IDENTIFICATION**
+   - What files have I been working with?
+   - What files contain the current implementation?
+   - What files show the problem or issue I'm facing?
+   - What files would help the consult agent understand the project structure?
+   - What files contain relevant examples or patterns?
+   - What files demonstrate the current system architecture?
+
+4. **🔍 SELF-REVIEW**
+   - Am I making any assumptions that might be wrong?
+   - Have I considered all the relevant factors?
+   - Is my request clear and specific enough?
+   - What might I be missing?
+   - Have I done enough research to ask an informed question?
+   - Have I identified potential gaps in understanding?
+
+5. **📦 CONTEXT PACKAGING**
+   - What context would I need if I were the consult agent?
+   - What information am I taking for granted that the consult agent won't know?
+   - What files should I include as attachments?
+   - What specific details should I mention in my prompt?
+   - What constraints or requirements should I explicitly state?
+
+### **📂 MANDATORY FILE INCLUSION GUIDELINES**
+
+**You MUST include these files when relevant:**
+
+#### **For Code Generation Requests:**
+- **Current implementation files** (the code you're working on)
+- **Related component files** (similar patterns or dependencies)
+- **Configuration files** (package.json, tsconfig.json, etc.)
+- **Error logs or messages** (if debugging)
+- **Test files** (if they exist)
+
+#### **For Architecture Planning Requests:**
+- **Current system architecture files** (diagrams, configs)
+- **Dependency files** (package.json, requirements.txt, etc.)
+- **Environment configuration** (docker files, deployment configs)
+- **Existing documentation** (README, API docs, etc.)
+
+#### **For Debugging Requests:**
+- **The problematic code file**
+- **Error messages and logs**
+- **Related files that might be involved**
+- **Test files that reproduce the issue**
+- **Environment configuration**
+
+#### **For Documentation Requests:**
+- **Current documentation files**
+- **Code files being documented**
+- **Project structure files**
+- **Existing examples or templates**
+
+### **🎭 REQUEST TYPE SPECIFIC CONTEXT**
+
+#### **Code Generation Context:**
+```markdown
+### CONTEXT I MUST PROVIDE:
+- Current codebase structure and patterns
+- Existing implementations that are similar
+- Dependencies and constraints
+- Error messages or issues encountered
+- Performance requirements
+- Security considerations
+```
+
+#### **Architecture Planning Context:**
+```markdown
+### CONTEXT I MUST PROVIDE:
+- Current system architecture
+- Performance requirements and constraints
+- Existing infrastructure and tools
+- Business requirements and goals
+- Scalability needs
+- Security requirements
+```
+
+#### **Debugging Context:**
+```markdown
+### CONTEXT I MUST PROVIDE:
+- Error messages and logs
+- Steps to reproduce the issue
+- Current code that's causing problems
+- Expected vs actual behavior
+- Environment details
+- Recent changes that might have caused the issue
+```
+
+### **✅ QUALITY VALIDATION CHECKLIST**
+
+**Before submitting, validate your request:**
+
+- [ ] **Clear and specific**: Can someone else understand exactly what I want?
+- [ ] **Complete context**: Have I provided all necessary background information?
+- [ ] **Relevant files**: Have I included all files the consult agent needs to see?
+- [ ] **No assumptions**: Have I explained things the consult agent won't know?
+- [ ] **Specific outcome**: Do I know exactly what I want as a result?
+- [ ] **Self-reviewed**: Have I caught any obvious mistakes in my own thinking?
+- [ ] **Ritual completed**: Have I completed all 5 steps of the thinking tool ritual?
+- [ ] **Comprehensive answers**: Do my ritual responses address all checklist questions?
+- [ ] **File attachments**: Have I included all files identified during the ritual?
+- [ ] **Request refinement**: Have I refined my request based on ritual insights?
+
+### **❌ COMMON PITFALLS TO AVOID**
+
+**These will result in poor responses:**
+
+1. **❌ Vague requests**: "Help me build a web app" (too broad)
+2. **❌ Missing context**: No explanation of current state or requirements
+3. **❌ No files included**: Consult agent can't see your actual code
+4. **❌ Assumptions**: Taking for granted that the agent knows your project
+5. **❌ Incomplete information**: Missing key details about constraints or goals
+6. **❌ No self-review**: Not catching obvious issues before asking for help
+7. **❌ Skipping the ritual**: Not completing the mandatory thinking tool process
+8. **❌ Incomplete ritual**: Rushing through the 5-step process without thorough consideration
+9. **❌ No file attachments**: Failing to include files identified during the ritual
+10. **❌ Generic thinking**: Not providing specific, concrete answers to checklist questions
+
+### **🎯 DETAILED EXAMPLE PRE-SUBMISSION THINKING**
+
+```python
+# Example thinking tool usage before consult agent call
+mcp_thinking_sequentialthinking({
+    "thought": "I need to create a React component for user authentication. Let me think through what the consult agent needs to know...",
+    "nextThoughtNeeded": True,
+    "thoughtNumber": 1,
+    "totalThoughts": 5
+})
+
+mcp_thinking_sequentialthinking({
+    "thought": "REQUEST CLARITY: I need a React auth component that handles login/logout, integrates with our JWT system, supports SSO, and follows our existing component patterns. The outcome should be a production-ready component with TypeScript types and unit tests.",
+    "nextThoughtNeeded": True,
+    "thoughtNumber": 2,
+    "totalThoughts": 5
+})
+
+mcp_thinking_sequentialthinking({
+    "thought": "PROJECT CONTEXT: We have an existing Next.js app with JWT authentication. I've tried using a basic form component but need proper error handling, loading states, and SSO integration. Current assumptions: we'll use NextAuth.js for SSO, JWT tokens for session management.",
+    "nextThoughtNeeded": True,
+    "thoughtNumber": 3,
+    "totalThoughts": 5
+})
+
+mcp_thinking_sequentialthinking({
+    "thought": "FILE IDENTIFICATION: I need to include: package.json (dependencies), existing auth utilities, current component structure, NextAuth configuration, and any existing auth components. These will show the consult agent our current patterns and constraints.",
+    "nextThoughtNeeded": True,
+    "thoughtNumber": 4,
+    "totalThoughts": 5
+})
+
+mcp_thinking_sequentialthinking({
+    "thought": "CONTEXT PACKAGING: My request should be: 'Create a React auth component for Next.js that integrates with our existing JWT system and NextAuth.js for SSO. Include TypeScript types, error handling, loading states, and unit tests. Follow our existing component patterns.' I'll attach the relevant files.",
+    "nextThoughtNeeded": False,
+    "thoughtNumber": 5,
+    "totalThoughts": 5
+})
+```
+
+### **📋 TEMPLATE FOR RITUAL COMPLETION**
+
+**Use this template structure for your thinking tool ritual:**
+
+```python
+# Step 1: Initial Assessment
+mcp_thinking_sequentialthinking({
+    "thought": "REQUEST CLARITY: [Define your specific request and desired outcome]",
+    "nextThoughtNeeded": True,
+    "thoughtNumber": 1,
+    "totalThoughts": 5
+})
+
+# Step 2: Project Context
+mcp_thinking_sequentialthinking({
+    "thought": "PROJECT CONTEXT: [Current state, what you've tried, assumptions, constraints]",
+    "nextThoughtNeeded": True,
+    "thoughtNumber": 2,
+    "totalThoughts": 5
+})
+
+# Step 3: File Identification
+mcp_thinking_sequentialthinking({
+    "thought": "FILE IDENTIFICATION: [List all relevant files to include]",
+    "nextThoughtNeeded": True,
+    "thoughtNumber": 3,
+    "totalThoughts": 5
+})
+
+# Step 4: Self-Review
+mcp_thinking_sequentialthinking({
+    "thought": "SELF-REVIEW: [Check assumptions, identify gaps, validate completeness]",
+    "nextThoughtNeeded": True,
+    "thoughtNumber": 4,
+    "totalThoughts": 5
+})
+
+# Step 5: Final Packaging
+mcp_thinking_sequentialthinking({
+    "thought": "CONTEXT PACKAGING: [Final request formulation with all necessary details]",
+    "nextThoughtNeeded": False,
+    "thoughtNumber": 5,
+    "totalThoughts": 5
+})
+```
+
+### **🚨 ENFORCEMENT AND COMPLIANCE**
+
+**This ritual is MANDATORY. You MUST complete the thinking tool ritual before making any consult agent call.**
+
+#### **Compliance Requirements:**
+- **Documentation**: You must complete the 5-step thinking tool ritual and document your responses
+- **Validation**: Your thinking tool responses must demonstrate systematic consideration of all checklist questions
+- **Attachment**: Include relevant files identified during the ritual as attachments to your consult agent call
+- **Reference**: Reference your ritual conclusions in your consult agent prompt
+
+#### **Consequences of Non-Compliance:**
+- **Generic Responses**: You'll receive unhelpful, generic advice that doesn't address your specific situation
+- **Time Waste**: Back-and-forth clarification will be required, wasting development time
+- **Missed Opportunities**: You'll miss chances to catch your own mistakes before asking for help
+- **Poor Performance**: Consult agent responses will lack context and relevance
+
+#### **Quality Validation:**
+Before submitting your consult agent call, verify:
+- [ ] You've completed all 5 steps of the thinking tool ritual
+- [ ] Your responses address all checklist questions comprehensively
+- [ ] You've identified and included all relevant files
+- [ ] Your final request is clear, specific, and complete
+- [ ] You've caught any obvious issues in your own thinking
+
+**The thinking tool ritual is your quality gate - use it every time.**
+
+## **🎯 Key Principle: Trust Auto-Selection**
+
+**The consult agent now uses intelligent model selection based on comprehensive SDLC testing. Agents should NOT specify the `model` parameter unless they have a specific reason to override the automatic selection.**
+
+## **📁 Knowledge File Management**
+
+**When creating knowledge files for consult agent research, always use the standardized location:**
+
+- **Create knowledge files in**: `.cursor/knowledge/` directory in the current project root
+- **File naming**: `knowledge_update_[topic]_[timestamp].md`
+- **Example path**: `.cursor/knowledge/knowledge_update_mcp_integration_20250715.md`
+- **Use absolute paths** when attaching files to consult agent calls
+
+**❌ DO NOT create knowledge files in hardcoded paths like `/home/opsvi/ACCF/`**
+
+## Parameter Optimization
+
+### Required Parameters
+```python
+{
+    "prompt": "string",           # Detailed development request
+    "session_id": "string"        # Unique session identifier
+}
+```
+
+### Optional Parameters
+```python
+{
+    "artifact_type": "string",    # Output type: "code", "plan", "test", "doc", "diagram", "workflow"
+    "iterate": "integer",         # Iterations: 1-3 (default: 1)
+    "critic_enabled": "boolean",  # Quality control: true/false (default: true)
+    "model": "string",            # AI model override: "o3", "gpt-4.1", "gpt-4.1-mini" (NOT RECOMMENDED - use auto-selection)
+    "auto_attach_project_intelligence": "boolean"  # Auto-attach project context for new sessions (default: true)
+}
+```
+
+## Task-Specific Prompt Engineering
+
+### Code Generation Requests (Auto-selects: gpt-4.1-nano)
+**Use this format for coding tasks** - the system will auto-select gpt-4.1-nano for fastest execution.
+
+**Structure**: TASK + LANGUAGE/RUNTIME + INPUTS + CONSTRAINTS + OUTPUT_FORMAT
+```python
+"### TASK
+Create a GitHub Actions workflow that builds & tests a Node library
+
+### LANGUAGE / RUNTIME
+YAML · Node 20
+
+### INPUTS
+• Node versions: [18.x, 20.x]
+• OS matrix: ubuntu-latest, macos-latest
+
+### CONSTRAINTS
+- Cache node_modules using actions/cache@v4
+- Lint with ESLint; fail on warnings
+
+### OUTPUT_FORMAT
+```yaml
+# .github/workflows/ci.yml
+name: CI
+...
+```
+"
+```
+
+**What makes gpt-4.1-nano's job easier:**
+- Deterministic parameters (temperature 0.0)
+- Fenced code blocks with file names as comments
+- Separate prose from code
+- Explicit language/runtime/version specifications
+
+**What makes gpt-4.1-nano's job harder:**
+- Runtime unspecified → wrong syntax
+- Temperature > 0.5 → flaky builds
+- Wall of prose describing code verbally
+
+### Architecture Planning Requests (Auto-selects: o3)
+**Use this format for complex reasoning tasks** - the system will auto-select o3 for advanced reasoning.
+
+**Structure**: ROLE + OBJECTIVE + CONTEXT + DELIVERABLES + FORMAT + RULES
+**IMPORTANT**: For agent consumption, focus on actionable technical details, not project management timelines or resource allocation.
+```python
+"### ROLE
+Senior Cloud Architect
+
+### OBJECTIVE
+Compare lift-and-shift vs re-architecting an on-prem Java monolith to AWS
+
+### CONTEXT
+• SLA 99.9 % uptime
+• Budget cap $120 k / yr
+• Current stack: Tomcat on VMware
+
+### DELIVERABLES
+1. Pros/cons table
+2. 3-year cost projection
+3. Mermaid component diagram
+
+### FORMAT
+Markdown + ```mermaid``` diagram
+
+### RULES
+- Cite assumptions
+- No proprietary data
+"
+```
+
+**What makes o3's job easier:**
+- Bullet-listed constraints
+- Tabular input data for cost models
+- Separate code or schema chunks with fenced blocks
+- Quantitative data and constraints up front
+
+**What makes o3's job harder:**
+- Ambiguous scope ("design a scalable system")
+- >200 lines of embedded code (burns reasoning tokens)
+- Missing or conflicting constraints
+
+### Documentation Requests (Auto-selects: gpt-4.1-mini)
+**Use this format for documentation tasks** - the system will auto-select gpt-4.1-mini for balanced approach.
+
+**Structure**: TARGET_AUDIENCE + DOC_TYPE + PRODUCT_CONTEXT + MUST_INCLUDE + TONE
+```python
+"### TARGET_AUDIENCE
+QA engineers new to Playwright
+
+### DOC_TYPE
+End-to-End Test Strategy (.md)
+
+### PRODUCT_CONTEXT
+Next.js SaaS app with SSO
+
+### MUST_INCLUDE
+- Test pyramid overview
+- Data seeding strategy
+- CI integration steps
+
+### TONE
+Professional, concise
+"
+```
+
+**What makes gpt-4.1-mini's job easier:**
+- Clear section checklist
+- Code blocks labeled with language for syntax highlighting
+- Short paragraphs & bulleted lists
+- Clear audience persona and document type declarations
+
+**What makes gpt-4.1-mini's job harder:**
+- No audience → mismatched depth
+- Marketing fluff mixed with tech docs
+- One giant paragraph with no headings
+
+## Artifact Type Selection
+
+### Code Artifacts
+- **Use When**: Implementation tasks, function/component creation
+- **Best For**: Production-ready code with error handling, type hints, logging
+- **Example**: API endpoints, React components, utility functions
+
+### Plan Artifacts
+- **Use When**: Architecture design, project planning, system design
+- **Best For**: Structured project plans with timelines, resources, risks
+- **Example**: Microservices architecture, deployment strategies, migration plans
+
+### Test Artifacts
+- **Use When**: Testing strategies, quality assurance planning
+- **Best For**: Test frameworks, coverage strategies, testing methodologies
+- **Example**: Unit test suites, integration test plans, performance testing
+
+### Documentation Artifacts
+- **Use When**: User guides, API documentation, technical specifications
+- **Best For**: Comprehensive documentation with examples and best practices
+- **Example**: Component libraries, API references, user manuals
+
+### Diagram Artifacts
+- **Use When**: Visual architecture, system design, workflow visualization
+- **Best For**: System architecture diagrams, data flow charts, process flows
+- **Example**: Database schemas, service mesh diagrams, deployment architectures
+
+### Workflow Artifacts
+- **Use When**: Process automation, CI/CD pipelines, operational procedures
+- **Best For**: Automated workflows, deployment procedures, operational runbooks
+- **Example**: GitHub Actions workflows, deployment scripts, monitoring setups
+
+## Quality Control Strategies
+
+### Critic Integration
+- **Always Enable**: `critic_enabled: true` for production code
+- **Review Suggestions**: Pay attention to critic feedback for improvements
+- **Iterative Refinement**: Use multiple iterations for complex tasks
+
+### Iteration Patterns
+- **Single Iteration**: Simple tasks, quick prototypes
+- **Double Iteration**: Complex implementations, production code
+- **Triple Iteration**: Critical systems, enterprise-grade solutions
+
+### Model Selection
+**⚠️ IMPORTANT: DO NOT specify the `model` parameter unless you have a specific reason to override auto-selection**
+
+The consult agent now uses **intelligent model selection** based on comprehensive SDLC testing results:
+
+- **Auto-Selection (Recommended)**: Let the agent choose the optimal model based on task type
+  - `code_implementation` → `gpt-4.1-nano` (fastest for coding)
+  - `system_architecture` → `o3` (best for complex reasoning)
+  - `requirements_gathering` → `gpt-4.1-mini` (balanced approach)
+  - `testing_strategy` → `gpt-4.1-mini` (good for planning)
+  - `devops_deployment` → `gpt-4.1-nano` (fastest for infrastructure)
+
+- **Manual Override (Use Sparingly)**: Only specify `model` parameter when you need:
+  - `o3`: For complex reasoning tasks that require advanced problem-solving
+  - `gpt-4.1`: For balanced performance on general development tasks
+  - `gpt-4.1-mini`: For quick responses on simple tasks
+  - `gpt-4.1-nano`: For fastest execution on coding tasks
+
+### **When to Use Manual Override:**
+
+**✅ Use manual override ONLY in these specific cases:**
+
+1. **Complex Reasoning Required**: When you need o3's advanced reasoning for a task that might be misclassified
+   ```python
+   mcp_consult_agent_consult({
+       "prompt": "### ROLE\nSenior Technical Architect\n\n### OBJECTIVE\nAnalyze this complex architectural decision with multiple trade-offs...\n\n### CONTEXT\n[Your specific context]\n\n### DELIVERABLES\n[What you need]\n\n### FORMAT\n[Output format]\n\n### RULES\n[Constraints]",
+       "session_id": "complex_analysis_001",
+       "model": "o3"  # Force o3 for advanced reasoning
+   })
+   ```
+
+2. **Performance Critical**: When you need the fastest possible response
+   ```python
+   mcp_consult_agent_consult({
+       "prompt": "### TASK\nQuick code review of this simple function\n\n### LANGUAGE / RUNTIME\nPython 3.11\n\n### INPUTS\n[Your code snippet]\n\n### CONSTRAINTS\n- Focus on critical issues only\n- Keep review concise\n\n### OUTPUT_FORMAT\n```markdown\n## Code Review\n[Review content]\n```",
+       "session_id": "quick_review_001",
+       "model": "gpt-4.1-nano"  # Force fastest model
+   })
+   ```
+
+3. **Specific Model Requirements**: When your organization has specific model preferences
+   ```python
+   mcp_consult_agent_consult({
+       "prompt": "Generate documentation...",
+       "session_id": "org_docs_001",
+       "model": "gpt-4.1"  # Organization preference
+   })
+   ```
+
+**❌ DO NOT specify model for:**
+- Standard coding tasks (auto-selects gpt-4.1-nano)
+- Architecture planning (auto-selects o3)
+- Documentation (auto-selects gpt-4.1-mini)
+- Testing strategies (auto-selects gpt-4.1-mini)
+
+## Model-Specific Preferences (For Manual Override)
+
+If you need to override the auto-selected model, here are each model's preferences:
+
+### o3 Model Preferences
+**Best for**: Complex reasoning, system architecture, strategic planning
+**Prompt structure**: ROLE + OBJECTIVE + CONTEXT + DELIVERABLES + FORMAT + RULES
+**What it likes**:
+- Bullet-listed constraints and quantitative data
+- Tabular input data for cost models
+- Separate code chunks with fenced blocks
+- Clear deliverables and output formats
+
+**What it dislikes**:
+- Ambiguous scope or vague objectives
+- >200 lines of embedded code
+- Missing or conflicting constraints
+
+### gpt-4.1-nano Model Preferences
+**Best for**: Code generation, DevOps, CI/CD, fast implementation
+**Prompt structure**: TASK + LANGUAGE/RUNTIME + INPUTS + CONSTRAINTS + OUTPUT_FORMAT
+**What it likes**:
+- Deterministic parameters (temperature 0.0)
+- Fenced code blocks with file names as comments
+- Explicit language/runtime/version specifications
+- Separate prose from code
+
+**What it dislikes**:
+- Unspecified runtimes or ambiguous requirements
+- High temperature settings (> 0.5)
+- Wall of prose describing code verbally
+
+### gpt-4.1-mini Model Preferences
+**Best for**: Documentation, testing strategy, balanced analysis
+**Prompt structure**: TARGET_AUDIENCE + DOC_TYPE + PRODUCT_CONTEXT + MUST_INCLUDE + TONE
+**What it likes**:
+- Clear section checklists and structured content
+- Code blocks labeled with language for syntax highlighting
+- Short paragraphs and bulleted lists
+- Clear audience persona and document type declarations
+
+**What it dislikes**:
+- Unclear audience or mismatched depth
+- Marketing fluff mixed with technical content
+- One giant paragraph with no headings
+
+## 🧠 Session Management & Context Preservation
+
+**⚠️ CRITICAL: Session memory is essential for quality results. Poor session management leads to subpar responses that may not be immediately obvious.**
+
+## 🚀 Automatic Context Enhancement
+
+**For new sessions, the consult agent automatically attaches comprehensive project intelligence:**
+
+### **What Gets Attached**
+- **Enhanced Project Map**: Complete project structure and dependencies via genFileMap
+- **Project Analysis**: Project purpose, development state, and architecture via project-intelligence
+- **Architecture Insights**: Dependency analysis, circular dependencies, most imported files
+- **Development Context**: Repository status, recent activity, development maturity
+
+### **When It Happens**
+- **First request** with a new `session_id`
+- **New session detection** (not existing session)
+- **Project intelligence tools available** (genFileMap + project-intelligence)
+- **Automatic enhancement enabled** (default: `auto_attach_project_intelligence: true`)
+
+### **Benefits**
+- **Immediate Architectural Context**: Consult agent understands project structure instantly
+- **Reduced Cognitive Load**: No need for requesting agent to explain project context
+- **Better Quality Responses**: More relevant and contextual advice
+- **Smarter Questions**: Consult agent can ask contextually relevant questions
+- **Consistent Baseline**: Every new session starts with comprehensive understanding
+
+### **How It Works**
+```python
+# Automatic enhancement (default behavior)
+mcp_consult_agent_consult({
+    "prompt": "Create a React component for user authentication",
+    "session_id": "auth_component_001",  # New session - auto-enhancement triggered
+    "auto_attach_project_intelligence": True  # Default: True
+})
+
+# Disable automatic enhancement if needed
+mcp_consult_agent_consult({
+    "prompt": "Quick question about API design",
+    "session_id": "quick_question_001",
+    "auto_attach_project_intelligence": False  # Disable for quick questions
+})
+```
+
+### **Enhanced Prompt Structure**
+When automatic enhancement is triggered, the consult agent receives:
+
+```markdown
+# Enhanced Request with Project Intelligence
+
+## PROJECT CONTEXT
+- Project type, file count, languages, dependencies
+- Key features and capabilities
+
+## ARCHITECTURE INSIGHTS
+- Dependency analysis and circular dependencies
+- Most imported files and project statistics
+- Package structure and relationships
+
+## DEVELOPMENT CONTEXT
+- Repository status and recent activity
+- Development maturity and project purpose
+- Target users and primary goals
+
+## ORIGINAL REQUEST
+[Your original request here]
+
+## INSTRUCTIONS
+Please consider the project context, architecture insights, and development context above when responding...
+```
+
+## 📊 Auto-Attachment Project Intelligence Details
+
+### **What the Consult Agent Automatically Receives**
+
+When you start a new session, the consult agent automatically gets comprehensive project intelligence that includes:
+
+#### **1. Project Overview**
+- **Project Name**: The name of your project
+- **Total Files**: Count of all files in the project
+- **Total Lines**: Total lines of code across all files
+- **Functions**: Number of functions in the codebase
+- **Classes**: Number of classes in the codebase
+- **Module Structure**: Breakdown by directory/module with file counts and statistics
+
+#### **2. Architecture Insights**
+- **Most Imported Files**: Top files that are imported by other files (shows core dependencies)
+- **Circular Dependencies**: Any circular import dependencies detected
+- **Dependency Analysis**: Import relationships and dependency mapping
+- **File Relationships**: How files are connected and depend on each other
+
+#### **3. Development Context**
+- **Key Files Analysis**: Top files by line count (largest/most complex files)
+- **Entry Points**: Main entry points and CLI interfaces
+- **File Type Distribution**: Breakdown by programming languages and file types
+- **Project Statistics**: Comprehensive metrics about the codebase
+
+#### **4. Raw Project Data**
+- **Complete Project Map**: Full genFileMap analysis in YAML format
+- **File Details**: Individual file analysis with line counts, functions, classes
+- **Dependency Graphs**: Import relationships and dependency chains
+- **Project Structure**: Complete directory tree with analysis
+
+### **When Auto-Attachment is Triggered**
+
+#### **✅ Triggers Auto-Attachment:**
+- **New Session ID**: First time using a specific `session_id`
+- **Expired Session**: Session that has been inactive for more than 1 hour
+- **Fresh Start**: When the session store is cleared or reset
+- **Default Enabled**: `auto_attach_project_intelligence: true` (default behavior)
+
+#### **❌ Does NOT Trigger Auto-Attachment:**
+- **Existing Session**: Using the same `session_id` within 1 hour
+- **Explicitly Disabled**: `auto_attach_project_intelligence: false`
+- **Tool Unavailable**: genFileMap not installed or accessible
+- **Generation Failed**: Project intelligence generation fails for any reason
+
+### **What This Means for Agents**
+
+#### **🎯 You Can Expect:**
+- **Immediate Context**: The consult agent will understand your project structure from the first request
+- **Specific References**: Responses will reference your actual files, modules, and architecture
+- **Tailored Advice**: Recommendations will be based on your specific codebase patterns
+- **Smart Questions**: The agent can ask contextually relevant questions about your project
+- **Architectural Awareness**: The agent understands your project's dependencies and structure
+
+#### **📋 What You DON'T Need to Explain:**
+- **Project Structure**: The agent already knows your file organization
+- **Technology Stack**: The agent can see your dependencies and file types
+- **Architecture Patterns**: The agent understands your current architectural decisions
+- **Code Organization**: The agent knows how your code is structured and related
+- **Development State**: The agent can see the maturity and complexity of your project
+
+#### **🔍 What You SHOULD Still Provide:**
+- **Specific Requirements**: What you want to build or modify
+- **Current Issues**: Problems you're trying to solve
+- **Constraints**: Performance, security, or business requirements
+- **Context**: Why you're making this request (business goals, user needs)
+- **Related Files**: Specific files you're working with (if not already covered)
+
+### **Example: What the Agent Knows vs. What You Need to Tell It**
+
+#### **✅ Agent Already Knows (From Auto-Attachment):**
+```markdown
+- Your project has 81 files with 12,617 lines of code
+- Main modules: orchestrator, agent_base, accf_agents, capabilities, tests
+- Key files: capabilities/consult_agent.py (1,294 lines), capabilities/research_agent.py (792 lines)
+- Primary language: Python
+- Architecture: AI-driven agents with knowledge management and orchestrated workflows
+- Dependencies: OpenAI interfaces, MCP clients, Neo4j integration
+```
+
+#### **📝 You Still Need to Tell the Agent:**
+```markdown
+- "I need to add OAuth2 authentication to the user management system"
+- "The current auth flow is causing 500 errors when users log in"
+- "We need to support Google and GitHub SSO"
+- "Performance requirement: login must complete in under 2 seconds"
+- "Security requirement: must comply with SOC2 standards"
+```
+
+### **Caching and Performance**
+
+#### **Smart Caching:**
+- **Project Intelligence Cache**: Generated intelligence is cached for 24 hours
+- **Efficient Reuse**: Subsequent requests use cached data instead of regenerating
+- **Cache Location**: `.cursor/project_intelligence_cache/` in project root
+- **Cache Key**: Based on project path hash for uniqueness
+
+#### **Performance Benefits:**
+- **Fast First Request**: Cached data is used when available
+- **Reduced Processing**: No need to re-analyze the entire project
+- **Consistent Results**: Same project intelligence across multiple sessions
+- **Background Generation**: Project analysis happens in the background
+
+### **Troubleshooting Auto-Attachment**
+
+#### **If Auto-Attachment Isn't Working:**
+1. **Check genFileMap Installation**: Ensure genFileMap is installed in the virtual environment
+2. **Verify Virtual Environment**: Make sure the MCP server is using the correct Python environment
+3. **Check Cache**: Look for `.cursor/project_intelligence_cache/` directory
+4. **Review Logs**: Check for error messages in the MCP server logs
+5. **Manual Test**: Try running genFileMap manually to verify it works
+
+#### **Common Issues:**
+- **Wrong Python Environment**: MCP server using system Python instead of project virtual environment
+- **genFileMap Not Installed**: Missing the required tool for project analysis
+- **Permission Issues**: Cannot create cache directory or project map files
+- **Network Issues**: Cannot access external dependencies or APIs
+
+### **Best Practices for Agents**
+
+#### **✅ Do This:**
+- **Trust the Auto-Attachment**: Assume the agent has project context for new sessions
+- **Be Specific About Requirements**: Focus on what you want to build, not project structure
+- **Reference Related Files**: Mention specific files you're working with
+- **Provide Business Context**: Explain why you're making the request
+- **Use Descriptive Session IDs**: Help the agent maintain context across requests
+
+#### **❌ Don't Do This:**
+- **Explain Project Structure**: The agent already knows this from auto-attachment
+- **List All Files**: Don't enumerate files the agent can see automatically
+- **Describe Architecture**: The agent understands your current architecture
+- **Worry About Context**: Don't spend time explaining basic project details
+- **Disable Auto-Attachment**: Unless you have a specific reason to do so
+
+### **Example: Optimized Request with Auto-Attachment**
+
+#### **❌ Before Auto-Attachment (Verbose):**
+```python
+mcp_consult_agent_consult({
+    "prompt": "I'm working on a Python project with 81 files, 12K+ lines of code. The main modules are orchestrator, agent_base, accf_agents, capabilities, tests. I have a capabilities/consult_agent.py file with 1,294 lines that handles MCP server integration. I need to add OAuth2 authentication to the user management system...",
+    "session_id": "auth_implementation_001"
+})
+```
+
+#### **✅ With Auto-Attachment (Concise):**
+```python
+mcp_consult_agent_consult({
+    "prompt": "I need to add OAuth2 authentication to the user management system. The current auth flow is causing 500 errors, and we need to support Google and GitHub SSO. Performance requirement: login must complete in under 2 seconds. Security requirement: must comply with SOC2 standards.",
+    "session_id": "auth_implementation_001"
+})
+```
+
+The agent automatically knows about your project structure, so you can focus on the specific requirements and constraints.
+
+### **Default Session ID (Automatic Context)**
+The consult agent automatically uses `session_id: "default"` if none is provided. This provides baseline context persistence across requests, but **you should still use specific session IDs for optimal results**.
+
+### **Session ID Strategy**
+
+#### **✅ When to Use the SAME Session ID:**
+- **Same Project/Feature**: All requests related to one development task
+- **Iterative Development**: Code reviews, refinements, and improvements
+- **Related Architecture**: System design, planning, and implementation phases
+- **Continuous Context**: When you need the agent to remember previous decisions
+
+#### **🔄 When to Change Session ID:**
+- **New Project/Feature**: Starting work on a different component
+- **Different Task Type**: Switching from coding to documentation to testing
+- **Context Pollution**: When previous context might confuse the current task
+- **Clean Slate**: When you want to start fresh without previous assumptions
+
+### **Session Tracking (Requesting Agent Responsibility)**
+
+**The requesting agent MUST track session IDs on their side:**
+
+```python
+# Example session tracking in requesting agent
+current_session = {
+    "project": "ecommerce_platform",
+    "feature": "user_authentication",
+    "session_id": "auth_system_001",
+    "request_count": 0,
+    "last_request": None
+}
+
+# Update session tracking
+current_session["request_count"] += 1
+current_session["last_request"] = time.time()
+
+# Use consistent session ID for related requests
+mcp_consult_agent_consult({
+    "prompt": "...",
+    "session_id": current_session["session_id"]
+})
+```
+
+### **Session ID Naming Conventions**
+
+#### **Project-Based Naming:**
+```python
+# Format: [project]_[feature]_[version]
+"ecommerce_auth_001"
+"ecommerce_payment_001"
+"ecommerce_catalog_002"  # Version 2 of catalog feature
+```
+
+#### **Task-Based Naming:**
+```python
+# Format: [task_type]_[specific_task]_[version]
+"code_review_auth_service_001"
+"architecture_payment_flow_001"
+"docs_api_reference_001"
+```
+
+#### **Time-Based Naming:**
+```python
+# Format: [date]_[task]_[session]
+"20250715_auth_implementation_001"
+"20250715_auth_testing_002"
+```
+
+### **Context Quality Indicators**
+
+#### **✅ Good Context (Same Session):**
+- Agent references previous decisions and rationale
+- Consistent terminology and approach
+- Builds on previous work without repetition
+- Maintains architectural consistency
+
+#### **❌ Poor Context (No Session/Generic Session):**
+- Agent asks for information already provided
+- Inconsistent approaches across related requests
+- Repetitive explanations of basic concepts
+- Contradictory recommendations
+
+### **Session Memory Benefits**
+
+| Benefit               | Without Session                  | With Session                          |
+| --------------------- | -------------------------------- | ------------------------------------- |
+| **Context Awareness** | ❌ Each request is isolated       | ✅ Remembers previous decisions        |
+| **Consistency**       | ❌ May contradict previous advice | ✅ Maintains architectural consistency |
+| **Efficiency**        | ❌ Re-explains basic concepts     | ✅ Builds on established context       |
+| **Quality**           | ❌ Generic, less specific advice  | ✅ Tailored to your specific situation |
+
+### **Session Management Best Practices**
+
+#### **1. Track Sessions Locally**
+```python
+# Maintain session state in your agent
+sessions = {
+    "current_project": "ecommerce_platform",
+    "active_sessions": {
+        "auth_system": "ecommerce_auth_001",
+        "payment_flow": "ecommerce_payment_001",
+        "api_docs": "ecommerce_docs_001"
+    }
+}
+```
+
+#### **2. Use Descriptive Session IDs**
+```python
+# Good: Specific and descriptive
+"react_component_library_001"
+"microservices_architecture_001"
+
+# Bad: Generic and unclear
+"test_001"
+"session_1"
+"temp_001"
+```
+
+#### **3. Version Sessions for Iterations**
+```python
+# First iteration
+"auth_service_001"
+
+# Second iteration (refinements)
+"auth_service_002"
+
+# Major redesign
+"auth_service_003"
+```
+
+#### **4. Reset Sessions When Needed**
+```python
+# When context becomes polluted or outdated
+mcp_consult_agent_consult({
+    "prompt": "Let's start fresh with a new approach...",
+    "session_id": "auth_service_004"  # New session for fresh start
+})
+```
+
+### **Session Memory Architecture**
+
+The consult agent maintains:
+- **Conversation History**: Last 3 exchanges per session
+- **Session Timeout**: 1 hour of inactivity
+- **Context Injection**: Previous Q&A included in new requests
+- **Automatic Cleanup**: Expired sessions are removed
+
+### **Quality Risk Warning**
+
+**⚠️ SUBPAR RESULTS RISK:**
+- **Without proper session management**, the consult agent loses context
+- **Responses may still be "good enough"** but lack the depth and specificity possible with proper context
+- **You may not notice the quality degradation** until much later in the development process
+- **The cost of poor session management** is technical debt and architectural inconsistencies
+
+**Always use specific, descriptive session IDs for optimal results.**
+
+## Integration Workflows
+
+### Development Pipeline Integration
+1. **Requirement Analysis**: Use consult agent for initial planning
+2. **Implementation**: Generate production-ready code
+3. **Testing**: Create comprehensive test strategies
+4. **Documentation**: Generate user and technical documentation
+5. **Deployment**: Plan deployment and operational procedures
+
+### Autonomous Agent Integration
+- **Prompt Generation**: Use consult agent to create detailed prompts for other agents
+- **Quality Assurance**: Leverage critic suggestions for validation
+- **Iterative Improvement**: Use multiple iterations for refinement
+
+## Anti-Patterns
+
+### Poor Prompt Practices
+- **Vague Requests**: "Build a web app" (too broad)
+- **Missing Context**: No technology stack or requirements specified
+- **Incomplete Requirements**: Missing error handling, security, or performance considerations
+
+### Inefficient Usage
+- **Over-Iteration**: Using 3 iterations for simple tasks
+- **Critic Disabled**: Missing quality control for production code
+- **Wrong Artifact Type**: Using "code" for architecture planning
+- **Unnecessary Model Override**: Specifying model parameter when auto-selection would work
+
+### Session Management Issues
+- **Generic Session IDs**: Using "test" or "session1"
+- **Session Pollution**: Mixing unrelated tasks in same session
+- **Context Loss**: Not maintaining session continuity
+- **No Session Tracking**: Not tracking session IDs on the requesting agent side
+- **Over-Reliance on Default**: Always using the default session ID instead of specific ones
+- **Session Hoarding**: Using the same session ID for too many unrelated requests
+
+## Success Metrics
+
+### Response Quality Indicators
+- **Completeness**: All requirements addressed
+- **Production Readiness**: Error handling, logging, type safety
+- **Best Practices**: Current standards and patterns
+- **Critic Approval**: Minimal or actionable critic suggestions
+
+### Efficiency Metrics
+- **Prompt Clarity**: Specific, actionable requests
+- **Iteration Effectiveness**: Meaningful improvements per iteration
+- **Session Continuity**: Logical task progression within sessions
+
+## Reference Examples
+
+### Code Generation Example (With Session Management)
+```python
+# Session tracking in requesting agent
+current_feature = {
+    "project": "admin_dashboard",
+    "feature": "data_table_component",
+    "session_id": "admin_datatable_001",
+    "request_count": 0
+}
+
+# First request: Initial component creation
+current_feature["request_count"] += 1
+mcp_consult_agent_consult({
+    "prompt": "### TASK\nCreate a React component for a data table with sorting, filtering, pagination, and export functionality\n\n### LANGUAGE / RUNTIME\nTypeScript · React 18 · Jest\n\n### INPUTS\n• Data: Array of objects with dynamic columns\n• Features: sort, filter, paginate, export to CSV\n\n### CONSTRAINTS\n- Include TypeScript types and accessibility features\n- Follow React best practices and include unit tests\n- Support keyboard navigation and screen readers\n\n### OUTPUT_FORMAT\n```tsx\n// Component code with full implementation\n```",
+    "session_id": current_feature["session_id"],
+    "artifact_type": "code",
+    "iterate": 2,
+    "critic_enabled": true
+    # Note: No model specified - will auto-select gpt-4.1-nano for code implementation
+})
+
+# Second request: Refinement based on previous work
+current_feature["request_count"] += 1
+mcp_consult_agent_consult({
+    "prompt": "### TASK\nRefine the data table component to add virtual scrolling for large datasets\n\n### CONTEXT\nBuilding on the previous data table implementation with sorting/filtering\n\n### NEW REQUIREMENTS\n- Virtual scrolling for 10K+ rows\n- Maintain existing sorting/filtering functionality\n- Optimize performance for large datasets\n\n### OUTPUT_FORMAT\n```tsx\n// Updated component with virtual scrolling\n```",
+    "session_id": current_feature["session_id"],  # Same session for context continuity
+    "artifact_type": "code",
+    "iterate": 1,
+    "critic_enabled": true
+})
+```
+
+### Architecture Planning Example (With Session Management)
+```python
+# Session tracking for architecture planning
+architecture_session = {
+    "project": "ecommerce_platform",
+    "phase": "system_design",
+    "session_id": "ecommerce_architecture_001",
+    "request_count": 0
+}
+
+# First request: High-level architecture
+architecture_session["request_count"] += 1
+mcp_consult_agent_consult({
+    "prompt": "### ROLE\nSenior Cloud Architect\n\n### OBJECTIVE\nDesign a microservices architecture for an e-commerce platform with user management, product catalog, order processing, and payment integration\n\n### CONTEXT\n• Scale: 1M+ users, 10K+ concurrent sessions\n• SLA: 99.9% uptime, <200ms p95 latency\n• Budget: $50K/month infrastructure\n\n### DELIVERABLES\n1. Service boundary diagram (Mermaid)\n2. Data flow architecture\n3. Deployment strategy\n4. Scalability planning\n\n### FORMAT\nMarkdown + ```mermaid``` diagrams\n\n### RULES\n- Include security considerations\n- Consider data consistency patterns\n- Address monitoring and observability",
+    "session_id": architecture_session["session_id"],
+    "artifact_type": "plan",
+    "iterate": 2,
+    "critic_enabled": true
+    # Note: No model specified - will auto-select o3 for system architecture
+})
+
+# Second request: Detailed service design (same session for context)
+architecture_session["request_count"] += 1
+mcp_consult_agent_consult({
+    "prompt": "### ROLE\nSenior Cloud Architect\n\n### OBJECTIVE\nDesign detailed service specifications for the e-commerce microservices architecture\n\n### CONTEXT\nBuilding on the previous high-level architecture design\n\n### DELIVERABLES\n1. API specifications for each service\n2. Database schema design\n3. Service communication patterns\n4. Security implementation details\n\n### FORMAT\nMarkdown + OpenAPI specs\n\n### RULES\n- Maintain consistency with previous architecture decisions\n- Include error handling and resilience patterns",
+    "session_id": architecture_session["session_id"],  # Same session for architectural consistency
+    "artifact_type": "plan",
+    "iterate": 2,
+    "critic_enabled": true
+})
+```
+
+### Documentation Example (With Session Management)
+```python
+# Session tracking for documentation
+docs_session = {
+    "project": "react_component_library",
+    "doc_type": "component_documentation",
+    "session_id": "react_library_docs_001",
+    "request_count": 0
+}
+
+# First request: Component documentation structure
+docs_session["request_count"] += 1
+mcp_consult_agent_consult({
+    "prompt": "### TARGET_AUDIENCE\nIntermediate to advanced React developers\n\n### DOC_TYPE\nComponent Library Documentation (.md)\n\n### PRODUCT_CONTEXT\nReact component library with TypeScript, 15+ components\n\n### MUST_INCLUDE\n- Usage examples with code snippets\n- Props documentation with TypeScript types\n- Best practices and patterns\n- Accessibility guidelines and examples\n- Installation and setup instructions\n\n### TONE\nProfessional, comprehensive, developer-friendly",
+    "session_id": docs_session["session_id"],
+    "artifact_type": "doc",
+    "iterate": 1,
+    "critic_enabled": true
+    # Note: No model specified - will auto-select gpt-4.1-mini for documentation
+})
+
+# Second request: API reference documentation (same session for consistency)
+docs_session["request_count"] += 1
+mcp_consult_agent_consult({
+    "prompt": "### TARGET_AUDIENCE\nIntermediate to advanced React developers\n\n### DOC_TYPE\nAPI Reference Documentation (.md)\n\n### PRODUCT_CONTEXT\nBuilding on the previous component library documentation structure\n\n### MUST_INCLUDE\n- Complete API reference for all 15+ components\n- TypeScript interface definitions\n- Code examples for each component\n- Migration guides and breaking changes\n\n### TONE\nTechnical, comprehensive, reference-style",
+    "session_id": docs_session["session_id"],  # Same session for documentation consistency
+    "artifact_type": "doc",
+    "iterate": 1,
+    "critic_enabled": true
+})
+```
+
+### Knowledge File Integration Example (With Session Management)
+```python
+# Session tracking for knowledge-based planning
+knowledge_session = {
+    "project": "react_component_library",
+    "phase": "research_implementation",
+    "session_id": "react_library_research_001",
+    "request_count": 0
+}
+
+# First, create knowledge file in .cursor/knowledge/
+# File: .cursor/knowledge/knowledge_update_react_library_20250715.md
+
+# Then use with consult agent (first request)
+knowledge_session["request_count"] += 1
+mcp_consult_agent_consult({
+    "prompt": "Based on the attached knowledge file, create a comprehensive implementation plan for the React component library.",
+    "session_id": knowledge_session["session_id"],
+    "artifact_type": "plan",
+    "file_paths": ["/home/opsvi/current_project/.cursor/knowledge/knowledge_update_react_library_20250715.md"],
+    "iterate": 2,
+    "critic_enabled": true
+    # Note: No model specified - will auto-select o3 for planning with knowledge context
+})
+
+# Second request: Refine implementation based on research (same session)
+knowledge_session["request_count"] += 1
+mcp_consult_agent_consult({
+    "prompt": "Based on the previous research and implementation plan, create detailed component specifications for the first 5 components in the library.",
+    "session_id": knowledge_session["session_id"],  # Same session to maintain research context
+    "artifact_type": "plan",
+    "iterate": 1,
+    "critic_enabled": true
+})
+```
+
+## Validation Framework
+
+### Pre-Execution Checklist
+- [ ] Clear, specific prompt with all requirements
+- [ ] Appropriate artifact type selected
+- [ ] Session ID follows naming convention
+- [ ] Quality control enabled for production code
+- [ ] Iteration count appropriate for task complexity
+
+### Post-Execution Validation
+- [ ] Response addresses all requirements
+- [ ] Critic suggestions reviewed and addressed
+- [ ] Production readiness confirmed
+- [ ] Best practices followed
+- [ ] Session continuity maintained
+
+### Quality Gates
+- **Code Quality**: Type safety, error handling, logging, tests
+- **Architecture Quality**: Scalability, maintainability, security
+- **Documentation Quality**: Completeness, clarity, examples
+- **Workflow Quality**: Automation, monitoring, operational readiness
+
+## **🔄 INTERACTIVE RESPONSE HANDLING**
+
+### **📋 Response Type Detection**
+
+The consult agent may respond with different types of responses. You MUST detect and handle each type appropriately:
+
+#### **Response Types:**
+- **FINAL**: Complete response ready for use
+- **QUESTIONS**: Agent needs more information
+- **CONCERNS**: Agent has identified potential issues
+- **CLARIFICATION**: Agent needs specific details clarified
+
+#### **Detection Logic:**
+```python
+def extract_response_type(response_text):
+    """Extract response type from consult agent response"""
+    lines = response_text.strip().split('\n')
+    first_line = lines[0].strip()
+
+    if first_line.startswith("**FINAL:**"):
+        return "FINAL"
+    elif first_line.startswith("**QUESTIONS:**"):
+        return "QUESTIONS"
+    elif first_line.startswith("**CONCERNS:**"):
+        return "CONCERNS"
+    elif first_line.startswith("**CLARIFICATION:**"):
+        return "CLARIFICATION"
+    else:
+        return "FINAL"  # Default to final response
+```
+
+### **🔄 Multi-Turn Interaction Workflow**
+
+#### **When You Receive Questions/Concerns/Clarification:**
+
+1. **Analyze the Response**: Extract the questions, concerns, or clarification requests
+2. **Gather Required Information**: Use the thinking tool to identify what additional information is needed
+3. **Prepare Follow-up**: Structure your response to address all points raised
+4. **Make Follow-up Call**: Use the same session_id to maintain context
+
+#### **Follow-up Call Structure:**
+```python
+# First call - Analysis and Questions
+response1 = mcp_consult_agent_consult({
+    "prompt": "Help me create a React auth component",
+    "session_id": "auth_component_001"
+})
+# Returns: "QUESTIONS: 1. What auth method? 2. Existing utilities?..."
+
+# Second call - Provide additional info
+response2 = mcp_consult_agent_consult({
+    "prompt": "We're using JWT, have existing utilities in /utils/auth.ts, need login/logout",
+    "session_id": "auth_component_001"  # Same session ID
+})
+# Returns: "FINAL: Here's your React auth component..."
+```
+
+### **📋 Response Handling Checklist**
+
+#### **For QUESTIONS Responses:**
+- [ ] Extract all questions from the response
+- [ ] Use thinking tool to identify what information is needed
+- [ ] Gather any missing files or context
+- [ ] Structure a comprehensive follow-up response
+- [ ] Make follow-up call with same session_id
+
+#### **For CONCERNS Responses:**
+- [ ] Review all flagged concerns
+- [ ] Assess whether concerns are valid
+- [ ] Provide additional context to address concerns
+- [ ] Consider alternative approaches if needed
+- [ ] Make follow-up call with same session_id
+
+#### **For CLARIFICATION Responses:**
+- [ ] Identify what specifically needs clarification
+- [ ] Provide more specific details about your request
+- [ ] Include relevant examples or context
+- [ ] Make follow-up call with same session_id
+
+#### **For FINAL Responses:**
+- [ ] Review the complete response
+- [ ] Validate it meets your requirements
+- [ ] Proceed with implementation or use as directed
+
+### **🎯 Best Practices for Interactive Sessions**
+
+1. **Maintain Session Context**: Always use the same session_id for follow-up calls
+2. **Be Comprehensive**: Address all questions/concerns in your follow-up
+3. **Provide Context**: Include relevant files and background information
+4. **Be Specific**: Give concrete details rather than vague descriptions
+5. **Follow the Flow**: Let the consult agent guide the conversation naturally
+
+### **⚠️ Common Pitfalls to Avoid**
+
+- **Session ID Mismatch**: Using different session_ids breaks context continuity
+- **Incomplete Responses**: Not addressing all questions/concerns in follow-up
+- **Missing Context**: Failing to provide requested files or information
+- **Rushing**: Not taking time to properly analyze the consult agent's response
+- **Ignoring Concerns**: Dismissing valid concerns without proper consideration
+
+description:
+globs:
+alwaysApply: false
+---

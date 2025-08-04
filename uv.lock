@@ -10,33 +10,11 @@ resolution-markers = [
 
 [manifest]
 members = [
-    "accf",
-    "genfilemap",
     "opsvi-agents",
     "opsvi-core",
     "opsvi-llm",
     "opsvi-master",
     "opsvi-rag",
-    "project-intel",
-]
-
-[[package]]
-name = "accf"
-version = "0.1.0"
-source = { editable = "apps/accf" }
-dependencies = [
-    { name = "opsvi-agents" },
-    { name = "opsvi-core" },
-    { name = "opsvi-llm" },
-    { name = "opsvi-rag" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "opsvi-agents", editable = "libs/opsvi-agents" },
-    { name = "opsvi-core", editable = "libs/opsvi-core" },
-    { name = "opsvi-llm", editable = "libs/opsvi-llm" },
-    { name = "opsvi-rag", editable = "libs/opsvi-rag" },
 ]
 
 [[package]]
@@ -955,23 +933,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/8b/02/0835e6ab9cfc03916fe3f78c0956cfcdb6ff2669ffa6651065d5ebf7fc98/fsspec-2025.7.0.tar.gz", hash = "sha256:786120687ffa54b8283d942929540d8bc5ccfa820deb555a2b5d0ed2b737bf58", size = 304432, upload-time = "2025-07-15T16:05:21.19Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2f/e0/014d5d9d7a4564cf1c40b5039bc882db69fd881111e03ab3657ac0b218e2/fsspec-2025.7.0-py3-none-any.whl", hash = "sha256:8b012e39f63c7d5f10474de957f3ab793b47b45ae7d39f2fb735f8bbe25c0e21", size = 199597, upload-time = "2025-07-15T16:05:19.529Z" },
-]
-
-[[package]]
-name = "genfilemap"
-version = "0.1.0"
-source = { editable = "apps/genfilemap" }
-dependencies = [
-    { name = "opsvi-agents" },
-    { name = "opsvi-core" },
-    { name = "opsvi-llm" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "opsvi-agents", editable = "libs/opsvi-agents" },
-    { name = "opsvi-core", editable = "libs/opsvi-core" },
-    { name = "opsvi-llm", editable = "libs/opsvi-llm" },
 ]
 
 [[package]]
@@ -3060,40 +3021,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/08/39/679ca9b26c7bb2999
 wheels = [
     { url = "https://files.pythonhosted.org/packages/88/74/a88bf1b1efeae488a0c0b7bdf71429c313722d1fc0f377537fbe554e6180/pre_commit-4.2.0-py2.py3-none-any.whl", hash = "sha256:a009ca7205f1eb497d10b845e52c838a98b6cdd2102a6c8e4540e94ee75c58bd", size = 220707, upload-time = "2025-03-18T21:35:19.343Z" },
 ]
-
-[[package]]
-name = "project-intel"
-version = "0.1.0"
-source = { editable = "apps/project-intel" }
-dependencies = [
-    { name = "click" },
-    { name = "opsvi-core" },
-    { name = "opsvi-rag" },
-    { name = "rich" },
-]
-
-[package.optional-dependencies]
-dev = [
-    { name = "black" },
-    { name = "mypy" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "black", marker = "extra == 'dev'", specifier = ">=23.0.0" },
-    { name = "click", specifier = ">=8.0.0" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.0.0" },
-    { name = "opsvi-core", editable = "libs/opsvi-core" },
-    { name = "opsvi-rag", editable = "libs/opsvi-rag" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
-    { name = "rich", specifier = ">=13.0.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },
-]
-provides-extras = ["dev"]
 
 [[package]]
 name = "prompt-toolkit"
