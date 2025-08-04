@@ -1,4 +1,4 @@
 # Exclude intake directories until ready to work on them
 intake/
 .consult/
-.cursor/project_intelligence_cache/ 
+.cursor/project_intelligence_cache/

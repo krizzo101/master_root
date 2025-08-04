@@ -1,18 +1,18 @@
 {
   "metadata": {
-    "build_time_ms": 0.0064373016357421875,
+    "build_time_ms": 0.006198883056640625,
     "project_path": "/home/opsvi/master_root",
     "builder_type": "DefaultPackageBuilder",
-    "build_timestamp": "2025-08-04T20:08:30.000648",
+    "build_timestamp": "2025-08-04T20:27:07.228781",
     "package_type": "default",
     "collector_count": 5,
-    "total_data_size": 10219
+    "total_data_size": 10218
   },
   "collectors": [
     {
       "collector": "DevelopmentStateCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-04T16:08:27.081268",
+      "timestamp": "2025-08-04T16:27:04.188186",
       "data": {
         "git_repository": true,
         "current_branch": "AUTOSAVE",
@@ -24,8 +24,8 @@
         ],
         "has_uncommitted_changes": true,
         "staged_files_count": 1,
-        "unstaged_files_count": 8,
-        "untracked_files_count": 3,
+        "unstaged_files_count": 2,
+        "untracked_files_count": 0,
         "ci_status": {
           "has_ci": true,
           "ci_provider": "GitHub Actions",
@@ -41,9 +41,9 @@
           "recent_activity": false
         },
         "recent_activity": {
-          "last_commit_days_ago": 1,
-          "commits_last_week": 11,
-          "commits_last_month": 11,
+          "last_commit_days_ago": 0,
+          "commits_last_week": 12,
+          "commits_last_month": 12,
           "active_contributors": 0,
           "recent_branches": [
             "AUTOSAVE",
@@ -65,7 +65,7 @@
     {
       "collector": "ProjectPurposeCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-04T16:08:27.082294",
+      "timestamp": "2025-08-04T16:27:04.188866",
       "data": {
         "project_name": "OPSVI Master Workspace",
         "description": "[![CI](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml) A comprehensive monorepo for AI/ML Operations with built-in observability, RAG capabilities, and MCP integration. ```bash",
@@ -77,7 +77,7 @@
     {
       "collector": "ConstraintsCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-04T16:08:28.882166",
+      "timestamp": "2025-08-04T16:27:06.066433",
       "data": {
         "technical_constraints": {
           "performance_constraints": [
@@ -224,7 +224,7 @@
     {
       "collector": "WorkflowCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-04T16:08:28.895864",
+      "timestamp": "2025-08-04T16:27:06.079672",
       "data": {
         "branching_strategy": {
           "branching_model": "simple",
@@ -325,12 +325,12 @@
     {
       "collector": "AgentArchitectureCollector",
       "schema_version": "1.0.0",
-      "timestamp": 1754338110.0002365,
+      "timestamp": 1754339227.228325,
       "data": {
         "error": "Collector AgentArchitectureCollector failed: 'Attribute' object has no attribute 'id'"
       }
     }
   ],
-  "timestamp": "2025-08-04 20:08:30.000746",
+  "timestamp": "2025-08-04 20:27:07.228880",
   "schema_version": "1.1.0"
 }
