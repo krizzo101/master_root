@@ -130,6 +130,10 @@ dev:
     just lint
     just test
 
+# Run pre-commit hooks
+hooks:
+    pre-commit run --all-files
+
 # Check for security issues
 security:
     uv run bandit -r libs/ apps/

@@ -1,8 +1,7 @@
-import structlog
 import opsvi_core.logging as log_mod
 
 
-def test_get_logger_returns_logger():
+def test_get_logger_returns_logger() -> None:
     logger = log_mod.get_logger("unit-test")
     # structlog returns a BoundLoggerLazyProxy initially
     assert hasattr(logger, "info")

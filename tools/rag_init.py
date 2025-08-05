@@ -77,7 +77,9 @@ async def init_rag_system(collection_name: str = "global__demo") -> None:
             collection_name=collection_name,
             points=[
                 {"id": i, "vector": vector, "payload": {"text": text}}
-                for i, (text, vector) in enumerate(zip(sample_texts, sample_vectors, strict=False))
+                for i, (text, vector) in enumerate(
+                    zip(sample_texts, sample_vectors, strict=False)
+                )
             ],
         )
 
@@ -107,7 +109,7 @@ async def init_rag_system(collection_name: str = "global__demo") -> None:
         sys.exit(1)
 
 
-def main():
+def main() -> None:
     """Main entry point."""
     import argparse
 
