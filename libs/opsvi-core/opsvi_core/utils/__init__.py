@@ -11,11 +11,32 @@ from opsvi_foundation import (
     get_logger,
 )
 
+# Base utility functions
+from .base import (
+    AsyncLock,
+    RateLimiter,
+    chunk_list,
+    format_bytes,
+    format_duration,
+    gather_with_limit,
+    merge_dicts,
+    retry_on_failure,
+    safe_dict_get,
+    timing_decorator,
+)
+
 __all__ = [
-    "get_logger",
-    "ComponentError",
-    "BaseComponent",
-    "FoundationConfig",
+    # Base classes and utilities
+    "AsyncLock",
+    "RateLimiter",
+    "chunk_list",
+    "format_bytes",
+    "format_duration",
+    "gather_with_limit",
+    "merge_dicts",
+    "retry_on_failure",
+    "safe_dict_get",
+    "timing_decorator",
 ]
 
 __version__ = "1.0.0"

@@ -10,10 +10,26 @@ from opsvi_foundation import (
     get_logger,
 )
 
+# Base plugin infrastructure
+from .base import (
+    BasePlugin,
+    PluginError,
+    PluginLoader,
+    PluginManager,
+    PluginMetadata,
+    PluginRegistry,
+    PluginState,
+)
+
 __all__ = [
-    "get_logger",
-    "ComponentError",
-    "BaseComponent",
+    # Base classes
+    "BasePlugin",
+    "PluginError",
+    "PluginLoader",
+    "PluginManager",
+    "PluginMetadata",
+    "PluginRegistry",
+    "PluginState",
 ]
 
 __version__ = "1.0.0"

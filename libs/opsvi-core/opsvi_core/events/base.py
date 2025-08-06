@@ -8,9 +8,10 @@ from __future__ import annotations
 
 import uuid
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 from opsvi_foundation import BaseComponent, ComponentError, get_logger
 from pydantic import BaseModel
@@ -30,11 +31,11 @@ class Event:
 
     event_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     name: str = field(default="")
-    payload: Dict[str, Any] = field(default_factory=dict)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    payload: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.utcnow)
     source: str = field(default="unknown")
-    correlation_id: Optional[str] = None
+    correlation_id: str | None = None
     version: str = field(default="1.0")
 
 
@@ -43,7 +44,7 @@ class EventHandler(BaseModel):
 
     name: str
     handler: Callable[[Event], Any]
-    event_types: List[str] = []
+    event_types: list[str] = []
     priority: int = 0
     enabled: bool = True
 
@@ -60,8 +61,8 @@ class EventBus(BaseComponent, ABC):
 
     def __init__(self):
         super().__init__()
-        self._handlers: Dict[str, List[EventHandler]] = {}
-        self._event_history: List[Event] = []
+        self._handlers: dict[str, list[EventHandler]] = {}
+        self._event_history: list[Event] = []
 
     @abstractmethod
     async def publish(self, event: Event) -> None:
@@ -115,7 +116,7 @@ class EventFilter(BaseComponent):
 
     def __init__(self):
         super().__init__()
-        self._filters: Dict[str, Callable[[Event], bool]] = {}
+        self._filters: dict[str, Callable[[Event], bool]] = {}
 
     def add_filter(self, name: str, filter_func: Callable[[Event], bool]) -> None:
         """Add an event filter."""
@@ -132,7 +133,9 @@ class EventFilter(BaseComponent):
         for filter_name, filter_func in self._filters.items():
             try:
                 if not filter_func(event):
-                    logger.debug("Event %s filtered out by %s", event.event_id, filter_name)
+                    logger.debug(
+                        "Event %s filtered out by %s", event.event_id, filter_name
+                    )
                     return False
             except Exception as e:
                 logger.error("Filter %s failed: %s", filter_name, str(e))
@@ -147,10 +150,10 @@ class EventReplay(BaseComponent):
     def __init__(self, event_bus: EventBus):
         super().__init__()
         self.event_bus = event_bus
-        self._replay_buffer: List[Event] = []
+        self._replay_buffer: list[Event] = []
 
     async def replay_events(
-        self, event_types: Optional[List[str]] = None, since: Optional[datetime] = None
+        self, event_types: list[str] | None = None, since: datetime | None = None
     ) -> None:
         """Replay events from history."""
         events = self.event_bus._event_history
@@ -184,6 +187,8 @@ class EventReplay(BaseComponent):
             try:
                 await self.event_bus.publish(event)
             except Exception as e:
-                logger.error("Failed to replay buffered event %s: %s", event.event_id, str(e))
+                logger.error(
+                    "Failed to replay buffered event %s: %s", event.event_id, str(e)
+                )
 
         self._replay_buffer.clear()

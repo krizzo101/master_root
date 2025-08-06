@@ -5,25 +5,37 @@ Provides data serialization and format conversion capabilities.
 """
 
 from opsvi_foundation import (
+    BaseComponent,
+    ComponentError,
+    get_logger,
+)
+
+# Base serialization infrastructure
+from .base import (
+    BaseSerializer,
     DeserializationError,
+    JSONSerializer,
+    MessagePackSerializer,
+    PickleSerializer,
     SerializationError,
-    deserialize_json,
-    deserialize_msgpack,
-    deserialize_pickle,
-    serialize_json,
-    serialize_msgpack,
-    serialize_pickle,
+    SerializationFormat,
+    SerializationManager,
+    SerializerConfig,
+    YAMLSerializer,
 )
 
 __all__ = [
-    "SerializationError",
+    # Base classes
+    "BaseSerializer",
     "DeserializationError",
-    "serialize_json",
-    "deserialize_json",
-    "serialize_pickle",
-    "deserialize_pickle",
-    "serialize_msgpack",
-    "deserialize_msgpack",
+    "JSONSerializer",
+    "MessagePackSerializer",
+    "PickleSerializer",
+    "SerializationError",
+    "SerializationFormat",
+    "SerializationManager",
+    "SerializerConfig",
+    "YAMLSerializer",
 ]
 
 __version__ = "1.0.0"

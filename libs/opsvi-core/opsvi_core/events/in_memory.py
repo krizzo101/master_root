@@ -7,7 +7,8 @@ Provides a simple in-memory event bus for testing and single-node deployments.
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any, Callable, Dict, List
+from collections.abc import Callable
+from typing import Any
 
 from opsvi_foundation import get_logger
 
@@ -26,7 +27,7 @@ class InMemoryEventBus(EventBus):
     def __init__(self, broker: InMemoryBroker | None = None) -> None:
         super().__init__()
         self._broker = broker or InMemoryBroker()
-        self._handlers: Dict[str, List[Callable[[Event], Any]]] = defaultdict(list)
+        self._handlers: dict[str, list[Callable[[Event], Any]]] = defaultdict(list)
 
     async def _start(self) -> None:
         await self._broker.start()
@@ -47,6 +48,7 @@ class InMemoryEventBus(EventBus):
 
     async def subscribe(self, event_name: str, handler: Callable[[Event], Any]) -> None:
         """Subscribe to events of a specific type."""
+
         async def _callback(msg: Message) -> None:
             data = msg.payload
             event = Event(

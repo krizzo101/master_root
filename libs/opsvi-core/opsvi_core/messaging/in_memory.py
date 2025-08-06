@@ -9,7 +9,8 @@ from __future__ import annotations
 import asyncio
 import contextlib
 from collections import defaultdict
-from typing import Any, Callable, Dict, List
+from collections.abc import Callable
+from typing import Any
 
 from opsvi_foundation import get_logger, sanitize_input
 
@@ -23,10 +24,10 @@ class InMemoryBroker(MessageBroker):
 
     def __init__(self, *, encryption_key: bytes | None = None, max_queue: int = 1000):
         super().__init__(encryption_key=encryption_key)
-        self._queues: Dict[str, asyncio.Queue[Message]] = defaultdict(
+        self._queues: dict[str, asyncio.Queue[Message]] = defaultdict(
             lambda: asyncio.Queue(maxsize=max_queue)
         )
-        self._tasks: List[asyncio.Task[Any]] = []
+        self._tasks: list[asyncio.Task[Any]] = []
 
     async def _start(self) -> None:
         logger.info("InMemoryBroker started")

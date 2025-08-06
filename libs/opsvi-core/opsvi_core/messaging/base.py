@@ -9,13 +9,13 @@ from __future__ import annotations
 import asyncio
 import uuid
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, Optional
+from typing import Any
 
 from opsvi_foundation import BaseComponent, ComponentError, get_logger
-from pydantic import BaseModel, Field
 
 logger = get_logger(__name__)
 
@@ -39,10 +39,10 @@ class MessageRoute:
     """Message routing information."""
 
     source: str
-    destination: Optional[str] = None
-    topic: Optional[str] = None
-    exchange: Optional[str] = None
-    routing_key: Optional[str] = None
+    destination: str | None = None
+    topic: str | None = None
+    exchange: str | None = None
+    routing_key: str | None = None
 
 
 @dataclass
@@ -50,13 +50,13 @@ class Message:
     """Message structure for inter-agent communication."""
 
     message_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    payload: Dict[str, Any] = field(default_factory=dict)
+    payload: dict[str, Any] = field(default_factory=dict)
     route: MessageRoute = field(default_factory=lambda: MessageRoute(source="unknown"))
     qos: QoSLevel = QoSLevel.AT_LEAST_ONCE
     timestamp: datetime = field(default_factory=datetime.utcnow)
-    correlation_id: Optional[str] = None
-    reply_to: Optional[str] = None
-    headers: Dict[str, str] = field(default_factory=dict)
+    correlation_id: str | None = None
+    reply_to: str | None = None
+    headers: dict[str, str] = field(default_factory=dict)
     encrypted: bool = False
 
 
@@ -72,10 +72,10 @@ class MessageBroker(BaseComponent, ABC):
 
     RETRY_DELAY = 1.0  # seconds
 
-    def __init__(self, *, encryption_key: Optional[bytes] = None):
+    def __init__(self, *, encryption_key: bytes | None = None):
         super().__init__()
         self.encryption_key = encryption_key
-        self._subscribers: Dict[str, list[Callable]] = {}
+        self._subscribers: dict[str, list[Callable]] = {}
 
     @abstractmethod
     async def publish(self, message: Message) -> None:
@@ -88,7 +88,7 @@ class MessageBroker(BaseComponent, ABC):
         topic: str,
         *,
         callback: Callable[[Message], Any],
-        group: Optional[str] = None,
+        group: str | None = None,
     ) -> None:
         """Subscribe to messages on a topic."""
         pass
@@ -111,8 +111,8 @@ class MessageRouter(BaseComponent):
 
     def __init__(self):
         super().__init__()
-        self._routes: Dict[str, str] = {}
-        self._broker: Optional[MessageBroker] = None
+        self._routes: dict[str, str] = {}
+        self._broker: MessageBroker | None = None
 
     def set_broker(self, broker: MessageBroker) -> None:
         """Set the message broker for routing."""
@@ -128,12 +128,16 @@ class MessageRouter(BaseComponent):
         if not self._broker:
             raise MessagingError("No broker configured")
 
-        destination = self._routes.get(message.route.destination, message.route.destination)
+        destination = self._routes.get(
+            message.route.destination, message.route.destination
+        )
         if destination:
             message.route.destination = destination
             await self._broker.publish(message)
         else:
-            logger.warning("No route found for destination: %s", message.route.destination)
+            logger.warning(
+                "No route found for destination: %s", message.route.destination
+            )
 
 
 class MessageQueue(BaseComponent):
@@ -143,8 +147,8 @@ class MessageQueue(BaseComponent):
         super().__init__()
         self.broker = broker
         self.max_retries = max_retries
-        self._pending: Dict[str, Message] = {}
-        self._retry_counts: Dict[str, int] = {}
+        self._pending: dict[str, Message] = {}
+        self._retry_counts: dict[str, int] = {}
 
     async def enqueue(self, message: Message) -> None:
         """Add message to queue."""

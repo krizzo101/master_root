@@ -7,12 +7,21 @@ This document summarizes all the comprehensive knowledge updates that have been 
 ### Consolidation Status
 ✅ **Consolidation Complete**: All duplicate knowledge update files have been consolidated into single, comprehensive files per technology. Older `20250804.md` versions have been removed, ensuring only the latest `20250805.md` versions remain with the most current and accurate information.
 
+### Distribution Status
+✅ **Distribution Complete**: All knowledge files have been moved from the central `knowledge/` directory to their respective package directories for better context and reference:
+
+- **opsvi-foundation**: OpenTelemetry, Pydantic, pytest, Ruff, Structlog, uv
+- **opsvi-llm**: LangChain, OpenAI
+- **opsvi-agents**: CrewAI, LangGraph
+- **opsvi-rag**: Qdrant, Sentence Transformers
+- **knowledge/** (root): Summary document only
+
 ## Completed Knowledge Updates
 
 ### Core Development Tools
 
 #### 1. uv - Python Package Manager
-- **File**: `knowledge_update_uv_20250805.md`
+- **File**: `libs/opsvi-foundation/knowledge_update_uv_20250805.md`
 - **Status**: ✅ Complete (Enhanced)
 - **Coverage**:
   - Latest features and updates (2024-2025)
@@ -24,7 +33,7 @@ This document summarizes all the comprehensive knowledge updates that have been 
   - Advanced caching and performance optimization
 
 #### 2. Ruff - Python Linter and Formatter
-- **File**: `knowledge_update_ruff_20250805.md`
+- **File**: `libs/opsvi-foundation/knowledge_update_ruff_20250805.md`
 - **Status**: ✅ Complete
 - **Coverage**:
   - Latest Ruff features and performance improvements
@@ -35,7 +44,7 @@ This document summarizes all the comprehensive knowledge updates that have been 
   - Performance optimization techniques
 
 #### 3. pytest - Python Testing Framework
-- **File**: `knowledge_update_pytest_20250805.md`
+- **File**: `libs/opsvi-foundation/knowledge_update_pytest_20250805.md`
 - **Status**: ✅ Complete
 - **Coverage**:
   - Latest pytest features and async support
@@ -46,7 +55,7 @@ This document summarizes all the comprehensive knowledge updates that have been 
   - CI/CD integration examples
 
 #### 4. OpenTelemetry - Observability Framework
-- **File**: `knowledge_update_opentelemetry_20250805.md`
+- **File**: `libs/opsvi-foundation/knowledge_update_opentelemetry_20250805.md`
 - **Status**: ✅ Complete
 - **Coverage**:
   - Latest OpenTelemetry features and standards
@@ -59,7 +68,7 @@ This document summarizes all the comprehensive knowledge updates that have been 
 ### AI/ML Frameworks
 
 #### 5. LangChain - LLM Application Framework
-- **File**: `knowledge_update_langchain_20250805.md`
+- **File**: `libs/opsvi-llm/knowledge_update_langchain_20250805.md`
 - **Status**: ✅ Complete (Enhanced)
 - **Coverage**:
   - Latest LangChain features and LCEL (LangChain Expression Language)
@@ -71,7 +80,7 @@ This document summarizes all the comprehensive knowledge updates that have been 
   - Modular architecture and shared library patterns
 
 #### 6. LangGraph - AI Workflow Orchestration
-- **File**: `knowledge_update_langgraph_20250805.md`
+- **File**: `libs/opsvi-agents/knowledge_update_langgraph_20250805.md`
 - **Status**: ✅ Complete (Enhanced)
 - **Coverage**:
   - Latest LangGraph features and graph-based architecture
@@ -83,7 +92,7 @@ This document summarizes all the comprehensive knowledge updates that have been 
   - Enterprise features and monitoring
 
 #### 7. CrewAI - Multi-Agent Framework
-- **File**: `knowledge_update_crewai_20250805.md`
+- **File**: `libs/opsvi-agents/knowledge_update_crewai_20250805.md`
 - **Status**: ✅ Complete (Enhanced)
 - **Coverage**:
   - Latest CrewAI features and role-based architecture
@@ -95,7 +104,7 @@ This document summarizes all the comprehensive knowledge updates that have been 
   - Advanced agent patterns and workflows
 
 #### 8. OpenAI API - AI Model Integration
-- **File**: `knowledge_update_openai_20250805.md`
+- **File**: `libs/opsvi-llm/knowledge_update_openai_20250805.md`
 - **Status**: ✅ Complete (Enhanced)
 - **Coverage**:
   - Latest OpenAI API features (GPT-4.1, O3, O4 series)
@@ -109,7 +118,7 @@ This document summarizes all the comprehensive knowledge updates that have been 
 ### Data & Storage
 
 #### 9. Sentence Transformers - Text Embeddings
-- **File**: `knowledge_update_sentence_transformers_20250805.md`
+- **File**: `libs/opsvi-rag/knowledge_update_sentence_transformers_20250805.md`
 - **Status**: ✅ Complete (Enhanced)
 - **Coverage**:
   - Latest Sentence Transformers features and multi-modal support
@@ -121,7 +130,7 @@ This document summarizes all the comprehensive knowledge updates that have been 
   - Advanced search patterns and optimization
 
 #### 10. Qdrant - Vector Database
-- **File**: `knowledge_update_qdrant_20250805.md`
+- **File**: `libs/opsvi-rag/knowledge_update_qdrant_20250805.md`
 - **Status**: ✅ Complete (Enhanced)
 - **Coverage**:
   - Latest Qdrant features and performance improvements
@@ -135,7 +144,7 @@ This document summarizes all the comprehensive knowledge updates that have been 
 ### Data Validation & Processing
 
 #### 11. Pydantic - Data Validation
-- **File**: `knowledge_update_pydantic_20250805.md`
+- **File**: `libs/opsvi-foundation/knowledge_update_pydantic_20250805.md`
 - **Status**: ✅ Complete (Enhanced)
 - **Coverage**:
   - Latest Pydantic v2.x features and performance improvements
@@ -147,7 +156,7 @@ This document summarizes all the comprehensive knowledge updates that have been 
   - Configuration management and error handling
 
 #### 12. Structlog - Structured Logging
-- **File**: `knowledge_update_structlog_20250805.md`
+- **File**: `libs/opsvi-foundation/knowledge_update_structlog_20250805.md`
 - **Status**: ✅ Complete (Updated 2025-08-05)
 - **Coverage**:
   - Latest Structlog 2025 features and structured logging patterns

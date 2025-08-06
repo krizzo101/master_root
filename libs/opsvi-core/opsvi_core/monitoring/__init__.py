@@ -10,10 +10,32 @@ from opsvi_foundation import (
     get_logger,
 )
 
+# Base monitoring infrastructure
+from .base import (
+    AlertManager,
+    HealthCheck,
+    HealthChecker,
+    HealthResult,
+    HealthStatus,
+    Metric,
+    MetricsCollector,
+    MetricType,
+    MonitoringError,
+    MonitoringSystem,
+)
+
 __all__ = [
-    "get_logger",
-    "ComponentError",
-    "BaseComponent",
+    # Base classes
+    "AlertManager",
+    "HealthCheck",
+    "HealthChecker",
+    "HealthResult",
+    "HealthStatus",
+    "Metric",
+    "MetricsCollector",
+    "MetricType",
+    "MonitoringError",
+    "MonitoringSystem",
 ]
 
 __version__ = "1.0.0"

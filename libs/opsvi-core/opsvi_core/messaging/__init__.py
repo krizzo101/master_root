@@ -27,7 +27,7 @@ from .in_memory import InMemoryBroker
 __all__ = [
     # Base classes
     "Message",
-    "MessageBroker", 
+    "MessageBroker",
     "MessageQueue",
     "MessageRoute",
     "MessageRouter",

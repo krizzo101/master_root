@@ -10,10 +10,24 @@ from opsvi_foundation import (
     get_logger,
 )
 
+# Base storage infrastructure
+from .base import (
+    FileStorage,
+    KeyValueStore,
+    StorageBackend,
+    StorageConfig,
+    StorageError,
+    StorageManager,
+)
+
 __all__ = [
-    "get_logger",
-    "ComponentError",
-    "BaseComponent",
+    # Base classes
+    "FileStorage",
+    "KeyValueStore",
+    "StorageBackend",
+    "StorageConfig",
+    "StorageError",
+    "StorageManager",
 ]
 
 __version__ = "1.0.0"

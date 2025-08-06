@@ -18,16 +18,16 @@ from .base import (
     APIError,
     APIServer,
     JWTAuthenticator,
+    RateLimiter,
     RateLimitExceeded,
     RateLimitMiddleware,
-    RateLimiter,
 )
 
 __all__ = [
     # Base classes
     "APIAuthenticator",
     "APIConfig",
-    "APIEndpoint", 
+    "APIEndpoint",
     "APIError",
     "APIServer",
     "JWTAuthenticator",

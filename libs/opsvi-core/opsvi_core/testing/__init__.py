@@ -10,10 +10,22 @@ from opsvi_foundation import (
     get_logger,
 )
 
+# Base testing infrastructure
+from .base import (
+    MockServices,
+    PerformanceTester,
+    TestCase,
+    TestFixtures,
+    TestHelpers,
+)
+
 __all__ = [
-    "get_logger",
-    "ComponentError",
-    "BaseComponent",
+    # Base classes
+    "MockServices",
+    "PerformanceTester",
+    "TestCase",
+    "TestFixtures",
+    "TestHelpers",
 ]
 
 __version__ = "1.0.0"

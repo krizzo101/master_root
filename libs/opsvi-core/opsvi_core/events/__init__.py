@@ -27,7 +27,7 @@ __all__ = [
     # Base classes
     "Event",
     "EventBus",
-    "EventError", 
+    "EventError",
     "EventFilter",
     "EventHandler",
     "EventReplay",

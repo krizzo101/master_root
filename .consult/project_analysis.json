@@ -1,18 +1,18 @@
 {
   "metadata": {
-    "build_time_ms": 0.0069141387939453125,
+    "build_time_ms": 0.00667572021484375,
     "project_path": "/home/opsvi/master_root",
     "builder_type": "DefaultPackageBuilder",
-    "build_timestamp": "2025-08-06T14:33:56.569857",
+    "build_timestamp": "2025-08-06T16:14:35.645493",
     "package_type": "default",
     "collector_count": 5,
-    "total_data_size": 70150
+    "total_data_size": 74669
   },
   "collectors": [
     {
       "collector": "DevelopmentStateCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-06T10:33:55.300964",
+      "timestamp": "2025-08-06T12:14:34.309031",
       "data": {
         "git_repository": true,
         "current_branch": "feature/libs-foundation",
@@ -27,8 +27,8 @@
         ],
         "has_uncommitted_changes": true,
         "staged_files_count": 1,
-        "unstaged_files_count": 3,
-        "untracked_files_count": 0,
+        "unstaged_files_count": 13,
+        "untracked_files_count": 6,
         "ci_status": {
           "has_ci": true,
           "ci_provider": "GitHub Actions",
@@ -45,8 +45,8 @@
         },
         "recent_activity": {
           "last_commit_days_ago": 0,
-          "commits_last_week": 27,
-          "commits_last_month": 27,
+          "commits_last_week": 28,
+          "commits_last_month": 28,
           "active_contributors": 0,
           "recent_branches": [
             "AUTOSAVE",
@@ -63,7 +63,7 @@
           "has_docker": false,
           "has_requirements": false,
           "main_language": "Python",
-          "file_count": 267
+          "file_count": 280
         },
         "development_state": "active_development"
       }
@@ -71,7 +71,7 @@
     {
       "collector": "ProjectPurposeCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-06T10:33:55.302082",
+      "timestamp": "2025-08-06T12:14:34.317155",
       "data": {
         "project_name": "OPSVI Master Workspace",
         "description": "[![CI](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml) A comprehensive monorepo for AI/ML Operations with built-in observability, RAG capabilities, and MCP integration. **Now featuring a complete foundational library ecosystem for production AI applications.** - \u2705 **Phase 1**: Linting & Type Checking (ruff, black, mypy)",
@@ -83,7 +83,7 @@
     {
       "collector": "ConstraintsCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-06T10:33:55.663552",
+      "timestamp": "2025-08-06T12:14:34.705075",
       "data": {
         "technical_constraints": {
           "performance_constraints": [
@@ -198,7 +198,7 @@
     {
       "collector": "WorkflowCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-06T10:33:55.691306",
+      "timestamp": "2025-08-06T12:14:34.729428",
       "data": {
         "branching_strategy": {
           "branching_model": "simple",
@@ -303,7 +303,7 @@
     {
       "collector": "AgentArchitectureCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-06T10:33:56.569127",
+      "timestamp": "2025-08-06T12:14:35.644963",
       "data": {
         "agent_classes": [
           {
@@ -981,6 +981,71 @@
             "agent_type": "general"
           },
           {
+            "name": "APIError",
+            "file_path": "libs/opsvi-core/opsvi_core/api/base.py",
+            "lineno": 24,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when API operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "RateLimitExceeded",
+            "file_path": "libs/opsvi-core/opsvi_core/api/base.py",
+            "lineno": 30,
+            "bases": [
+              "APIError"
+            ],
+            "methods": [],
+            "docstring": "Raised when rate limit is exceeded.",
+            "agent_type": "general"
+          },
+          {
+            "name": "APIServer",
+            "file_path": "libs/opsvi-core/opsvi_core/api/base.py",
+            "lineno": 185,
+            "bases": [
+              "BaseComponent"
+            ],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 188,
+                "docstring": null
+              },
+              {
+                "name": "_setup_middleware",
+                "lineno": 205,
+                "docstring": "Setup middleware."
+              },
+              {
+                "name": "_setup_routes",
+                "lineno": 219,
+                "docstring": "Setup default routes."
+              },
+              {
+                "name": "add_endpoint",
+                "lineno": 232,
+                "docstring": "Add an endpoint to the API."
+              }
+            ],
+            "docstring": "Main API server implementation.",
+            "agent_type": "general"
+          },
+          {
+            "name": "CacheError",
+            "file_path": "libs/opsvi-core/opsvi_core/caching/base.py",
+            "lineno": 17,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when cache operations fail.",
+            "agent_type": "general"
+          },
+          {
             "name": "AgentError",
             "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
             "lineno": 16,
@@ -989,6 +1054,150 @@
             ],
             "methods": [],
             "docstring": "Agent-related errors.",
+            "agent_type": "general"
+          },
+          {
+            "name": "EventError",
+            "file_path": "libs/opsvi-core/opsvi_core/events/base.py",
+            "lineno": 22,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when event operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "MessagingError",
+            "file_path": "libs/opsvi-core/opsvi_core/messaging/base.py",
+            "lineno": 23,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when messaging operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "Message",
+            "file_path": "libs/opsvi-core/opsvi_core/messaging/base.py",
+            "lineno": 49,
+            "bases": [],
+            "methods": [],
+            "docstring": "Message structure for inter-agent communication.",
+            "agent_type": "general"
+          },
+          {
+            "name": "MonitoringError",
+            "file_path": "libs/opsvi-core/opsvi_core/monitoring/base.py",
+            "lineno": 24,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when monitoring operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "MetricsCollector",
+            "file_path": "libs/opsvi-core/opsvi_core/monitoring/base.py",
+            "lineno": 207,
+            "bases": [
+              "BaseComponent"
+            ],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 210,
+                "docstring": null
+              },
+              {
+                "name": "increment_counter",
+                "lineno": 216,
+                "docstring": "Increment a counter metric."
+              },
+              {
+                "name": "set_gauge",
+                "lineno": 230,
+                "docstring": "Set a gauge metric value."
+              },
+              {
+                "name": "record_histogram",
+                "lineno": 244,
+                "docstring": "Record a histogram metric value."
+              },
+              {
+                "name": "_get_metric_key",
+                "lineno": 255,
+                "docstring": "Generate unique key for metric with labels."
+              },
+              {
+                "name": "_store_metric",
+                "lineno": 260,
+                "docstring": "Store metric in memory."
+              },
+              {
+                "name": "get_metrics",
+                "lineno": 271,
+                "docstring": "Get collected metrics."
+              },
+              {
+                "name": "get_current_values",
+                "lineno": 277,
+                "docstring": "Get current values for counters and gauges."
+              }
+            ],
+            "docstring": "Metrics collection and management.",
+            "agent_type": "collector"
+          },
+          {
+            "name": "MonitoringSystem",
+            "file_path": "libs/opsvi-core/opsvi_core/monitoring/base.py",
+            "lineno": 325,
+            "bases": [
+              "BaseComponent"
+            ],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 328,
+                "docstring": null
+              }
+            ],
+            "docstring": "Main monitoring system coordinator.",
+            "agent_type": "coordinator"
+          },
+          {
+            "name": "PluginError",
+            "file_path": "libs/opsvi-core/opsvi_core/plugins/base.py",
+            "lineno": 25,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when plugin operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "PluginManager",
+            "file_path": "libs/opsvi-core/opsvi_core/plugins/base.py",
+            "lineno": 306,
+            "bases": [
+              "BaseComponent"
+            ],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 309,
+                "docstring": null
+              },
+              {
+                "name": "get_plugin_status",
+                "lineno": 348,
+                "docstring": "Get status of all plugins."
+              }
+            ],
+            "docstring": "Main plugin management system.",
             "agent_type": "general"
           },
           {
@@ -1037,6 +1246,39 @@
               }
             ],
             "docstring": "Raised when all retry attempts are exhausted.",
+            "agent_type": "general"
+          },
+          {
+            "name": "SerializationError",
+            "file_path": "libs/opsvi-core/opsvi_core/serialization/base.py",
+            "lineno": 20,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when serialization operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "DeserializationError",
+            "file_path": "libs/opsvi-core/opsvi_core/serialization/base.py",
+            "lineno": 26,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when deserialization operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "StorageError",
+            "file_path": "libs/opsvi-core/opsvi_core/storage/base.py",
+            "lineno": 18,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when storage operations fail.",
             "agent_type": "general"
           },
           {
@@ -3130,10 +3372,10 @@
             "agent_type": "general"
           }
         ],
-        "agent_count": 167,
+        "agent_count": 182,
         "communication": {
-          "has_messaging": false,
-          "has_event_system": false,
+          "has_messaging": true,
+          "has_event_system": true,
           "has_rpc": false,
           "has_grpc": false,
           "has_websockets": false,
@@ -3170,14 +3412,14 @@
         },
         "architecture_pattern": "centralized_multi_agent",
         "agent_types": [
+          "coordinator",
           "collector",
-          "general",
-          "coordinator"
+          "general"
         ],
         "has_multi_agent_system": true
       }
     }
   ],
-  "timestamp": "2025-08-06 14:33:56.570444",
+  "timestamp": "2025-08-06 16:14:35.646146",
   "schema_version": "1.1.0"
 }

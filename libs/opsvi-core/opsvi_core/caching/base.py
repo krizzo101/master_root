@@ -7,7 +7,7 @@ Provides cache backend interface and common caching utilities.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 from opsvi_foundation import BaseComponent, ComponentError, get_logger
 
@@ -24,7 +24,7 @@ class CacheBackend(BaseComponent, ABC):
     """Abstract cache backend interface."""
 
     @abstractmethod
-    async def get(self, key: str) -> Optional[Any]:
+    async def get(self, key: str) -> Any | None:
         """Get a value from cache."""
         pass
 
@@ -66,12 +66,14 @@ class CacheManager(BaseComponent):
         """Get a cache backend by name."""
         return self._backends.get(name, self.default_backend)
 
-    async def get(self, key: str, backend: str = "default") -> Optional[Any]:
+    async def get(self, key: str, backend: str = "default") -> Any | None:
         """Get a value from cache."""
         cache = self.get_backend(backend)
         return await cache.get(key)
 
-    async def set(self, key: str, value: Any, *, ttl: int = 60, backend: str = "default") -> None:
+    async def set(
+        self, key: str, value: Any, *, ttl: int = 60, backend: str = "default"
+    ) -> None:
         """Set a value in cache."""
         cache = self.get_backend(backend)
         await cache.set(key, value, ttl=ttl)
