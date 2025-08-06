@@ -1,7 +1,7 @@
 """
 Messaging module for opsvi-core.
 
-Provides message bus system, handlers, and transport capabilities.
+Provides message broker implementations, routing, and queue management.
 """
 
 from opsvi_foundation import (
@@ -10,10 +10,31 @@ from opsvi_foundation import (
     get_logger,
 )
 
+# Base messaging infrastructure
+from .base import (
+    Message,
+    MessageBroker,
+    MessageQueue,
+    MessageRoute,
+    MessageRouter,
+    MessagingError,
+    QoSLevel,
+)
+
+# Message broker implementations
+from .in_memory import InMemoryBroker
+
 __all__ = [
-    "get_logger",
-    "ComponentError",
-    "BaseComponent",
+    # Base classes
+    "Message",
+    "MessageBroker", 
+    "MessageQueue",
+    "MessageRoute",
+    "MessageRouter",
+    "MessagingError",
+    "QoSLevel",
+    # Implementations
+    "InMemoryBroker",
 ]
 
 __version__ = "1.0.0"

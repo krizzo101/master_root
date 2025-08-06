@@ -44,33 +44,33 @@ from .base import (
 
 class {class_name}Config(ProcessorConfig):
     """Configuration for {module_name} processor."""
-    
+
     processor_type: ProcessorType = Field(default=ProcessorType.{processor_type}, description="Processor type")
     # Add specific configuration options here
 
 
 class {class_name}(BaseProcessor):
     """{module_name} document processor."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} processor."""
         super().__init__(config)
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def can_process(self, file_path: Path) -> bool:
         """Check if file can be processed."""
         return file_path.suffix.lower() in {file_extensions}
-    
+
     def process(self, file_path: Path) -> ProcessingResult:
         """Process {module_name} file."""
         start_time = time.time()
-        
+
         try:
             # TODO: Implement {module_name} processing logic
             content = ""
             metadata = {{}}
-            
+
             # Create processing metadata
             processing_metadata = ProcessingMetadata(
                 file_size=file_path.stat().st_size,
@@ -81,7 +81,7 @@ class {class_name}(BaseProcessor):
                 image_count=0,
                 metadata_count=len(metadata),
             )
-            
+
             return ProcessingResult(
                 content=content,
                 metadata=metadata,
@@ -89,7 +89,7 @@ class {class_name}(BaseProcessor):
                 status=ProcessingStatus.SUCCESS,
                 error_message=None,
             )
-            
+
         except Exception as e:
             self.logger.error(f"Error processing {module_name} file {{file_path}}: {{e}}")
             return ProcessingResult(
@@ -138,7 +138,7 @@ class Chunk:
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} chunking."""
-    
+
     chunk_size: int = Field(default=1000, description="Target chunk size in characters")
     overlap_size: int = Field(default=200, description="Overlap between chunks")
     # Add specific configuration options here
@@ -146,13 +146,13 @@ class {class_name}Config(BaseModel):
 
 class {class_name}(BaseComponent):
     """{module_name} chunking strategy."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} chunker."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def chunk(self, text: str) -> List[Chunk]:
         """Chunk the given text."""
         # TODO: Implement {module_name} chunking logic
@@ -188,20 +188,20 @@ class SearchResult:
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} search."""
-    
+
     max_results: int = Field(default=10, description="Maximum number of results")
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} search implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} search."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def search(self, query: str, **kwargs) -> List[SearchResult]:
         """Search for content matching the query."""
         # TODO: Implement {module_name} search logic
@@ -229,29 +229,29 @@ class StorageError(ComponentError):
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} storage."""
-    
+
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} storage implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} storage."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def store(self, key: str, data: Any) -> bool:
         """Store data with the given key."""
         # TODO: Implement {module_name} storage logic
         return True
-    
+
     def retrieve(self, key: str) -> Optional[Any]:
         """Retrieve data with the given key."""
         # TODO: Implement {module_name} retrieval logic
         return None
-    
+
     def delete(self, key: str) -> bool:
         """Delete data with the given key."""
         # TODO: Implement {module_name} deletion logic

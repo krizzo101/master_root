@@ -47,20 +47,20 @@ class RetrievalResult:
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} retrieval."""
-    
+
     max_results: int = Field(default=10, description="Maximum number of results")
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} retrieval implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} retrieval."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def retrieve(self, query: str, **kwargs) -> List[RetrievalResult]:
         """Retrieve content matching the query."""
         # TODO: Implement {module_name} retrieval logic
@@ -88,29 +88,29 @@ class IndexingError(ComponentError):
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} indexing."""
-    
+
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} indexing implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} indexing."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def index(self, documents: List[Dict[str, Any]]) -> bool:
         """Index the given documents."""
         # TODO: Implement {module_name} indexing logic
         return True
-    
+
     def search(self, query: str, **kwargs) -> List[Dict[str, Any]]:
         """Search the index."""
         # TODO: Implement {module_name} search logic
         return []
-    
+
     def delete(self, document_ids: List[str]) -> bool:
         """Delete documents from index."""
         # TODO: Implement {module_name} deletion logic
@@ -136,19 +136,19 @@ class PipelineError(ComponentError):
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} pipeline."""
-    
+
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} pipeline implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} pipeline."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def execute(self, input_data: Any) -> Any:
         """Execute the pipeline."""
         # TODO: Implement {module_name} pipeline logic
@@ -174,19 +174,19 @@ class AnalyticsError(ComponentError):
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} analytics."""
-    
+
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} analytics implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} analytics."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def analyze(self, data: Any) -> Dict[str, Any]:
         """Analyze the given data."""
         # TODO: Implement {module_name} analytics logic
@@ -212,19 +212,19 @@ class QualityError(ComponentError):
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} quality assessment."""
-    
+
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} quality assessment implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} quality assessment."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def assess(self, content: Any) -> Dict[str, Any]:
         """Assess the quality of the given content."""
         # TODO: Implement {module_name} quality assessment logic
@@ -250,35 +250,35 @@ class CacheError(ComponentError):
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} cache."""
-    
+
     ttl: int = Field(default=3600, description="Time to live in seconds")
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} cache implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} cache."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def get(self, key: str) -> Optional[Any]:
         """Get value from cache."""
         # TODO: Implement {module_name} cache get logic
         return None
-    
+
     def set(self, key: str, value: Any, ttl: Optional[int] = None) -> bool:
         """Set value in cache."""
         # TODO: Implement {module_name} cache set logic
         return True
-    
+
     def delete(self, key: str) -> bool:
         """Delete value from cache."""
         # TODO: Implement {module_name} cache delete logic
         return True
-    
+
     def clear(self) -> bool:
         """Clear all cache entries."""
         # TODO: Implement {module_name} cache clear logic

@@ -1,16 +1,32 @@
 """
 Caching module for opsvi-core.
 
-Provides application-specific caching capabilities.
+Provides cache backend implementations and cache management utilities.
 """
 
-from opsvi_foundation import Cache, CacheError, CacheKeyError, CacheValueError
+from opsvi_foundation import (
+    BaseComponent,
+    ComponentError,
+    get_logger,
+)
+
+# Base caching infrastructure
+from .base import (
+    CacheBackend,
+    CacheError,
+    CacheManager,
+)
+
+# Cache implementations
+from .in_memory import InMemoryCache
 
 __all__ = [
-    "Cache",
+    # Base classes
+    "CacheBackend",
     "CacheError",
-    "CacheKeyError",
-    "CacheValueError",
+    "CacheManager",
+    # Implementations
+    "InMemoryCache",
 ]
 
 __version__ = "1.0.0"

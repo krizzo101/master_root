@@ -47,19 +47,19 @@ class AgentState:
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name}."""
-    
+
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name}."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def execute(self, input_data: Any) -> Any:
         """Execute the {module_name}."""
         # TODO: Implement {module_name} logic
@@ -85,19 +85,19 @@ class WorkflowError(ComponentError):
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} workflow."""
-    
+
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} workflow implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} workflow."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def execute(self, input_data: Any) -> Any:
         """Execute the workflow."""
         # TODO: Implement {module_name} workflow logic
@@ -123,19 +123,19 @@ class OrchestrationError(ComponentError):
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} orchestration."""
-    
+
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} orchestration implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} orchestration."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def orchestrate(self, tasks: List[Any]) -> Any:
         """Orchestrate the given tasks."""
         # TODO: Implement {module_name} orchestration logic
@@ -161,29 +161,29 @@ class MemoryError(ComponentError):
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} memory."""
-    
+
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} memory implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} memory."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def store(self, key: str, data: Any) -> bool:
         """Store data in memory."""
         # TODO: Implement {module_name} memory store logic
         return True
-    
+
     def retrieve(self, key: str) -> Optional[Any]:
         """Retrieve data from memory."""
         # TODO: Implement {module_name} memory retrieve logic
         return None
-    
+
     def clear(self) -> bool:
         """Clear memory."""
         # TODO: Implement {module_name} memory clear logic
@@ -209,24 +209,24 @@ class CommunicationError(ComponentError):
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} communication."""
-    
+
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} communication implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} communication."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def send(self, message: Any, target: str) -> bool:
         """Send a message."""
         # TODO: Implement {module_name} communication send logic
         return True
-    
+
     def receive(self, source: str) -> Optional[Any]:
         """Receive a message."""
         # TODO: Implement {module_name} communication receive logic
@@ -252,24 +252,24 @@ class PlanningError(ComponentError):
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} planning."""
-    
+
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} planning implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} planning."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def plan(self, goal: str) -> List[str]:
         """Create a plan for the given goal."""
         # TODO: Implement {module_name} planning logic
         return []
-    
+
     def execute_plan(self, plan: List[str]) -> bool:
         """Execute the given plan."""
         # TODO: Implement {module_name} plan execution logic
@@ -295,24 +295,24 @@ class LearningError(ComponentError):
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} learning."""
-    
+
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} learning implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} learning."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def learn(self, data: Any) -> bool:
         """Learn from the given data."""
         # TODO: Implement {module_name} learning logic
         return True
-    
+
     def predict(self, input_data: Any) -> Any:
         """Make a prediction."""
         # TODO: Implement {module_name} prediction logic
@@ -338,24 +338,24 @@ class TestingError(ComponentError):
 
 class {class_name}Config(BaseModel):
     """Configuration for {module_name} testing."""
-    
+
     # Add specific configuration options here
 
 
 class {class_name}(BaseComponent):
     """{module_name} testing implementation."""
-    
+
     def __init__(self, config: {class_name}Config):
         """Initialize {module_name} testing."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
-    
+
     def test(self, component: Any) -> Dict[str, Any]:
         """Test the given component."""
         # TODO: Implement {module_name} testing logic
         return {{"status": "passed"}}
-    
+
     def simulate(self, scenario: str) -> Dict[str, Any]:
         """Simulate the given scenario."""
         # TODO: Implement {module_name} simulation logic

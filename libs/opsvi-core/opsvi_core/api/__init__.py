@@ -1,7 +1,7 @@
 """
 API module for opsvi-core.
 
-Provides API framework, routes, middleware, and documentation capabilities.
+Provides FastAPI-based REST API framework with authentication, rate limiting, and documentation.
 """
 
 from opsvi_foundation import (
@@ -10,10 +10,30 @@ from opsvi_foundation import (
     get_logger,
 )
 
+# Base API infrastructure
+from .base import (
+    APIAuthenticator,
+    APIConfig,
+    APIEndpoint,
+    APIError,
+    APIServer,
+    JWTAuthenticator,
+    RateLimitExceeded,
+    RateLimitMiddleware,
+    RateLimiter,
+)
+
 __all__ = [
-    "get_logger",
-    "ComponentError",
-    "BaseComponent",
+    # Base classes
+    "APIAuthenticator",
+    "APIConfig",
+    "APIEndpoint", 
+    "APIError",
+    "APIServer",
+    "JWTAuthenticator",
+    "RateLimitExceeded",
+    "RateLimitMiddleware",
+    "RateLimiter",
 ]
 
 __version__ = "1.0.0"
