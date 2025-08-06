@@ -1,7 +1,7 @@
 """
-ingestion pipeline for opsvi-rag.
+retrieval pipeline for opsvi-rag.
 
-Document ingestion pipeline
+Retrieval pipeline
 """
 
 from typing import Any
@@ -16,22 +16,22 @@ class PipelineError(ComponentError):
     pass
 
 
-class IngestionPipelineConfig(BaseModel):
-    """Configuration for ingestion pipeline."""
+class RetrievalPipelineConfig(BaseModel):
+    """Configuration for retrieval pipeline."""
 
     # Add specific configuration options here
 
 
-class IngestionPipeline(BaseComponent):
-    """ingestion pipeline implementation."""
+class RetrievalPipeline(BaseComponent):
+    """retrieval pipeline implementation."""
 
-    def __init__(self, config: IngestionPipelineConfig):
-        """Initialize ingestion pipeline."""
+    def __init__(self, config: RetrievalPipelineConfig):
+        """Initialize retrieval pipeline."""
         super().__init__()
         self.config = config
         self.logger = get_logger(__name__)
 
     def execute(self, input_data: Any) -> Any:
         """Execute the pipeline."""
-        # TODO: Implement ingestion pipeline logic
+        # TODO: Implement retrieval pipeline logic
         return input_data
