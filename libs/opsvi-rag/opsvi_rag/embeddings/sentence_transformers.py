@@ -202,8 +202,6 @@ class SentenceTransformerEmbeddingProvider(BaseEmbeddingProvider):
     def list_available_models(cls) -> list[str]:
         """List available Sentence Transformers models (requires internet connection)."""
         try:
-            from sentence_transformers import SentenceTransformer
-
             # This would require additional logic to fetch from HuggingFace
             # For now, return the commonly used models
             return cls.get_supported_models()

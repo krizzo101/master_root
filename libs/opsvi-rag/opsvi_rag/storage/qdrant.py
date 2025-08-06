@@ -394,7 +394,7 @@ class QdrantStore(BaseVectorStore):
         conditions = []
 
         for key, value in filter_metadata.items():
-            if isinstance(value, (str, int, float, bool)):
+            if isinstance(value, str | int | float | bool):
                 conditions.append(
                     rest.FieldCondition(
                         key=f"metadata.{key}",

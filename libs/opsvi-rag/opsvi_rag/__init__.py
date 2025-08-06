@@ -18,9 +18,28 @@ from opsvi_foundation import (
     get_logger,
 )
 
+# Import analytics
+from .analytics.performance import (
+    PerformanceConfig,
+    PerformanceMonitor,
+    profile_datastore_operation,
+    profile_search,
+)
+
 # Import domain-specific components
 from .core import RAGConfig, config
 from .core.exceptions import RAGConfigurationError, RAGError, RAGValidationError
+
+# Import enhanced datastore components
+from .datastores import (
+    BaseDatastore,
+    ChromaDBConfig,
+    ChromaDBStore,
+    Neo4jConfig,
+    Neo4jStore,
+    SQLiteConfig,
+    SQLiteStore,
+)
 
 # Import embedding components
 from .embeddings import (
@@ -44,6 +63,14 @@ from .storage import (
     QdrantStore,
     SearchResult,
     VectorStoreConfig,
+)
+
+# Import utilities
+from .utils.datastore_factory import (
+    DatastoreFactory,
+    create_chromadb_store,
+    create_neo4j_store,
+    create_sqlite_store,
 )
 
 __all__ = [
@@ -77,4 +104,22 @@ __all__ = [
     "QdrantConfig",
     "InMemoryStore",
     "InMemoryConfig",
+    # Enhanced datastore exports
+    "BaseDatastore",
+    "Neo4jStore",
+    "Neo4jConfig",
+    "ChromaDBStore",
+    "ChromaDBConfig",
+    "SQLiteStore",
+    "SQLiteConfig",
+    # Utility exports
+    "DatastoreFactory",
+    "create_neo4j_store",
+    "create_chromadb_store",
+    "create_sqlite_store",
+    # Analytics exports
+    "PerformanceMonitor",
+    "PerformanceConfig",
+    "profile_search",
+    "profile_datastore_operation",
 ]
