@@ -22,6 +22,20 @@ from opsvi_foundation import (
 from .core import CoreConfig, config
 from .core.exceptions import AgentError, CoreError, WorkflowError
 
+# Import resilience components
+from .resilience import (
+    CircuitBreaker as CoreCircuitBreaker,
+)
+from .resilience import (
+    CircuitBreakerConfig,
+    RetryConfig,
+    RetryManager,
+)
+
+# Import security components
+from .security import AuthConfig, SecurityError
+from .security import AuthManager as CoreAuthManager
+
 __all__ = [
     # Foundation exports
     "FoundationConfig",
@@ -35,4 +49,13 @@ __all__ = [
     "CoreError",
     "AgentError",
     "WorkflowError",
+    # Security exports
+    "AuthConfig",
+    "CoreAuthManager",
+    "SecurityError",
+    # Resilience exports
+    "CoreCircuitBreaker",
+    "CircuitBreakerConfig",
+    "RetryConfig",
+    "RetryManager",
 ]

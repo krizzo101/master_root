@@ -80,13 +80,13 @@ class CircuitBreaker:
             await self._on_failure()
             raise TimeoutError(
                 f"Function timed out after {self.config.timeout} seconds"
-            )
+            ) from None
         except self.config.expected_exception:
             await self._on_failure()
             raise
         except Exception as e:
             await self._on_failure()
-            raise ExternalServiceError(f"Unexpected error: {e}")
+            raise ExternalServiceError(f"Unexpected error: {e}") from e
 
     async def _execute_function(self, func: Callable[..., T], *args, **kwargs) -> T:
         """Execute function, handling both sync and async."""

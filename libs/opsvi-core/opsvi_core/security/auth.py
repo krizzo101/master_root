@@ -69,7 +69,7 @@ class AuthManager:
             return token
         except Exception as e:
             logger.error("Failed to generate JWT", error=str(e))
-            raise AuthenticationError(f"Failed to generate token: {e}")
+            raise AuthenticationError(f"Failed to generate token: {e}") from e
 
     def validate_jwt(self, token: str) -> TokenPayload:
         """Validate and decode a JWT token."""
@@ -87,9 +87,9 @@ class AuthManager:
             logger.debug("JWT validated", user_id=token_payload.user_id)
             return token_payload
         except jwt.ExpiredSignatureError:
-            raise AuthenticationError("Token has expired")
+            raise AuthenticationError("Token has expired") from None
         except jwt.InvalidTokenError as e:
-            raise AuthenticationError(f"Invalid token: {e}")
+            raise AuthenticationError(f"Invalid token: {e}") from e
 
     def generate_api_key(self, prefix: str = "opsvi") -> str:
         """Generate a secure API key."""
@@ -130,7 +130,7 @@ class AuthManager:
             decrypted = self._cipher.decrypt(encrypted_data.encode())
             return decrypted.decode()
         except Exception as e:
-            raise AuthenticationError(f"Failed to decrypt data: {e}")
+            raise AuthenticationError(f"Failed to decrypt data: {e}") from e
 
     def check_permission(self, user_roles: list[str], required_role: str) -> bool:
         """Check if user has required permission."""
