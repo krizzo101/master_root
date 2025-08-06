@@ -1,33 +1,34 @@
 {
   "metadata": {
-    "build_time_ms": 0.0057220458984375,
+    "build_time_ms": 0.008344650268554688,
     "project_path": "/home/opsvi/master_root",
     "builder_type": "DefaultPackageBuilder",
-    "build_timestamp": "2025-08-06T01:31:24.446523",
+    "build_timestamp": "2025-08-06T03:18:10.086713",
     "package_type": "default",
     "collector_count": 5,
-    "total_data_size": 7729
+    "total_data_size": 16905
   },
   "collectors": [
     {
       "collector": "DevelopmentStateCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-05T21:31:24.305557",
+      "timestamp": "2025-08-05T23:18:09.814295",
       "data": {
         "git_repository": true,
-        "current_branch": "fix/storage-api",
+        "current_branch": "feature/libs-foundation",
         "remote_url": "https://github.com/krizzo101/master_root.git",
-        "active_branches": 4,
+        "active_branches": 5,
         "branch_names": [
           "AUTOSAVE",
           "feat/workspace-optimization",
+          "feature/libs-foundation",
           "fix/storage-api",
           "main"
         ],
         "has_uncommitted_changes": true,
         "staged_files_count": 1,
-        "unstaged_files_count": 6,
-        "untracked_files_count": 6,
+        "unstaged_files_count": 0,
+        "untracked_files_count": 0,
         "ci_status": {
           "has_ci": true,
           "ci_provider": "GitHub Actions",
@@ -44,12 +45,13 @@
         },
         "recent_activity": {
           "last_commit_days_ago": 0,
-          "commits_last_week": 19,
-          "commits_last_month": 19,
+          "commits_last_week": 21,
+          "commits_last_month": 21,
           "active_contributors": 0,
           "recent_branches": [
             "AUTOSAVE",
             "feat/workspace-optimization",
+            "feature/libs-foundation",
             "fix/storage-api",
             "main"
           ]
@@ -61,7 +63,7 @@
           "has_docker": false,
           "has_requirements": false,
           "main_language": null,
-          "file_count": 72
+          "file_count": 97
         },
         "development_state": "active_development"
       }
@@ -69,10 +71,10 @@
     {
       "collector": "ProjectPurposeCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-05T21:31:24.306263",
+      "timestamp": "2025-08-05T23:18:09.815242",
       "data": {
         "project_name": "OPSVI Master Workspace",
-        "description": "[![CI](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml) A comprehensive monorepo for AI/ML Operations with built-in observability, RAG capabilities, and MCP integration. This workspace has been optimized with:",
+        "description": "[![CI](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml) A comprehensive monorepo for AI/ML Operations with built-in observability, RAG capabilities, and MCP integration. **Now featuring a complete foundational library ecosystem for production AI applications.** - \u2705 **Phase 1**: Linting & Type Checking (ruff, black, mypy)",
         "key_features": [
           "**Worktrees**: Use `scripts/new_agent_worktree.sh` for feature development"
         ]
@@ -81,7 +83,7 @@
     {
       "collector": "ConstraintsCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-05T21:31:24.341488",
+      "timestamp": "2025-08-05T23:18:09.889481",
       "data": {
         "technical_constraints": {
           "performance_constraints": [],
@@ -100,7 +102,9 @@
             "- **mypy**: Static type checking with strict configuration",
             "- **Pre-commit Hooks**: Automatic quality checks on commit"
           ],
-          "business_logic": [],
+          "business_logic": [
+            "- **Retry Logic**: Exponential backoff with configurable parameters"
+          ],
           "compliance_requirements": [
             "- **Package Structure**: Standardized Python package layout"
           ],
@@ -109,14 +113,23 @@
             "- **ruff**: Fast Python linter and formatter",
             "- **black**: Code formatting",
             "just fmt         # Run formatting",
-            "- **black**: Consistent code formatting"
+            "- **Configuration**: Type-safe config with Pydantic V2 and environment variables",
+            "- **Function Calling**: Structured function calling with type safety",
+            "- **Qdrant**: Vector database optimization",
+            "- **black**: Consistent code formatting",
+            "3. Make changes following modern Python patterns (async, type hints, Pydantic V2)"
           ],
           "workflow_rules": [
             "[![CI](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml)",
             "- \u2705 **Phase 4**: Workflow Automation (pre-commit hooks)",
+            "- **Planned**: Document processors and retrieval engines",
+            "- **LangGraph**: State management and agent workflows",
             "- **CI/CD**: GitHub Actions workflow for automated testing",
             "- **README Updates**: Comprehensive documentation of new tools and processes",
-            "- **Workflow Documentation**: Clear development workflow instructions"
+            "- **Workflow Documentation**: Clear development workflow instructions",
+            "- **opsvi-rag completion**: Embedding providers and document processors",
+            "- **Advanced RAG**: Multi-modal document processing and hybrid search",
+            "- **Agent Workflows**: LangGraph integration for complex agent orchestration"
           ]
         },
         "limitations": {
@@ -127,22 +140,23 @@
           "scalability_limitations": []
         },
         "constraint_summary": {
-          "total_constraints": 16,
+          "total_constraints": 26,
           "constraint_types": [
             "validation_rules",
+            "business_logic",
             "compliance_requirements",
             "data_rules",
             "workflow_rules"
           ],
           "critical_constraints": [],
-          "constraint_impact": "medium"
+          "constraint_impact": "high"
         }
       }
     },
     {
       "collector": "WorkflowCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-05T21:31:24.361355",
+      "timestamp": "2025-08-05T23:18:09.911195",
       "data": {
         "branching_strategy": {
           "branching_model": "simple",
@@ -151,10 +165,11 @@
           "feature_branch_pattern": "feature/*",
           "release_branch_pattern": "release/*",
           "hotfix_branch_pattern": null,
-          "total_branches": 4,
+          "total_branches": 5,
           "branch_names": [
             "AUTOSAVE",
             "feat/workspace-optimization",
+            "feature/libs-foundation",
             "fix/storage-api",
             "main"
           ]
@@ -246,7 +261,7 @@
     {
       "collector": "AgentArchitectureCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-05T21:31:24.446084",
+      "timestamp": "2025-08-05T23:18:10.086033",
       "data": {
         "agent_classes": [
           {
@@ -287,6 +302,151 @@
               }
             ],
             "docstring": "Adapter for LangGraph agent framework.",
+            "agent_type": "general"
+          },
+          {
+            "name": "BaseAgent",
+            "file_path": "libs/opsvi-core/opsvi_core/agents/base_agent.py",
+            "lineno": 14,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 22,
+                "docstring": "Initialize the agent.\n\nArgs:\n    agent_id: Unique identifier for this agent\n    plugins: Optional list of plugins to attach to this agent"
+              },
+              {
+                "name": "add_plugin",
+                "lineno": 125,
+                "docstring": "Add a plugin to this agent.\n\nArgs:\n    plugin: Plugin to add"
+              },
+              {
+                "name": "remove_plugin",
+                "lineno": 135,
+                "docstring": "Remove a plugin from this agent.\n\nArgs:\n    plugin: Plugin to remove"
+              },
+              {
+                "name": "get_plugins",
+                "lineno": 146,
+                "docstring": "Get all plugins attached to this agent.\n\nReturns:\n    List[Any]: List of plugins"
+              },
+              {
+                "name": "is_active",
+                "lineno": 155,
+                "docstring": "Check if the agent is active.\n\nReturns:\n    bool: True if agent is active, False otherwise"
+              }
+            ],
+            "docstring": "Base class for agents, managing lifecycle, message handling, and plugins.\n\nProvides a foundation for implementing agents with proper lifecycle management,\nasync message processing, and plugin architecture.",
+            "agent_type": "general"
+          },
+          {
+            "name": "ConfigurationError",
+            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
+            "lineno": 17,
+            "bases": [
+              "OpsviError"
+            ],
+            "methods": [],
+            "docstring": "Raised when configuration validation fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "InitializationError",
+            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
+            "lineno": 23,
+            "bases": [
+              "OpsviError"
+            ],
+            "methods": [],
+            "docstring": "Raised when core components fail to initialize.",
+            "agent_type": "general"
+          },
+          {
+            "name": "ValidationError",
+            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
+            "lineno": 29,
+            "bases": [
+              "OpsviError"
+            ],
+            "methods": [],
+            "docstring": "Raised on validation failures in data models.",
+            "agent_type": "general"
+          },
+          {
+            "name": "ExternalServiceError",
+            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
+            "lineno": 35,
+            "bases": [
+              "OpsviError"
+            ],
+            "methods": [],
+            "docstring": "Raised when external service interactions fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "AuthenticationError",
+            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
+            "lineno": 47,
+            "bases": [
+              "OpsviError"
+            ],
+            "methods": [],
+            "docstring": "Raised when authentication or authorization fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "ResourceNotFoundError",
+            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
+            "lineno": 53,
+            "bases": [
+              "OpsviError"
+            ],
+            "methods": [],
+            "docstring": "Raised when a requested resource is not found.",
+            "agent_type": "general"
+          },
+          {
+            "name": "TimeoutError",
+            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
+            "lineno": 59,
+            "bases": [
+              "OpsviError"
+            ],
+            "methods": [],
+            "docstring": "Raised when operations exceed their timeout limits.",
+            "agent_type": "general"
+          },
+          {
+            "name": "RateLimitError",
+            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
+            "lineno": 65,
+            "bases": [
+              "ExternalServiceError"
+            ],
+            "methods": [],
+            "docstring": "Raised when rate limits are exceeded.",
+            "agent_type": "general"
+          },
+          {
+            "name": "NetworkError",
+            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
+            "lineno": 71,
+            "bases": [
+              "ExternalServiceError"
+            ],
+            "methods": [],
+            "docstring": "Raised when network-related errors occur.",
+            "agent_type": "worker"
+          },
+          {
+            "name": "SerializationError",
+            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
+            "lineno": 77,
+            "bases": [
+              "OpsviError"
+            ],
+            "methods": [],
+            "docstring": "Raised when data serialization/deserialization fails.",
             "agent_type": "general"
           },
           {
@@ -332,9 +492,191 @@
             "methods": [],
             "docstring": "Raised when operations timeout.",
             "agent_type": "general"
+          },
+          {
+            "name": "TestBaseAgent",
+            "file_path": "libs/opsvi-core/tests/test_core.py",
+            "lineno": 214,
+            "bases": [],
+            "methods": [
+              {
+                "name": "test_agent_plugin_management",
+                "lineno": 263,
+                "docstring": "Test agent plugin management."
+              },
+              {
+                "name": "test_agent_get_plugins",
+                "lineno": 278,
+                "docstring": "Test getting agent plugins."
+              },
+              {
+                "name": "test_agent_is_active",
+                "lineno": 289,
+                "docstring": "Test agent active status check."
+              }
+            ],
+            "docstring": "Test BaseAgent class.",
+            "agent_type": "general"
+          },
+          {
+            "name": "TestAgent",
+            "file_path": "libs/opsvi-core/tests/test_core.py",
+            "lineno": 217,
+            "bases": [
+              "BaseAgent"
+            ],
+            "methods": [],
+            "docstring": "Concrete implementation of BaseAgent for testing.",
+            "agent_type": "general"
+          },
+          {
+            "name": "OpenAIProvider",
+            "file_path": "libs/opsvi-llm/opsvi_llm/providers/openai_provider.py",
+            "lineno": 26,
+            "bases": [
+              "BaseLLMProvider"
+            ],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 38,
+                "docstring": "Initialize the OpenAI provider.\n\nArgs:\n    api_key: OpenAI API key\n    model: Model identifier (e.g., \"gpt-4\", \"gpt-3.5-turbo\")\n    organization: OpenAI organization ID (optional)\n    base_url: Custom base URL for API calls (optional)\n    **kwargs: Additional configuration options"
+              },
+              {
+                "name": "_validate_config",
+                "lineno": 71,
+                "docstring": "Validate OpenAI-specific configuration."
+              },
+              {
+                "name": "_setup_rate_limiting",
+                "lineno": 79,
+                "docstring": "Setup rate limiting for OpenAI API."
+              },
+              {
+                "name": "_prepare_request_params",
+                "lineno": 187,
+                "docstring": "Prepare request parameters for OpenAI API."
+              },
+              {
+                "name": "_parse_chat_response",
+                "lineno": 232,
+                "docstring": "Parse OpenAI chat completion response."
+              },
+              {
+                "name": "supports_function_calling",
+                "lineno": 329,
+                "docstring": "Check if the provider supports function calling."
+              },
+              {
+                "name": "supports_streaming",
+                "lineno": 333,
+                "docstring": "Check if the provider supports streaming responses."
+              }
+            ],
+            "docstring": "OpenAI SDK-based LLM provider supporting async generation with modern patterns.\n\nProvides comprehensive integration with OpenAI's API including:\n- Chat completions\n- Function calling\n- Streaming responses\n- Rate limiting\n- Retry logic",
+            "agent_type": "general"
+          },
+          {
+            "name": "FunctionCall",
+            "file_path": "libs/opsvi-llm/opsvi_llm/schemas/responses.py",
+            "lineno": 57,
+            "bases": [
+              "BaseModel"
+            ],
+            "methods": [
+              {
+                "name": "validate_arguments",
+                "lineno": 71,
+                "docstring": "Validate that arguments is a valid JSON string."
+              }
+            ],
+            "docstring": "Function call information for structured outputs.\n\nAttributes:\n    name: Name of the function to call\n    arguments: JSON string containing function arguments",
+            "agent_type": "general"
+          },
+          {
+            "name": "LLMResponse",
+            "file_path": "libs/opsvi-llm/opsvi_llm/schemas/responses.py",
+            "lineno": 81,
+            "bases": [
+              "BaseModel"
+            ],
+            "methods": [
+              {
+                "name": "validate_generated_text",
+                "lineno": 113,
+                "docstring": "Validate that generated_text is a non-empty string."
+              },
+              {
+                "name": "to_dict",
+                "lineno": 122,
+                "docstring": "Convert response to dictionary."
+              },
+              {
+                "name": "get_content",
+                "lineno": 126,
+                "docstring": "Get the main content of the response."
+              },
+              {
+                "name": "has_function_calls",
+                "lineno": 130,
+                "docstring": "Check if the response contains function calls."
+              },
+              {
+                "name": "get_function_calls",
+                "lineno": 134,
+                "docstring": "Get function calls from the response."
+              }
+            ],
+            "docstring": "Structured schema for LLM responses with comprehensive metadata.\n\nAttributes:\n    generated_text: The main generated text content\n    messages: List of chat messages (for chat completions)\n    function_calls: List of function calls made\n    metadata: Additional response metadata\n    reasoning: Optional reasoning or explanation\n    usage: Token usage information\n    model: Model used for generation\n    finish_reason: Reason for completion",
+            "agent_type": "general"
+          },
+          {
+            "name": "RateLimiter",
+            "file_path": "libs/opsvi-llm/opsvi_llm/utils/rate_limiting.py",
+            "lineno": 27,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 35,
+                "docstring": "Initialize the rate limiter.\n\nArgs:\n    config: Rate limiting configuration"
+              },
+              {
+                "name": "_can_make_request",
+                "lineno": 83,
+                "docstring": "Check if a request can be made."
+              },
+              {
+                "name": "_refill_tokens",
+                "lineno": 97,
+                "docstring": "Refill tokens based on time elapsed."
+              },
+              {
+                "name": "_check_sliding_window",
+                "lineno": 107,
+                "docstring": "Check sliding window rate limit."
+              },
+              {
+                "name": "_record_request",
+                "lineno": 119,
+                "docstring": "Record a request."
+              },
+              {
+                "name": "_calculate_wait_time",
+                "lineno": 125,
+                "docstring": "Calculate how long to wait before next request."
+              },
+              {
+                "name": "get_stats",
+                "lineno": 147,
+                "docstring": "Get current rate limiter statistics."
+              }
+            ],
+            "docstring": "Rate limiter for API requests with sliding window support.\n\nProvides token bucket and sliding window rate limiting to prevent\nAPI quota exhaustion and ensure fair usage.",
+            "agent_type": "general"
           }
         ],
-        "agent_count": 6,
+        "agent_count": 23,
         "communication": {
           "has_messaging": false,
           "has_event_system": false,
@@ -342,7 +684,9 @@
           "has_grpc": false,
           "has_websockets": false,
           "has_queues": false,
-          "protocols": [],
+          "protocols": [
+            "messaging"
+          ],
           "message_types": []
         },
         "orchestration": {
@@ -369,12 +713,13 @@
         },
         "architecture_pattern": "distributed",
         "agent_types": [
-          "general"
+          "general",
+          "worker"
         ],
         "has_multi_agent_system": true
       }
     }
   ],
-  "timestamp": "2025-08-06 01:31:24.446600",
+  "timestamp": "2025-08-06 03:18:10.086944",
   "schema_version": "1.1.0"
 }
