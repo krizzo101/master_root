@@ -1,13 +1,7 @@
 """
-Utilities module for OPSVI LLM Library.
+Utils module for opsvi-llm
 
-Provides utility functions for retry logic, rate limiting, and other common operations.
+Part of the OPSVI ecosystem.
 """
 
-from .rate_limiting import RateLimiter
-from .retry import retry_with_backoff
-
-__all__ = [
-    "retry_with_backoff",
-    "RateLimiter",
-]
+__version__ = "1.0.0"

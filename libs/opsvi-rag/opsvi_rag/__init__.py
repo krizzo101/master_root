@@ -1,28 +1,38 @@
 """
-OPSVI RAG Library
+opsvi-rag Library
 
-Retrieval-Augmented Generation library for the OPSVI ecosystem.
-Provides vector search, embedding management, and RAG capabilities.
+Domain-specific components for the OPSVI ecosystem.
+Builds on opsvi-foundation for shared concerns.
 """
 
 __version__ = "1.0.0"
 __author__ = "OPSVI Team"
 __email__ = "team@opsvi.com"
 
-from .providers import (
-    BaseEmbeddingProvider,
-    EmbeddingProviderFactory,
-    OpenAIEmbeddingProvider,
-    SentenceTransformerEmbeddingProvider,
+# Import foundation components
+from opsvi_foundation import (
+    FoundationConfig,
+    AuthManager,
+    CircuitBreaker,
+    BaseComponent,
+    get_logger,
 )
-from .storage.qdrant_client import QdrantVectorStore
+
+# Import domain-specific components
+from .core import RAGConfig, config
+from .core.exceptions import RAGError, RAGValidationError, RAGConfigurationError
 
 __all__ = [
-    # Storage
-    "QdrantVectorStore",
-    # Providers
-    "BaseEmbeddingProvider",
-    "OpenAIEmbeddingProvider",
-    "SentenceTransformerEmbeddingProvider",
-    "EmbeddingProviderFactory",
+    # Foundation exports
+    "FoundationConfig",
+    "AuthManager", 
+    "CircuitBreaker",
+    "BaseComponent",
+    "get_logger",
+    # Domain exports
+    "RAGConfig",
+    "config",
+    "RAGError",
+    "RAGValidationError", 
+    "RAGConfigurationError",
 ]

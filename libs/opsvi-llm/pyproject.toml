@@ -25,10 +25,13 @@ classifiers = [
 ]
 
 dependencies = [
+    "opsvi-foundation>=1.0.0",
     "opsvi-core>=1.0.0",
-    "openai>=1.0.0",
-    "anthropic>=0.7.0",
-    "pydantic>=2.0.0",
+    # LLM providers (2025 approved versions)
+    "openai>=1.50.0",
+    "anthropic>=0.25.0",
+    # Data validation (2025 standards)
+    "pydantic>=2.11.0",
     "structlog>=24.1.0",
     "orjson>=3.9.0",
     "httpx>=0.25.0",
@@ -37,14 +40,17 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.4.0",
-    "pytest-asyncio>=0.21.0",
+    # Testing (2025 standards)
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
     "pytest-cov>=4.1.0",
     "pytest-mock>=3.12.0",
-    "mypy>=1.5.0",
-    "ruff>=0.1.0",
-    "black>=23.0.0",
-    "pre-commit>=3.4.0",
+    # Type checking
+    "mypy>=1.8.0",
+    # Linting and formatting (2025 standards)
+    "ruff>=0.4.0",
+    "black>=24.0.0",
+    "pre-commit>=3.6.0",
 ]
 
 docs = [

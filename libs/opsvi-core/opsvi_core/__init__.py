@@ -1,42 +1,38 @@
 """
 OPSVI Core Library
 
-Core utilities and base classes for the OPSVI ecosystem.
-Provides configuration, logging, exceptions, and base patterns for AI/ML operations.
+Application-level components and patterns for the OPSVI ecosystem.
+Builds on opsvi-foundation for shared concerns.
 """
 
 __version__ = "1.0.0"
 __author__ = "OPSVI Team"
 __email__ = "team@opsvi.com"
 
-from .agents.base_agent import BaseAgent
-from .core.config import AppConfig, config, load_config
-from .core.exceptions import (
-    ConfigurationError,
-    DatabaseConnectionError,
-    ExternalServiceError,
-    InitializationError,
-    OpsviError,
-    ValidationError,
+# Import foundation components
+from opsvi_foundation import (
+    FoundationConfig,
+    AuthManager,
+    CircuitBreaker,
+    BaseComponent,
+    get_logger,
 )
-from .core.logging import setup_logging
-from .core.patterns import BaseActor
+
+# Import core-specific components
+from .core import CoreConfig, config
+from .core.exceptions import CoreError, AgentError, WorkflowError
 
 __all__ = [
-    # Configuration
+    # Foundation exports
+    "FoundationConfig",
+    "AuthManager",
+    "CircuitBreaker",
+    "BaseComponent",
+    "get_logger",
+    # Core exports
+    "CoreConfig",
     "config",
-    "AppConfig",
-    "load_config",
-    # Logging
-    "setup_logging",
-    # Exceptions
-    "OpsviError",
-    "ConfigurationError",
-    "InitializationError",
-    "ValidationError",
-    "ExternalServiceError",
-    "DatabaseConnectionError",
-    # Patterns
-    "BaseActor",
-    "BaseAgent",
+    "CoreError",
+    "AgentError",
+    "WorkflowError",
 ]

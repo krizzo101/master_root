@@ -1,192 +1,113 @@
 """
-Abstract base class for LLM providers.
+Base LLM provider interface.
 
-Defines the interface that all LLM providers must implement.
+Defines the abstract interface that all LLM providers must implement.
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, AsyncIterator, Dict, List
 
-from ..schemas.responses import ChatMessage, GenerationConfig, LLMResponse
-from ..utils.retry import retry_with_backoff
+from opsvi_foundation import BaseComponent
+
+from ..schemas.requests import ChatRequest, CompletionRequest
+from ..schemas.responses import LLMResponse
 
 
-class BaseLLMProvider(ABC):
+class BaseLLMProvider(BaseComponent, ABC):
+    """Abstract base class for all LLM providers.
+
+    Defines the interface that all LLM providers must implement,
+    including chat completions, streaming, and function calling.
     """
-    Abstract base class defining the interface for LLM providers.
-
-    All LLM providers must implement these methods to ensure
-    consistent behavior across different services.
-    """
-
-    def __init__(self, model: str, **kwargs: Any):
-        """
-        Initialize the LLM provider.
-
-        Args:
-            model: Model identifier for the LLM service
-            **kwargs: Additional provider-specific configuration
-        """
-        self.model = model
-        self.config = kwargs
-        self._validate_config()
 
     @abstractmethod
-    def _validate_config(self) -> None:
-        """
-        Validate provider-specific configuration.
+    async def generate_chat(self, request: ChatRequest) -> LLMResponse:
+        """Generate chat completion.
+
+        Args:
+            request: Chat completion request
+
+        Returns:
+            LLM response with generated content
 
         Raises:
-            ValueError: If configuration is invalid
+            LLMError: If generation fails
         """
         pass
 
     @abstractmethod
-    async def generate(
-        self, prompt: str, config: GenerationConfig | None = None, **kwargs: Any
-    ) -> LLMResponse:
-        """
-        Generate completion based on prompt.
+    async def generate_stream(self, request: ChatRequest) -> AsyncIterator[str]:
+        """Generate streaming chat completion.
 
         Args:
-            prompt: Input prompt for generation
-            config: Generation configuration parameters
-            **kwargs: Additional generation parameters
+            request: Chat completion request
 
-        Returns:
-            LLMResponse: Structured response with generated content
+        Yields:
+            Content chunks as they arrive
 
         Raises:
-            Exception: If generation fails
+            LLMError: If streaming fails
         """
         pass
 
     @abstractmethod
-    async def generate_chat(
-        self,
-        messages: list[ChatMessage],
-        config: GenerationConfig | None = None,
-        **kwargs: Any,
-    ) -> LLMResponse:
-        """
-        Generate chat completion based on message history.
+    async def generate_with_functions(self, request: ChatRequest) -> LLMResponse:
+        """Generate chat completion with function calling.
 
         Args:
-            messages: List of chat messages
-            config: Generation configuration parameters
-            **kwargs: Additional generation parameters
+            request: Chat completion request with functions
 
         Returns:
-            LLMResponse: Structured response with generated content
+            LLM response with function calls if any
 
         Raises:
-            Exception: If generation fails
+            LLMError: If generation fails
         """
         pass
 
     @abstractmethod
-    async def generate_with_functions(
-        self,
-        messages: list[ChatMessage],
-        functions: list[dict[str, Any]],
-        config: GenerationConfig | None = None,
-        **kwargs: Any,
-    ) -> LLMResponse:
-        """
-        Generate completion with function calling support.
-
-        Args:
-            messages: List of chat messages
-            functions: List of function definitions
-            config: Generation configuration parameters
-            **kwargs: Additional generation parameters
+    def get_supported_models(self) -> List[str]:
+        """Get list of supported models.
 
         Returns:
-            LLMResponse: Structured response with function calls
-
-        Raises:
-            Exception: If generation fails
+            List of supported model names
         """
         pass
 
-    @retry_with_backoff(max_retries=3, base_delay=1.0)
-    async def generate_with_retry(
-        self, prompt: str, config: GenerationConfig | None = None, **kwargs: Any
-    ) -> LLMResponse:
-        """
-        Generate completion with automatic retry logic.
+    @abstractmethod
+    def supports_function_calling(self, model: str | None = None) -> bool:
+        """Check if model supports function calling.
 
         Args:
-            prompt: Input prompt for generation
-            config: Generation configuration parameters
-            **kwargs: Additional generation parameters
+            model: Model name, uses default if None
 
         Returns:
-            LLMResponse: Structured response with generated content
+            True if model supports function calling
         """
-        return await self.generate(prompt, config, **kwargs)
+        pass
 
-    @retry_with_backoff(max_retries=3, base_delay=1.0)
-    async def generate_chat_with_retry(
-        self,
-        messages: list[ChatMessage],
-        config: GenerationConfig | None = None,
-        **kwargs: Any,
-    ) -> LLMResponse:
-        """
-        Generate chat completion with automatic retry logic.
+    @abstractmethod
+    def supports_streaming(self, model: str | None = None) -> bool:
+        """Check if model supports streaming.
 
         Args:
-            messages: List of chat messages
-            config: Generation configuration parameters
-            **kwargs: Additional generation parameters
+            model: Model name, uses default if None
 
         Returns:
-            LLMResponse: Structured response with generated content
+            True if model supports streaming
         """
-        return await self.generate_chat(messages, config, **kwargs)
+        pass
 
-    def get_model_info(self) -> dict[str, Any]:
-        """
-        Get information about the current model.
-
-        Returns:
-            Dict[str, Any]: Model information
-        """
-        return {
-            "model": self.model,
-            "provider": self.__class__.__name__,
-            "config": self.config,
-        }
-
-    def supports_function_calling(self) -> bool:
-        """
-        Check if the provider supports function calling.
+    @abstractmethod
+    async def health_check(self) -> Dict[str, Any]:
+        """Perform health check.
 
         Returns:
-            bool: True if function calling is supported
-        """
-        return hasattr(self, "generate_with_functions")
+            Health status information
 
-    def supports_streaming(self) -> bool:
+        Raises:
+            ComponentError: If health check fails
         """
-        Check if the provider supports streaming responses.
-
-        Returns:
-            bool: True if streaming is supported
-        """
-        return hasattr(self, "generate_stream")
-
-    async def health_check(self) -> bool:
-        """
-        Perform a health check on the provider.
-
-        Returns:
-            bool: True if provider is healthy
-        """
-        try:
-            # Simple health check with minimal prompt
-            response = await self.generate("test", max_tokens=1)
-            return bool(response and response.generated_text)
-        except Exception:
-            return False
+        pass

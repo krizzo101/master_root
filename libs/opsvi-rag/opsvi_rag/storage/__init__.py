@@ -1,11 +1,7 @@
 """
-Storage module for OPSVI RAG Library.
+Storage module for opsvi-rag
 
-Provides vector database storage implementations.
+Part of the OPSVI ecosystem.
 """
 
-from .qdrant_client import QdrantVectorStore
-
-__all__ = [
-    "QdrantVectorStore",
-]
+__version__ = "1.0.0"

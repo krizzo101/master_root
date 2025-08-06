@@ -1,162 +1,349 @@
 """
-Base agent implementation for OPSVI Core Library.
+Base agent implementation.
 
-Provides the foundation for implementing agents with lifecycle management,
-message handling, and plugin support.
+Provides foundational agent lifecycle, state management, and communication.
 """
 
-import logging
-from typing import Any
+from __future__ import annotations
 
-from ..core.exceptions import InitializationError
+import asyncio
+import uuid
+from abc import ABC, abstractmethod
+from enum import Enum
+from typing import Any, Dict, Optional
+
+from opsvi_foundation import (
+    BaseComponent,
+    get_logger,
+    retry,
+    RetryConfig,
+    ComponentError
+)
+from pydantic import BaseModel, Field
+
+from ..core.exceptions import AgentError
+
+logger = get_logger(__name__)
 
 
-class BaseAgent:
+class AgentState(str, Enum):
+    """Agent lifecycle states."""
+    CREATED = "created"
+    INITIALIZING = "initializing"
+    READY = "ready"
+    RUNNING = "running"
+    PAUSED = "paused"
+    STOPPING = "stopping"
+    STOPPED = "stopped"
+    ERROR = "error"
+
+
+class AgentCapability(BaseModel):
+    """Agent capability definition."""
+    name: str = Field(..., description="Capability name")
+    version: str = Field(default="1.0.0", description="Capability version")
+    description: str = Field(default="", description="Capability description")
+    parameters: Dict[str, Any] = Field(default_factory=dict, description="Capability parameters")
+
+
+class AgentMetadata(BaseModel):
+    """Agent metadata and configuration."""
+    agent_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str = Field(..., description="Agent name")
+    version: str = Field(default="1.0.0", description="Agent version")
+    description: str = Field(default="", description="Agent description")
+    capabilities: list[AgentCapability] = Field(default_factory=list)
+    tags: list[str] = Field(default_factory=list)
+    config: Dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentMessage(BaseModel):
+    """Message structure for agent communication."""
+    message_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    sender_id: str = Field(..., description="Sender agent ID")
+    recipient_id: Optional[str] = Field(default=None, description="Recipient agent ID")
+    message_type: str = Field(..., description="Message type")
+    payload: Dict[str, Any] = Field(default_factory=dict)
+    timestamp: float = Field(default_factory=lambda: asyncio.get_event_loop().time())
+
+
+class BaseAgent(BaseComponent, ABC):
+    """Base agent with lifecycle management and communication.
+
+    Provides:
+    - Async lifecycle management (initialize, start, stop, cleanup)
+    - State tracking and transitions
+    - Message handling and communication
+    - Capability registration and discovery
+    - Error handling and recovery
     """
-    Base class for agents, managing lifecycle, message handling, and plugins.
 
-    Provides a foundation for implementing agents with proper lifecycle management,
-    async message processing, and plugin architecture.
-    """
+    def __init__(self, metadata: AgentMetadata):
+        super().__init__()
+        self.metadata = metadata
+        self.state = AgentState.CREATED
+        self._message_handlers: Dict[str, callable] = {}
+        self._plugins: Dict[str, Any] = {}
+        self._stats = {
+            "messages_sent": 0,
+            "messages_received": 0,
+            "errors": 0,
+            "uptime": 0.0
+        }
 
-    def __init__(self, agent_id: str, plugins: list[Any] | None = None):
-        """
-        Initialize the agent.
-
-        Args:
-            agent_id: Unique identifier for this agent
-            plugins: Optional list of plugins to attach to this agent
-        """
-        self.agent_id = agent_id
-        self.plugins = plugins or []
-        self.active = False
-        self.logger = logging.getLogger(f"{self.__class__.__name__}.{agent_id}")
-
-    async def activate(self) -> None:
-        """
-        Activate the agent, initialize resources.
-
-        Raises:
-            InitializationError: If activation fails
-        """
-        try:
-            await self._initialize()
-            self.active = True
-            self.logger.info("Agent activated successfully")
-        except Exception as e:
-            self.logger.exception("Activation failed for agent: %s", e)
-            raise InitializationError(
-                f"Activation failed for agent {self.agent_id}: {e}"
-            ) from e
-
-    async def deactivate(self) -> None:
-        """
-        Deactivate the agent, clean up resources.
-
-        Raises:
-            InitializationError: If deactivation fails
-        """
-        try:
-            await self._cleanup()
-            self.active = False
-            self.logger.info("Agent deactivated successfully")
-        except Exception as e:
-            self.logger.exception("Deactivation failed for agent: %s", e)
-            raise InitializationError(
-                f"Deactivation failed for agent {self.agent_id}: {e}"
-            ) from e
-
-    async def handle(self, message: dict[str, Any]) -> Any:
-        """
-        Handle incoming messages asynchronously.
-
-        Args:
-            message: Message to process
-
-        Returns:
-            Any: Processing result
-
-        Raises:
-            Exception: If message processing fails
-        """
-        if not self.active:
-            raise RuntimeError(f"Agent {self.agent_id} is not active")
-
-        try:
-            response = await self.process(message)
-            return response
-        except Exception as e:
-            self.logger.exception("Error handling message for agent: %s", e)
-            raise
+        logger.info("Agent created",
+                   agent_id=self.metadata.agent_id,
+                   name=self.metadata.name)
 
     async def _initialize(self) -> None:
-        """
-        Initialization hook; override as needed.
+        """Initialize the agent."""
+        self.state = AgentState.INITIALIZING
 
-        Called during agent activation to perform custom initialization.
-        """
-        pass
+        try:
+            await self.setup()
+            self.state = AgentState.READY
+
+            logger.info("Agent initialized",
+                       agent_id=self.metadata.agent_id,
+                       capabilities=len(self.metadata.capabilities))
+
+        except Exception as e:
+            self.state = AgentState.ERROR
+            logger.error("Agent initialization failed",
+                        agent_id=self.metadata.agent_id,
+                        error=str(e))
+            raise AgentError(f"Agent initialization failed: {e}")
+
+    async def _start(self) -> None:
+        """Start the agent."""
+        if self.state != AgentState.READY:
+            raise AgentError(f"Cannot start agent in state {self.state}")
+
+        self.state = AgentState.RUNNING
+
+        try:
+            await self.run()
+
+            logger.info("Agent started", agent_id=self.metadata.agent_id)
+
+        except Exception as e:
+            self.state = AgentState.ERROR
+            self._stats["errors"] += 1
+            logger.error("Agent start failed",
+                        agent_id=self.metadata.agent_id,
+                        error=str(e))
+            raise AgentError(f"Agent start failed: {e}")
+
+    async def _stop(self) -> None:
+        """Stop the agent."""
+        if self.state not in [AgentState.RUNNING, AgentState.PAUSED]:
+            logger.warning("Attempting to stop agent not in running state",
+                          agent_id=self.metadata.agent_id,
+                          state=self.state)
+            return
+
+        self.state = AgentState.STOPPING
+
+        try:
+            await self.teardown()
+            self.state = AgentState.STOPPED
+
+            logger.info("Agent stopped", agent_id=self.metadata.agent_id)
+
+        except Exception as e:
+            self.state = AgentState.ERROR
+            self._stats["errors"] += 1
+            logger.error("Agent stop failed",
+                        agent_id=self.metadata.agent_id,
+                        error=str(e))
+            raise AgentError(f"Agent stop failed: {e}")
 
     async def _cleanup(self) -> None:
-        """
-        Cleanup hook; override as needed.
+        """Cleanup agent resources."""
+        try:
+            await self.cleanup_resources()
+            logger.info("Agent cleanup completed", agent_id=self.metadata.agent_id)
 
-        Called during agent deactivation to perform custom cleanup.
+        except Exception as e:
+            logger.error("Agent cleanup failed",
+                        agent_id=self.metadata.agent_id,
+                        error=str(e))
+            raise AgentError(f"Agent cleanup failed: {e}")
+
+    @abstractmethod
+    async def setup(self) -> None:
+        """Agent-specific setup logic.
+
+        Override this method to implement custom initialization.
         """
         pass
 
-    async def process(self, message: dict[str, Any]) -> Any:
+    @abstractmethod
+    async def run(self) -> None:
+        """Agent-specific run logic.
+
+        Override this method to implement the main agent loop.
         """
-        Main message processing method; must be overridden.
+        pass
+
+    @abstractmethod
+    async def teardown(self) -> None:
+        """Agent-specific teardown logic.
+
+        Override this method to implement custom cleanup.
+        """
+        pass
+
+    async def cleanup_resources(self) -> None:
+        """Cleanup agent resources.
+
+        Override this method to implement custom resource cleanup.
+        """
+        pass
+
+    async def pause(self) -> None:
+        """Pause the agent."""
+        if self.state != AgentState.RUNNING:
+            raise AgentError(f"Cannot pause agent in state {self.state}")
+
+        self.state = AgentState.PAUSED
+        logger.info("Agent paused", agent_id=self.metadata.agent_id)
+
+    async def resume(self) -> None:
+        """Resume the agent."""
+        if self.state != AgentState.PAUSED:
+            raise AgentError(f"Cannot resume agent in state {self.state}")
+
+        self.state = AgentState.RUNNING
+        logger.info("Agent resumed", agent_id=self.metadata.agent_id)
+
+    @retry(RetryConfig(max_attempts=3))
+    async def send_message(self, message: AgentMessage) -> None:
+        """Send message to another agent.
 
         Args:
-            message: Message to process
-
-        Returns:
-            Any: Processing result
+            message: Message to send
 
         Raises:
-            NotImplementedError: If not implemented by subclass
+            AgentError: If message sending fails
         """
-        raise NotImplementedError(
-            "The 'process' method must be implemented by subclasses."
-        )
+        try:
+            await self.deliver_message(message)
+            self._stats["messages_sent"] += 1
 
-    def add_plugin(self, plugin: Any) -> None:
-        """
-        Add a plugin to this agent.
+            logger.debug("Message sent",
+                        agent_id=self.metadata.agent_id,
+                        message_id=message.message_id,
+                        recipient=message.recipient_id)
+
+        except Exception as e:
+            self._stats["errors"] += 1
+            logger.error("Failed to send message",
+                        agent_id=self.metadata.agent_id,
+                        message_id=message.message_id,
+                        error=str(e))
+            raise AgentError(f"Failed to send message: {e}")
+
+    async def receive_message(self, message: AgentMessage) -> None:
+        """Receive and process a message.
 
         Args:
-            plugin: Plugin to add
+            message: Received message
         """
-        self.plugins.append(plugin)
-        self.logger.info("Plugin added to agent: %s", type(plugin).__name__)
+        self._stats["messages_received"] += 1
 
-    def remove_plugin(self, plugin: Any) -> None:
-        """
-        Remove a plugin from this agent.
+        logger.debug("Message received",
+                    agent_id=self.metadata.agent_id,
+                    message_id=message.message_id,
+                    sender=message.sender_id,
+                    message_type=message.message_type)
+
+        try:
+            handler = self._message_handlers.get(message.message_type)
+
+            if handler:
+                await handler(message)
+            else:
+                await self.handle_unknown_message(message)
+
+        except Exception as e:
+            self._stats["errors"] += 1
+            logger.error("Message processing failed",
+                        agent_id=self.metadata.agent_id,
+                        message_id=message.message_id,
+                        error=str(e))
+
+    def register_message_handler(self, message_type: str, handler: callable) -> None:
+        """Register a message handler.
 
         Args:
-            plugin: Plugin to remove
+            message_type: Type of message to handle
+            handler: Async function to handle the message
         """
-        if plugin in self.plugins:
-            self.plugins.remove(plugin)
-            self.logger.info("Plugin removed from agent: %s", type(plugin).__name__)
+        self._message_handlers[message_type] = handler
+        logger.debug("Message handler registered",
+                    agent_id=self.metadata.agent_id,
+                    message_type=message_type)
 
-    def get_plugins(self) -> list[Any]:
+    def add_capability(self, capability: AgentCapability) -> None:
+        """Add a capability to the agent.
+
+        Args:
+            capability: Capability to add
         """
-        Get all plugins attached to this agent.
+        self.metadata.capabilities.append(capability)
+        logger.info("Capability added",
+                   agent_id=self.metadata.agent_id,
+                   capability=capability.name)
+
+    def get_stats(self) -> Dict[str, Any]:
+        """Get agent statistics.
 
         Returns:
-            List[Any]: List of plugins
+            Dictionary of agent statistics
         """
-        return self.plugins.copy()
+        return {
+            **self._stats,
+            "state": self.state.value,
+            "capabilities": len(self.metadata.capabilities),
+            "plugins": len(self._plugins)
+        }
 
-    def is_active(self) -> bool:
-        """
-        Check if the agent is active.
+    async def health_check(self) -> Dict[str, Any]:
+        """Perform agent health check.
 
         Returns:
-            bool: True if agent is active, False otherwise
+            Health status information
         """
-        return self.active
+        return {
+            "agent_id": self.metadata.agent_id,
+            "name": self.metadata.name,
+            "state": self.state.value,
+            "healthy": self.state in [AgentState.READY, AgentState.RUNNING],
+            "stats": self.get_stats()
+        }
+
+    async def deliver_message(self, message: AgentMessage) -> None:
+        """Deliver message to recipient.
+
+        Override this method to implement custom message delivery.
+
+        Args:
+            message: Message to deliver
+        """
+        # Default implementation - override in subclasses
+        logger.debug("Message delivery not implemented",
+                    agent_id=self.metadata.agent_id)
+
+    async def handle_unknown_message(self, message: AgentMessage) -> None:
+        """Handle unknown message types.
+
+        Override this method to implement custom unknown message handling.
+
+        Args:
+            message: Unknown message
+        """
+        logger.warning("Unknown message type",
+                      agent_id=self.metadata.agent_id,
+                      message_type=message.message_type,
+                      message_id=message.message_id)

@@ -1,13 +1,34 @@
 """
-Schemas module for OPSVI LLM Library.
+Schemas module for opsvi-llm.
 
-Provides Pydantic V2 models for structured LLM responses and data validation.
+Provides request and response models for LLM APIs.
 """
 
-from .responses import ChatMessage, FunctionCall, LLMResponse
+from .requests import ChatRequest, CompletionRequest, EmbeddingRequest, ModerationRequest
+from .responses import (
+    LLMResponse,
+    ChatMessage,
+    MessageRole,
+    FunctionCall,
+    FunctionDefinition,
+    StreamChunk,
+    EmbeddingResponse,
+    ModerationResponse
+)
 
 __all__ = [
+    # Requests
+    "ChatRequest",
+    "CompletionRequest",
+    "EmbeddingRequest",
+    "ModerationRequest",
+    # Responses
     "LLMResponse",
     "ChatMessage",
+    "MessageRole",
     "FunctionCall",
+    "FunctionDefinition",
+    "StreamChunk",
+    "EmbeddingResponse",
+    "ModerationResponse",
 ]

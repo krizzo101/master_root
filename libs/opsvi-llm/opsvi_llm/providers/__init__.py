@@ -1,15 +1,14 @@
 """
-Providers module for OPSVI LLM Library.
+LLM providers module for opsvi-llm.
 
-Provides abstract base classes and concrete implementations for LLM providers.
+Provides LLM provider implementations and interfaces.
 """
 
-from .anthropic_provider import AnthropicProvider
 from .base import BaseLLMProvider
-from .openai_provider import OpenAIProvider
+from .openai_provider import OpenAIProvider, OpenAIConfig
 
 __all__ = [
     "BaseLLMProvider",
     "OpenAIProvider",
-    "AnthropicProvider",
+    "OpenAIConfig",
 ]

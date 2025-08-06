@@ -1,344 +1,424 @@
 """
-OpenAI provider implementation for OPSVI LLM Library.
+OpenAI LLM provider implementation.
 
-Provides integration with OpenAI's API using the modern Python SDK.
+Provides integration with OpenAI's GPT models including chat completions,
+function calling, and streaming responses.
 """
 
-import logging
-from typing import Any
+from __future__ import annotations
+
+import asyncio
+from typing import Any, AsyncIterator, Dict, List, Optional
 
 from openai import AsyncOpenAI
-from openai.types.chat import ChatCompletion
+from openai.types.chat import ChatCompletion, ChatCompletionChunk
+from pydantic import BaseModel, Field
 
-from ..schemas.responses import (
-    ChatMessage,
-    FunctionCall,
-    GenerationConfig,
-    LLMResponse,
-    MessageRole,
+from opsvi_foundation import (
+    get_logger,
+    retry,
+    RetryConfig,
+    CircuitBreaker,
+    CircuitBreakerConfig,
+    ComponentError
 )
-from ..utils.rate_limiting import RateLimitConfig, add_global_rate_limiter
-from .base import BaseLLMProvider
 
-logger = logging.getLogger(__name__)
+from ..core.exceptions import LLMError, LLMValidationError
+from .base import BaseLLMProvider
+from ..schemas.requests import ChatRequest, CompletionRequest
+from ..schemas.responses import LLMResponse, ChatMessage, FunctionCall
+
+# 2025 MODEL CONSTRAINTS - IRONCLAD ENFORCEMENT
+APPROVED_MODELS = {
+    "o4-mini", "o3", "gpt-4.1-mini", "gpt-4.1", "gpt-4.1-nano"
+}
+
+FORBIDDEN_MODELS = {
+    "gpt-4o", "gpt-4o-mini", "gpt-4o-2024-08-06",
+    "claude-3", "claude-3.5", "claude-3.5-sonnet", 
+    "gemini", "gemini-pro", "gemini-flash",
+    "llama", "llama-3", "llama-3.1",
+    "mistral", "mixtral", "codellama"
+}
+
+def validate_model_constraints(model: str) -> None:
+    """Validate model against approved list (MANDATORY)."""
+    if model in FORBIDDEN_MODELS:
+        raise LLMValidationError(f"🚨 UNAUTHORIZED MODEL: {model} is FORBIDDEN. Use approved models only: {list(APPROVED_MODELS)}")
+    
+    if model not in APPROVED_MODELS:
+        raise LLMValidationError(f"🚨 UNAUTHORIZED MODEL: {model} not in approved list. Use: {list(APPROVED_MODELS)}")
+
+logger = get_logger(__name__)
+
+
+class OpenAIConfig(BaseModel):
+    """Configuration for OpenAI provider."""
+    api_key: str = Field(..., description="OpenAI API key")
+    base_url: Optional[str] = Field(default=None, description="Custom base URL")
+    organization: Optional[str] = Field(default=None, description="OpenAI organization")
+    project: Optional[str] = Field(default=None, description="OpenAI project")
+    default_model: str = Field(default="gpt-4.1-mini", description="Default model to use")
+    max_retries: int = Field(default=3, description="Maximum retry attempts")
+    timeout: float = Field(default=60.0, description="Request timeout in seconds")
+    max_tokens: int = Field(default=4096, description="Maximum tokens per request")
+    temperature: float = Field(default=0.7, description="Default temperature")
+    rate_limit_rpm: int = Field(default=3500, description="Rate limit requests per minute")
 
 
 class OpenAIProvider(BaseLLMProvider):
-    """
-    OpenAI SDK-based LLM provider supporting async generation with modern patterns.
+    """OpenAI LLM provider with chat completions and function calling.
 
-    Provides comprehensive integration with OpenAI's API including:
-    - Chat completions
-    - Function calling
+    Features:
+    - Chat completions with GPT models
+    - Function calling support
     - Streaming responses
+    - Automatic retries with exponential backoff
+    - Circuit breaker for fault tolerance
     - Rate limiting
-    - Retry logic
-    """
-
-    def __init__(
-        self,
-        api_key: str,
-        model: str = "gpt-4",
-        organization: str | None = None,
-        base_url: str | None = None,
-        **kwargs: Any,
-    ):
         """
-        Initialize the OpenAI provider.
-
-        Args:
-            api_key: OpenAI API key
-            model: Model identifier (e.g., "gpt-4", "gpt-3.5-turbo")
-            organization: OpenAI organization ID (optional)
-            base_url: Custom base URL for API calls (optional)
-            **kwargs: Additional configuration options
-        """
-        super().__init__(model, **kwargs)
-        self.api_key = api_key
-        self.organization = organization
-        self.base_url = base_url
-
+    
+    def __init__(self, config: OpenAIConfig):
+        super().__init__()
+        self.config = config
+        
+        # MANDATORY: Validate default model
+        validate_model_constraints(config.default_model)
+        
         # Initialize OpenAI client
         self.client = AsyncOpenAI(
-            api_key=api_key, organization=organization, base_url=base_url
+            api_key=config.api_key,
+            base_url=config.base_url,
+            organization=config.organization,
+            project=config.project,
+            max_retries=config.max_retries,
+            timeout=config.timeout
         )
 
-        # Setup rate limiting
-        self._setup_rate_limiting()
-
-        logger.info("OpenAI provider initialized with model: %s", model)
-
-    def _validate_config(self) -> None:
-        """Validate OpenAI-specific configuration."""
-        if not self.api_key:
-            raise ValueError("OpenAI API key is required")
-
-        if not self.model:
-            raise ValueError("Model identifier is required")
-
-    def _setup_rate_limiting(self) -> None:
-        """Setup rate limiting for OpenAI API."""
-        # Default rate limits for OpenAI
-        rate_limit_config = RateLimitConfig(
-            requests_per_minute=60, requests_per_hour=1000, burst_size=10
+        # Initialize circuit breaker
+        self.circuit_breaker = CircuitBreaker(
+            CircuitBreakerConfig(
+                failure_threshold=5,
+                recovery_timeout=60,
+                success_threshold=3
+            )
         )
-        add_global_rate_limiter("openai", rate_limit_config)
 
-    async def generate(
-        self, prompt: str, config: GenerationConfig | None = None, **kwargs: Any
-    ) -> LLMResponse:
-        """
-        Generate completion based on prompt.
-
-        Args:
-            prompt: Input prompt for generation
-            config: Generation configuration parameters
-            **kwargs: Additional generation parameters
-
-        Returns:
-            LLMResponse: Structured response with generated content
-        """
-        # Convert prompt to chat message
-        messages = [ChatMessage(role=MessageRole.USER, content=prompt)]
-        return await self.generate_chat(messages, config, **kwargs)
-
-    async def generate_chat(
-        self,
-        messages: list[ChatMessage],
-        config: GenerationConfig | None = None,
-        **kwargs: Any,
-    ) -> LLMResponse:
-        """
-        Generate chat completion based on message history.
-
-        Args:
-            messages: List of chat messages
-            config: Generation configuration parameters
-            **kwargs: Additional generation parameters
-
-        Returns:
-            LLMResponse: Structured response with generated content
-        """
-        # Apply rate limiting
-        from ..utils.rate_limiting import acquire_global_rate_limit
-
-        await acquire_global_rate_limit("openai", timeout=30.0)
-
-        # Prepare request parameters
-        request_params = self._prepare_request_params(messages, config, **kwargs)
-
-        try:
-            logger.info("Sending chat completion request to OpenAI")
-
-            # Make API call
-            response = await self.client.chat.completions.create(**request_params)
-
-            # Parse response
-            return self._parse_chat_response(response, messages)
-
-        except Exception as e:
-            logger.exception("Error during OpenAI chat completion: %s", e)
-            raise
-
-    async def generate_with_functions(
-        self,
-        messages: list[ChatMessage],
-        functions: list[dict[str, Any]],
-        config: GenerationConfig | None = None,
-        **kwargs: Any,
-    ) -> LLMResponse:
-        """
-        Generate completion with function calling support.
-
-        Args:
-            messages: List of chat messages
-            functions: List of function definitions
-            config: Generation configuration parameters
-            **kwargs: Additional generation parameters
-
-        Returns:
-            LLMResponse: Structured response with function calls
-        """
-        # Apply rate limiting
-        from ..utils.rate_limiting import acquire_global_rate_limit
-
-        await acquire_global_rate_limit("openai", timeout=30.0)
-
-        # Prepare request parameters
-        request_params = self._prepare_request_params(messages, config, **kwargs)
-        request_params["tools"] = [
-            {"type": "function", "function": func} for func in functions
-        ]
-        request_params["tool_choice"] = "auto"
-
-        try:
-            logger.info("Sending function calling request to OpenAI")
-
-            # Make API call
-            response = await self.client.chat.completions.create(**request_params)
-
-            # Parse response
-            return self._parse_chat_response(response, messages)
-
-        except Exception as e:
-            logger.exception("Error during OpenAI function calling: %s", e)
-            raise
-
-    def _prepare_request_params(
-        self,
-        messages: list[ChatMessage],
-        config: GenerationConfig | None = None,
-        **kwargs: Any,
-    ) -> dict[str, Any]:
-        """Prepare request parameters for OpenAI API."""
-        # Convert messages to OpenAI format
-        openai_messages = []
-        for msg in messages:
-            openai_msg = {"role": msg.role.value, "content": msg.content}
-            if msg.name:
-                openai_msg["name"] = msg.name
-            if msg.function_call:
-                openai_msg["function_call"] = {
-                    "name": msg.function_call.name,
-                    "arguments": msg.function_call.arguments,
-                }
-            openai_messages.append(openai_msg)
-
-        # Base parameters
-        params = {
-            "model": self.model,
-            "messages": openai_messages,
+        # Supported models (2025 APPROVED MODELS ONLY)
+        self.supported_models = {
+            "o4-mini": {"max_tokens": 128000, "supports_functions": True, "use_case": "reasoning"},
+            "o3": {"max_tokens": 200000, "supports_functions": True, "use_case": "complex_reasoning"},
+            "gpt-4.1-mini": {"max_tokens": 128000, "supports_functions": True, "use_case": "agent_execution"},
+            "gpt-4.1": {"max_tokens": 1000000, "supports_functions": True, "use_case": "structured_outputs"},
+            "gpt-4.1-nano": {"max_tokens": 16384, "supports_functions": True, "use_case": "fast_responses"}
         }
 
-        # Apply configuration
-        if config:
-            if config.max_tokens:
-                params["max_tokens"] = config.max_tokens
-            params["temperature"] = config.temperature
-            params["top_p"] = config.top_p
-            if config.top_k:
-                params["top_k"] = config.top_k
-            params["frequency_penalty"] = config.frequency_penalty
-            params["presence_penalty"] = config.presence_penalty
-            if config.stop:
-                params["stop"] = config.stop
-            params["stream"] = config.stream
+        logger.info("OpenAI provider initialized",
+                   default_model=config.default_model,
+                   supported_models=len(self.supported_models))
 
-        # Apply additional kwargs
-        params.update(kwargs)
+    async def _initialize(self) -> None:
+        """Initialize the provider."""
+        try:
+            # Test connection
+            await self.health_check()
+            logger.info("OpenAI provider connection verified")
 
-        return params
+        except Exception as e:
+            logger.error("OpenAI provider initialization failed", error=str(e))
+            raise ComponentError(f"OpenAI provider initialization failed: {e}")
 
-    def _parse_chat_response(
-        self, response: ChatCompletion, original_messages: list[ChatMessage]
-    ) -> LLMResponse:
-        """Parse OpenAI chat completion response."""
-        if not response.choices:
-            raise ValueError("No choices returned from OpenAI API")
+    @retry(RetryConfig(max_attempts=3, exceptions=(Exception,)))
+    async def generate_chat(self, request: ChatRequest) -> LLMResponse:
+        """Generate chat completion.
 
+        Args:
+            request: Chat completion request
+
+        Returns:
+            LLM response with generated content
+
+        Raises:
+            LLMError: If generation fails
+            LLMValidationError: If request validation fails
+        """
+        self._validate_request(request)
+
+        try:
+            async with self.circuit_breaker.call(self._create_chat_completion, request) as result:
+                return await result
+
+        except Exception as e:
+            logger.error("Chat generation failed",
+                        model=request.model,
+                        messages=len(request.messages),
+                        error=str(e))
+            raise LLMError(f"Chat generation failed: {e}")
+
+    async def generate_stream(self, request: ChatRequest) -> AsyncIterator[str]:
+        """Generate streaming chat completion.
+
+        Args:
+            request: Chat completion request
+
+        Yields:
+            Content chunks as they arrive
+
+        Raises:
+            LLMError: If streaming fails
+        """
+        self._validate_request(request)
+
+        try:
+            async with self.circuit_breaker.call(self._create_chat_stream, request) as stream:
+                async for chunk in await stream:
+                    if chunk.choices and chunk.choices[0].delta.content:
+                        yield chunk.choices[0].delta.content
+
+        except Exception as e:
+            logger.error("Streaming generation failed",
+                        model=request.model,
+                        error=str(e))
+            raise LLMError(f"Streaming generation failed: {e}")
+
+    async def generate_with_functions(self, request: ChatRequest) -> LLMResponse:
+        """Generate chat completion with function calling.
+
+        Args:
+            request: Chat completion request with functions
+
+        Returns:
+            LLM response with function calls if any
+
+        Raises:
+            LLMError: If generation fails
+            LLMValidationError: If functions are not supported
+        """
+        if not request.functions:
+            return await self.generate_chat(request)
+
+        model_info = self.supported_models.get(request.model or self.config.default_model)
+        if not model_info or not model_info.get("supports_functions"):
+            raise LLMValidationError(f"Model {request.model} does not support function calling")
+
+        return await self.generate_chat(request)
+
+    async def _create_chat_completion(self, request: ChatRequest) -> LLMResponse:
+        """Create chat completion using OpenAI API.
+
+        Args:
+            request: Chat completion request
+
+        Returns:
+            LLM response
+        """
+        # Build API request
+        api_request = self._build_api_request(request)
+
+        logger.debug("Creating chat completion",
+                    model=api_request["model"],
+                    messages=len(api_request["messages"]),
+                    functions=len(api_request.get("functions", [])))
+
+        # Make API call
+        response: ChatCompletion = await self.client.chat.completions.create(**api_request)
+
+        # Convert to LLM response
+        return self._convert_response(response)
+
+    async def _create_chat_stream(self, request: ChatRequest) -> AsyncIterator[ChatCompletionChunk]:
+        """Create streaming chat completion.
+
+        Args:
+            request: Chat completion request
+
+        Yields:
+            Chat completion chunks
+        """
+        # Build API request with streaming
+        api_request = self._build_api_request(request)
+        api_request["stream"] = True
+
+        logger.debug("Creating streaming chat completion",
+                    model=api_request["model"],
+                    messages=len(api_request["messages"]))
+
+        # Make streaming API call
+        async for chunk in await self.client.chat.completions.create(**api_request):
+            yield chunk
+
+    def _build_api_request(self, request: ChatRequest) -> Dict[str, Any]:
+        """Build OpenAI API request from chat request.
+
+        Args:
+            request: Chat completion request
+
+        Returns:
+            OpenAI API request parameters
+        """
+        api_request = {
+            "model": request.model or self.config.default_model,
+            "messages": [msg.model_dump() for msg in request.messages],
+            "max_tokens": request.max_tokens or self.config.max_tokens,
+            "temperature": request.temperature if request.temperature is not None else self.config.temperature,
+            "top_p": request.top_p,
+            "frequency_penalty": request.frequency_penalty,
+            "presence_penalty": request.presence_penalty,
+            "stop": request.stop,
+            "user": request.user
+        }
+
+        # Remove None values
+        api_request = {k: v for k, v in api_request.items() if v is not None}
+
+        # Add functions if provided
+        if request.functions:
+            api_request["functions"] = [func.model_dump() for func in request.functions]
+            if request.function_call:
+                api_request["function_call"] = request.function_call
+
+        return api_request
+
+    def _convert_response(self, response: ChatCompletion) -> LLMResponse:
+        """Convert OpenAI response to LLM response.
+
+        Args:
+            response: OpenAI chat completion response
+
+        Returns:
+            LLM response
+        """
         choice = response.choices[0]
         message = choice.message
 
-        # Extract function calls
+        # Convert message
+        chat_message = ChatMessage(
+            role=message.role,
+            content=message.content or "",
+            name=getattr(message, 'name', None)
+        )
+
+        # Convert function calls if any
         function_calls = []
-        if message.tool_calls:
-            for tool_call in message.tool_calls:
-                if tool_call.type == "function":
-                    function_calls.append(
-                        FunctionCall(
-                            name=tool_call.function.name,
-                            arguments=tool_call.function.arguments,
-                        )
-                    )
-
-        # Build response
-        llm_response = LLMResponse(
-            generated_text=message.content or "",
-            messages=original_messages
-            + [
-                ChatMessage(
-                    role=MessageRole.ASSISTANT,
-                    content=message.content or "",
-                    function_call=function_calls[0] if function_calls else None,
+        if hasattr(message, 'function_call') and message.function_call:
+            function_calls.append(
+                FunctionCall(
+                    name=message.function_call.name,
+                    arguments=message.function_call.arguments
                 )
-            ],
-            function_calls=function_calls if function_calls else None,
-            metadata={
-                "model": self.model,
-                "finish_reason": choice.finish_reason,
-                "usage": response.usage.model_dump() if response.usage else None,
-            },
-            model=self.model,
+            )
+
+        # Extract usage information
+        usage = {}
+        if response.usage:
+            usage = {
+                "prompt_tokens": response.usage.prompt_tokens,
+                "completion_tokens": response.usage.completion_tokens,
+                "total_tokens": response.usage.total_tokens
+            }
+
+        return LLMResponse(
+            generated_text=message.content or "",
+            messages=[chat_message],
+            function_calls=function_calls,
+            model=response.model,
+            usage=usage,
             finish_reason=choice.finish_reason,
-            usage=response.usage.model_dump() if response.usage else None,
-        )
-
-        logger.info(
-            "Received OpenAI response with %d tokens",
-            response.usage.total_tokens if response.usage else 0,
-        )
-
-        return llm_response
-
-    async def generate_stream(
-        self,
-        messages: list[ChatMessage],
-        config: GenerationConfig | None = None,
-        **kwargs: Any,
-    ):
+            metadata={
+                "response_id": response.id,
+                "created": response.created,
+                "system_fingerprint": getattr(response, 'system_fingerprint', None)
+            }
+                )
+    
+    def _validate_request(self, request: ChatRequest) -> None:
+        """Validate chat request.
+        
+        Args:
+            request: Chat completion request
+            
+        Raises:
+            LLMValidationError: If request is invalid
         """
-        Generate streaming chat completion.
+        if not request.messages:
+            raise LLMValidationError("Messages cannot be empty")
+        
+        model = request.model or self.config.default_model
+        
+        # MANDATORY: Validate model constraints
+        validate_model_constraints(model)
+        
+        if model not in self.supported_models:
+            raise LLMValidationError(f"Unsupported model: {model}")
+        
+        # Check token limits
+        model_info = self.supported_models[model]
+        max_tokens = request.max_tokens or self.config.max_tokens
+        if max_tokens > model_info["max_tokens"]:
+            raise LLMValidationError(
+                f"Max tokens {max_tokens} exceeds model limit {model_info['max_tokens']}"
+            )
+
+    def get_supported_models(self) -> List[str]:
+        """Get list of supported models.
+
+        Returns:
+            List of supported model names
+        """
+        return list(self.supported_models.keys())
+
+    def supports_function_calling(self, model: str | None = None) -> bool:
+        """Check if model supports function calling.
 
         Args:
-            messages: List of chat messages
-            config: Generation configuration parameters
-            **kwargs: Additional generation parameters
+            model: Model name, uses default if None
 
-        Yields:
-            LLMResponse: Partial responses as they arrive
+        Returns:
+            True if model supports function calling
         """
-        # Apply rate limiting
-        from ..utils.rate_limiting import acquire_global_rate_limit
+        model = model or self.config.default_model
+        model_info = self.supported_models.get(model, {})
+        return model_info.get("supports_functions", False)
 
-        await acquire_global_rate_limit("openai", timeout=30.0)
+    def supports_streaming(self, model: str | None = None) -> bool:
+        """Check if model supports streaming.
 
-        # Prepare request parameters
-        request_params = self._prepare_request_params(messages, config, **kwargs)
-        request_params["stream"] = True
+        Args:
+            model: Model name, uses default if None
 
+        Returns:
+            True if model supports streaming (all OpenAI models do)
+        """
+        model = model or self.config.default_model
+        return model in self.supported_models
+
+    async def health_check(self) -> Dict[str, Any]:
+        """Perform health check.
+
+        Returns:
+            Health status information
+
+        Raises:
+            ComponentError: If health check fails
+        """
         try:
-            logger.info("Starting streaming chat completion")
+            # Simple API test
+            test_request = ChatRequest(
+                messages=[ChatMessage(role="user", content="Hello")],
+                model=self.config.default_model,
+                max_tokens=1
+            )
 
-            async with self.client.chat.completions.create(**request_params) as stream:
-                async for chunk in stream:
-                    if chunk.choices:
-                        choice = chunk.choices[0]
-                        if choice.delta.content:
-                            # Create partial response
-                            partial_response = LLMResponse(
-                                generated_text=choice.delta.content,
-                                model=self.model,
-                                metadata={"streaming": True},
-                            )
-                            yield partial_response
+            await self._create_chat_completion(test_request)
+
+            return {
+                "status": "healthy",
+                "provider": "openai",
+                "default_model": self.config.default_model,
+                "supported_models": len(self.supported_models),
+                "circuit_breaker_state": self.circuit_breaker.get_state()
+            }
 
         except Exception as e:
-            logger.exception("Error during OpenAI streaming: %s", e)
-            raise
-
-    def supports_function_calling(self) -> bool:
-        """Check if the provider supports function calling."""
-        return True
-
-    def supports_streaming(self) -> bool:
-        """Check if the provider supports streaming responses."""
-        return True
-
-    async def health_check(self) -> bool:
-        """Perform a health check on the provider."""
-        try:
-            response = await self.generate("test", max_tokens=1)
-            return bool(response and response.generated_text)
-        except Exception as e:
-            logger.warning("OpenAI health check failed: %s", e)
-            return False
+            logger.error("OpenAI health check failed", error=str(e))
+            raise ComponentError(f"OpenAI health check failed: {e}")

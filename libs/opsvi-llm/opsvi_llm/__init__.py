@@ -1,31 +1,38 @@
 """
-OPSVI LLM Library
+opsvi-llm Library
 
-Unified LLM integration library for the OPSVI ecosystem.
-Provides interfaces for OpenAI, Anthropic, and other LLM providers with structured outputs.
+Domain-specific components for the OPSVI ecosystem.
+Builds on opsvi-foundation for shared concerns.
 """
 
 __version__ = "1.0.0"
 __author__ = "OPSVI Team"
 __email__ = "team@opsvi.com"
 
-from .providers.anthropic_provider import AnthropicProvider
-from .providers.base import BaseLLMProvider
-from .providers.openai_provider import OpenAIProvider
-from .schemas.responses import ChatMessage, FunctionCall, LLMResponse
-from .utils.rate_limiting import RateLimiter
-from .utils.retry import retry_with_backoff
+# Import foundation components
+from opsvi_foundation import (
+    FoundationConfig,
+    AuthManager,
+    CircuitBreaker,
+    BaseComponent,
+    get_logger,
+)
+
+# Import domain-specific components
+from .core import LLMConfig, config
+from .core.exceptions import LLMError, LLMValidationError, LLMConfigurationError
 
 __all__ = [
-    # Schemas
-    "LLMResponse",
-    "ChatMessage",
-    "FunctionCall",
-    # Providers
-    "BaseLLMProvider",
-    "OpenAIProvider",
-    "AnthropicProvider",
-    # Utilities
-    "retry_with_backoff",
-    "RateLimiter",
+    # Foundation exports
+    "FoundationConfig",
+    "AuthManager", 
+    "CircuitBreaker",
+    "BaseComponent",
+    "get_logger",
+    # Domain exports
+    "LLMConfig",
+    "config",
+    "LLMError",
+    "LLMValidationError", 
+    "LLMConfigurationError",
 ]

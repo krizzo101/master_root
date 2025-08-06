@@ -25,6 +25,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "opsvi-foundation>=1.0.0",
     "opsvi-core>=1.0.0",
     "opsvi-llm>=1.0.0",
     "qdrant-client>=1.7.0",

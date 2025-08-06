@@ -1,11 +1,21 @@
 """
-Agents module for OPSVI Core Library.
+Agents module for opsvi-core.
 
-Provides base classes and patterns for implementing agents and multi-agent systems.
+Provides agent management, lifecycle, and communication.
 """
 
-from .base_agent import BaseAgent
+from .base_agent import (
+    BaseAgent,
+    AgentState,
+    AgentCapability,
+    AgentMetadata,
+    AgentMessage
+)
 
 __all__ = [
     "BaseAgent",
+    "AgentState",
+    "AgentCapability",
+    "AgentMetadata",
+    "AgentMessage",
 ]
