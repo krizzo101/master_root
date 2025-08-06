@@ -1,7 +1,7 @@
 """
-Orchestration module for opsvi-agents.
+Learning module for opsvi-agents.
 
-Provides multi-agent coordination, scheduling, and resource management.
+Provides reinforcement learning, meta-learning, federated learning, and memory systems.
 """
 
 from opsvi_foundation import (

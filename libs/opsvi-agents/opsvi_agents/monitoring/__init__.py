@@ -1,7 +1,19 @@
 """
-Monitoring module for opsvi-agents
+Monitoring module for opsvi-agents.
 
-Part of the OPSVI ecosystem.
+Provides agent monitoring, metrics, tracing, and observability capabilities.
 """
+
+from opsvi_foundation import (
+    BaseComponent,
+    ComponentError,
+    get_logger,
+)
+
+__all__ = [
+    "BaseComponent",
+    "ComponentError",
+    "get_logger",
+]
 
 __version__ = "1.0.0"

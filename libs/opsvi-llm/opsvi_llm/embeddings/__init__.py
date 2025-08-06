@@ -1,7 +1,7 @@
 """
-Analytics module for opsvi-rag.
+Embeddings module for opsvi-llm.
 
-Provides usage analytics, performance monitoring, and reporting capabilities.
+Provides embedding generation, similarity computation, and search capabilities.
 """
 
 from opsvi_foundation import (

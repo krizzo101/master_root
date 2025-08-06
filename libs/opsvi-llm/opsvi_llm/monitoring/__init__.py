@@ -1,7 +1,7 @@
 """
-Orchestration module for opsvi-agents.
+Monitoring module for opsvi-llm.
 
-Provides multi-agent coordination, scheduling, and resource management.
+Provides LLM monitoring, metrics, logging, and analytics capabilities.
 """
 
 from opsvi_foundation import (
@@ -11,9 +11,9 @@ from opsvi_foundation import (
 )
 
 __all__ = [
-    "BaseComponent",
-    "ComponentError",
     "get_logger",
+    "ComponentError",
+    "BaseComponent",
 ]
 
 __version__ = "1.0.0"

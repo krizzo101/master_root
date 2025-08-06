@@ -1,7 +1,7 @@
 """
-Orchestration module for opsvi-agents.
+Events module for opsvi-core.
 
-Provides multi-agent coordination, scheduling, and resource management.
+Provides event system, dispatcher, handlers, and event store capabilities.
 """
 
 from opsvi_foundation import (
@@ -11,9 +11,9 @@ from opsvi_foundation import (
 )
 
 __all__ = [
-    "BaseComponent",
-    "ComponentError",
     "get_logger",
+    "ComponentError",
+    "BaseComponent",
 ]
 
 __version__ = "1.0.0"

@@ -1,7 +1,19 @@
 """
-Communication module for opsvi-agents
+Communication module for opsvi-agents.
 
-Part of the OPSVI ecosystem.
+Provides inter-agent communication protocols and message passing.
 """
+
+from opsvi_foundation import (
+    BaseComponent,
+    ComponentError,
+    get_logger,
+)
+
+__all__ = [
+    "BaseComponent",
+    "ComponentError",
+    "get_logger",
+]
 
 __version__ = "1.0.0"

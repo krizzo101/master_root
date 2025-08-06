@@ -1,7 +1,7 @@
 """
-Analytics module for opsvi-rag.
+Fine-tuning module for opsvi-llm.
 
-Provides usage analytics, performance monitoring, and reporting capabilities.
+Provides model fine-tuning, training orchestration, and evaluation capabilities.
 """
 
 from opsvi_foundation import (

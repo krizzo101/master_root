@@ -1,7 +1,7 @@
 """
-Orchestration module for opsvi-agents.
+Collaboration module for opsvi-agents.
 
-Provides multi-agent coordination, scheduling, and resource management.
+Provides agent negotiation, coalition formation, knowledge sharing, and coordination capabilities.
 """
 
 from opsvi_foundation import (

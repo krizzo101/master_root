@@ -1,7 +1,16 @@
 """
-Caching module for opsvi-core
+Caching module for opsvi-core.
 
-Part of the OPSVI ecosystem.
+Provides application-specific caching capabilities.
 """
+
+from opsvi_foundation import Cache, CacheError, CacheKeyError, CacheValueError
+
+__all__ = [
+    "Cache",
+    "CacheError",
+    "CacheKeyError",
+    "CacheValueError",
+]
 
 __version__ = "1.0.0"

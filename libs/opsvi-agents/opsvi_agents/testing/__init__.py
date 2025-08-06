@@ -1,7 +1,7 @@
 """
-Orchestration module for opsvi-agents.
+Testing module for opsvi-agents.
 
-Provides multi-agent coordination, scheduling, and resource management.
+Provides agent testing, simulation, scenarios, validation, and automation capabilities.
 """
 
 from opsvi_foundation import (

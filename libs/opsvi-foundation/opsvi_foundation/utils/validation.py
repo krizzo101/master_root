@@ -91,7 +91,7 @@ def is_not_empty(value: Any) -> bool:
         return False
     if isinstance(value, str):
         return len(value.strip()) > 0
-    if isinstance(value, (list, tuple, set)):
+    if isinstance(value, list | tuple | set):
         return len(value) > 0
     if isinstance(value, dict):
         return len(value) > 0
@@ -263,7 +263,7 @@ def validate_input(schema: ValidationSchema):
                 errors = schema.validate(arg)
                 if errors:
                     raise CustomValidationError(
-                        f"Validation failed: {'; '.join(errors)}"
+                        f"Validation failed: {'; '.join(errors)}",
                     )
             return func(*args, **kwargs)
 
@@ -281,7 +281,7 @@ def validate_output(schema: ValidationSchema):
             errors = schema.validate(result)
             if errors:
                 raise CustomValidationError(
-                    f"Output validation failed: {'; '.join(errors)}"
+                    f"Output validation failed: {'; '.join(errors)}",
                 )
             return result
 
@@ -520,7 +520,7 @@ def validate_range(
 
     if max_value is not None and value > max_value:
         raise CustomValidationError(
-            f"Value {value} is greater than maximum {max_value}"
+            f"Value {value} is greater than maximum {max_value}",
         )
 
     return value
@@ -536,12 +536,12 @@ def validate_length(
 
     if min_length is not None and length < min_length:
         raise CustomValidationError(
-            f"Length {length} is less than minimum {min_length}"
+            f"Length {length} is less than minimum {min_length}",
         )
 
     if max_length is not None and length > max_length:
         raise CustomValidationError(
-            f"Length {length} is greater than maximum {max_length}"
+            f"Length {length} is greater than maximum {max_length}",
         )
 
     return value
@@ -557,7 +557,7 @@ def validate_pattern(value: str, pattern: str, flags: int = 0) -> str:
 
     if not re.match(pattern, value, flags):
         raise CustomValidationError(
-            f"Value '{value}' does not match pattern '{pattern}'"
+            f"Value '{value}' does not match pattern '{pattern}'",
         )
 
     return value

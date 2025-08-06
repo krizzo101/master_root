@@ -1,7 +1,7 @@
 """
-Analytics module for opsvi-rag.
+Monitoring module for opsvi-core.
 
-Provides usage analytics, performance monitoring, and reporting capabilities.
+Provides application monitoring, metrics, health checks, and profiling capabilities.
 """
 
 from opsvi_foundation import (

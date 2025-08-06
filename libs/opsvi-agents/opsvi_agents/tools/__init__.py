@@ -1,7 +1,7 @@
 """
-Orchestration module for opsvi-agents.
+Tools module for opsvi-agents.
 
-Provides multi-agent coordination, scheduling, and resource management.
+Provides CLI tools, workflow designer, simulator, profiler, and debugger capabilities.
 """
 
 from opsvi_foundation import (

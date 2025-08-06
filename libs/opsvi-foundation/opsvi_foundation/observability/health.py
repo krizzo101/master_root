@@ -10,10 +10,12 @@ from __future__ import annotations
 import asyncio
 import time
 from abc import ABC, abstractmethod
-from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 from opsvi_foundation.patterns import ComponentError
 
@@ -402,9 +404,7 @@ class HealthMonitor:
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         # Handle exceptions
-        for i, (name, result) in enumerate(
-            zip(self.checkers.keys(), results, strict=False)
-        ):
+        for name, result in zip(self.checkers.keys(), results, strict=False):
             if isinstance(result, Exception):
                 self.last_results[name] = HealthCheck(
                     name=name,
@@ -462,7 +462,7 @@ class HealthMonitor:
         """
         overall_status = self.get_overall_status()
 
-        summary = {
+        return {
             "status": overall_status.value,
             "timestamp": time.time(),
             "checks": {
@@ -476,8 +476,6 @@ class HealthMonitor:
                 for name, result in self.last_results.items()
             },
         }
-
-        return summary
 
     def start_auto_refresh(self, interval: float | None = None) -> None:
         """

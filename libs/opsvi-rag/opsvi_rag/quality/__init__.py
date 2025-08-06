@@ -1,7 +1,7 @@
 """
-Orchestration module for opsvi-agents.
+Quality module for opsvi-rag.
 
-Provides multi-agent coordination, scheduling, and resource management.
+Provides quality assurance, validation, evaluation, and feedback capabilities.
 """
 
 from opsvi_foundation import (
@@ -11,9 +11,9 @@ from opsvi_foundation import (
 )
 
 __all__ = [
-    "BaseComponent",
-    "ComponentError",
     "get_logger",
+    "ComponentError",
+    "BaseComponent",
 ]
 
 __version__ = "1.0.0"
