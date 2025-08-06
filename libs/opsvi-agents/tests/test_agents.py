@@ -4,18 +4,16 @@ Test suite for opsvi-agents library.
 Comprehensive tests for agent orchestration components.
 """
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock
 
-from opsvi_core.agents.base_agent import BaseAgent
-from opsvi_core.exceptions import ValidationError, InitializationError
+import pytest
 
 from opsvi_agents import (
+    AgentRegistry,
     CrewAdapter,
     GraphAdapter,
-    BaseOrchestrator,
-    AgentRegistry,
 )
+from opsvi_core.agents.base_agent import BaseAgent
+from opsvi_core.exceptions import ValidationError
 
 
 class MockAgent(BaseAgent):
@@ -203,7 +201,7 @@ class TestAgentRegistry:
             "mock_agent",
             MockAgent,
             "test_framework",
-            {"description": "Test agent"}
+            {"description": "Test agent"},
         )
 
         types = registry.list_agent_types()

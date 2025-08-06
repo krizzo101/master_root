@@ -6,10 +6,7 @@ Creates a new OPSVI library with consistent structure and patterns.
 """
 
 import argparse
-import os
-import shutil
 from pathlib import Path
-from typing import Dict, Any
 
 LIBRARY_TEMPLATE = {
     "directories": [
@@ -103,7 +100,6 @@ ignore = ["E501", "B008", "C901"]
 target-version = ["py311"]
 line-length = 88
 """,
-
         "{lib_name}/__init__.py": '''"""
 {lib_title}
 
@@ -132,7 +128,6 @@ __all__ = [
 {custom_exports}
 ]
 ''',
-
         "{lib_name}/core/__init__.py": '''"""
 Core components for {lib_name}.
 """
@@ -142,7 +137,6 @@ from .exceptions import {class_name}Error
 
 __all__ = ["{class_name}Config", "{class_name}Error"]
 ''',
-
         "{lib_name}/core/config.py": '''"""
 Configuration management for {lib_name}.
 """
@@ -173,7 +167,6 @@ class {class_name}Config(BaseModel):
 # Global configuration instance
 config = {class_name}Config.from_env()
 ''',
-
         "{lib_name}/core/exceptions.py": '''"""
 Exception hierarchy for {lib_name}.
 """
@@ -195,8 +188,7 @@ class {class_name}ConfigurationError({class_name}Error):
     """Configuration error specific to {lib_name}."""
     pass
 ''',
-
-        "README.md": '''# {lib_title}
+        "README.md": """# {lib_title}
 
 {description}
 
@@ -254,8 +246,7 @@ mypy .
 2. Add tests for new functionality
 3. Update documentation
 4. Ensure all quality checks pass
-''',
-
+""",
         "tests/test_{package_name}.py": '''"""
 Test suite for {lib_name}.
 """
@@ -276,12 +267,20 @@ async def test_basic_functionality():
     # Add your tests here
     pass
 ''',
-    }
+    },
 }
 
-def create_library(name: str, description: str, domain: str, custom_dependencies: list = None,
-                  custom_config_fields: str = "", custom_imports: str = "",
-                  custom_exports: str = "", custom_config_values: str = "") -> None:
+
+def create_library(
+    name: str,
+    description: str,
+    domain: str,
+    custom_dependencies: list = None,
+    custom_config_fields: str = "",
+    custom_imports: str = "",
+    custom_exports: str = "",
+    custom_config_values: str = "",
+) -> None:
     """Create a new OPSVI library from template."""
 
     if custom_dependencies is None:
@@ -295,7 +294,9 @@ def create_library(name: str, description: str, domain: str, custom_dependencies
     # Prepare template variables
     lib_name = name
     package_name = name.replace("-", "_")
-    class_name = "".join(word.capitalize() for word in name.replace("opsvi-", "").split("-"))
+    class_name = "".join(
+        word.capitalize() for word in name.replace("opsvi-", "").split("-")
+    )
     lib_title = f"OPSVI {class_name} Library"
 
     template_vars = {
@@ -324,7 +325,7 @@ def create_library(name: str, description: str, domain: str, custom_dependencies
         dir_path.mkdir(parents=True, exist_ok=True)
 
     # Create files from templates
-    print(f"📝 Creating files...")
+    print("📝 Creating files...")
     for file_path, content in LIBRARY_TEMPLATE["files"].items():
         full_path = base_path / file_path.format(**template_vars)
         full_path.parent.mkdir(parents=True, exist_ok=True)
@@ -333,13 +334,13 @@ def create_library(name: str, description: str, domain: str, custom_dependencies
             f.write(content.format(**template_vars))
 
     print(f"✅ Library {lib_name} created successfully!")
-    print(f"")
-    print(f"📋 Next steps:")
+    print("")
+    print("📋 Next steps:")
     print(f"  1. cd {lib_name}")
-    print(f"  2. Customize the configuration and core logic")
-    print(f"  3. Add domain-specific modules")
-    print(f"  4. Write comprehensive tests")
-    print(f"  5. Update documentation")
+    print("  2. Customize the configuration and core logic")
+    print("  3. Add domain-specific modules")
+    print("  4. Write comprehensive tests")
+    print("  5. Update documentation")
 
 
 def main():
@@ -356,7 +357,7 @@ def main():
         name=args.name,
         description=args.description,
         domain=args.domain,
-        custom_dependencies=args.deps or []
+        custom_dependencies=args.deps or [],
     )
 
 

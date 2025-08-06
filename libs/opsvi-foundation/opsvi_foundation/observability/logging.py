@@ -7,8 +7,9 @@ Provides consistent logging configuration across all components.
 import logging
 import sys
 from typing import Any
-import structlog
+
 import orjson
+import structlog
 
 
 def setup_logging(log_level: str = "INFO") -> None:

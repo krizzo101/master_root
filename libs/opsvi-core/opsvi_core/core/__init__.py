@@ -5,7 +5,7 @@ Domain-specific configuration and exceptions.
 """
 
 from .config import CoreConfig, config
-from .exceptions import CoreError, AgentError, WorkflowError
+from .exceptions import AgentError, CoreError, WorkflowError
 
 __all__ = [
     "CoreConfig",

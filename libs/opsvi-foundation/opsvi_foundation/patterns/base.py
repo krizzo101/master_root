@@ -4,15 +4,14 @@ Base patterns and components.
 Provides abstract base classes and lifecycle management.
 """
 
-import asyncio
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 
 class ComponentError(Exception):
     """Base exception for all foundation components."""
 
-    def __init__(self, message: str, details: Optional[dict[str, Any]] = None):
+    def __init__(self, message: str, details: dict[str, Any] | None = None):
         self.message = message
         self.details = details or {}
         super().__init__(self.message)
@@ -71,19 +70,15 @@ class BaseComponent(ABC):
     @abstractmethod
     async def _initialize(self) -> None:
         """Component-specific initialization logic."""
-        pass
 
     async def _start(self) -> None:
         """Component-specific start logic."""
-        pass
 
     async def _stop(self) -> None:
         """Component-specific stop logic."""
-        pass
 
     async def _cleanup(self) -> None:
         """Component-specific cleanup logic."""
-        pass
 
 
 class LifecycleComponent(BaseComponent):
@@ -91,4 +86,3 @@ class LifecycleComponent(BaseComponent):
 
     async def _initialize(self) -> None:
         """Default initialization - override if needed."""
-        pass

@@ -10,12 +10,11 @@ import base64
 import hashlib
 import os
 import secrets
-from typing import Any
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from pydantic import BaseModel
 
 from ..observability import get_logger
@@ -25,6 +24,7 @@ logger = get_logger(__name__)
 
 class EncryptionConfig(BaseModel):
     """Configuration for encryption operations."""
+
     key_length: int = 32
     salt_length: int = 16
     iterations: int = 100000
@@ -38,7 +38,11 @@ class AdvancedEncryption:
         self.config = config or EncryptionConfig()
         logger.debug("Initialized AdvancedEncryption", config=self.config.model_dump())
 
-    def generate_key(self, password: str, salt: bytes | None = None) -> tuple[bytes, bytes]:
+    def generate_key(
+        self,
+        password: str,
+        salt: bytes | None = None,
+    ) -> tuple[bytes, bytes]:
         """Generate encryption key from password using PBKDF2.
 
         Args:
@@ -130,13 +134,13 @@ class AdvancedEncryption:
         private_pem = private_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
-            encryption_algorithm=serialization.NoEncryption()
+            encryption_algorithm=serialization.NoEncryption(),
         )
 
         public_key = private_key.public_key()
         public_pem = public_key.public_bytes(
             encoding=serialization.Encoding.PEM,
-            format=serialization.PublicFormat.SubjectPublicKeyInfo
+            format=serialization.PublicFormat.SubjectPublicKeyInfo,
         )
 
         logger.debug("Generated RSA keypair", key_size=key_size)
@@ -170,7 +174,7 @@ def hash_password(password: str, salt: bytes | None = None) -> tuple[str, str]:
     if salt is None:
         salt = os.urandom(16)
 
-    pwd_hash = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100000)
+    pwd_hash = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 100000)
 
     logger.debug("Hashed password", salt_length=len(salt))
     return pwd_hash.hex(), salt.hex()
@@ -191,7 +195,7 @@ def verify_password(password: str, hash_hex: str, salt_hex: str) -> bool:
         salt = bytes.fromhex(salt_hex)
         stored_hash = bytes.fromhex(hash_hex)
 
-        pwd_hash = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100000)
+        pwd_hash = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 100000)
 
         result = secrets.compare_digest(pwd_hash, stored_hash)
         logger.debug("Password verification", result=result)

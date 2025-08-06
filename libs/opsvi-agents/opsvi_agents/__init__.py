@@ -11,21 +11,25 @@ __email__ = "team@opsvi.com"
 
 # Import foundation components
 from opsvi_foundation import (
-    FoundationConfig,
     AuthManager,
-    CircuitBreaker,
     BaseComponent,
+    CircuitBreaker,
+    FoundationConfig,
     get_logger,
 )
 
 # Import domain-specific components
 from .core import AgentsConfig, config
-from .core.exceptions import AgentsError, AgentsValidationError, AgentsConfigurationError
+from .core.exceptions import (
+    AgentsConfigurationError,
+    AgentsError,
+    AgentsValidationError,
+)
 
 __all__ = [
     # Foundation exports
     "FoundationConfig",
-    "AuthManager", 
+    "AuthManager",
     "CircuitBreaker",
     "BaseComponent",
     "get_logger",
@@ -33,6 +37,6 @@ __all__ = [
     "AgentsConfig",
     "config",
     "AgentsError",
-    "AgentsValidationError", 
+    "AgentsValidationError",
     "AgentsConfigurationError",
 ]

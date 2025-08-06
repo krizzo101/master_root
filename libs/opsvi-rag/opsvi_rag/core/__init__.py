@@ -5,11 +5,11 @@ Domain-specific configuration and exceptions.
 """
 
 from .config import RAGConfig, config
-from .exceptions import RAGError, RAGValidationError, RAGConfigurationError
+from .exceptions import RAGConfigurationError, RAGError, RAGValidationError
 
 __all__ = [
     "RAGConfig",
-    "config", 
+    "config",
     "RAGError",
     "RAGValidationError",
     "RAGConfigurationError",

@@ -7,11 +7,12 @@ Defines the abstract interface that all LLM providers must implement.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, AsyncIterator, Dict, List
+from collections.abc import AsyncIterator
+from typing import Any
 
 from opsvi_foundation import BaseComponent
 
-from ..schemas.requests import ChatRequest, CompletionRequest
+from ..schemas.requests import ChatRequest
 from ..schemas.responses import LLMResponse
 
 
@@ -68,7 +69,7 @@ class BaseLLMProvider(BaseComponent, ABC):
         pass
 
     @abstractmethod
-    def get_supported_models(self) -> List[str]:
+    def get_supported_models(self) -> list[str]:
         """Get list of supported models.
 
         Returns:
@@ -101,7 +102,7 @@ class BaseLLMProvider(BaseComponent, ABC):
         pass
 
     @abstractmethod
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check.
 
         Returns:

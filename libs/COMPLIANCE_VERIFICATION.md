@@ -204,7 +204,7 @@ line-length = 88
 "opentelemetry-api>=1.25.0",  # Latest observability
 "prometheus-client>=0.20.0",  # Modern metrics collection
 
-# LLM Library - 2025 Standards  
+# LLM Library - 2025 Standards
 "openai>=1.50.0",             # Latest API features
 "anthropic>=0.25.0",          # Current Claude integration
 "pytest>=8.0.0",              # Latest testing framework
@@ -245,7 +245,7 @@ line-length = 88
 ```bash
 # All tools use 2025 standards
 uv run ruff check --fix --preview libs/
-uv run mypy libs/ --strict  
+uv run mypy libs/ --strict
 uv run black libs/ --check
 uv run pytest tests/ --cov=libs --cov-report=html
 ```

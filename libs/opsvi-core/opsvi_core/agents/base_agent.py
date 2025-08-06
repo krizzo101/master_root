@@ -10,14 +10,13 @@ import asyncio
 import uuid
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any
 
 from opsvi_foundation import (
     BaseComponent,
+    RetryConfig,
     get_logger,
     retry,
-    RetryConfig,
-    ComponentError
 )
 from pydantic import BaseModel, Field
 
@@ -28,6 +27,7 @@ logger = get_logger(__name__)
 
 class AgentState(str, Enum):
     """Agent lifecycle states."""
+
     CREATED = "created"
     INITIALIZING = "initializing"
     READY = "ready"
@@ -40,30 +40,35 @@ class AgentState(str, Enum):
 
 class AgentCapability(BaseModel):
     """Agent capability definition."""
+
     name: str = Field(..., description="Capability name")
     version: str = Field(default="1.0.0", description="Capability version")
     description: str = Field(default="", description="Capability description")
-    parameters: Dict[str, Any] = Field(default_factory=dict, description="Capability parameters")
+    parameters: dict[str, Any] = Field(
+        default_factory=dict, description="Capability parameters"
+    )
 
 
 class AgentMetadata(BaseModel):
     """Agent metadata and configuration."""
+
     agent_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str = Field(..., description="Agent name")
     version: str = Field(default="1.0.0", description="Agent version")
     description: str = Field(default="", description="Agent description")
     capabilities: list[AgentCapability] = Field(default_factory=list)
     tags: list[str] = Field(default_factory=list)
-    config: Dict[str, Any] = Field(default_factory=dict)
+    config: dict[str, Any] = Field(default_factory=dict)
 
 
 class AgentMessage(BaseModel):
     """Message structure for agent communication."""
+
     message_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     sender_id: str = Field(..., description="Sender agent ID")
-    recipient_id: Optional[str] = Field(default=None, description="Recipient agent ID")
+    recipient_id: str | None = Field(default=None, description="Recipient agent ID")
     message_type: str = Field(..., description="Message type")
-    payload: Dict[str, Any] = Field(default_factory=dict)
+    payload: dict[str, Any] = Field(default_factory=dict)
     timestamp: float = Field(default_factory=lambda: asyncio.get_event_loop().time())
 
 
@@ -82,18 +87,18 @@ class BaseAgent(BaseComponent, ABC):
         super().__init__()
         self.metadata = metadata
         self.state = AgentState.CREATED
-        self._message_handlers: Dict[str, callable] = {}
-        self._plugins: Dict[str, Any] = {}
+        self._message_handlers: dict[str, callable] = {}
+        self._plugins: dict[str, Any] = {}
         self._stats = {
             "messages_sent": 0,
             "messages_received": 0,
             "errors": 0,
-            "uptime": 0.0
+            "uptime": 0.0,
         }
 
-        logger.info("Agent created",
-                   agent_id=self.metadata.agent_id,
-                   name=self.metadata.name)
+        logger.info(
+            "Agent created", agent_id=self.metadata.agent_id, name=self.metadata.name
+        )
 
     async def _initialize(self) -> None:
         """Initialize the agent."""
@@ -103,15 +108,19 @@ class BaseAgent(BaseComponent, ABC):
             await self.setup()
             self.state = AgentState.READY
 
-            logger.info("Agent initialized",
-                       agent_id=self.metadata.agent_id,
-                       capabilities=len(self.metadata.capabilities))
+            logger.info(
+                "Agent initialized",
+                agent_id=self.metadata.agent_id,
+                capabilities=len(self.metadata.capabilities),
+            )
 
         except Exception as e:
             self.state = AgentState.ERROR
-            logger.error("Agent initialization failed",
-                        agent_id=self.metadata.agent_id,
-                        error=str(e))
+            logger.error(
+                "Agent initialization failed",
+                agent_id=self.metadata.agent_id,
+                error=str(e),
+            )
             raise AgentError(f"Agent initialization failed: {e}")
 
     async def _start(self) -> None:
@@ -129,17 +138,19 @@ class BaseAgent(BaseComponent, ABC):
         except Exception as e:
             self.state = AgentState.ERROR
             self._stats["errors"] += 1
-            logger.error("Agent start failed",
-                        agent_id=self.metadata.agent_id,
-                        error=str(e))
+            logger.error(
+                "Agent start failed", agent_id=self.metadata.agent_id, error=str(e)
+            )
             raise AgentError(f"Agent start failed: {e}")
 
     async def _stop(self) -> None:
         """Stop the agent."""
         if self.state not in [AgentState.RUNNING, AgentState.PAUSED]:
-            logger.warning("Attempting to stop agent not in running state",
-                          agent_id=self.metadata.agent_id,
-                          state=self.state)
+            logger.warning(
+                "Attempting to stop agent not in running state",
+                agent_id=self.metadata.agent_id,
+                state=self.state,
+            )
             return
 
         self.state = AgentState.STOPPING
@@ -153,9 +164,9 @@ class BaseAgent(BaseComponent, ABC):
         except Exception as e:
             self.state = AgentState.ERROR
             self._stats["errors"] += 1
-            logger.error("Agent stop failed",
-                        agent_id=self.metadata.agent_id,
-                        error=str(e))
+            logger.error(
+                "Agent stop failed", agent_id=self.metadata.agent_id, error=str(e)
+            )
             raise AgentError(f"Agent stop failed: {e}")
 
     async def _cleanup(self) -> None:
@@ -165,9 +176,9 @@ class BaseAgent(BaseComponent, ABC):
             logger.info("Agent cleanup completed", agent_id=self.metadata.agent_id)
 
         except Exception as e:
-            logger.error("Agent cleanup failed",
-                        agent_id=self.metadata.agent_id,
-                        error=str(e))
+            logger.error(
+                "Agent cleanup failed", agent_id=self.metadata.agent_id, error=str(e)
+            )
             raise AgentError(f"Agent cleanup failed: {e}")
 
     @abstractmethod
@@ -231,17 +242,21 @@ class BaseAgent(BaseComponent, ABC):
             await self.deliver_message(message)
             self._stats["messages_sent"] += 1
 
-            logger.debug("Message sent",
-                        agent_id=self.metadata.agent_id,
-                        message_id=message.message_id,
-                        recipient=message.recipient_id)
+            logger.debug(
+                "Message sent",
+                agent_id=self.metadata.agent_id,
+                message_id=message.message_id,
+                recipient=message.recipient_id,
+            )
 
         except Exception as e:
             self._stats["errors"] += 1
-            logger.error("Failed to send message",
-                        agent_id=self.metadata.agent_id,
-                        message_id=message.message_id,
-                        error=str(e))
+            logger.error(
+                "Failed to send message",
+                agent_id=self.metadata.agent_id,
+                message_id=message.message_id,
+                error=str(e),
+            )
             raise AgentError(f"Failed to send message: {e}")
 
     async def receive_message(self, message: AgentMessage) -> None:
@@ -252,11 +267,13 @@ class BaseAgent(BaseComponent, ABC):
         """
         self._stats["messages_received"] += 1
 
-        logger.debug("Message received",
-                    agent_id=self.metadata.agent_id,
-                    message_id=message.message_id,
-                    sender=message.sender_id,
-                    message_type=message.message_type)
+        logger.debug(
+            "Message received",
+            agent_id=self.metadata.agent_id,
+            message_id=message.message_id,
+            sender=message.sender_id,
+            message_type=message.message_type,
+        )
 
         try:
             handler = self._message_handlers.get(message.message_type)
@@ -268,10 +285,12 @@ class BaseAgent(BaseComponent, ABC):
 
         except Exception as e:
             self._stats["errors"] += 1
-            logger.error("Message processing failed",
-                        agent_id=self.metadata.agent_id,
-                        message_id=message.message_id,
-                        error=str(e))
+            logger.error(
+                "Message processing failed",
+                agent_id=self.metadata.agent_id,
+                message_id=message.message_id,
+                error=str(e),
+            )
 
     def register_message_handler(self, message_type: str, handler: callable) -> None:
         """Register a message handler.
@@ -281,9 +300,11 @@ class BaseAgent(BaseComponent, ABC):
             handler: Async function to handle the message
         """
         self._message_handlers[message_type] = handler
-        logger.debug("Message handler registered",
-                    agent_id=self.metadata.agent_id,
-                    message_type=message_type)
+        logger.debug(
+            "Message handler registered",
+            agent_id=self.metadata.agent_id,
+            message_type=message_type,
+        )
 
     def add_capability(self, capability: AgentCapability) -> None:
         """Add a capability to the agent.
@@ -292,11 +313,13 @@ class BaseAgent(BaseComponent, ABC):
             capability: Capability to add
         """
         self.metadata.capabilities.append(capability)
-        logger.info("Capability added",
-                   agent_id=self.metadata.agent_id,
-                   capability=capability.name)
+        logger.info(
+            "Capability added",
+            agent_id=self.metadata.agent_id,
+            capability=capability.name,
+        )
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get agent statistics.
 
         Returns:
@@ -306,10 +329,10 @@ class BaseAgent(BaseComponent, ABC):
             **self._stats,
             "state": self.state.value,
             "capabilities": len(self.metadata.capabilities),
-            "plugins": len(self._plugins)
+            "plugins": len(self._plugins),
         }
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform agent health check.
 
         Returns:
@@ -320,7 +343,7 @@ class BaseAgent(BaseComponent, ABC):
             "name": self.metadata.name,
             "state": self.state.value,
             "healthy": self.state in [AgentState.READY, AgentState.RUNNING],
-            "stats": self.get_stats()
+            "stats": self.get_stats(),
         }
 
     async def deliver_message(self, message: AgentMessage) -> None:
@@ -332,8 +355,9 @@ class BaseAgent(BaseComponent, ABC):
             message: Message to deliver
         """
         # Default implementation - override in subclasses
-        logger.debug("Message delivery not implemented",
-                    agent_id=self.metadata.agent_id)
+        logger.debug(
+            "Message delivery not implemented", agent_id=self.metadata.agent_id
+        )
 
     async def handle_unknown_message(self, message: AgentMessage) -> None:
         """Handle unknown message types.
@@ -343,7 +367,9 @@ class BaseAgent(BaseComponent, ABC):
         Args:
             message: Unknown message
         """
-        logger.warning("Unknown message type",
-                      agent_id=self.metadata.agent_id,
-                      message_type=message.message_type,
-                      message_id=message.message_id)
+        logger.warning(
+            "Unknown message type",
+            agent_id=self.metadata.agent_id,
+            message_type=message.message_type,
+            message_id=message.message_id,
+        )

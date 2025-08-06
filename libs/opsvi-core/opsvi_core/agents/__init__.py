@@ -5,11 +5,11 @@ Provides agent management, lifecycle, and communication.
 """
 
 from .base_agent import (
-    BaseAgent,
-    AgentState,
     AgentCapability,
+    AgentMessage,
     AgentMetadata,
-    AgentMessage
+    AgentState,
+    BaseAgent,
 )
 
 __all__ = [

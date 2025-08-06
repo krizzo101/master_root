@@ -8,7 +8,6 @@ import hashlib
 import hmac
 import secrets
 from datetime import datetime, timedelta
-from typing import Any, Optional
 
 import jwt
 from cryptography.fernet import Fernet
@@ -17,15 +16,17 @@ from pydantic import BaseModel
 
 class AuthConfig(BaseModel):
     """Authentication configuration."""
+
     jwt_secret: str
     jwt_algorithm: str = "HS256"
     jwt_expiry_hours: int = 24
     api_key_length: int = 32
-    encryption_key: Optional[str] = None
+    encryption_key: str | None = None
 
 
 class TokenPayload(BaseModel):
     """JWT token payload structure."""
+
     user_id: str
     email: str
     roles: list[str]
@@ -50,21 +51,29 @@ class AuthManager:
             "email": email,
             "roles": roles,
             "iat": now,
-            "exp": now + timedelta(hours=self.config.jwt_expiry_hours)
+            "exp": now + timedelta(hours=self.config.jwt_expiry_hours),
         }
 
-        return jwt.encode(payload, self.config.jwt_secret, algorithm=self.config.jwt_algorithm)
+        return jwt.encode(
+            payload,
+            self.config.jwt_secret,
+            algorithm=self.config.jwt_algorithm,
+        )
 
     def validate_jwt(self, token: str) -> TokenPayload:
         """Validate and decode a JWT token."""
         try:
-            payload = jwt.decode(token, self.config.jwt_secret, algorithms=[self.config.jwt_algorithm])
+            payload = jwt.decode(
+                token,
+                self.config.jwt_secret,
+                algorithms=[self.config.jwt_algorithm],
+            )
             return TokenPayload(
                 user_id=payload["user_id"],
                 email=payload["email"],
                 roles=payload["roles"],
                 exp=datetime.fromtimestamp(payload["exp"]),
-                iat=datetime.fromtimestamp(payload["iat"])
+                iat=datetime.fromtimestamp(payload["iat"]),
             )
         except jwt.ExpiredSignatureError:
             raise ValueError("Token has expired")
@@ -76,12 +85,17 @@ class AuthManager:
         key = secrets.token_urlsafe(self.config.api_key_length)
         return f"{prefix}_{key}"
 
-    def hash_api_key(self, api_key: str, salt: Optional[str] = None) -> tuple[str, str]:
+    def hash_api_key(self, api_key: str, salt: str | None = None) -> tuple[str, str]:
         """Hash an API key for secure storage."""
         if salt is None:
             salt = secrets.token_hex(16)
 
-        key_hash = hashlib.pbkdf2_hmac('sha256', api_key.encode(), salt.encode(), 100000)
+        key_hash = hashlib.pbkdf2_hmac(
+            "sha256",
+            api_key.encode(),
+            salt.encode(),
+            100000,
+        )
         return key_hash.hex(), salt
 
     def verify_api_key(self, api_key: str, stored_hash: str, salt: str) -> bool:
@@ -112,9 +126,9 @@ def sanitize_input(data: str, max_length: int = 1000) -> str:
         raise ValueError(f"Input exceeds maximum length of {max_length}")
 
     # Remove potentially dangerous characters
-    dangerous_chars = ['<', '>', '"', "'", '&', ';', '(', ')', '|', '`']
+    dangerous_chars = ["<", ">", '"', "'", "&", ";", "(", ")", "|", "`"]
     sanitized = data
     for char in dangerous_chars:
-        sanitized = sanitized.replace(char, '')
+        sanitized = sanitized.replace(char, "")
 
     return sanitized.strip()

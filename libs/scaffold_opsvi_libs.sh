@@ -24,12 +24,12 @@ echo "📁 Creating directory structures..."
 for lib in "${!LIB_FEATURES[@]}"; do
     echo "  Creating $lib directories..."
     lib_name=$(echo $lib | tr '-' '_')
-    
+
     # Create common directories
     for dir in $COMMON_DIRS; do
         mkdir -p "$lib/$lib_name/$dir"
     done
-    
+
     # Create library-specific feature directories
     for dir in ${LIB_FEATURES[$lib]}; do
         mkdir -p "$lib/$lib_name/$dir"
@@ -43,7 +43,7 @@ create_init_file() {
     local filepath="$1"
     local module_name="$2"
     local description="$3"
-    
+
     cat > "$filepath" << EOF
 """
 $description
@@ -58,15 +58,15 @@ EOF
 # Create __init__.py files for all directories
 for lib in "${!LIB_FEATURES[@]}"; do
     lib_name=$(echo $lib | tr '-' '_')
-    
+
     # Main library __init__.py
     create_init_file "$lib/$lib_name/__init__.py" "$lib" "$lib - $(echo $lib | sed 's/opsvi-//' | tr '[:lower:]' '[:upper:]') components for OPSVI ecosystem"
-    
+
     # Common module __init__.py files
     for dir in $COMMON_DIRS; do
         create_init_file "$lib/$lib_name/$dir/__init__.py" "$lib" "$(echo $dir | sed 's/.*/\u&/') components for $lib"
     done
-    
+
     # Feature-specific __init__.py files
     for dir in ${LIB_FEATURES[$lib]}; do
         create_init_file "$lib/$lib_name/$dir/__init__.py" "$lib" "$(echo $dir | sed 's/.*/\u&/') components for $lib"
@@ -79,7 +79,7 @@ echo "🔧 Creating base exception classes..."
 for lib in "${!LIB_FEATURES[@]}"; do
     lib_name=$(echo $lib | tr '-' '_')
     lib_class=$(echo $lib | sed 's/opsvi-//' | sed 's/.*/\u&/')
-    
+
     cat > "$lib/$lib_name/core/exceptions.py" << EOF
 """
 Exception hierarchy for $lib.
@@ -92,7 +92,7 @@ from typing import Any, Optional
 
 class ${lib_class}Error(Exception):
     """Base exception for all $lib errors."""
-    
+
     def __init__(self, message: str, details: Optional[dict[str, Any]] = None):
         self.message = message
         self.details = details or {}
@@ -156,7 +156,7 @@ echo "⚙️ Creating configuration modules..."
 for lib in "${!LIB_FEATURES[@]}"; do
     lib_name=$(echo $lib | tr '-' '_')
     lib_class=$(echo $lib | sed 's/opsvi-//' | sed 's/.*/\u&/')
-    
+
     cat > "$lib/$lib_name/core/config.py" << EOF
 """
 Configuration management for $lib.
@@ -173,17 +173,17 @@ from .exceptions import ConfigurationError
 
 class ${lib_class}Config(BaseModel):
     """Configuration settings for $lib."""
-    
+
     # Environment settings
     environment: str = Field(default="development", description="Runtime environment")
     debug: bool = Field(default=False, description="Enable debug mode")
     log_level: str = Field(default="INFO", description="Logging level")
-    
+
     # Security settings
     encryption_key: Optional[str] = Field(default=None, description="Encryption key for sensitive data")
     api_timeout: int = Field(default=30, description="Default API timeout in seconds")
     max_retries: int = Field(default=3, description="Default maximum retry attempts")
-    
+
     @classmethod
     def from_env(cls) -> "${lib_class}Config":
         """Create configuration from environment variables."""
@@ -198,12 +198,12 @@ class ${lib_class}Config(BaseModel):
             )
         except Exception as e:
             raise ConfigurationError(f"Failed to load configuration: {e}")
-    
+
     def validate(self) -> None:
         """Validate configuration settings."""
         if self.environment not in ["development", "staging", "production"]:
             raise ConfigurationError(f"Invalid environment: {self.environment}")
-        
+
         if self.log_level not in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
             raise ConfigurationError(f"Invalid log level: {self.log_level}")
 
@@ -219,7 +219,7 @@ echo "📊 Creating logging modules..."
 for lib in "${!LIB_FEATURES[@]}"; do
     lib_name=$(echo $lib | tr '-' '_')
     lib_class=$(echo $lib | sed 's/opsvi-//' | sed 's/.*/\u&/')
-    
+
     cat > "$lib/$lib_name/core/logging.py" << EOF
 """
 Structured logging setup for $lib.
@@ -238,7 +238,7 @@ from .config import config
 
 def setup_logging() -> None:
     """Configure structured logging for the application."""
-    
+
     # Configure structlog
     structlog.configure(
         processors=[
@@ -257,7 +257,7 @@ def setup_logging() -> None:
         wrapper_class=structlog.stdlib.BoundLogger,
         cache_logger_on_first_use=True,
     )
-    
+
     # Configure standard logging
     logging.basicConfig(
         format="%(message)s",
@@ -292,7 +292,7 @@ done
 echo ""
 echo "🎯 Next steps:"
 echo "  1. Run security module creation"
-echo "  2. Run resilience module creation" 
+echo "  2. Run resilience module creation"
 echo "  3. Run observability module creation"
 echo "  4. Create library-specific features"
 echo "  5. Update configurations"

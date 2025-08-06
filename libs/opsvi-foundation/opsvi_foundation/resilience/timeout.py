@@ -7,9 +7,11 @@ Provides configurable timeouts and deadline propagation.
 from __future__ import annotations
 
 import asyncio
+import builtins
 import time
+from collections.abc import Awaitable, Callable
 from contextlib import asynccontextmanager
-from typing import Any, Awaitable, Callable, TypeVar
+from typing import TypeVar
 
 from pydantic import BaseModel
 
@@ -17,11 +19,12 @@ from ..observability import get_logger
 
 logger = get_logger(__name__)
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class TimeoutConfig(BaseModel):
     """Configuration for timeout operations."""
+
     default_timeout: float = 30.0
     max_timeout: float = 300.0
     min_timeout: float = 0.1
@@ -66,33 +69,35 @@ class Timeout:
             async with asyncio.timeout(timeout):
                 yield
 
-        except asyncio.TimeoutError:
+        except builtins.TimeoutError:
             elapsed = time.time() - start_time
-            logger.error("Operation timed out",
-                        timeout=timeout,
-                        elapsed=elapsed,
-                        operation=operation)
+            logger.error(
+                "Operation timed out",
+                timeout=timeout,
+                elapsed=elapsed,
+                operation=operation,
+            )
             raise TimeoutError(timeout, operation)
 
         except Exception as e:
             elapsed = time.time() - start_time
-            logger.error("Operation failed",
-                        error=str(e),
-                        elapsed=elapsed,
-                        operation=operation)
+            logger.error(
+                "Operation failed",
+                error=str(e),
+                elapsed=elapsed,
+                operation=operation,
+            )
             raise
 
         else:
             elapsed = time.time() - start_time
-            logger.debug("Operation completed",
-                        elapsed=elapsed,
-                        operation=operation)
+            logger.debug("Operation completed", elapsed=elapsed, operation=operation)
 
     async def run_with_timeout(
         self,
         coro: Awaitable[T],
         timeout: float | None = None,
-        operation: str = "operation"
+        operation: str = "operation",
     ) -> T:
         """Run coroutine with timeout.
 
@@ -113,13 +118,18 @@ class Timeout:
         async with self.timeout_context(timeout, operation):
             return await coro
 
-    def timeout_decorator(self, timeout: float | None = None, operation: str | None = None):
+    def timeout_decorator(
+        self,
+        timeout: float | None = None,
+        operation: str | None = None,
+    ):
         """Decorator to add timeout to async functions.
 
         Args:
             timeout: Timeout in seconds, uses default if None
             operation: Operation name, uses function name if None
         """
+
         def decorator(func: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T]]:
             async def wrapper(*args, **kwargs) -> T:
                 op_name = operation or func.__name__
@@ -127,6 +137,7 @@ class Timeout:
                 return await self.run_with_timeout(coro, timeout, op_name)
 
             return wrapper
+
         return decorator
 
 
@@ -189,7 +200,11 @@ def with_timeout(timeout: float | None = None, operation: str | None = None):
     return timeout_manager.timeout_decorator(timeout, operation)
 
 
-async def wait_for(coro: Awaitable[T], timeout: float, operation: str = "operation") -> T:
+async def wait_for(
+    coro: Awaitable[T],
+    timeout: float,
+    operation: str = "operation",
+) -> T:
     """Wait for coroutine with timeout.
 
     Args:

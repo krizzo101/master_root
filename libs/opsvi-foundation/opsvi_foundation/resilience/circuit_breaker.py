@@ -6,29 +6,31 @@ Provides fault tolerance and resilience for external service calls.
 
 import asyncio
 import time
-from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Callable, Optional, TypeVar
+from typing import Any, TypeVar
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class CircuitState(Enum):
     """Circuit breaker states."""
-    CLOSED = "closed"      # Normal operation
-    OPEN = "open"          # Failing, reject calls
-    HALF_OPEN = "half_open" # Testing recovery
+
+    CLOSED = "closed"  # Normal operation
+    OPEN = "open"  # Failing, reject calls
+    HALF_OPEN = "half_open"  # Testing recovery
 
 
 @dataclass
 class CircuitBreakerConfig:
     """Configuration for circuit breaker."""
-    failure_threshold: int = 5          # Failures before opening
-    recovery_timeout: int = 60          # Seconds before trying half-open
-    success_threshold: int = 3          # Successes to close from half-open
-    timeout: int = 30                   # Request timeout in seconds
-    expected_exception: type = Exception # Exception type to catch
+
+    failure_threshold: int = 5  # Failures before opening
+    recovery_timeout: int = 60  # Seconds before trying half-open
+    success_threshold: int = 3  # Successes to close from half-open
+    timeout: int = 30  # Request timeout in seconds
+    expected_exception: type = Exception  # Exception type to catch
 
 
 class CircuitBreaker:
@@ -54,16 +56,18 @@ class CircuitBreaker:
             # Execute with timeout
             result = await asyncio.wait_for(
                 self._execute_function(func, *args, **kwargs),
-                timeout=self.config.timeout
+                timeout=self.config.timeout,
             )
 
             await self._on_success()
             return result
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             await self._on_failure()
-            raise TimeoutError(f"Function timed out after {self.config.timeout} seconds")
-        except self.config.expected_exception as e:
+            raise TimeoutError(
+                f"Function timed out after {self.config.timeout} seconds",
+            )
+        except self.config.expected_exception:
             await self._on_failure()
             raise
         except Exception as e:
@@ -74,8 +78,7 @@ class CircuitBreaker:
         """Execute function, handling both sync and async."""
         if asyncio.iscoroutinefunction(func):
             return await func(*args, **kwargs)
-        else:
-            return func(*args, **kwargs)
+        return func(*args, **kwargs)
 
     async def _check_state(self) -> None:
         """Check and update circuit breaker state."""
@@ -101,10 +104,10 @@ class CircuitBreaker:
             self.failure_count += 1
             self.last_failure_time = time.time()
 
-            if self.state == CircuitState.HALF_OPEN:
-                self.state = CircuitState.OPEN
-            elif (self.state == CircuitState.CLOSED and
-                  self.failure_count >= self.config.failure_threshold):
+            if self.state == CircuitState.HALF_OPEN or (
+                self.state == CircuitState.CLOSED
+                and self.failure_count >= self.config.failure_threshold
+            ):
                 self.state = CircuitState.OPEN
 
     def get_state(self) -> dict[str, Any]:

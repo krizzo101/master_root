@@ -7,11 +7,16 @@ Provides counters, gauges, histograms, and custom metrics.
 from __future__ import annotations
 
 import time
-from typing import Any, Dict
+from typing import Any
 
 from prometheus_client import (
-    Counter, Gauge, Histogram, Info, Enum,
-    CollectorRegistry, generate_latest, CONTENT_TYPE_LATEST
+    CONTENT_TYPE_LATEST,
+    CollectorRegistry,
+    Counter,
+    Enum,
+    Gauge,
+    Histogram,
+    generate_latest,
 )
 from pydantic import BaseModel
 
@@ -22,6 +27,7 @@ logger = get_logger(__name__)
 
 class MetricsConfig(BaseModel):
     """Configuration for metrics collection."""
+
     enabled: bool = True
     namespace: str = "opsvi"
     subsystem: str = ""
@@ -34,14 +40,16 @@ class MetricsCollector:
     def __init__(self, config: MetricsConfig | None = None):
         self.config = config or MetricsConfig()
         self.registry = CollectorRegistry()
-        self._metrics: Dict[str, Any] = {}
+        self._metrics: dict[str, Any] = {}
 
         if self.config.enabled:
             self._initialize_default_metrics()
 
-        logger.debug("Initialized MetricsCollector",
-                    enabled=self.config.enabled,
-                    namespace=self.config.namespace)
+        logger.debug(
+            "Initialized MetricsCollector",
+            enabled=self.config.enabled,
+            namespace=self.config.namespace,
+        )
 
     def _initialize_default_metrics(self):
         """Initialize default system metrics."""
@@ -49,27 +57,27 @@ class MetricsCollector:
         self.request_count = self.create_counter(
             "requests_total",
             "Total number of requests",
-            ["method", "endpoint", "status"]
+            ["method", "endpoint", "status"],
         )
 
         self.request_duration = self.create_histogram(
             "request_duration_seconds",
             "Request duration in seconds",
-            ["method", "endpoint"]
+            ["method", "endpoint"],
         )
 
         # Error metrics
         self.error_count = self.create_counter(
             "errors_total",
             "Total number of errors",
-            ["type", "component"]
+            ["type", "component"],
         )
 
         # System metrics
         self.active_connections = self.create_gauge(
             "active_connections",
             "Number of active connections",
-            ["type"]
+            ["type"],
         )
 
         # Component health
@@ -77,12 +85,17 @@ class MetricsCollector:
             "component_status",
             "Component health status",
             ["component"],
-            states=["healthy", "degraded", "unhealthy"]
+            states=["healthy", "degraded", "unhealthy"],
         )
 
         logger.debug("Initialized default metrics")
 
-    def create_counter(self, name: str, description: str, labels: list[str] | None = None) -> Counter:
+    def create_counter(
+        self,
+        name: str,
+        description: str,
+        labels: list[str] | None = None,
+    ) -> Counter:
         """Create a Prometheus counter.
 
         Args:
@@ -101,14 +114,19 @@ class MetricsCollector:
             full_name,
             description,
             labelnames=labels or [],
-            registry=self.registry
+            registry=self.registry,
         )
 
         self._metrics[full_name] = counter
         logger.debug("Created counter", name=full_name, labels=labels)
         return counter
 
-    def create_gauge(self, name: str, description: str, labels: list[str] | None = None) -> Gauge:
+    def create_gauge(
+        self,
+        name: str,
+        description: str,
+        labels: list[str] | None = None,
+    ) -> Gauge:
         """Create a Prometheus gauge.
 
         Args:
@@ -127,14 +145,19 @@ class MetricsCollector:
             full_name,
             description,
             labelnames=labels or [],
-            registry=self.registry
+            registry=self.registry,
         )
 
         self._metrics[full_name] = gauge
         logger.debug("Created gauge", name=full_name, labels=labels)
         return gauge
 
-    def create_histogram(self, name: str, description: str, labels: list[str] | None = None) -> Histogram:
+    def create_histogram(
+        self,
+        name: str,
+        description: str,
+        labels: list[str] | None = None,
+    ) -> Histogram:
         """Create a Prometheus histogram.
 
         Args:
@@ -153,14 +176,20 @@ class MetricsCollector:
             full_name,
             description,
             labelnames=labels or [],
-            registry=self.registry
+            registry=self.registry,
         )
 
         self._metrics[full_name] = histogram
         logger.debug("Created histogram", name=full_name, labels=labels)
         return histogram
 
-    def create_enum(self, name: str, description: str, labels: list[str], states: list[str]) -> Enum:
+    def create_enum(
+        self,
+        name: str,
+        description: str,
+        labels: list[str],
+        states: list[str],
+    ) -> Enum:
         """Create a Prometheus enum.
 
         Args:
@@ -181,7 +210,7 @@ class MetricsCollector:
             description,
             labelnames=labels,
             states=states,
-            registry=self.registry
+            registry=self.registry,
         )
 
         self._metrics[full_name] = enum
@@ -220,11 +249,13 @@ class MetricsCollector:
         self.request_count.labels(method=method, endpoint=endpoint, status=status).inc()
         self.request_duration.labels(method=method, endpoint=endpoint).observe(duration)
 
-        logger.debug("Recorded request metrics",
-                    method=method,
-                    endpoint=endpoint,
-                    status=status,
-                    duration=duration)
+        logger.debug(
+            "Recorded request metrics",
+            method=method,
+            endpoint=endpoint,
+            status=status,
+            duration=duration,
+        )
 
     def record_error(self, error_type: str, component: str):
         """Record error metrics.
@@ -261,7 +292,7 @@ class MetricsCollector:
         if not self.config.enabled:
             return ""
 
-        return generate_latest(self.registry).decode('utf-8')
+        return generate_latest(self.registry).decode("utf-8")
 
     def get_content_type(self) -> str:
         """Get Prometheus content type.
@@ -275,7 +306,11 @@ class MetricsCollector:
 class TimingContext:
     """Context manager for timing operations."""
 
-    def __init__(self, histogram: Histogram | None, labels: dict[str, str] | None = None):
+    def __init__(
+        self,
+        histogram: Histogram | None,
+        labels: dict[str, str] | None = None,
+    ):
         self.histogram = histogram
         self.labels = labels or {}
         self.start_time = None
@@ -297,7 +332,10 @@ class TimingContext:
 metrics = MetricsCollector()
 
 
-def time_operation(histogram: Histogram, labels: dict[str, str] | None = None) -> TimingContext:
+def time_operation(
+    histogram: Histogram,
+    labels: dict[str, str] | None = None,
+) -> TimingContext:
     """Create timing context for operation.
 
     Args:

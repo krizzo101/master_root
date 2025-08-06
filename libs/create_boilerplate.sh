@@ -9,7 +9,7 @@ create_init() {
     local file="$1"
     local module="$2"
     local description="$3"
-    
+
     cat > "$file" << EOF
 """
 $description
@@ -24,14 +24,14 @@ EOF
 # Create __init__.py for all directories
 for lib in opsvi-core opsvi-llm opsvi-rag opsvi-agents; do
     lib_name=$(echo $lib | tr '-' '_')
-    
+
     # Find all directories and create __init__.py
     find "$lib/$lib_name" -type d | while read dir; do
         module_path=$(echo "$dir" | sed "s|$lib/$lib_name/||" | sed 's|/|.|g')
         if [ "$module_path" = "" ]; then
             module_path="main"
         fi
-        
+
         description="$(basename "$dir" | sed 's/.*/\u&/') module for $lib"
         create_init "$dir/__init__.py" "$module_path" "$description"
     done
@@ -43,7 +43,7 @@ echo "🔧 Creating core exception files..."
 for lib in opsvi-core opsvi-llm opsvi-rag opsvi-agents; do
     lib_name=$(echo $lib | tr '-' '_')
     lib_class=$(echo $lib | sed 's/opsvi-//' | sed 's/.*/\u&/')
-    
+
     cat > "$lib/$lib_name/core/exceptions.py" << EOF
 """
 Exception hierarchy for $lib.
@@ -56,7 +56,7 @@ from typing import Any, Optional
 
 class ${lib_class}Error(Exception):
     """Base exception for all $lib errors."""
-    
+
     def __init__(self, message: str, details: Optional[dict[str, Any]] = None):
         self.message = message
         self.details = details or {}
@@ -120,7 +120,7 @@ echo "⚙️ Creating configuration files..."
 for lib in opsvi-core opsvi-llm opsvi-rag opsvi-agents; do
     lib_name=$(echo $lib | tr '-' '_')
     lib_class=$(echo $lib | sed 's/opsvi-//' | sed 's/.*/\u&/')
-    
+
     cat > "$lib/$lib_name/core/config.py" << EOF
 """
 Configuration management for $lib.
@@ -137,17 +137,17 @@ from .exceptions import ConfigurationError
 
 class ${lib_class}Config(BaseModel):
     """Configuration settings for $lib."""
-    
+
     # Environment settings
     environment: str = Field(default="development", description="Runtime environment")
     debug: bool = Field(default=False, description="Enable debug mode")
     log_level: str = Field(default="INFO", description="Logging level")
-    
+
     # Security settings
     encryption_key: Optional[str] = Field(default=None, description="Encryption key for sensitive data")
     api_timeout: int = Field(default=30, description="Default API timeout in seconds")
     max_retries: int = Field(default=3, description="Default maximum retry attempts")
-    
+
     @classmethod
     def from_env(cls) -> "${lib_class}Config":
         """Create configuration from environment variables."""
@@ -162,12 +162,12 @@ class ${lib_class}Config(BaseModel):
             )
         except Exception as e:
             raise ConfigurationError(f"Failed to load configuration: {e}")
-    
+
     def validate(self) -> None:
         """Validate configuration settings."""
         if self.environment not in ["development", "staging", "production"]:
             raise ConfigurationError(f"Invalid environment: {self.environment}")
-        
+
         if self.log_level not in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
             raise ConfigurationError(f"Invalid log level: {self.log_level}")
 
@@ -182,7 +182,7 @@ echo "📊 Creating logging files..."
 # Create logging files for all libraries
 for lib in opsvi-core opsvi-llm opsvi-rag opsvi-agents; do
     lib_name=$(echo $lib | tr '-' '_')
-    
+
     cat > "$lib/$lib_name/core/logging.py" << EOF
 """
 Structured logging setup for $lib.
@@ -201,7 +201,7 @@ from .config import config
 
 def setup_logging() -> None:
     """Configure structured logging for the application."""
-    
+
     # Configure structlog
     structlog.configure(
         processors=[
@@ -220,7 +220,7 @@ def setup_logging() -> None:
         wrapper_class=structlog.stdlib.BoundLogger,
         cache_logger_on_first_use=True,
     )
-    
+
     # Configure standard logging
     logging.basicConfig(
         format="%(message)s",

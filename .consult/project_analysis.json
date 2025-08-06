@@ -1,18 +1,18 @@
 {
   "metadata": {
-    "build_time_ms": 0.008344650268554688,
+    "build_time_ms": 0.006198883056640625,
     "project_path": "/home/opsvi/master_root",
     "builder_type": "DefaultPackageBuilder",
-    "build_timestamp": "2025-08-06T03:18:10.086713",
+    "build_timestamp": "2025-08-06T13:04:56.716303",
     "package_type": "default",
     "collector_count": 5,
-    "total_data_size": 16905
+    "total_data_size": 38825
   },
   "collectors": [
     {
       "collector": "DevelopmentStateCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-05T23:18:09.814295",
+      "timestamp": "2025-08-06T09:04:55.832165",
       "data": {
         "git_repository": true,
         "current_branch": "feature/libs-foundation",
@@ -27,8 +27,8 @@
         ],
         "has_uncommitted_changes": true,
         "staged_files_count": 1,
-        "unstaged_files_count": 0,
-        "untracked_files_count": 0,
+        "unstaged_files_count": 38,
+        "untracked_files_count": 22,
         "ci_status": {
           "has_ci": true,
           "ci_provider": "GitHub Actions",
@@ -45,8 +45,8 @@
         },
         "recent_activity": {
           "last_commit_days_ago": 0,
-          "commits_last_week": 21,
-          "commits_last_month": 21,
+          "commits_last_week": 23,
+          "commits_last_month": 23,
           "active_contributors": 0,
           "recent_branches": [
             "AUTOSAVE",
@@ -62,8 +62,8 @@
           "has_ci": false,
           "has_docker": false,
           "has_requirements": false,
-          "main_language": null,
-          "file_count": 97
+          "main_language": "Python",
+          "file_count": 177
         },
         "development_state": "active_development"
       }
@@ -71,7 +71,7 @@
     {
       "collector": "ProjectPurposeCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-05T23:18:09.815242",
+      "timestamp": "2025-08-06T09:04:55.833445",
       "data": {
         "project_name": "OPSVI Master Workspace",
         "description": "[![CI](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml) A comprehensive monorepo for AI/ML Operations with built-in observability, RAG capabilities, and MCP integration. **Now featuring a complete foundational library ecosystem for production AI applications.** - \u2705 **Phase 1**: Linting & Type Checking (ruff, black, mypy)",
@@ -83,14 +83,36 @@
     {
       "collector": "ConstraintsCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-05T23:18:09.889481",
+      "timestamp": "2025-08-06T09:04:56.097630",
       "data": {
         "technical_constraints": {
-          "performance_constraints": [],
-          "security_constraints": [],
+          "performance_constraints": [
+            "Exception: raise TimeoutError(f'Function timed out after {self.config.timeout} seconds')",
+            "Exception: raise ResourceExhaustedError('Bulkhead timeout exceeded')",
+            "Exception: raise TimeoutError(f'Function timed out after {self.config.timeout} seconds')",
+            "Exception: raise TimeoutError(0, f'deadline for {operation}')",
+            "Exception: raise TimeoutError(timeout, operation)",
+            "Assert: assert execution_time <= timeout, f'Function took {execution_time}s, expected <= {timeout}s'",
+            "Exception: raise TimeoutError(f'Condition not met within {timeout} seconds')"
+          ],
+          "security_constraints": [
+            "Exception: raise PermissionError('User ID not found in function arguments')",
+            "Exception: raise PermissionError(f'User {user_id} lacks permission for {resource}:{action}')"
+          ],
           "scalability_constraints": [],
           "compatibility_constraints": [],
-          "resource_constraints": [],
+          "resource_constraints": [
+            "Maximum number of resources",
+            "Maximum resources",
+            "Exception: raise ResourceExhaustedError('Bulkhead is closed')",
+            "Exception: raise ResourceExhaustedError('Thread pool exhausted')",
+            "Resource being accessed",
+            "Resource being accessed",
+            "Resource being accessed",
+            "Resource being accessed",
+            "Resource being accessed",
+            "Assert: assert openai_defaults['max_batch_size'] == 100"
+          ],
           "dependency_constraints": [],
           "general_constraints": []
         },
@@ -140,15 +162,29 @@
           "scalability_limitations": []
         },
         "constraint_summary": {
-          "total_constraints": 26,
+          "total_constraints": 45,
           "constraint_types": [
+            "performance_constraints",
+            "security_constraints",
+            "resource_constraints",
             "validation_rules",
             "business_logic",
             "compliance_requirements",
             "data_rules",
             "workflow_rules"
           ],
-          "critical_constraints": [],
+          "critical_constraints": [
+            "Exception: raise TimeoutError(f'Function timed out after {self.config.timeout} seconds')",
+            "Exception: raise ResourceExhaustedError('Bulkhead timeout exceeded')",
+            "Exception: raise TimeoutError(f'Function timed out after {self.config.timeout} seconds')",
+            "Exception: raise TimeoutError(0, f'deadline for {operation}')",
+            "Exception: raise TimeoutError(timeout, operation)",
+            "Exception: raise TimeoutError(f'Condition not met within {timeout} seconds')",
+            "Exception: raise PermissionError('User ID not found in function arguments')",
+            "Exception: raise PermissionError(f'User {user_id} lacks permission for {resource}:{action}')",
+            "Exception: raise ResourceExhaustedError('Bulkhead is closed')",
+            "Exception: raise ResourceExhaustedError('Thread pool exhausted')"
+          ],
           "constraint_impact": "high"
         }
       }
@@ -156,7 +192,7 @@
     {
       "collector": "WorkflowCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-05T23:18:09.911195",
+      "timestamp": "2025-08-06T09:04:56.120911",
       "data": {
         "branching_strategy": {
           "branching_model": "simple",
@@ -261,236 +297,246 @@
     {
       "collector": "AgentArchitectureCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-05T23:18:10.086033",
+      "timestamp": "2025-08-06T09:04:56.715738",
       "data": {
         "agent_classes": [
           {
-            "name": "CrewAdapter",
-            "file_path": "libs/opsvi-agents/src/opsvi/agents/crew_adapter.py",
-            "lineno": 6,
-            "bases": [],
+            "name": "AgentsConfig",
+            "file_path": "libs/opsvi-agents/opsvi_agents/core/config.py",
+            "lineno": 12,
+            "bases": [
+              "BaseModel"
+            ],
             "methods": [
               {
-                "name": "__init__",
-                "lineno": 9,
-                "docstring": "Initialize the CrewAI adapter."
-              },
-              {
-                "name": "create_crew",
-                "lineno": 14,
-                "docstring": "Create a crew with agents and tasks."
+                "name": "from_env",
+                "lineno": 21,
+                "docstring": "Create configuration from environment variables."
               }
             ],
-            "docstring": "Adapter for CrewAI agent framework.",
+            "docstring": "Configuration for opsvi-agents.",
             "agent_type": "general"
           },
           {
-            "name": "GraphAdapter",
-            "file_path": "libs/opsvi-agents/src/opsvi/agents/graph_adapter.py",
-            "lineno": 6,
-            "bases": [],
+            "name": "AgentsError",
+            "file_path": "libs/opsvi-agents/opsvi_agents/core/exceptions.py",
+            "lineno": 10,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Base exception for opsvi-agents.",
+            "agent_type": "general"
+          },
+          {
+            "name": "AgentsValidationError",
+            "file_path": "libs/opsvi-agents/opsvi_agents/core/exceptions.py",
+            "lineno": 16,
+            "bases": [
+              "AgentsError"
+            ],
+            "methods": [],
+            "docstring": "Validation error specific to opsvi-agents.",
+            "agent_type": "general"
+          },
+          {
+            "name": "AgentsConfigurationError",
+            "file_path": "libs/opsvi-agents/opsvi_agents/core/exceptions.py",
+            "lineno": 22,
+            "bases": [
+              "AgentsError"
+            ],
+            "methods": [],
+            "docstring": "Configuration error specific to opsvi-agents.",
+            "agent_type": "general"
+          },
+          {
+            "name": "MockAgent",
+            "file_path": "libs/opsvi-agents/tests/test_agents.py",
+            "lineno": 21,
+            "bases": [
+              "BaseAgent"
+            ],
             "methods": [
               {
                 "name": "__init__",
-                "lineno": 9,
-                "docstring": "Initialize the LangGraph adapter."
+                "lineno": 24,
+                "docstring": null
               },
               {
-                "name": "create_graph",
-                "lineno": 14,
-                "docstring": "Create a graph with nodes and edges."
+                "name": "is_active",
+                "lineno": 40,
+                "docstring": "Check if agent is active."
               }
             ],
-            "docstring": "Adapter for LangGraph agent framework.",
+            "docstring": "Mock agent for testing.",
+            "agent_type": "general"
+          },
+          {
+            "name": "TestAgentRegistry",
+            "file_path": "libs/opsvi-agents/tests/test_agents.py",
+            "lineno": 192,
+            "bases": [],
+            "methods": [
+              {
+                "name": "registry",
+                "lineno": 196,
+                "docstring": "Create AgentRegistry instance for testing."
+              },
+              {
+                "name": "test_register_agent_type",
+                "lineno": 200,
+                "docstring": "Test agent type registration."
+              },
+              {
+                "name": "test_register_duplicate_type",
+                "lineno": 211,
+                "docstring": "Test registering duplicate agent type."
+              },
+              {
+                "name": "test_get_stats",
+                "lineno": 259,
+                "docstring": "Test registry statistics."
+              }
+            ],
+            "docstring": "Test AgentRegistry functionality.",
+            "agent_type": "general"
+          },
+          {
+            "name": "AgentState",
+            "file_path": "libs/opsvi-core/opsvi_core/agents/base_agent.py",
+            "lineno": 29,
+            "bases": [
+              "str",
+              "Enum"
+            ],
+            "methods": [],
+            "docstring": "Agent lifecycle states.",
+            "agent_type": "general"
+          },
+          {
+            "name": "AgentCapability",
+            "file_path": "libs/opsvi-core/opsvi_core/agents/base_agent.py",
+            "lineno": 42,
+            "bases": [
+              "BaseModel"
+            ],
+            "methods": [],
+            "docstring": "Agent capability definition.",
+            "agent_type": "general"
+          },
+          {
+            "name": "AgentMetadata",
+            "file_path": "libs/opsvi-core/opsvi_core/agents/base_agent.py",
+            "lineno": 53,
+            "bases": [
+              "BaseModel"
+            ],
+            "methods": [],
+            "docstring": "Agent metadata and configuration.",
+            "agent_type": "general"
+          },
+          {
+            "name": "AgentMessage",
+            "file_path": "libs/opsvi-core/opsvi_core/agents/base_agent.py",
+            "lineno": 65,
+            "bases": [
+              "BaseModel"
+            ],
+            "methods": [],
+            "docstring": "Message structure for agent communication.",
             "agent_type": "general"
           },
           {
             "name": "BaseAgent",
             "file_path": "libs/opsvi-core/opsvi_core/agents/base_agent.py",
-            "lineno": 14,
+            "lineno": 76,
+            "bases": [
+              "BaseComponent",
+              "ABC"
+            ],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 87,
+                "docstring": null
+              },
+              {
+                "name": "register_message_handler",
+                "lineno": 296,
+                "docstring": "Register a message handler.\n\nArgs:\n    message_type: Type of message to handle\n    handler: Async function to handle the message"
+              },
+              {
+                "name": "add_capability",
+                "lineno": 310,
+                "docstring": "Add a capability to the agent.\n\nArgs:\n    capability: Capability to add"
+              },
+              {
+                "name": "get_stats",
+                "lineno": 323,
+                "docstring": "Get agent statistics.\n\nReturns:\n    Dictionary of agent statistics"
+              }
+            ],
+            "docstring": "Base agent with lifecycle management and communication.\n\nProvides:\n- Async lifecycle management (initialize, start, stop, cleanup)\n- State tracking and transitions\n- Message handling and communication\n- Capability registration and discovery\n- Error handling and recovery",
+            "agent_type": "general"
+          },
+          {
+            "name": "AgentError",
+            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
+            "lineno": 16,
+            "bases": [
+              "CoreError"
+            ],
+            "methods": [],
+            "docstring": "Agent-related errors.",
+            "agent_type": "general"
+          },
+          {
+            "name": "CircuitBreakerError",
+            "file_path": "libs/opsvi-core/opsvi_core/resilience/circuit_breaker.py",
+            "lineno": 39,
+            "bases": [
+              "ExternalServiceError"
+            ],
+            "methods": [],
+            "docstring": "Raised when circuit breaker is open.",
+            "agent_type": "general"
+          },
+          {
+            "name": "CircuitBreaker",
+            "file_path": "libs/opsvi-core/opsvi_core/resilience/circuit_breaker.py",
+            "lineno": 44,
             "bases": [],
             "methods": [
               {
                 "name": "__init__",
-                "lineno": 22,
-                "docstring": "Initialize the agent.\n\nArgs:\n    agent_id: Unique identifier for this agent\n    plugins: Optional list of plugins to attach to this agent"
+                "lineno": 47,
+                "docstring": null
               },
               {
-                "name": "add_plugin",
-                "lineno": 125,
-                "docstring": "Add a plugin to this agent.\n\nArgs:\n    plugin: Plugin to add"
-              },
-              {
-                "name": "remove_plugin",
-                "lineno": 135,
-                "docstring": "Remove a plugin from this agent.\n\nArgs:\n    plugin: Plugin to remove"
-              },
-              {
-                "name": "get_plugins",
-                "lineno": 146,
-                "docstring": "Get all plugins attached to this agent.\n\nReturns:\n    List[Any]: List of plugins"
-              },
-              {
-                "name": "is_active",
-                "lineno": 155,
-                "docstring": "Check if the agent is active.\n\nReturns:\n    bool: True if agent is active, False otherwise"
+                "name": "get_state",
+                "lineno": 126,
+                "docstring": "Get current circuit breaker state information."
               }
             ],
-            "docstring": "Base class for agents, managing lifecycle, message handling, and plugins.\n\nProvides a foundation for implementing agents with proper lifecycle management,\nasync message processing, and plugin architecture.",
+            "docstring": "Circuit breaker implementation with timeout and failure tracking.",
             "agent_type": "general"
           },
           {
-            "name": "ConfigurationError",
-            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
-            "lineno": 17,
-            "bases": [
-              "OpsviError"
-            ],
-            "methods": [],
-            "docstring": "Raised when configuration validation fails.",
-            "agent_type": "general"
-          },
-          {
-            "name": "InitializationError",
-            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
-            "lineno": 23,
-            "bases": [
-              "OpsviError"
-            ],
-            "methods": [],
-            "docstring": "Raised when core components fail to initialize.",
-            "agent_type": "general"
-          },
-          {
-            "name": "ValidationError",
-            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
-            "lineno": 29,
-            "bases": [
-              "OpsviError"
-            ],
-            "methods": [],
-            "docstring": "Raised on validation failures in data models.",
-            "agent_type": "general"
-          },
-          {
-            "name": "ExternalServiceError",
-            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
-            "lineno": 35,
-            "bases": [
-              "OpsviError"
-            ],
-            "methods": [],
-            "docstring": "Raised when external service interactions fail.",
-            "agent_type": "general"
-          },
-          {
-            "name": "AuthenticationError",
-            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
-            "lineno": 47,
-            "bases": [
-              "OpsviError"
-            ],
-            "methods": [],
-            "docstring": "Raised when authentication or authorization fails.",
-            "agent_type": "general"
-          },
-          {
-            "name": "ResourceNotFoundError",
-            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
-            "lineno": 53,
-            "bases": [
-              "OpsviError"
-            ],
-            "methods": [],
-            "docstring": "Raised when a requested resource is not found.",
-            "agent_type": "general"
-          },
-          {
-            "name": "TimeoutError",
-            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
-            "lineno": 59,
-            "bases": [
-              "OpsviError"
-            ],
-            "methods": [],
-            "docstring": "Raised when operations exceed their timeout limits.",
-            "agent_type": "general"
-          },
-          {
-            "name": "RateLimitError",
-            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
-            "lineno": 65,
+            "name": "RetryError",
+            "file_path": "libs/opsvi-core/opsvi_core/resilience/retry.py",
+            "lineno": 92,
             "bases": [
               "ExternalServiceError"
             ],
-            "methods": [],
-            "docstring": "Raised when rate limits are exceeded.",
-            "agent_type": "general"
-          },
-          {
-            "name": "NetworkError",
-            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
-            "lineno": 71,
-            "bases": [
-              "ExternalServiceError"
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 95,
+                "docstring": null
+              }
             ],
-            "methods": [],
-            "docstring": "Raised when network-related errors occur.",
-            "agent_type": "worker"
-          },
-          {
-            "name": "SerializationError",
-            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
-            "lineno": 77,
-            "bases": [
-              "OpsviError"
-            ],
-            "methods": [],
-            "docstring": "Raised when data serialization/deserialization fails.",
-            "agent_type": "general"
-          },
-          {
-            "name": "ConfigurationError",
-            "file_path": "libs/opsvi-core/src/opsvi_core/exceptions.py",
-            "lineno": 13,
-            "bases": [
-              "OPSVIError"
-            ],
-            "methods": [],
-            "docstring": "Raised when there's a configuration error.",
-            "agent_type": "general"
-          },
-          {
-            "name": "ValidationError",
-            "file_path": "libs/opsvi-core/src/opsvi_core/exceptions.py",
-            "lineno": 19,
-            "bases": [
-              "OPSVIError"
-            ],
-            "methods": [],
-            "docstring": "Raised when data validation fails.",
-            "agent_type": "general"
-          },
-          {
-            "name": "ConnectionError",
-            "file_path": "libs/opsvi-core/src/opsvi_core/exceptions.py",
-            "lineno": 25,
-            "bases": [
-              "OPSVIError"
-            ],
-            "methods": [],
-            "docstring": "Raised when connection to external services fails.",
-            "agent_type": "general"
-          },
-          {
-            "name": "TimeoutError",
-            "file_path": "libs/opsvi-core/src/opsvi_core/exceptions.py",
-            "lineno": 31,
-            "bases": [
-              "OPSVIError"
-            ],
-            "methods": [],
-            "docstring": "Raised when operations timeout.",
+            "docstring": "Raised when all retry attempts are exhausted.",
             "agent_type": "general"
           },
           {
@@ -530,171 +576,1065 @@
             "agent_type": "general"
           },
           {
+            "name": "EnvironmentError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/config/environments.py",
+            "lineno": 19,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when environment configuration fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "SecretError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/config/secrets.py",
+            "lineno": 21,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when secret operation fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "AlertError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/observability/alerts.py",
+            "lineno": 19,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when alert operation fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "EmailNotificationChannel",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/observability/alerts.py",
+            "lineno": 98,
+            "bases": [
+              "NotificationChannel"
+            ],
+            "methods": [],
+            "docstring": "Email notification channel.",
+            "agent_type": "general"
+          },
+          {
+            "name": "AlertManager",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/observability/alerts.py",
+            "lineno": 157,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 160,
+                "docstring": "Initialize alert manager."
+              },
+              {
+                "name": "add_rule",
+                "lineno": 169,
+                "docstring": "Add alert rule.\n\nArgs:\n    rule: Alert rule to add"
+              },
+              {
+                "name": "remove_rule",
+                "lineno": 178,
+                "docstring": "Remove alert rule.\n\nArgs:\n    name: Rule name"
+              },
+              {
+                "name": "add_notification_channel",
+                "lineno": 187,
+                "docstring": "Add notification channel.\n\nArgs:\n    channel: Notification channel to add"
+              },
+              {
+                "name": "remove_notification_channel",
+                "lineno": 196,
+                "docstring": "Remove notification channel.\n\nArgs:\n    name: Channel name"
+              },
+              {
+                "name": "_format_notification_message",
+                "lineno": 364,
+                "docstring": "Format notification message."
+              },
+              {
+                "name": "_schedule_escalation",
+                "lineno": 377,
+                "docstring": "Schedule alert escalation."
+              },
+              {
+                "name": "get_active_alerts",
+                "lineno": 389,
+                "docstring": "Get all active alerts."
+              },
+              {
+                "name": "get_alerts_by_severity",
+                "lineno": 396,
+                "docstring": "Get alerts by severity."
+              },
+              {
+                "name": "get_alerts_by_rule",
+                "lineno": 403,
+                "docstring": "Get alerts by rule name."
+              },
+              {
+                "name": "get_alert_summary",
+                "lineno": 410,
+                "docstring": "Get alert summary."
+              }
+            ],
+            "docstring": "Main alert management system.",
+            "agent_type": "general"
+          },
+          {
+            "name": "HealthError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/observability/health.py",
+            "lineno": 19,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when health check fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "HealthMonitor",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/observability/health.py",
+            "lineno": 324,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 327,
+                "docstring": "Initialize health monitor."
+              },
+              {
+                "name": "add_checker",
+                "lineno": 335,
+                "docstring": "Add health checker.\n\nArgs:\n    checker: Health checker to add"
+              },
+              {
+                "name": "remove_checker",
+                "lineno": 344,
+                "docstring": "Remove health checker.\n\nArgs:\n    name: Health checker name"
+              },
+              {
+                "name": "get_overall_status",
+                "lineno": 405,
+                "docstring": "Get overall health status.\n\nReturns:\n    Overall health status"
+              },
+              {
+                "name": "get_health_summary",
+                "lineno": 438,
+                "docstring": "Get health summary.\n\nReturns:\n    Health summary dictionary"
+              },
+              {
+                "name": "start_auto_refresh",
+                "lineno": 464,
+                "docstring": "Start automatic health check refresh.\n\nArgs:\n    interval: Refresh interval in seconds"
+              },
+              {
+                "name": "stop_auto_refresh",
+                "lineno": 478,
+                "docstring": "Stop automatic health check refresh."
+              }
+            ],
+            "docstring": "Main health monitoring system.",
+            "agent_type": "general"
+          },
+          {
+            "name": "MetricsCollector",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/observability/metrics.py",
+            "lineno": 38,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 41,
+                "docstring": null
+              },
+              {
+                "name": "_initialize_default_metrics",
+                "lineno": 55,
+                "docstring": "Initialize default system metrics."
+              },
+              {
+                "name": "create_counter",
+                "lineno": 90,
+                "docstring": "Create a Prometheus counter.\n\nArgs:\n    name: Metric name\n    description: Metric description\n    labels: Label names\n\nReturns:\n    Prometheus Counter instance"
+              },
+              {
+                "name": "create_gauge",
+                "lineno": 115,
+                "docstring": "Create a Prometheus gauge.\n\nArgs:\n    name: Metric name\n    description: Metric description\n    labels: Label names\n\nReturns:\n    Prometheus Gauge instance"
+              },
+              {
+                "name": "create_histogram",
+                "lineno": 140,
+                "docstring": "Create a Prometheus histogram.\n\nArgs:\n    name: Metric name\n    description: Metric description\n    labels: Label names\n\nReturns:\n    Prometheus Histogram instance"
+              },
+              {
+                "name": "create_enum",
+                "lineno": 165,
+                "docstring": "Create a Prometheus enum.\n\nArgs:\n    name: Metric name\n    description: Metric description\n    labels: Label names\n    states: Possible enum states\n\nReturns:\n    Prometheus Enum instance"
+              },
+              {
+                "name": "_build_metric_name",
+                "lineno": 195,
+                "docstring": "Build full metric name with namespace and subsystem.\n\nArgs:\n    name: Base metric name\n\nReturns:\n    Full metric name"
+              },
+              {
+                "name": "record_request",
+                "lineno": 212,
+                "docstring": "Record request metrics.\n\nArgs:\n    method: HTTP method\n    endpoint: Request endpoint\n    status: Response status\n    duration: Request duration in seconds"
+              },
+              {
+                "name": "record_error",
+                "lineno": 235,
+                "docstring": "Record error metrics.\n\nArgs:\n    error_type: Type of error\n    component: Component that generated the error"
+              },
+              {
+                "name": "set_component_status",
+                "lineno": 248,
+                "docstring": "Set component health status.\n\nArgs:\n    component: Component name\n    status: Health status (healthy, degraded, unhealthy)"
+              },
+              {
+                "name": "get_metrics",
+                "lineno": 261,
+                "docstring": "Get metrics in Prometheus format.\n\nReturns:\n    Metrics as Prometheus text format"
+              },
+              {
+                "name": "get_content_type",
+                "lineno": 272,
+                "docstring": "Get Prometheus content type.\n\nReturns:\n    Prometheus content type"
+              }
+            ],
+            "docstring": "Centralized metrics collection with Prometheus integration.",
+            "agent_type": "collector"
+          },
+          {
+            "name": "ProfilingError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/observability/profiling.py",
+            "lineno": 24,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when profiling operation fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "PerformanceProfiler",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/observability/profiling.py",
+            "lineno": 202,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 205,
+                "docstring": "Initialize performance profiler."
+              },
+              {
+                "name": "start",
+                "lineno": 212,
+                "docstring": "Start profiling.\n\nArgs:\n    profiling_type: Type of profiling to perform"
+              },
+              {
+                "name": "stop",
+                "lineno": 230,
+                "docstring": "Stop profiling and return results.\n\nArgs:\n    profiling_type: Type of profiling to stop\n\nReturns:\n    Profiling result"
+              }
+            ],
+            "docstring": "Main performance profiler combining CPU, memory, and async profiling.",
+            "agent_type": "general"
+          },
+          {
+            "name": "TracingError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/observability/tracing.py",
+            "lineno": 19,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when tracing operation fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "Tracer",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/observability/tracing.py",
+            "lineno": 193,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 196,
+                "docstring": "Initialize tracer.\n\nArgs:\n    config: Tracing configuration"
+              },
+              {
+                "name": "start_span",
+                "lineno": 207,
+                "docstring": "Start a new span.\n\nArgs:\n    name: Span name\n    context: Trace context\n\nReturns:\n    Started span"
+              },
+              {
+                "name": "end_span",
+                "lineno": 227,
+                "docstring": "End a span.\n\nArgs:\n    span: Span to end"
+              },
+              {
+                "name": "get_current_span",
+                "lineno": 240,
+                "docstring": "Get current active span."
+              },
+              {
+                "name": "inject_context",
+                "lineno": 248,
+                "docstring": "Inject trace context into carrier.\n\nArgs:\n    span: Span to inject\n    carrier: Carrier dictionary"
+              },
+              {
+                "name": "extract_context",
+                "lineno": 258,
+                "docstring": "Extract trace context from carrier.\n\nArgs:\n    carrier: Carrier dictionary\n\nReturns:\n    Extracted trace context"
+              },
+              {
+                "name": "should_sample",
+                "lineno": 272,
+                "docstring": "Determine if trace should be sampled.\n\nArgs:\n    trace_id: Trace ID\n\nReturns:\n    True if should sample, False otherwise"
+              }
+            ],
+            "docstring": "Main tracer class for creating and managing spans.",
+            "agent_type": "general"
+          },
+          {
+            "name": "DependencyResolutionError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/patterns/dependency_injection.py",
+            "lineno": 26,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when dependency resolution fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "DependencyContainer",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/patterns/dependency_injection.py",
+            "lineno": 45,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 48,
+                "docstring": null
+              },
+              {
+                "name": "register",
+                "lineno": 54,
+                "docstring": "Register a service with the container."
+              },
+              {
+                "name": "register_singleton",
+                "lineno": 68,
+                "docstring": "Register a singleton service."
+              },
+              {
+                "name": "register_transient",
+                "lineno": 74,
+                "docstring": "Register a transient service."
+              },
+              {
+                "name": "register_scoped",
+                "lineno": 80,
+                "docstring": "Register a scoped service."
+              },
+              {
+                "name": "resolve",
+                "lineno": 86,
+                "docstring": "Resolve a service instance."
+              },
+              {
+                "name": "_create_instance",
+                "lineno": 113,
+                "docstring": "Create a new instance of a service."
+              },
+              {
+                "name": "_create_instance_from_type",
+                "lineno": 129,
+                "docstring": "Create an instance from a type, resolving dependencies."
+              },
+              {
+                "name": "scope",
+                "lineno": 157,
+                "docstring": "Create a new scope for scoped services."
+              },
+              {
+                "name": "is_registered",
+                "lineno": 166,
+                "docstring": "Check if a service is registered."
+              },
+              {
+                "name": "get_registered_services",
+                "lineno": 170,
+                "docstring": "Get all registered service types."
+              },
+              {
+                "name": "clear",
+                "lineno": 174,
+                "docstring": "Clear all registrations and instances."
+              }
+            ],
+            "docstring": "Dependency injection container.",
+            "agent_type": "general"
+          },
+          {
+            "name": "FactoryError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/patterns/factory.py",
+            "lineno": 18,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when factory operation fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "DependencyInjector",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/patterns/factory.py",
+            "lineno": 444,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 447,
+                "docstring": "Initialize dependency injector."
+              },
+              {
+                "name": "register_service",
+                "lineno": 453,
+                "docstring": "Register a service instance.\n\nArgs:\n    name: Service name\n    service: Service instance"
+              },
+              {
+                "name": "register_factory",
+                "lineno": 463,
+                "docstring": "Register a service factory.\n\nArgs:\n    name: Service name\n    factory: Factory function"
+              },
+              {
+                "name": "register_singleton",
+                "lineno": 473,
+                "docstring": "Register a singleton factory.\n\nArgs:\n    name: Service name\n    factory: Factory function"
+              },
+              {
+                "name": "get_service",
+                "lineno": 484,
+                "docstring": "Get a service by name.\n\nArgs:\n    name: Service name\n\nReturns:\n    Service instance\n\nRaises:\n    FactoryError: If service not found"
+              },
+              {
+                "name": "inject_dependencies",
+                "lineno": 519,
+                "docstring": "Inject dependencies into an object.\n\nArgs:\n    obj: Object to inject dependencies into"
+              },
+              {
+                "name": "create_with_dependencies",
+                "lineno": 533,
+                "docstring": "Create an instance and inject dependencies.\n\nArgs:\n    cls: Class to instantiate\n    **kwargs: Additional keyword arguments\n\nReturns:\n    Created instance with dependencies injected"
+              }
+            ],
+            "docstring": "Dependency injection container.",
+            "agent_type": "general"
+          },
+          {
+            "name": "StateTransitionError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/patterns/state_machine.py",
+            "lineno": 18,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when state transition is invalid.",
+            "agent_type": "general"
+          },
+          {
+            "name": "StrategySelector",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/patterns/strategy.py",
+            "lineno": 163,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 166,
+                "docstring": null
+              },
+              {
+                "name": "add_rule",
+                "lineno": 169,
+                "docstring": "Add a selection rule for a strategy type."
+              },
+              {
+                "name": "select_strategy",
+                "lineno": 174,
+                "docstring": "Select the best strategy based on context."
+              }
+            ],
+            "docstring": "Intelligent strategy selector based on context.",
+            "agent_type": "general"
+          },
+          {
+            "name": "BulkheadError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/resilience/bulkhead.py",
+            "lineno": 19,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when bulkhead operation fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "ResourceExhaustedError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/resilience/bulkhead.py",
+            "lineno": 24,
+            "bases": [
+              "BulkheadError"
+            ],
+            "methods": [],
+            "docstring": "Raised when bulkhead resources are exhausted.",
+            "agent_type": "general"
+          },
+          {
+            "name": "CircuitBreaker",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/resilience/circuit_breaker.py",
+            "lineno": 36,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 39,
+                "docstring": null
+              },
+              {
+                "name": "get_state",
+                "lineno": 116,
+                "docstring": "Get current circuit breaker state information."
+              }
+            ],
+            "docstring": "Circuit breaker implementation with timeout and failure tracking.",
+            "agent_type": "general"
+          },
+          {
+            "name": "FallbackError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/resilience/fallback.py",
+            "lineno": 17,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when fallback strategy fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "FastFailHandler",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/resilience/fallback.py",
+            "lineno": 76,
+            "bases": [
+              "FallbackHandler"
+            ],
+            "methods": [],
+            "docstring": "Fast fail fallback handler.",
+            "agent_type": "general"
+          },
+          {
+            "name": "FallbackChain",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/resilience/fallback.py",
+            "lineno": 367,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 370,
+                "docstring": "Initialize fallback chain.\n\nArgs:\n    handlers: List of fallback handlers in order of preference"
+              }
+            ],
+            "docstring": "Chain of fallback strategies.",
+            "agent_type": "general"
+          },
+          {
+            "name": "RateLimitError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/resilience/rate_limiter.py",
+            "lineno": 18,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when rate limit is exceeded.",
+            "agent_type": "general"
+          },
+          {
+            "name": "RateLimiter",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/resilience/rate_limiter.py",
+            "lineno": 297,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 300,
+                "docstring": "Initialize rate limiter.\n\nArgs:\n    config: Rate limiter configuration"
+              }
+            ],
+            "docstring": "Main rate limiter class supporting multiple strategies.",
+            "agent_type": "general"
+          },
+          {
+            "name": "TimeoutError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/resilience/timeout.py",
+            "lineno": 31,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 34,
+                "docstring": null
+              }
+            ],
+            "docstring": "Raised when an operation times out.",
+            "agent_type": "general"
+          },
+          {
+            "name": "TokenValidationError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/security/oauth.py",
+            "lineno": 23,
+            "bases": [
+              "OAuthError"
+            ],
+            "methods": [],
+            "docstring": "Raised when token validation fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "PKCEError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/security/oauth.py",
+            "lineno": 28,
+            "bases": [
+              "OAuthError"
+            ],
+            "methods": [],
+            "docstring": "Raised when PKCE (Proof Key for Code Exchange) fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "PermissionError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/security/permissions.py",
+            "lineno": 16,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when permission check fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "RoleError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/security/permissions.py",
+            "lineno": 21,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when role operation fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "ValidationError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/security/validation.py",
+            "lineno": 17,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when input validation fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "SanitizationError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/security/validation.py",
+            "lineno": 22,
+            "bases": [
+              "ComponentError"
+            ],
+            "methods": [],
+            "docstring": "Raised when input sanitization fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "TestMetricsCollector",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/testing/helpers.py",
+            "lineno": 301,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 304,
+                "docstring": null
+              },
+              {
+                "name": "increment_counter",
+                "lineno": 310,
+                "docstring": "Increment a counter."
+              },
+              {
+                "name": "set_gauge",
+                "lineno": 325,
+                "docstring": "Set a gauge value."
+              },
+              {
+                "name": "record_histogram",
+                "lineno": 338,
+                "docstring": "Record a histogram value."
+              },
+              {
+                "name": "get_counter",
+                "lineno": 353,
+                "docstring": "Get counter value."
+              },
+              {
+                "name": "get_gauge",
+                "lineno": 357,
+                "docstring": "Get gauge value."
+              },
+              {
+                "name": "get_histogram",
+                "lineno": 361,
+                "docstring": "Get histogram values."
+              },
+              {
+                "name": "get_metrics",
+                "lineno": 365,
+                "docstring": "Get all metrics."
+              },
+              {
+                "name": "clear_metrics",
+                "lineno": 371,
+                "docstring": "Clear all metrics."
+              }
+            ],
+            "docstring": "Test metrics collector for testing observability components.",
+            "agent_type": "collector"
+          },
+          {
+            "name": "CacheError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/caching.py",
+            "lineno": 21,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when cache operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "CacheKeyError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/caching.py",
+            "lineno": 26,
+            "bases": [
+              "CacheError"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when cache key operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "CacheValueError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/caching.py",
+            "lineno": 31,
+            "bases": [
+              "CacheError"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when cache value operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "Cache",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/caching.py",
+            "lineno": 284,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 287,
+                "docstring": null
+              },
+              {
+                "name": "set_key_prefix",
+                "lineno": 292,
+                "docstring": "Set a prefix for all cache keys."
+              },
+              {
+                "name": "set_default_ttl",
+                "lineno": 296,
+                "docstring": "Set default TTL for cache entries."
+              },
+              {
+                "name": "_make_key",
+                "lineno": 300,
+                "docstring": "Make a full cache key with prefix."
+              }
+            ],
+            "docstring": "Main cache class that uses a backend.",
+            "agent_type": "general"
+          },
+          {
+            "name": "CompressionError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/compression.py",
+            "lineno": 30,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when compression operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "DecompressionError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/compression.py",
+            "lineno": 35,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when decompression operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "EncodingError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/encoding.py",
+            "lineno": 34,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when encoding operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "DecodingError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/encoding.py",
+            "lineno": 39,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when decoding operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "EncryptionError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/encryption.py",
+            "lineno": 37,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when encryption operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "DecryptionError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/encryption.py",
+            "lineno": 42,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when decryption operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "KeyGenerationError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/encryption.py",
+            "lineno": 47,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when key generation fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "HashingError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/hashing.py",
+            "lineno": 34,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when hashing operations fail.",
+            "agent_type": "general"
+          },
+          {
+            "name": "HashVerificationError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/hashing.py",
+            "lineno": 39,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when hash verification fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "SerializationError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/serialization.py",
+            "lineno": 34,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when serialization fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "DeserializationError",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/serialization.py",
+            "lineno": 39,
+            "bases": [
+              "Exception"
+            ],
+            "methods": [],
+            "docstring": "Exception raised when deserialization fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "EmailValidator",
+            "file_path": "libs/opsvi-foundation/opsvi_foundation/utils/validation.py",
+            "lineno": 289,
+            "bases": [
+              "BaseModel"
+            ],
+            "methods": [
+              {
+                "name": "validate_email",
+                "lineno": 294,
+                "docstring": null
+              }
+            ],
+            "docstring": "Email validation model.",
+            "agent_type": "general"
+          },
+          {
+            "name": "OpenAIConfig",
+            "file_path": "libs/opsvi-llm/opsvi_llm/providers/openai_provider.py",
+            "lineno": 69,
+            "bases": [
+              "BaseModel"
+            ],
+            "methods": [],
+            "docstring": "Configuration for OpenAI provider.",
+            "agent_type": "general"
+          },
+          {
             "name": "OpenAIProvider",
             "file_path": "libs/opsvi-llm/opsvi_llm/providers/openai_provider.py",
-            "lineno": 26,
+            "lineno": 88,
             "bases": [
               "BaseLLMProvider"
             ],
             "methods": [
               {
                 "name": "__init__",
-                "lineno": 38,
-                "docstring": "Initialize the OpenAI provider.\n\nArgs:\n    api_key: OpenAI API key\n    model: Model identifier (e.g., \"gpt-4\", \"gpt-3.5-turbo\")\n    organization: OpenAI organization ID (optional)\n    base_url: Custom base URL for API calls (optional)\n    **kwargs: Additional configuration options"
+                "lineno": 100,
+                "docstring": null
               },
               {
-                "name": "_validate_config",
-                "lineno": 71,
-                "docstring": "Validate OpenAI-specific configuration."
+                "name": "_build_api_request",
+                "lineno": 307,
+                "docstring": "Build OpenAI API request from chat request.\n\nArgs:\n    request: Chat completion request\n\nReturns:\n    OpenAI API request parameters"
               },
               {
-                "name": "_setup_rate_limiting",
-                "lineno": 79,
-                "docstring": "Setup rate limiting for OpenAI API."
+                "name": "_convert_response",
+                "lineno": 341,
+                "docstring": "Convert OpenAI response to LLM response.\n\nArgs:\n    response: OpenAI chat completion response\n\nReturns:\n    LLM response"
               },
               {
-                "name": "_prepare_request_params",
-                "lineno": 187,
-                "docstring": "Prepare request parameters for OpenAI API."
+                "name": "_validate_request",
+                "lineno": 393,
+                "docstring": "Validate chat request.\n\nArgs:\n    request: Chat completion request\n\nRaises:\n    LLMValidationError: If request is invalid"
               },
               {
-                "name": "_parse_chat_response",
-                "lineno": 232,
-                "docstring": "Parse OpenAI chat completion response."
+                "name": "get_supported_models",
+                "lineno": 421,
+                "docstring": "Get list of supported models.\n\nReturns:\n    List of supported model names"
               },
               {
                 "name": "supports_function_calling",
-                "lineno": 329,
-                "docstring": "Check if the provider supports function calling."
+                "lineno": 429,
+                "docstring": "Check if model supports function calling.\n\nArgs:\n    model: Model name, uses default if None\n\nReturns:\n    True if model supports function calling"
               },
               {
                 "name": "supports_streaming",
-                "lineno": 333,
-                "docstring": "Check if the provider supports streaming responses."
+                "lineno": 442,
+                "docstring": "Check if model supports streaming.\n\nArgs:\n    model: Model name, uses default if None\n\nReturns:\n    True if model supports streaming (all OpenAI models do)"
               }
             ],
-            "docstring": "OpenAI SDK-based LLM provider supporting async generation with modern patterns.\n\nProvides comprehensive integration with OpenAI's API including:\n- Chat completions\n- Function calling\n- Streaming responses\n- Rate limiting\n- Retry logic",
+            "docstring": "OpenAI LLM provider with chat completions and function calling.\n\nFeatures:\n- Chat completions with GPT models\n- Function calling support\n- Streaming responses\n- Automatic retries with exponential backoff\n- Circuit breaker for fault tolerance\n- Rate limiting",
             "agent_type": "general"
           },
           {
-            "name": "FunctionCall",
-            "file_path": "libs/opsvi-llm/opsvi_llm/schemas/responses.py",
-            "lineno": 57,
-            "bases": [
-              "BaseModel"
-            ],
-            "methods": [
-              {
-                "name": "validate_arguments",
-                "lineno": 71,
-                "docstring": "Validate that arguments is a valid JSON string."
-              }
-            ],
-            "docstring": "Function call information for structured outputs.\n\nAttributes:\n    name: Name of the function to call\n    arguments: JSON string containing function arguments",
-            "agent_type": "general"
-          },
-          {
-            "name": "LLMResponse",
-            "file_path": "libs/opsvi-llm/opsvi_llm/schemas/responses.py",
-            "lineno": 81,
-            "bases": [
-              "BaseModel"
-            ],
-            "methods": [
-              {
-                "name": "validate_generated_text",
-                "lineno": 113,
-                "docstring": "Validate that generated_text is a non-empty string."
-              },
-              {
-                "name": "to_dict",
-                "lineno": 122,
-                "docstring": "Convert response to dictionary."
-              },
-              {
-                "name": "get_content",
-                "lineno": 126,
-                "docstring": "Get the main content of the response."
-              },
-              {
-                "name": "has_function_calls",
-                "lineno": 130,
-                "docstring": "Check if the response contains function calls."
-              },
-              {
-                "name": "get_function_calls",
-                "lineno": 134,
-                "docstring": "Get function calls from the response."
-              }
-            ],
-            "docstring": "Structured schema for LLM responses with comprehensive metadata.\n\nAttributes:\n    generated_text: The main generated text content\n    messages: List of chat messages (for chat completions)\n    function_calls: List of function calls made\n    metadata: Additional response metadata\n    reasoning: Optional reasoning or explanation\n    usage: Token usage information\n    model: Model used for generation\n    finish_reason: Reason for completion",
-            "agent_type": "general"
-          },
-          {
-            "name": "RateLimiter",
-            "file_path": "libs/opsvi-llm/opsvi_llm/utils/rate_limiting.py",
-            "lineno": 27,
+            "name": "TestOpenAIEmbeddingProvider",
+            "file_path": "libs/opsvi-rag/tests/test_providers.py",
+            "lineno": 77,
             "bases": [],
             "methods": [
               {
-                "name": "__init__",
-                "lineno": 35,
-                "docstring": "Initialize the rate limiter.\n\nArgs:\n    config: Rate limiting configuration"
+                "name": "config",
+                "lineno": 81,
+                "docstring": null
               },
               {
-                "name": "_can_make_request",
-                "lineno": 83,
-                "docstring": "Check if a request can be made."
+                "name": "mock_openai_provider",
+                "lineno": 87,
+                "docstring": null
               },
               {
-                "name": "_refill_tokens",
-                "lineno": 97,
-                "docstring": "Refill tokens based on time elapsed."
+                "name": "test_initialization_valid_model",
+                "lineno": 99,
+                "docstring": "Test initialization with valid model."
               },
               {
-                "name": "_check_sliding_window",
-                "lineno": 107,
-                "docstring": "Check sliding window rate limit."
+                "name": "test_initialization_invalid_model",
+                "lineno": 105,
+                "docstring": "Test initialization with invalid model."
               },
               {
-                "name": "_record_request",
-                "lineno": 119,
-                "docstring": "Record a request."
-              },
-              {
-                "name": "_calculate_wait_time",
-                "lineno": 125,
-                "docstring": "Calculate how long to wait before next request."
-              },
-              {
-                "name": "get_stats",
-                "lineno": 147,
-                "docstring": "Get current rate limiter statistics."
+                "name": "test_get_model_info",
+                "lineno": 152,
+                "docstring": "Test getting model information."
               }
             ],
-            "docstring": "Rate limiter for API requests with sliding window support.\n\nProvides token bucket and sliding window rate limiting to prevent\nAPI quota exhaustion and ensure fair usage.",
+            "docstring": "Tests for OpenAI embedding provider.",
             "agent_type": "general"
           }
         ],
-        "agent_count": 23,
+        "agent_count": 70,
         "communication": {
           "has_messaging": false,
           "has_event_system": false,
           "has_rpc": false,
           "has_grpc": false,
           "has_websockets": false,
-          "has_queues": false,
+          "has_queues": true,
           "protocols": [
-            "messaging"
+            "messaging",
+            "websockets",
+            "events",
+            "queues"
           ],
           "message_types": []
         },
         "orchestration": {
-          "has_orchestrator": false,
+          "has_orchestrator": true,
           "has_scheduler": false,
           "has_workflow": false,
           "has_task_queue": false,
-          "orchestration_pattern": "unknown",
+          "orchestration_pattern": "centralized_orchestration",
           "coordination_mechanism": "unknown"
         },
         "configuration": {
@@ -711,15 +1651,15 @@
             "OPENAI_BASE_URL=https://api.openai.com/v1"
           ]
         },
-        "architecture_pattern": "distributed",
+        "architecture_pattern": "centralized_multi_agent",
         "agent_types": [
-          "general",
-          "worker"
+          "collector",
+          "general"
         ],
         "has_multi_agent_system": true
       }
     }
   ],
-  "timestamp": "2025-08-06 03:18:10.086944",
+  "timestamp": "2025-08-06 13:04:56.716663",
   "schema_version": "1.1.0"
 }

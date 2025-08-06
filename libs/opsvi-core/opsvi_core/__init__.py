@@ -11,16 +11,16 @@ __email__ = "team@opsvi.com"
 
 # Import foundation components
 from opsvi_foundation import (
-    FoundationConfig,
     AuthManager,
-    CircuitBreaker,
     BaseComponent,
+    CircuitBreaker,
+    FoundationConfig,
     get_logger,
 )
 
 # Import core-specific components
 from .core import CoreConfig, config
-from .core.exceptions import CoreError, AgentError, WorkflowError
+from .core.exceptions import AgentError, CoreError, WorkflowError
 
 __all__ = [
     # Foundation exports

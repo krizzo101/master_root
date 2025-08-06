@@ -5,7 +5,7 @@ Handles environment-based configuration with validation and defaults.
 """
 
 import os
-from typing import Any, Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -19,13 +19,22 @@ class FoundationConfig(BaseModel):
 
     # Security settings
     jwt_secret: str = Field(default="dev-secret", description="JWT signing secret")
-    encryption_key: Optional[str] = Field(default=None, description="Encryption key for sensitive data")
+    encryption_key: str | None = Field(
+        default=None,
+        description="Encryption key for sensitive data",
+    )
     api_timeout: int = Field(default=30, description="Default API timeout in seconds")
     max_retries: int = Field(default=3, description="Default maximum retry attempts")
 
     # Circuit breaker settings
-    circuit_failure_threshold: int = Field(default=5, description="Circuit breaker failure threshold")
-    circuit_recovery_timeout: int = Field(default=60, description="Circuit breaker recovery timeout")
+    circuit_failure_threshold: int = Field(
+        default=5,
+        description="Circuit breaker failure threshold",
+    )
+    circuit_recovery_timeout: int = Field(
+        default=60,
+        description="Circuit breaker recovery timeout",
+    )
 
     @classmethod
     def from_env(cls) -> "FoundationConfig":
@@ -39,8 +48,12 @@ class FoundationConfig(BaseModel):
                 encryption_key=os.getenv("OPSVI_ENCRYPTION_KEY"),
                 api_timeout=int(os.getenv("OPSVI_API_TIMEOUT", "30")),
                 max_retries=int(os.getenv("OPSVI_MAX_RETRIES", "3")),
-                circuit_failure_threshold=int(os.getenv("OPSVI_CIRCUIT_FAILURE_THRESHOLD", "5")),
-                circuit_recovery_timeout=int(os.getenv("OPSVI_CIRCUIT_RECOVERY_TIMEOUT", "60"))
+                circuit_failure_threshold=int(
+                    os.getenv("OPSVI_CIRCUIT_FAILURE_THRESHOLD", "5"),
+                ),
+                circuit_recovery_timeout=int(
+                    os.getenv("OPSVI_CIRCUIT_RECOVERY_TIMEOUT", "60"),
+                ),
             )
         except Exception as e:
             raise ValueError(f"Failed to load configuration: {e}")

@@ -5,7 +5,7 @@ Provides LLM provider implementations and interfaces.
 """
 
 from .base import BaseLLMProvider
-from .openai_provider import OpenAIProvider, OpenAIConfig
+from .openai_provider import OpenAIConfig, OpenAIProvider
 
 __all__ = [
     "BaseLLMProvider",

@@ -4,9 +4,8 @@ Configuration for opsvi-core.
 Extends foundation configuration with core-specific settings.
 """
 
-from typing import Optional
-from pydantic import BaseModel, Field
 from opsvi_foundation import FoundationConfig
+from pydantic import BaseModel, Field
 
 
 class CoreConfig(BaseModel):

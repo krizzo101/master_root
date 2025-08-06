@@ -5,11 +5,11 @@ Domain-specific configuration and exceptions.
 """
 
 from .config import LLMConfig, config
-from .exceptions import LLMError, LLMValidationError, LLMConfigurationError
+from .exceptions import LLMConfigurationError, LLMError, LLMValidationError
 
 __all__ = [
     "LLMConfig",
-    "config", 
+    "config",
     "LLMError",
     "LLMValidationError",
     "LLMConfigurationError",

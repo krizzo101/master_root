@@ -14,11 +14,11 @@ import tempfile
 from pathlib import Path
 
 from opsvi_rag.processors import (
-    DocumentProcessorFactory,
     DocumentProcessingRequest,
-    TextDocumentProcessor,
+    DocumentProcessorFactory,
     SemanticChunkingStrategy,
     SimpleTokenChunkingStrategy,
+    TextDocumentProcessor,
 )
 
 
@@ -40,30 +40,29 @@ async def test_text_processing():
     Final paragraph to ensure proper handling of multiple sections.
     """
 
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
         f.write(test_content.strip())
         temp_path = Path(f.name)
 
     try:
         # Test processing
         request = DocumentProcessingRequest(
-            path=temp_path,
-            chunk_size=200,
-            overlap=50,
-            strategy="semantic"
+            path=temp_path, chunk_size=200, overlap=50, strategy="semantic"
         )
 
         processor = DocumentProcessorFactory.get_processor(temp_path)
         response = await processor.process(request)
 
-        print(f"✅ Document processed successfully!")
+        print("✅ Document processed successfully!")
         print(f"   File: {response.document_metadata.file_name}")
         print(f"   Size: {response.document_metadata.size_bytes} bytes")
         print(f"   SHA256: {response.document_metadata.sha256[:16]}...")
         print(f"   Chunks: {len(response.chunks)}")
 
         for i, chunk in enumerate(response.chunks):
-            print(f"   Chunk {i}: {len(chunk.text)} chars (offset {chunk.metadata.start_offset}-{chunk.metadata.end_offset})")
+            print(
+                f"   Chunk {i}: {len(chunk.text)} chars (offset {chunk.metadata.start_offset}-{chunk.metadata.end_offset})"
+            )
             print(f"            {repr(chunk.text[:50])}...")
 
         return response
@@ -107,7 +106,7 @@ async def test_embedding_integration():
     # Create test content
     test_content = "This is a test document for embedding integration. It should convert to EmbeddingRequest format."
 
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
         f.write(test_content)
         temp_path = Path(f.name)
 
@@ -119,7 +118,7 @@ async def test_embedding_integration():
         # Convert to embedding request
         embedding_request = response.to_embedding_request()
 
-        print(f"✅ Embedding integration successful!")
+        print("✅ Embedding integration successful!")
         print(f"   Texts for embedding: {len(embedding_request.texts)}")
         print(f"   Metadata included: {bool(embedding_request.metadata)}")
         print(f"   First text: {repr(embedding_request.texts[0][:50])}...")
@@ -135,10 +134,10 @@ async def test_factory_processor_selection():
     print("\n🧪 Testing Processor Factory...")
 
     test_cases = [
-        ('.txt', 'TextDocumentProcessor'),
-        ('.md', 'MarkdownDocumentProcessor'),
-        ('.markdown', 'MarkdownDocumentProcessor'),
-        ('.pdf', 'PDFDocumentProcessor'),
+        (".txt", "TextDocumentProcessor"),
+        (".md", "MarkdownDocumentProcessor"),
+        (".markdown", "MarkdownDocumentProcessor"),
+        (".pdf", "PDFDocumentProcessor"),
     ]
 
     for ext, expected_class in test_cases:
@@ -174,6 +173,7 @@ async def main():
     except Exception as e:
         print(f"\n❌ Test failed: {e}")
         import traceback
+
         traceback.print_exc()
 
 

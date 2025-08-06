@@ -4,11 +4,13 @@ Shared testing fixtures and utilities.
 Provides common test fixtures for OPSVI libraries.
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
+
 from ..config import FoundationConfig
-from ..security import AuthManager, AuthConfig
 from ..resilience import CircuitBreaker, CircuitBreakerConfig
+from ..security import AuthConfig, AuthManager
 
 
 @pytest.fixture
