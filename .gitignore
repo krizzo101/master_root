@@ -338,7 +338,11 @@ local/
 Thumbs.db
 
 # Project intake directories (exclude from project intelligence)
-intake/
+intake
+apps
+.archive/
+.ruff_cache/
+.pytest_cache/
 
 # Project intelligence cache
 .proj-intel/

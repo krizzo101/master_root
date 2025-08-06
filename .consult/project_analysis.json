@@ -1,31 +1,33 @@
 {
   "metadata": {
-    "build_time_ms": 0.006198883056640625,
+    "build_time_ms": 0.0057220458984375,
     "project_path": "/home/opsvi/master_root",
     "builder_type": "DefaultPackageBuilder",
-    "build_timestamp": "2025-08-04T20:27:07.228781",
+    "build_timestamp": "2025-08-06T01:31:24.446523",
     "package_type": "default",
     "collector_count": 5,
-    "total_data_size": 10218
+    "total_data_size": 7729
   },
   "collectors": [
     {
       "collector": "DevelopmentStateCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-04T16:27:04.188186",
+      "timestamp": "2025-08-05T21:31:24.305557",
       "data": {
         "git_repository": true,
-        "current_branch": "AUTOSAVE",
+        "current_branch": "fix/storage-api",
         "remote_url": "https://github.com/krizzo101/master_root.git",
-        "active_branches": 2,
+        "active_branches": 4,
         "branch_names": [
           "AUTOSAVE",
+          "feat/workspace-optimization",
+          "fix/storage-api",
           "main"
         ],
         "has_uncommitted_changes": true,
         "staged_files_count": 1,
-        "unstaged_files_count": 2,
-        "untracked_files_count": 0,
+        "unstaged_files_count": 6,
+        "untracked_files_count": 6,
         "ci_status": {
           "has_ci": true,
           "ci_provider": "GitHub Actions",
@@ -42,22 +44,24 @@
         },
         "recent_activity": {
           "last_commit_days_ago": 0,
-          "commits_last_week": 12,
-          "commits_last_month": 12,
+          "commits_last_week": 19,
+          "commits_last_month": 19,
           "active_contributors": 0,
           "recent_branches": [
             "AUTOSAVE",
+            "feat/workspace-optimization",
+            "fix/storage-api",
             "main"
           ]
         },
         "project_structure": {
-          "has_tests": false,
+          "has_tests": true,
           "has_docs": true,
           "has_ci": false,
           "has_docker": false,
           "has_requirements": false,
           "main_language": null,
-          "file_count": 13172
+          "file_count": 72
         },
         "development_state": "active_development"
       }
@@ -65,10 +69,10 @@
     {
       "collector": "ProjectPurposeCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-04T16:27:04.188866",
+      "timestamp": "2025-08-05T21:31:24.306263",
       "data": {
         "project_name": "OPSVI Master Workspace",
-        "description": "[![CI](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml) A comprehensive monorepo for AI/ML Operations with built-in observability, RAG capabilities, and MCP integration. ```bash",
+        "description": "[![CI](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml) A comprehensive monorepo for AI/ML Operations with built-in observability, RAG capabilities, and MCP integration. This workspace has been optimized with:",
         "key_features": [
           "**Worktrees**: Use `scripts/new_agent_worktree.sh` for feature development"
         ]
@@ -77,101 +81,42 @@
     {
       "collector": "ConstraintsCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-04T16:27:06.066433",
+      "timestamp": "2025-08-05T21:31:24.341488",
       "data": {
         "technical_constraints": {
-          "performance_constraints": [
-            "Assert: assert len(performance_engine.active_tasks) == 0",
-            "Assert: assert len(performance_engine.task_executions) == 0",
-            "Assert: assert 'performance_issue' in agent.repair_capabilities",
-            "Assert: assert result.repair_type == 'performance_issue'",
-            "Assert: assert 'performance_issue' in capabilities",
-            "Assert: assert 'Performance Smoke Test Results' in response.content",
-            "Assert: assert 'Performance Smoke Test Results' in response.content",
-            "Assert: assert 'Performance Optimization Analysis' in response.content",
-            "Assert: assert 'slow_operations' in profile",
-            "Assert: assert len(slow_ops) >= 2",
-            "Assert: assert 'Performance Optimization Analysis' in response.content",
-            "Exception: raise TimeoutError(f'Operation timed out after {timeout} seconds')",
-            "Assert: assert 'performance_metrics' in content",
-            "Assert: assert result.status == ExecutionStatus.TIMEOUT",
-            "Assert: assert settings.redis_connection_timeout == 5",
-            "Assert: assert settings.test_timeout == 300",
-            "Assert: assert settings.enable_performance_optimization is True",
-            "Assert: assert task_def.timeout_seconds == 300",
-            "Assert: assert task_def.timeout_seconds == 300",
-            "Assert: assert perf_policy.name == 'performance'",
-            "Assert: assert policy_result.policy_name == 'performance'",
-            "Assert: assert _determine_issue_type(perf_result) == 'performance_issue'",
-            "Assert: assert config.timeout == 30.0",
-            "Assert: assert config.default_timeout == 30.0",
-            "Assert: assert config['default_timeout'] == 30.0",
-            "Assert: assert config['brave']['timeout'] == 45.0",
-            "Assert: assert config['default_timeout'] == 45.0",
-            "Assert: assert config['firecrawl']['timeout'] == 30.0",
-            "Assert: assert config.default_timeout == 30.0",
-            "Exception: raise HTTPException(status_code=500, detail=f'Failed to get agent performance: {e}')",
-            "Exception: raise TimeoutError(f'Task {node_id} timed out')",
-            "Exception: raise ValueError('Timeout must be positive')",
-            "Exception: raise TimeoutError(f'Task {task_id} timed out')",
-            "Exception: raise ConfigError(f'Invalid timeout for client {client.name}: {client.timeout}')",
-            "Exception: raise ValueError(f'Invalid timeout for client {client_name}')",
-            "Exception: raise ClientError(f'Request to {self.name} timed out after {timeout}s', self.name, {'timeout': timeout})",
-            "Exception: raise Exception(f'Execution timeout after {self.config.execution_timeout_seconds} seconds')",
-            "40% faster than creating new instances each time",
-            "Exception: raise Exception(f'Execution timeout after {self.config.execution_timeout_seconds} seconds')",
-            "40% faster than creating new instances each time"
-          ],
-          "security_constraints": [
-            "Assert: assert settings.access_token_expire_minutes == 30",
-            "Exception: raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f\"Permission '{permission}' required\")",
-            "Exception: raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f'One of permissions {permissions} required')",
-            "Exception: raise HTTPException(status_code=403, detail=f'Permission required: {permission}')",
-            "Exception: raise HTTPException(status_code=403, detail=f'Permission required: {permission}')"
-          ],
+          "performance_constraints": [],
+          "security_constraints": [],
           "scalability_constraints": [],
           "compatibility_constraints": [],
-          "resource_constraints": [
-            "Assert: assert execution_time < load_size * 2.0",
-            "Assert: assert len(results) == load_size",
-            "Assert: assert size == 1024",
-            "Assert: assert 'size' in data",
-            "Assert: assert budget.limit == 1000",
-            "Assert: assert budget.soft_limit == 800",
-            "Assert: assert budget.hard_limit == 1200",
-            "Assert: assert budget.soft_limit is None",
-            "Assert: assert budget.hard_limit is None",
-            "Assert: assert budget.limit == 1000",
-            "Assert: assert usage.limit == 1000",
-            "Assert: assert alert.message == 'Token usage approaching limit'",
-            "Assert: assert budget is None or isinstance(budget, BudgetLimit)",
-            "Assert: assert settings.neo4j_max_connection_pool_size == 50",
-            "Exception: raise ValueError('Memory usage must be positive')"
-          ],
+          "resource_constraints": [],
           "dependency_constraints": [],
-          "general_constraints": [
-            "Additional constraints",
-            "Additional constraints",
-            "Additional constraints",
-            "Additional constraints",
-            "Additional constraints",
-            "Additional constraints",
-            "- This is task automation, not autonomous intelligence",
-            "- This is task automation, not autonomous intelligence",
-            "- This is system optimization, not intelligence enhancement"
-          ]
+          "general_constraints": []
         },
         "business_rules": {
           "validation_rules": [
-            "uv run ruff check"
+            "- \u2705 **Phase 1**: Linting & Type Checking (ruff, black, mypy)",
+            "uv run ruff check",
+            "- **mypy**: Static type checking",
+            "- **mypy**: Static type checking with strict configuration",
+            "- **Pre-commit Hooks**: Automatic quality checks on commit"
           ],
           "business_logic": [],
-          "compliance_requirements": [],
+          "compliance_requirements": [
+            "- **Package Structure**: Standardized Python package layout"
+          ],
           "data_rules": [
-            "uv run ruff format"
+            "uv run ruff format",
+            "- **ruff**: Fast Python linter and formatter",
+            "- **black**: Code formatting",
+            "just fmt         # Run formatting",
+            "- **black**: Consistent code formatting"
           ],
           "workflow_rules": [
-            "[![CI](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml)"
+            "[![CI](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml)",
+            "- \u2705 **Phase 4**: Workflow Automation (pre-commit hooks)",
+            "- **CI/CD**: GitHub Actions workflow for automated testing",
+            "- **README Updates**: Comprehensive documentation of new tools and processes",
+            "- **Workflow Documentation**: Clear development workflow instructions"
           ]
         },
         "limitations": {
@@ -182,60 +127,35 @@
           "scalability_limitations": []
         },
         "constraint_summary": {
-          "total_constraints": 72,
+          "total_constraints": 16,
           "constraint_types": [
-            "performance_constraints",
-            "security_constraints",
-            "resource_constraints",
-            "general_constraints",
             "validation_rules",
+            "compliance_requirements",
             "data_rules",
             "workflow_rules"
           ],
-          "critical_constraints": [
-            "Assert: assert len(performance_engine.active_tasks) == 0",
-            "Assert: assert len(performance_engine.task_executions) == 0",
-            "Assert: assert 'performance_issue' in agent.repair_capabilities",
-            "Assert: assert result.repair_type == 'performance_issue'",
-            "Assert: assert 'performance_issue' in capabilities",
-            "Assert: assert 'Performance Smoke Test Results' in response.content",
-            "Assert: assert 'Performance Smoke Test Results' in response.content",
-            "Assert: assert 'Performance Optimization Analysis' in response.content",
-            "Assert: assert 'Performance Optimization Analysis' in response.content",
-            "Exception: raise TimeoutError(f'Operation timed out after {timeout} seconds')",
-            "Assert: assert 'performance_metrics' in content",
-            "Assert: assert settings.enable_performance_optimization is True",
-            "Assert: assert perf_policy.name == 'performance'",
-            "Assert: assert policy_result.policy_name == 'performance'",
-            "Assert: assert _determine_issue_type(perf_result) == 'performance_issue'",
-            "Exception: raise HTTPException(status_code=500, detail=f'Failed to get agent performance: {e}')",
-            "Exception: raise TimeoutError(f'Task {node_id} timed out')",
-            "Exception: raise ValueError('Timeout must be positive')",
-            "Exception: raise TimeoutError(f'Task {task_id} timed out')",
-            "Exception: raise ConfigError(f'Invalid timeout for client {client.name}: {client.timeout}')",
-            "Exception: raise ValueError(f'Invalid timeout for client {client_name}')",
-            "Exception: raise ClientError(f'Request to {self.name} timed out after {timeout}s', self.name, {'timeout': timeout})",
-            "Exception: raise ValueError('Memory usage must be positive')"
-          ],
-          "constraint_impact": "high"
+          "critical_constraints": [],
+          "constraint_impact": "medium"
         }
       }
     },
     {
       "collector": "WorkflowCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-04T16:27:06.079672",
+      "timestamp": "2025-08-05T21:31:24.361355",
       "data": {
         "branching_strategy": {
           "branching_model": "simple",
           "main_branch": "main",
           "development_branch": null,
-          "feature_branch_pattern": null,
+          "feature_branch_pattern": "feature/*",
           "release_branch_pattern": "release/*",
           "hotfix_branch_pattern": null,
-          "total_branches": 2,
+          "total_branches": 4,
           "branch_names": [
             "AUTOSAVE",
+            "feat/workspace-optimization",
+            "fix/storage-api",
             "main"
           ]
         },
@@ -244,7 +164,7 @@
           "ci_provider": "GitHub Actions",
           "workflow_files": [
             {
-              "name": "CI",
+              "name": "Workspace CI",
               "on": {},
               "jobs": [
                 "test"
@@ -254,13 +174,10 @@
               ],
               "steps": [
                 "unnamed",
-                "Set up Python ${{ matrix.python-version }}",
-                "Install uv",
-                "Install dependencies",
-                "Lint with ruff",
-                "Format check with black",
-                "Type check with mypy",
-                "Test with pytest"
+                "unnamed",
+                "unnamed",
+                "uv sync",
+                "uv run pytest"
               ]
             }
           ],
@@ -303,6 +220,10 @@
               "category": "configuration"
             },
             {
+              "name": "mypy",
+              "category": "configuration"
+            },
+            {
               "name": "pytest",
               "category": "configuration"
             }
@@ -325,12 +246,135 @@
     {
       "collector": "AgentArchitectureCollector",
       "schema_version": "1.0.0",
-      "timestamp": 1754339227.228325,
+      "timestamp": "2025-08-05T21:31:24.446084",
       "data": {
-        "error": "Collector AgentArchitectureCollector failed: 'Attribute' object has no attribute 'id'"
+        "agent_classes": [
+          {
+            "name": "CrewAdapter",
+            "file_path": "libs/opsvi-agents/src/opsvi/agents/crew_adapter.py",
+            "lineno": 6,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 9,
+                "docstring": "Initialize the CrewAI adapter."
+              },
+              {
+                "name": "create_crew",
+                "lineno": 14,
+                "docstring": "Create a crew with agents and tasks."
+              }
+            ],
+            "docstring": "Adapter for CrewAI agent framework.",
+            "agent_type": "general"
+          },
+          {
+            "name": "GraphAdapter",
+            "file_path": "libs/opsvi-agents/src/opsvi/agents/graph_adapter.py",
+            "lineno": 6,
+            "bases": [],
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 9,
+                "docstring": "Initialize the LangGraph adapter."
+              },
+              {
+                "name": "create_graph",
+                "lineno": 14,
+                "docstring": "Create a graph with nodes and edges."
+              }
+            ],
+            "docstring": "Adapter for LangGraph agent framework.",
+            "agent_type": "general"
+          },
+          {
+            "name": "ConfigurationError",
+            "file_path": "libs/opsvi-core/src/opsvi_core/exceptions.py",
+            "lineno": 13,
+            "bases": [
+              "OPSVIError"
+            ],
+            "methods": [],
+            "docstring": "Raised when there's a configuration error.",
+            "agent_type": "general"
+          },
+          {
+            "name": "ValidationError",
+            "file_path": "libs/opsvi-core/src/opsvi_core/exceptions.py",
+            "lineno": 19,
+            "bases": [
+              "OPSVIError"
+            ],
+            "methods": [],
+            "docstring": "Raised when data validation fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "ConnectionError",
+            "file_path": "libs/opsvi-core/src/opsvi_core/exceptions.py",
+            "lineno": 25,
+            "bases": [
+              "OPSVIError"
+            ],
+            "methods": [],
+            "docstring": "Raised when connection to external services fails.",
+            "agent_type": "general"
+          },
+          {
+            "name": "TimeoutError",
+            "file_path": "libs/opsvi-core/src/opsvi_core/exceptions.py",
+            "lineno": 31,
+            "bases": [
+              "OPSVIError"
+            ],
+            "methods": [],
+            "docstring": "Raised when operations timeout.",
+            "agent_type": "general"
+          }
+        ],
+        "agent_count": 6,
+        "communication": {
+          "has_messaging": false,
+          "has_event_system": false,
+          "has_rpc": false,
+          "has_grpc": false,
+          "has_websockets": false,
+          "has_queues": false,
+          "protocols": [],
+          "message_types": []
+        },
+        "orchestration": {
+          "has_orchestrator": false,
+          "has_scheduler": false,
+          "has_workflow": false,
+          "has_task_queue": false,
+          "orchestration_pattern": "unknown",
+          "coordination_mechanism": "unknown"
+        },
+        "configuration": {
+          "has_agent_config": false,
+          "config_files": [],
+          "agent_settings": {},
+          "environment_variables": [
+            "MCP_REGISTRY_URL=https://mcp.opsvi.ai",
+            "MCP_PUBLIC_URL=https://public-mcp.opsvi.ai",
+            "MCP_GIT_BRANCH=main",
+            "# OpenAI Configuration",
+            "OPENAI_API_KEY=your_openai_api_key",
+            "OPENAI_MODEL=gpt-4",
+            "OPENAI_BASE_URL=https://api.openai.com/v1"
+          ]
+        },
+        "architecture_pattern": "distributed",
+        "agent_types": [
+          "general"
+        ],
+        "has_multi_agent_system": true
       }
     }
   ],
-  "timestamp": "2025-08-04 20:27:07.228880",
+  "timestamp": "2025-08-06 01:31:24.446600",
   "schema_version": "1.1.0"
 }
