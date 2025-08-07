@@ -5,8 +5,9 @@ import logging
 from pathlib import Path
 
 from .generation.planner import (
-    build_messages_for_build_app,
     build_messages_for_patch_repo,
+    build_messages_full_from_spec,
+    build_messages_to_fill_missing,
     run_tool_orchestrated,
 )
 from .openai_client import OpenAIClient, OpenAIClientError
@@ -36,8 +37,8 @@ def build_app(spec: str, out_dir: str, reasoning_effort: str) -> None:
     logging.info("[build-app] Starting app generation")
     Path(out_dir).mkdir(parents=True, exist_ok=True)
     client = OpenAIClient(reasoning_effort=reasoning_effort)
-    logging.info("[build-app] Requesting patch from model")
-    messages = build_messages_for_build_app(spec)
+    logging.info("[build-app] Requesting patch from model (full-from-spec)")
+    messages = build_messages_full_from_spec(spec)
     patch_text = run_tool_orchestrated(client, messages)
     if not patch_text.strip().startswith("*** Begin Patch"):
         raise RuntimeError("Model did not return a patch.")
@@ -45,6 +46,37 @@ def build_app(spec: str, out_dir: str, reasoning_effort: str) -> None:
     logging.info("[build-app] Applying patch to %s", out_dir)
     result = apply_patch_text(out_dir, patch_text)
     logging.info("[build-app] Patch result: %s", result)
+    # Check whether expected source directory exists per README
+    readme_path = Path(out_dir) / "README.md"
+    if readme_path.exists():
+        readme = readme_path.read_text(errors="ignore")
+        expected_pkg = None
+        for line in readme.splitlines():
+            if line.strip().startswith("- pycalc/"):
+                expected_pkg = "pycalc"
+                break
+        if expected_pkg and not (Path(out_dir) / expected_pkg).exists():
+            logging.info(
+                "[build-app] Detected missing source package '%s', requesting follow-up patch",
+                expected_pkg,
+            )
+            # Build a quick tree listing to guide the model
+            tree = "\n".join(
+                sorted([str(p.relative_to(out_dir)) for p in Path(out_dir).rglob("*")])
+            )
+            client = OpenAIClient(reasoning_effort=reasoning_effort)
+            fill_messages = build_messages_to_fill_missing(readme, tree)
+            follow_patch = run_tool_orchestrated(client, fill_messages)
+            if follow_patch.strip().startswith("*** Begin Patch"):
+                logging.info(
+                    "[build-app] Applying follow-up patch to add missing files"
+                )
+                apply_res = apply_patch_text(out_dir, follow_patch)
+                logging.info("[build-app] Follow-up patch result: %s", apply_res)
+            else:
+                logging.warning(
+                    "[build-app] Follow-up patch request did not return a patch"
+                )
     logging.info("[build-app] Completed")
 
 

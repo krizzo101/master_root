@@ -128,9 +128,15 @@ def build_messages_for_build_app(spec: str) -> list[dict[str, Any]]:
         {
             "role": "developer",
             "content": (
-                "You are a senior software engineer. Generate a complete, runnable application. "
-                "Use small, modular files with clear names and docstrings. If code is long, split files.\n"
-                "When producing code edits, output ONLY a cookbook patch format between *** Begin Patch and *** End Patch."
+                "You are a senior software engineer. Generate a complete, runnable application.\n"
+                "Requirements:\n"
+                "- Create ALL source files and tests required to run the app end-to-end.\n"
+                "- Include a Python package directory with __init__.py and, if CLI, __main__.py.\n"
+                "- Provide modules, CLI entrypoint, and basic tests.\n"
+                "- If any file is large, split into smaller modules.\n"
+                "Output policy:\n"
+                "- Output ONLY a cookbook patch format between *** Begin Patch and *** End Patch.\n"
+                "- Use relative paths.\n"
             ),
         },
         {"role": "user", "content": spec},
@@ -159,7 +165,48 @@ def build_messages_for_patch_repo(
     ]
 
 
+def build_messages_to_fill_missing(
+    readme_text: str, existing_tree: str
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "role": "developer",
+            "content": (
+                "Add ALL missing source files and tests so the project is runnable.\n"
+                "- Use the README as the spec.\n"
+                "- Do NOT delete or overwrite existing files unless necessary.\n"
+                "- Output ONLY a cookbook patch format between *** Begin Patch and *** End Patch.\n"
+                "- Use relative paths and include full file contents in Add File sections.\n"
+            ),
+        },
+        {
+            "role": "user",
+            "content": (
+                "README contents (spec):\n"
+                + readme_text[:8000]
+                + "\n\nExisting file tree:\n"
+                + existing_tree[:4000]
+            ),
+        },
+    ]
+
+
 def run_tool_orchestrated(client: OpenAIClient, messages: list[dict[str, Any]]) -> str:
     tools, router = get_function_tools()
     final_text, _ = client.tool_loop(messages, tools, router)
     return final_text
+
+
+def build_messages_full_from_spec(spec: str) -> list[dict[str, Any]]:
+    return [
+        {
+            "role": "developer",
+            "content": (
+                "Create a complete, runnable application from this spec.\n"
+                "- Output ONLY a cookbook patch between *** Begin Patch and *** End Patch.\n"
+                "- Include ALL files: package dir with __init__.py (and __main__.py if CLI), modules, tests, and an updated pyproject.toml.\n"
+                "- Use relative paths.\n"
+            ),
+        },
+        {"role": "user", "content": spec},
+    ]
