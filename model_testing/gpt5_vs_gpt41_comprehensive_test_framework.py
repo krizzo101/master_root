@@ -63,6 +63,46 @@ def get_log_file_path() -> str:
     return LOG_FILE_PATH
 
 
+def set_log_file_path(path: str) -> str:
+    """Reconfigure the module logger to write to a new log file path.
+
+    - If `path` is relative, it will be resolved relative to `RESULTS_DIR`.
+    - Ensures parent directory exists.
+    - Replaces the existing file handler with one pointing to the new path.
+    Returns the absolute path used.
+    """
+    global LOG_FILE_PATH, LOGGER
+
+    # Resolve path
+    resolved = path
+    if not os.path.isabs(resolved):
+        os.makedirs(RESULTS_DIR, exist_ok=True)
+        resolved = os.path.join(RESULTS_DIR, resolved)
+    parent_dir = os.path.dirname(resolved)
+    os.makedirs(parent_dir or ".", exist_ok=True)
+
+    # Reconfigure handlers
+    for h in list(LOGGER.handlers):
+        try:
+            h.flush()
+        except Exception:
+            pass
+        LOGGER.removeHandler(h)
+
+    file_handler = logging.FileHandler(resolved, encoding="utf-8")
+    file_handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+        fmt="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    file_handler.setFormatter(formatter)
+    LOGGER.addHandler(file_handler)
+
+    LOG_FILE_PATH = resolved
+    LOGGER.debug("Logger reconfigured to new file: %s", LOG_FILE_PATH)
+    return LOG_FILE_PATH
+
+
 def _preview(text: str, limit: int = 800) -> str:
     """Return a safe, truncated preview of large text blobs for logging."""
     if text is None:
@@ -2568,7 +2608,7 @@ class ComprehensiveTestRunner:
             pairs = await asyncio.gather(*(run_one_category(c) for c in coding_categories))
             for cat_value, res in pairs:
                 effort_result["categories"][cat_value] = res
-            effort_result["summary"] = self._calculate_reasoning_effort_summary(effort_result["categories"]) 
+            effort_result["summary"] = self._calculate_reasoning_effort_summary(effort_result["categories"])
             return effort.value, effort_result
 
         gathered = await asyncio.gather(*(run_effort_and_categories(e) for e in ReasoningEffort))

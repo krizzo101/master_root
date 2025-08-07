@@ -23,6 +23,7 @@ from gpt5_vs_gpt41_comprehensive_test_framework import (
     ReasoningEffort,
     TestCategory,
     get_log_file_path,
+    set_log_file_path,
 )
 
 
@@ -129,11 +130,20 @@ def main() -> dict:
         default=int(os.environ.get("MODEL_TEST_CONCURRENCY", "8")),
         help="Max concurrent API calls (default 8 or MODEL_TEST_CONCURRENCY)",
     )
+    parser.add_argument(
+        "--log-file",
+        type=str,
+        default=os.environ.get("MODEL_TEST_LOG", "test_run.log"),
+        help="Log file name or absolute path (default results/test_run.log). Relative paths are placed under results/",
+    )
 
     args = parser.parse_args()
 
     # Apply concurrency to evaluator via env (read by framework)
     os.environ["MODEL_TEST_CONCURRENCY"] = str(args.concurrency)
+    # Apply log file path
+    resolved_log = set_log_file_path(args.log_file)
+    print(f"📝 Debug log: {resolved_log}")
 
     # Determine which tests to run
     if args.quick:
