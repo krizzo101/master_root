@@ -251,22 +251,22 @@ file_templates:
         from .exceptions.base import {{exception_exports}}
 
         # Service-specific exports
-        {% if service_exports %}
+        {% if has_service_exports %}
         from .providers.base import {{service_exports}}
-        from .schemas.models import {{schema_exports}}
+        {% if schema_exports %}from .schemas.models import {{schema_exports}}{% endif %}
         {% endif %}
 
         # RAG-specific exports
-        {% if rag_exports %}
+        {% if has_rag_exports %}
         from .datastores.base import {{rag_exports}}
-        from .embeddings.providers import {{embedding_exports}}
-        from .processors.base import {{processor_exports}}
+        {% if embedding_exports %}from .embeddings.providers import {{embedding_exports}}{% endif %}
+        {% if processor_exports %}from .processors.base import {{processor_exports}}{% endif %}
         {% endif %}
 
         # Manager-specific exports
-        {% if manager_exports %}
+        {% if has_manager_exports %}
         from .coordinators.base import {{manager_exports}}
-        from .schedulers.base import {{scheduler_exports}}
+        {% if scheduler_exports %}from .schedulers.base import {{scheduler_exports}}{% endif %}
         {% endif %}
 
         __all__ = [
@@ -274,21 +274,21 @@ file_templates:
             {{core_exports_list}},
             {{config_exports_list}},
             {{exception_exports_list}},
-            {% if service_exports_list %}
+            {% if has_service_exports %}
             # Service
             {{service_exports_list}},
-            {{schema_exports_list}},
+            {% if schema_exports_list %}{{schema_exports_list}},{% endif %}
             {% endif %}
-            {% if rag_exports_list %}
+            {% if has_rag_exports %}
             # RAG
             {{rag_exports_list}},
-            {{embedding_exports_list}},
-            {{processor_exports_list}},
+            {% if embedding_exports_list %}{{embedding_exports_list}},{% endif %}
+            {% if processor_exports_list %}{{processor_exports_list}},{% endif %}
             {% endif %}
-            {% if manager_exports_list %}
+            {% if has_manager_exports %}
             # Manager
             {{manager_exports_list}},
-            {{scheduler_exports_list}},
+            {% if scheduler_exports_list %}{{scheduler_exports_list}},{% endif %}
             {% endif %}
         ]
 
@@ -329,7 +329,7 @@ file_templates:
         import logging
 
         from opsvi_foundation import BaseComponent, ComponentError
-        from opsvi_foundation.config.settings import BaseSettings
+        from pydantic_settings import BaseSettings
 
         logger = logging.getLogger(__name__)
 

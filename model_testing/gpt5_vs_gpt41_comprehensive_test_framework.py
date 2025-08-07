@@ -2412,7 +2412,7 @@ class ComprehensiveTestRunner:
         }
 
     def _analyze_coding_performance_across_efforts(
-        self, reasoning_efforts: Dict[str, Any]
+        self, reasoning_efforts: dict[str, Any]
     ) -> dict[str, Any]:
         """Analyze how coding performance varies across reasoning effort levels."""
         analysis: dict[str, Any] = {

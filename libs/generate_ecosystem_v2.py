@@ -13,6 +13,7 @@ from typing import Dict, List, Any, Optional
 import re
 from jinja2 import Template, Environment, BaseLoader
 
+
 class OpsviEcosystemGeneratorV2:
     def __init__(self, libs_dir: str = "."):
         self.libs_dir = Path(libs_dir)
@@ -33,7 +34,7 @@ class OpsviEcosystemGeneratorV2:
             loader=BaseLoader(),
             trim_blocks=True,
             lstrip_blocks=True,
-            keep_trailing_newline=True
+            keep_trailing_newline=True,
         )
 
         print(f"Loaded {len(self.libraries)} libraries from structure definition")
@@ -41,68 +42,108 @@ class OpsviEcosystemGeneratorV2:
     def _load_yaml(self, file_path: Path) -> Dict:
         """Load YAML file with error handling"""
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 return yaml.safe_load(f)
         except Exception as e:
             print(f"Error loading {file_path}: {e}")
             return {}
 
+    def _normalize_template_key(self, template_path: str) -> Optional[str]:
+        """Normalize legacy template names like 'core_services.py.j2' -> 'core_services_py'."""
+        if not template_path:
+            return None
+        # Extract the trailing file part
+        base = template_path.split("/")[-1]
+        # Handle common legacy forms
+        if base.endswith(".py.j2"):
+            base = base[:-5]  # remove '.py.j2'
+            return f"{base}_py"
+        if base.endswith(".j2"):
+            base = base[:-3]  # remove '.j2'
+            mapping = {
+                "init.py": "init_py",
+                "core_init.py": "core_init_py",
+                "config_init.py": "config_init_py",
+                "exceptions_init.py": "exceptions_init_py",
+                "pyproject.toml": "pyproject_toml",
+                "readme.md": "README_md",
+            }
+            return mapping.get(base, base.replace(".", "_"))
+        return None
+
     def _get_template(self, template_path: str) -> Optional[str]:
         """Get template content from nested path"""
+        # Try direct nested lookup
         try:
-            keys = template_path.split('.')
+            keys = template_path.split(".")
             template = self.templates
             for key in keys:
                 template = template[key]
 
-            # If template is a dict, extract the template field
             if isinstance(template, dict):
                 return template.get("template", "")
-            elif isinstance(template, str):
+            if isinstance(template, str):
                 return template
-            else:
-                print(f"Unexpected template type for {template_path}: {type(template)}")
-                return None
         except (KeyError, TypeError):
-            # Try alternative template paths
-            alternative_paths = [
+            pass
+
+        # Try normalized legacy key
+        candidates: List[str] = []
+        normalized = self._normalize_template_key(template_path)
+        if normalized:
+            candidates.extend(
+                [
+                    f"file_templates.python_files.{normalized}",
+                    f"file_templates.config_files.{normalized}",
+                    f"file_templates.documentation_files.{normalized}",
+                ]
+            )
+        # Try raw path in known namespaces
+        candidates.extend(
+            [
                 f"file_templates.python_files.{template_path}",
                 f"file_templates.config_files.{template_path}",
                 f"file_templates.documentation_files.{template_path}",
             ]
+        )
 
-            for alt_path in alternative_paths:
-                try:
-                    keys = alt_path.split('.')
-                    template = self.templates
-                    for key in keys:
-                        template = template[key]
+        for alt_path in candidates:
+            try:
+                keys = alt_path.split(".")
+                template = self.templates
+                for key in keys:
+                    template = template[key]
+                if isinstance(template, dict):
+                    return template.get("template", "")
+                if isinstance(template, str):
+                    return template
+            except (KeyError, TypeError):
+                continue
 
-                    if isinstance(template, dict):
-                        return template.get("template", "")
-                    elif isinstance(template, str):
-                        return template
-                except (KeyError, TypeError):
-                    continue
+        print(f"Template not found: {template_path}")
+        return None
 
-            print(f"Template not found: {template_path}")
-            return None
-
-    def _get_library_variables(self, library_name: str, library_data: Dict) -> Dict[str, Any]:
+    def _get_library_variables(
+        self, library_name: str, library_data: Dict
+    ) -> Dict[str, Any]:
         """Generate comprehensive variables for a library"""
         # Convert kebab-case to snake_case for package name
-        package_name = library_name.replace('-', '_')
+        package_name = library_name.replace("-", "_")
 
         # Generate class names
-        library_class_name = ''.join(word.capitalize() for word in library_name.split('-'))
+        library_class_name = "".join(
+            word.capitalize() for word in library_name.split("-")
+        )
         main_class_name = f"{library_class_name}Manager"
         config_class_name = f"{library_class_name}Config"
         exception_class_name = f"{library_class_name}Error"
 
-        # Generate export lists
-        core_exports = "BaseComponent, ComponentError"
-        config_exports = "LibraryConfig, LibrarySettings"
-        exception_exports = "LibraryError, LibraryConfigurationError"
+        # Generate export lists aligned with templates
+        core_exports = f"{main_class_name}"
+        config_exports = f"{library_class_name}Settings, get_settings"
+        exception_exports = (
+            f"{library_class_name}Error, {library_class_name}ConfigurationError"
+        )
 
         # Library-specific exports based on type
         library_type = library_data.get("type", "service")
@@ -111,11 +152,11 @@ class OpsviEcosystemGeneratorV2:
         manager_exports = ""
 
         if library_type == "service":
-            service_exports = "ServiceProvider, ServiceConfig"
+            service_exports = f"{library_class_name}Provider"
         elif library_type == "rag":
-            rag_exports = "RAGProvider, RAGConfig"
+            rag_exports = f"{library_class_name}Provider"
         elif library_type == "manager":
-            manager_exports = "ManagerProvider, ManagerConfig"
+            manager_exports = f"{library_class_name}Coordinator"
 
         return {
             # Basic info
@@ -126,20 +167,20 @@ class OpsviEcosystemGeneratorV2:
             "version": "0.1.0",
             "author": "OPSVI Team",
             "email": "team@opsvi.com",
-
             # Class names
             "library_class_name": library_class_name,
             "main_class_name": main_class_name,
             "config_class_name": config_class_name,
             "exception_class_name": exception_class_name,
-
+            # Convenience for templates expecting these
+            "class_name": main_class_name,
+            "component_name": library_name,
             # Environment and config
             "env_prefix": f"OPSVI_{package_name.upper()}_",
             "homepage_url": f"https://github.com/opsvi/{library_name}",
             "repository_url": f"https://github.com/opsvi/{library_name}",
             "documentation_url": f"https://docs.opsvi.com/{library_name}",
             "bug_tracker_url": f"https://github.com/opsvi/{library_name}/issues",
-
             # Exports
             "core_exports": core_exports,
             "config_exports": config_exports,
@@ -147,7 +188,6 @@ class OpsviEcosystemGeneratorV2:
             "service_exports": service_exports,
             "rag_exports": rag_exports,
             "manager_exports": manager_exports,
-
             # Export lists for __all__
             "core_exports_list": core_exports,
             "config_exports_list": config_exports,
@@ -155,10 +195,17 @@ class OpsviEcosystemGeneratorV2:
             "service_exports_list": service_exports,
             "rag_exports_list": rag_exports,
             "manager_exports_list": manager_exports,
-
+            # Optional exports used by some templates
+            "schema_exports": "",
+            "schema_exports_list": "",
+            "embedding_exports": "",
+            "embedding_exports_list": "",
+            "processor_exports": "",
+            "processor_exports_list": "",
+            "scheduler_exports": "",
+            "scheduler_exports_list": "",
             # Dependencies
             "library_dependencies": "opsvi-foundation>=0.1.0",
-
             # Descriptions
             "detailed_description": f"Comprehensive {library_name} library for the OPSVI ecosystem",
             "component_description": f"Core {library_name} functionality",
@@ -166,28 +213,24 @@ class OpsviEcosystemGeneratorV2:
             "detailed_class_description": f"Provides base functionality for all {library_name} components",
             "utils_description": f"Utility functions for {library_name}",
             "tests_description": f"Tests for {library_name} components",
-
             # Features and examples
             "library_features": f"Core {library_name} functionality, configuration management, error handling",
             "usage_example": f"from {package_name} import {main_class_name}",
             "library_env_vars": f"OPSVI_{package_name.upper()}_ENABLED=true",
             "library_config_example": f"{config_class_name}(enabled=True)",
-
             # Documentation
             "contributing_guidelines": "Please read CONTRIBUTING.md for development guidelines",
             "license_info": "MIT License - see LICENSE file for details",
             "changelog": "See CHANGELOG.md for version history",
-
-            # Conditional flags for Jinja2
-            "service_exports": bool(service_exports),
-            "rag_exports": bool(rag_exports),
-            "manager_exports": bool(manager_exports),
-            "service_exports_list": bool(service_exports),
-            "rag_exports_list": bool(rag_exports),
-            "manager_exports_list": bool(manager_exports),
+            # Conditional flags (separate from export strings)
+            "has_service_exports": bool(service_exports),
+            "has_rag_exports": bool(rag_exports),
+            "has_manager_exports": bool(manager_exports),
         }
 
-    def _process_template(self, template_content: str, variables: Dict[str, Any]) -> str:
+    def _process_template(
+        self, template_content: str, variables: Dict[str, Any]
+    ) -> str:
         """Process template with Jinja2 and variable substitution"""
         try:
             # Create Jinja2 template
@@ -209,7 +252,7 @@ class OpsviEcosystemGeneratorV2:
     def _create_directory_structure(self, library_name: str, library_data: Dict):
         """Create directory structure for a library"""
         library_dir = self.libs_dir / library_name
-        package_name = library_name.replace('-', '_')
+        package_name = library_name.replace("-", "_")
         package_dir = library_dir / package_name
 
         # Create directories
@@ -222,12 +265,18 @@ class OpsviEcosystemGeneratorV2:
         directory_structure = type_config.get("directory_structure", [])
 
         for subdir in directory_structure:
-            subdir_path = package_dir / subdir
+            # Strip '{{package_name}}/' prefix and trailing slashes
+            sub = subdir.replace("{{package_name}}/", "").strip("/")
+            if not sub:
+                continue
+            subdir_path = package_dir / sub
             subdir_path.mkdir(exist_ok=True)
             # Create __init__.py for each subdirectory
             init_file = subdir_path / "__init__.py"
             if not init_file.exists():
-                init_file.write_text('"""{} module."""\n\n'.format(subdir.replace('/', '.')))
+                init_file.write_text(
+                    '"""{} module."""\n\n'.format(subdir.replace("/", "."))
+                )
 
         # Create tests directory
         tests_dir = library_dir / "tests"
@@ -235,7 +284,9 @@ class OpsviEcosystemGeneratorV2:
 
         print(f"Created directory structure for {library_name}")
 
-    def _generate_file(self, file_path: Path, template_path: str, variables: Dict[str, Any]):
+    def _generate_file(
+        self, file_path: Path, template_path: str, variables: Dict[str, Any]
+    ):
         """Generate a file from template"""
         template_content = self._get_template(template_path)
         if not template_content:
@@ -249,7 +300,7 @@ class OpsviEcosystemGeneratorV2:
         file_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Write file
-        with open(file_path, 'w', encoding='utf-8') as f:
+        with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
 
         print(f"Generated {file_path}")
@@ -257,7 +308,7 @@ class OpsviEcosystemGeneratorV2:
     def _generate_standard_files(self, library_name: str, library_data: Dict):
         """Generate standard files that every library should have"""
         library_dir = self.libs_dir / library_name
-        package_name = library_name.replace('-', '_')
+        package_name = library_name.replace("-", "_")
         variables = self._get_library_variables(library_name, library_data)
 
         # Generate pyproject.toml
@@ -369,7 +420,9 @@ class OpsviEcosystemGeneratorV2:
             elif isinstance(template_ref, str):
                 template_path = template_ref
             else:
-                print(f"Warning: Unexpected template reference type for {file_path}: {type(template_ref)}")
+                print(
+                    f"Warning: Unexpected template reference type for {file_path}: {type(template_ref)}"
+                )
                 continue
 
             self._generate_file(file_path, template_path, variables)
@@ -401,7 +454,7 @@ class OpsviEcosystemGeneratorV2:
 
         for library_name in self.libraries.keys():
             library_dir = self.libs_dir / library_name
-            package_name = library_name.replace('-', '_')
+            package_name = library_name.replace("-", "_")
             package_dir = library_dir / package_name
 
             if not library_dir.exists():
@@ -424,7 +477,7 @@ class OpsviEcosystemGeneratorV2:
                 f"{package_name}/exceptions/__init__.py",
                 f"{package_name}/exceptions/base.py",
                 "tests/__init__.py",
-                f"tests/test_{package_name}.py"
+                f"tests/test_{package_name}.py",
             ]
 
             missing_files = []
@@ -437,10 +490,12 @@ class OpsviEcosystemGeneratorV2:
             else:
                 print(f"✅ {library_name}: All files present")
 
+
 def main():
     generator = OpsviEcosystemGeneratorV2()
     generator.generate_ecosystem()
     generator.validate_generation()
+
 
 if __name__ == "__main__":
     main()
