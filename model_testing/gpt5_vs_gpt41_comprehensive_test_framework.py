@@ -1849,16 +1849,25 @@ class ModelEvaluator:
                 create_kwargs["temperature"] = api_cfg.get("temperature", 0.1)
             else:
                 LOGGER.debug("Omitting temperature for model=%s due to API support.", model)
-            # Add reasoning/verbosity for GPT-5 if available
+            # Add reasoning for GPT-5 if available
             if self._is_gpt5_model(model):
                 reasoning_effort = api_cfg.get("reasoning_effort")
-                verbosity = api_cfg.get("verbosity")
                 if reasoning_effort:
                     create_kwargs["reasoning"] = {"effort": reasoning_effort}
-                if verbosity:
-                    create_kwargs["verbosity"] = verbosity
-                LOGGER.debug("GPT-5 params set | reasoning_effort=%s | verbosity=%s", reasoning_effort, verbosity)
-            resp = self.client.responses.create(**create_kwargs)
+                LOGGER.debug("GPT-5 params set | reasoning_effort=%s", reasoning_effort)
+
+            try:
+                resp = self.client.responses.create(**create_kwargs)
+            except Exception:
+                # Retry stripping potentially unsupported params
+                LOGGER.warning(
+                    "Initial call rejected for model=%s, retrying without temperature/reasoning...",
+                    model,
+                )
+                create_kwargs.pop("temperature", None)
+                create_kwargs.pop("reasoning", None)
+                create_kwargs.pop("verbosity", None)
+                resp = self.client.responses.create(**create_kwargs)
 
             execution_time = time.time() - start_time
 
