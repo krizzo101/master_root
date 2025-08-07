@@ -56,6 +56,16 @@ BASELINE_CODE_TASKS = {
     "design_pattern": (
         "Refactor an event notification system to use the Observer pattern in Python. Include Subject and Observer abstractions and a small demo. Return code in a single fenced code block."
     ),
+    "python_bugfix": (
+        "A colleague wrote a buggy Python function below that is intended to compute the factorial of n. Fix the bug and return a correct implementation. Provide only the corrected function in a single fenced code block.\n\n"
+        "def factorial(n: int) -> int:\n    if n == 0:\n        return 0\n    result = 1\n    for i in range(1, n):\n        result *= i\n    return result\n"
+    ),
+    "code_optimization": (
+        "Optimize a Python function that checks if a number is prime. The baseline is naive. Replace with an efficient, readable solution. Include type hints and tests for a few cases. Return only code in a single fenced code block."
+    ),
+    "react_component": (
+        "Write a React TSX component named ButtonPrimary with props {label: string, onClick?: () => void, disabled?: boolean}. Use accessible markup and keyboard support. Export default. Return only TSX code in a single fenced code block."
+    ),
 }
 
 BASE_PREFIX = ""
@@ -99,6 +109,8 @@ class EvalConfig:
     validate_python: bool
     system_prefix: Optional[str]
     max_output_tokens: Optional[int]
+    price_in_per_mtoken: Optional[float]
+    price_out_per_mtoken: Optional[float]
 
 
 @dataclass
@@ -121,6 +133,8 @@ class EvalResult:
     code_lines: int
     py_syntax_ok: Optional[bool]
     py_tests_passed: Optional[bool]
+    cost_input_usd: Optional[float]
+    cost_output_usd: Optional[float]
 
 
 class GPT5PromptEvaluator:
@@ -351,6 +365,12 @@ class GPT5PromptEvaluator:
                 py_tests_passed = self._py_test_fibonacci(code)
 
         elapsed = time.time() - start
+        # Costs (optional)
+        cin = cout = None
+        if self.cfg.price_in_per_mtoken is not None:
+            cin = (input_tokens / 1_000_000.0) * float(self.cfg.price_in_per_mtoken)
+        if self.cfg.price_out_per_mtoken is not None:
+            cout = (output_tokens / 1_000_000.0) * float(self.cfg.price_out_per_mtoken)
         result = EvalResult(
             model=model,
             task=task_name,
@@ -370,6 +390,8 @@ class GPT5PromptEvaluator:
             code_lines=code_lines,
             py_syntax_ok=py_syntax_ok,
             py_tests_passed=py_tests_passed,
+            cost_input_usd=cin,
+            cost_output_usd=cout,
         )
         self.results.append(result)
         log_line(self.cfg.log_file, f"Result ← {asdict(result)}")
@@ -400,6 +422,8 @@ class GPT5PromptEvaluator:
 
     def _aggregate(self) -> Dict[str, Any]:
         by_key: Dict[str, Dict[str, Any]] = {}
+        total_input = total_output = 0
+        total_cost_in = total_cost_out = 0.0
         for r in self.results:
             key = f"{r.variant} | {r.reasoning_effort} | {r.verbosity} | {'two' if r.two_turn else 'one'}-turn"
             if key not in by_key:
@@ -412,6 +436,12 @@ class GPT5PromptEvaluator:
                 slot["empty_count"] += 1
             if r.had_retry:
                 slot["retry_count"] += 1
+            total_input += r.input_tokens
+            total_output += r.output_tokens
+            if r.cost_input_usd:
+                total_cost_in += r.cost_input_usd
+            if r.cost_output_usd:
+                total_cost_out += r.cost_output_usd
         for k, slot in by_key.items():
             c = max(slot["count"], 1)
             slot["avg_time"] /= c
@@ -425,6 +455,13 @@ class GPT5PromptEvaluator:
             },
             "variants_summary": by_key,
             "results": [asdict(r) for r in self.results],
+            "totals": {
+                "input_tokens": total_input,
+                "output_tokens": total_output,
+                "cost_input_usd": round(total_cost_in, 6) if (self.cfg.price_in_per_mtoken is not None) else None,
+                "cost_output_usd": round(total_cost_out, 6) if (self.cfg.price_out_per_mtoken is not None) else None,
+                "cost_total_usd": round(total_cost_in + total_cost_out, 6) if (self.cfg.price_in_per_mtoken is not None or self.cfg.price_out_per_mtoken is not None) else None,
+            },
         }
 
     def _save(self, report: Dict[str, Any]) -> None:
@@ -442,10 +479,18 @@ class GPT5PromptEvaluator:
                 f.write(f"- {k}: count={v['count']}, avg_time={v['avg_time']:.2f}s, avg_output_tokens={v['avg_output_tokens']:.0f}, empty={v['empty_count']}, retries={v['retry_count']}\n")
             f.write("\n## Notes\n\n")
             f.write("- Prompts include a finalization instruction; retries occur when the model returns empty text.\n")
-            f.write("- Verbosity lever used via text={\\"verbosity\\": ...}.\n")
+            f.write('- Verbosity lever used via text={"verbosity": ...}.\n')
             f.write("- No max_output_tokens cap is set.\n")
             f.write("- Raw outputs saved when --save-raw is enabled.\n")
             f.write("- Python correctness checks (Fibonacci) when --validate-python is enabled.\n")
+            totals = report.get("totals") or {}
+            if any(totals.get(k) for k in ("cost_input_usd", "cost_output_usd", "cost_total_usd")):
+                f.write("\n## Cost\n\n")
+                f.write(f"- Input tokens: {totals.get('input_tokens', 0)}\n")
+                f.write(f"- Output tokens: {totals.get('output_tokens', 0)}\n")
+                f.write(f"- Cost in: ${totals.get('cost_input_usd')}\n")
+                f.write(f"- Cost out: ${totals.get('cost_output_usd')}\n")
+                f.write(f"- Cost total: ${totals.get('cost_total_usd')}\n")
 
 
 async def main_async(args: argparse.Namespace) -> None:
@@ -463,6 +508,8 @@ async def main_async(args: argparse.Namespace) -> None:
         validate_python=args.validate_python,
         system_prefix=args.system,
         max_output_tokens=args.max_output_tokens,
+        price_in_per_mtoken=args.price_in,
+        price_out_per_mtoken=args.price_out,
     )
     os.makedirs(os.path.dirname(cfg.log_file) or ".", exist_ok=True)
     log_line(cfg.log_file, f"Starting GPT-5 prompt variation eval | model={cfg.model} | concurrency={cfg.concurrency}")
@@ -490,6 +537,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--validate-python", action="store_true")
     p.add_argument("--system", help="Optional system prefix text to prepend", default=None)
     p.add_argument("--max-output-tokens", type=int, default=None)
+    p.add_argument("--price-in", type=float, default=None, help="USD per 1M input tokens")
+    p.add_argument("--price-out", type=float, default=None, help="USD per 1M output tokens")
     return p.parse_args()
 
 
