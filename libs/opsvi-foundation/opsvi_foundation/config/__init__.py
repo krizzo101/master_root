@@ -1,12 +1,11 @@
-"""
-Configuration module for opsvi-foundation.
+"""Configuration module for opsvi-foundation.
 
-Provides environment-based configuration management.
+Provides configuration management and settings.
 """
 
-from .settings import FoundationConfig, config
+from .settings import OpsviFoundationSettings, get_settings
 
 __all__ = [
-    "FoundationConfig",
-    "config",
+    "OpsviFoundationSettings",
+    "get_settings",
 ]

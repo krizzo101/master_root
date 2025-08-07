@@ -4,126 +4,69 @@ build-backend = "hatchling.build"
 
 [project]
 name = "opsvi-rag"
-version = "1.0.0"
-description = "Retrieval-Augmented Generation library for the OPSVI ecosystem"
-readme = "README.md"
-requires-python = ">=3.11"
-license = {text = "MIT"}
+version = "0.1.0"
+description = "Retrieval Augmented Generation system"
 authors = [
     {name = "OPSVI Team", email = "team@opsvi.com"}
 ]
-keywords = ["ai", "rag", "vector-search", "embeddings", "qdrant", "retrieval"]
+readme = "README.md"
+requires-python = ">=3.9"
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
-
 dependencies = [
-    "opsvi-foundation>=1.0.0",
-    "opsvi-core>=1.0.0",
-    "opsvi-llm>=1.0.0",
-    "qdrant-client>=1.7.0",
-    "sentence-transformers>=2.2.0",
-    "torch>=2.0.0",
-    "openai>=1.0.0",
+    "opsvi-foundation>=0.1.0",
     "pydantic>=2.0.0",
-    "structlog>=24.1.0",
-    "orjson>=3.9.0",
-    "httpx>=0.25.0",
-    "tenacity>=8.2.0",
-    "numpy>=1.24.0",
-    "scikit-learn>=1.3.0",
+    "pydantic-settings>=2.0.0",
+    "structlog>=23.0.0",
+    opsvi-foundation>=0.1.0
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.4.0",
+    "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",
-    "pytest-cov>=4.1.0",
-    "pytest-mock>=3.12.0",
-    "mypy>=1.5.0",
+    "pytest-cov>=4.0.0",
     "ruff>=0.1.0",
+    "mypy>=1.0.0",
     "black>=23.0.0",
-    "pre-commit>=3.4.0",
+    "pre-commit>=3.0.0",
 ]
-
-docs = [
-    "sphinx>=7.0.0",
-    "sphinx-rtd-theme>=1.3.0",
-    "myst-parser>=2.0.0",
+test = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
 ]
 
 [project.urls]
 Homepage = "https://github.com/opsvi/opsvi-rag"
-Documentation = "https://opsvi-rag.readthedocs.io"
 Repository = "https://github.com/opsvi/opsvi-rag"
-Issues = "https://github.com/opsvi/opsvi-rag/issues"
+Documentation = "https://docs.opsvi.com/opsvi-rag"
+"Bug Tracker" = "https://github.com/opsvi/opsvi-rag/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["opsvi_rag"]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = [
-    "--strict-markers",
-    "--strict-config",
-    "--cov=opsvi_rag",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-report=xml",
+[tool.hatch.build.targets.sdist]
+include = [
+    "/opsvi_rag",
+    "/tests",
+    "/README.md",
+    "/LICENSE",
 ]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-    "qdrant: marks tests that require Qdrant",
-    "openai: marks tests that require OpenAI API",
-]
-
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
-
-[[tool.mypy.overrides]]
-module = [
-    "qdrant_client.*",
-    "sentence_transformers.*",
-    "openai.*",
-    "pydantic.*",
-    "structlog.*",
-    "orjson.*",
-    "httpx.*",
-    "tenacity.*",
-    "numpy.*",
-    "sklearn.*",
-]
-ignore_missing_imports = true
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py39"
 line-length = 88
-
-[tool.ruff.lint]
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
@@ -139,17 +82,38 @@ ignore = [
     "C901",  # too complex
 ]
 
-[tool.ruff.lint.per-file-ignores]
+[tool.ruff.per-file-ignores]
 "__init__.py" = ["F401"]
+"tests/**/*" = ["B011"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
 
 [tool.black]
-target-version = ['py311']
+target-version = ['py39']
 line-length = 88
 include = '\.pyi?$'
 extend-exclude = '''
 /(
-  # directories
-  \.eggs
+    # directories
+    \.eggs
   | \.git
   | \.hg
   | \.mypy_cache
@@ -159,3 +123,22 @@ extend-exclude = '''
   | dist
 )/
 '''
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=opsvi_rag",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]

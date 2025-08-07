@@ -1,48 +1,35 @@
-"""
-OPSVI Foundation Library
+"""opsvi-foundation - Foundation library providing base components and utilities.
 
-Shared foundation components for the OPSVI ecosystem.
-Provides security, resilience, observability, and configuration management.
+Comprehensive opsvi-foundation library for the OPSVI ecosystem
 """
 
-__version__ = "1.0.0"
+__version__ = "0.1.0"
 __author__ = "OPSVI Team"
 __email__ = "team@opsvi.com"
 
 # Core exports
-from .config import FoundationConfig, config
-from .observability import get_logger, log_context, setup_logging
-from .patterns import BaseComponent, ComponentError, LifecycleComponent
-from .resilience import (
-    CircuitBreaker,
-    CircuitBreakerConfig,
-    RetryConfig,
-    RetryExecutor,
-    retry,
-)
-from .security import AuthConfig, AuthManager, TokenPayload, sanitize_input
+from .core.base import BaseComponent, ComponentError
+from .config.settings import LibraryConfig, LibrarySettings
+from .exceptions.base import LibraryError, LibraryConfigurationError
+
+# Service-specific exports
+
+# RAG-specific exports
+
+# Manager-specific exports
 
 __all__ = [
-    # Configuration
-    "FoundationConfig",
-    "config",
-    # Security
-    "AuthManager",
-    "AuthConfig",
-    "TokenPayload",
-    "sanitize_input",
-    # Resilience
-    "CircuitBreaker",
-    "CircuitBreakerConfig",
-    "RetryExecutor",
-    "RetryConfig",
-    "retry",
-    # Patterns
-    "BaseComponent",
-    "LifecycleComponent",
-    "ComponentError",
-    # Observability
-    "setup_logging",
-    "get_logger",
-    "log_context",
+    # Core
+    BaseComponent, ComponentError,
+    LibraryConfig, LibrarySettings,
+    LibraryError, LibraryConfigurationError,
 ]
+
+# Version info
+def get_version() -> str:
+    """Get the library version."""
+    return __version__
+
+def get_author() -> str:
+    """Get the library author."""
+    return __author__

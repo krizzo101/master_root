@@ -1,45 +1,125 @@
+""" - Core opsvi-agents functionality.
+
+Comprehensive opsvi-agents library for the OPSVI ecosystem
 """
-base core for opsvi-agents.
 
-Base agent interface
-"""
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional, Union
+import asyncio
+import logging
 
-from dataclasses import dataclass
-from typing import Any
+from opsvi_foundation import BaseComponent, ComponentError
+from opsvi_foundation.config.settings import BaseSettings
 
-from opsvi_foundation import BaseComponent, ComponentError, get_logger
-from pydantic import BaseModel
+logger = logging.getLogger(__name__)
 
+class Error(ComponentError):
+    """Base exception for  errors."""
+    pass
 
-class AgentError(ComponentError):
-    """Raised when agent operations fail."""
+class ConfigurationError(Error):
+    """Configuration-related errors in ."""
+    pass
 
+class InitializationError(Error):
+    """Initialization-related errors in ."""
+    pass
 
-@dataclass
-class AgentState:
-    """Represents agent state."""
+class Config(BaseSettings):
+    """Configuration for ."""
 
-    id: str
-    status: str
-    data: dict[str, Any]
+    # Core configuration
+    enabled: bool = True
+    debug: bool = False
+    log_level: str = "INFO"
 
+    # Component-specific configuration
+    
 
-class BaseAgentConfig(BaseModel):
-    """Configuration for base."""
+    class Config:
+        env_prefix = "OPSVI_OPSVI_AGENTS__"
 
-    # Add specific configuration options here
+class (BaseComponent):
+    """Base class for opsvi-agents components.
 
+    Provides base functionality for all opsvi-agents components
+    """
 
-class BaseAgent(BaseComponent):
-    """base implementation."""
+    def __init__(
+        self,
+        config: Optional[Config] = None,
+        **kwargs: Any
+    ) -> None:
+        """Initialize .
 
-    def __init__(self, config: BaseAgentConfig):
-        """Initialize base."""
-        super().__init__()
-        self.config = config
-        self.logger = get_logger(__name__)
+        Args:
+            config: Configuration for the component
+            **kwargs: Additional configuration parameters
+        """
+        super().__init__("", config.dict() if config else {})
+        self.config = config or Config(**kwargs)
+        self._initialized = False
+        self._logger = logging.getLogger(f"{__name__}.")
 
-    def execute(self, input_data: Any) -> Any:
-        """Execute the base."""
-        # TODO: Implement base logic
-        return input_data
+        # Component-specific initialization
+        
+
+    async def initialize(self) -> None:
+        """Initialize the component.
+
+        Raises:
+            InitializationError: If initialization fails
+        """
+        try:
+            self._logger.info("Initializing ")
+
+            # Component-specific initialization logic
+            
+
+            self._initialized = True
+            self._logger.info(" initialized successfully")
+
+        except Exception as e:
+            self._logger.error(f"Failed to initialize : {e}")
+            raise InitializationError(f"Initialization failed: {e}") from e
+
+    async def shutdown(self) -> None:
+        """Shutdown the component.
+
+        Raises:
+            Error: If shutdown fails
+        """
+        try:
+            self._logger.info("Shutting down ")
+
+            # Component-specific shutdown logic
+            
+
+            self._initialized = False
+            self._logger.info(" shut down successfully")
+
+        except Exception as e:
+            self._logger.error(f"Failed to shutdown : {e}")
+            raise Error(f"Shutdown failed: {e}") from e
+
+    async def health_check(self) -> bool:
+        """Perform health check.
+
+        Returns:
+            True if healthy, False otherwise
+        """
+        try:
+            if not self._initialized:
+                return False
+
+            # Component-specific health check logic
+            
+
+            return True
+
+        except Exception as e:
+            self._logger.error(f"Health check failed: {e}")
+            return False
+
+    # Component-specific methods
+    

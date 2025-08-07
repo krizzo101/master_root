@@ -1,16 +1,12 @@
-"""
-Core module for opsvi-llm.
+"""Core module for opsvi-llm.
 
-Domain-specific configuration and exceptions.
+Provides base classes and core functionality.
 """
 
-from .config import LLMConfig, config
-from .exceptions import LLMConfigurationError, LLMError, LLMValidationError
+from .base import Error, ConfigurationError, InitializationError
 
 __all__ = [
-    "LLMConfig",
-    "config",
-    "LLMError",
-    "LLMValidationError",
-    "LLMConfigurationError",
+    "Error",
+    "ConfigurationError",
+    "InitializationError",
 ]

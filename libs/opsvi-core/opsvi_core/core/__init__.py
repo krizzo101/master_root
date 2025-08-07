@@ -1,16 +1,12 @@
-"""
-Core module for opsvi-core.
+"""Core module for opsvi-core.
 
-Domain-specific configuration and exceptions.
+Provides base classes and core functionality.
 """
 
-from .config import CoreConfig, config
-from .exceptions import AgentError, CoreError, WorkflowError
+from .base import Error, ConfigurationError, InitializationError
 
 __all__ = [
-    "CoreConfig",
-    "config",
-    "CoreError",
-    "AgentError",
-    "WorkflowError",
+    "Error",
+    "ConfigurationError",
+    "InitializationError",
 ]

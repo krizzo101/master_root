@@ -1,38 +1,40 @@
-"""
-opsvi-llm Library
+"""opsvi-llm - LLM integration and management.
 
-Domain-specific components for the OPSVI ecosystem.
-Builds on opsvi-foundation for shared concerns.
+Comprehensive opsvi-llm library for the OPSVI ecosystem
 """
 
-__version__ = "1.0.0"
+__version__ = "0.1.0"
 __author__ = "OPSVI Team"
 __email__ = "team@opsvi.com"
 
-# Import foundation components
-from opsvi_foundation import (
-    AuthManager,
-    BaseComponent,
-    CircuitBreaker,
-    FoundationConfig,
-    get_logger,
-)
+# Core exports
+from .core.base import BaseComponent, ComponentError
+from .config.settings import LibraryConfig, LibrarySettings
+from .exceptions.base import LibraryError, LibraryConfigurationError
 
-# Import domain-specific components
-from .core import LLMConfig, config
-from .core.exceptions import LLMConfigurationError, LLMError, LLMValidationError
+# Service-specific exports
+from .providers.base import True
+from .schemas.models import 
+
+# RAG-specific exports
+
+# Manager-specific exports
 
 __all__ = [
-    # Foundation exports
-    "FoundationConfig",
-    "AuthManager",
-    "CircuitBreaker",
-    "BaseComponent",
-    "get_logger",
-    # Domain exports
-    "LLMConfig",
-    "config",
-    "LLMError",
-    "LLMValidationError",
-    "LLMConfigurationError",
+    # Core
+    BaseComponent, ComponentError,
+    LibraryConfig, LibrarySettings,
+    LibraryError, LibraryConfigurationError,
+    # Service
+    True,
+    ,
 ]
+
+# Version info
+def get_version() -> str:
+    """Get the library version."""
+    return __version__
+
+def get_author() -> str:
+    """Get the library author."""
+    return __author__

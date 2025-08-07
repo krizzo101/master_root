@@ -1,18 +1,18 @@
 {
   "metadata": {
-    "build_time_ms": 0.00667572021484375,
+    "build_time_ms": 0.006198883056640625,
     "project_path": "/home/opsvi/master_root",
     "builder_type": "DefaultPackageBuilder",
-    "build_timestamp": "2025-08-06T16:14:35.645493",
+    "build_timestamp": "2025-08-07T02:02:03.522432",
     "package_type": "default",
     "collector_count": 5,
-    "total_data_size": 74669
+    "total_data_size": 74726
   },
   "collectors": [
     {
       "collector": "DevelopmentStateCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-06T12:14:34.309031",
+      "timestamp": "2025-08-06T22:02:01.946951",
       "data": {
         "git_repository": true,
         "current_branch": "feature/libs-foundation",
@@ -27,8 +27,8 @@
         ],
         "has_uncommitted_changes": true,
         "staged_files_count": 1,
-        "unstaged_files_count": 13,
-        "untracked_files_count": 6,
+        "unstaged_files_count": 80,
+        "untracked_files_count": 19,
         "ci_status": {
           "has_ci": true,
           "ci_provider": "GitHub Actions",
@@ -45,8 +45,8 @@
         },
         "recent_activity": {
           "last_commit_days_ago": 0,
-          "commits_last_week": 28,
-          "commits_last_month": 28,
+          "commits_last_week": 31,
+          "commits_last_month": 31,
           "active_contributors": 0,
           "recent_branches": [
             "AUTOSAVE",
@@ -63,7 +63,7 @@
           "has_docker": false,
           "has_requirements": false,
           "main_language": "Python",
-          "file_count": 280
+          "file_count": 317
         },
         "development_state": "active_development"
       }
@@ -71,7 +71,7 @@
     {
       "collector": "ProjectPurposeCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-06T12:14:34.317155",
+      "timestamp": "2025-08-06T22:02:01.948277",
       "data": {
         "project_name": "OPSVI Master Workspace",
         "description": "[![CI](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml) A comprehensive monorepo for AI/ML Operations with built-in observability, RAG capabilities, and MCP integration. **Now featuring a complete foundational library ecosystem for production AI applications.** - \u2705 **Phase 1**: Linting & Type Checking (ruff, black, mypy)",
@@ -83,11 +83,11 @@
     {
       "collector": "ConstraintsCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-06T12:14:34.705075",
+      "timestamp": "2025-08-06T22:02:02.404966",
       "data": {
         "technical_constraints": {
           "performance_constraints": [
-            "Exception: raise TimeoutError(f'Function timed out after {self.config.timeout} seconds')",
+            "Exception: raise TimeoutError(f'Function timed out after {self.config.timeout} seconds') from None",
             "Exception: raise ResourceExhaustedError('Bulkhead timeout exceeded')",
             "Exception: raise TimeoutError(f'Function timed out after {self.config.timeout} seconds')",
             "Exception: raise TimeoutError(0, f'deadline for {operation}')",
@@ -177,7 +177,7 @@
             "workflow_rules"
           ],
           "critical_constraints": [
-            "Exception: raise TimeoutError(f'Function timed out after {self.config.timeout} seconds')",
+            "Exception: raise TimeoutError(f'Function timed out after {self.config.timeout} seconds') from None",
             "Exception: raise ResourceExhaustedError('Bulkhead timeout exceeded')",
             "Exception: raise TimeoutError(f'Function timed out after {self.config.timeout} seconds')",
             "Exception: raise TimeoutError(0, f'deadline for {operation}')",
@@ -198,7 +198,7 @@
     {
       "collector": "WorkflowCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-06T12:14:34.729428",
+      "timestamp": "2025-08-06T22:02:02.424963",
       "data": {
         "branching_strategy": {
           "branching_model": "simple",
@@ -303,7 +303,7 @@
     {
       "collector": "AgentArchitectureCollector",
       "schema_version": "1.0.0",
-      "timestamp": "2025-08-06T12:14:35.644963",
+      "timestamp": "2025-08-06T22:02:03.521899",
       "data": {
         "agent_classes": [
           {
@@ -329,106 +329,115 @@
             "agent_type": "general"
           },
           {
-            "name": "AgentError",
+            "name": "AgentsBase",
             "file_path": "libs/opsvi-agents/opsvi_agents/core/base.py",
-            "lineno": 14,
+            "lineno": 15,
             "bases": [
-              "ComponentError"
-            ],
-            "methods": [],
-            "docstring": "Raised when agent operations fail.",
-            "agent_type": "general"
-          },
-          {
-            "name": "AgentState",
-            "file_path": "libs/opsvi-agents/opsvi_agents/core/base.py",
-            "lineno": 19,
-            "bases": [],
-            "methods": [],
-            "docstring": "Represents agent state.",
-            "agent_type": "general"
-          },
-          {
-            "name": "BaseAgentConfig",
-            "file_path": "libs/opsvi-agents/opsvi_agents/core/base.py",
-            "lineno": 27,
-            "bases": [
-              "BaseModel"
-            ],
-            "methods": [],
-            "docstring": "Configuration for base.",
-            "agent_type": "general"
-          },
-          {
-            "name": "BaseAgent",
-            "file_path": "libs/opsvi-agents/opsvi_agents/core/base.py",
-            "lineno": 33,
-            "bases": [
-              "BaseComponent"
+              "BaseComponent",
+              "ABC"
             ],
             "methods": [
               {
                 "name": "__init__",
-                "lineno": 36,
-                "docstring": "Initialize base."
-              },
-              {
-                "name": "execute",
-                "lineno": 42,
-                "docstring": "Execute the base."
+                "lineno": 18,
+                "docstring": null
               }
             ],
-            "docstring": "base implementation.",
+            "docstring": "Base class for all opsvi-agents components.",
             "agent_type": "general"
           },
           {
             "name": "AgentsConfig",
             "file_path": "libs/opsvi-agents/opsvi_agents/core/config.py",
-            "lineno": 11,
+            "lineno": 16,
             "bases": [
-              "BaseModel"
+              "BaseSettings"
             ],
-            "methods": [
-              {
-                "name": "from_env",
-                "lineno": 20,
-                "docstring": "Create configuration from environment variables."
-              }
+            "methods": [],
+            "docstring": "Configuration for opsvi-agents components.",
+            "agent_type": "general"
+          },
+          {
+            "name": "AgentsSettings",
+            "file_path": "libs/opsvi-agents/opsvi_agents/core/config.py",
+            "lineno": 27,
+            "bases": [
+              "BaseSettings"
             ],
-            "docstring": "Configuration for opsvi-agents.",
+            "methods": [],
+            "docstring": "Global settings for opsvi-agents.",
             "agent_type": "general"
           },
           {
             "name": "AgentsError",
             "file_path": "libs/opsvi-agents/opsvi_agents/core/exceptions.py",
-            "lineno": 10,
-            "bases": [
-              "ComponentError"
-            ],
-            "methods": [],
-            "docstring": "Base exception for opsvi-agents.",
-            "agent_type": "general"
-          },
-          {
-            "name": "AgentsValidationError",
-            "file_path": "libs/opsvi-agents/opsvi_agents/core/exceptions.py",
             "lineno": 14,
             "bases": [
-              "AgentsError"
+              "OPSVIError"
             ],
-            "methods": [],
-            "docstring": "Validation error specific to opsvi-agents.",
+            "methods": [
+              {
+                "name": "__init__",
+                "lineno": 17,
+                "docstring": null
+              }
+            ],
+            "docstring": "Base exception for all opsvi-agents errors.",
             "agent_type": "general"
           },
           {
             "name": "AgentsConfigurationError",
             "file_path": "libs/opsvi-agents/opsvi_agents/core/exceptions.py",
-            "lineno": 18,
+            "lineno": 21,
             "bases": [
               "AgentsError"
             ],
             "methods": [],
-            "docstring": "Configuration error specific to opsvi-agents.",
+            "docstring": "Configuration-related errors in opsvi-agents.",
+            "agent_type": "general"
+          },
+          {
+            "name": "AgentsConnectionError",
+            "file_path": "libs/opsvi-agents/opsvi_agents/core/exceptions.py",
+            "lineno": 25,
+            "bases": [
+              "AgentsError"
+            ],
+            "methods": [],
+            "docstring": "Connection-related errors in opsvi-agents.",
+            "agent_type": "general"
+          },
+          {
+            "name": "AgentsValidationError",
+            "file_path": "libs/opsvi-agents/opsvi_agents/core/exceptions.py",
+            "lineno": 29,
+            "bases": [
+              "AgentsError"
+            ],
+            "methods": [],
+            "docstring": "Validation-related errors in opsvi-agents.",
+            "agent_type": "general"
+          },
+          {
+            "name": "AgentsTimeoutError",
+            "file_path": "libs/opsvi-agents/opsvi_agents/core/exceptions.py",
+            "lineno": 33,
+            "bases": [
+              "AgentsError"
+            ],
+            "methods": [],
+            "docstring": "Timeout-related errors in opsvi-agents.",
+            "agent_type": "general"
+          },
+          {
+            "name": "AgentsResourceError",
+            "file_path": "libs/opsvi-agents/opsvi_agents/core/exceptions.py",
+            "lineno": 37,
+            "bases": [
+              "AgentsError"
+            ],
+            "methods": [],
+            "docstring": "Resource-related errors in opsvi-agents.",
             "agent_type": "general"
           },
           {
@@ -1046,17 +1055,6 @@
             "agent_type": "general"
           },
           {
-            "name": "AgentError",
-            "file_path": "libs/opsvi-core/opsvi_core/core/exceptions.py",
-            "lineno": 16,
-            "bases": [
-              "CoreError"
-            ],
-            "methods": [],
-            "docstring": "Agent-related errors.",
-            "agent_type": "general"
-          },
-          {
             "name": "EventError",
             "file_path": "libs/opsvi-core/opsvi_core/events/base.py",
             "lineno": 22,
@@ -1090,7 +1088,7 @@
           {
             "name": "MonitoringError",
             "file_path": "libs/opsvi-core/opsvi_core/monitoring/base.py",
-            "lineno": 24,
+            "lineno": 22,
             "bases": [
               "ComponentError"
             ],
@@ -1118,32 +1116,32 @@
               },
               {
                 "name": "set_gauge",
-                "lineno": 230,
+                "lineno": 232,
                 "docstring": "Set a gauge metric value."
               },
               {
                 "name": "record_histogram",
-                "lineno": 244,
+                "lineno": 248,
                 "docstring": "Record a histogram metric value."
               },
               {
                 "name": "_get_metric_key",
-                "lineno": 255,
+                "lineno": 261,
                 "docstring": "Generate unique key for metric with labels."
               },
               {
                 "name": "_store_metric",
-                "lineno": 260,
+                "lineno": 266,
                 "docstring": "Store metric in memory."
               },
               {
                 "name": "get_metrics",
-                "lineno": 271,
+                "lineno": 277,
                 "docstring": "Get collected metrics."
               },
               {
                 "name": "get_current_values",
-                "lineno": 277,
+                "lineno": 283,
                 "docstring": "Get current values for counters and gauges."
               }
             ],
@@ -1153,14 +1151,14 @@
           {
             "name": "MonitoringSystem",
             "file_path": "libs/opsvi-core/opsvi_core/monitoring/base.py",
-            "lineno": 325,
+            "lineno": 335,
             "bases": [
               "BaseComponent"
             ],
             "methods": [
               {
                 "name": "__init__",
-                "lineno": 328,
+                "lineno": 338,
                 "docstring": null
               }
             ],
@@ -1170,7 +1168,7 @@
           {
             "name": "PluginError",
             "file_path": "libs/opsvi-core/opsvi_core/plugins/base.py",
-            "lineno": 25,
+            "lineno": 23,
             "bases": [
               "ComponentError"
             ],
@@ -1181,19 +1179,19 @@
           {
             "name": "PluginManager",
             "file_path": "libs/opsvi-core/opsvi_core/plugins/base.py",
-            "lineno": 306,
+            "lineno": 315,
             "bases": [
               "BaseComponent"
             ],
             "methods": [
               {
                 "name": "__init__",
-                "lineno": 309,
+                "lineno": 318,
                 "docstring": null
               },
               {
                 "name": "get_plugin_status",
-                "lineno": 348,
+                "lineno": 359,
                 "docstring": "Get status of all plugins."
               }
             ],
@@ -3412,14 +3410,14 @@
         },
         "architecture_pattern": "centralized_multi_agent",
         "agent_types": [
-          "coordinator",
           "collector",
-          "general"
+          "general",
+          "coordinator"
         ],
         "has_multi_agent_system": true
       }
     }
   ],
-  "timestamp": "2025-08-06 16:14:35.646146",
+  "timestamp": "2025-08-07 02:02:03.522997",
   "schema_version": "1.1.0"
 }

@@ -1,16 +1,12 @@
-"""
-Core module for opsvi-agents.
+"""Core module for opsvi-agents.
 
-Domain-specific configuration and exceptions.
+Provides base classes and core functionality.
 """
 
-from .config import AgentsConfig, config
-from .exceptions import AgentsConfigurationError, AgentsError, AgentsValidationError
+from .base import Error, ConfigurationError, InitializationError
 
 __all__ = [
-    "AgentsConfig",
-    "AgentsConfigurationError",
-    "AgentsError",
-    "AgentsValidationError",
-    "config",
+    "Error",
+    "ConfigurationError",
+    "InitializationError",
 ]

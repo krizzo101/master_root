@@ -1,16 +1,12 @@
-"""
-Core module for opsvi-rag.
+"""Core module for opsvi-rag.
 
-Domain-specific configuration and exceptions.
+Provides base classes and core functionality.
 """
 
-from .config import RAGConfig, config
-from .exceptions import RAGConfigurationError, RAGError, RAGValidationError
+from .base import Error, ConfigurationError, InitializationError
 
 __all__ = [
-    "RAGConfig",
-    "config",
-    "RAGError",
-    "RAGValidationError",
-    "RAGConfigurationError",
+    "Error",
+    "ConfigurationError",
+    "InitializationError",
 ]

@@ -1,7 +1,2 @@
-"""
-Tests module for opsvi-llm
+"""tests. module."""
 
-Part of the OPSVI ecosystem.
-"""
-
-__version__ = "1.0.0"

@@ -1,42 +1,40 @@
-"""
-opsvi-agents Library
+"""opsvi-agents - Multi-agent system management.
 
-Domain-specific components for the OPSVI ecosystem.
-Builds on opsvi-foundation for shared concerns.
+Comprehensive opsvi-agents library for the OPSVI ecosystem
 """
 
-__version__ = "1.0.0"
+__version__ = "0.1.0"
 __author__ = "OPSVI Team"
 __email__ = "team@opsvi.com"
 
-# Import foundation components
-from opsvi_foundation import (
-    AuthManager,
-    BaseComponent,
-    CircuitBreaker,
-    FoundationConfig,
-    get_logger,
-)
+# Core exports
+from .core.base import BaseComponent, ComponentError
+from .config.settings import LibraryConfig, LibrarySettings
+from .exceptions.base import LibraryError, LibraryConfigurationError
 
-# Import domain-specific components
-from .core import AgentsConfig, config
-from .core.exceptions import (
-    AgentsConfigurationError,
-    AgentsError,
-    AgentsValidationError,
-)
+# Service-specific exports
+
+# RAG-specific exports
+
+# Manager-specific exports
+from .coordinators.base import True
+from .schedulers.base import 
 
 __all__ = [
-    # Foundation exports
-    "FoundationConfig",
-    "AuthManager",
-    "CircuitBreaker",
-    "BaseComponent",
-    "get_logger",
-    # Domain exports
-    "AgentsConfig",
-    "config",
-    "AgentsError",
-    "AgentsValidationError",
-    "AgentsConfigurationError",
+    # Core
+    BaseComponent, ComponentError,
+    LibraryConfig, LibrarySettings,
+    LibraryError, LibraryConfigurationError,
+    # Manager
+    True,
+    ,
 ]
+
+# Version info
+def get_version() -> str:
+    """Get the library version."""
+    return __version__
+
+def get_author() -> str:
+    """Get the library author."""
+    return __author__

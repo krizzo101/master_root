@@ -1,5 +1,2 @@
-"""
-Tests for OPSVI Core Library.
+"""Tests for opsvi-core."""
 
-Provides comprehensive test coverage for all core components.
-"""

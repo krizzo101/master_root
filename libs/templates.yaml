@@ -1,0 +1,1494 @@
+# OPSVI Library Templates
+# Comprehensive template system for all levels and file types
+
+# Project-Level Templates
+project_templates:
+  project_context:
+    template: |
+      {
+        "project_overview": {
+          "name": "OPSVI Master Workspace",
+          "scope": "AI/ML Operations monorepo with observability, RAG, and MCP integration",
+          "vision": "{{vision}}",
+          "architecture_principles": [
+            "{{principle_1}}",
+            "{{principle_2}}",
+            "{{principle_3}}"
+          ]
+        },
+        "architecture_decisions": {
+          "monorepo_structure": "{{monorepo_decision}}",
+          "library_organization": "{{library_org_decision}}",
+          "integration_patterns": "{{integration_decision}}",
+          "technology_stack": "{{tech_stack_decision}}"
+        },
+        "coding_standards": {
+          "style_guide": "{{style_guide}}",
+          "naming_conventions": "{{naming_conventions}}",
+          "documentation_requirements": "{{doc_requirements}}",
+          "testing_requirements": "{{testing_requirements}}"
+        },
+        "integration_patterns": {
+          "component_interaction": "{{component_interaction}}",
+          "service_integration": "{{service_integration}}",
+          "data_flow": "{{data_flow}}",
+          "error_handling": "{{error_handling}}"
+        },
+        "performance_requirements": {
+          "response_times": "{{response_times}}",
+          "throughput": "{{throughput}}",
+          "resource_usage": "{{resource_usage}}",
+          "scalability": "{{scalability}}"
+        },
+        "security_considerations": {
+          "authentication": "{{auth_considerations}}",
+          "authorization": "{{authz_considerations}}",
+          "data_protection": "{{data_protection}}",
+          "vulnerability_management": "{{vuln_management}}"
+        }
+      }
+
+# Category-Level Templates
+category_templates:
+  category_context:
+    template: |
+      {
+        "category_overview": {
+          "name": "{{category_name}}",
+          "description": "{{category_description}}",
+          "scope": "{{category_scope}}",
+          "responsibilities": [
+            "{{responsibility_1}}",
+            "{{responsibility_2}}",
+            "{{responsibility_3}}"
+          ]
+        },
+        "design_patterns": {
+          "primary_patterns": [
+            "{{pattern_1}}",
+            "{{pattern_2}}",
+            "{{pattern_3}}"
+          ],
+          "implementation_guidelines": "{{implementation_guidelines}}",
+          "best_practices": [
+            "{{best_practice_1}}",
+            "{{best_practice_2}}",
+            "{{best_practice_3}}"
+          ]
+        },
+        "common_challenges": {
+          "technical_challenges": [
+            "{{tech_challenge_1}}",
+            "{{tech_challenge_2}}"
+          ],
+          "performance_challenges": [
+            "{{perf_challenge_1}}",
+            "{{perf_challenge_2}}"
+          ],
+          "integration_challenges": [
+            "{{integration_challenge_1}}",
+            "{{integration_challenge_2}}"
+          ]
+        },
+        "performance_considerations": {
+          "bottlenecks": "{{bottlenecks}}",
+          "optimization_strategies": "{{optimization_strategies}}",
+          "monitoring_requirements": "{{monitoring_requirements}}"
+        },
+        "integration_requirements": {
+          "internal_dependencies": "{{internal_deps}}",
+          "external_dependencies": "{{external_deps}}",
+          "api_requirements": "{{api_requirements}}"
+        }
+      }
+
+# Library-Level Templates
+library_templates:
+  library_context:
+    template: |
+      {
+        "library_purpose": {
+          "name": "{{library_name}}",
+          "description": "{{library_description}}",
+          "primary_use_cases": [
+            "{{use_case_1}}",
+            "{{use_case_2}}",
+            "{{use_case_3}}"
+          ],
+          "target_audience": "{{target_audience}}"
+        },
+        "core_capabilities": {
+          "primary_functions": [
+            "{{function_1}}",
+            "{{function_2}}",
+            "{{function_3}}"
+          ],
+          "key_features": [
+            "{{feature_1}}",
+            "{{feature_2}}",
+            "{{feature_3}}"
+          ],
+          "performance_characteristics": "{{performance_chars}}"
+        },
+        "api_design": {
+          "public_interface": "{{public_interface}}",
+          "configuration_options": "{{config_options}}",
+          "error_handling": "{{error_handling}}",
+          "async_support": "{{async_support}}"
+        },
+        "performance_requirements": {
+          "response_time": "{{response_time}}",
+          "throughput": "{{throughput}}",
+          "resource_usage": "{{resource_usage}}",
+          "scalability": "{{scalability}}"
+        },
+        "integration_points": {
+          "dependencies": [
+            "{{dependency_1}}",
+            "{{dependency_2}}"
+          ],
+          "exported_components": [
+            "{{exported_component_1}}",
+            "{{exported_component_2}}"
+          ],
+          "extension_points": [
+            "{{extension_point_1}}",
+            "{{extension_point_2}}"
+          ]
+        },
+        "testing_strategy": {
+          "unit_testing": "{{unit_testing}}",
+          "integration_testing": "{{integration_testing}}",
+          "performance_testing": "{{performance_testing}}",
+          "coverage_targets": "{{coverage_targets}}"
+        }
+      }
+
+# Component-Level Templates
+component_templates:
+  component_context:
+    template: |
+      {
+        "component_purpose": {
+          "name": "{{component_name}}",
+          "description": "{{component_description}}",
+          "responsibilities": [
+            "{{responsibility_1}}",
+            "{{responsibility_2}}",
+            "{{responsibility_3}}"
+          ],
+          "scope": "{{component_scope}}"
+        },
+        "interface_definitions": {
+          "public_methods": [
+            {
+              "name": "{{method_name}}",
+              "signature": "{{method_signature}}",
+              "purpose": "{{method_purpose}}",
+              "parameters": "{{method_parameters}}",
+              "return_type": "{{return_type}}"
+            }
+          ],
+          "events": [
+            {
+              "name": "{{event_name}}",
+              "payload": "{{event_payload}}",
+              "trigger": "{{event_trigger}}"
+            }
+          ],
+          "configuration": {
+            "required_settings": "{{required_settings}}",
+            "optional_settings": "{{optional_settings}}",
+            "defaults": "{{defaults}}"
+          }
+        },
+        "implementation_requirements": {
+          "core_algorithm": "{{core_algorithm}}",
+          "data_structures": "{{data_structures}}",
+          "error_handling": "{{error_handling}}",
+          "resource_management": "{{resource_management}}"
+        },
+        "performance_characteristics": {
+          "time_complexity": "{{time_complexity}}",
+          "space_complexity": "{{space_complexity}}",
+          "bottlenecks": "{{bottlenecks}}",
+          "optimization_opportunities": "{{optimization_opportunities}}"
+        },
+        "error_handling": {
+          "exception_types": [
+            "{{exception_type_1}}",
+            "{{exception_type_2}}"
+          ],
+          "recovery_strategies": "{{recovery_strategies}}",
+          "logging_requirements": "{{logging_requirements}}"
+        },
+        "testing_requirements": {
+          "unit_tests": "{{unit_tests}}",
+          "integration_tests": "{{integration_tests}}",
+          "edge_cases": "{{edge_cases}}",
+          "performance_tests": "{{performance_tests}}"
+        }
+      }
+
+# File-Level Templates
+file_templates:
+  # Python File Templates
+  python_files:
+    init_py:
+      template: |
+        """{{library_name}} - {{library_description}}.
+
+        {{detailed_description}}
+        """
+
+        __version__ = "{{version}}"
+        __author__ = "{{author}}"
+        __email__ = "{{email}}"
+
+        # Core exports
+        from .core.base import {{core_exports}}
+        from .config.settings import {{config_exports}}
+        from .exceptions.base import {{exception_exports}}
+
+        # Service-specific exports
+        {% if service_exports %}
+        from .providers.base import {{service_exports}}
+        from .schemas.models import {{schema_exports}}
+        {% endif %}
+
+        # RAG-specific exports
+        {% if rag_exports %}
+        from .datastores.base import {{rag_exports}}
+        from .embeddings.providers import {{embedding_exports}}
+        from .processors.base import {{processor_exports}}
+        {% endif %}
+
+        # Manager-specific exports
+        {% if manager_exports %}
+        from .coordinators.base import {{manager_exports}}
+        from .schedulers.base import {{scheduler_exports}}
+        {% endif %}
+
+        __all__ = [
+            # Core
+            {{core_exports_list}},
+            {{config_exports_list}},
+            {{exception_exports_list}},
+            {% if service_exports_list %}
+            # Service
+            {{service_exports_list}},
+            {{schema_exports_list}},
+            {% endif %}
+            {% if rag_exports_list %}
+            # RAG
+            {{rag_exports_list}},
+            {{embedding_exports_list}},
+            {{processor_exports_list}},
+            {% endif %}
+            {% if manager_exports_list %}
+            # Manager
+            {{manager_exports_list}},
+            {{scheduler_exports_list}},
+            {% endif %}
+        ]
+
+        # Version info
+        def get_version() -> str:
+            """Get the library version."""
+            return __version__
+
+        def get_author() -> str:
+            """Get the library author."""
+            return __author__
+
+    core_init_py:
+      template: |
+        """Core module for {{library_name}}.
+
+        Provides base classes and core functionality.
+        """
+
+        from .base import {{class_name}}Error, {{class_name}}ConfigurationError, {{class_name}}InitializationError
+
+        __all__ = [
+            "{{class_name}}Error",
+            "{{class_name}}ConfigurationError",
+            "{{class_name}}InitializationError",
+        ]
+
+    core_base_py:
+      template: |
+        """{{component_name}} - {{component_description}}.
+
+        {{detailed_description}}
+        """
+
+        from abc import ABC, abstractmethod
+        from typing import Any, Dict, List, Optional, Union
+        import asyncio
+        import logging
+
+        from opsvi_foundation import BaseComponent, ComponentError
+        from opsvi_foundation.config.settings import BaseSettings
+
+        logger = logging.getLogger(__name__)
+
+        class {{class_name}}Error(ComponentError):
+            """Base exception for {{component_name}} errors."""
+            pass
+
+        class {{class_name}}ConfigurationError({{class_name}}Error):
+            """Configuration-related errors in {{component_name}}."""
+            pass
+
+        class {{class_name}}InitializationError({{class_name}}Error):
+            """Initialization-related errors in {{component_name}}."""
+            pass
+
+        class {{class_name}}Config(BaseSettings):
+            """Configuration for {{component_name}}."""
+
+            # Core configuration
+            enabled: bool = True
+            debug: bool = False
+            log_level: str = "INFO"
+
+            # Component-specific configuration
+            {{component_config_fields}}
+
+            class Config:
+                env_prefix = "{{env_prefix}}_"
+
+        class {{class_name}}(BaseComponent):
+            """{{class_description}}.
+
+            {{detailed_class_description}}
+            """
+
+            def __init__(
+                self,
+                config: Optional[{{class_name}}Config] = None,
+                **kwargs: Any
+            ) -> None:
+                """Initialize {{class_name}}.
+
+                Args:
+                    config: Configuration for the component
+                    **kwargs: Additional configuration parameters
+                """
+                super().__init__("{{component_name}}", config.dict() if config else {})
+                self.config = config or {{class_name}}Config(**kwargs)
+                self._initialized = False
+                self._logger = logging.getLogger(f"{__name__}.{{component_name}}")
+
+                # Component-specific initialization
+                {{component_init_fields}}
+
+            async def initialize(self) -> None:
+                """Initialize the component.
+
+                Raises:
+                    {{class_name}}InitializationError: If initialization fails
+                """
+                try:
+                    self._logger.info("Initializing {{component_name}}")
+
+                    # Component-specific initialization logic
+                    {{component_init_logic}}
+
+                    self._initialized = True
+                    self._logger.info("{{component_name}} initialized successfully")
+
+                except Exception as e:
+                    self._logger.error(f"Failed to initialize {{component_name}}: {e}")
+                    raise {{class_name}}InitializationError(f"Initialization failed: {e}") from e
+
+            async def shutdown(self) -> None:
+                """Shutdown the component.
+
+                Raises:
+                    {{class_name}}Error: If shutdown fails
+                """
+                try:
+                    self._logger.info("Shutting down {{component_name}}")
+
+                    # Component-specific shutdown logic
+                    {{component_shutdown_logic}}
+
+                    self._initialized = False
+                    self._logger.info("{{component_name}} shut down successfully")
+
+                except Exception as e:
+                    self._logger.error(f"Failed to shutdown {{component_name}}: {e}")
+                    raise {{class_name}}Error(f"Shutdown failed: {e}") from e
+
+            async def health_check(self) -> bool:
+                """Perform health check.
+
+                Returns:
+                    True if healthy, False otherwise
+                """
+                try:
+                    if not self._initialized:
+                        return False
+
+                    # Component-specific health check logic
+                    {{component_health_check_logic}}
+
+                    return True
+
+                except Exception as e:
+                    self._logger.error(f"Health check failed: {e}")
+                    return False
+
+            # Component-specific methods
+            {{component_methods}}
+
+    config_init_py:
+      template: |
+        """Configuration module for {{library_name}}.
+
+        Provides configuration management and settings.
+        """
+
+        from .settings import {{library_class_name}}Settings, get_settings
+
+        __all__ = [
+            "{{library_class_name}}Settings",
+            "get_settings",
+        ]
+
+    config_settings_py:
+      template: |
+        """Configuration settings for {{library_name}}.
+
+        {{config_description}}
+        """
+
+        from typing import Any, Dict, List, Optional, Union
+        from pydantic import BaseSettings, Field, validator
+        from pydantic_settings import SettingsConfigDict
+
+        class {{library_class_name}}Settings(BaseSettings):
+            """Settings for {{library_name}}."""
+
+            model_config = SettingsConfigDict(
+                env_file=".env",
+                env_file_encoding="utf-8",
+                case_sensitive=False,
+                extra="ignore"
+            )
+
+            # Core settings
+            enabled: bool = Field(default=True, description="Enable {{library_name}}")
+            debug: bool = Field(default=False, description="Enable debug mode")
+            log_level: str = Field(default="INFO", description="Logging level")
+
+            # Library-specific settings
+            {{library_specific_settings}}
+
+            @validator("log_level")
+            def validate_log_level(cls, v: str) -> str:
+                """Validate log level."""
+                valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+                if v.upper() not in valid_levels:
+                    raise ValueError(f"Invalid log level: {v}")
+                return v.upper()
+
+            {{additional_validators}}
+
+            class Config:
+                env_prefix = "{{env_prefix}}_"
+
+        # Convenience function
+        def get_settings() -> {{library_class_name}}Settings:
+            """Get {{library_name}} settings."""
+            return {{library_class_name}}Settings()
+
+    exceptions_init_py:
+      template: |
+        """Exceptions module for {{library_name}}.
+
+        Provides exception hierarchy and error handling.
+        """
+
+        from .base import (
+            {{library_class_name}}Error,
+            {{library_class_name}}ConfigurationError,
+            {{library_class_name}}ConnectionError,
+            {{library_class_name}}ValidationError,
+            {{library_class_name}}TimeoutError,
+            {{library_class_name}}ResourceError,
+            {{library_class_name}}InitializationError,
+        )
+
+        __all__ = [
+            "{{library_class_name}}Error",
+            "{{library_class_name}}ConfigurationError",
+            "{{library_class_name}}ConnectionError",
+            "{{library_class_name}}ValidationError",
+            "{{library_class_name}}TimeoutError",
+            "{{library_class_name}}ResourceError",
+            "{{library_class_name}}InitializationError",
+        ]
+
+    exceptions_base_py:
+      template: |
+        """Exception classes for {{library_name}}.
+
+        {{exceptions_description}}
+        """
+
+        from opsvi_foundation.exceptions.base import OPSVIError
+
+        class {{library_class_name}}Error(OPSVIError):
+            """Base exception for all {{library_name}} errors."""
+            pass
+
+        class {{library_class_name}}ConfigurationError({{library_class_name}}Error):
+            """Configuration-related errors in {{library_name}}."""
+            pass
+
+        class {{library_class_name}}ConnectionError({{library_class_name}}Error):
+            """Connection-related errors in {{library_name}}."""
+            pass
+
+        class {{library_class_name}}ValidationError({{library_class_name}}Error):
+            """Validation-related errors in {{library_name}}."""
+            pass
+
+        class {{library_class_name}}TimeoutError({{library_class_name}}Error):
+            """Timeout-related errors in {{library_name}}."""
+            pass
+
+        class {{library_class_name}}ResourceError({{library_class_name}}Error):
+            """Resource-related errors in {{library_name}}."""
+            pass
+
+        class {{library_class_name}}InitializationError({{library_class_name}}Error):
+            """Initialization-related errors in {{library_name}}."""
+            pass
+
+        class {{library_class_name}}ShutdownError({{library_class_name}}Error):
+            """Shutdown-related errors in {{library_name}}."""
+            pass
+
+        # Library-specific exceptions
+        {{library_specific_exceptions}}
+
+    utils_helpers_py:
+      template: |
+        """Utility functions for {{library_name}}.
+
+        {{utils_description}}
+        """
+
+        import asyncio
+        import logging
+        from typing import Any, Dict, List, Optional, Union, Callable
+        from functools import wraps
+        import time
+
+        logger = logging.getLogger(__name__)
+
+        # Async utilities
+        async def safe_async_call(
+            func: Callable,
+            *args: Any,
+            **kwargs: Any
+        ) -> Any:
+            """Safely call an async function with error handling.
+
+            Args:
+                func: Function to call
+                *args: Positional arguments
+                **kwargs: Keyword arguments
+
+            Returns:
+                Function result
+
+            Raises:
+                Exception: If function call fails
+            """
+            try:
+                return await func(*args, **kwargs)
+            except Exception as e:
+                logger.error(f"Async call failed: {e}")
+                raise
+
+        def retry_async(
+            max_retries: int = 3,
+            delay: float = 1.0,
+            backoff: float = 2.0
+        ) -> Callable:
+            """Decorator for async retry logic.
+
+            Args:
+                max_retries: Maximum number of retries
+                delay: Initial delay between retries
+                backoff: Backoff multiplier
+
+            Returns:
+                Decorated function
+            """
+            def decorator(func: Callable) -> Callable:
+                @wraps(func)
+                async def wrapper(*args: Any, **kwargs: Any) -> Any:
+                    last_exception = None
+                    current_delay = delay
+
+                    for attempt in range(max_retries + 1):
+                        try:
+                            return await func(*args, **kwargs)
+                        except Exception as e:
+                            last_exception = e
+                            if attempt < max_retries:
+                                logger.warning(
+                                    f"Attempt {attempt + 1} failed, retrying in {current_delay}s: {e}"
+                                )
+                                await asyncio.sleep(current_delay)
+                                current_delay *= backoff
+                            else:
+                                logger.error(f"All {max_retries + 1} attempts failed")
+
+                    raise last_exception
+                return wrapper
+            return decorator
+
+        # Configuration utilities
+        def merge_configs(
+            base: Dict[str, Any],
+            override: Dict[str, Any]
+        ) -> Dict[str, Any]:
+            """Merge configuration dictionaries.
+
+            Args:
+                base: Base configuration
+                override: Override configuration
+
+            Returns:
+                Merged configuration
+            """
+            result = base.copy()
+            result.update(override)
+            return result
+
+        def validate_config(
+            config: Dict[str, Any],
+            required_keys: List[str]
+        ) -> None:
+            """Validate configuration has required keys.
+
+            Args:
+                config: Configuration to validate
+                required_keys: Required configuration keys
+
+            Raises:
+                ValueError: If required keys are missing
+            """
+            missing_keys = [key for key in required_keys if key not in config]
+            if missing_keys:
+                raise ValueError(f"Missing required configuration keys: {missing_keys}")
+
+        # Performance utilities
+        def timing_decorator(func: Callable) -> Callable:
+            """Decorator to time function execution.
+
+            Args:
+                func: Function to time
+
+            Returns:
+                Decorated function
+            """
+            @wraps(func)
+            async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
+                start_time = time.time()
+                try:
+                    result = await func(*args, **kwargs)
+                    return result
+                finally:
+                    end_time = time.time()
+                    logger.debug(f"{func.__name__} took {end_time - start_time:.4f}s")
+
+            @wraps(func)
+            def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
+                start_time = time.time()
+                try:
+                    result = func(*args, **kwargs)
+                    return result
+                finally:
+                    end_time = time.time()
+                    logger.debug(f"{func.__name__} took {end_time - start_time:.4f}s")
+
+            if asyncio.iscoroutinefunction(func):
+                return async_wrapper
+            else:
+                return sync_wrapper
+
+        # Library-specific utilities
+        {{library_specific_utilities}}
+
+    test_base_py:
+      template: |
+        """Tests for {{library_name}}.
+
+        {{tests_description}}
+        """
+
+        import pytest
+        import asyncio
+        from unittest.mock import Mock, patch, AsyncMock
+        from typing import Any, Dict, List
+
+        from {{package_name}} import {{main_class_name}}
+        from {{package_name}}.config.settings import {{config_class_name}}
+        from {{package_name}}.exceptions.base import {{exception_class_name}}
+
+        class Test{{library_class_name}}:
+            """Test cases for {{library_name}}."""
+
+            @pytest.fixture
+            def config(self) -> {{config_class_name}}:
+                """Create test configuration."""
+                return {{config_class_name}}(enabled=True, debug=True)
+
+            @pytest.fixture
+            def component(self, config: {{config_class_name}}) -> {{main_class_name}}:
+                """Create test component."""
+                return {{main_class_name}}(config=config)
+
+            @pytest.mark.asyncio
+            async def test_initialization(self, component: {{main_class_name}}):
+                """Test component initialization."""
+                assert component is not None
+                assert component.config is not None
+
+            @pytest.mark.asyncio
+            async def test_start_stop(self, component: {{main_class_name}}):
+                """Test component start and stop."""
+                await component.start()
+                assert component.is_active()
+
+                await component.stop()
+                assert not component.is_active()
+
+            @pytest.mark.asyncio
+            async def test_health_check(self, component: {{main_class_name}}):
+                """Test component health check."""
+                await component.start()
+                assert await component.health_check()
+
+            @pytest.mark.asyncio
+            async def test_error_handling(self, component: {{main_class_name}}):
+                """Test error handling."""
+                with pytest.raises({{exception_class_name}}):
+                    # Test error condition
+                    pass
+
+            # Component-specific tests
+            {{component_specific_tests}}
+
+    # Specialized Library Templates
+    core_services_py:
+      template: |
+        """Core services for {{library_name}}.
+
+        Provides service management and orchestration.
+        """
+
+        from typing import Dict, Any, Optional
+        import asyncio
+        import logging
+
+        from {{package_name}}.core.base import {{main_class_name}}
+        from {{package_name}}.config.settings import {{config_class_name}}
+        from {{package_name}}.exceptions.base import {{exception_class_name}}
+
+        logger = logging.getLogger(__name__)
+
+        class {{library_class_name}}ServiceManager({{main_class_name}}):
+            """Service manager for {{library_name}}."""
+
+            def __init__(self, config: {{config_class_name}}):
+                super().__init__(config=config)
+                self.services: Dict[str, Any] = {}
+
+            async def register_service(self, name: str, service: Any) -> None:
+                """Register a service."""
+                self.services[name] = service
+                logger.info(f"Registered service: {name}")
+
+            async def get_service(self, name: str) -> Optional[Any]:
+                """Get a service by name."""
+                return self.services.get(name)
+
+            async def list_services(self) -> Dict[str, Any]:
+                """List all registered services."""
+                return self.services.copy()
+
+    events_base_py:
+      template: |
+        """Event system foundation for {{library_name}}.
+
+        Provides event handling and routing capabilities.
+        """
+
+        from typing import Dict, List, Any, Callable
+        import asyncio
+        import logging
+
+        from {{package_name}}.core.base import {{main_class_name}}
+        from {{package_name}}.config.settings import {{config_class_name}}
+        from {{package_name}}.exceptions.base import {{exception_class_name}}
+
+        logger = logging.getLogger(__name__)
+
+        class Event:
+            """Base event class."""
+            def __init__(self, event_type: str, data: Dict[str, Any] = None):
+                self.event_type = event_type
+                self.data = data or {}
+                self.timestamp = asyncio.get_event_loop().time()
+
+        class {{library_class_name}}EventManager({{main_class_name}}):
+            """Event manager for {{library_name}}."""
+
+            def __init__(self, config: {{config_class_name}}):
+                super().__init__(config=config)
+                self.handlers: Dict[str, List[Callable]] = {}
+
+            async def subscribe(self, event_type: str, handler: Callable) -> None:
+                """Subscribe to an event type."""
+                if event_type not in self.handlers:
+                    self.handlers[event_type] = []
+                self.handlers[event_type].append(handler)
+
+            async def publish(self, event: Event) -> None:
+                """Publish an event."""
+                handlers = self.handlers.get(event.event_type, [])
+                for handler in handlers:
+                    try:
+                        await handler(event)
+                    except Exception as e:
+                        logger.error(f"Error in event handler: {e}")
+
+    utils_helpers_py:
+      template: |
+        """Utility functions for {{library_name}}.
+
+        Provides common utility functions and helpers.
+        """
+
+        import asyncio
+        import logging
+        from typing import Any, Dict, List, Optional
+        from functools import wraps
+
+        logger = logging.getLogger(__name__)
+
+        def async_retry(max_attempts: int = 3, delay: float = 1.0):
+            """Decorator for async retry logic."""
+            def decorator(func):
+                @wraps(func)
+                async def wrapper(*args, **kwargs):
+                    last_exception = None
+                    for attempt in range(max_attempts):
+                        try:
+                            return await func(*args, **kwargs)
+                        except Exception as e:
+                            last_exception = e
+                            if attempt < max_attempts - 1:
+                                await asyncio.sleep(delay * (2 ** attempt))
+                    raise last_exception
+                return wrapper
+            return decorator
+
+        def safe_get(data: Dict[str, Any], key: str, default: Any = None) -> Any:
+            """Safely get a value from a nested dictionary."""
+            keys = key.split('.')
+            current = data
+            for k in keys:
+                if isinstance(current, dict) and k in current:
+                    current = current[k]
+                else:
+                    return default
+            return current
+
+        async def batch_process(items: List[Any], processor: callable,
+                              batch_size: int = 10) -> List[Any]:
+            """Process items in batches."""
+            results = []
+            for i in range(0, len(items), batch_size):
+                batch = items[i:i + batch_size]
+                batch_results = await asyncio.gather(
+                    *[processor(item) for item in batch],
+                    return_exceptions=True
+                )
+                results.extend(batch_results)
+            return results
+
+    # Additional Specialized Templates
+    providers_base_py:
+      template: |
+        """Provider base classes for {{library_name}}.
+
+        Provides base classes for service providers.
+        """
+
+        from abc import ABC, abstractmethod
+        from typing import Dict, Any, Optional
+        import asyncio
+        import logging
+
+        from {{package_name}}.core.base import {{main_class_name}}
+        from {{package_name}}.config.settings import {{config_class_name}}
+        from {{package_name}}.exceptions.base import {{exception_class_name}}
+
+        logger = logging.getLogger(__name__)
+
+        class {{library_class_name}}Provider({{main_class_name}}, ABC):
+            """Base provider class for {{library_name}}."""
+
+            def __init__(self, config: {{config_class_name}}):
+                super().__init__(config=config)
+                self.provider_name = self.__class__.__name__
+
+            @abstractmethod
+            async def connect(self) -> bool:
+                """Connect to the provider service."""
+                pass
+
+            @abstractmethod
+            async def disconnect(self) -> None:
+                """Disconnect from the provider service."""
+                pass
+
+            @abstractmethod
+            async def health_check(self) -> bool:
+                """Check provider health."""
+                pass
+
+    providers_openai_py:
+      template: |
+        """OpenAI provider for {{library_name}}.
+
+        Provides OpenAI API integration.
+        """
+
+        from typing import Dict, Any, Optional, List
+        import asyncio
+        import logging
+
+        from {{package_name}}.providers.base import {{library_class_name}}Provider
+        from {{package_name}}.config.settings import {{config_class_name}}
+        from {{package_name}}.exceptions.base import {{exception_class_name}}
+
+        logger = logging.getLogger(__name__)
+
+        class OpenAIProvider({{library_class_name}}Provider):
+            """OpenAI API provider."""
+
+            def __init__(self, config: {{config_class_name}}):
+                super().__init__(config=config)
+                self.api_key = config.openai_api_key
+                self.base_url = config.openai_base_url
+
+            async def connect(self) -> bool:
+                """Connect to OpenAI API."""
+                try:
+                    # OpenAI connection logic
+                    logger.info("Connected to OpenAI API")
+                    return True
+                except Exception as e:
+                    logger.error(f"Failed to connect to OpenAI: {e}")
+                    return False
+
+            async def disconnect(self) -> None:
+                """Disconnect from OpenAI API."""
+                logger.info("Disconnected from OpenAI API")
+
+            async def health_check(self) -> bool:
+                """Check OpenAI API health."""
+                try:
+                    # Health check logic
+                    return True
+                except Exception as e:
+                    logger.error(f"OpenAI health check failed: {e}")
+                    return False
+
+    prompts_manager_py:
+      template: |
+        """Prompt manager for {{library_name}}.
+
+        Manages prompt templates and generation.
+        """
+
+        from typing import Dict, Any, Optional, List
+        import json
+        import logging
+
+        from {{package_name}}.core.base import {{main_class_name}}
+        from {{package_name}}.config.settings import {{config_class_name}}
+        from {{package_name}}.exceptions.base import {{exception_class_name}}
+
+        logger = logging.getLogger(__name__)
+
+        class PromptTemplate:
+            """Prompt template class."""
+            def __init__(self, name: str, template: str, variables: List[str] = None):
+                self.name = name
+                self.template = template
+                self.variables = variables or []
+
+            def format(self, **kwargs) -> str:
+                """Format the prompt template."""
+                return self.template.format(**kwargs)
+
+        class {{library_class_name}}PromptManager({{main_class_name}}):
+            """Prompt manager for {{library_name}}."""
+
+            def __init__(self, config: {{config_class_name}}):
+                super().__init__(config=config)
+                self.templates: Dict[str, PromptTemplate] = {}
+
+            async def register_template(self, name: str, template: str,
+                                      variables: List[str] = None) -> None:
+                """Register a prompt template."""
+                self.templates[name] = PromptTemplate(name, template, variables)
+                logger.info(f"Registered prompt template: {name}")
+
+            async def get_template(self, name: str) -> Optional[PromptTemplate]:
+                """Get a prompt template by name."""
+                return self.templates.get(name)
+
+            async def format_prompt(self, name: str, **kwargs) -> str:
+                """Format a prompt template."""
+                template = await self.get_template(name)
+                if not template:
+                    raise {{exception_class_name}}(f"Template not found: {name}")
+                return template.format(**kwargs)
+
+    tests_base_py:
+      template: |
+        """Base tests for {{library_name}}.
+
+        {{tests_description}}
+        """
+
+        import pytest
+        import asyncio
+        from typing import Any, Dict, Optional
+        from unittest.mock import Mock, AsyncMock, patch
+
+        from {{package_name}}.core.base import {{main_class_name}}
+        from {{package_name}}.config.settings import {{config_class_name}}
+        from {{package_name}}.exceptions.base import {{exception_class_name}}
+
+        class Test{{main_class_name}}:
+            """Test cases for {{main_class_name}}."""
+
+            @pytest.fixture
+            def config(self) -> {{config_class_name}}:
+                """Create test configuration."""
+                return {{config_class_name}}(
+                    enabled=True,
+                    debug=True,
+                    log_level="DEBUG"
+                )
+
+            @pytest.fixture
+            def component(self, config: {{config_class_name}}) -> {{main_class_name}}:
+                """Create test component."""
+                return {{main_class_name}}(config=config)
+
+            @pytest.mark.asyncio
+            async def test_initialization(self, component: {{main_class_name}}) -> None:
+                """Test component initialization."""
+                await component.initialize()
+                assert component._initialized is True
+
+            @pytest.mark.asyncio
+            async def test_shutdown(self, component: {{main_class_name}}) -> None:
+                """Test component shutdown."""
+                await component.initialize()
+                await component.shutdown()
+                assert component._initialized is False
+
+            @pytest.mark.asyncio
+            async def test_health_check_initialized(self, component: {{main_class_name}}) -> None:
+                """Test health check when initialized."""
+                await component.initialize()
+                assert await component.health_check() is True
+
+            @pytest.mark.asyncio
+            async def test_health_check_not_initialized(self, component: {{main_class_name}}) -> None:
+                """Test health check when not initialized."""
+                assert await component.health_check() is False
+
+            @pytest.mark.asyncio
+            async def test_initialization_error(self, config: {{config_class_name}}) -> None:
+                """Test initialization error handling."""
+                # Mock component to raise error during initialization
+                with patch.object({{main_class_name}}, '_initialize_component', side_effect=Exception("Init failed")):
+                    component = {{main_class_name}}(config=config)
+                    with pytest.raises({{exception_class_name}}InitializationError):
+                        await component.initialize()
+
+            @pytest.mark.asyncio
+            async def test_shutdown_error(self, component: {{main_class_name}}) -> None:
+                """Test shutdown error handling."""
+                await component.initialize()
+
+                # Mock component to raise error during shutdown
+                with patch.object({{main_class_name}}, '_shutdown_component', side_effect=Exception("Shutdown failed")):
+                    with pytest.raises({{exception_class_name}}Error):
+                        await component.shutdown()
+
+            # Component-specific tests
+            {{component_specific_tests}}
+
+  # Configuration File Templates
+  config_files:
+    pyproject_toml:
+      template: |
+        [build-system]
+        requires = ["hatchling"]
+        build-backend = "hatchling.build"
+
+        [project]
+        name = "{{library_name}}"
+        version = "{{version}}"
+        description = "{{library_description}}"
+        authors = [
+            {name = "{{author}}", email = "{{email}}"}
+        ]
+        readme = "README.md"
+        requires-python = ">=3.9"
+        classifiers = [
+            "Development Status :: 3 - Alpha",
+            "Intended Audience :: Developers",
+            "License :: OSI Approved :: MIT License",
+            "Operating System :: OS Independent",
+            "Programming Language :: Python :: 3",
+            "Programming Language :: Python :: 3.9",
+            "Programming Language :: Python :: 3.10",
+            "Programming Language :: Python :: 3.11",
+            "Programming Language :: Python :: 3.12",
+            "Topic :: Software Development :: Libraries :: Python Modules",
+        ]
+        dependencies = [
+            "opsvi-foundation>=0.1.0",
+            "pydantic>=2.0.0",
+            "pydantic-settings>=2.0.0",
+            "structlog>=23.0.0",
+            {{library_dependencies}}
+        ]
+
+        [project.optional-dependencies]
+        dev = [
+            "pytest>=7.0.0",
+            "pytest-asyncio>=0.21.0",
+            "pytest-cov>=4.0.0",
+            "ruff>=0.1.0",
+            "mypy>=1.0.0",
+            "black>=23.0.0",
+            "pre-commit>=3.0.0",
+        ]
+        test = [
+            "pytest>=7.0.0",
+            "pytest-asyncio>=0.21.0",
+            "pytest-cov>=4.0.0",
+        ]
+
+        [project.urls]
+        Homepage = "{{homepage_url}}"
+        Repository = "{{repository_url}}"
+        Documentation = "{{documentation_url}}"
+        "Bug Tracker" = "{{bug_tracker_url}}"
+
+        [tool.hatch.build.targets.wheel]
+        packages = ["{{package_name}}"]
+
+        [tool.hatch.build.targets.sdist]
+        include = [
+            "/{{package_name}}",
+            "/tests",
+            "/README.md",
+            "/LICENSE",
+        ]
+
+        [tool.ruff]
+        target-version = "py39"
+        line-length = 88
+        select = [
+            "E",  # pycodestyle errors
+            "W",  # pycodestyle warnings
+            "F",  # pyflakes
+            "I",  # isort
+            "B",  # flake8-bugbear
+            "C4", # flake8-comprehensions
+            "UP", # pyupgrade
+        ]
+        ignore = [
+            "E501",  # line too long, handled by black
+            "B008",  # do not perform function calls in argument defaults
+            "C901",  # too complex
+        ]
+
+        [tool.ruff.per-file-ignores]
+        "__init__.py" = ["F401"]
+        "tests/**/*" = ["B011"]
+
+        [tool.mypy]
+        python_version = "3.9"
+        warn_return_any = true
+        warn_unused_configs = true
+        disallow_untyped_defs = true
+        disallow_incomplete_defs = true
+        check_untyped_defs = true
+        disallow_untyped_decorators = true
+        no_implicit_optional = true
+        warn_redundant_casts = true
+        warn_unused_ignores = true
+        warn_no_return = true
+        warn_unreachable = true
+        strict_equality = true
+
+        [[tool.mypy.overrides]]
+        module = "tests.*"
+        disallow_untyped_defs = false
+        disallow_incomplete_defs = false
+
+        [tool.black]
+        target-version = ['py39']
+        line-length = 88
+        include = '\.pyi?$'
+        extend-exclude = '''
+        /(
+            # directories
+            \.eggs
+          | \.git
+          | \.hg
+          | \.mypy_cache
+          | \.tox
+          | \.venv
+          | build
+          | dist
+        )/
+        '''
+
+        [tool.pytest.ini_options]
+        testpaths = ["tests"]
+        python_files = ["test_*.py", "*_test.py"]
+        python_classes = ["Test*"]
+        python_functions = ["test_*"]
+        addopts = [
+            "--strict-markers",
+            "--strict-config",
+            "--cov={{package_name}}",
+            "--cov-report=term-missing",
+            "--cov-report=html",
+            "--cov-report=xml",
+        ]
+        markers = [
+            "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+            "integration: marks tests as integration tests",
+            "unit: marks tests as unit tests",
+        ]
+
+  # Documentation Templates
+  documentation_files:
+    README_md:
+      template: |
+        # {{library_name}}
+
+        {{library_description}}
+
+        ## Features
+
+        {{library_features}}
+
+        ## Installation
+
+        ```bash
+        pip install {{library_name}}
+        ```
+
+        ## Quick Start
+
+        ```python
+        from {{package_name}} import {{main_class_name}}
+        from {{package_name}}.config.settings import {{config_class_name}}
+
+        # Create configuration
+        config = {{config_class_name}}(
+            enabled=True,
+            debug=True
+        )
+
+        # Create and initialize component
+        component = {{main_class_name}}(config=config)
+        await component.initialize()
+
+        # Use the component
+        {{usage_example}}
+
+        # Cleanup
+        await component.shutdown()
+        ```
+
+        ## Configuration
+
+        {{library_name}} can be configured using environment variables or programmatically:
+
+        ### Environment Variables
+
+        ```bash
+        export {{env_prefix}}_ENABLED=true
+        export {{env_prefix}}_DEBUG=false
+        export {{env_prefix}}_LOG_LEVEL=INFO
+        {{library_env_vars}}
+        ```
+
+        ### Programmatic Configuration
+
+        ```python
+        from {{package_name}}.config.settings import {{config_class_name}}
+
+        config = {{config_class_name}}(
+            enabled=True,
+            debug=False,
+            log_level="INFO",
+            {{library_config_example}}
+        )
+        ```
+
+        ## API Reference
+
+        ### {{main_class_name}}
+
+        The main component class for {{library_name}}.
+
+        #### Methods
+
+        - `initialize()` - Initialize the component
+        - `shutdown()` - Shutdown the component
+        - `health_check()` - Perform health check
+        {{api_methods}}
+
+        ### {{config_class_name}}
+
+        Configuration class for {{library_name}}.
+
+        #### Fields
+
+        - `enabled` (bool) - Enable the component
+        - `debug` (bool) - Enable debug mode
+        - `log_level` (str) - Logging level
+        {{config_fields}}
+
+        ## Development
+
+        ### Setup
+
+        ```bash
+        git clone {{repository_url}}
+        cd {{library_name}}
+        pip install -e ".[dev]"
+        ```
+
+        ### Testing
+
+        ```bash
+        pytest
+        ```
+
+        ### Code Quality
+
+        ```bash
+        ruff check .
+        black .
+        mypy .
+        ```
+
+        ## Contributing
+
+        {{contributing_guidelines}}
+
+        ## License
+
+        {{license_info}}
+
+        ## Changelog
+
+        {{changelog}}
+
+# Template Variables
+template_variables:
+  common:
+    - "{{library_name}}"           # opsvi-foundation
+    - "{{package_name}}"           # opsvi_foundation
+    - "{{library_description}}"    # Library description
+    - "{{version}}"               # 0.1.0
+    - "{{author}}"                # OPSVI Team
+    - "{{email}}"                 # team@opsvi.com
+    - "{{env_prefix}}"            # OPSVI_FOUNDATION
+    - "{{library_class_name}}"    # OpsviFoundation
+    - "{{main_class_name}}"       # Main component class
+    - "{{config_class_name}}"     # Config class
+    - "{{exception_class_name}}"  # Exception class
+    - "{{component_name}}"        # Component name
+    - "{{component_description}}" # Component description
+    - "{{detailed_description}}"  # Detailed description
+    - "{{class_description}}"     # Class description
+    - "{{detailed_class_description}}" # Detailed class description
+    - "{{component_config_fields}}" # Component config fields
+    - "{{component_init_fields}}" # Component init fields
+    - "{{component_init_logic}}"  # Component init logic
+    - "{{component_shutdown_logic}}" # Component shutdown logic
+    - "{{component_health_check_logic}}" # Component health check logic
+    - "{{component_methods}}"     # Component methods
+    - "{{library_specific_settings}}" # Library specific settings
+    - "{{additional_validators}}" # Additional validators
+    - "{{library_specific_exceptions}}" # Library specific exceptions
+    - "{{utils_description}}"     # Utils description
+    - "{{library_specific_utilities}}" # Library specific utilities
+    - "{{tests_description}}"     # Tests description
+    - "{{component_specific_tests}}" # Component specific tests
+    - "{{library_dependencies}}"  # Library dependencies
+    - "{{homepage_url}}"          # Homepage URL
+    - "{{repository_url}}"        # Repository URL
+    - "{{documentation_url}}"     # Documentation URL
+    - "{{bug_tracker_url}}"       # Bug tracker URL
+    - "{{library_features}}"      # Library features
+    - "{{usage_example}}"         # Usage example
+    - "{{library_env_vars}}"      # Library env vars
+    - "{{library_config_example}}" # Library config example
+    - "{{api_methods}}"           # API methods
+    - "{{config_fields}}"         # Config fields
+    - "{{contributing_guidelines}}" # Contributing guidelines
+    - "{{license_info}}"          # License info
+    - "{{changelog}}"             # Changelog
+
+# Template Processing Rules
+template_processing:
+  variable_substitution:
+    - "Replace all {{variable}} placeholders with actual values"
+    - "Use library-specific values for library templates"
+    - "Use component-specific values for component templates"
+    - "Use file-specific values for file templates"
+
+  conditional_processing:
+    - "Process {% if condition %} blocks based on library type"
+    - "Include/exclude sections based on component type"
+    - "Handle optional dependencies and features"
+
+  validation:
+    - "Ensure all required variables are provided"
+    - "Validate variable types and formats"
+    - "Check for missing or invalid template references"
+
+  customization:
+    - "Allow library-specific template overrides"
+    - "Support component-specific customizations"
+    - "Enable feature-specific template variations"

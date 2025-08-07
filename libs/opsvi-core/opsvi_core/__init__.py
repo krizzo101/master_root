@@ -1,61 +1,35 @@
-"""
-OPSVI Core Library
+"""opsvi-core - Core functionality for OPSVI applications.
 
-Application-level components and patterns for the OPSVI ecosystem.
-Builds on opsvi-foundation for shared concerns.
+Comprehensive opsvi-core library for the OPSVI ecosystem
 """
 
-__version__ = "1.0.0"
+__version__ = "0.1.0"
 __author__ = "OPSVI Team"
 __email__ = "team@opsvi.com"
 
-# Import foundation components
-from opsvi_foundation import (
-    AuthManager,
-    BaseComponent,
-    CircuitBreaker,
-    FoundationConfig,
-    get_logger,
-)
+# Core exports
+from .core.base import BaseComponent, ComponentError
+from .config.settings import LibraryConfig, LibrarySettings
+from .exceptions.base import LibraryError, LibraryConfigurationError
 
-# Import core-specific components
-from .core import CoreConfig, config
-from .core.exceptions import AgentError, CoreError, WorkflowError
+# Service-specific exports
 
-# Import resilience components
-from .resilience import (
-    CircuitBreaker as CoreCircuitBreaker,
-)
-from .resilience import (
-    CircuitBreakerConfig,
-    RetryConfig,
-    RetryManager,
-)
+# RAG-specific exports
 
-# Import security components
-from .security import AuthConfig, SecurityError
-from .security import AuthManager as CoreAuthManager
+# Manager-specific exports
 
 __all__ = [
-    # Foundation exports
-    "FoundationConfig",
-    "AuthManager",
-    "CircuitBreaker",
-    "BaseComponent",
-    "get_logger",
-    # Core exports
-    "CoreConfig",
-    "config",
-    "CoreError",
-    "AgentError",
-    "WorkflowError",
-    # Security exports
-    "AuthConfig",
-    "CoreAuthManager",
-    "SecurityError",
-    # Resilience exports
-    "CoreCircuitBreaker",
-    "CircuitBreakerConfig",
-    "RetryConfig",
-    "RetryManager",
+    # Core
+    BaseComponent, ComponentError,
+    LibraryConfig, LibrarySettings,
+    LibraryError, LibraryConfigurationError,
 ]
+
+# Version info
+def get_version() -> str:
+    """Get the library version."""
+    return __version__
+
+def get_author() -> str:
+    """Get the library author."""
+    return __author__

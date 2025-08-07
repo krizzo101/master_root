@@ -1,5 +1,2 @@
-"""
-Tests for OPSVI LLM Library.
+"""Tests for opsvi-llm."""
 
-Provides comprehensive test coverage for all LLM components.
-"""
