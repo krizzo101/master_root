@@ -1016,6 +1016,257 @@ file_templates:
                     logger.error(f"OpenAI health check failed: {e}")
                     return False
 
+    # Newly added specialized templates to cover structure references
+    client_base_py:
+      template: |
+        """HTTP client base for {{library_name}}."""
+        from typing import Any, Dict, Optional
+        import logging
+        from {{package_name}}.core.base import {{main_class_name}}
+        from {{package_name}}.config.settings import {{config_class_name}}
+        from {{package_name}}.exceptions.base import {{exception_class_name}}
+
+        logger = logging.getLogger(__name__)
+
+        class HTTPClient({{main_class_name}}):
+            async def request(self, method: str, url: str, **kwargs: Any) -> Any:
+                raise NotImplementedError
+
+    server_base_py:
+      template: |
+        """HTTP server base for {{library_name}}."""
+        from typing import Any
+        import logging
+        from {{package_name}}.core.base import {{main_class_name}}
+        from {{package_name}}.config.settings import {{config_class_name}}
+
+        logger = logging.getLogger(__name__)
+
+        class HTTPServer({{main_class_name}}):
+            async def start(self) -> None:
+                await self.initialize()
+
+    auth_base_py:
+      template: |
+        """Auth base for {{library_name}}."""
+        from {{package_name}}.core.base import {{main_class_name}}
+
+        class AuthManager({{main_class_name}}):
+            async def authenticate(self, token: str) -> bool:
+                return False
+
+    datastores_base_py:
+      template: |
+        """Vector datastore base for {{library_name}}."""
+        from typing import Any, List
+        from {{package_name}}.core.base import {{main_class_name}}
+
+        class VectorStore({{main_class_name}}):
+            async def upsert(self, vectors: List[Any]) -> None:
+                raise NotImplementedError
+
+    embeddings_providers_py:
+      template: |
+        """Embeddings providers for {{library_name}}."""
+        from typing import List
+
+        class EmbeddingsProvider:
+            async def embed(self, texts: List[str]) -> List[List[float]]:
+                raise NotImplementedError
+
+    processors_base_py:
+      template: |
+        """Document processors for {{library_name}}."""
+        from typing import Any
+
+        class DocumentProcessor:
+            async def process(self, doc: Any) -> Any:
+                raise NotImplementedError
+
+    agents_base_py:
+      template: |
+        """Agent base for {{library_name}}."""
+        from {{package_name}}.core.base import {{main_class_name}}
+
+        class Agent({{main_class_name}}):
+            async def act(self, input_data: str) -> str:
+                return input_data
+
+    coordinators_base_py:
+      template: |
+        """Coordinator base for {{library_name}}."""
+        from {{package_name}}.core.base import {{main_class_name}}
+
+        class Coordinator({{main_class_name}}):
+            async def coordinate(self) -> None:
+                pass
+
+    communication_base_py:
+      template: |
+        """Communication base for {{library_name}}."""
+        class Communicator:
+            async def send(self, message: str) -> None:
+                pass
+
+    fs_providers_base_py:
+      template: |
+        """FS provider base for {{library_name}}."""
+        class FileSystemProvider:
+            async def save(self, path: str, data: bytes) -> None:
+                raise NotImplementedError
+
+    fs_processors_base_py:
+      template: |
+        """FS processors base for {{library_name}}."""
+        class FileProcessor:
+            async def process(self, path: str) -> None:
+                raise NotImplementedError
+
+    data_providers_base_py:
+      template: |
+        """Data provider base for {{library_name}}."""
+        class DataProvider:
+            async def connect(self) -> bool:
+                return True
+
+    orm_base_py:
+      template: |
+        """ORM base for {{library_name}}."""
+        class ORM:
+            pass
+
+    auth_providers_base_py:
+      template: |
+        """Auth provider base for {{library_name}}."""
+        class AuthProvider:
+            async def validate(self, token: str) -> bool:
+                return False
+
+    auth_models_user_py:
+      template: |
+        """User model for {{library_name}}."""
+        from dataclasses import dataclass
+
+        @dataclass
+        class User:
+            id: str
+            name: str
+
+    memory_stores_base_py:
+      template: |
+        """Memory store base for {{library_name}}."""
+        class MemoryStore:
+            async def get(self, key: str):
+                return None
+
+    cache_manager_py:
+      template: |
+        """Cache manager for {{library_name}}."""
+        class CacheManager:
+            async def invalidate(self, key: str) -> None:
+                pass
+
+    communication_channels_base_py:
+      template: |
+        """Comm channel base for {{library_name}}."""
+        class Channel:
+            async def publish(self, message: str) -> None:
+                pass
+
+    messages_base_py:
+      template: |
+        """Message base for {{library_name}}."""
+        from dataclasses import dataclass
+
+        @dataclass
+        class Message:
+            type: str
+            payload: dict
+
+    pipeline_stages_base_py:
+      template: |
+        """Pipeline stage base for {{library_name}}."""
+        class Stage:
+            async def run(self, data):
+                return data
+
+    orchestrators_base_py:
+      template: |
+        """Orchestrator base for {{library_name}}."""
+        class Orchestrator:
+            async def execute(self):
+                pass
+
+    monitoring_metrics_base_py:
+      template: |
+        """Metrics base for {{library_name}}."""
+        class Metrics:
+            def record(self, name: str, value: float) -> None:
+                pass
+
+    tracing_base_py:
+      template: |
+        """Tracing base for {{library_name}}."""
+        class Tracer:
+            def start_span(self, name: str):
+                pass
+
+    security_crypto_base_py:
+      template: |
+        """Crypto base for {{library_name}}."""
+        class Crypto:
+            def encrypt(self, data: bytes) -> bytes:
+                return data
+
+    audit_base_py:
+      template: |
+        """Audit base for {{library_name}}."""
+        class Auditor:
+            def log(self, event: str) -> None:
+                pass
+
+    orchestration_workflows_base_py:
+      template: |
+        """Workflow base for {{library_name}}."""
+        class Workflow:
+            async def run(self):
+                pass
+
+    schedulers_base_py:
+      template: |
+        """Scheduler base for {{library_name}}."""
+        class Scheduler:
+            async def schedule(self):
+                pass
+
+    deploy_infrastructure_base_py:
+      template: |
+        """Infrastructure base for {{library_name}}."""
+        class Infrastructure:
+            async def provision(self):
+                pass
+
+    environments_base_py:
+      template: |
+        """Environments base for {{library_name}}."""
+        class EnvironmentManager:
+            def current(self) -> str:
+                return "dev"
+
+    gateway_routers_base_py:
+      template: |
+        """Gateway router base for {{library_name}}."""
+        class Router:
+            def route(self, path: str) -> str:
+                return path
+
+    gateway_middleware_base_py:
+      template: |
+        """Gateway middleware base for {{library_name}}."""
+        class Middleware:
+            async def process(self, request):
+                return request
+
     prompts_manager_py:
       template: |
         """Prompt manager for {{library_name}}.

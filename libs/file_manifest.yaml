@@ -87,4 +87,3 @@ libraries:
         template: "gateway_routers_base.py.j2"
       - path: "{{package_name}}/middleware/base.py"
         template: "gateway_middleware_base.py.j2"
-

@@ -2721,6 +2721,10 @@ class ComprehensiveTestRunner:
                 "average_completeness": 0.0,
                 "average_execution_time": 0.0,
                 "total_tests": 0,
+                # Ensure report code has consistent keys even for empty categories
+                "average_improvement": 0.0,
+                "median_improvement": 0.0,
+                "std_improvement": 0.0,
             }
 
         return {
@@ -2740,6 +2744,10 @@ class ComprehensiveTestRunner:
                 m.get("execution_time", 0.0) for m in metrics_list
             ),
             "total_tests": len(metrics_list),
+            # For compatibility with overall report aggregation
+            "average_improvement": 0.0,
+            "median_improvement": 0.0,
+            "std_improvement": 0.0,
         }
 
     def _generate_comprehensive_report(self, total_time: float) -> dict[str, Any]:
