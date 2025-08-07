@@ -1,5 +1,6 @@
 ---
 description: "use when INTEGRATING OPENAI APIs to ENFORCE USAGE PATTERNS for FUNCTION CALLING AND SECURITY"
+globs:
 alwaysApply: false
 ---
 # OpenAI Integration Rules (2025)
@@ -30,21 +31,21 @@ current_time = current_time(format="YYYY-MM-DD HH:mm:ss")
 
 ## Model Selection (2025 Current Standards)
 
-**APPROVED MODELS ONLY**: o3, o4 series and GPT-4.1 series
+**APPROVED MODELS ONLY**: o3, o4 series, GPT-5 series
 **gpt-4o series models are FORBIDDEN**
 
 | Use‑Case                   | Primary Model                  | Alternative         | Notes                               |
 | -------------------------- | ------------------------------ | ------------------- | ----------------------------------- |
 | **Reasoning/Planning**     | `o4-mini`                      | `o3`                | MANDATORY for reasoning workflows   |
-| **Agent Execution**        | `gpt-4.1-mini`                 | `gpt-4.1`           | MANDATORY for agent implementation  |
-| **Structured Outputs**     | `gpt-4.1`                      | `gpt-4.1-mini`      | Required for JSON schema compliance |
-| **Complex reasoning/code** | `gpt-4.1`, `o3`                | `o4-mini`           | Context-dependent selection         |
-| **Fast responses**         | `gpt-4.1-nano`, `gpt-4.1-mini` | Efficiency priority |
+| **Agent Execution**        | `gpt-5-mini`                   | `gpt-5`             | MANDATORY for agent implementation  |
+| **Structured Outputs**     | `gpt-5`                        | `gpt-5-mini`        | Required for JSON schema compliance |
+| **Complex reasoning/code** | `gpt-5`, `o3`                  | `o4-mini`           | Context-dependent selection         |
+| **Fast responses**         | `gpt-5-nano`, `gpt-5-mini`     | Efficiency priority |
 
 **CRITICAL MODEL CONSTRAINTS**:
-- **OAMAT-SD Application**: MUST use `o4-mini` (reasoning) and `gpt-4.1-mini` (agents)
-- **Structured Outputs**: Use `gpt-4.1-mini` or `gpt-4.1` for JSON schema compliance
-- **NO GPT-4O VARIANTS**: Only o3, o4, and GPT-4.1 series approved for use
+- **OAMAT-SD Application**: MUST use `o4-mini` (reasoning) and `gpt-5-mini` (agents)
+- **Structured Outputs**: Use `gpt-5-mini` or `gpt-5` for JSON schema compliance
+- **NO GPT-4O VARIANTS**: Only o3, o4, and GPT-5 series approved for use
 - **Resolution**: Use appropriate model for specific requirements, document conflicts
 
 ## Latest Responses API Patterns (2025 PREFERRED)
@@ -66,7 +67,7 @@ class ResponseSchema(BaseModel):
     metadata: Optional[dict] = None
 
 response = client.responses.create(
-    model="gpt-4.1-mini",  # or "o4-mini" for reasoning
+    model="gpt-5-mini",  # or "o4-mini" for reasoning
     instructions="You are a helpful assistant that provides structured analysis.",
     input="Analyze this data and provide recommendations...",
     text_format=ResponseSchema
@@ -106,7 +107,7 @@ messages = [
 ]
 
 response = client.responses.create(
-    model="gpt-4.1-mini",
+    model="gpt-5-mini",
     input=messages,
     text_format=CodeResponseSchema
 )
@@ -131,11 +132,11 @@ response = client.responses.create(
 # ❌ AVOID: "Think step by step...", "Let's break this down..."
 ```
 
-#### **For GPT-4.1 Models (Execution Focus)**
+#### **For GPT-5 Models (Execution Focus)**
 ```python
-# ✅ GPT-4.1-OPTIMIZED PATTERN - Detailed, explicit guidance
+# ✅ GPT-5-OPTIMIZED PATTERN - Detailed, explicit guidance
 response = client.responses.create(
-    model="gpt-4.1-mini",
+    model="gpt-5-mini",
     instructions="""
     ## PERSISTENCE
     Continue until the user's query is completely resolved.
@@ -159,7 +160,7 @@ response = client.responses.create(
 ```python
 # ✅ REUSABLE PROMPT TEMPLATES
 response = client.responses.create(
-    model="gpt-4.1-mini",
+    model="gpt-5-mini",
     prompt={
         "id": "pmpt_code_generator_v2",
         "version": "2.1",
@@ -232,7 +233,7 @@ strict_schema = {
 }
 
 response = client.responses.create(
-    model="gpt-4.1-mini",
+    model="gpt-5-mini",
     input="Analyze security vulnerabilities in this code...",
     text={
         "format": {
@@ -276,7 +277,7 @@ tools = [
 ]
 
 response = client.responses.create(
-    model="gpt-4.1-mini",
+    model="gpt-5-mini",
     input="Review this authentication code for security issues...",
     tools=tools,
     text_format=SecurityAnalysisSchema
@@ -306,14 +307,14 @@ def select_optimal_model(task_type: str, complexity: str) -> str:
     if task_type == "reasoning" or task_type == "planning":
         return "o4-mini" if complexity == "standard" else "o3"
     elif task_type == "execution" or task_type == "coding":
-        return "gpt-4.1-mini" if complexity == "standard" else "gpt-4.1"
+        return "gpt-5-mini" if complexity == "standard" else "gpt-5"
     else:
         # Default fallback
-        return "gpt-4.1-mini"
+        return "gpt-5-mini"
 
 # ❌ HARDCODED CONFIG - PROHIBITED
 FORBIDDEN_CONFIG = {
-    "model": "gpt-4.1-mini",
+    "model": "gpt-5-mini",
     "temperature": 0.1,
     "max_tokens": 4000
 }  # VIOLATION - No hardcoded values allowed
@@ -376,7 +377,7 @@ def stream_structured_response(prompt: str, schema: BaseModel):
     accumulated_data = {}
 
     with client.responses.stream(
-        model="gpt-4.1-mini",
+        model="gpt-5-mini",
         input=prompt,
         text_format=schema,
     ) as stream:
@@ -569,10 +570,10 @@ class OpenAIResponsesInterface:
 - [ ] Prompt templates and caching utilized when applicable
 
 ### **Model Selection and Optimization**:
-- [ ] Only approved models used (O3 and GPT-4.1 series)
+- [ ] Only approved models used (O3 and GPT-5 series)
 - [ ] Model selected dynamically based on task type
 - [ ] O3 models: Clear, minimal prompts with no chain-of-thought
-- [ ] GPT-4.1 models: Detailed, explicit instructions with reasoning guidance
+- [ ] GPT-5 models: Detailed, explicit instructions with reasoning guidance
 - [ ] Reasoning effort parameter set for o4-mini when applicable
 
 ### **Security and Quality Requirements**:
@@ -624,14 +625,14 @@ backup_model = "gpt-4o-mini"           # VIOLATION - fallback to unauthorized mo
 # ✅ MANDATORY APPROVED MODELS
 "o4-mini"             # ✅ APPROVED - Reasoning
 "o3"                  # ✅ APPROVED - Advanced reasoning
-"gpt-4.1-mini"        # ✅ APPROVED - Agent execution
-"gpt-4.1"             # ✅ APPROVED - Advanced execution
-"gpt-4.1-nano"        # ✅ APPROVED - Fast responses
+"gpt-5-mini"          # ✅ APPROVED - Agent execution
+"gpt-5"               # ✅ APPROVED - Advanced execution
+"gpt-5-nano"          # ✅ APPROVED - Fast responses
 
 # ✅ APPROVED CONFIGURATION PATTERNS
 REASONING_MODEL = "o4-mini"         # ✅ CORRECT
-EXECUTION_MODEL = "gpt-4.1-mini"    # ✅ CORRECT
-APPROVED_MODELS = ["o4-mini", "gpt-4.1-mini"]  # ✅ CORRECT
+EXECUTION_MODEL = "gpt-5-mini"      # ✅ CORRECT
+APPROVED_MODELS = ["o4-mini", "gpt-5-mini"]  # ✅ CORRECT
 ```
 
 ### **🔒 AUTOMATIC ENFORCEMENT**
@@ -640,8 +641,8 @@ APPROVED_MODELS = ["o4-mini", "gpt-4.1-mini"]  # ✅ CORRECT
 def validate_model_constraints(model_name: str) -> bool:
     """Validate model is approved - MANDATORY check"""
     APPROVED_MODELS = {
-        "o4-mini", "o3", "gpt-4.1-mini",
-        "gpt-4.1", "gpt-4.1-nano"
+        "o4-mini", "o3", "gpt-5-mini",
+        "gpt-5", "gpt-5-nano"
     }
 
     if model_name not in APPROVED_MODELS:
@@ -682,7 +683,7 @@ UNAUTHORIZED MODEL DETECTED - RESPONSE BLOCKED
 🔒 ENFORCEMENT ACTIVE - NO EXCEPTIONS
 
 APPROVED MODELS ONLY:
-✅ o4-mini, o3, gpt-4.1-mini, gpt-4.1, gpt-4.1-nano
+✅ o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano
 
 IMMEDIATE REMEDIATION REQUIRED:
 1. Remove ALL unauthorized model references
