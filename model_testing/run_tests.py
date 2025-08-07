@@ -123,8 +123,17 @@ def main() -> dict:
     parser.add_argument(
         "--full", action="store_true", help="Run full comprehensive tests (default)"
     )
+    parser.add_argument(
+        "--concurrency",
+        type=int,
+        default=int(os.environ.get("MODEL_TEST_CONCURRENCY", "8")),
+        help="Max concurrent API calls (default 8 or MODEL_TEST_CONCURRENCY)",
+    )
 
     args = parser.parse_args()
+
+    # Apply concurrency to evaluator via env (read by framework)
+    os.environ["MODEL_TEST_CONCURRENCY"] = str(args.concurrency)
 
     # Determine which tests to run
     if args.quick:

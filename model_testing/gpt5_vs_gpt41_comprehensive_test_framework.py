@@ -94,9 +94,10 @@ def _normalize_placeholders(prompt_text: str) -> str:
 
     This prevents KeyError: "'key'" when prompts include quoted placeholders.
     """
+
     def _repl(match: re.Match) -> str:
-        key = match.group('key') or ''
-        return '{' + key + '}'
+        key = match.group("key") or ""
+        return "{" + key + "}"
 
     return _QUOTED_FIELD_PATTERN.sub(_repl, prompt_text)
 
@@ -1865,10 +1866,15 @@ class ModelEvaluator:
     def __init__(self) -> None:
         self.results: dict[str, Any] = {}
         self.comparison_data: dict[str, Any] = {}
-        # OpenAI client (expects OPENAI_API_KEY in environment)
-        self.client: OpenAI = OpenAI()
+        # OpenAI async client (expects OPENAI_API_KEY in environment)
+        self.client: AsyncOpenAI = AsyncOpenAI()
+        # Bounded concurrency for API calls
+        self.semaphore: asyncio.Semaphore = asyncio.Semaphore(
+            int(os.environ.get("MODEL_TEST_CONCURRENCY", "8"))
+        )
         LOGGER.debug(
-            "Initialized ModelEvaluator with OpenAI client. Env set: OPENAI_API_KEY=%s, ORG=%s, PROJECT=%s",
+            "Initialized ModelEvaluator (async) with concurrency=%s. Env set: OPENAI_API_KEY=%s, ORG=%s, PROJECT=%s",
+            self.semaphore._value,
             bool(os.environ.get("OPENAI_API_KEY")),
             os.environ.get("OPENAI_ORG_ID"),
             os.environ.get("OPENAI_PROJECT_ID"),
@@ -1943,7 +1949,8 @@ class ModelEvaluator:
             )
 
             try:
-                resp = self.client.responses.create(**create_kwargs)
+                async with self.semaphore:
+                    resp = await self.client.responses.create(**create_kwargs)
             except Exception:
                 # Retry stripping potentially unsupported params
                 LOGGER.warning(
@@ -1957,7 +1964,8 @@ class ModelEvaluator:
                     "Create kwargs (retry): %s",
                     json.dumps(_sanitize_create_kwargs(create_kwargs)),
                 )
-                resp = self.client.responses.create(**create_kwargs)
+                async with self.semaphore:
+                    resp = await self.client.responses.create(**create_kwargs)
 
             execution_time = time.time() - start_time
 
@@ -2068,7 +2076,8 @@ class ModelEvaluator:
                 "Create kwargs: %s", json.dumps(_sanitize_create_kwargs(create_kwargs))
             )
             try:
-                resp = self.client.responses.create(**create_kwargs)
+                async with self.semaphore:
+                    resp = await self.client.responses.create(**create_kwargs)
             except Exception:
                 # Retry without temperature/reasoning if rejected
                 LOGGER.warning(
@@ -2081,7 +2090,8 @@ class ModelEvaluator:
                     "Create kwargs (retry): %s",
                     json.dumps(_sanitize_create_kwargs(create_kwargs)),
                 )
-                resp = self.client.responses.create(**create_kwargs)
+                async with self.semaphore:
+                    resp = await self.client.responses.create(**create_kwargs)
 
             execution_time = time.time() - start_time
 
@@ -2544,29 +2554,26 @@ class ComprehensiveTestRunner:
             TestCategory.CODE_OPTIMIZATION,
         ]
 
-        for effort_level in ReasoningEffort:
-            print(f"    🧪 Testing {effort_level.value} reasoning effort")
-
-            effort_results: dict[str, Any] = {
-                "effort_level": effort_level.value,
+        async def run_effort_and_categories(effort: ReasoningEffort):
+            print(f"    🧪 Testing {effort.value} reasoning effort")
+            effort_result: dict[str, Any] = {
+                "effort_level": effort.value,
                 "categories": {},
                 "summary": {},
             }
+            async def run_one_category(cat: TestCategory):
+                print(f"      📋 Testing {cat.value}")
+                res = await self._test_category_with_reasoning_effort("gpt-5", cat, effort)
+                return cat.value, res
+            pairs = await asyncio.gather(*(run_one_category(c) for c in coding_categories))
+            for cat_value, res in pairs:
+                effort_result["categories"][cat_value] = res
+            effort_result["summary"] = self._calculate_reasoning_effort_summary(effort_result["categories"]) 
+            return effort.value, effort_result
 
-            for category in coding_categories:
-                print(f"      📋 Testing {category.value}")
-
-                category_results = await self._test_category_with_reasoning_effort(
-                    "gpt-5", category, effort_level
-                )
-                effort_results["categories"][category.value] = category_results
-
-            # Calculate effort level summary
-            effort_results["summary"] = self._calculate_reasoning_effort_summary(
-                effort_results["categories"]
-            )
-
-            reasoning_results["reasoning_efforts"][effort_level.value] = effort_results
+        gathered = await asyncio.gather(*(run_effort_and_categories(e) for e in ReasoningEffort))
+        for effort_value, effort_result in gathered:
+            reasoning_results["reasoning_efforts"][effort_value] = effort_result
 
         # Analyze coding performance across reasoning efforts
         reasoning_results[
@@ -2766,12 +2773,14 @@ class ComprehensiveTestRunner:
             "categories": {},
         }
 
-        for category in TestCategory:
-            print(f"  📝 Testing {category.value}")
-            category_results = await self._test_category(
-                gpt41_model, gpt5_model, category
-            )
-            pair_results["categories"][category.value] = category_results
+        async def run_one_category(cat: TestCategory):
+            print(f"  📝 Testing {cat.value}")
+            res = await self._test_category(gpt41_model, gpt5_model, cat)
+            return cat.value, res
+
+        tasks = [run_one_category(cat) for cat in TestCategory]
+        for cat_value, res in await asyncio.gather(*tasks):
+            pair_results["categories"][cat_value] = res
 
         return pair_results
 
@@ -2786,37 +2795,33 @@ class ComprehensiveTestRunner:
         gpt5_tests = GPT5_OPTIMIZED_PROMPTS.get(category) or {}
         datasets = TEST_DATASETS.get(category) or {}
 
-        for test_name in gpt41_tests.keys():
-            if test_name in datasets and test_name in gpt5_tests:
-                print(f"    🧪 Running {test_name}")
-                LOGGER.debug("Running category=%s test=%s | dataset_keys=%s", category.value, test_name, list(datasets[test_name][0].keys()) if datasets.get(test_name) else [])
+        async def run_one_test(name: str):
+            print(f"    🧪 Running {name}")
+            LOGGER.debug(
+                "Running category=%s test=%s | dataset_keys=%s",
+                category.value,
+                name,
+                list(datasets[name][0].keys()) if datasets.get(name) else [],
+            )
+            gpt41_task = self.evaluator.evaluate_model(
+                gpt41_model, category, name, gpt41_tests[name], datasets[name][0]
+            )
+            gpt5_task = self.evaluator.evaluate_model(
+                gpt5_model, category, name, gpt5_tests[name], datasets[name][0]
+            )
+            gpt41_metrics, gpt5_metrics = await asyncio.gather(gpt41_task, gpt5_task)
+            comparison = self._compare_metrics(gpt41_metrics, gpt5_metrics)
+            return name, {
+                "gpt41_metrics": self._metrics_to_dict(gpt41_metrics),
+                "gpt5_metrics": self._metrics_to_dict(gpt5_metrics),
+                "comparison": comparison,
+            }
 
-                # Test GPT-4.1 model with GPT-4.1 optimized prompt
-                gpt41_metrics = await self.evaluator.evaluate_model(
-                    gpt41_model,
-                    category,
-                    test_name,
-                    gpt41_tests[test_name],
-                    datasets[test_name][0],
-                )
-
-                # Test GPT-5 model with GPT-5 optimized prompt
-                gpt5_metrics = await self.evaluator.evaluate_model(
-                    gpt5_model,
-                    category,
-                    test_name,
-                    gpt5_tests[test_name],
-                    datasets[test_name][0],
-                )
-
-                # Compare results
-                comparison = self._compare_metrics(gpt41_metrics, gpt5_metrics)
-
-                category_results["tests"][test_name] = {
-                    "gpt41_metrics": self._metrics_to_dict(gpt41_metrics),
-                    "gpt5_metrics": self._metrics_to_dict(gpt5_metrics),
-                    "comparison": comparison,
-                }
+        names = [n for n in gpt41_tests.keys() if n in datasets and n in gpt5_tests]
+        if names:
+            results = await asyncio.gather(*(run_one_test(n) for n in names))
+            for name, data in results:
+                category_results["tests"][name] = data
 
         # Calculate category summary
         category_results["summary"] = self._calculate_category_summary(
