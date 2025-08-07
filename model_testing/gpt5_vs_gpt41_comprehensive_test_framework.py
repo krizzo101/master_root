@@ -176,6 +176,48 @@ def _extract_text_from_response(resp: Any) -> str:
     return "\n".join(pieces)
 
 
+_FIELD_PATTERN = re.compile(r"\{\s*([A-Za-z0-9_]+)\s*\}")
+
+
+def _safe_format(template: str, data: dict[str, Any]) -> str:
+    """Safely substitute {key} placeholders with values from data without KeyError."""
+    def repl(match: re.Match) -> str:
+        key = match.group(1)
+        val = data.get(key)
+        return str(val) if val is not None else match.group(0)
+
+    return _FIELD_PATTERN.sub(repl, template)
+
+
+def _build_fallback_prompt(category: TestCategory, dataset: dict[str, Any]) -> str:
+    """Construct a minimal fallback prompt when the provided prompt is invalid/corrupted."""
+    if category == TestCategory.REASONING:
+        if "problem" in dataset:
+            return f"Solve this problem step by step and provide the final answer.\n\nProblem: {dataset.get('problem')}"
+        if "scenario" in dataset and "question" in dataset:
+            return (
+                f"Analyze the scenario and answer the question.\n\nScenario: {dataset.get('scenario')}\nQuestion: {dataset.get('question')}"
+            )
+    elif category == TestCategory.AGENTIC_TASKS:
+        if "task" in dataset:
+            return f"Plan and execute the following task. Provide a clear plan and steps.\n\nTask: {dataset.get('task')}"
+    elif category == TestCategory.LONG_CONTEXT:
+        if "document" in dataset and "question" in dataset:
+            return (
+                f"Read the document and answer the question with citations.\n\nDocument: {dataset.get('document')}\nQuestion: {dataset.get('question')}"
+            )
+    elif category == TestCategory.FACTUALITY:
+        if "query" in dataset:
+            return f"Answer factually and cite sources.\n\nQuery: {dataset.get('query')}"
+    else:  # CODE_GENERATION and coding-focused categories
+        if "requirements" in dataset:
+            return f"Implement code that satisfies these requirements.\n\nRequirements: {dataset.get('requirements')}"
+        if "problem" in dataset:
+            return f"Write code to solve the following problem.\n\nProblem: {dataset.get('problem')}"
+    # Generic fallback
+    return "Please complete the task using the provided context."
+
+
 class TestCategory(Enum):
     CODE_GENERATION = "code_generation"
     REASONING = "reasoning"
@@ -1951,7 +1993,15 @@ class ModelEvaluator:
                     prompt = str(prompt)
             # Normalize quoted placeholders before formatting to avoid KeyError: "'key'"
             normalized_prompt = _normalize_placeholders(prompt)
-            formatted_prompt = normalized_prompt.format(**dataset)
+            try:
+                formatted_prompt = normalized_prompt.format(**dataset)
+            except KeyError as ke:
+                LOGGER.warning("Missing placeholder during format for test=%s model=%s: %s. Falling back to safe_format.", test_name, model, ke)
+                formatted_prompt = _safe_format(normalized_prompt, dataset)
+            # If still unchanged and contains placeholders, build a fallback prompt
+            if _FIELD_PATTERN.search(formatted_prompt):
+                LOGGER.warning("Unresolved placeholders remain for test=%s model=%s. Using constructed fallback prompt.", test_name, model)
+                formatted_prompt = _build_fallback_prompt(category, dataset)
 
             api_cfg = GPT5_CONFIG if model.startswith("gpt-5") else GPT41_CONFIG
             LOGGER.debug(
@@ -2080,7 +2130,14 @@ class ModelEvaluator:
                 else:
                     prompt = str(prompt)
             normalized_prompt = _normalize_placeholders(prompt)
-            formatted_prompt = normalized_prompt.format(**dataset)
+            try:
+                formatted_prompt = normalized_prompt.format(**dataset)
+            except KeyError as ke:
+                LOGGER.warning("Missing placeholder during format (reasoning) test=%s model=%s: %s. Falling back to safe_format.", test_name, model, ke)
+                formatted_prompt = _safe_format(normalized_prompt, dataset)
+            if _FIELD_PATTERN.search(formatted_prompt):
+                LOGGER.warning("Unresolved placeholders remain (reasoning) test=%s model=%s. Using constructed fallback prompt.", test_name, model)
+                formatted_prompt = _build_fallback_prompt(category, dataset)
 
             # Get reasoning effort configuration
             reasoning_config = GPT5_REASONING_CONFIGS[effort_level]
