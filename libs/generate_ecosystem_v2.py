@@ -2,27 +2,42 @@
 """
 OPSVI Library Ecosystem Generator v2
 Improved version with proper Jinja2 template processing and variable resolution
+
+Adds support for an optional file manifest to scaffold additional low-level files
+per library type and per specific library. Can optionally create stub files when
+templates are missing so agentic coding can populate them later.
 """
 
-import os
-import sys
+import argparse
 import yaml
-import json
 from pathlib import Path
 from typing import Dict, List, Any, Optional
-import re
-from jinja2 import Template, Environment, BaseLoader
+from jinja2 import Environment, BaseLoader
 
 
 class OpsviEcosystemGeneratorV2:
-    def __init__(self, libs_dir: str = "."):
+    def __init__(
+        self,
+        libs_dir: str = ".",
+        file_manifest: Optional[str] = None,
+        touch_missing: bool = True,
+    ):
         self.libs_dir = Path(libs_dir)
         self.structure_file = self.libs_dir / "recommended_structure.yaml"
         self.templates_file = self.libs_dir / "templates.yaml"
+        self.file_manifest_file = (
+            Path(file_manifest) if file_manifest else self.libs_dir / "file_manifest.yaml"
+        )
 
         # Load configuration
         self.structure = self._load_yaml(self.structure_file)
         self.templates = self._load_yaml(self.templates_file)
+        self.file_manifest = (
+            self._load_yaml(self.file_manifest_file)
+            if self.file_manifest_file.exists()
+            else {}
+        )
+        self.touch_missing = touch_missing
 
         # Extract libraries and naming conventions
         self.libraries = self.structure.get("libraries", {})
@@ -228,6 +243,31 @@ class OpsviEcosystemGeneratorV2:
             "has_manager_exports": bool(manager_exports),
         }
 
+    def _get_manifest_files(self, library_name: str, library_data: Dict) -> List[Dict[str, Any]]:
+        """Return additional files from file_manifest for the given library.
+
+        Structure:
+        library_types:
+          core:
+            files: [{ path: "{{package_name}}/utils/helpers.py", template: "utils_helpers_py" }]
+          service:
+            files: [...]
+        libraries:
+          opsvi-llm:
+            files: [...]
+        """
+        manifest = self.file_manifest or {}
+        lib_type = library_data.get("type", "service")
+
+        results: List[Dict[str, Any]] = []
+        type_entry = (manifest.get("library_types", {}) or {}).get(lib_type, {}) or {}
+        results.extend(type_entry.get("files", []) or [])
+
+        lib_entry = (manifest.get("libraries", {}) or {}).get(library_name, {}) or {}
+        results.extend(lib_entry.get("files", []) or [])
+
+        return results
+
     def _process_template(
         self, template_content: str, variables: Dict[str, Any]
     ) -> str:
@@ -291,6 +331,18 @@ class OpsviEcosystemGeneratorV2:
         template_content = self._get_template(template_path)
         if not template_content:
             print(f"Warning: Template not found for {template_path}")
+            if self.touch_missing:
+                file_path.parent.mkdir(parents=True, exist_ok=True)
+                header = (
+                    '"""AUTO-GENERATED STUB\n'
+                    f"Path: {file_path.name}\n"
+                    f"Template missing: {template_path}\n"
+                    "This file is intended to be populated by the agentic coder.\n"\
+                    '"""\n\n'
+                )
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(header)
+                print(f"Touched {file_path} (missing template)")
             return
 
         # Process template with variables
@@ -369,7 +421,9 @@ class OpsviEcosystemGeneratorV2:
         variables = self._get_library_variables(library_name, library_data)
 
         # Get files to generate
-        files = library_data.get("files", [])
+        files = list(library_data.get("files", []) or [])
+        # Extend with manifest-defined files
+        files.extend(self._get_manifest_files(library_name, library_data))
 
         for file_info in files:
             file_path_str = file_info.get("path", "")
@@ -492,7 +546,32 @@ class OpsviEcosystemGeneratorV2:
 
 
 def main():
-    generator = OpsviEcosystemGeneratorV2()
+    parser = argparse.ArgumentParser(description="OPSVI Ecosystem Generator v2")
+    parser.add_argument(
+        "--libs-dir",
+        dest="libs_dir",
+        default="libs",
+        help="Directory containing structure/templates (default: libs)",
+    )
+    parser.add_argument(
+        "--file-manifest",
+        dest="file_manifest",
+        default=None,
+        help="Optional YAML manifest defining extra low-level files to scaffold",
+    )
+    parser.add_argument(
+        "--no-touch-missing",
+        dest="touch_missing",
+        action="store_false",
+        help="Do not create stub files when templates are missing",
+    )
+    args = parser.parse_args()
+
+    generator = OpsviEcosystemGeneratorV2(
+        libs_dir=args.libs_dir,
+        file_manifest=args.file_manifest,
+        touch_missing=args.touch_missing,
+    )
     generator.generate_ecosystem()
     generator.validate_generation()
 

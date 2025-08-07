@@ -1,0 +1,90 @@
+library_types:
+  core:
+    files:
+      - path: "{{package_name}}/utils/helpers.py"
+        template: "utils_helpers_py"
+      - path: "tests/test_{{package_name}}.py"
+        template: "test_base_py"
+  service:
+    files:
+      - path: "{{package_name}}/providers/base.py"
+        template: "providers_base_py"
+      - path: "{{package_name}}/utils/helpers.py"
+        template: "utils_helpers_py"
+      - path: "tests/test_{{package_name}}.py"
+        template: "test_base_py"
+  rag:
+    files:
+      - path: "{{package_name}}/datastores/base.py"
+        template: "datastores_base.py.j2"
+      - path: "{{package_name}}/embeddings/providers.py"
+        template: "embeddings_providers.py.j2"
+      - path: "{{package_name}}/processors/base.py"
+        template: "processors_base.py.j2"
+      - path: "{{package_name}}/utils/helpers.py"
+        template: "utils_helpers_py"
+      - path: "tests/test_{{package_name}}.py"
+        template: "test_base_py"
+  manager:
+    files:
+      - path: "{{package_name}}/coordinators/base.py"
+        template: "coordinators_base.py.j2"
+      - path: "{{package_name}}/schedulers/base.py"
+        template: "schedulers_base.py.j2"
+      - path: "{{package_name}}/utils/helpers.py"
+        template: "utils_helpers_py"
+      - path: "tests/test_{{package_name}}.py"
+        template: "test_base_py"
+
+libraries:
+  opsvi-core:
+    files:
+      - path: "{{package_name}}/core/services.py"
+        template: "core_services_py"
+      - path: "{{package_name}}/events/base.py"
+        template: "events_base_py"
+  opsvi-llm:
+    files:
+      - path: "{{package_name}}/providers/openai.py"
+        template: "providers_openai_py"
+      - path: "{{package_name}}/prompts/manager.py"
+        template: "prompts_manager_py"
+  opsvi-http:
+    files:
+      - path: "{{package_name}}/client/base.py"
+        template: "client_base.py.j2"
+      - path: "{{package_name}}/server/base.py"
+        template: "server_base.py.j2"
+      - path: "{{package_name}}/auth/base.py"
+        template: "auth_base.py.j2"
+  opsvi-monitoring:
+    files:
+      - path: "{{package_name}}/metrics/base.py"
+        template: "monitoring_metrics_base.py.j2"
+      - path: "{{package_name}}/tracing/base.py"
+        template: "tracing_base.py.j2"
+  opsvi-security:
+    files:
+      - path: "{{package_name}}/crypto/base.py"
+        template: "security_crypto_base.py.j2"
+      - path: "{{package_name}}/audit/base.py"
+        template: "audit_base.py.j2"
+  opsvi-orchestration:
+    files:
+      - path: "{{package_name}}/workflows/base.py"
+        template: "orchestration_workflows_base.py.j2"
+      - path: "{{package_name}}/schedulers/base.py"
+        template: "schedulers_base.py.j2"
+  opsvi-deploy:
+    files:
+      - path: "{{package_name}}/infrastructure/base.py"
+        template: "deploy_infrastructure_base.py.j2"
+      - path: "{{package_name}}/environments/base.py"
+        template: "environments_base.py.j2"
+  opsvi-gateway:
+    files:
+      - path: "{{package_name}}/routers/base.py"
+        template: "gateway_routers_base.py.j2"
+      - path: "{{package_name}}/middleware/base.py"
+        template: "gateway_middleware_base.py.j2"
+

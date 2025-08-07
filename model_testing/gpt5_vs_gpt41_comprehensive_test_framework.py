@@ -25,6 +25,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import Any, IO
+from openai import OpenAI
 
 # =============================================================================
 # TEST CONFIGURATION
@@ -1761,6 +1762,17 @@ class ModelEvaluator:
     def __init__(self) -> None:
         self.results: dict[str, Any] = {}
         self.comparison_data: dict[str, Any] = {}
+        # OpenAI client (expects OPENAI_API_KEY in environment)
+        self.client: OpenAI = OpenAI()
+
+    @staticmethod
+    def _is_gpt5_model(model: str) -> bool:
+        return model.startswith("gpt-5")
+
+    @staticmethod
+    def _supports_temperature(model: str) -> bool:
+        # Per Responses API, some GPT-5 series snapshots may reject temperature
+        return not model.startswith("gpt-5")
 
     async def evaluate_model(
         self,
@@ -1774,42 +1786,44 @@ class ModelEvaluator:
         start_time = time.time()
 
         try:
-            # Import and use the actual consult agent tool
-            from mcp_agent_server import ConsultAgentTool
-
-            tool = ConsultAgentTool()
-
             # Prepare the prompt with dataset
+            if not isinstance(prompt, str):
+                if isinstance(prompt, list):
+                    prompt = "\n".join(str(x) for x in prompt)
+                elif isinstance(prompt, dict):
+                    prompt = json.dumps(prompt)
+                else:
+                    prompt = str(prompt)
             formatted_prompt = prompt.format(**dataset)
 
-            # Execute the test
-            result = await tool.execute(
-                {
-                    "prompt": formatted_prompt,
-                    "model": model,
-                    "iterate": GPT41_CONFIG["iterations"]
-                    if model.startswith("gpt-4.1")
-                    else GPT5_CONFIG["iterations"],
-                    "critic_enabled": GPT41_CONFIG["critic_enabled"]
-                    if model.startswith("gpt-4.1")
-                    else GPT5_CONFIG["critic_enabled"],
-                    "artifact_type": "code"
-                    if category == TestCategory.CODE_GENERATION
-                    else "answer",
-                }
-            )
+            # Execute using OpenAI Responses API
+            api_cfg = GPT5_CONFIG if model.startswith("gpt-5") else GPT41_CONFIG
+            create_kwargs: dict[str, Any] = {
+                "model": model,
+                "input": formatted_prompt,
+                "max_output_tokens": api_cfg.get("max_tokens", 4000),
+            }
+            if self._supports_temperature(model):
+                create_kwargs["temperature"] = api_cfg.get("temperature", 0.1)
+            resp = self.client.responses.create(**create_kwargs)
 
             execution_time = time.time() - start_time
 
-            # Extract response text
-            response_text = ""
-            if result and len(result) > 0:
-                response_text = result[0].text
+            # Extract response text and usage
+            response_text = getattr(resp, "output_text", "") or ""
+            usage = getattr(resp, "usage", None)
+            token_count = 0
+            if usage is not None:
+                token_count = int(getattr(usage, "input_tokens", 0)) + int(
+                    getattr(usage, "output_tokens", 0)
+                )
 
             # Calculate metrics
             metrics = self._calculate_metrics(
                 response_text, dataset, category, execution_time
             )
+            # Overwrite token_count if available
+            metrics.token_count = token_count
 
             return metrics
 
@@ -1841,49 +1855,56 @@ class ModelEvaluator:
         start_time = time.time()
 
         try:
-            # Import and use the actual consult agent tool
-            from mcp_agent_server import ConsultAgentTool
-
-            tool = ConsultAgentTool()
-
             # Prepare the prompt with dataset
+            if not isinstance(prompt, str):
+                if isinstance(prompt, list):
+                    prompt = "\n".join(str(x) for x in prompt)
+                elif isinstance(prompt, dict):
+                    prompt = json.dumps(prompt)
+                else:
+                    prompt = str(prompt)
             formatted_prompt = prompt.format(**dataset)
 
             # Get reasoning effort configuration
             reasoning_config = GPT5_REASONING_CONFIGS[effort_level]
 
-            # Execute the test with specific reasoning effort
-            result = await tool.execute(
-                {
-                    "prompt": formatted_prompt,
-                    "model": model,
-                    "iterate": reasoning_config["iterations"],
-                    "critic_enabled": reasoning_config["critic_enabled"],
-                    "artifact_type": "code"
-                    if category
-                    in [
-                        TestCategory.CODE_GENERATION,
-                        TestCategory.CODING_REASONING,
-                        TestCategory.ALGORITHM_DESIGN,
-                        TestCategory.CODE_OPTIMIZATION,
-                    ]
-                    else "answer",
-                    "reasoning_effort": reasoning_config["reasoning_effort"],
-                    "verbosity": reasoning_config["verbosity"],
+            # Execute using OpenAI Responses API with reasoning config
+            create_kwargs: dict[str, Any] = {
+                "model": model,
+                "input": formatted_prompt,
+                "max_output_tokens": reasoning_config.get("max_tokens", 4000),
+            }
+            # For GPT-5, send reasoning if supported; otherwise omit
+            if self._is_gpt5_model(model):
+                create_kwargs["reasoning"] = {
+                    "effort": reasoning_config.get("reasoning_effort", "medium")
                 }
-            )
+            if self._supports_temperature(model):
+                create_kwargs["temperature"] = reasoning_config.get("temperature", 0.1)
+            try:
+                resp = self.client.responses.create(**create_kwargs)
+            except Exception:
+                # Retry without temperature/reasoning if rejected
+                create_kwargs.pop("temperature", None)
+                create_kwargs.pop("reasoning", None)
+                resp = self.client.responses.create(**create_kwargs)
 
             execution_time = time.time() - start_time
 
-            # Extract response text
-            response_text = ""
-            if result and len(result) > 0:
-                response_text = result[0].text
+            # Extract response text and usage
+            response_text = getattr(resp, "output_text", "") or ""
+            usage = getattr(resp, "usage", None)
+            token_count = 0
+            if usage is not None:
+                token_count = int(getattr(usage, "input_tokens", 0)) + int(
+                    getattr(usage, "output_tokens", 0)
+                )
 
             # Calculate metrics
             metrics = self._calculate_metrics(
                 response_text, dataset, category, execution_time
             )
+            metrics.token_count = token_count
 
             return metrics
 
@@ -1955,6 +1976,30 @@ class ModelEvaluator:
             structure_quality = self._evaluate_structure_quality(response)
             completeness = self._evaluate_completeness(response, dataset)
             accuracy = self._evaluate_accuracy(response, dataset)
+
+        elif category in (
+            TestCategory.CODING_REASONING,
+            TestCategory.ALGORITHM_DESIGN,
+            TestCategory.CODE_OPTIMIZATION,
+        ):
+            # Treat coding-focused categories like code generation
+            functional_correctness = self._evaluate_code_correctness(response, dataset)
+            code_quality = self._evaluate_code_quality(response)
+            reasoning_quality = self._evaluate_reasoning_quality(response)
+            creativity_score = self._evaluate_creativity(response)
+            structure_quality = self._evaluate_structure_quality(response)
+            completeness = self._evaluate_completeness(response, dataset)
+            accuracy = 0.0
+
+        else:
+            # Fallback: assign conservative defaults to avoid unbound locals
+            functional_correctness = 0.0
+            code_quality = 0.0
+            reasoning_quality = self._evaluate_reasoning_quality(response)
+            creativity_score = 0.0
+            structure_quality = self._evaluate_structure_quality(response)
+            completeness = self._evaluate_completeness(response, dataset)
+            accuracy = 0.0
 
         return EvaluationMetrics(
             execution_time=execution_time,
@@ -2330,8 +2375,8 @@ class ComprehensiveTestRunner:
         category_results: dict[str, Any] = {"tests": {}, "summary": {}}
 
         # Get tests for this category
-        gpt5_tests = GPT5_OPTIMIZED_PROMPTS[category]
-        datasets = TEST_DATASETS[category]
+        gpt5_tests = GPT5_OPTIMIZED_PROMPTS.get(category) or {}
+        datasets = TEST_DATASETS.get(category) or {}
 
         for test_name in gpt5_tests.keys():
             if test_name in datasets:
@@ -2528,9 +2573,9 @@ class ComprehensiveTestRunner:
         category_results: dict[str, Any] = {"tests": {}, "summary": {}}
 
         # Get tests for this category
-        gpt41_tests = GPT41_OPTIMIZED_PROMPTS[category]
-        gpt5_tests = GPT5_OPTIMIZED_PROMPTS[category]
-        datasets = TEST_DATASETS[category]
+        gpt41_tests = GPT41_OPTIMIZED_PROMPTS.get(category) or {}
+        gpt5_tests = GPT5_OPTIMIZED_PROMPTS.get(category) or {}
+        datasets = TEST_DATASETS.get(category) or {}
 
         for test_name in gpt41_tests.keys():
             if test_name in datasets and test_name in gpt5_tests:
