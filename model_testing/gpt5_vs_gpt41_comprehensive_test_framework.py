@@ -23,7 +23,7 @@ import statistics
 import time
 import logging
 from logging import Logger
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from datetime import datetime
 from enum import Enum
 from typing import Any, IO, Dict
@@ -61,6 +61,78 @@ LOGGER: Logger = _setup_logger()
 def get_log_file_path() -> str:
     """Expose the absolute path of the debug log file for callers (e.g., runner)."""
     return LOG_FILE_PATH
+
+
+def _preview(text: str, limit: int = 800) -> str:
+    """Return a safe, truncated preview of large text blobs for logging."""
+    if text is None:
+        return ""
+    text = str(text)
+    if len(text) <= limit:
+        return text
+    return text[:limit] + f"... [truncated {len(text) - limit} chars]"
+
+
+def _sanitize_create_kwargs(kwargs: dict[str, Any]) -> dict[str, Any]:
+    """Remove large or sensitive fields and keep a compact view for logs."""
+    sanitized: dict[str, Any] = {
+        "model": kwargs.get("model"),
+        "max_output_tokens": kwargs.get("max_output_tokens"),
+        "has_temperature": "temperature" in kwargs,
+        "has_reasoning": "reasoning" in kwargs,
+    }
+    if "reasoning" in kwargs and isinstance(kwargs["reasoning"], dict):
+        sanitized["reasoning_effort"] = kwargs["reasoning"].get("effort")
+    return sanitized
+
+
+_QUOTED_FIELD_PATTERN = re.compile(r"\{\s*(['\"])?(?P<key>[A-Za-z0-9_]+)(['\"])??\s*\}")
+
+
+def _normalize_placeholders(prompt_text: str) -> str:
+    """Normalize placeholders like {'key'} or {"key"} to {key} for str.format.
+
+    This prevents KeyError: "'key'" when prompts include quoted placeholders.
+    """
+    def _repl(match: re.Match) -> str:
+        key = match.group('key') or ''
+        return '{' + key + '}'
+
+    return _QUOTED_FIELD_PATTERN.sub(_repl, prompt_text)
+
+
+def _extract_text_from_response(resp: Any) -> str:
+    """Robustly extract text from a Responses API result.
+
+    Falls back to traversing the output structure if output_text is empty.
+    """
+    text = getattr(resp, "output_text", None)
+    if text:
+        return text
+    # Fallback: traverse dict representation
+    try:
+        data = resp.model_dump()
+    except Exception:
+        try:
+            # As a last resort, to_dict style
+            data = getattr(resp, "to_dict", lambda: {})()
+        except Exception:
+            data = {}
+    pieces: list[str] = []
+    output = data.get("output") or []
+    for item in output:
+        if item.get("type") == "message":
+            for c in item.get("content") or []:
+                ctype = c.get("type")
+                if ctype in ("output_text", "text"):
+                    # Some SDKs use {"text": {"value": "..."}}
+                    if isinstance(c.get("text"), dict):
+                        val = c.get("text", {}).get("value")
+                    else:
+                        val = c.get("text")
+                    if val:
+                        pieces.append(str(val))
+    return "\n".join(pieces)
 
 
 class TestCategory(Enum):
@@ -1795,8 +1867,12 @@ class ModelEvaluator:
         self.comparison_data: dict[str, Any] = {}
         # OpenAI client (expects OPENAI_API_KEY in environment)
         self.client: OpenAI = OpenAI()
-        LOGGER.debug("Initialized ModelEvaluator with OpenAI client. Env set: OPENAI_API_KEY=%s, ORG=%s, PROJECT=%s",
-                     bool(os.environ.get("OPENAI_API_KEY")), os.environ.get("OPENAI_ORG_ID"), os.environ.get("OPENAI_PROJECT_ID"))
+        LOGGER.debug(
+            "Initialized ModelEvaluator with OpenAI client. Env set: OPENAI_API_KEY=%s, ORG=%s, PROJECT=%s",
+            bool(os.environ.get("OPENAI_API_KEY")),
+            os.environ.get("OPENAI_ORG_ID"),
+            os.environ.get("OPENAI_PROJECT_ID"),
+        )
 
     @staticmethod
     def _is_gpt5_model(model: str) -> bool:
@@ -1827,7 +1903,9 @@ class ModelEvaluator:
                     prompt = json.dumps(prompt)
                 else:
                     prompt = str(prompt)
-            formatted_prompt = prompt.format(**dataset)
+            # Normalize quoted placeholders before formatting to avoid KeyError: "'key'"
+            normalized_prompt = _normalize_placeholders(prompt)
+            formatted_prompt = normalized_prompt.format(**dataset)
 
             api_cfg = GPT5_CONFIG if model.startswith("gpt-5") else GPT41_CONFIG
             LOGGER.debug(
@@ -1838,6 +1916,8 @@ class ModelEvaluator:
                 len(formatted_prompt),
                 api_cfg.get("api_type"),
             )
+            LOGGER.debug("Prompt preview: %s", _preview(formatted_prompt))
+            LOGGER.debug("Dataset keys: %s", sorted(list(dataset.keys())))
 
             # Execute using OpenAI Responses API
             create_kwargs: dict[str, Any] = {
@@ -1848,13 +1928,19 @@ class ModelEvaluator:
             if self._supports_temperature(model):
                 create_kwargs["temperature"] = api_cfg.get("temperature", 0.1)
             else:
-                LOGGER.debug("Omitting temperature for model=%s due to API support.", model)
+                LOGGER.debug(
+                    "Omitting temperature for model=%s due to API support.", model
+                )
             # Add reasoning for GPT-5 if available
             if self._is_gpt5_model(model):
                 reasoning_effort = api_cfg.get("reasoning_effort")
                 if reasoning_effort:
                     create_kwargs["reasoning"] = {"effort": reasoning_effort}
                 LOGGER.debug("GPT-5 params set | reasoning_effort=%s", reasoning_effort)
+
+            LOGGER.debug(
+                "Create kwargs: %s", json.dumps(_sanitize_create_kwargs(create_kwargs))
+            )
 
             try:
                 resp = self.client.responses.create(**create_kwargs)
@@ -1867,23 +1953,30 @@ class ModelEvaluator:
                 create_kwargs.pop("temperature", None)
                 create_kwargs.pop("reasoning", None)
                 create_kwargs.pop("verbosity", None)
+                LOGGER.debug(
+                    "Create kwargs (retry): %s",
+                    json.dumps(_sanitize_create_kwargs(create_kwargs)),
+                )
                 resp = self.client.responses.create(**create_kwargs)
 
             execution_time = time.time() - start_time
 
             # Extract response text and usage
-            response_text = getattr(resp, "output_text", "") or ""
+            response_text = _extract_text_from_response(resp)
             usage = getattr(resp, "usage", None)
+            resp_id = getattr(resp, "id", None)
+            LOGGER.debug("Response preview: %s", _preview(response_text))
             token_count = 0
             if usage is not None:
                 token_count = int(getattr(usage, "input_tokens", 0)) + int(
                     getattr(usage, "output_tokens", 0)
                 )
             LOGGER.debug(
-                "Model=%s completed | exec_time=%.2fs | tokens=%s",
+                "Model=%s completed | exec_time=%.2fs | tokens=%s | response_id=%s",
                 model,
                 execution_time,
                 token_count,
+                resp_id,
             )
 
             # Calculate metrics
@@ -1892,11 +1985,18 @@ class ModelEvaluator:
             )
             # Overwrite token_count if available
             metrics.token_count = token_count
+            LOGGER.debug("Metrics: %s", json.dumps(asdict(metrics)))
 
             return metrics
 
         except Exception as e:
-            LOGGER.exception("Error evaluating model=%s | test=%s: %s", model, test_name, e)
+            LOGGER.exception(
+                "Error evaluating model=%s | test=%s: %s | prompt_preview=%s",
+                model,
+                test_name,
+                e,
+                _preview(prompt),
+            )
             return EvaluationMetrics(
                 execution_time=time.time() - start_time,
                 token_count=0,
@@ -1931,7 +2031,8 @@ class ModelEvaluator:
                     prompt = json.dumps(prompt)
                 else:
                     prompt = str(prompt)
-            formatted_prompt = prompt.format(**dataset)
+            normalized_prompt = _normalize_placeholders(prompt)
+            formatted_prompt = normalized_prompt.format(**dataset)
 
             # Get reasoning effort configuration
             reasoning_config = GPT5_REASONING_CONFIGS[effort_level]
@@ -1943,6 +2044,8 @@ class ModelEvaluator:
                 test_name,
                 len(formatted_prompt),
             )
+            LOGGER.debug("Prompt preview: %s", _preview(formatted_prompt))
+            LOGGER.debug("Dataset keys: %s", sorted(list(dataset.keys())))
 
             # Execute using OpenAI Responses API with reasoning config
             create_kwargs: dict[str, Any] = {
@@ -1958,32 +2061,47 @@ class ModelEvaluator:
             if self._supports_temperature(model):
                 create_kwargs["temperature"] = reasoning_config.get("temperature", 0.1)
             else:
-                LOGGER.debug("Omitting temperature for model=%s due to API support.", model)
+                LOGGER.debug(
+                    "Omitting temperature for model=%s due to API support.", model
+                )
+            LOGGER.debug(
+                "Create kwargs: %s", json.dumps(_sanitize_create_kwargs(create_kwargs))
+            )
             try:
                 resp = self.client.responses.create(**create_kwargs)
             except Exception:
                 # Retry without temperature/reasoning if rejected
-                LOGGER.warning("Initial call rejected for model=%s, retrying without temperature/reasoning...", model)
+                LOGGER.warning(
+                    "Initial call rejected for model=%s, retrying without temperature/reasoning...",
+                    model,
+                )
                 create_kwargs.pop("temperature", None)
                 create_kwargs.pop("reasoning", None)
+                LOGGER.debug(
+                    "Create kwargs (retry): %s",
+                    json.dumps(_sanitize_create_kwargs(create_kwargs)),
+                )
                 resp = self.client.responses.create(**create_kwargs)
 
             execution_time = time.time() - start_time
 
             # Extract response text and usage
-            response_text = getattr(resp, "output_text", "") or ""
+            response_text = _extract_text_from_response(resp)
             usage = getattr(resp, "usage", None)
+            resp_id = getattr(resp, "id", None)
+            LOGGER.debug("Response preview: %s", _preview(response_text))
             token_count = 0
             if usage is not None:
                 token_count = int(getattr(usage, "input_tokens", 0)) + int(
                     getattr(usage, "output_tokens", 0)
                 )
             LOGGER.debug(
-                "Model=%s effort=%s completed | exec_time=%.2fs | tokens=%s",
+                "Model=%s effort=%s completed | exec_time=%.2fs | tokens=%s | response_id=%s",
                 model,
                 effort_level.value,
                 execution_time,
                 token_count,
+                resp_id,
             )
 
             # Calculate metrics
@@ -1991,6 +2109,7 @@ class ModelEvaluator:
                 response_text, dataset, category, execution_time
             )
             metrics.token_count = token_count
+            LOGGER.debug("Metrics: %s", json.dumps(asdict(metrics)))
 
             return metrics
 
@@ -2670,6 +2789,7 @@ class ComprehensiveTestRunner:
         for test_name in gpt41_tests.keys():
             if test_name in datasets and test_name in gpt5_tests:
                 print(f"    🧪 Running {test_name}")
+                LOGGER.debug("Running category=%s test=%s | dataset_keys=%s", category.value, test_name, list(datasets[test_name][0].keys()) if datasets.get(test_name) else [])
 
                 # Test GPT-4.1 model with GPT-4.1 optimized prompt
                 gpt41_metrics = await self.evaluator.evaluate_model(
@@ -2843,7 +2963,9 @@ class ComprehensiveTestRunner:
     def _generate_comprehensive_report(self, total_time: float) -> dict[str, Any]:
         """Generate comprehensive comparison report."""
         print("\n📊 Generating comprehensive report...")
-        LOGGER.debug("Generating comprehensive report with total_time=%.2fs", total_time)
+        LOGGER.debug(
+            "Generating comprehensive report with total_time=%.2fs", total_time
+        )
 
         # Calculate overall statistics
         all_improvements = []
@@ -2908,13 +3030,17 @@ class ComprehensiveTestRunner:
         os.makedirs(results_dir, exist_ok=True)
 
         # Save detailed JSON results
-        json_path = os.path.join(results_dir, "comprehensive_gpt5_vs_gpt41_results.json")
+        json_path = os.path.join(
+            results_dir, "comprehensive_gpt5_vs_gpt41_results.json"
+        )
         with open(json_path, "w") as f:
             json.dump(report, f, indent=2, default=str)
         LOGGER.debug("Updated file: %s", json_path)
 
         # Save markdown report
-        md_report_path = os.path.join(results_dir, "comprehensive_gpt5_vs_gpt41_report.md")
+        md_report_path = os.path.join(
+            results_dir, "comprehensive_gpt5_vs_gpt41_report.md"
+        )
         with open(md_report_path, "w") as f:
             self._generate_markdown_report(report, f)
         LOGGER.debug("Updated file: %s", md_report_path)

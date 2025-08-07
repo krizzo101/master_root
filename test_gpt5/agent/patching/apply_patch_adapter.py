@@ -54,8 +54,41 @@ def apply_patch_text(repo_root: str, patch_text: str) -> str:
         if p.exists():
             p.unlink()
 
+    # Normalize Add File sections: ensure '+' prefix per line
+    normalized_text = _normalize_patch_add_file_sections(patch_text)
     try:
-        result = cookbook.process_patch(patch_text, open_fn, write_fn, remove_fn)
+        result = cookbook.process_patch(normalized_text, open_fn, write_fn, remove_fn)
         return str(result)
     except Exception as e:
         raise PatchApplyError(str(e)) from None
+
+
+def _normalize_patch_add_file_sections(text: str) -> str:
+    """Ensure every line in an '*** Add File:' section starts with '+'."""
+    lines = text.split("\n")
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        out.append(line)
+        i += 1
+        if line.startswith("*** Add File: "):
+            # Convert subsequent lines until next section marker
+            while i < len(lines):
+                nxt = lines[i]
+                if nxt.startswith(
+                    (
+                        "*** End Patch",
+                        "*** Update File:",
+                        "*** Delete File:",
+                        "*** Add File:",
+                    )
+                ):
+                    break
+                if not nxt.startswith("+"):
+                    out.append("+" + nxt)
+                else:
+                    out.append(nxt)
+                i += 1
+            # Do not skip the marker line; loop will append it next
+    return "\n".join(out)
