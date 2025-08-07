@@ -2980,6 +2980,8 @@ class ComprehensiveTestRunner:
                 "average_improvement": 0.0,
                 "median_improvement": 0.0,
                 "std_improvement": 0.0,
+                "best_improvement": 0.0,
+                "worst_improvement": 0.0,
             }
 
         return {
@@ -3003,6 +3005,8 @@ class ComprehensiveTestRunner:
             "average_improvement": 0.0,
             "median_improvement": 0.0,
             "std_improvement": 0.0,
+            "best_improvement": 0.0,
+            "worst_improvement": 0.0,
         }
 
     def _generate_comprehensive_report(self, total_time: float) -> dict[str, Any]:

@@ -33,12 +33,14 @@ def _read_repo_hint(repo_root: str, max_chars: int = 5000) -> str:
     return joined[:max_chars]
 
 
-def build_app(spec: str, out_dir: str, reasoning_effort: str) -> None:
+def build_app(
+    spec: str, out_dir: str, reasoning_effort: str, package_name: str = "pycalc"
+) -> None:
     logging.info("[build-app] Starting app generation")
     Path(out_dir).mkdir(parents=True, exist_ok=True)
     client = OpenAIClient(reasoning_effort=reasoning_effort)
     logging.info("[build-app] Requesting patch from model (full-from-spec)")
-    messages = build_messages_full_from_spec(spec)
+    messages = build_messages_full_from_spec(spec, package_name)
     patch_text = run_tool_orchestrated(client, messages)
     if not patch_text.strip().startswith("*** Begin Patch"):
         raise RuntimeError("Model did not return a patch.")
@@ -52,8 +54,8 @@ def build_app(spec: str, out_dir: str, reasoning_effort: str) -> None:
         readme = readme_path.read_text(errors="ignore")
         expected_pkg = None
         for line in readme.splitlines():
-            if line.strip().startswith("- pycalc/"):
-                expected_pkg = "pycalc"
+            if line.strip().startswith(f"- {package_name}/"):
+                expected_pkg = package_name
                 break
         if expected_pkg and not (Path(out_dir) / expected_pkg).exists():
             logging.info(
@@ -65,7 +67,12 @@ def build_app(spec: str, out_dir: str, reasoning_effort: str) -> None:
                 sorted([str(p.relative_to(out_dir)) for p in Path(out_dir).rglob("*")])
             )
             client = OpenAIClient(reasoning_effort=reasoning_effort)
-            fill_messages = build_messages_to_fill_missing(readme, tree)
+            suggested = (
+                f"pyproject.toml\n{package_name}/__init__.py\n{package_name}/__main__.py\n"
+                f"{package_name}/cli.py\n{package_name}/ast_eval.py\n{package_name}/operations.py\n"
+                f"{package_name}/history.py\ntests/test_{package_name}.py\n"
+            )
+            fill_messages = build_messages_to_fill_missing(readme, tree, package_name, suggested)
             follow_patch = run_tool_orchestrated(client, fill_messages)
             if follow_patch.strip().startswith("*** Begin Patch"):
                 logging.info(

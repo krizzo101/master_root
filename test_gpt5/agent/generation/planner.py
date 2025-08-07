@@ -123,7 +123,7 @@ def _apply_patch_safe(args: dict[str, Any]) -> dict[str, Any]:
         return {"error": str(e)}
 
 
-def build_messages_for_build_app(spec: str) -> list[dict[str, Any]]:
+def build_messages_for_build_app(spec: str, package_name: str) -> list[dict[str, Any]]:
     return [
         {
             "role": "developer",
@@ -131,7 +131,9 @@ def build_messages_for_build_app(spec: str) -> list[dict[str, Any]]:
                 "You are a senior software engineer. Generate a complete, runnable application.\n"
                 "Requirements:\n"
                 "- Create ALL source files and tests required to run the app end-to-end.\n"
-                "- Include a Python package directory with __init__.py and, if CLI, __main__.py.\n"
+                "- Include a Python package directory named '"
+                + package_name
+                + "' with __init__.py and, if CLI, __main__.py.\n"
                 "- Provide modules, CLI entrypoint, and basic tests.\n"
                 "- If any file is large, split into smaller modules.\n"
                 "Output policy:\n"
@@ -167,7 +169,10 @@ def build_messages_for_patch_repo(
 
 
 def build_messages_to_fill_missing(
-    readme_text: str, existing_tree: str
+    readme_text: str,
+    existing_tree: str,
+    package_name: str,
+    suggested_files: str | None = None,
 ) -> list[dict[str, Any]]:
     return [
         {
@@ -175,6 +180,7 @@ def build_messages_to_fill_missing(
             "content": (
                 "Add ALL missing source files and tests so the project is runnable.\n"
                 "- Use the README as the spec.\n"
+                "- The package directory MUST be named '" + package_name + "'.\n"
                 "- Do NOT delete or overwrite existing files unless necessary.\n"
                 "- Output ONLY a cookbook patch format between *** Begin Patch and *** End Patch.\n"
                 "- All file paths MUST be relative to the target output directory (do NOT prefix with the output folder).\n"
@@ -188,6 +194,7 @@ def build_messages_to_fill_missing(
                 + readme_text[:8000]
                 + "\n\nExisting file tree:\n"
                 + existing_tree[:4000]
+                + ("\n\nSUGGESTED FILES (must be created if missing):\n" + suggested_files if suggested_files else "")
             ),
         },
     ]
@@ -199,14 +206,16 @@ def run_tool_orchestrated(client: OpenAIClient, messages: list[dict[str, Any]]) 
     return final_text
 
 
-def build_messages_full_from_spec(spec: str) -> list[dict[str, Any]]:
+def build_messages_full_from_spec(spec: str, package_name: str) -> list[dict[str, Any]]:
     return [
         {
             "role": "developer",
             "content": (
                 "Create a complete, runnable application from this spec.\n"
                 "- Output ONLY a cookbook patch between *** Begin Patch and *** End Patch.\n"
-                "- Include ALL files: package dir with __init__.py (and __main__.py if CLI), modules, tests, and an updated pyproject.toml.\n"
+                "- Include ALL files: package dir named '"
+                + package_name
+                + "' with __init__.py (and __main__.py if CLI), modules, tests, and an updated pyproject.toml.\n"
                 "- All file paths MUST be relative to the target output directory (do NOT prefix with the output folder).\n"
             ),
         },
