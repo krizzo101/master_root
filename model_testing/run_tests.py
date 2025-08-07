@@ -22,12 +22,14 @@ from gpt5_vs_gpt41_comprehensive_test_framework import (
     ComprehensiveTestRunner,
     ReasoningEffort,
     TestCategory,
+    get_log_file_path,
 )
 
 
 async def run_quick_tests() -> dict:
     """Run a quick subset of tests for rapid evaluation."""
     print("🚀 Running Quick Tests (GPT-5 vs GPT-4.1 Mini only)")
+    print(f"📝 Debug log: {get_log_file_path()}")
 
     # Create a modified runner for quick tests
     runner = ComprehensiveTestRunner()
@@ -47,6 +49,7 @@ async def run_quick_tests() -> dict:
     # Generate and save report
     report = runner._generate_comprehensive_report(0)  # Time will be calculated
     runner._save_results(report)
+    print(f"📝 Files updated under: {__file__.rsplit('/', 1)[0]}/results/")
 
     return report
 
@@ -54,6 +57,7 @@ async def run_quick_tests() -> dict:
 async def run_reasoning_effort_tests() -> dict:
     """Run only the reasoning effort tests for GPT-5."""
     print("🧠 Running GPT-5 Reasoning Effort Tests Only")
+    print(f"📝 Debug log: {get_log_file_path()}")
 
     runner = ComprehensiveTestRunner()
     reasoning_results = await runner._test_gpt5_reasoning_efforts()
@@ -86,12 +90,14 @@ async def run_reasoning_effort_tests() -> dict:
     }
 
     runner._save_results(report)
+    print(f"📝 Files updated under: {__file__.rsplit('/', 1)[0]}/results/")
     return report
 
 
 async def run_full_tests() -> dict:
     """Run the complete comprehensive testing framework."""
     print("🚀 Running Full Comprehensive Tests")
+    print(f"📝 Debug log: {get_log_file_path()}")
 
     runner = ComprehensiveTestRunner()
     report = await runner.run_comprehensive_tests()
@@ -133,6 +139,7 @@ def main() -> dict:
 
     print(f"\n✅ Testing completed successfully!")
     print(f"📊 Results saved to: results/")
+    print(f"📝 Debug log file: {get_log_file_path()}")
 
     return report
 

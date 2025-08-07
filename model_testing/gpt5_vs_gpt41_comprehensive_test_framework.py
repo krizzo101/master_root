@@ -21,15 +21,46 @@ import os
 import re
 import statistics
 import time
+import logging
+from logging import Logger
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Any, IO
+from typing import Any, IO, Dict
 from openai import OpenAI
 
 # =============================================================================
 # TEST CONFIGURATION
 # =============================================================================
+
+# Centralized debug logger setup
+BASE_DIR = os.path.dirname(__file__)
+RESULTS_DIR = os.path.join(BASE_DIR, "results")
+LOG_FILE_PATH = os.path.join(RESULTS_DIR, "test_run.log")
+
+
+def _setup_logger() -> Logger:
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+    logger = logging.getLogger("model_testing")
+    if not logger.handlers:
+        logger.setLevel(logging.DEBUG)
+        file_handler = logging.FileHandler(LOG_FILE_PATH, encoding="utf-8")
+        file_handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(
+            fmt="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+    return logger
+
+
+LOGGER: Logger = _setup_logger()
+
+
+def get_log_file_path() -> str:
+    """Expose the absolute path of the debug log file for callers (e.g., runner)."""
+    return LOG_FILE_PATH
 
 
 class TestCategory(Enum):
@@ -1764,6 +1795,8 @@ class ModelEvaluator:
         self.comparison_data: dict[str, Any] = {}
         # OpenAI client (expects OPENAI_API_KEY in environment)
         self.client: OpenAI = OpenAI()
+        LOGGER.debug("Initialized ModelEvaluator with OpenAI client. Env set: OPENAI_API_KEY=%s, ORG=%s, PROJECT=%s",
+                     bool(os.environ.get("OPENAI_API_KEY")), os.environ.get("OPENAI_ORG_ID"), os.environ.get("OPENAI_PROJECT_ID"))
 
     @staticmethod
     def _is_gpt5_model(model: str) -> bool:
@@ -1796,8 +1829,17 @@ class ModelEvaluator:
                     prompt = str(prompt)
             formatted_prompt = prompt.format(**dataset)
 
-            # Execute using OpenAI Responses API
             api_cfg = GPT5_CONFIG if model.startswith("gpt-5") else GPT41_CONFIG
+            LOGGER.debug(
+                "Evaluating model=%s | category=%s | test=%s | prompt_chars=%d | api_type=%s",
+                model,
+                category.value,
+                test_name,
+                len(formatted_prompt),
+                api_cfg.get("api_type"),
+            )
+
+            # Execute using OpenAI Responses API
             create_kwargs: dict[str, Any] = {
                 "model": model,
                 "input": formatted_prompt,
@@ -1805,6 +1847,17 @@ class ModelEvaluator:
             }
             if self._supports_temperature(model):
                 create_kwargs["temperature"] = api_cfg.get("temperature", 0.1)
+            else:
+                LOGGER.debug("Omitting temperature for model=%s due to API support.", model)
+            # Add reasoning/verbosity for GPT-5 if available
+            if self._is_gpt5_model(model):
+                reasoning_effort = api_cfg.get("reasoning_effort")
+                verbosity = api_cfg.get("verbosity")
+                if reasoning_effort:
+                    create_kwargs["reasoning"] = {"effort": reasoning_effort}
+                if verbosity:
+                    create_kwargs["verbosity"] = verbosity
+                LOGGER.debug("GPT-5 params set | reasoning_effort=%s | verbosity=%s", reasoning_effort, verbosity)
             resp = self.client.responses.create(**create_kwargs)
 
             execution_time = time.time() - start_time
@@ -1817,6 +1870,12 @@ class ModelEvaluator:
                 token_count = int(getattr(usage, "input_tokens", 0)) + int(
                     getattr(usage, "output_tokens", 0)
                 )
+            LOGGER.debug(
+                "Model=%s completed | exec_time=%.2fs | tokens=%s",
+                model,
+                execution_time,
+                token_count,
+            )
 
             # Calculate metrics
             metrics = self._calculate_metrics(
@@ -1828,7 +1887,7 @@ class ModelEvaluator:
             return metrics
 
         except Exception as e:
-            print(f"Error evaluating {model} on {test_name}: {e}")
+            LOGGER.exception("Error evaluating model=%s | test=%s: %s", model, test_name, e)
             return EvaluationMetrics(
                 execution_time=time.time() - start_time,
                 token_count=0,
@@ -1867,6 +1926,14 @@ class ModelEvaluator:
 
             # Get reasoning effort configuration
             reasoning_config = GPT5_REASONING_CONFIGS[effort_level]
+            LOGGER.debug(
+                "Evaluating GPT-5 with reasoning | model=%s | effort=%s | category=%s | test=%s | prompt_chars=%d",
+                model,
+                effort_level.value,
+                category.value,
+                test_name,
+                len(formatted_prompt),
+            )
 
             # Execute using OpenAI Responses API with reasoning config
             create_kwargs: dict[str, Any] = {
@@ -1881,10 +1948,13 @@ class ModelEvaluator:
                 }
             if self._supports_temperature(model):
                 create_kwargs["temperature"] = reasoning_config.get("temperature", 0.1)
+            else:
+                LOGGER.debug("Omitting temperature for model=%s due to API support.", model)
             try:
                 resp = self.client.responses.create(**create_kwargs)
             except Exception:
                 # Retry without temperature/reasoning if rejected
+                LOGGER.warning("Initial call rejected for model=%s, retrying without temperature/reasoning...", model)
                 create_kwargs.pop("temperature", None)
                 create_kwargs.pop("reasoning", None)
                 resp = self.client.responses.create(**create_kwargs)
@@ -1899,6 +1969,13 @@ class ModelEvaluator:
                 token_count = int(getattr(usage, "input_tokens", 0)) + int(
                     getattr(usage, "output_tokens", 0)
                 )
+            LOGGER.debug(
+                "Model=%s effort=%s completed | exec_time=%.2fs | tokens=%s",
+                model,
+                effort_level.value,
+                execution_time,
+                token_count,
+            )
 
             # Calculate metrics
             metrics = self._calculate_metrics(
@@ -1909,8 +1986,12 @@ class ModelEvaluator:
             return metrics
 
         except Exception as e:
-            print(
-                f"Error evaluating {model} on {test_name} with {effort_level.value} reasoning: {e}"
+            LOGGER.exception(
+                "Error in reasoning-effort eval | model=%s | effort=%s | test=%s: %s",
+                model,
+                effort_level.value,
+                test_name,
+                e,
             )
             return EvaluationMetrics(
                 execution_time=time.time() - start_time,
@@ -2753,6 +2834,7 @@ class ComprehensiveTestRunner:
     def _generate_comprehensive_report(self, total_time: float) -> dict[str, Any]:
         """Generate comprehensive comparison report."""
         print("\n📊 Generating comprehensive report...")
+        LOGGER.debug("Generating comprehensive report with total_time=%.2fs", total_time)
 
         # Calculate overall statistics
         all_improvements = []
@@ -2817,25 +2899,24 @@ class ComprehensiveTestRunner:
         os.makedirs(results_dir, exist_ok=True)
 
         # Save detailed JSON results
-        with open(
-            os.path.join(results_dir, "comprehensive_gpt5_vs_gpt41_results.json"), "w"
-        ) as f:
+        json_path = os.path.join(results_dir, "comprehensive_gpt5_vs_gpt41_results.json")
+        with open(json_path, "w") as f:
             json.dump(report, f, indent=2, default=str)
+        LOGGER.debug("Updated file: %s", json_path)
 
         # Save markdown report
-        with open(
-            os.path.join(results_dir, "comprehensive_gpt5_vs_gpt41_report.md"), "w"
-        ) as f:
+        md_report_path = os.path.join(results_dir, "comprehensive_gpt5_vs_gpt41_report.md")
+        with open(md_report_path, "w") as f:
             self._generate_markdown_report(report, f)
+        LOGGER.debug("Updated file: %s", md_report_path)
 
         # Save executive summary
-        with open(
-            os.path.join(
-                results_dir, "comprehensive_gpt5_vs_gpt41_executive_summary.md"
-            ),
-            "w",
-        ) as f:
+        summary_path = os.path.join(
+            results_dir, "comprehensive_gpt5_vs_gpt41_executive_summary.md"
+        )
+        with open(summary_path, "w") as f:
             self._generate_executive_summary(report, f)
+        LOGGER.debug("Updated file: %s", summary_path)
 
         print("✅ Results saved to:")
         print(
