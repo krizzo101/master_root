@@ -29,7 +29,11 @@ import json
 import os
 import time
 from dataclasses import dataclass, asdict
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
+import re
+import random
+import math
+import ast
 
 from openai import AsyncOpenAI
 
@@ -87,6 +91,14 @@ class EvalConfig:
     log_file: str
     results_dir: str
     quick: bool
+    variants: List[str]
+    reasoning_levels: List[str]
+    verbosity_levels: List[str]
+    turns_mode: str  # one|two|both
+    save_raw: bool
+    validate_python: bool
+    system_prefix: Optional[str]
+    max_output_tokens: Optional[int]
 
 
 @dataclass
@@ -103,6 +115,12 @@ class EvalResult:
     empty_output: bool
     had_retry: bool
     output_preview: str
+    raw_path: Optional[str]
+    code_block_present: bool
+    code_lang: Optional[str]
+    code_lines: int
+    py_syntax_ok: Optional[bool]
+    py_tests_passed: Optional[bool]
 
 
 class GPT5PromptEvaluator:
@@ -113,8 +131,24 @@ class GPT5PromptEvaluator:
         self.results: List[EvalResult] = []
 
     async def _create(self, **kwargs) -> Any:
-        async with self.sem:
-            return await self.client.responses.create(**kwargs)
+        # Basic retry with backoff for transient errors (e.g., 429)
+        delays = [0.5, 1.5, 3.0]
+        last_exc = None
+        for attempt, delay in enumerate([0.0] + delays):
+            if delay:
+                await asyncio.sleep(delay + random.uniform(0, 0.2))
+            try:
+                async with self.sem:
+                    return await self.client.responses.create(**kwargs)
+            except Exception as e:
+                last_exc = e
+                msg = str(e).lower()
+                if attempt == len(delays):
+                    break
+                if any(x in msg for x in ["rate", "429", "temporar", "timeout", "unavailable"]):
+                    continue
+                break
+        raise last_exc  # type: ignore[misc]
 
     @staticmethod
     def _extract_text(resp: Any) -> str:
@@ -155,7 +189,67 @@ class GPT5PromptEvaluator:
 
     def _compose_prompt(self, variant: str, task_text: str) -> str:
         parts = PROMPT_VARIANTS[variant]
-        return ("\n\n".join(parts) + "\n\n" + task_text).strip()
+        composed = ("\n\n".join(parts) + "\n\n" + task_text).strip()
+        if self.cfg.system_prefix:
+            # Prepend a pseudo-system preface to the input text
+            composed = (self.cfg.system_prefix.strip() + "\n\n" + composed).strip()
+        return composed
+
+    @staticmethod
+    def _extract_code_block(text: str) -> Tuple[bool, Optional[str], str]:
+        if not text:
+            return False, None, ""
+        # Match triple-fenced code, optional language
+        m = re.search(r"```([a-zA-Z0-9_+-]*)\n([\s\S]*?)```", text)
+        if not m:
+            return False, None, ""
+        lang = m.group(1) or None
+        code = m.group(2)
+        return True, lang, code
+
+    @staticmethod
+    def _py_syntax_ok(code: str) -> bool:
+        try:
+            ast.parse(code)
+            return True
+        except Exception:
+            return False
+
+    @staticmethod
+    def _py_test_fibonacci(code: str) -> Optional[bool]:
+        # Heuristic: execute code in a sandbox dict and try to find a function named like fib*
+        local_env: Dict[str, Any] = {}
+        try:
+            exec(compile(code, "<gpt5_code>", "exec"), {}, local_env)
+        except Exception:
+            return False
+        cand = None
+        for name, obj in local_env.items():
+            if callable(obj) and re.search(r"^fib|fibonacci", name, re.I):
+                cand = obj
+                break
+        if cand is None:
+            # Try to find any single-arg function
+            for name, obj in local_env.items():
+                if callable(obj):
+                    try:
+                        if obj.__code__.co_argcount == 1:
+                            cand = obj
+                            break
+                    except Exception:
+                        continue
+        if cand is None:
+            return None
+        # Check small cases
+        expected = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+        try:
+            for i, exp in enumerate(expected):
+                out = cand(i)
+                if out != exp:
+                    return False
+            return True
+        except Exception:
+            return False
 
     async def _eval_single(
         self,
@@ -170,6 +264,7 @@ class GPT5PromptEvaluator:
         start = time.time()
         had_retry = False
         input_tokens = output_tokens = 0
+        raw_path: Optional[str] = None
 
         prompt = self._compose_prompt(variant, task_text)
 
@@ -180,6 +275,8 @@ class GPT5PromptEvaluator:
         }
         if reasoning_effort:
             kwargs["reasoning"] = {"effort": reasoning_effort}
+        if self.cfg.max_output_tokens is not None:
+            kwargs["max_output_tokens"] = int(self.cfg.max_output_tokens)
 
         log_line(self.cfg.log_file, f"Request → model={model} task={task_name} variant={variant} effort={reasoning_effort} verbosity={verbosity} two_turn={two_turn}")
         try:
@@ -199,6 +296,8 @@ class GPT5PromptEvaluator:
             }
             if reasoning_effort:
                 kwargs2["reasoning"] = {"effort": reasoning_effort}
+            if self.cfg.max_output_tokens is not None:
+                kwargs2["max_output_tokens"] = int(self.cfg.max_output_tokens)
             try:
                 resp = await self._create(**kwargs2)
             except Exception as e:
@@ -208,8 +307,8 @@ class GPT5PromptEvaluator:
         text = self._extract_text(resp)
         usage = getattr(resp, "usage", None)
         if usage is not None:
-            input_tokens = int(getattr(usage, "input_tokens", 0))
-            output_tokens = int(getattr(usage, "output_tokens", 0))
+            input_tokens += int(getattr(usage, "input_tokens", 0))
+            output_tokens += int(getattr(usage, "output_tokens", 0))
 
         if not (text or "").strip():
             had_retry = True
@@ -224,10 +323,32 @@ class GPT5PromptEvaluator:
                 text = self._extract_text(resp_retry) or text
                 usage2 = getattr(resp_retry, "usage", None)
                 if usage2 is not None:
-                    input_tokens = int(getattr(usage2, "input_tokens", input_tokens))
-                    output_tokens = int(getattr(usage2, "output_tokens", output_tokens))
+                    input_tokens += int(getattr(usage2, "input_tokens", 0))
+                    output_tokens += int(getattr(usage2, "output_tokens", 0))
             except Exception as e:
                 log_line(self.cfg.log_file, f"ERROR retry: {e}")
+
+        # Save raw output
+        if self.cfg.save_raw:
+            raw_dir = os.path.join(self.cfg.results_dir, "raw", task_name)
+            os.makedirs(raw_dir, exist_ok=True)
+            fname = f"{variant}__{reasoning_effort}__{verbosity}__{'two' if two_turn else 'one'}-turn.txt"
+            raw_path = os.path.join(raw_dir, fname)
+            try:
+                with open(raw_path, "w", encoding="utf-8") as f:
+                    f.write(text or "")
+            except Exception as e:
+                log_line(self.cfg.log_file, f"WARN failed to write raw: {e}")
+
+        # Compliance checks
+        code_block_present, code_lang, code = self._extract_code_block(text or "")
+        code_lines = code.count("\n") + (1 if code else 0)
+        py_syntax_ok: Optional[bool] = None
+        py_tests_passed: Optional[bool] = None
+        if task_name == "python_function" and code_block_present and (code_lang in (None, "", "py", "python")):
+            py_syntax_ok = self._py_syntax_ok(code)
+            if self.cfg.validate_python and py_syntax_ok:
+                py_tests_passed = self._py_test_fibonacci(code)
 
         elapsed = time.time() - start
         result = EvalResult(
@@ -243,6 +364,12 @@ class GPT5PromptEvaluator:
             empty_output=not bool(text and text.strip()),
             had_retry=had_retry,
             output_preview=self._preview(text),
+            raw_path=raw_path,
+            code_block_present=code_block_present,
+            code_lang=code_lang,
+            code_lines=code_lines,
+            py_syntax_ok=py_syntax_ok,
+            py_tests_passed=py_tests_passed,
         )
         self.results.append(result)
         log_line(self.cfg.log_file, f"Result ← {asdict(result)}")
@@ -254,10 +381,13 @@ class GPT5PromptEvaluator:
         if self.cfg.quick:
             task_items = task_items[:1]
         for task_name, task_text in task_items:
-            for variant in PROMPT_VARIANTS.keys():
-                for r in REASONING_LEVELS:
-                    for v in VERBOSITY_LEVELS:
-                        for two_turn in ([False] if self.cfg.quick else [False, True]):
+            for variant in (self.cfg.variants or list(PROMPT_VARIANTS.keys())):
+                for r in (self.cfg.reasoning_levels or REASONING_LEVELS):
+                    for v in (self.cfg.verbosity_levels or VERBOSITY_LEVELS):
+                        turns = [False, True] if self.cfg.turns_mode == "both" else ([True] if self.cfg.turns_mode == "two" else [False])
+                        if self.cfg.quick:
+                            turns = [False]
+                        for two_turn in turns:
                             tasks.append(
                                 asyncio.create_task(
                                     self._eval_single(task_name, task_text, variant, r, v, two_turn)
@@ -314,6 +444,8 @@ class GPT5PromptEvaluator:
             f.write("- Prompts include a finalization instruction; retries occur when the model returns empty text.\n")
             f.write("- Verbosity lever used via text={\\"verbosity\\": ...}.\n")
             f.write("- No max_output_tokens cap is set.\n")
+            f.write("- Raw outputs saved when --save-raw is enabled.\n")
+            f.write("- Python correctness checks (Fibonacci) when --validate-python is enabled.\n")
 
 
 async def main_async(args: argparse.Namespace) -> None:
@@ -323,6 +455,14 @@ async def main_async(args: argparse.Namespace) -> None:
         log_file=args.log_file,
         results_dir=args.results_dir,
         quick=args.quick,
+        variants=args.variants,
+        reasoning_levels=args.reasoning,
+        verbosity_levels=args.verbosity,
+        turns_mode=args.turns,
+        save_raw=args.save_raw,
+        validate_python=args.validate_python,
+        system_prefix=args.system,
+        max_output_tokens=args.max_output_tokens,
     )
     os.makedirs(os.path.dirname(cfg.log_file) or ".", exist_ok=True)
     log_line(cfg.log_file, f"Starting GPT-5 prompt variation eval | model={cfg.model} | concurrency={cfg.concurrency}")
@@ -342,10 +482,16 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--log-file", default=os.path.join("results_gpt5", "gpt5_prompt_eval.log"))
     p.add_argument("--results-dir", default="results_gpt5")
     p.add_argument("--quick", action="store_true", help="Reduce task/variants for a fast run")
+    p.add_argument("--variants", type=lambda s: [x.strip() for x in s.split(",") if x.strip()], default=list(PROMPT_VARIANTS.keys()))
+    p.add_argument("--reasoning", type=lambda s: [x.strip() for x in s.split(",") if x.strip()], default=REASONING_LEVELS)
+    p.add_argument("--verbosity", type=lambda s: [x.strip() for x in s.split(",") if x.strip()], default=VERBOSITY_LEVELS)
+    p.add_argument("--turns", choices=["one", "two", "both"], default="both")
+    p.add_argument("--save-raw", action="store_true")
+    p.add_argument("--validate-python", action="store_true")
+    p.add_argument("--system", help="Optional system prefix text to prepend", default=None)
+    p.add_argument("--max-output-tokens", type=int, default=None)
     return p.parse_args()
 
 
 if __name__ == "__main__":
     asyncio.run(main_async(parse_args()))
-
-
