@@ -136,7 +136,8 @@ def build_messages_for_build_app(spec: str) -> list[dict[str, Any]]:
                 "- If any file is large, split into smaller modules.\n"
                 "Output policy:\n"
                 "- Output ONLY a cookbook patch format between *** Begin Patch and *** End Patch.\n"
-                "- Use relative paths.\n"
+                "- All file paths MUST be relative to the target output directory (do NOT prefix with the output folder).\n"
+                "- Include ALL code files (not only docs/metadata).\n"
             ),
         },
         {"role": "user", "content": spec},
@@ -176,7 +177,8 @@ def build_messages_to_fill_missing(
                 "- Use the README as the spec.\n"
                 "- Do NOT delete or overwrite existing files unless necessary.\n"
                 "- Output ONLY a cookbook patch format between *** Begin Patch and *** End Patch.\n"
-                "- Use relative paths and include full file contents in Add File sections.\n"
+                "- All file paths MUST be relative to the target output directory (do NOT prefix with the output folder).\n"
+                "- Include full file contents in Add File sections.\n"
             ),
         },
         {
@@ -205,7 +207,7 @@ def build_messages_full_from_spec(spec: str) -> list[dict[str, Any]]:
                 "Create a complete, runnable application from this spec.\n"
                 "- Output ONLY a cookbook patch between *** Begin Patch and *** End Patch.\n"
                 "- Include ALL files: package dir with __init__.py (and __main__.py if CLI), modules, tests, and an updated pyproject.toml.\n"
-                "- Use relative paths.\n"
+                "- All file paths MUST be relative to the target output directory (do NOT prefix with the output folder).\n"
             ),
         },
         {"role": "user", "content": spec},

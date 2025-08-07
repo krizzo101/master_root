@@ -27,7 +27,7 @@ from dataclasses import dataclass, asdict
 from datetime import datetime
 from enum import Enum
 from typing import Any, IO, Dict
-from openai import OpenAI
+from openai import OpenAI, AsyncOpenAI
 
 # =============================================================================
 # TEST CONFIGURATION
