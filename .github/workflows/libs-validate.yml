@@ -28,6 +28,9 @@ jobs:
           cp libs/templates.yaml _gen_sandbox/
           cp libs/file_manifest.yaml _gen_sandbox/
           python3 libs/generate_ecosystem_v2.py --libs-dir _gen_sandbox --file-manifest _gen_sandbox/file_manifest.yaml --no-touch-missing
+      - name: Registry reference checker
+        run: |
+          python3 tools/libs_check.py
       - name: Lint generator
         run: |
           ruff check libs/generate_ecosystem_v2.py
@@ -35,4 +38,3 @@ jobs:
       - name: Type-check generator
         run: |
           mypy --python-version 3.12 libs/generate_ecosystem_v2.py
-

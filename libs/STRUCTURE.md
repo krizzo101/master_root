@@ -29,4 +29,3 @@
 
 ### Validation
 The generator validates template references up front. CI runs a sandbox generation to ensure all files are present.
-

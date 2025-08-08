@@ -911,7 +911,7 @@ file_templates:
                 async with self._lock:
                     return dict(self._state)
 
-        
+
 
     utils_helpers_py_alt:
       template: |
@@ -1086,7 +1086,7 @@ file_templates:
         class HTTPServer({{main_class_name}}):
             async def start(self) -> None:
                 await self.initialize()
-            
+
             async def stop(self) -> None:
                 await self.shutdown()
     middleware_cors_py:
@@ -1119,7 +1119,7 @@ file_templates:
                 response = await next_handler(request)
                 logger.info("request.end")
                 return response
-        
+
 
     auth_base_py:
       template: |

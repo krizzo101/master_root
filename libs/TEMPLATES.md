@@ -60,4 +60,3 @@ This document maps keys in `libs/templates.yaml` to their purpose and typical us
 Notes
 - All keys are rendered via the YAML registry; no .j2 files are used.
 - Add new templates by extending `file_templates` in `templates.yaml` and referencing them in `recommended_structure.yaml`.
-

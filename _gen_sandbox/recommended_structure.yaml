@@ -1,0 +1,1247 @@
+# OPSVI Library Structure Definition
+# Comprehensive definition for multi-level AI-driven development
+
+# Template System Reference
+template_system:
+  template_file: "templates.yaml"
+  template_engine: "yaml-templates"
+  variable_processor: "yaml_processor"
+
+  # Template References by Level
+  level_templates:
+    project:
+      context_template: "project_templates.project_context"
+      research_template: "project_templates.research_context"
+      standards_template: "project_templates.standards_context"
+
+    category:
+      context_template: "category_templates.category_context"
+      research_template: "category_templates.research_context"
+      patterns_template: "category_templates.patterns_context"
+
+    library:
+      context_template: "library_templates.library_context"
+      research_template: "library_templates.research_context"
+      api_template: "library_templates.api_context"
+
+    component:
+      context_template: "component_templates.component_context"
+      interface_template: "component_templates.interface_context"
+      implementation_template: "component_templates.implementation_context"
+
+    file:
+      python_templates: "file_templates.python_files"
+      config_templates: "file_templates.config_files"
+      documentation_templates: "file_templates.documentation_files"
+
+# Template Definitions (YAML Anchors)
+templates:
+  base_init: &base_init
+    purpose: "Package initialization"
+    template: "init_py"
+    context_requirements:
+      - "Library name and description"
+      - "Version and author information"
+      - "Import patterns and dependencies"
+
+  base_core_init: &base_core_init
+    purpose: "Core module exports"
+    template: "core_init_py"
+    context_requirements:
+      - "Core component definitions"
+      - "Base class exports"
+      - "Type definitions"
+
+  base_config_init: &base_config_init
+    purpose: "Configuration module exports"
+    template: "config_init_py"
+    context_requirements:
+      - "Configuration class definitions"
+      - "Environment variable mappings"
+      - "Validation rules"
+
+  base_exceptions_init: &base_exceptions_init
+    purpose: "Exception module exports"
+    template: "exceptions_init_py"
+    context_requirements:
+      - "Exception hierarchy"
+      - "Error categorization"
+      - "Context preservation"
+
+  base_pyproject: &base_pyproject
+    purpose: "Package configuration"
+    template: "pyproject_toml"
+    context_requirements:
+      - "Package metadata"
+      - "Dependencies"
+      - "Build configuration"
+
+  base_readme: &base_readme
+    purpose: "Package documentation"
+    template: "README_md"
+    context_requirements:
+      - "Package overview"
+      - "Usage examples"
+      - "API documentation"
+
+# Project Context and Standards
+project_context:
+  scope: "OPSVI Master Workspace - AI/ML Operations monorepo"
+  research_topics:
+    - "AI/ML operations best practices"
+    - "Monorepo architecture patterns"
+    - "Observability and monitoring strategies"
+    - "RAG system design patterns"
+    - "MCP integration patterns"
+    - "Multi-agent system architectures"
+    - "Python library ecosystem design"
+    - "Async/await patterns and performance"
+    - "Configuration management strategies"
+    - "Testing strategies for AI/ML systems"
+
+  standards:
+    code_style: "Black + Ruff + MyPy"
+    async_patterns: "asyncio with proper error handling"
+    documentation: "Google-style docstrings + comprehensive READMEs"
+    testing: "pytest with async support and comprehensive coverage"
+    type_hints: "Full type annotations with generics"
+    error_handling: "Hierarchical exception system with context"
+    logging: "Structured logging with appropriate levels"
+    config: "Pydantic-based configuration with validation"
+
+  integration_patterns:
+    - "Component-based architecture with clear interfaces"
+    - "Dependency injection for loose coupling"
+    - "Event-driven communication between components"
+    - "Configuration-driven behavior"
+    - "Health check and monitoring integration"
+
+  context_file: "project_context.json"
+
+# AI Development Standards
+ai_development_standards:
+  code_quality:
+    principles:
+      - "Single Responsibility Principle"
+      - "Open/Closed Principle"
+      - "Dependency Inversion Principle"
+      - "Interface Segregation Principle"
+      - "DRY (Don't Repeat Yourself)"
+
+    naming_conventions:
+      directories: "kebab-case (e.g., opsvi-foundation)"
+      packages: "snake_case (e.g., opsvi_foundation)"
+      classes: "PascalCase (e.g., OpsviFoundation)"
+      functions: "snake_case (e.g., initialize_component)"
+      constants: "UPPER_SNAKE_CASE (e.g., DEFAULT_TIMEOUT)"
+      variables: "snake_case (e.g., config_data)"
+
+    code_organization:
+      - "One class per file for complex classes"
+      - "Group related functionality in modules"
+      - "Use __init__.py for clean exports"
+      - "Separate concerns into logical modules"
+      - "Keep files under 500 lines when possible"
+
+    documentation_standards:
+      docstrings: "Google-style with type hints"
+      readme: "Comprehensive with examples"
+      api_docs: "Clear method signatures and examples"
+      inline_comments: "Explain complex logic, not obvious code"
+
+  architecture:
+    design_patterns:
+      - "Factory pattern for component creation"
+      - "Strategy pattern for algorithm selection"
+      - "Observer pattern for event handling"
+      - "Command pattern for operation encapsulation"
+      - "Builder pattern for complex object construction"
+
+    component_design:
+      - "All components inherit from BaseComponent"
+      - "Components should be configurable"
+      - "Components should support async operations"
+      - "Components should be stateless when possible"
+      - "Implement proper resource cleanup"
+
+    interface_design:
+      - "Define clear public APIs"
+      - "Use type hints for all public methods"
+      - "Provide sensible defaults"
+      - "Support both sync and async interfaces"
+      - "Include comprehensive error handling"
+
+  error_handling:
+    principles:
+      - "Fail fast with clear error messages"
+      - "Defensive programming with proper validation"
+
+    exception_hierarchy:
+      base_exception: "OPSVIError"
+      specific_exceptions:
+        - "ConfigurationError - Configuration-related issues"
+        - "ConnectionError - Network and connection issues"
+        - "ValidationError - Data validation failures"
+        - "TimeoutError - Operation timeout issues"
+        - "ResourceError - Resource allocation issues"
+        - "InitializationError - Component initialization failures"
+        - "ShutdownError - Component shutdown failures"
+
+    error_context:
+      - "Include operation being performed"
+      - "Include relevant parameters"
+      - "Provide recovery suggestions when possible"
+      - "Log errors with appropriate levels"
+
+  performance:
+    principles:
+      - "Profile before optimizing"
+      - "Use async/await for I/O operations"
+      - "Implement proper caching strategies"
+      - "Batch processing when possible"
+      - "Resource cleanup and memory management"
+
+    optimization_guidelines:
+      - "Use connection pooling for databases"
+      - "Implement lazy loading for heavy resources"
+      - "Use generators for large datasets"
+      - "Implement proper connection pooling"
+
+    monitoring_requirements:
+      - "Include performance metrics"
+      - "Track resource usage"
+      - "Monitor error rates"
+      - "Measure response times"
+
+  security:
+    principles:
+      - "Principle of least privilege"
+      - "Defense in depth"
+      - "Secure by default"
+      - "Input validation and sanitization"
+
+    implementation_guidelines:
+      - "Sanitize all user inputs"
+      - "Use secure random number generators"
+      - "Implement proper authentication"
+      - "Follow principle of least privilege"
+
+  testing:
+    principles:
+      - "Test-driven development when possible"
+      - "Comprehensive coverage of edge cases"
+      - "Mock external dependencies"
+      - "Use meaningful test names"
+      - "Mock external dependencies"
+
+    test_organization:
+      - "Unit tests for individual functions"
+      - "Integration tests for component interaction"
+      - "End-to-end tests for complete workflows"
+      - "Performance tests for critical paths"
+      - "Security tests for authentication/authorization"
+
+    test_patterns:
+      - "Arrange-Act-Assert pattern"
+      - "Use fixtures for common setup"
+      - "Mock external services"
+      - "Test both success and failure cases"
+
+  configuration:
+    principles:
+      - "Configuration as code"
+      - "Environment-specific settings"
+      - "Validate configuration at startup"
+      - "Support configuration hot-reloading when possible"
+
+    implementation_patterns:
+      - "Inherit from BaseSettings"
+      - "Use environment variables with prefixes"
+      - "Provide sensible defaults"
+      - "Validate configuration on load"
+
+  logging:
+    principles:
+      - "Structured logging with context"
+      - "Appropriate log levels"
+      - "Never log sensitive information"
+      - "Include context in log messages"
+
+    implementation_patterns:
+      - "Use structlog for structured logging"
+      - "Include correlation IDs"
+      - "Log at appropriate levels"
+      - "Include relevant context"
+
+  api_design:
+    principles:
+      - "Consistent naming conventions"
+      - "Clear method signatures"
+      - "Comprehensive error handling"
+      - "Sensible defaults"
+      - "Backward compatibility when possible"
+
+    interface_patterns:
+      - "Use dataclasses or Pydantic models for data transfer"
+      - "Provide both sync and async interfaces"
+      - "Include type hints for all parameters"
+      - "Use builder patterns for complex objects"
+
+  research_standards:
+    process:
+      - "Identify current best practices"
+      - "Research industry standards"
+      - "Evaluate security considerations"
+      - "Check for Python-specific implementations"
+
+    context_gathering:
+      - "Collect real-world examples and use cases"
+      - "Find integration patterns with other systems"
+      - "Look for testing strategies and tools"
+
+    documentation_requirements:
+      - "Cite sources for design decisions"
+      - "Document trade-offs and alternatives"
+      - "Include performance benchmarks when relevant"
+
+  development_workflow:
+    level_processing:
+      - "Process levels from highest to lowest scope"
+      - "Gather context at each level before proceeding"
+      - "Validate context completeness before moving to next level"
+      - "Set performance and security baselines"
+      - "Define testing and deployment strategies"
+
+    category_level:
+      - "Research category-specific best practices"
+      - "Identify common patterns and anti-patterns"
+      - "Define category-specific standards"
+      - "Identify integration requirements"
+      - "Define testing strategies"
+
+    library_level:
+      - "Research library-specific implementation patterns"
+      - "Identify dependencies and integration points"
+      - "Define library-specific APIs and interfaces"
+      - "Define integration points"
+      - "Plan testing and documentation"
+
+    component_level:
+      - "Define component responsibilities"
+      - "Design component interfaces"
+      - "Plan component implementation"
+      - "Define performance characteristics"
+      - "Plan testing approach"
+
+    file_level:
+      - "Implement according to established patterns"
+      - "Follow coding standards and conventions"
+      - "Include comprehensive error handling"
+      - "Add appropriate logging and monitoring"
+      - "Write tests for all functionality"
+
+  quality_assurance:
+    code_review:
+      - "Review for adherence to standards"
+      - "Check for security vulnerabilities"
+      - "Verify error handling completeness"
+      - "Ensure proper documentation"
+
+    automated_checks:
+      - "Type checking with MyPy"
+      - "Code formatting with Black"
+      - "Linting with Ruff"
+      - "Security scanning with Bandit"
+      - "Test coverage reporting"
+
+    integration_validation:
+      - "Component integration testing"
+      - "End-to-end workflow testing"
+      - "Performance benchmarking"
+      - "Security penetration testing"
+
+  integration_standards:
+    component_integration:
+      - "Clear interface definitions"
+      - "Dependency injection patterns"
+      - "Event-driven communication"
+      - "Health check integration"
+      - "Support graceful shutdown"
+
+    external_service_integration:
+      - "Implement retry logic with exponential backoff"
+      - "Use connection pooling"
+      - "Implement circuit breaker patterns"
+      - "Include proper error handling"
+      - "Support configuration validation"
+
+# Library Categories
+library_categories:
+  core:
+    description: "Foundation and core functionality"
+    research_topics:
+      - "Python library design patterns"
+      - "Component lifecycle management"
+      - "Configuration management systems"
+      - "Exception handling hierarchies"
+    context_file: "core_category_context.json"
+
+  service:
+    description: "External service integrations"
+    research_topics:
+      - "HTTP client best practices"
+      - "Database connection patterns"
+      - "Authentication and authorization"
+      - "Service discovery and health checks"
+    context_file: "service_category_context.json"
+
+  rag:
+    description: "Retrieval Augmented Generation"
+    research_topics:
+      - "Vector database integration"
+      - "Embedding model integration"
+      - "Document processing and chunking strategies"
+      - "RAG pipeline optimization"
+    context_file: "rag_category_context.json"
+
+  manager:
+    description: "Orchestration and management"
+    research_topics:
+      - "Task scheduling and orchestration"
+      - "Resource management patterns"
+      - "Multi-agent coordination"
+      - "Workflow management systems"
+    context_file: "manager_category_context.json"
+
+# Library Types and Base Files
+library_types:
+  core:
+    description: "Core functionality libraries"
+    directory_structure:
+      - "{{package_name}}/"
+      - "{{package_name}}/core/"
+      - "{{package_name}}/config/"
+      - "{{package_name}}/exceptions/"
+      - "{{package_name}}/utils/"
+      - "tests/"
+    base_files: *base_init
+    responsibilities:
+      - "Provide foundational functionality"
+      - "Define core interfaces and patterns"
+      - "Handle configuration and settings"
+      - "Manage exceptions and error handling"
+
+  service:
+    description: "External service integration libraries"
+    directory_structure:
+      - "{{package_name}}/"
+      - "{{package_name}}/core/"
+      - "{{package_name}}/config/"
+      - "{{package_name}}/exceptions/"
+      - "{{package_name}}/providers/"
+      - "{{package_name}}/schemas/"
+      - "{{package_name}}/utils/"
+      - "tests/"
+    base_files: *base_init
+    responsibilities:
+      - "Integrate with external services"
+      - "Handle authentication and authorization"
+      - "Manage connections and sessions"
+      - "Provide data validation and schemas"
+
+  rag:
+    description: "RAG system libraries"
+    directory_structure:
+      - "{{package_name}}/"
+      - "{{package_name}}/core/"
+      - "{{package_name}}/config/"
+      - "{{package_name}}/exceptions/"
+      - "{{package_name}}/datastores/"
+      - "{{package_name}}/embeddings/"
+      - "{{package_name}}/processors/"
+      - "{{package_name}}/utils/"
+      - "tests/"
+    base_files: *base_init
+    responsibilities:
+      - "Manage vector databases and embeddings"
+      - "Process and chunk documents"
+      - "Handle retrieval and generation"
+      - "Optimize RAG pipelines"
+
+  manager:
+    description: "Orchestration and management libraries"
+    directory_structure:
+      - "{{package_name}}/"
+      - "{{package_name}}/core/"
+      - "{{package_name}}/config/"
+      - "{{package_name}}/exceptions/"
+      - "{{package_name}}/coordinators/"
+      - "{{package_name}}/schedulers/"
+      - "{{package_name}}/utils/"
+      - "tests/"
+    base_files: *base_init
+    responsibilities:
+      - "Orchestrate complex workflows"
+      - "Manage resource allocation"
+      - "Coordinate multi-agent systems"
+      - "Handle task scheduling and execution"
+
+
+
+# Development Process
+development_process:
+  levels:
+    - name: "project"
+      scope: "entire OPSVI workspace"
+      context_file: "project_context.json"
+      research_agent: "deep_research"
+      code_agent: "code_generator"
+      output: "Project-wide standards and architecture"
+
+    - name: "category"
+      scope: "library category (core, service, rag, manager)"
+      context_file: "{{category}}_category_context.json"
+      research_agent: "deep_research"
+      code_agent: "code_generator"
+      output: "Category-specific patterns and standards"
+
+    - name: "library"
+      scope: "individual library"
+      context_file: "{{library_name}}_context.json"
+      research_agent: "deep_research"
+      code_agent: "code_generator"
+      output: "Library-specific capabilities and requirements"
+
+    - name: "component"
+      scope: "library component (core, config, providers, etc.)"
+      context_file: "{{component_name}}_context.json"
+      research_agent: "deep_research"
+      code_agent: "code_generator"
+      output: "Component-specific functionality and interfaces"
+
+    - name: "file"
+      scope: "individual file"
+      context_file: "{{file_name}}_context.json"
+      research_agent: "deep_research"
+      code_agent: "code_generator"
+      output: "File-specific implementation"
+
+# Context File Structure
+context_file_structure:
+  project_context:
+    - "project_overview"
+    - "architecture_decisions"
+    - "coding_standards"
+    - "integration_patterns"
+    - "performance_requirements"
+    - "security_considerations"
+
+  category_context:
+    - "category_overview"
+    - "design_patterns"
+    - "common_challenges"
+    - "performance_considerations"
+    - "integration_requirements"
+
+  library_context:
+    - "library_purpose"
+    - "core_capabilities"
+    - "api_design"
+    - "performance_requirements"
+    - "integration_points"
+    - "testing_strategy"
+
+  component_context:
+    - "component_purpose"
+    - "interface_definitions"
+    - "implementation_requirements"
+    - "performance_characteristics"
+    - "error_handling"
+    - "testing_requirements"
+
+# Libraries Definition
+libraries:
+  opsvi-foundation:
+    type: "core"
+    description: "Foundation library providing base components and utilities"
+    research_topics:
+      - "Python library foundation patterns"
+      - "Component lifecycle management"
+      - "Configuration management systems"
+      - "Exception handling hierarchies"
+    context_file: "opsvi_foundation_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "Package initialization and exports"
+        template: *base_init
+        context_requirements:
+          - "Foundation library exports"
+          - "Base component definitions"
+          - "Utility function exports"
+
+      - path: "{{package_name}}/core/base.py"
+        purpose: "Base component classes"
+        template: "core_base_py"
+        context_requirements:
+          - "Base component interface"
+          - "Lifecycle management"
+          - "Error handling patterns"
+
+      - path: "{{package_name}}/config/settings.py"
+        purpose: "Configuration management"
+        template: "config_settings_py"
+        context_requirements:
+          - "Configuration patterns"
+          - "Environment variable handling"
+          - "Validation rules"
+
+      - path: "{{package_name}}/exceptions/base.py"
+        purpose: "Exception hierarchy"
+        template: "exceptions_base_py"
+        context_requirements:
+          - "Exception hierarchy design"
+          - "Error categorization"
+          - "Context preservation"
+
+      - path: "{{package_name}}/utils/helpers.py"
+        purpose: "Utility functions"
+        template: "utils_helpers_py"
+        context_requirements:
+          - "Common utility patterns"
+          - "Performance helpers"
+          - "Async utilities"
+
+      - path: "tests/test_foundation.py"
+        purpose: "Foundation tests"
+        template: "test_base_py"
+        context_requirements:
+          - "Test patterns for base components"
+          - "Mock strategies"
+          - "Coverage requirements"
+
+      - path: "pyproject.toml"
+        purpose: "Package configuration"
+        template: *base_pyproject
+        context_requirements:
+          - "Foundation dependencies"
+          - "Build configuration"
+          - "Development tools"
+
+      - path: "README.md"
+        purpose: "Foundation documentation"
+        template: *base_readme
+        context_requirements:
+          - "Foundation overview"
+          - "Usage examples"
+          - "API documentation"
+
+  opsvi-core:
+    type: "core"
+    description: "Core functionality for OPSVI applications"
+    research_topics:
+      - "Core application patterns"
+      - "Service orchestration"
+      - "Event handling systems"
+      - "State management patterns"
+    context_file: "opsvi_core_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "Core package initialization"
+        template: *base_init
+        context_requirements:
+          - "Core library exports"
+          - "Service definitions"
+          - "Event system exports"
+
+      - path: "{{package_name}}/core/services.py"
+        purpose: "Core service management"
+        template: "core_services_py"
+        context_requirements:
+          - "Service lifecycle management"
+          - "Dependency injection"
+          - "Service discovery"
+
+      - path: "{{package_name}}/events/base.py"
+        purpose: "Event system foundation"
+        template: "events_base_py"
+        context_requirements:
+          - "Event handling patterns"
+          - "Event routing"
+          - "Event persistence"
+
+      - path: "{{package_name}}/state/manager.py"
+        purpose: "State management"
+        template: "state_manager_py"
+        context_requirements:
+          - "State persistence patterns"
+          - "State synchronization"
+          - "Conflict resolution"
+
+  opsvi-llm:
+    type: "service"
+    description: "LLM integration and management"
+    research_topics:
+      - "LLM API integration patterns"
+      - "Prompt engineering strategies"
+      - "Model management and caching"
+      - "Response processing and validation"
+    context_file: "opsvi_llm_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "LLM package initialization"
+        template: *base_init
+        context_requirements:
+          - "LLM provider exports"
+          - "Model management exports"
+          - "Prompt utilities exports"
+
+      - path: "{{package_name}}/providers/base.py"
+        purpose: "LLM provider interface"
+        template: "providers_base_py"
+        context_requirements:
+          - "Provider interface design"
+          - "Model abstraction"
+          - "Response handling"
+
+      - path: "{{package_name}}/providers/openai.py"
+        purpose: "OpenAI provider implementation"
+        template: "providers_openai_py"
+        context_requirements:
+          - "OpenAI API integration"
+          - "Rate limiting"
+          - "Error handling"
+
+      - path: "{{package_name}}/prompts/manager.py"
+        purpose: "Prompt management"
+        template: "prompts_manager_py"
+        context_requirements:
+          - "Prompt template system"
+          - "Prompt versioning"
+          - "Prompt optimization"
+
+  opsvi-rag:
+    type: "rag"
+    description: "Retrieval Augmented Generation system"
+    research_topics:
+      - "Vector database integration patterns"
+      - "Embedding model management"
+      - "Document processing pipelines"
+      - "RAG optimization strategies"
+    context_file: "opsvi_rag_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "RAG package initialization"
+        template: *base_init
+        context_requirements:
+          - "RAG system exports"
+          - "Vector store exports"
+          - "Embedding exports"
+
+      - path: "{{package_name}}/datastores/base.py"
+        purpose: "Vector store interface"
+        template: "datastores_base_py"
+        context_requirements:
+          - "Vector store abstraction"
+          - "Query interface design"
+          - "Index management"
+
+      - path: "{{package_name}}/embeddings/providers.py"
+        purpose: "Embedding model providers"
+        template: "embeddings_providers_py"
+        context_requirements:
+          - "Embedding model interface"
+          - "Model caching"
+          - "Batch processing"
+
+      - path: "{{package_name}}/processors/base.py"
+        purpose: "Document processing"
+        template: "processors_base_py"
+        context_requirements:
+          - "Document chunking strategies"
+          - "Metadata extraction"
+          - "Content preprocessing"
+
+  opsvi-http:
+    type: "service"
+    description: "HTTP client and server functionality"
+    research_topics:
+      - "HTTP client best practices"
+      - "Server framework patterns"
+      - "API design principles"
+      - "Authentication and authorization"
+    context_file: "opsvi_http_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "HTTP package initialization"
+        template: *base_init
+        context_requirements:
+          - "HTTP client exports"
+          - "Server exports"
+          - "Middleware exports"
+
+      - path: "{{package_name}}/client/base.py"
+        purpose: "HTTP client foundation"
+        template: "client_base_py"
+        context_requirements:
+          - "HTTP client interface"
+          - "Connection pooling"
+          - "Retry logic"
+
+      - path: "{{package_name}}/server/base.py"
+        purpose: "HTTP server foundation"
+        template: "server_base_py"
+        context_requirements:
+          - "Server interface design"
+          - "Middleware system"
+          - "Request/response handling"
+
+      - path: "{{package_name}}/auth/base.py"
+        purpose: "Authentication system"
+        template: "auth_base_py"
+        context_requirements:
+          - "Authentication patterns"
+          - "Token management"
+          - "Authorization logic"
+
+    additional_files:
+      - path: "{{package_name}}/middleware/cors.py"
+        purpose: "CORS middleware"
+        template: "middleware_cors_py"
+        context_requirements:
+          - "CORS configuration"
+          - "Preflight handling"
+          - "Security considerations"
+
+      - path: "{{package_name}}/middleware/logging.py"
+        purpose: "Request logging middleware"
+        template: "middleware_logging_py"
+        context_requirements:
+          - "Request/response logging"
+          - "Performance metrics"
+          - "Error tracking"
+
+  opsvi-agents:
+    type: "manager"
+    description: "Multi-agent system management"
+    research_topics:
+      - "Multi-agent system architectures"
+      - "Agent communication patterns"
+      - "Task distribution strategies"
+      - "Agent lifecycle management"
+    context_file: "opsvi_agents_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "Agents package initialization"
+        template: *base_init
+        context_requirements:
+          - "Agent system exports"
+          - "Coordinator exports"
+          - "Communication exports"
+
+      - path: "{{package_name}}/agents/base.py"
+        purpose: "Base agent implementation"
+        template: "agents_base_py"
+        context_requirements:
+          - "Agent interface design"
+          - "Task execution patterns"
+          - "State management"
+
+      - path: "{{package_name}}/coordinators/base.py"
+        purpose: "Agent coordination"
+        template: "coordinators_base_py"
+        context_requirements:
+          - "Coordination patterns"
+          - "Task distribution"
+          - "Conflict resolution"
+
+      - path: "{{package_name}}/communication/base.py"
+        purpose: "Inter-agent communication"
+        template: "communication_base_py"
+        context_requirements:
+          - "Message passing patterns"
+          - "Event broadcasting"
+          - "Communication protocols"
+
+  # Additional libraries following the same pattern...
+  opsvi-fs:
+    type: "service"
+    description: "File system and storage management"
+    research_topics:
+      - "File system abstraction patterns"
+      - "Storage provider integration"
+      - "File processing pipelines"
+      - "Caching and optimization"
+    context_file: "opsvi_fs_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "File system package initialization"
+        template: *base_init
+        context_requirements:
+          - "File system exports"
+          - "Storage provider exports"
+          - "Processing pipeline exports"
+
+      - path: "{{package_name}}/providers/base.py"
+        purpose: "Storage provider interface"
+        template: "fs_providers_base_py"
+        context_requirements:
+          - "Storage provider abstraction"
+          - "File operation interface"
+          - "Metadata management"
+
+      - path: "{{package_name}}/processors/base.py"
+        purpose: "File processing pipeline"
+        template: "fs_processors_base_py"
+        context_requirements:
+          - "File processing patterns"
+          - "Pipeline orchestration"
+          - "Error handling"
+
+  opsvi-data:
+    type: "service"
+    description: "Data management and database access"
+    research_topics:
+      - "Database abstraction patterns"
+      - "ORM and query optimization"
+      - "Data migration strategies"
+      - "Connection pooling and management"
+    context_file: "opsvi_data_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "Data package initialization"
+        template: *base_init
+        context_requirements:
+          - "Database exports"
+          - "ORM exports"
+          - "Migration exports"
+
+      - path: "{{package_name}}/providers/base.py"
+        purpose: "Database provider interface"
+        template: "data_providers_base_py"
+        context_requirements:
+          - "Database abstraction"
+          - "Connection management"
+          - "Transaction handling"
+
+      - path: "{{package_name}}/orm/base.py"
+        purpose: "ORM foundation"
+        template: "orm_base_py"
+        context_requirements:
+          - "Model definition patterns"
+          - "Query interface design"
+          - "Relationship handling"
+
+  opsvi-auth:
+    type: "service"
+    description: "Authentication and authorization system"
+    research_topics:
+      - "Authentication protocols and standards"
+      - "Authorization models and patterns"
+      - "Token management and security"
+      - "Identity provider integration"
+    context_file: "opsvi_auth_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "Auth package initialization"
+        template: *base_init
+        context_requirements:
+          - "Authentication exports"
+          - "Authorization exports"
+          - "Provider exports"
+
+      - path: "{{package_name}}/providers/base.py"
+        purpose: "Auth provider interface"
+        template: "auth_providers_base_py"
+        context_requirements:
+          - "Provider abstraction"
+          - "Authentication flow"
+          - "Token management"
+
+      - path: "{{package_name}}/models/user.py"
+        purpose: "User and permission models"
+        template: "auth_models_user_py"
+        context_requirements:
+          - "User model design"
+          - "Permission system"
+          - "Role management"
+
+  opsvi-memory:
+    type: "service"
+    description: "Memory and caching systems"
+    research_topics:
+      - "Memory management patterns"
+      - "Caching strategies and algorithms"
+      - "Distributed cache coordination"
+      - "Memory optimization techniques"
+    context_file: "opsvi_memory_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "Memory package initialization"
+        template: *base_init
+        context_requirements:
+          - "Memory system exports"
+          - "Cache exports"
+          - "Store exports"
+
+      - path: "{{package_name}}/stores/base.py"
+        purpose: "Memory store interface"
+        template: "memory_stores_base_py"
+        context_requirements:
+          - "Store abstraction"
+          - "Key-value interface"
+          - "Expiration handling"
+
+      - path: "{{package_name}}/cache/manager.py"
+        purpose: "Cache management"
+        template: "cache_manager_py"
+        context_requirements:
+          - "Cache invalidation"
+          - "Memory optimization"
+          - "Performance monitoring"
+
+  opsvi-communication:
+    type: "service"
+    description: "Communication and messaging systems"
+    research_topics:
+      - "Message queue patterns"
+      - "Event streaming architectures"
+      - "Real-time communication protocols"
+      - "Message routing and delivery"
+    context_file: "opsvi_communication_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "Communication package initialization"
+        template: *base_init
+        context_requirements:
+          - "Communication exports"
+          - "Message exports"
+          - "Channel exports"
+
+      - path: "{{package_name}}/channels/base.py"
+        purpose: "Communication channel interface"
+        template: "communication_channels_base_py"
+        context_requirements:
+          - "Channel abstraction"
+          - "Message routing"
+          - "Delivery guarantees"
+
+      - path: "{{package_name}}/messages/base.py"
+        purpose: "Message handling"
+        template: "messages_base_py"
+        context_requirements:
+          - "Message format design"
+          - "Serialization patterns"
+          - "Validation rules"
+
+  opsvi-pipeline:
+    type: "manager"
+    description: "Data processing pipeline orchestration"
+    research_topics:
+      - "Pipeline design patterns"
+      - "Data flow optimization"
+      - "Pipeline monitoring and debugging"
+      - "Error handling and recovery"
+    context_file: "opsvi_pipeline_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "Pipeline package initialization"
+        template: *base_init
+        context_requirements:
+          - "Pipeline exports"
+          - "Stage exports"
+          - "Orchestrator exports"
+
+      - path: "{{package_name}}/stages/base.py"
+        purpose: "Pipeline stage interface"
+        template: "pipeline_stages_base_py"
+        context_requirements:
+          - "Stage abstraction"
+          - "Data transformation"
+          - "Error handling"
+
+      - path: "{{package_name}}/orchestrators/base.py"
+        purpose: "Pipeline orchestration"
+        template: "orchestrators_base_py"
+        context_requirements:
+          - "Pipeline execution"
+          - "Stage coordination"
+          - "Monitoring integration"
+
+  opsvi-monitoring:
+    type: "service"
+    description: "Monitoring and observability"
+    research_topics:
+      - "Observability patterns and practices"
+      - "Metrics collection and aggregation"
+      - "Distributed tracing strategies"
+      - "Alerting and notification systems"
+    context_file: "opsvi_monitoring_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "Monitoring package initialization"
+        template: *base_init
+        context_requirements:
+          - "Monitoring exports"
+          - "Metrics exports"
+          - "Tracing exports"
+
+      - path: "{{package_name}}/metrics/base.py"
+        purpose: "Metrics collection"
+        template: "monitoring_metrics_base_py"
+        context_requirements:
+          - "Metrics abstraction"
+          - "Collection patterns"
+          - "Aggregation strategies"
+
+      - path: "{{package_name}}/tracing/base.py"
+        purpose: "Distributed tracing"
+        template: "tracing_base_py"
+        context_requirements:
+          - "Trace context propagation"
+          - "Span management"
+          - "Performance analysis"
+
+  opsvi-security:
+    type: "service"
+    description: "Security and encryption utilities"
+    research_topics:
+      - "Cryptographic patterns and best practices"
+      - "Key management systems"
+      - "Security audit and compliance"
+      - "Threat modeling and mitigation"
+    context_file: "opsvi_security_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "Security package initialization"
+        template: *base_init
+        context_requirements:
+          - "Security exports"
+          - "Crypto exports"
+          - "Audit exports"
+
+      - path: "{{package_name}}/crypto/base.py"
+        purpose: "Cryptographic utilities"
+        template: "security_crypto_base_py"
+        context_requirements:
+          - "Crypto abstraction"
+          - "Key management"
+          - "Encryption patterns"
+
+      - path: "{{package_name}}/audit/base.py"
+        purpose: "Security auditing"
+        template: "audit_base_py"
+        context_requirements:
+          - "Audit logging"
+          - "Compliance checking"
+          - "Threat detection"
+
+  opsvi-orchestration:
+    type: "manager"
+    description: "Workflow and task orchestration"
+    research_topics:
+      - "Workflow engine patterns"
+      - "Task scheduling and execution"
+      - "Resource allocation strategies"
+      - "Failure recovery and resilience"
+    context_file: "opsvi_orchestration_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "Orchestration package initialization"
+        template: *base_init
+        context_requirements:
+          - "Orchestration exports"
+          - "Workflow exports"
+          - "Scheduler exports"
+
+      - path: "{{package_name}}/workflows/base.py"
+        purpose: "Workflow engine"
+        template: "orchestration_workflows_base_py"
+        context_requirements:
+          - "Workflow definition"
+          - "Execution engine"
+          - "State management"
+
+      - path: "{{package_name}}/schedulers/base.py"
+        purpose: "Task scheduling"
+        template: "schedulers_base_py"
+        context_requirements:
+          - "Scheduling algorithms"
+          - "Resource allocation"
+          - "Priority management"
+
+  opsvi-deploy:
+    type: "manager"
+    description: "Deployment and infrastructure management"
+    research_topics:
+      - "Infrastructure as code patterns"
+      - "Container orchestration strategies"
+      - "Deployment automation and CI/CD"
+      - "Environment management"
+    context_file: "opsvi_deploy_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "Deploy package initialization"
+        template: *base_init
+        context_requirements:
+          - "Deployment exports"
+          - "Infrastructure exports"
+          - "Environment exports"
+
+      - path: "{{package_name}}/infrastructure/base.py"
+        purpose: "Infrastructure management"
+        template: "deploy_infrastructure_base_py"
+        context_requirements:
+          - "Infrastructure abstraction"
+          - "Resource provisioning"
+          - "Configuration management"
+
+      - path: "{{package_name}}/environments/base.py"
+        purpose: "Environment management"
+        template: "environments_base_py"
+        context_requirements:
+          - "Environment isolation"
+          - "Configuration per environment"
+          - "Deployment strategies"
+
+  opsvi-gateway:
+    type: "manager"
+    description: "Multi-interface gateway and API management"
+    research_topics:
+      - "API gateway patterns and architectures"
+      - "Multi-protocol support and routing"
+      - "Rate limiting and throttling"
+      - "API versioning and evolution"
+    context_file: "opsvi_gateway_context.json"
+    files:
+      - path: "{{package_name}}/__init__.py"
+        purpose: "Gateway package initialization"
+        template: *base_init
+        context_requirements:
+          - "Gateway exports"
+          - "Router exports"
+          - "Middleware exports"
+
+      - path: "{{package_name}}/routers/base.py"
+        purpose: "Request routing"
+        template: "gateway_routers_base_py"
+        context_requirements:
+          - "Routing algorithms"
+          - "Load balancing"
+          - "Service discovery"
+
+      - path: "{{package_name}}/middleware/base.py"
+        purpose: "Gateway middleware"
+        template: "gateway_middleware_base_py"
+        context_requirements:
+          - "Middleware chain"
+          - "Request/response transformation"
+          - "Error handling"
+
+# Naming Conventions
+naming_conventions:
+  directories: "kebab-case (e.g., opsvi-foundation)"
+  packages: "snake_case (e.g., opsvi_foundation)"
+  classes: "PascalCase (e.g., OpsviFoundation)"
+  functions: "snake_case (e.g., initialize_component)"
+  constants: "UPPER_SNAKE_CASE (e.g., DEFAULT_TIMEOUT)"
+  variables: "snake_case (e.g., config_data)"

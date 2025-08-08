@@ -27,6 +27,11 @@ class OpsviEcosystemGeneratorV2:
         file_manifest: str | None = None,
         touch_missing: bool = True,
         strict: bool = True,
+        only: list[str] | None = None,
+        only_type: list[str] | None = None,
+        update_existing: bool = True,
+        dry_run: bool = False,
+        diff_only: bool = False,
     ):
         self.libs_dir = Path(libs_dir)
         self.structure_file = self.libs_dir / "recommended_structure.yaml"
@@ -47,6 +52,11 @@ class OpsviEcosystemGeneratorV2:
         )
         self.touch_missing = touch_missing
         self.strict = strict
+        self.only = set(only or [])
+        self.only_type = set(only_type or [])
+        self.update_existing = update_existing
+        self.dry_run = dry_run
+        self.diff_only = diff_only
 
         # Extract libraries and naming conventions
         self.libraries = self.structure.get("libraries", {})
@@ -370,6 +380,20 @@ class OpsviEcosystemGeneratorV2:
         # Ensure parent directory exists
         file_path.parent.mkdir(parents=True, exist_ok=True)
 
+        # Dry-run or diff-only behavior
+        if self.dry_run or self.diff_only:
+            status = "NEW"
+            if file_path.exists():
+                old = file_path.read_text(encoding="utf-8")
+                status = "UNCHANGED" if old == content else "CHANGED"
+            print(f"PLAN {status}: {file_path} <- {template_path}")
+            return
+
+        # Respect update_existing flag
+        if file_path.exists() and not self.update_existing:
+            print(f"SKIP (exists): {file_path}")
+            return
+
         # Write file
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
@@ -513,6 +537,12 @@ class OpsviEcosystemGeneratorV2:
         self._validate_template_refs()
 
         for library_name, library_data in self.libraries.items():
+            if self.only and library_name not in self.only:
+                continue
+            if self.only_type:
+                lib_type = library_data.get("type", "service")
+                if lib_type not in self.only_type:
+                    continue
             print(f"\nProcessing {library_name}...")
 
             # Create directory structure
@@ -526,7 +556,7 @@ class OpsviEcosystemGeneratorV2:
 
         print("\n" + "=" * 50)
         print("Ecosystem generation complete!")
-        print(f"Generated {len(self.libraries)} libraries")
+        print(f"Processed {len(self.libraries)} libraries (filters may apply)")
 
     def validate_generation(self):
         """Validate that all libraries were generated correctly"""
@@ -597,6 +627,38 @@ def main():
         action="store_false",
         help="Do not fail on missing template references (prints warnings instead)",
     )
+    parser.add_argument(
+        "--only",
+        dest="only",
+        nargs="*",
+        default=None,
+        help="Only process these libraries by name",
+    )
+    parser.add_argument(
+        "--type",
+        dest="only_type",
+        nargs="*",
+        default=None,
+        help="Only process libraries of these types (core, service, rag, manager)",
+    )
+    parser.add_argument(
+        "--no-update-existing",
+        dest="update_existing",
+        action="store_false",
+        help="Do not overwrite existing files",
+    )
+    parser.add_argument(
+        "--dry-run",
+        dest="dry_run",
+        action="store_true",
+        help="Plan-only: print actions without writing files",
+    )
+    parser.add_argument(
+        "--diff",
+        dest="diff_only",
+        action="store_true",
+        help="Print summary of files that would change",
+    )
     args = parser.parse_args()
 
     generator = OpsviEcosystemGeneratorV2(
@@ -604,6 +666,11 @@ def main():
         file_manifest=args.file_manifest,
         touch_missing=args.touch_missing,
         strict=args.strict,
+        only=args.only,
+        only_type=args.only_type,
+        update_existing=args.update_existing,
+        dry_run=args.dry_run,
+        diff_only=args.diff_only,
     )
     generator.generate_ecosystem()
     generator.validate_generation()
