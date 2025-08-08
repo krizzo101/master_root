@@ -150,7 +150,8 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
                 "code": {"type": "string"},
                 "reasoning": {"type": "string"},
             },
-            "required": ["code"],
+            # Responses structured outputs may require all properties to be listed in required
+            "required": ["code", "reasoning"],
             "additionalProperties": False,
         },
     }
