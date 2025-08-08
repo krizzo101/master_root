@@ -118,7 +118,13 @@ def _choose_model_for_content(content: str) -> str:
         return "gpt-5-mini"
 
 
-def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[str]) -> Optional[dict]:
+def _estimate_output_tokens(basis: str) -> int:
+    # Rough heuristic: ~3 chars per token; add headroom; clamp to sane bounds
+    approx = max(1200, (len(basis) // 3) + 800)
+    return min(8000, approx)
+
+
+def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[str], content_hint: str = "") -> Optional[dict]:
     """Version-tolerant Responses call. Returns dict with keys 'code' and optional 'reasoning'."""
     try:
         from openai import OpenAI  # type: ignore
@@ -150,14 +156,24 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
         },
     }
 
+    max_tokens = _estimate_output_tokens(content_hint or prompt)
     base_kwargs: dict = {
         "model": model,
         "input": prompt,
-        "max_output_tokens": 1200,
+        "max_output_tokens": max_tokens,
+        "temperature": 0,
     }
     with_schema_kwargs = {
         **base_kwargs,
-        "response_format": {"type": "json_schema", "json_schema": schema},
+        "response": {
+            "modalities": ["text"],
+            "text": {
+                "format": {
+                    "type": "json_schema",
+                    "json_schema": schema,
+                }
+            },
+        },
     }
 
     last_err: Optional[Exception] = None
@@ -165,20 +181,23 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
         for use_schema in (True, False):
             kwargs = with_schema_kwargs if use_schema else base_kwargs
             try:
-                print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt} schema={use_schema}")
+                print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt} schema={use_schema} max_tokens={max_tokens}")
                 resp = client.responses.create(**kwargs)
                 parsed = getattr(resp, "output_parsed", None)
-                if isinstance(parsed, dict) and parsed.get("code"):
-                    return {"code": parsed.get("code"), "reasoning": parsed.get("reasoning", "freeform")}
+                if isinstance(parsed, dict) and isinstance(parsed.get("code"), str) and parsed["code"].strip():
+                    return {"code": parsed.get("code"), "reasoning": parsed.get("reasoning", "")}
                 text = getattr(resp, "output_text", "") or ""
                 if isinstance(text, str) and text.strip():
+                    # Expect JSON per schema; fail if not parseable or missing code
                     try:
                         obj = json.loads(text)
-                        if isinstance(obj, dict) and obj.get("code"):
-                            return {"code": obj.get("code"), "reasoning": obj.get("reasoning", "freeform")}
-                    except Exception:
-                        pass
-                    return {"code": text, "reasoning": "freeform"}
+                        if isinstance(obj, dict) and isinstance(obj.get("code"), str) and obj["code"].strip():
+                            return {"code": obj.get("code"), "reasoning": obj.get("reasoning", "")}
+                        last_err = RuntimeError("Structured output missing 'code'")
+                        continue
+                    except Exception as e:
+                        last_err = RuntimeError(f"Non-JSON output under structured mode: {e}")
+                        continue
                 try:
                     data = resp.model_dump()
                 except Exception:
@@ -192,7 +211,15 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
                                 if isinstance(val, dict):
                                     val = val.get("value") or val.get("text")
                                 if isinstance(val, str) and val.strip():
-                                    return {"code": val, "reasoning": "freeform"}
+                                    # Attempt JSON parse; otherwise fail
+                                    try:
+                                        obj = json.loads(val)
+                                        if isinstance(obj, dict) and isinstance(obj.get("code"), str) and obj["code"].strip():
+                                            return {"code": obj.get("code"), "reasoning": obj.get("reasoning", "")}
+                                    except Exception:
+                                        pass
+                                    last_err = RuntimeError("Unstructured fallback content without JSON 'code'")
+                                    continue
                 last_err = RuntimeError("Empty response content")
             except (RateLimitError, APITimeoutError) as e:  # type: ignore[name-defined]
                 print(f"[{ts()}] OpenAI/Responses retryable error: {e}")
@@ -206,7 +233,7 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
             except TypeError as e:
                 last_err = e
                 if use_schema:
-                    print(f"[{ts()}] OpenAI/Responses TypeError: {e}; retrying without response_format")
+                    print(f"[{ts()}] OpenAI/Responses TypeError: {e}; retrying without structured response payload")
                     continue
                 print(f"[{ts()}] OpenAI/Responses TypeError without schema: {e}")
                 return None
@@ -228,7 +255,7 @@ def call_openai_responses(prompt: str, *, content_hint: str = "") -> Optional[di
         return None
     base_url = get_env_var("OPENAI_BASE_URL")
     model = _choose_model_for_content(content_hint)
-    return _call_responses_with_schema(prompt, model=model, base_url=base_url)
+    return _call_responses_with_schema(prompt, model=model, base_url=base_url, content_hint=content_hint)
 
 
 # Removed chat fallback: GPT-5 is only served by Responses API
