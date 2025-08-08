@@ -26,6 +26,7 @@ class OpsviEcosystemGeneratorV2:
         libs_dir: str = ".",
         file_manifest: str | None = None,
         touch_missing: bool = True,
+        strict: bool = True,
     ):
         self.libs_dir = Path(libs_dir)
         self.structure_file = self.libs_dir / "recommended_structure.yaml"
@@ -45,6 +46,7 @@ class OpsviEcosystemGeneratorV2:
             else {}
         )
         self.touch_missing = touch_missing
+        self.strict = strict
 
         # Extract libraries and naming conventions
         self.libraries = self.structure.get("libraries", {})
@@ -116,6 +118,54 @@ class OpsviEcosystemGeneratorV2:
 
         print(f"Template not found: {template_path}")
         return None
+
+    def _validate_template_refs(self) -> None:
+        """Validate that all template references in structure and manifest exist in the registry.
+
+        Raises ValueError if any reference is missing and strict mode is enabled.
+        """
+        missing: list[str] = []
+
+        def check_ref(ref: Any) -> None:
+            if isinstance(ref, str):
+                # Anchors handled later; only validate registry keys and nested paths
+                if ref.startswith("*"):
+                    return
+                if self._get_template(ref) is None:
+                    missing.append(ref)
+            elif isinstance(ref, dict):
+                t = ref.get("template") if "template" in ref else None
+                if (
+                    t
+                    and not str(t).startswith("*")
+                    and self._get_template(str(t)) is None
+                ):
+                    missing.append(str(t))
+
+        # From libraries in structure
+        for _, data in (self.libraries or {}).items():
+            for file_info in data.get("files") or []:
+                check_ref(file_info.get("template"))
+
+        # From manifest by type and library
+        lt = (
+            (self.file_manifest.get("library_types") or {})
+            if self.file_manifest
+            else {}
+        )
+        for _, entry in (lt or {}).items():
+            for fi in entry.get("files") or []:
+                check_ref(fi.get("template"))
+        libs = (self.file_manifest.get("libraries") or {}) if self.file_manifest else {}
+        for _, entry in (libs or {}).items():
+            for fi in entry.get("files") or []:
+                check_ref(fi.get("template"))
+
+        if missing:
+            msg = f"Missing templates in registry: {sorted(set(missing))}"
+            if self.strict:
+                raise ValueError(msg)
+            print(f"WARNING: {msg}")
 
     def _get_library_variables(
         self, library_name: str, library_data: dict
@@ -459,6 +509,9 @@ class OpsviEcosystemGeneratorV2:
         print("Generating OPSVI Library Ecosystem v2...")
         print("=" * 50)
 
+        # Validate template references up front
+        self._validate_template_refs()
+
         for library_name, library_data in self.libraries.items():
             print(f"\nProcessing {library_name}...")
 
@@ -538,12 +591,19 @@ def main():
         action="store_false",
         help="Do not create stub files when templates are missing",
     )
+    parser.add_argument(
+        "--no-strict",
+        dest="strict",
+        action="store_false",
+        help="Do not fail on missing template references (prints warnings instead)",
+    )
     args = parser.parse_args()
 
     generator = OpsviEcosystemGeneratorV2(
         libs_dir=args.libs_dir,
         file_manifest=args.file_manifest,
         touch_missing=args.touch_missing,
+        strict=args.strict,
     )
     generator.generate_ecosystem()
     generator.validate_generation()

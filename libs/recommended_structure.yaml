@@ -951,7 +951,7 @@ libraries:
 
       - path: "{{package_name}}/providers/base.py"
         purpose: "Auth provider interface"
-        template: "auth_providers_base.py.j2"
+        template: "auth_providers_base_py"
         context_requirements:
           - "Provider abstraction"
           - "Authentication flow"
@@ -959,7 +959,7 @@ libraries:
 
       - path: "{{package_name}}/models/user.py"
         purpose: "User and permission models"
-        template: "auth_models_user.py.j2"
+        template: "auth_models_user_py"
         context_requirements:
           - "User model design"
           - "Permission system"
@@ -985,7 +985,7 @@ libraries:
 
       - path: "{{package_name}}/stores/base.py"
         purpose: "Memory store interface"
-        template: "memory_stores_base.py.j2"
+        template: "memory_stores_base_py"
         context_requirements:
           - "Store abstraction"
           - "Key-value interface"
@@ -993,7 +993,7 @@ libraries:
 
       - path: "{{package_name}}/cache/manager.py"
         purpose: "Cache management"
-        template: "cache_manager.py.j2"
+        template: "cache_manager_py"
         context_requirements:
           - "Cache invalidation"
           - "Memory optimization"
@@ -1019,7 +1019,7 @@ libraries:
 
       - path: "{{package_name}}/channels/base.py"
         purpose: "Communication channel interface"
-        template: "communication_channels_base.py.j2"
+        template: "communication_channels_base_py"
         context_requirements:
           - "Channel abstraction"
           - "Message routing"
@@ -1027,7 +1027,7 @@ libraries:
 
       - path: "{{package_name}}/messages/base.py"
         purpose: "Message handling"
-        template: "messages_base.py.j2"
+        template: "messages_base_py"
         context_requirements:
           - "Message format design"
           - "Serialization patterns"
@@ -1053,7 +1053,7 @@ libraries:
 
       - path: "{{package_name}}/stages/base.py"
         purpose: "Pipeline stage interface"
-        template: "pipeline_stages_base.py.j2"
+        template: "pipeline_stages_base_py"
         context_requirements:
           - "Stage abstraction"
           - "Data transformation"
@@ -1061,7 +1061,7 @@ libraries:
 
       - path: "{{package_name}}/orchestrators/base.py"
         purpose: "Pipeline orchestration"
-        template: "orchestrators_base.py.j2"
+        template: "orchestrators_base_py"
         context_requirements:
           - "Pipeline execution"
           - "Stage coordination"

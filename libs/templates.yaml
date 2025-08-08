@@ -828,6 +828,47 @@ file_templates:
 
     events_base_py:
       template: |
+        """Event system foundation for {{library_name}}.
+
+        Provides event handling and routing capabilities.
+        """
+
+        from typing import Dict, List, Any, Callable
+        import asyncio
+        import logging
+
+        from {{package_name}}.core.base import {{main_class_name}}
+        from {{package_name}}.config.settings import {{config_class_name}}
+        from {{package_name}}.exceptions.base import {{exception_class_name}}
+
+        logger = logging.getLogger(__name__)
+
+        class Event:
+            """Base event class."""
+            def __init__(self, event_type: str, data: Dict[str, Any] | None = None):
+                self.event_type = event_type
+                self.data = data or {}
+                self.timestamp = asyncio.get_event_loop().time()
+
+        class {{library_class_name}}EventManager({{main_class_name}}):
+            """Event manager for {{library_name}}."""
+
+            def __init__(self, config: {{config_class_name}}):
+                super().__init__(config=config)
+                self.handlers: Dict[str, List[Callable]] = {}
+
+            async def subscribe(self, event_type: str, handler: Callable) -> None:
+                if event_type not in self.handlers:
+                    self.handlers[event_type] = []
+                self.handlers[event_type].append(handler)
+
+            async def publish(self, event: Event) -> None:
+                handlers = self.handlers.get(event.event_type, [])
+                for handler in handlers:
+                    try:
+                        await handler(event)
+                    except Exception as e:
+                        logger.error(f"Error in event handler: {e}")
     state_manager_py:
       template: |
         """State manager for {{library_name}}.
@@ -870,49 +911,7 @@ file_templates:
                 async with self._lock:
                     return dict(self._state)
 
-        """Event system foundation for {{library_name}}.
-
-        Provides event handling and routing capabilities.
-        """
-
-        from typing import Dict, List, Any, Callable
-        import asyncio
-        import logging
-
-        from {{package_name}}.core.base import {{main_class_name}}
-        from {{package_name}}.config.settings import {{config_class_name}}
-        from {{package_name}}.exceptions.base import {{exception_class_name}}
-
-        logger = logging.getLogger(__name__)
-
-        class Event:
-            """Base event class."""
-            def __init__(self, event_type: str, data: Dict[str, Any] = None):
-                self.event_type = event_type
-                self.data = data or {}
-                self.timestamp = asyncio.get_event_loop().time()
-
-        class {{library_class_name}}EventManager({{main_class_name}}):
-            """Event manager for {{library_name}}."""
-
-            def __init__(self, config: {{config_class_name}}):
-                super().__init__(config=config)
-                self.handlers: Dict[str, List[Callable]] = {}
-
-            async def subscribe(self, event_type: str, handler: Callable) -> None:
-                """Subscribe to an event type."""
-                if event_type not in self.handlers:
-                    self.handlers[event_type] = []
-                self.handlers[event_type].append(handler)
-
-            async def publish(self, event: Event) -> None:
-                """Publish an event."""
-                handlers = self.handlers.get(event.event_type, [])
-                for handler in handlers:
-                    try:
-                        await handler(event)
-                    except Exception as e:
-                        logger.error(f"Error in event handler: {e}")
+        
 
     utils_helpers_py:
       template: |
@@ -1076,6 +1075,20 @@ file_templates:
 
     server_base_py:
       template: |
+        """HTTP server base for {{library_name}}."""
+        from typing import Any
+        import logging
+        from {{package_name}}.core.base import {{main_class_name}}
+        from {{package_name}}.config.settings import {{config_class_name}}
+
+        logger = logging.getLogger(__name__)
+
+        class HTTPServer({{main_class_name}}):
+            async def start(self) -> None:
+                await self.initialize()
+            
+            async def stop(self) -> None:
+                await self.shutdown()
     middleware_cors_py:
       template: |
         """CORS middleware for {{library_name}}."""
@@ -1106,18 +1119,7 @@ file_templates:
                 response = await next_handler(request)
                 logger.info("request.end")
                 return response
-
-        """HTTP server base for {{library_name}}."""
-        from typing import Any
-        import logging
-        from {{package_name}}.core.base import {{main_class_name}}
-        from {{package_name}}.config.settings import {{config_class_name}}
-
-        logger = logging.getLogger(__name__)
-
-        class HTTPServer({{main_class_name}}):
-            async def start(self) -> None:
-                await self.initialize()
+        
 
     auth_base_py:
       template: |
