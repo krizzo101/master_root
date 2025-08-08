@@ -108,18 +108,26 @@ def ts() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
-def call_openai_responses(prompt: str) -> Optional[dict]:
-    """Call OpenAI Responses API; return {'code': str, 'reasoning': str} or None."""
-    api_key = get_env_var("OPENAI_API_KEY")
-    if not api_key:
-        print(f"[{ts()}] OpenAI/Responses: missing OPENAI_API_KEY")
-        return None
-
-    base_url = get_env_var("OPENAI_BASE_URL")
-    model = select_model()
-
+def _choose_model_for_content(content: str) -> str:
+    """Heuristic: use gpt-5 for larger files, else gpt-5-mini."""
     try:
-        from openai import OpenAI, APIError, RateLimitError, APITimeoutError  # type: ignore
+        default_model = select_model()
+        # Rough char threshold where we prefer larger model capacity
+        return "gpt-5" if len(content) > 3000 else default_model
+    except Exception:
+        return "gpt-5-mini"
+
+
+def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[str]) -> Optional[dict]:
+    """Version-tolerant Responses call. Returns dict with keys 'code' and optional 'reasoning'."""
+    try:
+        from openai import OpenAI  # type: ignore
+        try:
+            from openai import APIError, RateLimitError, APITimeoutError  # type: ignore
+        except Exception:  # noqa: BLE001
+            APIError = Exception  # type: ignore[assignment]
+            RateLimitError = Exception  # type: ignore[assignment]
+            APITimeoutError = Exception  # type: ignore[assignment]
     except Exception as e:  # noqa: BLE001
         print(f"[{ts()}] OpenAI SDK import failed: {e}")
         return None
@@ -129,7 +137,7 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
         client_kwargs["base_url"] = base_url
     client = OpenAI(timeout=get_timeout_seconds(), **client_kwargs)
 
-    schema = {
+    schema: dict = {
         "name": "ai_populate_response",
         "schema": {
             "type": "object",
@@ -142,84 +150,85 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
         },
     }
 
-    for attempt in range(5):
-        try:
-            print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt+1}")
-            kwargs = {
-                "model": model,
-                "input": prompt,
-                "reasoning": {"effort": "medium"},
-                "max_output_tokens": 1200,
-                "response_format": {"type": "json_schema", "json_schema": schema},
-                "text": {"verbosity": "low"},
-            }
+    base_kwargs: dict = {
+        "model": model,
+        "input": prompt,
+        "max_output_tokens": 1200,
+    }
+    with_schema_kwargs = {
+        **base_kwargs,
+        "response_format": {"type": "json_schema", "json_schema": schema},
+    }
+
+    last_err: Optional[Exception] = None
+    for attempt in range(1, 4):
+        for use_schema in (True, False):
+            kwargs = with_schema_kwargs if use_schema else base_kwargs
             try:
-                resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
-            except TypeError as e:
-                # Remove unsupported fields progressively for older SDKs
-                print(f"[{ts()}] OpenAI/Responses TypeError: {e}; retrying without response_format")
-                kwargs.pop("response_format", None)
-                try:
-                    resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
-                except TypeError as e2:
-                    print(f"[{ts()}] OpenAI/Responses TypeError: {e2}; retrying without reasoning")
-                    kwargs.pop("reasoning", None)
+                print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt} schema={use_schema}")
+                resp = client.responses.create(**kwargs)
+                parsed = getattr(resp, "output_parsed", None)
+                if isinstance(parsed, dict) and parsed.get("code"):
+                    return {"code": parsed.get("code"), "reasoning": parsed.get("reasoning", "freeform")}
+                text = getattr(resp, "output_text", "") or ""
+                if isinstance(text, str) and text.strip():
                     try:
-                        resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
-                    except TypeError as e3:
-                        print(f"[{ts()}] OpenAI/Responses TypeError: {e3}; retrying without text")
-                        kwargs.pop("text", None)
-                        resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
-            # Prefer parsed JSON when using json_schema
-            parsed = getattr(resp, "output_parsed", None)
-            if parsed:
-                code = parsed.get("code", "")
-                reasoning = parsed.get("reasoning", "n/a")
-                if isinstance(code, str) and code.strip():
-                    return {"code": code, "reasoning": reasoning}
-            # Fallback to text if SDK/version mismatch
-            txt = getattr(resp, "output_text", "") or ""
-            if isinstance(txt, str) and txt.strip():
-                # Try to parse JSON object first
+                        obj = json.loads(text)
+                        if isinstance(obj, dict) and obj.get("code"):
+                            return {"code": obj.get("code"), "reasoning": obj.get("reasoning", "freeform")}
+                    except Exception:
+                        pass
+                    return {"code": text, "reasoning": "freeform"}
                 try:
-                    obj = json.loads(txt)
-                    if isinstance(obj, dict) and isinstance(obj.get("code"), str):
-                        return {"code": obj.get("code"), "reasoning": obj.get("reasoning", "freeform")}
+                    data = resp.model_dump()
                 except Exception:
-                    pass
-                return {"code": txt, "reasoning": "freeform"}
-            # Deep fallback: inspect outputs structure
-            try:
-                data = resp.model_dump()
-            except Exception:
-                data = {}
-            outputs = (data.get("output") or data.get("outputs") or [])
-            for item in outputs:
-                if item.get("type") == "message":
-                    for c in item.get("content") or []:
-                        if c.get("type") in ("output_text", "text", "input_text"):
-                            val = c.get("text")
-                            if isinstance(val, dict):
-                                val = val.get("value") or val.get("text")
-                            if isinstance(val, str) and val.strip():
-                                return {"code": val, "reasoning": "freeform"}
-            print(f"[{ts()}] OpenAI/Responses: empty output")
-            # Try next attempt
-            continue
-        except (RateLimitError, APITimeoutError) as e:  # type: ignore[name-defined]
-            print(f"[{ts()}] OpenAI/Responses retryable error: {e}")
-            time.sleep(1.5 * (attempt + 1))
-        except APIError as e:  # type: ignore[name-defined]
-            status = getattr(e, "status_code", 500)
-            print(f"[{ts()}] OpenAI/Responses API error: status={status} {e}")
-            if status >= 500:
-                time.sleep(1.5 * (attempt + 1))
-            else:
+                    data = {}
+                outputs = (data.get("output") or data.get("outputs") or [])
+                for item in outputs:
+                    if item.get("type") == "message":
+                        for c in item.get("content") or []:
+                            if c.get("type") in ("output_text", "text", "input_text"):
+                                val = c.get("text")
+                                if isinstance(val, dict):
+                                    val = val.get("value") or val.get("text")
+                                if isinstance(val, str) and val.strip():
+                                    return {"code": val, "reasoning": "freeform"}
+                last_err = RuntimeError("Empty response content")
+            except (RateLimitError, APITimeoutError) as e:  # type: ignore[name-defined]
+                print(f"[{ts()}] OpenAI/Responses retryable error: {e}")
+                last_err = e
+            except APIError as e:  # type: ignore[name-defined]
+                status = getattr(e, "status_code", 500)
+                print(f"[{ts()}] OpenAI/Responses API error: status={status} {e}")
+                last_err = e
+                if status < 500:
+                    return None
+            except TypeError as e:
+                last_err = e
+                if use_schema:
+                    print(f"[{ts()}] OpenAI/Responses TypeError: {e}; retrying without response_format")
+                    continue
+                print(f"[{ts()}] OpenAI/Responses TypeError without schema: {e}")
                 return None
-        except Exception as e:  # noqa: BLE001
-            print(f"[{ts()}] OpenAI/Responses exception: {e}")
-            time.sleep(1.5 * (attempt + 1))
+            except Exception as e:  # noqa: BLE001
+                print(f"[{ts()}] OpenAI/Responses exception: {e}")
+                last_err = e
+        if attempt < 3:
+            time.sleep(1.5 * attempt)
     return None
+
+
+def call_openai_responses(prompt: str, *, content_hint: str = "") -> Optional[dict]:
+    """Call OpenAI Responses API using a version-tolerant helper.
+
+    Returns {'code': str, 'reasoning': str} or None.
+    """
+    if not is_ai_enabled():
+        print(f"[{ts()}] OpenAI/Responses: missing OPENAI_API_KEY")
+        return None
+    base_url = get_env_var("OPENAI_BASE_URL")
+    model = _choose_model_for_content(content_hint)
+    return _call_responses_with_schema(prompt, model=model, base_url=base_url)
 
 
 # Removed chat fallback: GPT-5 is only served by Responses API
@@ -304,7 +313,7 @@ def main() -> int:
                         content = ""
                     prompt = build_prompt(s, rel, lib_name, content)
                     print(f"[{ts()}] invoking AI for {rel} (mode={args.mode})")
-                    result = call_openai_responses(prompt)
+                    result = call_openai_responses(prompt, content_hint=content)
                     code = (result or {}).get("code") if isinstance(result, dict) else None
                     if not code:
                         # Fallback to placeholder if AI failed
