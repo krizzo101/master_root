@@ -95,16 +95,18 @@ class OpsviEcosystemGeneratorV2:
         # Try direct nested lookup
         try:
             keys = template_path.split(".")
-            template = self.templates
+            template: Any = self.templates
             for key in keys:
                 template = template[key]
             if isinstance(template, dict):
                 value = template.get("template")
-                return value if isinstance(value, str) else None
-            elif isinstance(template, str):
+                if isinstance(value, str):
+                    return value
+                return None
+            if isinstance(template, str):
                 return template
         except (KeyError, TypeError):
-            pass
+            template = None
 
         # Try short key in known namespaces
         candidates: list[str] = [
@@ -116,14 +118,16 @@ class OpsviEcosystemGeneratorV2:
         for alt_path in candidates:
             try:
                 keys = alt_path.split(".")
-                template = self.templates
+                node: Any = self.templates
                 for key in keys:
-                    template = template[key]
-                if isinstance(template, dict):
-                    value = template.get("template")
-                    return value if isinstance(value, str) else None
-                elif isinstance(template, str):
-                    return template
+                    node = node[key]
+                if isinstance(node, dict):
+                    value = node.get("template")
+                    if isinstance(value, str):
+                        return value
+                    continue
+                if isinstance(node, str):
+                    return node
             except (KeyError, TypeError):
                 continue
 
@@ -607,7 +611,7 @@ class OpsviEcosystemGeneratorV2:
                 print(f"✅ {library_name}: All files present")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="OPSVI Ecosystem Generator v2")
     parser.add_argument(
         "--libs-dir",
