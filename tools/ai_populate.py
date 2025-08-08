@@ -33,9 +33,9 @@ APPROVED_MODELS = {"o3", "o4-mini", "gpt-5", "gpt-5-mini", "gpt-5-nano"}
 
 def get_timeout_seconds() -> int:
     try:
-        return int(os.environ.get("OPENAI_TIMEOUT", "20"))
+        return int(os.environ.get("OPENAI_TIMEOUT", "60"))
     except Exception:
-        return 20
+        return 60
 
 
 def iter_library_packages(libs_dir: Path) -> Iterable[tuple[str, Path, Path]]:
@@ -105,7 +105,13 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
     body = {
         "model": model,
         "input": prompt,
+        # Align with internal interface usage
+        "reasoning": {"effort": "medium"} if model.startswith("gpt-5") else None,
+        "max_output_tokens": 3000,
+        "temperature": 0.2,
     }
+    # Remove None fields
+    body = {k: v for k, v in body.items() if v is not None}
     data = json.dumps(body).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     print(f"[{ts()}] OpenAI/Responses: POST {url} model={model}")
@@ -114,7 +120,15 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
             raw = resp.read().decode("utf-8")
             print(f"[{ts()}] OpenAI/Responses: HTTP {resp.status}; {len(raw)} bytes")
             payload = json.loads(raw)
-            # Try to extract text content
+            # Try common shapes
+            # 1) Unified helper shape
+            if isinstance(payload.get("output_text"), str):
+                text_val = payload["output_text"]
+                try:
+                    return json.loads(text_val)
+                except Exception:
+                    return {"code": text_val, "reasoning": "freeform"}
+            # 2) Responses API output array
             outputs = payload.get("output") or payload.get("outputs")
             if outputs:
                 first = outputs[0]
