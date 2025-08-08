@@ -29,6 +29,13 @@ TODO_MARKER = "# TODO(ai):"
 APPROVED_MODELS = {"o3", "o4-mini", "gpt-5", "gpt-5-mini", "gpt-5-nano"}
 
 
+def get_timeout_seconds() -> int:
+    try:
+        return int(os.environ.get("OPENAI_TIMEOUT", "20"))
+    except Exception:
+        return 20
+
+
 def iter_library_packages(libs_dir: Path) -> Iterable[tuple[str, Path, Path]]:
     for lib_dir in sorted(p for p in libs_dir.iterdir() if p.is_dir()):
         pkg_name = lib_dir.name.replace("-", "_")
@@ -104,7 +111,7 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
     data = json.dumps(body).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     try:
-        with urllib.request.urlopen(req, timeout=60) as resp:
+        with urllib.request.urlopen(req, timeout=get_timeout_seconds()) as resp:
             payload = json.loads(resp.read().decode("utf-8"))
             # Try to extract text content
             outputs = payload.get("output") or payload.get("outputs")
@@ -157,7 +164,7 @@ def call_openai_chat(prompt: str) -> Optional[dict]:
     data = json.dumps(body).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     try:
-        with urllib.request.urlopen(req, timeout=60) as resp:
+        with urllib.request.urlopen(req, timeout=get_timeout_seconds()) as resp:
             payload = json.loads(resp.read().decode("utf-8"))
             choices = payload.get("choices") or []
             if not choices:
@@ -202,6 +209,7 @@ def main() -> int:
     parser.add_argument("--type", dest="only_type", nargs="*", default=None)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--write", action="store_true")
+    parser.add_argument("--offline", action="store_true", help="Disable network/AI calls; write deterministic placeholders only")
     parser.add_argument(
         "--mode",
         choices=["append", "replace"],
@@ -226,7 +234,8 @@ def main() -> int:
             rel = str(s.relative_to(lib_dir))
             print(f"  - {rel}")
             if args.write and not args.dry_run:
-                if is_ai_enabled():
+                offline = bool(args.offline) or (not is_ai_enabled())
+                if not offline:
                     try:
                         content = s.read_text(encoding="utf-8")
                     except Exception:
