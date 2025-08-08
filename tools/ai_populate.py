@@ -104,7 +104,7 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
     body = {
         "model": model,
         "input": prompt,
-        "response_format": {"type": "json_object"},
+        "text": {"format": "json_object"},
     }
     data = json.dumps(body).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
