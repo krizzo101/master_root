@@ -217,7 +217,7 @@ def build_prompt(file_path: Path, rel_path: str, lib_name: str, content: str) ->
         "- Keep code under ~200 lines if possible; no external network calls.\n\n"
         f"Library: {lib_name}\nFile: {rel_path}\n\n"
         "Current content:\n---BEGIN---\n" + content + "\n---END---\n\n"
-        "Respond as JSON with fields: {\"code\": str, \"reasoning\": str}."
+        "Output strictly the complete code as plain text only. No markdown fences, no JSON, no commentary."
     )
 
 
