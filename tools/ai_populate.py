@@ -165,44 +165,23 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
 
     last_err: Optional[Exception] = None
     for attempt in range(1, 4):
-        # Try param styles in order: 'response' (Responses structured outputs), 'text' (legacy SDK), then none
-        for style in ("response", "text", None):
-            use_schema = style is not None
-            if style == "response":
-                # Preferred Responses shape: schema under response.text.format
-                kwargs = {
-                    **base_kwargs,
-                    "response": {
-                        "modalities": ["text"],
-                        "text": {
-                            "format": {
-                                "type": "json_schema",
-                                "json_schema": {
-                                    "name": schema.get("name", "response"),
-                                    "schema": schema.get("schema", {}),
-                                    "strict": True,
-                                },
-                            }
-                        },
-                    },
-                }
-            elif style == "text":
-                # Some SDKs expect flattened schema fields under text.format
+        # Try param styles: 'text' (correct Responses API), then none
+        for use_schema in (True, False):
+            if use_schema:
+                # Correct Responses API structure: text.format for structured outputs
                 kwargs = {
                     **base_kwargs,
                     "text": {
                         "format": {
                             "type": "json_schema",
-                            "name": schema.get("name", "response"),
-                            "schema": schema.get("schema", {}),
-                            "strict": True,
+                            "json_schema": schema,
                         }
                     },
                 }
             else:
                 kwargs = dict(base_kwargs)
             try:
-                print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt} schema={use_schema} style={style} max_tokens={max_tokens}")
+                print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt} schema={use_schema} max_tokens={max_tokens}")
                 # Try with temperature=0; if rejected, retry without it
                 with_temp = {**kwargs, "temperature": 0}
                 try:
@@ -265,8 +244,8 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
                     return None
             except TypeError as e:
                 last_err = e
-                print(f"[{ts()}] OpenAI/Responses TypeError with style={style}: {e}")
-                # try next style
+                print(f"[{ts()}] OpenAI/Responses TypeError with schema={use_schema}: {e}")
+                # try next approach
                 continue
             except Exception as e:  # noqa: BLE001
                 print(f"[{ts()}] OpenAI/Responses exception: {e}")
