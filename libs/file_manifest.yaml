@@ -7,6 +7,12 @@ library_types:
         template: "test_base_py"
       - path: "tests/test_imports.py"
         template: "tests_smoke_imports_py"
+      - path: "CONTRIBUTING.md"
+        template: "CONTRIBUTING_md"
+      - path: "CHANGELOG.md"
+        template: "CHANGELOG_md"
+      - path: "LICENSE"
+        template: "LICENSE_md"
   service:
     files:
       - path: "{{package_name}}/providers/base.py"
@@ -17,6 +23,12 @@ library_types:
         template: "test_base_py"
       - path: "tests/test_imports.py"
         template: "tests_smoke_imports_py"
+      - path: "CONTRIBUTING.md"
+        template: "CONTRIBUTING_md"
+      - path: "CHANGELOG.md"
+        template: "CHANGELOG_md"
+      - path: "LICENSE"
+        template: "LICENSE_md"
   rag:
     files:
       - path: "{{package_name}}/datastores/base.py"
@@ -31,6 +43,12 @@ library_types:
         template: "test_base_py"
       - path: "tests/test_imports.py"
         template: "tests_smoke_imports_py"
+      - path: "CONTRIBUTING.md"
+        template: "CONTRIBUTING_md"
+      - path: "CHANGELOG.md"
+        template: "CHANGELOG_md"
+      - path: "LICENSE"
+        template: "LICENSE_md"
   manager:
     files:
       - path: "{{package_name}}/coordinators/base.py"
@@ -43,6 +61,12 @@ library_types:
         template: "test_base_py"
       - path: "tests/test_imports.py"
         template: "tests_smoke_imports_py"
+      - path: "CONTRIBUTING.md"
+        template: "CONTRIBUTING_md"
+      - path: "CHANGELOG.md"
+        template: "CHANGELOG_md"
+      - path: "LICENSE"
+        template: "LICENSE_md"
 
 libraries:
   opsvi-core:
