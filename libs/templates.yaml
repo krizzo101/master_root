@@ -913,7 +913,7 @@ file_templates:
 
         
 
-    utils_helpers_py:
+    utils_helpers_py_alt:
       template: |
         """Utility functions for {{library_name}}.
 
