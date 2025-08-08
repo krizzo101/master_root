@@ -120,33 +120,34 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
             raw = resp.read().decode("utf-8")
             print(f"[{ts()}] OpenAI/Responses: HTTP {resp.status}; {len(raw)} bytes")
             payload = json.loads(raw)
-            # Try common shapes
-            # 1) Unified helper shape
+
+            # Unified text extraction
+            text_val: Optional[str] = None
             if isinstance(payload.get("output_text"), str):
                 text_val = payload["output_text"]
-                try:
-                    return json.loads(text_val)
-                except Exception:
-                    return {"code": text_val, "reasoning": "freeform"}
-            # 2) Responses API output array
-            outputs = payload.get("output") or payload.get("outputs")
-            if outputs:
-                first = outputs[0]
-                content = first.get("content") or []
-                for part in content:
-                    if part.get("type") in ("output_text", "text"):
-                        text_val = part.get("text", "")
-                        try:
-                            return json.loads(text_val)
-                        except Exception:
-                            return {"code": text_val, "reasoning": "freeform"}
-            # Fallback try common field names
-            if "text" in payload:
+            else:
+                outputs = payload.get("output") or payload.get("outputs")
+                if outputs:
+                    first = outputs[0]
+                    for part in (first.get("content") or []):
+                        if part.get("type") in ("output_text", "text") and isinstance(part.get("text"), str):
+                            text_val = part.get("text")
+                            break
+            if text_val is None and isinstance(payload.get("text"), str):
                 text_val = payload["text"]
-                try:
-                    return json.loads(text_val)
-                except Exception:
-                    return {"code": text_val, "reasoning": "freeform"}
+
+            if not text_val:
+                return None
+
+            # Prefer structured JSON {code, reasoning}; else treat as raw code
+            try:
+                parsed = json.loads(text_val)
+                if isinstance(parsed, dict) and isinstance(parsed.get("code"), str):
+                    return parsed
+                # If parsed JSON is not the expected shape, fall back to raw text
+                return {"code": text_val, "reasoning": "freeform"}
+            except Exception:
+                return {"code": text_val, "reasoning": "freeform"}
     except urllib.error.HTTPError as e:
         try:
             err_body = e.read().decode('utf-8', 'ignore')
