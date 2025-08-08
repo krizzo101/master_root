@@ -320,7 +320,9 @@ class OpsviEcosystemGeneratorV2:
         template = self.jinja_env.from_string(template_content)
         return template.render(**variables)
 
-    def _create_directory_structure(self, library_name: str, library_data: dict) -> None:
+    def _create_directory_structure(
+        self, library_name: str, library_data: dict
+    ) -> None:
         """Create directory structure for a library"""
         library_dir = self.libs_dir / library_name
         package_name = library_name.replace("-", "_")
@@ -499,7 +501,9 @@ class OpsviEcosystemGeneratorV2:
                 # YAML anchor resolved as dict - extract template field
                 template_value = template_ref.get("template")
                 if not isinstance(template_value, str):
-                    raise ValueError(f"Missing or invalid 'template' in dict for {file_path}")
+                    raise ValueError(
+                        f"Missing or invalid 'template' in dict for {file_path}"
+                    )
                 template_path = template_value
                 if template_path.startswith("*"):
                     # Handle nested anchor reference
