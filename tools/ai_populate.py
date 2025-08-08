@@ -100,19 +100,11 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
-    # New Responses API format (best-effort); if API changes, fallback to chat
+    # Responses API: simple shape; ask for JSON object output
     body = {
         "model": model,
-        "modalities": ["text"],
-        "input": [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "input_text", "text": prompt}
-                ],
-            }
-        ],
-        "text": {"format": "json"},
+        "input": prompt,
+        "text": {"format": "json_object"},
     }
     data = json.dumps(body).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
