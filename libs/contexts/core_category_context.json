@@ -1,0 +1,7 @@
+{
+  "category_overview": {"name": "core", "description": "Foundation and core", "scope": "core libs", "responsibilities": ["base classes", "config", "exceptions"]},
+  "design_patterns": {"primary_patterns": ["Factory", "Strategy"], "implementation_guidelines": "SRP + DI", "best_practices": ["typed APIs", "async"]},
+  "common_challenges": {"technical_challenges": ["lifecycle mgmt"], "performance_challenges": ["event overhead"], "integration_challenges": ["interface drift"]},
+  "performance_considerations": {"bottlenecks": "sync I/O", "optimization_strategies": "await I/O, cache", "monitoring_requirements": "latency, errors"},
+  "integration_requirements": {"internal_dependencies": "foundation", "external_dependencies": "none", "api_requirements": "stable"}
+}

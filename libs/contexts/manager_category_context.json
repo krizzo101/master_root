@@ -1,0 +1,7 @@
+{
+  "category_overview": {"name": "manager", "description": "Coordination and orchestration", "scope": "workflows/schedulers", "responsibilities": ["coordinate", "schedule", "monitor"]},
+  "design_patterns": {"primary_patterns": ["Coordinator", "Observer"], "implementation_guidelines": "clear state model", "best_practices": ["idempotency", "backpressure"]},
+  "common_challenges": {"technical_challenges": ["race conditions"], "performance_challenges": ["fanout"], "integration_challenges": ["heterogeneous deps"]},
+  "performance_considerations": {"bottlenecks": "contention", "optimization_strategies": "sharding", "monitoring_requirements": "queue depth"},
+  "integration_requirements": {"internal_dependencies": "core", "external_dependencies": "infra", "api_requirements": "observability"}
+}

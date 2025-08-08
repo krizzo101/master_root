@@ -1,0 +1,7 @@
+{
+  "category_overview": {"name": "rag", "description": "Retrieval Augmented Generation", "scope": "datastores + processors", "responsibilities": ["index", "retrieve", "embed"]},
+  "design_patterns": {"primary_patterns": ["Pipeline", "Strategy"], "implementation_guidelines": "chunking + batching", "best_practices": ["hybrid search", "telemetry"]},
+  "common_challenges": {"technical_challenges": ["consistency"], "performance_challenges": ["IO-bound"], "integration_challenges": ["drivers"]},
+  "performance_considerations": {"bottlenecks": "vector ops", "optimization_strategies": "ANN libs", "monitoring_requirements": "recall/latency"},
+  "integration_requirements": {"internal_dependencies": "core", "external_dependencies": "DBs", "api_requirements": "consistent"}
+}

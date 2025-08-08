@@ -1,0 +1,7 @@
+{
+  "category_overview": {"name": "service", "description": "External integrations", "scope": "providers", "responsibilities": ["connect", "health", "retry"]},
+  "design_patterns": {"primary_patterns": ["Adapter", "CircuitBreaker"], "implementation_guidelines": "timeouts + backoff", "best_practices": ["pooling", "metrics"]},
+  "common_challenges": {"technical_challenges": ["rate limits"], "performance_challenges": ["latency"], "integration_challenges": ["auth"]},
+  "performance_considerations": {"bottlenecks": "network I/O", "optimization_strategies": "batching", "monitoring_requirements": "p95, error rate"},
+  "integration_requirements": {"internal_dependencies": "core", "external_dependencies": "APIs", "api_requirements": "resilient"}
+}
