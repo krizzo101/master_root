@@ -20,7 +20,10 @@ echo "[$(ts)] validate_libs: lint/type checks done"
 
 # AI populator (must succeed with AI)
 echo "[$(ts)] validate_libs: AI populate (online, fail fast)"
-OPENAI_TIMEOUT=${OPENAI_TIMEOUT:-20} python3 "${ROOT_DIR}/tools/ai_populate.py" --libs-dir "${ROOT_DIR}/_gen_sandbox" --write --mode replace
+AI_POP_LOG="${ROOT_DIR}/_gen_sandbox/.logs/ai_populate.log"
+mkdir -p "$(dirname "$AI_POP_LOG")"
+OPENAI_TIMEOUT=${OPENAI_TIMEOUT:-20} python3 "${ROOT_DIR}/tools/ai_populate.py" --libs-dir "${ROOT_DIR}/_gen_sandbox" --write --mode replace --log-file "$AI_POP_LOG"
+echo "[$(ts)] validate_libs: AI populate log at $AI_POP_LOG"
 echo "[$(ts)] validate_libs: AI populate done"
 
 # Import smoke test for generated libs

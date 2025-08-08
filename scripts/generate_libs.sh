@@ -23,4 +23,7 @@ python3 "${ROOT_DIR}/libs/generate_ecosystem_v2.py" \
   --file-manifest "${SANDBOX_DIR}/file_manifest.yaml" "$@"
 status=$?
 echo "[$(ts)] generate_libs: generator exit=${status}"
+if [ $status -ne 0 ]; then
+  echo "[$(ts)] generate_libs: failed; see ${SANDBOX_DIR} for copies of configs and ${SANDBOX_DIR}/templates.yaml"
+fi
 exit ${status}

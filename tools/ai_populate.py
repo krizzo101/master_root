@@ -30,6 +30,29 @@ STUB_MARKER = "AUTO-GENERATED STUB"
 TODO_MARKER = "# TODO(ai):"
 APPROVED_MODELS = {"o3", "o4-mini", "gpt-5", "gpt-5-mini", "gpt-5-nano"}
 
+# Global log file path (set via --log-file). When set, all prints are also written to this file.
+LOG_FILE_PATH: Optional[str] = None
+
+
+class _TeeWriter:
+    def __init__(self, file_path: str, stream) -> None:
+        self._stream = stream
+        self._file = open(file_path, "a", encoding="utf-8")
+
+    def write(self, data: str) -> int:
+        w1 = self._stream.write(data)
+        self._stream.flush()
+        self._file.write(data)
+        self._file.flush()
+        return w1
+
+    def flush(self) -> None:  # noqa: D401
+        self._stream.flush()
+        self._file.flush()
+
+    def isatty(self) -> bool:
+        return False
+
 
 def get_timeout_seconds() -> int:
     try:
@@ -243,6 +266,7 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--write", action="store_true")
     parser.add_argument("--offline", action="store_true", help="Disable network/AI calls; write deterministic placeholders only (use only for diagnostics)")
+    parser.add_argument("--log-file", help="Path to write detailed logs (also echoed to console)")
     parser.add_argument(
         "--mode",
         choices=["append", "replace"],
@@ -253,6 +277,17 @@ def main() -> int:
 
     libs_dir = Path(args.libs_dir)
     only = set(args.only or [])
+
+    # Configure tee logging if requested
+    global LOG_FILE_PATH
+    if args.log_file:
+        LOG_FILE_PATH = args.log_file
+        log_dir = os.path.dirname(LOG_FILE_PATH)
+        if log_dir:
+            os.makedirs(log_dir, exist_ok=True)
+        sys.stdout = _TeeWriter(LOG_FILE_PATH, sys.stdout)  # type: ignore[assignment]
+        sys.stderr = _TeeWriter(LOG_FILE_PATH, sys.stderr)  # type: ignore[assignment]
+        print(f"[{ts()}] ai_populate: logging to {LOG_FILE_PATH}")
 
     any_changes = False
     for lib_name, lib_dir, pkg_dir in iter_library_packages(libs_dir):
