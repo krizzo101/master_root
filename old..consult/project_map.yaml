@@ -1,13 +1,7 @@
 version: 1
 generator: project-intelligence-fast
 files:
-  - CONSULT_AGENT_OPTIMIZATION_DESIGN_SPEC.md
-  - DESIGN_SPEC_FIXES_SUMMARY.md
-  - FINAL_OPTIMIZATION_IMPLEMENTATION_PLAN.md
-  - FINAL_OPTIMIZATION_SUMMARY.md
-  - MULTI_CRITIC_APPROACH.md
   - README.md
-  - TOURNAMENT_APPROACH_SUMMARY.md
   - _gen_sandbox/file_manifest.yaml
   - _gen_sandbox/opsvi-agents/CHANGELOG.md
   - _gen_sandbox/opsvi-agents/CONTRIBUTING.md
@@ -442,12 +436,6 @@ files:
   - _gen_sandbox/opsvi-security/tests/test_opsvi_security.py
   - _gen_sandbox/recommended_structure.yaml
   - _gen_sandbox/templates.yaml
-  - analyze_log_reality.py
-  - baseline_analysis.py
-  - clean_log.py
-  - comparison_test.py
-  - comprehensive_optimization_analysis.py
-  - consult_agent_optimization_strategy.md
   - docs/DEVELOPMENT.md
   - docs/WORKSPACE_OPTIMIZATION.md
   - docs/auto-attach-script-optimized-spec.md
@@ -468,7 +456,6 @@ files:
   - docs/libs/templates/create_opsvi_library.py
   - docs/status/workspace_status_2025-08-03_18-44-43.md
   - docs/template_notes.txt
-  - enhanced_critic_accountability.py
   - justfile
   - libs/README.md
   - libs/STRUCTURE.md
@@ -829,25 +816,7 @@ files:
   - libs/recommended_structure.yaml
   - libs/templates.yaml
   - libs/variable_schema.yaml
-  - multi_candidate_tournament.py
-  - multi_critic_integration.py
-  - multi_critic_system.py
   - mypy.ini
-  - old..consult/AGENT_ONBOARDING.md
-  - old..consult/agent_architecture.jsonl
-  - old..consult/blocks.index.json
-  - old..consult/file_elements.jsonl
-  - old..consult/file_elements.min.jsonl
-  - old..consult/proj_intel_manifest.json
-  - old..consult/project_analysis.index.json
-  - old..consult/project_analysis.json
-  - old..consult/project_analysis.jsonl
-  - old..consult/project_map.yaml
-  - old..consult/reverse_index.json
-  - old..consult/symbol_index.json
-  - optimized_critic_implementation.py
-  - optimized_main_agent.py
-  - optimized_nano_instructions.py
   - platform/mcp/registry.json
   - platform/observability/config/grafana/provisioning/datasources/tempo.yaml
   - platform/observability/config/otel-collector-config.yaml
@@ -856,7 +825,6 @@ files:
   - platform/rag/docker-compose.yml
   - pyproject.toml
   - pytest.ini
-  - real_world_test.py
   - ruff.toml
   - scripts/README_auto_attach.md
   - scripts/auto_attach.py
@@ -874,7 +842,6 @@ files:
   - systemd/autosave@.timer
   - systemd/snapshot@.service
   - systemd/snapshot@.timer
-  - test_optimized_critic.py
   - tests/opsvi_core/test_logging.py
   - tools/ai_populate.py
   - tools/autosave.sh
@@ -882,5 +849,4 @@ files:
   - tools/rag_init.py
   - tools/snapshot.sh
   - tools/template_vars_check.py
-  - unified_optimization_system.py
   - uv.lock
