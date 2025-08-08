@@ -130,27 +130,14 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
         # Apply HTTP timeout to avoid hanging
         client = OpenAI(timeout=get_timeout_seconds(), **client_kwargs)
 
+        # Use minimal, widely-supported kwargs to avoid SDK-version issues
         kwargs = {
             "model": model,
             "input": prompt,
-            # Align with reference client: top-level verbosity + reasoning_effort
-            "verbosity": "low",
-            "reasoning_effort": "medium" if model.startswith("gpt-5") else None,
         }
-        # Remove None fields
-        kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         print(f"[{ts()}] OpenAI/Responses (SDK): create model={model}")
-        try:
-            resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
-        except TypeError as e:
-            # Retry without optional kwargs if SDK version rejects them
-            print(f"[{ts()}] OpenAI/Responses (SDK) TypeError: {e}; retrying without verbosity/reasoning_effort")
-            clean_kwargs = {"model": model, "input": prompt}
-            try:
-                resp = client.responses.create(timeout=get_timeout_seconds(), **clean_kwargs)
-            except TypeError:
-                resp = client.responses.create(**clean_kwargs)
+        resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
 
         # Prefer unified SDK field
         text_val = getattr(resp, "output_text", None)
@@ -290,6 +277,7 @@ def main() -> int:
         print(f"[{ts()}] ai_populate: logging to {LOG_FILE_PATH}")
 
     any_changes = False
+    libs_processed = 0
     for lib_name, lib_dir, pkg_dir in iter_library_packages(libs_dir):
         if only and lib_name not in only:
             continue
@@ -299,12 +287,15 @@ def main() -> int:
             print(f"{lib_name}: no AI targets found")
             continue
         print(f"[{ts()}] {lib_name}: {len(targets)} target files")
-        for s in targets:
+        start_lib = time.time()
+        completed_in_lib = 0
+        for idx, s in enumerate(targets, start=1):
             rel = str(s.relative_to(lib_dir))
-            print(f"[{ts()}] target -> {rel}")
+            print(f"[{ts()}] target [{idx}/{len(targets)}] -> {rel}")
             if args.write and not args.dry_run:
                 offline = bool(args.offline)
                 if not offline:
+                    t0 = time.time()
                     try:
                         content = s.read_text(encoding="utf-8")
                     except Exception:
@@ -319,15 +310,19 @@ def main() -> int:
                         print(f"[{ts()}] HINT: Ensure OPENAI_API_KEY and OPENAI_BASE_URL (if custom) are set; model={select_model()}; timeout={get_timeout_seconds()}s")
                         return 2
                     else:
-                        print(f"[{ts()}] AI returned code ({len(code)} chars); applying -> {rel}")
+                        took = time.time() - t0
+                        print(f"[{ts()}] AI returned code ({len(code)} chars) in {took:.1f}s; applying -> {rel}")
                         apply_generated_code(s, args.mode, code)
+                        completed_in_lib += 1
                     any_changes = True
                 else:
                     print(f"[{ts()}] OFFLINE mode enabled — skipping AI and failing fast by design")
                     return 3
+        libs_processed += 1
+        print(f"[{ts()}] Completed {lib_name}: wrote {completed_in_lib}/{len(targets)} files in {time.time()-start_lib:.1f}s")
 
     if any_changes:
-        print(f"[{ts()}] WROTE AI-generated code to target files.")
+        print(f"[{ts()}] WROTE AI-generated code to target files. Libraries processed: {libs_processed}")
     else:
         print(f"[{ts()}] No changes written.")
 
