@@ -119,9 +119,8 @@ def _choose_model_for_content(content: str) -> str:
 
 
 def _estimate_output_tokens(basis: str) -> int:
-    # Rough heuristic: ~3 chars per token; add headroom; clamp to sane bounds
-    approx = max(1200, (len(basis) // 3) + 800)
-    return min(8000, approx)
+    # Use large headroom as requested
+    return 16000
 
 
 def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[str], content_hint: str = "") -> Optional[dict]:
@@ -161,27 +160,40 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
         "model": model,
         "input": prompt,
         "max_output_tokens": max_tokens,
-        "temperature": 0,
-    }
-    with_schema_kwargs = {
-        **base_kwargs,
-        "response": {
-            "modalities": ["text"],
-            "text": {
-                "format": {
-                    "type": "json_schema",
-                    "json_schema": schema,
-                }
-            },
-        },
     }
 
     last_err: Optional[Exception] = None
     for attempt in range(1, 4):
-        for use_schema in (True, False):
-            kwargs = with_schema_kwargs if use_schema else base_kwargs
+        # Try param styles in order: 'response' (new Responses), 'text' (older SDKs), then none
+        for style in ("response", "text", None):
+            use_schema = style is not None
+            if style == "response":
+                kwargs = {
+                    **base_kwargs,
+                    "response": {
+                        "modalities": ["text"],
+                        "text": {
+                            "format": {
+                                "type": "json_schema",
+                                "json_schema": schema,
+                            }
+                        },
+                    },
+                }
+            elif style == "text":
+                kwargs = {
+                    **base_kwargs,
+                    "text": {
+                        "format": {
+                            "type": "json_schema",
+                            "json_schema": schema,
+                        }
+                    },
+                }
+            else:
+                kwargs = dict(base_kwargs)
             try:
-                print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt} schema={use_schema} max_tokens={max_tokens}")
+                print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt} schema={use_schema} style={style} max_tokens={max_tokens}")
                 resp = client.responses.create(**kwargs)
                 parsed = getattr(resp, "output_parsed", None)
                 if isinstance(parsed, dict) and isinstance(parsed.get("code"), str) and parsed["code"].strip():
@@ -232,11 +244,9 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
                     return None
             except TypeError as e:
                 last_err = e
-                if use_schema:
-                    print(f"[{ts()}] OpenAI/Responses TypeError: {e}; retrying without structured response payload")
-                    continue
-                print(f"[{ts()}] OpenAI/Responses TypeError without schema: {e}")
-                return None
+                print(f"[{ts()}] OpenAI/Responses TypeError with style={style}: {e}")
+                # try next style
+                continue
             except Exception as e:  # noqa: BLE001
                 print(f"[{ts()}] OpenAI/Responses exception: {e}")
                 last_err = e
