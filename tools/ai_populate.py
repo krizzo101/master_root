@@ -151,6 +151,7 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
                 "reasoning": {"effort": "medium"},
                 "max_output_tokens": 1200,
                 "response_format": {"type": "json_schema", "json_schema": schema},
+                "text": {"verbosity": "low"},
             }
             try:
                 resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
@@ -163,7 +164,12 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
                 except TypeError as e2:
                     print(f"[{ts()}] OpenAI/Responses TypeError: {e2}; retrying without reasoning")
                     kwargs.pop("reasoning", None)
-                    resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
+                    try:
+                        resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
+                    except TypeError as e3:
+                        print(f"[{ts()}] OpenAI/Responses TypeError: {e3}; retrying without text")
+                        kwargs.pop("text", None)
+                        resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
             # Prefer parsed JSON when using json_schema
             parsed = getattr(resp, "output_parsed", None)
             if parsed:
@@ -182,8 +188,24 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
                 except Exception:
                     pass
                 return {"code": txt, "reasoning": "freeform"}
+            # Deep fallback: inspect outputs structure
+            try:
+                data = resp.model_dump()
+            except Exception:
+                data = {}
+            outputs = (data.get("output") or data.get("outputs") or [])
+            for item in outputs:
+                if item.get("type") == "message":
+                    for c in item.get("content") or []:
+                        if c.get("type") in ("output_text", "text", "input_text"):
+                            val = c.get("text")
+                            if isinstance(val, dict):
+                                val = val.get("value") or val.get("text")
+                            if isinstance(val, str) and val.strip():
+                                return {"code": val, "reasoning": "freeform"}
             print(f"[{ts()}] OpenAI/Responses: empty output")
-            return None
+            # Try next attempt
+            continue
         except (RateLimitError, APITimeoutError) as e:  # type: ignore[name-defined]
             print(f"[{ts()}] OpenAI/Responses retryable error: {e}")
             time.sleep(1.5 * (attempt + 1))
