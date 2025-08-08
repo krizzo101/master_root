@@ -1,23 +1,32 @@
 #!/usr/bin/env python3
 """
-ai_populate.py — AI-assisted file population planner for OPSVI libs.
+ai_populate.py — AI-assisted file population for OPSVI libs.
 
-- Scans for generated libraries and identifies stub files.
-- Dry-run prints a plan; write mode can insert TODO scaffolds.
-- Optional OpenAI integration is stubbed (no network calls by default).
+- Scans for generated libraries and identifies stub/TODO files
+- Dry-run prints a plan; write mode can append or replace content
+- Real AI integration via OpenAI Responses API with approved models only
 
 Usage:
   python tools/ai_populate.py --libs-dir libs --dry-run
-  python tools/ai_populate.py --libs-dir libs --only opsvi-core --write
+  python tools/ai_populate.py --libs-dir libs --only opsvi-core --write --mode append
+
+Env:
+  OPENAI_API_KEY (required for AI mode)
+  OPENAI_BASE_URL (optional; default https://api.openai.com/v1)
+  OPENAI_MODEL (optional; default gpt-5-mini; approved: o3, o4-mini, gpt-5, gpt-5-mini, gpt-5-nano)
 """
 from __future__ import annotations
 
 import argparse
+import json
 import os
+import sys
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Optional
 
 STUB_MARKER = "AUTO-GENERATED STUB"
+TODO_MARKER = "# TODO(ai):"
+APPROVED_MODELS = {"o3", "o4-mini", "gpt-5", "gpt-5-mini", "gpt-5-nano"}
 
 
 def iter_library_packages(libs_dir: Path) -> Iterable[tuple[str, Path, Path]]:
@@ -28,24 +37,104 @@ def iter_library_packages(libs_dir: Path) -> Iterable[tuple[str, Path, Path]]:
             yield (lib_dir.name, lib_dir, pkg_dir)
 
 
-def find_stubs(lib_dir: Path) -> list[Path]:
-    stubs: list[Path] = []
+def find_targets(lib_dir: Path) -> list[Path]:
+    targets: list[Path] = []
     for path in lib_dir.rglob("*.py"):
         try:
             text = path.read_text(encoding="utf-8")
         except Exception:
             continue
-        if STUB_MARKER in text:
-            stubs.append(path)
-    return stubs
+        if STUB_MARKER in text or TODO_MARKER in text:
+            targets.append(path)
+    return targets
 
 
 def write_placeholder(path: Path) -> None:
-    header = (
-        "\n# TODO(ai): Populate implementation using contexts and templates.\n"
-    )
+    header = "\n# TODO(ai): Populate implementation using contexts and templates.\n"
     with path.open("a", encoding="utf-8") as f:
         f.write(header)
+
+
+def get_env_var(name: str, default: Optional[str] = None) -> Optional[str]:
+    val = os.environ.get(name)
+    return val if val else default
+
+
+def is_ai_enabled() -> bool:
+    return bool(get_env_var("OPENAI_API_KEY"))
+
+
+def select_model() -> str:
+    model = get_env_var("OPENAI_MODEL", "gpt-5-mini") or "gpt-5-mini"
+    if model not in APPROVED_MODELS:
+        print(f"Warning: Model '{model}' not approved; falling back to gpt-5-mini")
+        model = "gpt-5-mini"
+    return model
+
+
+def call_openai_responses(prompt: str) -> Optional[dict]:
+    api_key = get_env_var("OPENAI_API_KEY")
+    if not api_key:
+        return None
+    base_url = get_env_var("OPENAI_BASE_URL", "https://api.openai.com/v1")
+    model = select_model()
+
+    import urllib.request
+    import urllib.error
+
+    url = f"{base_url.rstrip('/')}/responses"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    body = {
+        "model": model,
+        "input": prompt,
+        "response_format": {"type": "json_object"},
+    }
+    data = json.dumps(body).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+            # Expect { output: [ { content: [ { type: "output_text", text: "{...json...}" } ] } ] }
+            outputs = payload.get("output") or payload.get("outputs")
+            if not outputs:
+                return None
+            first = outputs[0]
+            content = first.get("content") or []
+            for part in content:
+                if part.get("type") in ("output_text", "text"):
+                    try:
+                        return json.loads(part.get("text", "{}"))
+                    except Exception:
+                        return {"code": part.get("text", ""), "reasoning": "freeform"}
+    except urllib.error.HTTPError as e:
+        print(f"OpenAI API error: {e.read().decode('utf-8', 'ignore')}")
+    except Exception as e:  # noqa: BLE001
+        print(f"OpenAI call failed: {e}")
+    return None
+
+
+def build_prompt(file_path: Path, rel_path: str, lib_name: str, content: str) -> str:
+    return (
+        "You are an expert Python library developer. Generate high-quality, typed, "
+        "readable code that replaces TODO/stub placeholders. Follow these rules: "
+        "- Match the module purpose inferred from the path and current content. "
+        "- Use asyncio where appropriate; include minimal docstrings; no secrets. "
+        "- Keep code under ~200 lines if possible; no external network calls.\n\n"
+        f"Library: {lib_name}\nFile: {rel_path}\n\n"
+        "Current content:\n---BEGIN---\n" + content + "\n---END---\n\n"
+        "Respond as JSON with fields: {\"code\": str, \"reasoning\": str}."
+    )
+
+
+def apply_generated_code(path: Path, mode: str, generated_code: str) -> None:
+    if mode == "replace":
+        path.write_text(generated_code, encoding="utf-8")
+    else:
+        with path.open("a", encoding="utf-8") as f:
+            f.write("\n\n" + generated_code + "\n")
 
 
 def main() -> int:
@@ -55,6 +144,12 @@ def main() -> int:
     parser.add_argument("--type", dest="only_type", nargs="*", default=None)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--write", action="store_true")
+    parser.add_argument(
+        "--mode",
+        choices=["append", "replace"],
+        default="append",
+        help="How to write generated code into target files",
+    )
     args = parser.parse_args()
 
     libs_dir = Path(args.libs_dir)
@@ -64,24 +159,39 @@ def main() -> int:
     for lib_name, lib_dir, pkg_dir in iter_library_packages(libs_dir):
         if only and lib_name not in only:
             continue
-        stubs = find_stubs(lib_dir)
-        if not stubs:
-            print(f"{lib_name}: no stubs found")
+        targets = find_targets(lib_dir)
+        if not targets:
+            print(f"{lib_name}: no AI targets found")
             continue
-        print(f"{lib_name}: {len(stubs)} stub files")
-        for s in stubs:
-            print(f"  - {s.relative_to(lib_dir)}")
+        print(f"{lib_name}: {len(targets)} target files")
+        for s in targets:
+            rel = str(s.relative_to(lib_dir))
+            print(f"  - {rel}")
             if args.write and not args.dry_run:
-                write_placeholder(s)
-                any_changes = True
+                if is_ai_enabled():
+                    try:
+                        content = s.read_text(encoding="utf-8")
+                    except Exception:
+                        content = ""
+                    prompt = build_prompt(s, rel, lib_name, content)
+                    result = call_openai_responses(prompt)
+                    code = (result or {}).get("code") if isinstance(result, dict) else None
+                    if not code:
+                        # Fallback to placeholder if AI failed
+                        write_placeholder(s)
+                    else:
+                        apply_generated_code(s, args.mode, code)
+                    any_changes = True
+                else:
+                    write_placeholder(s)
+                    any_changes = True
 
     if any_changes:
         print("WROTE placeholders to stub files.")
     else:
         print("No changes written.")
 
-    # Note: OpenAI integration intentionally omitted to avoid secrets in CI.
-    # Implement later with env OPENAI_API_KEY and approved models (e.g., gpt-5-mini).
+    # OpenAI integration is enabled when OPENAI_API_KEY is present; in CI this will typically be absent.
     return 0
 
 

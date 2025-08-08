@@ -5,6 +5,8 @@ library_types:
         template: "utils_helpers_py"
       - path: "tests/test_{{package_name}}.py"
         template: "test_base_py"
+      - path: "tests/test_imports.py"
+        template: "tests_smoke_imports_py"
   service:
     files:
       - path: "{{package_name}}/providers/base.py"
@@ -13,6 +15,8 @@ library_types:
         template: "utils_helpers_py"
       - path: "tests/test_{{package_name}}.py"
         template: "test_base_py"
+      - path: "tests/test_imports.py"
+        template: "tests_smoke_imports_py"
   rag:
     files:
       - path: "{{package_name}}/datastores/base.py"
@@ -25,6 +29,8 @@ library_types:
         template: "utils_helpers_py"
       - path: "tests/test_{{package_name}}.py"
         template: "test_base_py"
+      - path: "tests/test_imports.py"
+        template: "tests_smoke_imports_py"
   manager:
     files:
       - path: "{{package_name}}/coordinators/base.py"
@@ -35,6 +41,8 @@ library_types:
         template: "utils_helpers_py"
       - path: "tests/test_{{package_name}}.py"
         template: "test_base_py"
+      - path: "tests/test_imports.py"
+        template: "tests_smoke_imports_py"
 
 libraries:
   opsvi-core:

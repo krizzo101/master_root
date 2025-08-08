@@ -1396,6 +1396,30 @@ file_templates:
 
     tests_base_py:
       template: |
+    tests_smoke_imports_py:
+      template: |
+        """Smoke import tests for {{library_name}}.
+
+        Ensures public modules can be imported without side effects.
+        """
+
+        import importlib
+        import pytest
+
+        def test_import_root():
+            importlib.import_module("{{package_name}}")
+
+        @pytest.mark.parametrize(
+            "mod",
+            [
+                "{{package_name}}.config.settings",
+                "{{package_name}}.core.base",
+                "{{package_name}}.exceptions.base",
+            ],
+        )
+        def test_import_submodules(mod: str):
+            importlib.import_module(mod)
+
         """Base tests for {{library_name}}.
 
         {{tests_description}}
