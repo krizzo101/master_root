@@ -23,6 +23,8 @@ import os
 import sys
 from pathlib import Path
 from typing import Iterable, Optional
+from datetime import datetime
+import time
 
 STUB_MARKER = "AUTO-GENERATED STUB"
 TODO_MARKER = "# TODO(ai):"
@@ -79,6 +81,10 @@ def select_model() -> str:
     return model
 
 
+def ts() -> str:
+    return datetime.utcnow().isoformat(timespec="seconds") + "Z"
+
+
 def call_openai_responses(prompt: str) -> Optional[dict]:
     api_key = get_env_var("OPENAI_API_KEY")
     if not api_key:
@@ -110,9 +116,12 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
     }
     data = json.dumps(body).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    print(f"[{ts()}] OpenAI/Responses: POST {url} model={model}")
     try:
         with urllib.request.urlopen(req, timeout=get_timeout_seconds()) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
+            raw = resp.read().decode("utf-8")
+            print(f"[{ts()}] OpenAI/Responses: HTTP {resp.status}; {len(raw)} bytes")
+            payload = json.loads(raw)
             # Try to extract text content
             outputs = payload.get("output") or payload.get("outputs")
             if outputs:
@@ -133,9 +142,13 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
                 except Exception:
                     return {"code": text_val, "reasoning": "freeform"}
     except urllib.error.HTTPError as e:
-        print(f"OpenAI API error: {e.read().decode('utf-8', 'ignore')}")
+        try:
+            err_body = e.read().decode('utf-8', 'ignore')
+        except Exception:
+            err_body = '<no-body>'
+        print(f"[{ts()}] OpenAI/Responses ERROR: {e.code} {err_body}")
     except Exception as e:  # noqa: BLE001
-        print(f"OpenAI call failed: {e}")
+        print(f"[{ts()}] OpenAI/Responses EXCEPTION: {e}")
     return None
 
 
@@ -163,9 +176,12 @@ def call_openai_chat(prompt: str) -> Optional[dict]:
     }
     data = json.dumps(body).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    print(f"[{ts()}] OpenAI/Chat: POST {url} model={model}")
     try:
         with urllib.request.urlopen(req, timeout=get_timeout_seconds()) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
+            raw = resp.read().decode("utf-8")
+            print(f"[{ts()}] OpenAI/Chat: HTTP {resp.status}; {len(raw)} bytes")
+            payload = json.loads(raw)
             choices = payload.get("choices") or []
             if not choices:
                 return None
@@ -175,9 +191,13 @@ def call_openai_chat(prompt: str) -> Optional[dict]:
             except Exception:
                 return {"code": content, "reasoning": "freeform"}
     except urllib.error.HTTPError as e:
-        print(f"OpenAI Chat API error: {e.read().decode('utf-8', 'ignore')}")
+        try:
+            err_body = e.read().decode('utf-8', 'ignore')
+        except Exception:
+            err_body = '<no-body>'
+        print(f"[{ts()}] OpenAI/Chat ERROR: {e.code} {err_body}")
     except Exception as e:  # noqa: BLE001
-        print(f"OpenAI chat call failed: {e}")
+        print(f"[{ts()}] OpenAI/Chat EXCEPTION: {e}")
     return None
 
 
@@ -225,14 +245,15 @@ def main() -> int:
     for lib_name, lib_dir, pkg_dir in iter_library_packages(libs_dir):
         if only and lib_name not in only:
             continue
+        print(f"[{ts()}] Scanning: {lib_name} at {lib_dir}")
         targets = find_targets(lib_dir)
         if not targets:
             print(f"{lib_name}: no AI targets found")
             continue
-        print(f"{lib_name}: {len(targets)} target files")
+        print(f"[{ts()}] {lib_name}: {len(targets)} target files")
         for s in targets:
             rel = str(s.relative_to(lib_dir))
-            print(f"  - {rel}")
+            print(f"[{ts()}] target -> {rel}")
             if args.write and not args.dry_run:
                 offline = bool(args.offline) or (not is_ai_enabled())
                 if not offline:
@@ -241,22 +262,26 @@ def main() -> int:
                     except Exception:
                         content = ""
                     prompt = build_prompt(s, rel, lib_name, content)
+                    print(f"[{ts()}] invoking AI for {rel} (mode={args.mode})")
                     result = call_openai_responses(prompt) or call_openai_chat(prompt)
                     code = (result or {}).get("code") if isinstance(result, dict) else None
                     if not code:
                         # Fallback to placeholder if AI failed
+                        print(f"[{ts()}] AI failed; writing placeholder -> {rel}")
                         write_placeholder(s)
                     else:
+                        print(f"[{ts()}] AI returned code ({len(code)} chars); applying -> {rel}")
                         apply_generated_code(s, args.mode, code)
                     any_changes = True
                 else:
+                    print(f"[{ts()}] offline mode; writing placeholder -> {rel}")
                     write_placeholder(s)
                     any_changes = True
 
     if any_changes:
-        print("WROTE placeholders to stub files.")
+        print(f"[{ts()}] WROTE placeholders or AI code to target files.")
     else:
-        print("No changes written.")
+        print(f"[{ts()}] No changes written.")
 
     # OpenAI integration is enabled when OPENAI_API_KEY is present; in CI this will typically be absent.
     return 0
