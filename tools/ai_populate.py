@@ -150,8 +150,8 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
                 "code": {"type": "string"},
                 "reasoning": {"type": "string"},
             },
-            # Only code is required; reasoning is optional
-            "required": ["code"],
+            # API requires all properties in required array for strict mode
+            "required": ["code", "reasoning"],
             "additionalProperties": False,
         },
     }
@@ -168,13 +168,15 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
         # Try param styles: 'text' (correct Responses API), then none
         for use_schema in (True, False):
             if use_schema:
-                # Correct Responses API structure: text.format for structured outputs
+                # Correct Responses API structure: text.format with flattened schema
                 kwargs = {
                     **base_kwargs,
                     "text": {
                         "format": {
                             "type": "json_schema",
-                            "json_schema": schema,
+                            "name": schema.get("name", "response"),
+                            "schema": schema.get("schema", {}),
+                            "strict": True,
                         }
                     },
                 }
