@@ -18,10 +18,10 @@ black --check "${ROOT_DIR}/libs/generate_ecosystem_v2.py"
 mypy --python-version 3.12 "${ROOT_DIR}/libs/generate_ecosystem_v2.py"
 echo "[$(ts)] validate_libs: lint/type checks done"
 
-# AI populator dry-run
-echo "[$(ts)] validate_libs: AI populate dry-run"
-python3 "${ROOT_DIR}/tools/ai_populate.py" --libs-dir "${ROOT_DIR}/_gen_sandbox" --dry-run
-echo "[$(ts)] validate_libs: AI populate dry-run done"
+# AI populator (must succeed with AI)
+echo "[$(ts)] validate_libs: AI populate (online, fail fast)"
+OPENAI_TIMEOUT=${OPENAI_TIMEOUT:-20} python3 "${ROOT_DIR}/tools/ai_populate.py" --libs-dir "${ROOT_DIR}/_gen_sandbox" --write --mode replace
+echo "[$(ts)] validate_libs: AI populate done"
 
 # Import smoke test for generated libs
 echo "[$(ts)] validate_libs: import smoke"
@@ -53,4 +53,3 @@ if failures:
 print('Import smoke OK for generated libs')
 PY
 echo "[$(ts)] validate_libs: import smoke done"
-

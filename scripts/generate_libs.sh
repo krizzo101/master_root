@@ -24,4 +24,3 @@ python3 "${ROOT_DIR}/libs/generate_ecosystem_v2.py" \
 status=$?
 echo "[$(ts)] generate_libs: generator exit=${status}"
 exit ${status}
-

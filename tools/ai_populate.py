@@ -74,10 +74,10 @@ def is_ai_enabled() -> bool:
 
 
 def select_model() -> str:
-    model = get_env_var("OPENAI_MODEL", "gpt-5-mini") or "gpt-5-mini"
+    model = get_env_var("OPENAI_MODEL", "gpt-5") or "gpt-5"
     if model not in APPROVED_MODELS:
-        print(f"Warning: Model '{model}' not approved; falling back to gpt-5-mini")
-        model = "gpt-5-mini"
+        print(f"Warning: Model '{model}' not approved; falling back to gpt-5")
+        model = "gpt-5"
     return model
 
 
@@ -229,7 +229,7 @@ def main() -> int:
     parser.add_argument("--type", dest="only_type", nargs="*", default=None)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--write", action="store_true")
-    parser.add_argument("--offline", action="store_true", help="Disable network/AI calls; write deterministic placeholders only")
+    parser.add_argument("--offline", action="store_true", help="Disable network/AI calls; write deterministic placeholders only (use only for diagnostics)")
     parser.add_argument(
         "--mode",
         choices=["append", "replace"],
@@ -255,7 +255,7 @@ def main() -> int:
             rel = str(s.relative_to(lib_dir))
             print(f"[{ts()}] target -> {rel}")
             if args.write and not args.dry_run:
-                offline = bool(args.offline) or (not is_ai_enabled())
+                offline = bool(args.offline)
                 if not offline:
                     try:
                         content = s.read_text(encoding="utf-8")
@@ -263,23 +263,23 @@ def main() -> int:
                         content = ""
                     prompt = build_prompt(s, rel, lib_name, content)
                     print(f"[{ts()}] invoking AI for {rel} (mode={args.mode})")
-                    result = call_openai_responses(prompt) or call_openai_chat(prompt)
+                    result = call_openai_responses(prompt)
                     code = (result or {}).get("code") if isinstance(result, dict) else None
                     if not code:
                         # Fallback to placeholder if AI failed
-                        print(f"[{ts()}] AI failed; writing placeholder -> {rel}")
-                        write_placeholder(s)
+                        print(f"[{ts()}] AI failed; aborting. lib={lib_name} file={rel}")
+                        print(f"[{ts()}] HINT: Ensure OPENAI_API_KEY and OPENAI_BASE_URL (if custom) are set; model={select_model()}; timeout={get_timeout_seconds()}s")
+                        return 2
                     else:
                         print(f"[{ts()}] AI returned code ({len(code)} chars); applying -> {rel}")
                         apply_generated_code(s, args.mode, code)
                     any_changes = True
                 else:
-                    print(f"[{ts()}] offline mode; writing placeholder -> {rel}")
-                    write_placeholder(s)
-                    any_changes = True
+                    print(f"[{ts()}] OFFLINE mode enabled — skipping AI and failing fast by design")
+                    return 3
 
     if any_changes:
-        print(f"[{ts()}] WROTE placeholders or AI code to target files.")
+        print(f"[{ts()}] WROTE AI-generated code to target files.")
     else:
         print(f"[{ts()}] No changes written.")
 
