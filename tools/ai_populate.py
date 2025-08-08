@@ -104,7 +104,8 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
         client_kwargs = {}
         if base_url:
             client_kwargs["base_url"] = base_url
-        client = OpenAI(**client_kwargs)
+        # Apply HTTP timeout to avoid hanging
+        client = OpenAI(timeout=get_timeout_seconds(), **client_kwargs)
 
         kwargs = {
             "model": model,
@@ -118,12 +119,15 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
 
         print(f"[{ts()}] OpenAI/Responses (SDK): create model={model}")
         try:
-            resp = client.responses.create(**kwargs)
+            resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
         except TypeError as e:
             # Retry without optional kwargs if SDK version rejects them
             print(f"[{ts()}] OpenAI/Responses (SDK) TypeError: {e}; retrying without verbosity/reasoning_effort")
             clean_kwargs = {"model": model, "input": prompt}
-            resp = client.responses.create(**clean_kwargs)
+            try:
+                resp = client.responses.create(timeout=get_timeout_seconds(), **clean_kwargs)
+            except TypeError:
+                resp = client.responses.create(**clean_kwargs)
 
         # Prefer unified SDK field
         text_val = getattr(resp, "output_text", None)
