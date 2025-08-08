@@ -101,10 +101,10 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
         "Content-Type": "application/json",
     }
     # Responses API: simple shape; ask for JSON object output
+    # Minimal Responses API payload; request JSON via instruction in prompt
     body = {
         "model": model,
         "input": prompt,
-        "text": {"format": "json_object"},
     }
     data = json.dumps(body).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
