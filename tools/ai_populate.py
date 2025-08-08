@@ -109,14 +109,21 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
         kwargs = {
             "model": model,
             "input": prompt,
-            # Use verbosity lever per references; no hard cap on tokens
-            "text": {"verbosity": "low"},
+            # Align with reference client: top-level verbosity + reasoning_effort
+            "verbosity": "low",
+            "reasoning_effort": "medium" if model.startswith("gpt-5") else None,
         }
-        if model.startswith("gpt-5"):
-            kwargs["reasoning"] = {"effort": "medium"}
+        # Remove None fields
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         print(f"[{ts()}] OpenAI/Responses (SDK): create model={model}")
-        resp = client.responses.create(**kwargs)
+        try:
+            resp = client.responses.create(**kwargs)
+        except TypeError as e:
+            # Retry without optional kwargs if SDK version rejects them
+            print(f"[{ts()}] OpenAI/Responses (SDK) TypeError: {e}; retrying without verbosity/reasoning_effort")
+            clean_kwargs = {"model": model, "input": prompt}
+            resp = client.responses.create(**clean_kwargs)
 
         # Prefer unified SDK field
         text_val = getattr(resp, "output_text", None)
