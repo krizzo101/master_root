@@ -23,7 +23,7 @@ import os
 import sys
 from pathlib import Path
 from typing import Iterable, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import time
 
 STUB_MARKER = "AUTO-GENERATED STUB"
@@ -82,7 +82,7 @@ def select_model() -> str:
 
 
 def ts() -> str:
-    return datetime.utcnow().isoformat(timespec="seconds") + "Z"
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 def call_openai_responses(prompt: str) -> Optional[dict]:
@@ -104,7 +104,7 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
     body = {
         "model": model,
         "input": prompt,
-        "text": {"format": "json_object"},
+        "response_format": {"type": "json_object"},
     }
     data = json.dumps(body).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
