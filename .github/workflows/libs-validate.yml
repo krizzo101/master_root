@@ -67,3 +67,6 @@ jobs:
       - name: Type-check generator
         run: |
           mypy --python-version 3.12 libs/generate_ecosystem_v2.py
+      - name: Template variable schema check
+        run: |
+          python3 tools/template_vars_check.py
