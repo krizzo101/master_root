@@ -145,13 +145,25 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
     for attempt in range(5):
         try:
             print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt+1}")
-            resp = client.responses.create(
-                model=model,
-                input=prompt,
-                reasoning={"effort": "medium"},
-                max_output_tokens=1200,
-                response_format={"type": "json_schema", "json_schema": schema},
-            )
+            kwargs = {
+                "model": model,
+                "input": prompt,
+                "reasoning": {"effort": "medium"},
+                "max_output_tokens": 1200,
+                "response_format": {"type": "json_schema", "json_schema": schema},
+            }
+            try:
+                resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
+            except TypeError as e:
+                # Remove unsupported fields progressively for older SDKs
+                print(f"[{ts()}] OpenAI/Responses TypeError: {e}; retrying without response_format")
+                kwargs.pop("response_format", None)
+                try:
+                    resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
+                except TypeError as e2:
+                    print(f"[{ts()}] OpenAI/Responses TypeError: {e2}; retrying without reasoning")
+                    kwargs.pop("reasoning", None)
+                    resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
             # Prefer parsed JSON when using json_schema
             parsed = getattr(resp, "output_parsed", None)
             if parsed:
@@ -162,6 +174,13 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
             # Fallback to text if SDK/version mismatch
             txt = getattr(resp, "output_text", "") or ""
             if isinstance(txt, str) and txt.strip():
+                # Try to parse JSON object first
+                try:
+                    obj = json.loads(txt)
+                    if isinstance(obj, dict) and isinstance(obj.get("code"), str):
+                        return {"code": obj.get("code"), "reasoning": obj.get("reasoning", "freeform")}
+                except Exception:
+                    pass
                 return {"code": txt, "reasoning": "freeform"}
             print(f"[{ts()}] OpenAI/Responses: empty output")
             return None
