@@ -124,7 +124,7 @@ def _estimate_output_tokens(basis: str) -> int:
 
 
 def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[str], content_hint: str = "") -> Optional[dict]:
-    """Version-tolerant Responses call. Returns dict with keys 'code' and optional 'reasoning'."""
+    """Call OpenAI Responses API using proven working pattern from ACCF agents."""
     try:
         from openai import OpenAI  # type: ignore
         try:
@@ -142,116 +142,65 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
         client_kwargs["base_url"] = base_url
     client = OpenAI(timeout=get_timeout_seconds(), **client_kwargs)
 
-    schema: dict = {
-        "name": "ai_populate_response",
-        "schema": {
-            "type": "object",
-            "properties": {
-                "code": {"type": "string"},
-                "reasoning": {"type": "string"},
-            },
-            # API requires all properties in required array for strict mode
-            "required": ["code", "reasoning"],
-            "additionalProperties": False,
-        },
-    }
-
     max_tokens = _estimate_output_tokens(content_hint or prompt)
-    base_kwargs: dict = {
+    
+    # Use proven working pattern from ACCF coding agent
+    params = {
         "model": model,
         "input": prompt,
+        "text": {"format": {"type": "json_object"}},
         "max_output_tokens": max_tokens,
     }
+    
+    # Add reasoning for GPT-5 models like the working agent does
+    if model.startswith("gpt-5"):
+        params["reasoning"] = {"effort": "minimal"}
+        params["text"]["verbosity"] = "low"
 
-    last_err: Optional[Exception] = None
     for attempt in range(1, 4):
-        # Try param styles: 'text' (correct Responses API), then none
-        for use_schema in (True, False):
-            if use_schema:
-                # Correct Responses API structure: text.format with flattened schema
-                kwargs = {
-                    **base_kwargs,
-                    "text": {
-                        "format": {
-                            "type": "json_schema",
-                            "name": schema.get("name", "response"),
-                            "schema": schema.get("schema", {}),
-                            "strict": True,
-                        }
-                    },
-                }
-            else:
-                kwargs = dict(base_kwargs)
-            try:
-                print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt} schema={use_schema} max_tokens={max_tokens}")
-                # Try with temperature=0; if rejected, retry without it
-                with_temp = {**kwargs, "temperature": 0}
+        try:
+            print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt} max_tokens={max_tokens}")
+            resp = client.responses.create(**params)
+            
+            # Extract output like the working ACCF interface
+            output_text = getattr(resp, "output_text", None)
+            if not output_text and hasattr(resp, "output"):
+                # Try attribute-style extraction
                 try:
-                    resp = client.responses.create(**with_temp)
-                except APIError as e_temp:  # type: ignore[name-defined]
-                    status_temp = getattr(e_temp, "status_code", 500)
-                    param_temp = getattr(e_temp, "param", None)
-                    msg_temp = str(e_temp)
-                    if status_temp == 400 and (param_temp == "temperature" or "temperature" in msg_temp):
-                        print(f"[{ts()}] OpenAI/Responses: removing temperature and retrying (model constraint)")
-                        resp = client.responses.create(**kwargs)
-                    else:
-                        raise
-                parsed = getattr(resp, "output_parsed", None)
-                if isinstance(parsed, dict) and isinstance(parsed.get("code"), str) and parsed["code"].strip():
-                    return {"code": parsed.get("code"), "reasoning": parsed.get("reasoning", "")}
-                text = getattr(resp, "output_text", "") or ""
-                if isinstance(text, str) and text.strip():
-                    # Expect JSON per schema; fail if not parseable or missing code
-                    try:
-                        obj = json.loads(text)
-                        if isinstance(obj, dict) and isinstance(obj.get("code"), str) and obj["code"].strip():
-                            return {"code": obj.get("code"), "reasoning": obj.get("reasoning", "")}
-                        last_err = RuntimeError("Structured output missing 'code'")
-                        continue
-                    except Exception as e:
-                        last_err = RuntimeError(f"Non-JSON output under structured mode: {e}")
-                        continue
-                try:
-                    data = resp.model_dump()
+                    for item in resp.output:
+                        content = getattr(item, "content", None)
+                        if content:
+                            for c in content:
+                                txt = getattr(c, "text", None)
+                                if txt:
+                                    output_text = (output_text or "") + txt
                 except Exception:
-                    data = {}
-                outputs = (data.get("output") or data.get("outputs") or [])
-                for item in outputs:
-                    if item.get("type") == "message":
-                        for c in item.get("content") or []:
-                            if c.get("type") in ("output_text", "text", "input_text"):
-                                val = c.get("text")
-                                if isinstance(val, dict):
-                                    val = val.get("value") or val.get("text")
-                                if isinstance(val, str) and val.strip():
-                                    # Attempt JSON parse; otherwise fail
-                                    try:
-                                        obj = json.loads(val)
-                                        if isinstance(obj, dict) and isinstance(obj.get("code"), str) and obj["code"].strip():
-                                            return {"code": obj.get("code"), "reasoning": obj.get("reasoning", "")}
-                                    except Exception:
-                                        pass
-                                    last_err = RuntimeError("Unstructured fallback content without JSON 'code'")
-                                    continue
-                last_err = RuntimeError("Empty response content")
-            except (RateLimitError, APITimeoutError) as e:  # type: ignore[name-defined]
-                print(f"[{ts()}] OpenAI/Responses retryable error: {e}")
-                last_err = e
-            except APIError as e:  # type: ignore[name-defined]
-                status = getattr(e, "status_code", 500)
-                print(f"[{ts()}] OpenAI/Responses API error: status={status} {e}")
-                last_err = e
-                if status < 500:
-                    return None
-            except TypeError as e:
-                last_err = e
-                print(f"[{ts()}] OpenAI/Responses TypeError with schema={use_schema}: {e}")
-                # try next approach
+                    pass
+            
+            if output_text and output_text.strip():
+                try:
+                    obj = json.loads(output_text)
+                    if isinstance(obj, dict) and isinstance(obj.get("code"), str) and obj["code"].strip():
+                        return {"code": obj.get("code"), "reasoning": obj.get("reasoning", "")}
+                except Exception:
+                    pass
+                    
+            print(f"[{ts()}] OpenAI/Responses: no valid JSON code in response")
+            return None
+            
+        except (RateLimitError, APITimeoutError) as e:  # type: ignore[name-defined]
+            print(f"[{ts()}] OpenAI/Responses retryable error: {e}")
+            if attempt < 3:
+                time.sleep(1.5 * attempt)
                 continue
-            except Exception as e:  # noqa: BLE001
-                print(f"[{ts()}] OpenAI/Responses exception: {e}")
-                last_err = e
+        except APIError as e:  # type: ignore[name-defined]
+            status = getattr(e, "status_code", 500)
+            print(f"[{ts()}] OpenAI/Responses API error: status={status} {e}")
+            if status < 500:
+                return None
+        except Exception as e:  # noqa: BLE001
+            print(f"[{ts()}] OpenAI/Responses exception: {e}")
+            
         if attempt < 3:
             time.sleep(1.5 * attempt)
     return None
@@ -282,8 +231,8 @@ def build_prompt(file_path: Path, rel_path: str, lib_name: str, content: str) ->
         "- Keep code under ~200 lines if possible; no external network calls.\n\n"
         f"Library: {lib_name}\nFile: {rel_path}\n\n"
         "Current content:\n---BEGIN---\n" + content + "\n---END---\n\n"
-        "Return a JSON object with fields {\"code\": string, \"reasoning\": string}. "
-        "Place the full file contents in the 'code' field only. Do not include markdown fences."
+        "Return a JSON object only: {\"code\": \"<FULL FILE CODE>\"}. "
+        "The code must be complete, valid Python. No explanations outside the JSON."
     )
 
 
