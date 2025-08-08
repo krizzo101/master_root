@@ -14,7 +14,7 @@ All template references must be registry keys or nested registry paths.
 
 import argparse
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 from jinja2 import BaseLoader, Environment
@@ -73,11 +73,15 @@ class OpsviEcosystemGeneratorV2:
 
         print(f"Loaded {len(self.libraries)} libraries from structure definition")
 
-    def _load_yaml(self, file_path: Path) -> dict:
+    def _load_yaml(self, file_path: Path) -> dict[str, Any]:
         """Load YAML file with error handling"""
         try:
             with open(file_path, encoding="utf-8") as f:
-                return yaml.safe_load(f)
+                data = yaml.safe_load(f)
+                if not isinstance(data, dict):
+                    return {}
+                # Cast is safe after isinstance check
+                return cast(dict[str, Any], data)
         except Exception as e:
             print(f"Error loading {file_path}: {e}")
             return {}
@@ -94,24 +98,20 @@ class OpsviEcosystemGeneratorV2:
             template = self.templates
             for key in keys:
                 template = template[key]
-
             if isinstance(template, dict):
-                return template.get("template", "")
-            if isinstance(template, str):
+                value = template.get("template")
+                return value if isinstance(value, str) else None
+            elif isinstance(template, str):
                 return template
         except (KeyError, TypeError):
             pass
 
         # Try short key in known namespaces
         candidates: list[str] = [
-            [
-                f"file_templates.python_files.{template_path}",
-                f"file_templates.config_files.{template_path}",
-                f"file_templates.documentation_files.{template_path}",
-            ]
+            f"file_templates.python_files.{template_path}",
+            f"file_templates.config_files.{template_path}",
+            f"file_templates.documentation_files.{template_path}",
         ]
-        # Flatten list
-        candidates = [item for sub in candidates for item in sub]
 
         for alt_path in candidates:
             try:
@@ -120,8 +120,9 @@ class OpsviEcosystemGeneratorV2:
                 for key in keys:
                     template = template[key]
                 if isinstance(template, dict):
-                    return template.get("template", "")
-                if isinstance(template, str):
+                    value = template.get("template")
+                    return value if isinstance(value, str) else None
+                elif isinstance(template, str):
                     return template
             except (KeyError, TypeError):
                 continue
@@ -319,7 +320,7 @@ class OpsviEcosystemGeneratorV2:
         template = self.jinja_env.from_string(template_content)
         return template.render(**variables)
 
-    def _create_directory_structure(self, library_name: str, library_data: dict):
+    def _create_directory_structure(self, library_name: str, library_data: dict) -> None:
         """Create directory structure for a library"""
         library_dir = self.libs_dir / library_name
         package_name = library_name.replace("-", "_")
@@ -355,7 +356,7 @@ class OpsviEcosystemGeneratorV2:
 
     def _generate_file(
         self, file_path: Path, template_path: str, variables: dict[str, Any]
-    ):
+    ) -> None:
         """Generate a file from template"""
         template_content = self._get_template(template_path)
         if not template_content:
@@ -400,7 +401,7 @@ class OpsviEcosystemGeneratorV2:
 
         print(f"Generated {file_path}")
 
-    def _generate_standard_files(self, library_name: str, library_data: dict):
+    def _generate_standard_files(self, library_name: str, library_data: dict) -> None:
         """Generate standard files that every library should have"""
         library_dir = self.libs_dir / library_name
         package_name = library_name.replace("-", "_")
@@ -458,7 +459,7 @@ class OpsviEcosystemGeneratorV2:
         test_file_path = tests_dir / f"test_{package_name}.py"
         self._generate_file(test_file_path, "test_base_py", variables)
 
-    def _generate_library_files(self, library_name: str, library_data: dict):
+    def _generate_library_files(self, library_name: str, library_data: dict) -> None:
         """Generate library-specific files"""
         library_dir = self.libs_dir / library_name
         variables = self._get_library_variables(library_name, library_data)
@@ -496,9 +497,10 @@ class OpsviEcosystemGeneratorV2:
                     raise ValueError(f"Unknown YAML anchor reference: {anchor_name}")
             elif isinstance(template_ref, dict):
                 # YAML anchor resolved as dict - extract template field
-                template_path = template_ref.get("template")
-                if not template_path:
-                    raise ValueError(f"Missing 'template' in dict for {file_path}")
+                template_value = template_ref.get("template")
+                if not isinstance(template_value, str):
+                    raise ValueError(f"Missing or invalid 'template' in dict for {file_path}")
+                template_path = template_value
                 if template_path.startswith("*"):
                     # Handle nested anchor reference
                     anchor_name = template_path[1:]
@@ -528,7 +530,7 @@ class OpsviEcosystemGeneratorV2:
 
             self._generate_file(file_path, template_path, variables)
 
-    def generate_ecosystem(self):
+    def generate_ecosystem(self) -> None:
         """Generate the complete library ecosystem"""
         print("Generating OPSVI Library Ecosystem v2...")
         print("=" * 50)
@@ -558,7 +560,7 @@ class OpsviEcosystemGeneratorV2:
         print("Ecosystem generation complete!")
         print(f"Processed {len(self.libraries)} libraries (filters may apply)")
 
-    def validate_generation(self):
+    def validate_generation(self) -> None:
         """Validate that all libraries were generated correctly"""
         print("\nValidating generation...")
 
