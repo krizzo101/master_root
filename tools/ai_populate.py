@@ -181,12 +181,15 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
                     },
                 }
             elif style == "text":
+                # Some SDKs expect flattened schema fields under text.format
                 kwargs = {
                     **base_kwargs,
                     "text": {
                         "format": {
                             "type": "json_schema",
-                            "json_schema": schema,
+                            "name": schema.get("name", "response"),
+                            "schema": schema.get("schema", {}),
+                            "strict": True,
                         }
                     },
                 }
