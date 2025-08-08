@@ -165,23 +165,10 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
 
     last_err: Optional[Exception] = None
     for attempt in range(1, 4):
-        # Try param styles in order: 'response' (new Responses), 'text' (older SDKs), then none
-        for style in ("response", "text", None):
+        # Try param styles in order: 'text' (Responses structured outputs), then none
+        for style in ("text", None):
             use_schema = style is not None
-            if style == "response":
-                kwargs = {
-                    **base_kwargs,
-                    "response": {
-                        "modalities": ["text"],
-                        "text": {
-                            "format": {
-                                "type": "json_schema",
-                                "json_schema": schema,
-                            }
-                        },
-                    },
-                }
-            elif style == "text":
+            if style == "text":
                 # Some SDKs expect flattened schema fields under text.format
                 kwargs = {
                     **base_kwargs,
