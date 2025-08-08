@@ -137,13 +137,16 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
         print(f"[{ts()}] OpenAI SDK import failed: {e}")
         return None
 
-    client_kwargs = {}
+    client_kwargs = {
+        "timeout": get_timeout_seconds(),
+        "max_retries": 2,  # Built-in retries for network issues
+    }
     if base_url:
         client_kwargs["base_url"] = base_url
-    client = OpenAI(timeout=get_timeout_seconds(), **client_kwargs)
+    client = OpenAI(**client_kwargs)
 
     max_tokens = _estimate_output_tokens(content_hint or prompt)
-    
+
     # Use proven working pattern from ACCF coding agent
     params = {
         "model": model,
@@ -151,7 +154,7 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
         "text": {"format": {"type": "json_object"}},
         "max_output_tokens": max_tokens,
     }
-    
+
     # Add reasoning for GPT-5 models like the working agent does
     if model.startswith("gpt-5"):
         params["reasoning"] = {"effort": "minimal"}
@@ -198,6 +201,9 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
             print(f"[{ts()}] OpenAI/Responses API error: status={status} {e}")
             if status < 500:
                 return None
+        except KeyboardInterrupt:
+            print(f"[{ts()}] OpenAI/Responses interrupted by user")
+            raise
         except Exception as e:  # noqa: BLE001
             print(f"[{ts()}] OpenAI/Responses exception: {e}")
             
