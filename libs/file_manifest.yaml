@@ -16,11 +16,11 @@ library_types:
   rag:
     files:
       - path: "{{package_name}}/datastores/base.py"
-        template: "datastores_base.py.j2"
+        template: "datastores_base_py"
       - path: "{{package_name}}/embeddings/providers.py"
-        template: "embeddings_providers.py.j2"
+        template: "embeddings_providers_py"
       - path: "{{package_name}}/processors/base.py"
-        template: "processors_base.py.j2"
+        template: "processors_base_py"
       - path: "{{package_name}}/utils/helpers.py"
         template: "utils_helpers_py"
       - path: "tests/test_{{package_name}}.py"
@@ -52,11 +52,11 @@ libraries:
   opsvi-http:
     files:
       - path: "{{package_name}}/client/base.py"
-        template: "client_base.py.j2"
+        template: "client_base_py"
       - path: "{{package_name}}/server/base.py"
-        template: "server_base.py.j2"
+        template: "server_base_py"
       - path: "{{package_name}}/auth/base.py"
-        template: "auth_base.py.j2"
+        template: "auth_base_py"
   opsvi-monitoring:
     files:
       - path: "{{package_name}}/metrics/base.py"

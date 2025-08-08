@@ -4,7 +4,7 @@
 # Template System Reference
 template_system:
   template_file: "templates.yaml"
-  template_engine: "jinja2"
+  template_engine: "yaml-templates"
   variable_processor: "yaml_processor"
 
   # Template References by Level
@@ -38,7 +38,7 @@ template_system:
 templates:
   base_init: &base_init
     purpose: "Package initialization"
-    template: "init.py.j2"
+    template: "init_py"
     context_requirements:
       - "Library name and description"
       - "Version and author information"
@@ -46,7 +46,7 @@ templates:
 
   base_core_init: &base_core_init
     purpose: "Core module exports"
-    template: "core_init.py.j2"
+    template: "core_init_py"
     context_requirements:
       - "Core component definitions"
       - "Base class exports"
@@ -54,7 +54,7 @@ templates:
 
   base_config_init: &base_config_init
     purpose: "Configuration module exports"
-    template: "config_init.py.j2"
+    template: "config_init_py"
     context_requirements:
       - "Configuration class definitions"
       - "Environment variable mappings"
@@ -62,7 +62,7 @@ templates:
 
   base_exceptions_init: &base_exceptions_init
     purpose: "Exception module exports"
-    template: "exceptions_init.py.j2"
+    template: "exceptions_init_py"
     context_requirements:
       - "Exception hierarchy"
       - "Error categorization"
@@ -70,7 +70,7 @@ templates:
 
   base_pyproject: &base_pyproject
     purpose: "Package configuration"
-    template: "pyproject.toml.j2"
+    template: "pyproject_toml"
     context_requirements:
       - "Package metadata"
       - "Dependencies"
@@ -78,7 +78,7 @@ templates:
 
   base_readme: &base_readme
     purpose: "Package documentation"
-    template: "readme.md.j2"
+    template: "README_md"
     context_requirements:
       - "Package overview"
       - "Usage examples"
@@ -655,7 +655,7 @@ libraries:
 
       - path: "{{package_name}}/core/services.py"
         purpose: "Core service management"
-        template: "core_services.py.j2"
+        template: "core_services_py"
         context_requirements:
           - "Service lifecycle management"
           - "Dependency injection"
@@ -663,7 +663,7 @@ libraries:
 
       - path: "{{package_name}}/events/base.py"
         purpose: "Event system foundation"
-        template: "events_base.py.j2"
+        template: "events_base_py"
         context_requirements:
           - "Event handling patterns"
           - "Event routing"
@@ -671,7 +671,7 @@ libraries:
 
       - path: "{{package_name}}/state/manager.py"
         purpose: "State management"
-        template: "state_manager.py.j2"
+        template: "state_manager_py"
         context_requirements:
           - "State persistence patterns"
           - "State synchronization"
@@ -697,7 +697,7 @@ libraries:
 
       - path: "{{package_name}}/providers/base.py"
         purpose: "LLM provider interface"
-        template: "providers_base.py.j2"
+        template: "providers_base_py"
         context_requirements:
           - "Provider interface design"
           - "Model abstraction"
@@ -705,7 +705,7 @@ libraries:
 
       - path: "{{package_name}}/providers/openai.py"
         purpose: "OpenAI provider implementation"
-        template: "providers_openai.py.j2"
+        template: "providers_openai_py"
         context_requirements:
           - "OpenAI API integration"
           - "Rate limiting"
@@ -713,7 +713,7 @@ libraries:
 
       - path: "{{package_name}}/prompts/manager.py"
         purpose: "Prompt management"
-        template: "prompts_manager.py.j2"
+        template: "prompts_manager_py"
         context_requirements:
           - "Prompt template system"
           - "Prompt versioning"
@@ -739,7 +739,7 @@ libraries:
 
       - path: "{{package_name}}/datastores/base.py"
         purpose: "Vector store interface"
-        template: "datastores_base.py.j2"
+        template: "datastores_base_py"
         context_requirements:
           - "Vector store abstraction"
           - "Query interface design"
@@ -747,7 +747,7 @@ libraries:
 
       - path: "{{package_name}}/embeddings/providers.py"
         purpose: "Embedding model providers"
-        template: "embeddings_providers.py.j2"
+        template: "embeddings_providers_py"
         context_requirements:
           - "Embedding model interface"
           - "Model caching"
@@ -755,7 +755,7 @@ libraries:
 
       - path: "{{package_name}}/processors/base.py"
         purpose: "Document processing"
-        template: "processors_base.py.j2"
+        template: "processors_base_py"
         context_requirements:
           - "Document chunking strategies"
           - "Metadata extraction"
@@ -781,7 +781,7 @@ libraries:
 
       - path: "{{package_name}}/client/base.py"
         purpose: "HTTP client foundation"
-        template: "client_base.py.j2"
+        template: "client_base_py"
         context_requirements:
           - "HTTP client interface"
           - "Connection pooling"
@@ -789,7 +789,7 @@ libraries:
 
       - path: "{{package_name}}/server/base.py"
         purpose: "HTTP server foundation"
-        template: "server_base.py.j2"
+        template: "server_base_py"
         context_requirements:
           - "Server interface design"
           - "Middleware system"
@@ -797,7 +797,7 @@ libraries:
 
       - path: "{{package_name}}/auth/base.py"
         purpose: "Authentication system"
-        template: "auth_base.py.j2"
+        template: "auth_base_py"
         context_requirements:
           - "Authentication patterns"
           - "Token management"
@@ -806,7 +806,7 @@ libraries:
     additional_files:
       - path: "{{package_name}}/middleware/cors.py"
         purpose: "CORS middleware"
-        template: "middleware_cors.py.j2"
+        template: "middleware_cors_py"
         context_requirements:
           - "CORS configuration"
           - "Preflight handling"
@@ -814,7 +814,7 @@ libraries:
 
       - path: "{{package_name}}/middleware/logging.py"
         purpose: "Request logging middleware"
-        template: "middleware_logging.py.j2"
+        template: "middleware_logging_py"
         context_requirements:
           - "Request/response logging"
           - "Performance metrics"
@@ -840,7 +840,7 @@ libraries:
 
       - path: "{{package_name}}/agents/base.py"
         purpose: "Base agent implementation"
-        template: "agents_base.py.j2"
+        template: "agents_base_py"
         context_requirements:
           - "Agent interface design"
           - "Task execution patterns"
@@ -848,7 +848,7 @@ libraries:
 
       - path: "{{package_name}}/coordinators/base.py"
         purpose: "Agent coordination"
-        template: "coordinators_base.py.j2"
+        template: "coordinators_base_py"
         context_requirements:
           - "Coordination patterns"
           - "Task distribution"
@@ -856,7 +856,7 @@ libraries:
 
       - path: "{{package_name}}/communication/base.py"
         purpose: "Inter-agent communication"
-        template: "communication_base.py.j2"
+        template: "communication_base_py"
         context_requirements:
           - "Message passing patterns"
           - "Event broadcasting"
@@ -883,7 +883,7 @@ libraries:
 
       - path: "{{package_name}}/providers/base.py"
         purpose: "Storage provider interface"
-        template: "fs_providers_base.py.j2"
+        template: "fs_providers_base_py"
         context_requirements:
           - "Storage provider abstraction"
           - "File operation interface"
@@ -891,7 +891,7 @@ libraries:
 
       - path: "{{package_name}}/processors/base.py"
         purpose: "File processing pipeline"
-        template: "fs_processors_base.py.j2"
+        template: "fs_processors_base_py"
         context_requirements:
           - "File processing patterns"
           - "Pipeline orchestration"
@@ -917,7 +917,7 @@ libraries:
 
       - path: "{{package_name}}/providers/base.py"
         purpose: "Database provider interface"
-        template: "data_providers_base.py.j2"
+        template: "data_providers_base_py"
         context_requirements:
           - "Database abstraction"
           - "Connection management"
@@ -925,7 +925,7 @@ libraries:
 
       - path: "{{package_name}}/orm/base.py"
         purpose: "ORM foundation"
-        template: "orm_base.py.j2"
+        template: "orm_base_py"
         context_requirements:
           - "Model definition patterns"
           - "Query interface design"
@@ -1087,7 +1087,7 @@ libraries:
 
       - path: "{{package_name}}/metrics/base.py"
         purpose: "Metrics collection"
-        template: "monitoring_metrics_base.py.j2"
+        template: "monitoring_metrics_base_py"
         context_requirements:
           - "Metrics abstraction"
           - "Collection patterns"
@@ -1095,7 +1095,7 @@ libraries:
 
       - path: "{{package_name}}/tracing/base.py"
         purpose: "Distributed tracing"
-        template: "tracing_base.py.j2"
+        template: "tracing_base_py"
         context_requirements:
           - "Trace context propagation"
           - "Span management"
@@ -1121,7 +1121,7 @@ libraries:
 
       - path: "{{package_name}}/crypto/base.py"
         purpose: "Cryptographic utilities"
-        template: "security_crypto_base.py.j2"
+        template: "security_crypto_base_py"
         context_requirements:
           - "Crypto abstraction"
           - "Key management"
@@ -1129,7 +1129,7 @@ libraries:
 
       - path: "{{package_name}}/audit/base.py"
         purpose: "Security auditing"
-        template: "audit_base.py.j2"
+        template: "audit_base_py"
         context_requirements:
           - "Audit logging"
           - "Compliance checking"
@@ -1155,7 +1155,7 @@ libraries:
 
       - path: "{{package_name}}/workflows/base.py"
         purpose: "Workflow engine"
-        template: "orchestration_workflows_base.py.j2"
+        template: "orchestration_workflows_base_py"
         context_requirements:
           - "Workflow definition"
           - "Execution engine"
@@ -1163,7 +1163,7 @@ libraries:
 
       - path: "{{package_name}}/schedulers/base.py"
         purpose: "Task scheduling"
-        template: "schedulers_base.py.j2"
+        template: "schedulers_base_py"
         context_requirements:
           - "Scheduling algorithms"
           - "Resource allocation"
@@ -1189,7 +1189,7 @@ libraries:
 
       - path: "{{package_name}}/infrastructure/base.py"
         purpose: "Infrastructure management"
-        template: "deploy_infrastructure_base.py.j2"
+        template: "deploy_infrastructure_base_py"
         context_requirements:
           - "Infrastructure abstraction"
           - "Resource provisioning"
@@ -1197,7 +1197,7 @@ libraries:
 
       - path: "{{package_name}}/environments/base.py"
         purpose: "Environment management"
-        template: "environments_base.py.j2"
+        template: "environments_base_py"
         context_requirements:
           - "Environment isolation"
           - "Configuration per environment"
@@ -1223,7 +1223,7 @@ libraries:
 
       - path: "{{package_name}}/routers/base.py"
         purpose: "Request routing"
-        template: "gateway_routers_base.py.j2"
+        template: "gateway_routers_base_py"
         context_requirements:
           - "Routing algorithms"
           - "Load balancing"
@@ -1231,7 +1231,7 @@ libraries:
 
       - path: "{{package_name}}/middleware/base.py"
         purpose: "Gateway middleware"
-        template: "gateway_middleware_base.py.j2"
+        template: "gateway_middleware_base_py"
         context_requirements:
           - "Middleware chain"
           - "Request/response transformation"

@@ -828,6 +828,48 @@ file_templates:
 
     events_base_py:
       template: |
+    state_manager_py:
+      template: |
+        """State manager for {{library_name}}.
+
+        Provides basic state persistence and synchronization.
+        """
+
+        from typing import Any, Dict
+        import asyncio
+        import logging
+
+        from {{package_name}}.core.base import {{main_class_name}}
+        from {{package_name}}.config.settings import {{config_class_name}}
+
+        logger = logging.getLogger(__name__)
+
+        class StateManager({{main_class_name}}):
+            """State management component."""
+
+            def __init__(self, config: {{config_class_name}}):
+                super().__init__(config=config)
+                self._state: Dict[str, Any] = {}
+                self._lock = asyncio.Lock()
+
+            async def get(self, key: str, default: Any = None) -> Any:
+                async with self._lock:
+                    return self._state.get(key, default)
+
+            async def set(self, key: str, value: Any) -> None:
+                async with self._lock:
+                    self._state[key] = value
+                    logger.debug(f"State set: {key}")
+
+            async def delete(self, key: str) -> None:
+                async with self._lock:
+                    self._state.pop(key, None)
+                    logger.debug(f"State deleted: {key}")
+
+            async def snapshot(self) -> Dict[str, Any]:
+                async with self._lock:
+                    return dict(self._state)
+
         """Event system foundation for {{library_name}}.
 
         Provides event handling and routing capabilities.
@@ -1034,6 +1076,37 @@ file_templates:
 
     server_base_py:
       template: |
+    middleware_cors_py:
+      template: |
+        """CORS middleware for {{library_name}}."""
+
+        from typing import Any, Callable
+
+        class CORSMiddleware:
+            def __init__(self, allow_origins: list[str] | None = None) -> None:
+                self.allow_origins = allow_origins or ["*"]
+
+            async def __call__(self, request: Any, next_handler: Callable) -> Any:
+                response = await next_handler(request)
+                # Minimal placeholder – implementation depends on framework
+                return response
+
+    middleware_logging_py:
+      template: |
+        """Request logging middleware for {{library_name}}."""
+
+        import logging
+        from typing import Any, Callable
+
+        logger = logging.getLogger(__name__)
+
+        class LoggingMiddleware:
+            async def __call__(self, request: Any, next_handler: Callable) -> Any:
+                logger.info("request.start")
+                response = await next_handler(request)
+                logger.info("request.end")
+                return response
+
         """HTTP server base for {{library_name}}."""
         from typing import Any
         import logging
