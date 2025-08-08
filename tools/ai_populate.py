@@ -87,33 +87,90 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
+    # New Responses API format (best-effort); if API changes, fallback to chat
     body = {
         "model": model,
-        "input": prompt,
-        # Responses API expects text.format instead of response_format
-        "text": {"format": "json_object"},
+        "modalities": ["text"],
+        "input": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "input_text", "text": prompt}
+                ],
+            }
+        ],
+        "text": {"format": "json"},
     }
     data = json.dumps(body).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=60) as resp:
             payload = json.loads(resp.read().decode("utf-8"))
-            # Expect { output: [ { content: [ { type: "output_text", text: "{...json...}" } ] } ] }
+            # Try to extract text content
             outputs = payload.get("output") or payload.get("outputs")
-            if not outputs:
-                return None
-            first = outputs[0]
-            content = first.get("content") or []
-            for part in content:
-                if part.get("type") in ("output_text", "text"):
-                    try:
-                        return json.loads(part.get("text", "{}"))
-                    except Exception:
-                        return {"code": part.get("text", ""), "reasoning": "freeform"}
+            if outputs:
+                first = outputs[0]
+                content = first.get("content") or []
+                for part in content:
+                    if part.get("type") in ("output_text", "text"):
+                        text_val = part.get("text", "")
+                        try:
+                            return json.loads(text_val)
+                        except Exception:
+                            return {"code": text_val, "reasoning": "freeform"}
+            # Fallback try common field names
+            if "text" in payload:
+                text_val = payload["text"]
+                try:
+                    return json.loads(text_val)
+                except Exception:
+                    return {"code": text_val, "reasoning": "freeform"}
     except urllib.error.HTTPError as e:
         print(f"OpenAI API error: {e.read().decode('utf-8', 'ignore')}")
     except Exception as e:  # noqa: BLE001
         print(f"OpenAI call failed: {e}")
+    return None
+
+
+def call_openai_chat(prompt: str) -> Optional[dict]:
+    api_key = get_env_var("OPENAI_API_KEY")
+    if not api_key:
+        return None
+    base_url = get_env_var("OPENAI_BASE_URL", "https://api.openai.com/v1")
+    model = select_model()
+
+    import urllib.request
+    import urllib.error
+
+    url = f"{base_url.rstrip('/')}/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    body = {
+        "model": model,
+        "messages": [
+            {"role": "user", "content": prompt}
+        ],
+        "response_format": {"type": "json_object"},
+    }
+    data = json.dumps(body).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+            choices = payload.get("choices") or []
+            if not choices:
+                return None
+            content = choices[0].get("message", {}).get("content", "")
+            try:
+                return json.loads(content)
+            except Exception:
+                return {"code": content, "reasoning": "freeform"}
+    except urllib.error.HTTPError as e:
+        print(f"OpenAI Chat API error: {e.read().decode('utf-8', 'ignore')}")
+    except Exception as e:  # noqa: BLE001
+        print(f"OpenAI chat call failed: {e}")
     return None
 
 
@@ -175,7 +232,7 @@ def main() -> int:
                     except Exception:
                         content = ""
                     prompt = build_prompt(s, rel, lib_name, content)
-                    result = call_openai_responses(prompt)
+                    result = call_openai_responses(prompt) or call_openai_chat(prompt)
                     code = (result or {}).get("code") if isinstance(result, dict) else None
                     if not code:
                         # Fallback to placeholder if AI failed
