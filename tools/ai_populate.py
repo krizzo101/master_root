@@ -164,7 +164,7 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
         try:
             print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt} max_tokens={max_tokens}")
             resp = client.responses.create(**params)
-            
+
             # Extract output like the working ACCF interface
             output_text = getattr(resp, "output_text", None)
             if not output_text and hasattr(resp, "output"):
@@ -179,7 +179,7 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
                                     output_text = (output_text or "") + txt
                 except Exception:
                     pass
-            
+
             if output_text and output_text.strip():
                 try:
                     obj = json.loads(output_text)
@@ -187,10 +187,10 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
                         return {"code": obj.get("code"), "reasoning": obj.get("reasoning", "")}
                 except Exception:
                     pass
-                    
+
             print(f"[{ts()}] OpenAI/Responses: no valid JSON code in response")
             return None
-            
+
         except (RateLimitError, APITimeoutError) as e:  # type: ignore[name-defined]
             print(f"[{ts()}] OpenAI/Responses retryable error: {e}")
             if attempt < 3:
@@ -206,7 +206,7 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
             raise
         except Exception as e:  # noqa: BLE001
             print(f"[{ts()}] OpenAI/Responses exception: {e}")
-            
+
         if attempt < 3:
             time.sleep(1.5 * attempt)
     return None
