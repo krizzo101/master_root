@@ -1260,6 +1260,49 @@ file_templates:
 
         # TODO(ai): define pipeline hooks and error recovery
 
+    # Concrete RAG implementations
+    vectorstore_memory_py:
+      template: |
+        """In-memory vector store for {{library_name}} (for dev/testing)."""
+        from __future__ import annotations
+        from typing import Any, List, Tuple
+        import math
+
+        class InMemoryVectorStore:
+            def __init__(self) -> None:
+                self._vectors: list[tuple[str, list[float], dict[str, Any]]] = []
+
+            async def upsert(self, items: list[tuple[str, list[float], dict[str, Any]]]) -> None:
+                id_to_idx = {vid: i for i, (vid, _, _) in enumerate(self._vectors)}
+                for vid, vec, meta in items:
+                    if vid in id_to_idx:
+                        self._vectors[id_to_idx[vid]] = (vid, vec, meta)
+                    else:
+                        self._vectors.append((vid, vec, meta))
+
+            async def query(self, vec: list[float], top_k: int = 5) -> list[tuple[str, float, dict[str, Any]]]:
+                def cosine(a: list[float], b: list[float]) -> float:
+                    num = sum(x * y for x, y in zip(a, b))
+                    da = math.sqrt(sum(x * x for x in a))
+                    db = math.sqrt(sum(y * y for y in b))
+                    return 0.0 if da == 0 or db == 0 else num / (da * db)
+                scored = [(vid, cosine(vec, v), meta) for (vid, v, meta) in self._vectors]
+                scored.sort(key=lambda t: t[1], reverse=True)
+                return scored[:top_k]
+
+    processor_textsplit_py:
+      template: |
+        """Simple text-splitting document processor for {{library_name}}."""
+        from typing import Any, List
+
+        class TextSplitter:
+            def __init__(self, max_chars: int = 800) -> None:
+                self.max_chars = max_chars
+
+            async def process(self, doc: Any) -> List[str]:
+                text = str(doc)
+                return [text[i:i + self.max_chars] for i in range(0, len(text), self.max_chars)]
+
     agents_base_py:
       template: |
         """Agent base for {{library_name}}."""
@@ -1575,6 +1618,52 @@ file_templates:
                 pass
 
         # TODO(ai): implement priorities and backoff
+
+    # Concrete Manager implementations
+    scheduler_immediate_py:
+      template: |
+        """Immediate scheduler for {{library_name}} (executes tasks ASAP)."""
+        from typing import Awaitable, Callable, Any
+        import asyncio
+
+        class ImmediateScheduler:
+            def __init__(self) -> None:
+                self._tasks: list[asyncio.Task[Any]] = []
+
+            async def schedule(self, coro_factory: Callable[[], Awaitable[Any]]) -> None:
+                self._tasks.append(asyncio.create_task(coro_factory()))
+
+            async def drain(self) -> None:
+                if self._tasks:
+                    await asyncio.gather(*self._tasks, return_exceptions=True)
+                self._tasks.clear()
+
+    workflow_simple_py:
+      template: |
+        """Simple workflow for {{library_name}} (linear steps)."""
+        from typing import Awaitable, Callable, Any, List
+
+        class SimpleWorkflow:
+            def __init__(self, steps: List[Callable[[], Awaitable[Any]]]) -> None:
+                self.steps = steps
+
+            async def run(self) -> None:
+                for step in self.steps:
+                    await step()
+
+    coordinator_round_robin_py:
+      template: |
+        """Round-robin coordinator for {{library_name}}."""
+        from typing import Awaitable, Callable, Any, List
+        import itertools
+
+        class RoundRobinCoordinator:
+            def __init__(self, workers: List[Callable[[Any], Awaitable[Any]]]) -> None:
+                self._cycle = itertools.cycle(workers)
+
+            async def dispatch(self, item: Any) -> Any:
+                worker = next(self._cycle)
+                return await worker(item)
 
     deploy_infrastructure_base_py:
       template: |
