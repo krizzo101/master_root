@@ -150,8 +150,8 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
                 "code": {"type": "string"},
                 "reasoning": {"type": "string"},
             },
-            # Responses structured outputs may require all properties to be listed in required
-            "required": ["code", "reasoning"],
+            # Only code is required; reasoning is optional
+            "required": ["code"],
             "additionalProperties": False,
         },
     }
@@ -165,10 +165,28 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
 
     last_err: Optional[Exception] = None
     for attempt in range(1, 4):
-        # Try param styles in order: 'text' (Responses structured outputs), then none
-        for style in ("text", None):
+        # Try param styles in order: 'response' (Responses structured outputs), 'text' (legacy SDK), then none
+        for style in ("response", "text", None):
             use_schema = style is not None
-            if style == "text":
+            if style == "response":
+                # Preferred Responses shape: schema under response.text.format
+                kwargs = {
+                    **base_kwargs,
+                    "response": {
+                        "modalities": ["text"],
+                        "text": {
+                            "format": {
+                                "type": "json_schema",
+                                "json_schema": {
+                                    "name": schema.get("name", "response"),
+                                    "schema": schema.get("schema", {}),
+                                    "strict": True,
+                                },
+                            }
+                        },
+                    },
+                }
+            elif style == "text":
                 # Some SDKs expect flattened schema fields under text.format
                 kwargs = {
                     **base_kwargs,
@@ -185,7 +203,19 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
                 kwargs = dict(base_kwargs)
             try:
                 print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt} schema={use_schema} style={style} max_tokens={max_tokens}")
-                resp = client.responses.create(**kwargs)
+                # Try with temperature=0; if rejected, retry without it
+                with_temp = {**kwargs, "temperature": 0}
+                try:
+                    resp = client.responses.create(**with_temp)
+                except APIError as e_temp:  # type: ignore[name-defined]
+                    status_temp = getattr(e_temp, "status_code", 500)
+                    param_temp = getattr(e_temp, "param", None)
+                    msg_temp = str(e_temp)
+                    if status_temp == 400 and (param_temp == "temperature" or "temperature" in msg_temp):
+                        print(f"[{ts()}] OpenAI/Responses: removing temperature and retrying (model constraint)")
+                        resp = client.responses.create(**kwargs)
+                    else:
+                        raise
                 parsed = getattr(resp, "output_parsed", None)
                 if isinstance(parsed, dict) and isinstance(parsed.get("code"), str) and parsed["code"].strip():
                     return {"code": parsed.get("code"), "reasoning": parsed.get("reasoning", "")}
