@@ -41,3 +41,15 @@ repos:
               libs/.*|
               model_testing/.*
           )$
+  - repo: local
+    hooks:
+      - id: forbid-j2-in-libs
+        name: Forbid .j2 references in libs
+        entry: bash
+        args:
+          - -c
+          - >-
+            if grep -R --line-number -E '\\.j2' libs; then
+            echo 'Error: .j2 template references found in libs/'; exit 1; fi
+        language: system
+        types: [text]

@@ -1,0 +1,38 @@
+name: Libs Strict Validation
+
+on:
+  pull_request:
+    paths:
+      - 'libs/**'
+  push:
+    branches: [ feature/**, bugfix/**, hotfix/**, agent/** ]
+    paths:
+      - 'libs/**'
+
+jobs:
+  libs-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff black mypy pyyaml jinja2
+      - name: Strict template validation and sandbox generation
+        run: |
+          mkdir -p _gen_sandbox
+          cp libs/recommended_structure.yaml _gen_sandbox/
+          cp libs/templates.yaml _gen_sandbox/
+          cp libs/file_manifest.yaml _gen_sandbox/
+          python3 libs/generate_ecosystem_v2.py --libs-dir _gen_sandbox --file-manifest _gen_sandbox/file_manifest.yaml --no-touch-missing
+      - name: Lint generator
+        run: |
+          ruff check libs/generate_ecosystem_v2.py
+          black --check libs/generate_ecosystem_v2.py
+      - name: Type-check generator
+        run: |
+          mypy --python-version 3.12 libs/generate_ecosystem_v2.py
+

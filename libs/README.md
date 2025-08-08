@@ -65,7 +65,7 @@ Each level is processed by specialized AI agents:
   - YAML anchor system for reusable template patterns
 
 ### Template System
-- **`templates.yaml`** - Comprehensive template registry (YAML-driven)
+- **`templates.yaml`** - Comprehensive template registry (YAML-driven). See `libs/TEMPLATES.md` for key map.
   - Project, category, library, component, and file-level templates
   - Python, configuration, and documentation templates
   - Variable substitution and conditional processing
@@ -79,10 +79,11 @@ Each level is processed by specialized AI agents:
 - **`generate_ecosystem_v2.py`** - **CURRENT** - Advanced ecosystem generator
   - YAML-driven template registry; string substitution with optional conditional blocks
   - YAML anchor resolution (handles both string and dictionary references)
+  - Strict upfront validation of all template references (can disable via `--no-strict`)
   - Comprehensive variable generation for all library types
   - Template key resolution against `templates.yaml`
   - Error handling and validation
-  - Support for all 16 libraries with specialized templates
+  - Support for all 16+ libraries with specialized templates
 
 ### Legacy Scripts (Archived)
 - **`scaffold_shared_libs.py`** - Individual library scaffolding with DRY analysis
@@ -97,7 +98,7 @@ Each level is processed by specialized AI agents:
 - **Decision Rationale**: Changed generator instead of YAML to preserve template system design
 
 ### ✅ Template System Enhancements
-- **Added Specialized Templates**: `core_services_py`, `events_base_py`, `utils_helpers_py`
+- **Added Specialized Templates**: `core_services_py`, `events_base_py`, `server_base_py`, `utils_helpers_py`, `state_manager_py`, `middleware_cors_py`, `middleware_logging_py`
 - **Provider Templates**: `providers_base_py`, `providers_openai_py`
 - **Prompt Management**: `prompts_manager_py`
 - **Enhanced Test Templates**: Comprehensive test patterns with async support
