@@ -86,77 +86,72 @@ def ts() -> str:
 
 
 def call_openai_responses(prompt: str) -> Optional[dict]:
+    """Call OpenAI Responses API using official SDK; return {code, reasoning} or None."""
     api_key = get_env_var("OPENAI_API_KEY")
     if not api_key:
+        print(f"[{ts()}] OpenAI/Responses: missing OPENAI_API_KEY")
         return None
-    base_url = get_env_var("OPENAI_BASE_URL", "https://api.openai.com/v1")
+    base_url = get_env_var("OPENAI_BASE_URL")
     model = select_model()
 
-    import urllib.request
-    import urllib.error
-
-    url = f"{base_url.rstrip('/')}/responses"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    }
-    # Responses API: simple shape; ask for JSON object output
-    # Minimal Responses API payload; request JSON via instruction in prompt
-    body = {
-        "model": model,
-        "input": prompt,
-        # Request plain text output; we'll self-parse JSON if present
-        "text": {"format": {"type": "text"}},
-        "reasoning": {"effort": "medium"} if model.startswith("gpt-5") else None,
-        "max_output_tokens": 3000,
-    }
-    # Remove None fields
-    body = {k: v for k, v in body.items() if v is not None}
-    data = json.dumps(body).encode("utf-8")
-    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
-    print(f"[{ts()}] OpenAI/Responses: POST {url} model={model}")
     try:
-        with urllib.request.urlopen(req, timeout=get_timeout_seconds()) as resp:
-            raw = resp.read().decode("utf-8")
-            print(f"[{ts()}] OpenAI/Responses: HTTP {resp.status}; {len(raw)} bytes")
-            payload = json.loads(raw)
-
-            # Unified text extraction
-            text_val: Optional[str] = None
-            if isinstance(payload.get("output_text"), str):
-                text_val = payload["output_text"]
-            else:
-                outputs = payload.get("output") or payload.get("outputs")
-                if outputs:
-                    first = outputs[0]
-                    for part in (first.get("content") or []):
-                        if part.get("type") in ("output_text", "text") and isinstance(part.get("text"), str):
-                            text_val = part.get("text")
-                            break
-            if text_val is None and isinstance(payload.get("text"), str):
-                text_val = payload["text"]
-
-            if not text_val:
-                return None
-
-            # Prefer structured JSON {code, reasoning}; else treat as raw code
-            try:
-                parsed = json.loads(text_val)
-                if isinstance(parsed, dict) and isinstance(parsed.get("code"), str):
-                    return parsed
-                # If parsed JSON is not the expected shape, fall back to raw text
-                return {"code": text_val, "reasoning": "freeform"}
-            except Exception:
-                return {"code": text_val, "reasoning": "freeform"}
-    except urllib.error.HTTPError as e:
-        try:
-            err_body = e.read().decode('utf-8', 'ignore')
-        except Exception:
-            err_body = '<no-body>'
-        print(f"[{ts()}] OpenAI/Responses ERROR: {e.code} {err_body}")
+        from openai import OpenAI  # type: ignore
     except Exception as e:  # noqa: BLE001
-        print(f"[{ts()}] OpenAI/Responses EXCEPTION: {e}")
-    return None
+        print(f"[{ts()}] OpenAI SDK import failed: {e}")
+        return None
+
+    try:
+        client_kwargs = {}
+        if base_url:
+            client_kwargs["base_url"] = base_url
+        client = OpenAI(**client_kwargs)
+
+        kwargs = {
+            "model": model,
+            "input": prompt,
+            # Use verbosity lever per references; no hard cap on tokens
+            "text": {"verbosity": "low"},
+        }
+        if model.startswith("gpt-5"):
+            kwargs["reasoning"] = {"effort": "medium"}
+
+        print(f"[{ts()}] OpenAI/Responses (SDK): create model={model}")
+        resp = client.responses.create(**kwargs)
+
+        # Prefer unified SDK field
+        text_val = getattr(resp, "output_text", None)
+        if not text_val:
+            try:
+                data = resp.model_dump()
+            except Exception:
+                data = {}
+            outputs = (data.get("output") or data.get("outputs") or [])
+            if outputs:
+                first = outputs[0]
+                for part in (first.get("content") or []):
+                    if part.get("type") in ("output_text", "text"):
+                        val = part.get("text")
+                        if isinstance(val, dict):
+                            val = val.get("value") or val.get("text")
+                        if isinstance(val, str) and val.strip():
+                            text_val = val
+                            break
+
+        if not text_val or not str(text_val).strip():
+            print(f"[{ts()}] OpenAI/Responses: empty output_text")
+            return None
+
+        # Try JSON shape; else treat as raw code
+        try:
+            parsed = json.loads(text_val)
+            if isinstance(parsed, dict) and isinstance(parsed.get("code"), str):
+                return parsed
+            return {"code": str(text_val), "reasoning": "freeform"}
+        except Exception:
+            return {"code": str(text_val), "reasoning": "freeform"}
+    except Exception as e:  # noqa: BLE001
+        print(f"[{ts()}] OpenAI/Responses SDK EXCEPTION: {e}")
+        return None
 
 
 def call_openai_chat(prompt: str) -> Optional[dict]:
