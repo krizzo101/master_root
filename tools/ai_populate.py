@@ -97,10 +97,10 @@ def is_ai_enabled() -> bool:
 
 
 def select_model() -> str:
-    model = get_env_var("OPENAI_MODEL", "gpt-5") or "gpt-5"
+    model = get_env_var("OPENAI_MODEL", "gpt-5-mini") or "gpt-5-mini"
     if model not in APPROVED_MODELS:
-        print(f"Warning: Model '{model}' not approved; falling back to gpt-5")
-        model = "gpt-5"
+        print(f"Warning: Model '{model}' not approved; falling back to gpt-5-mini")
+        model = "gpt-5-mini"
     return model
 
 
@@ -109,119 +109,79 @@ def ts() -> str:
 
 
 def call_openai_responses(prompt: str) -> Optional[dict]:
-    """Call OpenAI Responses API using official SDK; return {code, reasoning} or None."""
+    """Call OpenAI Responses API; return {'code': str, 'reasoning': str} or None."""
     api_key = get_env_var("OPENAI_API_KEY")
     if not api_key:
         print(f"[{ts()}] OpenAI/Responses: missing OPENAI_API_KEY")
         return None
+
     base_url = get_env_var("OPENAI_BASE_URL")
     model = select_model()
 
     try:
-        from openai import OpenAI  # type: ignore
+        from openai import OpenAI, APIError, RateLimitError, APITimeoutError  # type: ignore
     except Exception as e:  # noqa: BLE001
         print(f"[{ts()}] OpenAI SDK import failed: {e}")
         return None
 
-    try:
-        client_kwargs = {}
-        if base_url:
-            client_kwargs["base_url"] = base_url
-        # Apply HTTP timeout to avoid hanging
-        client = OpenAI(timeout=get_timeout_seconds(), **client_kwargs)
+    client_kwargs = {}
+    if base_url:
+        client_kwargs["base_url"] = base_url
+    client = OpenAI(timeout=get_timeout_seconds(), **client_kwargs)
 
-        # Use minimal, widely-supported kwargs to avoid SDK-version issues
-        kwargs = {
-            "model": model,
-            "input": prompt,
-        }
+    schema = {
+        "name": "ai_populate_response",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "code": {"type": "string"},
+                "reasoning": {"type": "string"},
+            },
+            "required": ["code"],
+            "additionalProperties": False,
+        },
+    }
 
-        print(f"[{ts()}] OpenAI/Responses (SDK): create model={model}")
-        resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
-
-        # Prefer unified SDK field
-        text_val = getattr(resp, "output_text", None)
-        if not text_val:
-            try:
-                data = resp.model_dump()
-            except Exception:
-                data = {}
-            outputs = (data.get("output") or data.get("outputs") or [])
-            if outputs:
-                first = outputs[0]
-                for part in (first.get("content") or []):
-                    if part.get("type") in ("output_text", "text"):
-                        val = part.get("text")
-                        if isinstance(val, dict):
-                            val = val.get("value") or val.get("text")
-                        if isinstance(val, str) and val.strip():
-                            text_val = val
-                            break
-
-        if not text_val or not str(text_val).strip():
-            print(f"[{ts()}] OpenAI/Responses: empty output_text")
+    for attempt in range(5):
+        try:
+            print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt+1}")
+            resp = client.responses.create(
+                model=model,
+                input=prompt,
+                reasoning={"effort": "medium"},
+                max_output_tokens=1200,
+                response_format={"type": "json_schema", "json_schema": schema},
+            )
+            # Prefer parsed JSON when using json_schema
+            parsed = getattr(resp, "output_parsed", None)
+            if parsed:
+                code = parsed.get("code", "")
+                reasoning = parsed.get("reasoning", "n/a")
+                if isinstance(code, str) and code.strip():
+                    return {"code": code, "reasoning": reasoning}
+            # Fallback to text if SDK/version mismatch
+            txt = getattr(resp, "output_text", "") or ""
+            if isinstance(txt, str) and txt.strip():
+                return {"code": txt, "reasoning": "freeform"}
+            print(f"[{ts()}] OpenAI/Responses: empty output")
             return None
-
-        # Try JSON shape; else treat as raw code
-        try:
-            parsed = json.loads(text_val)
-            if isinstance(parsed, dict) and isinstance(parsed.get("code"), str):
-                return parsed
-            return {"code": str(text_val), "reasoning": "freeform"}
-        except Exception:
-            return {"code": str(text_val), "reasoning": "freeform"}
-    except Exception as e:  # noqa: BLE001
-        print(f"[{ts()}] OpenAI/Responses SDK EXCEPTION: {e}")
-        return None
-
-
-def call_openai_chat(prompt: str) -> Optional[dict]:
-    api_key = get_env_var("OPENAI_API_KEY")
-    if not api_key:
-        return None
-    base_url = get_env_var("OPENAI_BASE_URL", "https://api.openai.com/v1")
-    model = select_model()
-
-    import urllib.request
-    import urllib.error
-
-    url = f"{base_url.rstrip('/')}/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    }
-    body = {
-        "model": model,
-        "messages": [
-            {"role": "user", "content": prompt}
-        ],
-        "response_format": {"type": "json_object"},
-    }
-    data = json.dumps(body).encode("utf-8")
-    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
-    print(f"[{ts()}] OpenAI/Chat: POST {url} model={model}")
-    try:
-        with urllib.request.urlopen(req, timeout=get_timeout_seconds()) as resp:
-            raw = resp.read().decode("utf-8")
-            print(f"[{ts()}] OpenAI/Chat: HTTP {resp.status}; {len(raw)} bytes")
-            payload = json.loads(raw)
-            choices = payload.get("choices") or []
-            if not choices:
+        except (RateLimitError, APITimeoutError) as e:  # type: ignore[name-defined]
+            print(f"[{ts()}] OpenAI/Responses retryable error: {e}")
+            time.sleep(1.5 * (attempt + 1))
+        except APIError as e:  # type: ignore[name-defined]
+            status = getattr(e, "status_code", 500)
+            print(f"[{ts()}] OpenAI/Responses API error: status={status} {e}")
+            if status >= 500:
+                time.sleep(1.5 * (attempt + 1))
+            else:
                 return None
-            content = choices[0].get("message", {}).get("content", "")
-            try:
-                return json.loads(content)
-            except Exception:
-                return {"code": content, "reasoning": "freeform"}
-    except urllib.error.HTTPError as e:
-        try:
-            err_body = e.read().decode('utf-8', 'ignore')
-        except Exception:
-            err_body = '<no-body>'
-        print(f"[{ts()}] OpenAI/Chat ERROR: {e.code} {err_body}")
-    except Exception as e:  # noqa: BLE001
-        print(f"[{ts()}] OpenAI/Chat EXCEPTION: {e}")
+        except Exception as e:  # noqa: BLE001
+            print(f"[{ts()}] OpenAI/Responses exception: {e}")
+            time.sleep(1.5 * (attempt + 1))
     return None
+
+
+# Removed chat fallback: GPT-5 is only served by Responses API
 
 
 def build_prompt(file_path: Path, rel_path: str, lib_name: str, content: str) -> str:
@@ -233,7 +193,8 @@ def build_prompt(file_path: Path, rel_path: str, lib_name: str, content: str) ->
         "- Keep code under ~200 lines if possible; no external network calls.\n\n"
         f"Library: {lib_name}\nFile: {rel_path}\n\n"
         "Current content:\n---BEGIN---\n" + content + "\n---END---\n\n"
-        "Output strictly the complete code as plain text only. No markdown fences, no JSON, no commentary."
+        "Return a JSON object with fields {\"code\": string, \"reasoning\": string}. "
+        "Place the full file contents in the 'code' field only. Do not include markdown fences."
     )
 
 
