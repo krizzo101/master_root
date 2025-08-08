@@ -105,10 +105,10 @@ def call_openai_responses(prompt: str) -> Optional[dict]:
     body = {
         "model": model,
         "input": prompt,
-        # Align with internal interface usage
+        # Request plain text output; we'll self-parse JSON if present
+        "text": {"format": {"type": "text"}},
         "reasoning": {"effort": "medium"} if model.startswith("gpt-5") else None,
         "max_output_tokens": 3000,
-        "temperature": 0.2,
     }
     # Remove None fields
     body = {k: v for k, v in body.items() if v is not None}
