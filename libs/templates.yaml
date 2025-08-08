@@ -444,6 +444,8 @@ file_templates:
             # Component-specific methods
             {{component_methods}}
 
+        # TODO(ai): refine implementation details and component methods
+
     config_init_py:
       template: |
         """Configuration module for {{library_name}}.
@@ -911,6 +913,7 @@ file_templates:
                 async with self._lock:
                     return dict(self._state)
 
+        # TODO(ai): extend with persistence/backends and conflict resolution
 
 
     utils_helpers_py_alt:
@@ -1009,6 +1012,8 @@ file_templates:
                 """Check provider health."""
                 pass
 
+        # TODO(ai): add provider-specific lifecycle helpers and metrics hooks
+
     providers_openai_py:
       template: |
         """OpenAI provider for {{library_name}}.
@@ -1057,6 +1062,8 @@ file_templates:
                     logger.error(f"OpenAI health check failed: {e}")
                     return False
 
+        # TODO(ai): implement request/response helpers, retries, and rate limits
+
     # Newly added specialized templates to cover structure references
     client_base_py:
       template: |
@@ -1072,6 +1079,8 @@ file_templates:
         class HTTPClient({{main_class_name}}):
             async def request(self, method: str, url: str, **kwargs: Any) -> Any:
                 raise NotImplementedError
+
+        # TODO(ai): implement concrete HTTP client (aiohttp/httpx) adapters
 
     server_base_py:
       template: |
@@ -1089,6 +1098,8 @@ file_templates:
 
             async def stop(self) -> None:
                 await self.shutdown()
+
+        # TODO(ai): implement routing, middleware pipeline, and handlers
     middleware_cors_py:
       template: |
         """CORS middleware for {{library_name}}."""
@@ -1140,6 +1151,8 @@ file_templates:
             async def upsert(self, vectors: List[Any]) -> None:
                 raise NotImplementedError
 
+        # TODO(ai): add query, similarity search, and index maintenance
+
     embeddings_providers_py:
       template: |
         """Embeddings providers for {{library_name}}."""
@@ -1148,6 +1161,8 @@ file_templates:
         class EmbeddingsProvider:
             async def embed(self, texts: List[str]) -> List[List[float]]:
                 raise NotImplementedError
+
+        # TODO(ai): add batching, normalization, and caching
 
     processors_base_py:
       template: |
@@ -1158,6 +1173,8 @@ file_templates:
             async def process(self, doc: Any) -> Any:
                 raise NotImplementedError
 
+        # TODO(ai): define pipeline hooks and error recovery
+
     agents_base_py:
       template: |
         """Agent base for {{library_name}}."""
@@ -1166,6 +1183,8 @@ file_templates:
         class Agent({{main_class_name}}):
             async def act(self, input_data: str) -> str:
                 return input_data
+
+        # TODO(ai): implement planning, memory, and tool-use interfaces
 
     coordinators_base_py:
       template: |
@@ -1176,12 +1195,16 @@ file_templates:
             async def coordinate(self) -> None:
                 pass
 
+        # TODO(ai): add scheduling policies and contention resolution
+
     communication_base_py:
       template: |
         """Communication base for {{library_name}}."""
         class Communicator:
             async def send(self, message: str) -> None:
                 pass
+
+        # TODO(ai): add transports, serialization, and backpressure
 
     fs_providers_base_py:
       template: |
@@ -1190,12 +1213,16 @@ file_templates:
             async def save(self, path: str, data: bytes) -> None:
                 raise NotImplementedError
 
+        # TODO(ai): implement backends (local/S3/GCS) and streaming
+
     fs_processors_base_py:
       template: |
         """FS processors base for {{library_name}}."""
         class FileProcessor:
             async def process(self, path: str) -> None:
                 raise NotImplementedError
+
+        # TODO(ai): add fan-out, batching, and error handling
 
     data_providers_base_py:
       template: |
@@ -1204,11 +1231,15 @@ file_templates:
             async def connect(self) -> bool:
                 return True
 
+        # TODO(ai): implement CRUD operations and transaction scopes
+
     orm_base_py:
       template: |
         """ORM base for {{library_name}}."""
         class ORM:
             pass
+
+        # TODO(ai): define model base, session handling, and migrations hooks
 
     auth_providers_base_py:
       template: |
@@ -1216,6 +1247,8 @@ file_templates:
         class AuthProvider:
             async def validate(self, token: str) -> bool:
                 return False
+
+        # TODO(ai): implement token parsing, verification, and role mapping
 
     auth_models_user_py:
       template: |
@@ -1234,6 +1267,8 @@ file_templates:
             async def get(self, key: str):
                 return None
 
+        # TODO(ai): add set/delete/ttl and distributed coordination
+
     cache_manager_py:
       template: |
         """Cache manager for {{library_name}}."""
@@ -1241,12 +1276,16 @@ file_templates:
             async def invalidate(self, key: str) -> None:
                 pass
 
+        # TODO(ai): add eviction strategies and metrics
+
     communication_channels_base_py:
       template: |
         """Comm channel base for {{library_name}}."""
         class Channel:
             async def publish(self, message: str) -> None:
                 pass
+
+        # TODO(ai): add subscribe/ack/retry semantics
 
     messages_base_py:
       template: |
@@ -1258,12 +1297,16 @@ file_templates:
             type: str
             payload: dict
 
+        # TODO(ai): add validation and serialization helpers
+
     pipeline_stages_base_py:
       template: |
         """Pipeline stage base for {{library_name}}."""
         class Stage:
             async def run(self, data):
                 return data
+
+        # TODO(ai): add input/output contracts and error paths
 
     orchestrators_base_py:
       template: |
@@ -1272,12 +1315,16 @@ file_templates:
             async def execute(self):
                 pass
 
+        # TODO(ai): implement DAG execution and recovery
+
     monitoring_metrics_base_py:
       template: |
         """Metrics base for {{library_name}}."""
         class Metrics:
             def record(self, name: str, value: float) -> None:
                 pass
+
+        # TODO(ai): add exporters and labels
 
     tracing_base_py:
       template: |
@@ -1286,12 +1333,16 @@ file_templates:
             def start_span(self, name: str):
                 pass
 
+        # TODO(ai): integrate with OpenTelemetry
+
     security_crypto_base_py:
       template: |
         """Crypto base for {{library_name}}."""
         class Crypto:
             def encrypt(self, data: bytes) -> bytes:
                 return data
+
+        # TODO(ai): add decrypt/sign/verify with proper algorithms
 
     audit_base_py:
       template: |
@@ -1300,12 +1351,16 @@ file_templates:
             def log(self, event: str) -> None:
                 pass
 
+        # TODO(ai): add sinks and retention
+
     orchestration_workflows_base_py:
       template: |
         """Workflow base for {{library_name}}."""
         class Workflow:
             async def run(self):
                 pass
+
+        # TODO(ai): add state persistence and compensation
 
     schedulers_base_py:
       template: |
@@ -1314,12 +1369,16 @@ file_templates:
             async def schedule(self):
                 pass
 
+        # TODO(ai): implement priorities and backoff
+
     deploy_infrastructure_base_py:
       template: |
         """Infrastructure base for {{library_name}}."""
         class Infrastructure:
             async def provision(self):
                 pass
+
+        # TODO(ai): implement declarative resources
 
     environments_base_py:
       template: |
@@ -1328,6 +1387,8 @@ file_templates:
             def current(self) -> str:
                 return "dev"
 
+        # TODO(ai): add environment discovery and overrides
+
     gateway_routers_base_py:
       template: |
         """Gateway router base for {{library_name}}."""
@@ -1335,12 +1396,16 @@ file_templates:
             def route(self, path: str) -> str:
                 return path
 
+        # TODO(ai): add dispatch table and parameter extraction
+
     gateway_middleware_base_py:
       template: |
         """Gateway middleware base for {{library_name}}."""
         class Middleware:
             async def process(self, request):
                 return request
+
+        # TODO(ai): add chain composition and error handling
 
     prompts_manager_py:
       template: |
@@ -1393,6 +1458,8 @@ file_templates:
                 if not template:
                     raise {{exception_class_name}}(f"Template not found: {name}")
                 return template.format(**kwargs)
+
+        # TODO(ai): add persistence and versioning
 
     tests_base_py:
       template: |
