@@ -48,7 +48,6 @@ members = [
     "apps/genfilemap",
 ]
 exclude = [
-exclude = [
     "libs/contexts",
     "libs/gatekeeper",
     "platform/*",
