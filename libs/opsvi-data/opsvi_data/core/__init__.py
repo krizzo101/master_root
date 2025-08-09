@@ -3,7 +3,7 @@
 Provides base classes and core functionality.
 """
 
-from .base import Error, ConfigurationError, InitializationError
+from .base import ConfigurationError, Error, InitializationError
 
 __all__ = [
     "Error",
