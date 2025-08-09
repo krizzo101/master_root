@@ -1,11 +1,21 @@
-[tool.poetry]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
 name = "opsvi-data"
 version = "0.1.0"
 description = "Shared data clients (graph/vector) for OPSVI platform"
-packages = [{ include = "opsvi_data" }]
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "OPSVI Team", email = "team@opsvi.com" }
+]
+dependencies = [
+  "neo4j>=5",
+  "chromadb>=0.5",
+  "pydantic>=2"
+]
 
-[tool.poetry.dependencies]
-python = ">=3.10,<4.0"
-neo4j = "^5"
-chromadb = "^0.5"
-pydantic = "^2"
+[tool.hatch.build.targets.wheel]
+packages = ["opsvi_data"]
