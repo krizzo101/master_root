@@ -1,39 +1,96 @@
-"""opsvi-llm - LLM integration and management.
+"""opsvi-llm - LLM services for OPSVI applications.
 
-Comprehensive opsvi-llm library for the OPSVI ecosystem
+Comprehensive LLM library for the OPSVI ecosystem
 """
 
 __version__ = "0.1.0"
 __author__ = "OPSVI Team"
 __email__ = "team@opsvi.com"
 
-# Core exports
-from .core.base import BaseComponent, ComponentError
-from .config.settings import LibraryConfig, LibrarySettings
-from .exceptions.base import LibraryError, LibraryConfigurationError
+# Provider exports
+from .providers import (
+    BaseLLMProvider,
+    LLMConfig,
+    LLMError,
+    LLMProviderError,
+    LLMConfigError,
+    LLMRequestError,
+    LLMResponseError,
+    Message,
+    CompletionRequest,
+    ChatRequest,
+    EmbeddingRequest,
+    CompletionResponse,
+    ChatResponse,
+    EmbeddingResponse,
+    OpenAIProvider,
+    OpenAIConfig,
+)
 
-# Service-specific exports
-from .providers.base import True
-from .schemas.models import 
+# OpenAI Interface exports
+from .providers.openai_embeddings_interface import (
+    OpenAIEmbeddingsInterface,
+    OpenAIEmbeddingsError,
+)
 
-# RAG-specific exports
+from .providers.openai_models_interface import (
+    OpenAIModelsInterface,
+    OpenAIModelsError,
+    ModelInfo,
+)
 
-# Manager-specific exports
+from .providers.openai_batch_interface import (
+    OpenAIBatchInterface,
+    OpenAIBatchError,
+)
+
+from .providers.openai_responses_interface import (
+    OpenAIResponsesInterface,
+    AsyncOpenAIResponsesInterface,
+    OpenAIResponsesError,
+    StructuredResponse,
+)
 
 __all__ = [
-    # Core
-    BaseComponent, ComponentError,
-    LibraryConfig, LibrarySettings,
-    LibraryError, LibraryConfigurationError,
-    # Service
-    True,
-    ,
+    # Base classes
+    "BaseLLMProvider",
+    "LLMConfig",
+    "LLMError",
+    "LLMProviderError",
+    "LLMConfigError",
+    "LLMRequestError",
+    "LLMResponseError",
+    # Data models
+    "Message",
+    "CompletionRequest",
+    "ChatRequest",
+    "EmbeddingRequest",
+    "CompletionResponse",
+    "ChatResponse",
+    "EmbeddingResponse",
+    # Providers
+    "OpenAIProvider",
+    "OpenAIConfig",
+    # OpenAI Interfaces
+    "OpenAIEmbeddingsInterface",
+    "OpenAIEmbeddingsError",
+    "OpenAIModelsInterface",
+    "OpenAIModelsError",
+    "ModelInfo",
+    "OpenAIBatchInterface",
+    "OpenAIBatchError",
+    "OpenAIResponsesInterface",
+    "AsyncOpenAIResponsesInterface",
+    "OpenAIResponsesError",
+    "StructuredResponse",
 ]
+
 
 # Version info
 def get_version() -> str:
     """Get the library version."""
     return __version__
+
 
 def get_author() -> str:
     """Get the library author."""
