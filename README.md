@@ -1,50 +1,52 @@
-Python Calculator (CLI)
+# Enhanced Research Assistant
 
-Overview
+Production-ready FastAPI service that answers research questions leveraging Perplexity search, OpenAI embeddings (text-embedding-3-large), and Qdrant vector store.
 
-- A small, safe, and modular command-line calculator written in Python.
-- Supports standard arithmetic (+, -, *, /, //, %, **), parentheses, unary +/-, and a few functions (sqrt, abs, round).
-- Safe parsing via Python's AST (no eval).
-- REPL mode with history and an "ans" variable that remembers the last result.
+## Quick Start (Docker Compose)
+## Quick Demo
 
-Quick start
+Run the complete end-to-end demonstration:
 
-1) Install (editable install):
+```bash
+export OPENAI_API_KEY=sk-...  # Optional - has fallback
+export PERPLEXITY_API_KEY=pxy-...  # Optional - has fallback
+bash scripts/full_demo.sh
+```
 
-   pip install -e .
+See [Full Capabilities Walkthrough](docs/full_capabilities_walkthrough.md) for detailed explanation.
 
-2) One-off calculation:
 
-   pycalc "2 + 2 * (10 - 3)"
+```bash
+export OPENAI_API_KEY=sk-...  # Optional - has fallback
+export PERPLEXITY_API_KEY=pxy-...  # Optional - has fallback
 
-3) REPL mode:
+docker compose up --build
+```
 
-   pycalc -i
+Then visit `http://localhost:8000/docs` or call:
 
-   Commands inside REPL:
-   - history: show previous expressions and results
-   - quit or exit: leave the REPL
+```bash
+curl -X POST http://localhost:8000/ask -H 'Content-Type: application/json' -d '{"query": "What is CRISPR?"}'
+```
 
-Options
+## Local Development
 
-- --precision N  Format output to N decimal places (default: 10)
-- -i, --interactive  Start in interactive mode (REPL)
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn src.api.main:app --reload
+```
 
-Examples
+Run tests:
 
-- pycalc "sqrt(9) + 4"
-- pycalc "2 ** 10"
-- pycalc --precision 4 "10 / 3"
+```bash
+ruff src tests
+mypy src
+pytest
+```
 
-Design
+## Architecture Overview
 
-- calcapp/operations.py: Primitive numeric operations.
-- calcapp/parser.py: Safe AST-based expression evaluator.
-- calcapp/calculator.py: Calculator class that maintains history and memory (ans).
-- calcapp/cli.py: Command-line interface (one-off and REPL modes).
+![architecture](docs/architecture.png)
 
-Testing
-
-Run tests with:
-
-  pytest
+See `docs/ADR-001-initial-architecture.md` for design decisions.

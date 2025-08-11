@@ -1,0 +1,2 @@
+- Added Playwright scraper ADR
+- Added API key fallbacks for immediate demo functionality

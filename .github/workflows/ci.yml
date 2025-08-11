@@ -1,15 +1,41 @@
-name: Workspace CI
-
+name: CI
 on: [push, pull_request]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:24-dind
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - uses: prefix-dev/setup-uv@v1
-      - run: uv sync
-      - run: uv run pytest
+          python-version: '3.11'
+      - name: Install deps
+        run: |
+          pip install -r requirements.txt
+          pip install bandit detect-secrets pytest-cov
+      - name: Lint
+        run: ruff check src tests
+      - name: Type-check
+        run: mypy src
+      - name: Security Scan
+        run: bandit -r src -ll
+      - name: Secret Scan
+        run: detect-secrets scan --all-files --baseline .secrets.baseline || true
+      - name: Tests with coverage
+        run: pytest --cov=src --cov-fail-under=95
+      - name: Build Docker image
+        run: docker build -t research-assistant:latest .
+      - name: Smoke test
+        run: bash scripts/smoke_test.sh
+        env:
+          CI: "true"
+      - name: Full Demo
+        run: bash scripts/full_demo.sh
+        env:
+          CI: "true"
+          OFFLINE_MODE: "true"
+          OPENAI_API_KEY: "dummy"
+          PERPLEXITY_API_KEY: "dummy"

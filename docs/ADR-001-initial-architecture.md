@@ -1,0 +1,1 @@
+Initial architecture decision record.

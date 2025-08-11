@@ -1,0 +1,16 @@
+bandit
+pytest-cov
+detect-secrets
+fastapi
+uvicorn[standard]
+qdrant-client
+openai
+pydantic
+python-dotenv
+httpx
+tiktoken
+playwright
+pytest
+mypy
+ruff
+pydantic-settings
