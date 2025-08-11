@@ -1,0 +1,501 @@
+"""Task registry for managing available tasks."""
+
+import logging
+from typing import Any, Dict, List, Optional, Set
+from uuid import UUID
+
+from auto_forge.config.models import AgentRole
+from memory.graph.client import Neo4jClient
+
+from .task_models import TaskDefinition, TaskRegistry, TaskType, TaskPriority
+
+logger = logging.getLogger(__name__)
+
+
+class TaskRegistryManager:
+    """Manages task definitions and provides registration/discovery functionality."""
+
+    def __init__(self, neo4j_client: Optional[Neo4jClient] = None):
+        """Initialize the task registry manager."""
+        self.registry = TaskRegistry()
+        self.neo4j_client = neo4j_client
+        self._loaded_tasks: Set[str] = set()
+
+    async def register_task(self, task: TaskDefinition) -> bool:
+        """Register a task definition."""
+        try:
+            # Validate task definition
+            self._validate_task_definition(task)
+
+            # Register in memory
+            self.registry.register_task(task)
+
+            # Persist to Neo4j if available
+            if self.neo4j_client:
+                await self._persist_task_definition(task)
+
+            logger.info(f"Registered task: {task.name} ({task.type})")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to register task {task.name}: {e}")
+            return False
+
+    async def get_task(self, name: str) -> Optional[TaskDefinition]:
+        """Get a task definition by name."""
+        # Try memory first
+        task = self.registry.get_task(name)
+        if task:
+            return task
+
+        # Try Neo4j if not in memory
+        if self.neo4j_client and name not in self._loaded_tasks:
+            task = await self._load_task_from_neo4j(name)
+            if task:
+                self.registry.register_task(task)
+                self._loaded_tasks.add(name)
+                return task
+
+        return None
+
+    async def list_tasks(
+        self, task_type: Optional[TaskType] = None, agent: Optional[AgentRole] = None
+    ) -> List[TaskDefinition]:
+        """List all registered tasks with optional filtering."""
+        tasks = []
+
+        # Get from memory
+        for task in self.registry.tasks.values():
+            if self._matches_filter(task, task_type, agent):
+                tasks.append(task)
+
+        # Load from Neo4j if needed
+        if self.neo4j_client:
+            neo4j_tasks = await self._load_tasks_from_neo4j(task_type, agent)
+            for task in neo4j_tasks:
+                if task.name not in self._loaded_tasks:
+                    self.registry.register_task(task)
+                    self._loaded_tasks.add(task.name)
+                    if self._matches_filter(task, task_type, agent):
+                        tasks.append(task)
+
+        return tasks
+
+    async def remove_task(self, name: str) -> bool:
+        """Remove a task definition."""
+        try:
+            # Remove from memory
+            success = self.registry.remove_task(name)
+            if success:
+                self._loaded_tasks.discard(name)
+
+                # Remove from Neo4j if available
+                if self.neo4j_client:
+                    await self._remove_task_from_neo4j(name)
+
+                logger.info(f"Removed task: {name}")
+                return True
+
+            return False
+
+        except Exception as e:
+            logger.error(f"Failed to remove task {name}: {e}")
+            return False
+
+    async def get_task_dependencies(self, task_name: str) -> List[str]:
+        """Get dependencies for a task."""
+        task = await self.get_task(task_name)
+        if task:
+            return task.dependencies
+        return []
+
+    async def get_dependent_tasks(self, task_name: str) -> List[str]:
+        """Get tasks that depend on the specified task."""
+        dependent_tasks = []
+
+        for task in self.registry.tasks.values():
+            if task_name in task.dependencies:
+                dependent_tasks.append(task.name)
+
+        return dependent_tasks
+
+    def _validate_task_definition(self, task: TaskDefinition) -> None:
+        """Validate a task definition."""
+        if not task.name:
+            raise ValueError("Task name is required")
+
+        if not task.description:
+            raise ValueError("Task description is required")
+
+        if task.timeout_seconds <= 0:
+            raise ValueError("Timeout must be positive")
+
+        if task.retry_attempts < 0:
+            raise ValueError("Retry attempts must be non-negative")
+
+        # Validate dependencies exist
+        for dep in task.dependencies:
+            if dep == task.name:
+                raise ValueError(f"Task cannot depend on itself: {task.name}")
+
+    def _matches_filter(
+        self,
+        task: TaskDefinition,
+        task_type: Optional[TaskType] = None,
+        agent: Optional[AgentRole] = None,
+    ) -> bool:
+        """Check if task matches the given filters."""
+        if task_type and task.type != task_type:
+            return False
+
+        if agent and task.agent != agent:
+            return False
+
+        return True
+
+    async def _persist_task_definition(self, task: TaskDefinition) -> None:
+        """Persist task definition to Neo4j."""
+        if not self.neo4j_client:
+            return
+
+        query = """
+        MERGE (t:TaskDefinition {name: $name})
+        SET t.type = $type,
+            t.agent = $agent,
+            t.description = $description,
+            t.inputs = $inputs,
+            t.outputs = $outputs,
+            t.dependencies = $dependencies,
+            t.timeout_seconds = $timeout_seconds,
+            t.retry_attempts = $retry_attempts,
+            t.priority = $priority,
+            t.queue = $queue,
+            t.required = $required,
+            t.metadata = $metadata,
+            t.updated_at = datetime()
+        """
+
+        params = {
+            "name": task.name,
+            "type": task.type,
+            "agent": task.agent,
+            "description": task.description,
+            "inputs": task.inputs,
+            "outputs": task.outputs,
+            "dependencies": task.dependencies,
+            "timeout_seconds": task.timeout_seconds,
+            "retry_attempts": task.retry_attempts,
+            "priority": task.priority,
+            "queue": task.queue,
+            "required": task.required,
+            "metadata": task.metadata,
+        }
+
+        await self.neo4j_client.execute_query(query, params)
+
+    async def _load_task_from_neo4j(self, name: str) -> Optional[TaskDefinition]:
+        """Load task definition from Neo4j."""
+        if not self.neo4j_client:
+            return None
+
+        query = """
+        MATCH (t:TaskDefinition {name: $name})
+        RETURN t
+        """
+
+        result = await self.neo4j_client.execute_query(query, {"name": name})
+
+        if result and len(result) > 0:
+            task_data = result[0]["t"]
+            if task_data:  # Ensure task_data is not empty
+                return TaskDefinition(**task_data)
+
+        return None
+
+    async def _load_tasks_from_neo4j(
+        self, task_type: Optional[TaskType] = None, agent: Optional[AgentRole] = None
+    ) -> List[TaskDefinition]:
+        """Load task definitions from Neo4j with optional filtering."""
+        if not self.neo4j_client:
+            return []
+
+        query = "MATCH (t:TaskDefinition)"
+        params = {}
+
+        conditions = []
+        if task_type:
+            conditions.append("t.type = $task_type")
+            params["task_type"] = task_type
+
+        if agent:
+            conditions.append("t.agent = $agent")
+            params["agent"] = agent
+
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+
+        query += " RETURN t"
+
+        result = await self.neo4j_client.execute_query(query, params)
+
+        tasks = []
+        for record in result:
+            task_data = record["t"]
+            tasks.append(TaskDefinition(**task_data))
+
+        return tasks
+
+    async def _remove_task_from_neo4j(self, name: str) -> None:
+        """Remove task definition from Neo4j."""
+        if not self.neo4j_client:
+            return
+
+        query = """
+        MATCH (t:TaskDefinition {name: $name})
+        DELETE t
+        """
+
+        await self.neo4j_client.execute_query(query, {"name": name})
+
+    async def load_default_tasks(self) -> None:
+        """Load default task definitions."""
+        default_tasks = [
+            TaskDefinition(
+                name="plan",
+                type=TaskType.PLANNING,
+                agent_type="planner",
+                description="Analyze requirements and create development plan",
+                outputs={"plan": "Development plan document"},
+                timeout_seconds=300,
+                priority=TaskPriority.HIGH,
+                queue="default",
+            ),
+            TaskDefinition(
+                name="brainstorm",
+                type=TaskType.PLANNING,
+                agent_type="planner",
+                description="Generate creative solutions and approaches",
+                dependencies=["plan"],
+                inputs={"plan": "Development plan from planning stage"},
+                outputs={"brainstorm": "Creative solutions document"},
+                timeout_seconds=180,
+                priority=TaskPriority.NORMAL,
+                queue="default",
+                required=False,
+            ),
+            TaskDefinition(
+                name="requirements",
+                type=TaskType.SPECIFICATION,
+                agent_type="specifier",
+                description="Extract and formalize requirements",
+                dependencies=["plan", "brainstorm"],
+                inputs={"plan": "Development plan", "brainstorm": "Creative solutions"},
+                outputs={"requirements": "Formal requirements document"},
+                timeout_seconds=240,
+                priority=TaskPriority.HIGH,
+                queue="default",
+            ),
+            TaskDefinition(
+                name="spec",
+                type=TaskType.SPECIFICATION,
+                agent_type="specifier",
+                description="Create detailed technical specifications",
+                dependencies=["requirements"],
+                inputs={"requirements": "Requirements from requirements stage"},
+                outputs={"specification": "Detailed specification document"},
+                timeout_seconds=300,
+                priority=TaskPriority.HIGH,
+                queue="default",
+            ),
+            TaskDefinition(
+                name="techspec",
+                type=TaskType.SPECIFICATION,
+                agent_type="specifier",
+                description="Generate technology-specific specifications",
+                dependencies=["spec"],
+                inputs={"specification": "Specification from spec stage"},
+                outputs={"techspec": "Technology-specific specifications"},
+                timeout_seconds=240,
+                priority=TaskPriority.HIGH,
+                queue="default",
+            ),
+            TaskDefinition(
+                name="arch",
+                type=TaskType.ARCHITECTURE,
+                agent_type="architect",
+                description="Design system architecture",
+                dependencies=["spec"],
+                inputs={"specification": "Specification from spec stage"},
+                outputs={"architecture": "Architecture design document"},
+                timeout_seconds=300,
+                priority=TaskPriority.HIGH,
+                queue="default",
+            ),
+            TaskDefinition(
+                name="dataflow",
+                type=TaskType.ARCHITECTURE,
+                agent_type="architect",
+                description="Design data flow and integration patterns",
+                dependencies=["arch"],
+                inputs={"architecture": "Architecture from arch stage"},
+                outputs={"dataflow": "Data flow design document"},
+                timeout_seconds=180,
+                priority=TaskPriority.NORMAL,
+                queue="default",
+                required=False,
+            ),
+            TaskDefinition(
+                name="dbschema",
+                type=TaskType.ARCHITECTURE,
+                agent_type="architect",
+                description="Design database schema",
+                dependencies=["arch"],
+                inputs={"architecture": "Architecture from arch stage"},
+                outputs={"dbschema": "Database schema design"},
+                timeout_seconds=180,
+                priority=TaskPriority.NORMAL,
+                queue="default",
+                required=False,
+            ),
+            TaskDefinition(
+                name="cicd",
+                type=TaskType.ARCHITECTURE,
+                agent_type="architect",
+                description="Design CI/CD pipeline",
+                dependencies=["arch"],
+                inputs={"architecture": "Architecture from arch stage"},
+                outputs={"cicd": "CI/CD pipeline design"},
+                timeout_seconds=120,
+                priority=TaskPriority.NORMAL,
+                queue="default",
+                required=False,
+            ),
+            TaskDefinition(
+                name="scaffold",
+                type=TaskType.CODING,
+                agent_type="coder",
+                description="Create project structure and boilerplate",
+                dependencies=["arch", "techspec"],
+                inputs={"architecture": "Architecture design", "techspec": "Technology specifications"},
+                outputs={"scaffold": "Project structure and boilerplate"},
+                timeout_seconds=180,
+                priority=TaskPriority.HIGH,
+                queue="io",
+            ),
+            TaskDefinition(
+                name="code",
+                type=TaskType.CODING,
+                agent_type="coder",
+                description="Implement core functionality",
+                dependencies=["scaffold"],
+                inputs={"scaffold": "Project structure from scaffold stage"},
+                outputs={"code": "Source code files"},
+                timeout_seconds=600,
+                priority=TaskPriority.NORMAL,
+                queue="heavy",
+            ),
+            TaskDefinition(
+                name="testgen",
+                type=TaskType.TESTING,
+                agent_type="tester",
+                description="Generate comprehensive test suites",
+                dependencies=["code"],
+                inputs={"code": "Source code from coding stage"},
+                outputs={"testgen": "Test suite files"},
+                timeout_seconds=240,
+                priority=TaskPriority.NORMAL,
+                queue="io",
+            ),
+            TaskDefinition(
+                name="testrun",
+                type=TaskType.TESTING,
+                agent_type="tester",
+                description="Execute test suites and collect results",
+                dependencies=["testgen"],
+                inputs={"testgen": "Test suite from testgen stage"},
+                outputs={"testrun": "Test execution results"},
+                timeout_seconds=300,
+                priority=TaskPriority.NORMAL,
+                queue="test",
+            ),
+            TaskDefinition(
+                name="assure",
+                type=TaskType.ANALYSIS,
+                agent_type="critic",
+                description="Run assurance checks in parallel",
+                dependencies=["testrun"],
+                inputs={"testrun": "Test results from testrun stage"},
+                outputs={"assure": "Assurance check results"},
+                timeout_seconds=180,
+                priority=TaskPriority.NORMAL,
+                queue="io",
+            ),
+            TaskDefinition(
+                name="perf_smoke",
+                type=TaskType.PERFORMANCE,
+                agent_type="tester",
+                description="Run performance smoke tests",
+                dependencies=["testrun"],
+                inputs={"testrun": "Test results from testrun stage"},
+                outputs={"perf_smoke": "Performance test results"},
+                timeout_seconds=120,
+                priority=TaskPriority.NORMAL,
+                queue="test",
+                required=False,
+            ),
+            TaskDefinition(
+                name="critic",
+                type=TaskType.REVIEW,
+                agent_type="critic",
+                description="Evaluate overall quality and generate critique",
+                dependencies=["assure", "perf_smoke"],
+                inputs={"assure": "Assurance results", "perf_smoke": "Performance results"},
+                outputs={"critic": "Quality evaluation report"},
+                timeout_seconds=180,
+                priority=TaskPriority.NORMAL,
+                queue="io",
+            ),
+            TaskDefinition(
+                name="repair",
+                type=TaskType.CODING,
+                agent_type="coder",
+                description="Repair issues based on critique",
+                dependencies=["critic"],
+                inputs={"critic": "Critique from critic stage"},
+                outputs={"repair": "Repaired code"},
+                timeout_seconds=300,
+                priority=TaskPriority.NORMAL,
+                queue="heavy",
+                required=False,
+            ),
+            TaskDefinition(
+                name="perf_opt",
+                type=TaskType.PERFORMANCE,
+                agent_type="coder",
+                description="Optimize performance if needed",
+                dependencies=["critic"],
+                inputs={"critic": "Critique from critic stage"},
+                outputs={"perf_opt": "Performance optimizations"},
+                timeout_seconds=240,
+                priority=TaskPriority.NORMAL,
+                queue="heavy",
+                required=False,
+            ),
+            TaskDefinition(
+                name="finalize",
+                type=TaskType.DEPLOYMENT,
+                agent_type="coder",
+                description="Package and document the solution",
+                dependencies=["critic", "repair", "perf_opt"],
+                inputs={"critic": "Final critique", "repair": "Repaired code", "perf_opt": "Performance optimizations"},
+                outputs={"finalize": "Final packaged solution"},
+                timeout_seconds=180,
+                priority=TaskPriority.NORMAL,
+                queue="io",
+            ),
+        ]
+
+        for task in default_tasks:
+            await self.register_task(task)
+
+        logger.info(f"Loaded {len(default_tasks)} default tasks")

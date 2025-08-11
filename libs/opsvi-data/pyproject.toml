@@ -5,17 +5,42 @@ build-backend = "hatchling.build"
 [project]
 name = "opsvi-data"
 version = "0.1.0"
-description = "Shared data clients (graph/vector) for OPSVI platform"
+description = "OPSVI opsvi-data library"
 readme = "README.md"
-requires-python = ">=3.10"
-authors = [
-  { name = "OPSVI Team", email = "team@opsvi.com" }
-]
+license = "MIT"
+requires-python = ">=3.9"
 dependencies = [
-  "neo4j>=5",
-  "chromadb>=0.5",
-  "pydantic>=2"
+    "opsvi-foundation>=0.1.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
 ]
 
-[tool.hatch.build.targets.wheel]
-packages = ["opsvi_data"]
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--cov --cov-report=term-missing"
+asyncio_mode = "auto"
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.mypy]
+python_version = "3.9"
+ignore_missing_imports = true

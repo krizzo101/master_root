@@ -8,27 +8,50 @@ __author__ = "OPSVI Team"
 __email__ = "team@opsvi.com"
 
 # Core exports
-from .core.base import BaseComponent, ComponentError
-from .config.settings import LibraryConfig, LibrarySettings
-from .exceptions.base import LibraryError, LibraryConfigurationError
-
-# Service-specific exports
-
-# RAG-specific exports
-
-# Manager-specific exports
+from .core.base import BaseComponent, ComponentError, BaseSettings
+from .config.settings import LibraryConfig, LibrarySettings, FoundationConfig
+from .exceptions.base import (
+    LibraryError,
+    LibraryConfigurationError,
+    LibraryInitializationError,
+    LibraryValidationError,
+    LibraryConnectionError,
+    LibraryTimeoutError,
+    LibraryAuthenticationError,
+    LibraryAuthorizationError,
+    LibraryResourceError,
+    LibraryStateError,
+    LibraryOperationError,
+)
 
 __all__ = [
     # Core
-    BaseComponent, ComponentError,
-    LibraryConfig, LibrarySettings,
-    LibraryError, LibraryConfigurationError,
+    "BaseComponent",
+    "ComponentError",
+    "BaseSettings",
+    "LibraryConfig",
+    "LibrarySettings",
+    "FoundationConfig",
+    # Exceptions
+    "LibraryError",
+    "LibraryConfigurationError",
+    "LibraryInitializationError",
+    "LibraryValidationError",
+    "LibraryConnectionError",
+    "LibraryTimeoutError",
+    "LibraryAuthenticationError",
+    "LibraryAuthorizationError",
+    "LibraryResourceError",
+    "LibraryStateError",
+    "LibraryOperationError",
 ]
+
 
 # Version info
 def get_version() -> str:
     """Get the library version."""
     return __version__
+
 
 def get_author() -> str:
     """Get the library author."""

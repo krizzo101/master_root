@@ -1,6 +1,6 @@
-""" - Core opsvi-http functionality.
+"""Core opsvi-http functionality.
 
-Comprehensive opsvi-http library for the OPSVI ecosystem
+Comprehensive HTTP client and server functionality for the OPSVI ecosystem
 """
 
 from abc import ABC, abstractmethod
@@ -13,113 +13,101 @@ from opsvi_foundation.config.settings import BaseSettings
 
 logger = logging.getLogger(__name__)
 
-class Error(ComponentError):
-    """Base exception for  errors."""
+
+class HTTPCoreError(ComponentError):
+    """Base exception for HTTP core errors."""
+
     pass
 
-class ConfigurationError(Error):
-    """Configuration-related errors in ."""
+
+class HTTPConfigurationError(HTTPCoreError):
+    """Configuration-related errors in HTTP core."""
+
     pass
 
-class InitializationError(Error):
-    """Initialization-related errors in ."""
+
+class HTTPInitializationError(HTTPCoreError):
+    """Initialization-related errors in HTTP core."""
+
     pass
 
-class Config(BaseSettings):
-    """Configuration for ."""
+
+class HTTPCoreConfig(BaseSettings):
+    """Configuration for HTTP core components."""
 
     # Core configuration
     enabled: bool = True
     debug: bool = False
     log_level: str = "INFO"
 
-    # Component-specific configuration
-    
+    # HTTP-specific configuration
+    default_timeout: float = 30.0
+    max_connections: int = 100
+    connection_pool_size: int = 20
 
-    class Config:
-        env_prefix = "OPSVI_OPSVI_HTTP__"
+    model_config = {"env_prefix": "OPSVI_HTTP_CORE_"}
 
-class (BaseComponent):
-    """Base class for opsvi-http components.
 
-    Provides base functionality for all opsvi-http components
+class BaseHTTPCoreComponent(BaseComponent):
+    """Base class for HTTP core components.
+
+    Provides base functionality for all HTTP core components
     """
 
     def __init__(
-        self,
-        config: Optional[Config] = None,
-        **kwargs: Any
+        self, name: str, config: Optional[HTTPCoreConfig] = None, **kwargs: Any
     ) -> None:
-        """Initialize .
+        """Initialize HTTP core component.
 
         Args:
+            name: Component name
             config: Configuration for the component
             **kwargs: Additional configuration parameters
         """
-        super().__init__("", config.dict() if config else {})
-        self.config = config or Config(**kwargs)
+        super().__init__(name, config.model_dump() if config else {})
+        self.http_config = config or HTTPCoreConfig(**kwargs)
         self._initialized = False
-        self._logger = logging.getLogger(f"{__name__}.")
+        self._logger = logging.getLogger(f"{__name__}.{name}")
 
-        # Component-specific initialization
-        
-
-    async def initialize(self) -> None:
-        """Initialize the component.
-
-        Raises:
-            InitializationError: If initialization fails
-        """
+    async def _initialize_impl(self) -> None:
+        """Initialize the HTTP core component."""
         try:
-            self._logger.info("Initializing ")
-
+            self._logger.info(f"Initializing HTTP core component: {self.name}")
             # Component-specific initialization logic
-            
-
             self._initialized = True
-            self._logger.info(" initialized successfully")
-
+            self._logger.info(
+                f"HTTP core component {self.name} initialized successfully"
+            )
         except Exception as e:
-            self._logger.error(f"Failed to initialize : {e}")
-            raise InitializationError(f"Initialization failed: {e}") from e
+            self._logger.error(
+                f"Failed to initialize HTTP core component {self.name}: {e}"
+            )
+            raise HTTPInitializationError(f"Initialization failed: {e}") from e
 
-    async def shutdown(self) -> None:
-        """Shutdown the component.
-
-        Raises:
-            Error: If shutdown fails
-        """
+    async def _shutdown_impl(self) -> None:
+        """Shutdown the HTTP core component."""
         try:
-            self._logger.info("Shutting down ")
-
+            self._logger.info(f"Shutting down HTTP core component: {self.name}")
             # Component-specific shutdown logic
-            
-
             self._initialized = False
-            self._logger.info(" shut down successfully")
-
+            self._logger.info(f"HTTP core component {self.name} shut down successfully")
         except Exception as e:
-            self._logger.error(f"Failed to shutdown : {e}")
-            raise Error(f"Shutdown failed: {e}") from e
+            self._logger.error(
+                f"Failed to shutdown HTTP core component {self.name}: {e}"
+            )
+            raise HTTPCoreError(f"Shutdown failed: {e}") from e
 
-    async def health_check(self) -> bool:
-        """Perform health check.
-
-        Returns:
-            True if healthy, False otherwise
-        """
+    async def _health_check_impl(self) -> bool:
+        """Perform health check for HTTP core component."""
         try:
             if not self._initialized:
                 return False
 
             # Component-specific health check logic
-            
-
             return True
 
         except Exception as e:
-            self._logger.error(f"Health check failed: {e}")
+            self._logger.error(
+                f"Health check failed for HTTP core component {self.name}: {e}"
+            )
             return False
-
-    # Component-specific methods
-    

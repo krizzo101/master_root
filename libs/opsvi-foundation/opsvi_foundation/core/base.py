@@ -1,4 +1,4 @@
-""" - Core opsvi-foundation functionality.
+"""Core opsvi-foundation functionality.
 
 Comprehensive opsvi-foundation library for the OPSVI ecosystem
 """
@@ -7,100 +7,68 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Union
 import asyncio
 import logging
-
-from opsvi_foundation import BaseComponent, ComponentError
-from opsvi_foundation.config.settings import BaseSettings
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
-class Error(ComponentError):
-    """Base exception for  errors."""
+
+class ComponentError(Exception):
+    """Base exception for component errors."""
+
     pass
 
-class ConfigurationError(Error):
-    """Configuration-related errors in ."""
-    pass
 
-class InitializationError(Error):
-    """Initialization-related errors in ."""
-    pass
+class BaseComponent(ABC):
+    """Base class for all OPSVI components.
 
-class Config(BaseSettings):
-    """Configuration for ."""
-
-    # Core configuration
-    enabled: bool = True
-    debug: bool = False
-    log_level: str = "INFO"
-
-    # Component-specific configuration
-    
-
-    class Config:
-        env_prefix = "OPSVI_OPSVI_FOUNDATION__"
-
-class (BaseComponent):
-    """Base class for opsvi-foundation components.
-
-    Provides base functionality for all opsvi-foundation components
+    Provides base functionality for all components in the OPSVI ecosystem
     """
 
     def __init__(
-        self,
-        config: Optional[Config] = None,
-        **kwargs: Any
+        self, name: str, config: Optional[Dict[str, Any]] = None, **kwargs: Any
     ) -> None:
-        """Initialize .
+        """Initialize base component.
 
         Args:
-            config: Configuration for the component
+            name: Component name
+            config: Configuration dictionary
             **kwargs: Additional configuration parameters
         """
-        super().__init__("", config.dict() if config else {})
-        self.config = config or Config(**kwargs)
+        self.name = name
+        self.config = config or {}
+        self.config.update(kwargs)
         self._initialized = False
-        self._logger = logging.getLogger(f"{__name__}.")
-
-        # Component-specific initialization
-        
+        self._logger = logging.getLogger(f"{__name__}.{name}")
 
     async def initialize(self) -> None:
         """Initialize the component.
 
         Raises:
-            InitializationError: If initialization fails
+            ComponentError: If initialization fails
         """
         try:
-            self._logger.info("Initializing ")
-
-            # Component-specific initialization logic
-            
-
+            self._logger.info(f"Initializing {self.name}")
+            await self._initialize_impl()
             self._initialized = True
-            self._logger.info(" initialized successfully")
-
+            self._logger.info(f"{self.name} initialized successfully")
         except Exception as e:
-            self._logger.error(f"Failed to initialize : {e}")
-            raise InitializationError(f"Initialization failed: {e}") from e
+            self._logger.error(f"Failed to initialize {self.name}: {e}")
+            raise ComponentError(f"Initialization failed: {e}") from e
 
     async def shutdown(self) -> None:
         """Shutdown the component.
 
         Raises:
-            Error: If shutdown fails
+            ComponentError: If shutdown fails
         """
         try:
-            self._logger.info("Shutting down ")
-
-            # Component-specific shutdown logic
-            
-
+            self._logger.info(f"Shutting down {self.name}")
+            await self._shutdown_impl()
             self._initialized = False
-            self._logger.info(" shut down successfully")
-
+            self._logger.info(f"{self.name} shut down successfully")
         except Exception as e:
-            self._logger.error(f"Failed to shutdown : {e}")
-            raise Error(f"Shutdown failed: {e}") from e
+            self._logger.error(f"Failed to shutdown {self.name}: {e}")
+            raise ComponentError(f"Shutdown failed: {e}") from e
 
     async def health_check(self) -> bool:
         """Perform health check.
@@ -111,15 +79,30 @@ class (BaseComponent):
         try:
             if not self._initialized:
                 return False
-
-            # Component-specific health check logic
-            
-
-            return True
-
+            return await self._health_check_impl()
         except Exception as e:
-            self._logger.error(f"Health check failed: {e}")
+            self._logger.error(f"Health check failed for {self.name}: {e}")
             return False
 
-    # Component-specific methods
-    
+    @abstractmethod
+    async def _initialize_impl(self) -> None:
+        """Implementation-specific initialization."""
+        pass
+
+    @abstractmethod
+    async def _shutdown_impl(self) -> None:
+        """Implementation-specific shutdown."""
+        pass
+
+    @abstractmethod
+    async def _health_check_impl(self) -> bool:
+        """Implementation-specific health check."""
+        pass
+
+
+class BaseSettings(BaseModel):
+    """Base settings for OPSVI components."""
+
+    class Config:
+        env_prefix = "OPSVI_"
+        case_sensitive = False

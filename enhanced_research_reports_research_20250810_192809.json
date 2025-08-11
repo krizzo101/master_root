@@ -1,0 +1,89 @@
+{
+  "session_id": "research_20250810_192809",
+  "timestamp": "2025-08-10T19:28:21.659947",
+  "research_sessions": [
+    {
+      "topic": "Machine Learning in Healthcare",
+      "start_time": "2025-08-10T19:28:10.055466",
+      "papers_found": 8,
+      "papers_analyzed": 1,
+      "sources": [
+        "ArXiv",
+        "PubMed"
+      ],
+      "analyses": [
+        {
+          "provider": "openai",
+          "analysis": {
+            "summary": "1. Key findings and trends:\n- The first paper, \"FaceAnonyMixer\", introduces a cancelable face generation framework that leverages the latent space of a pre-trained generative model to synthesize privacy-preserving face images. It achieves superior recognition accuracy while providing stronger privac...",
+            "key_findings": [
+              "Finding 1: 1. Key findings and trends:\n- The first paper, \"FaceAnonyMixer\", introduces a cancelable face genera",
+              "Finding 2: tion framework that leverages the latent space of a pre-trained generative model to synthesize priva",
+              "Finding 3: cy-preserving face images. It achieves superior recognition accuracy while providing stronger privac"
+            ],
+            "relevance_score": 8,
+            "recommendations": [
+              "Continue research in this area",
+              "Explore practical applications",
+              "Consider interdisciplinary approaches"
+            ],
+            "provider": "openai",
+            "model": "gpt-3.5-turbo-0125"
+          }
+        }
+      ],
+      "status": "completed",
+      "end_time": "2025-08-10T19:28:16.419597"
+    },
+    {
+      "topic": "Natural Language Processing",
+      "start_time": "2025-08-10T19:28:16.419624",
+      "papers_found": 8,
+      "papers_analyzed": 0,
+      "sources": [
+        "ArXiv",
+        "PubMed"
+      ],
+      "analyses": [],
+      "status": "completed",
+      "end_time": "2025-08-10T19:28:16.841356"
+    },
+    {
+      "topic": "Quantum Computing Applications",
+      "start_time": "2025-08-10T19:28:16.841379",
+      "papers_found": 8,
+      "papers_analyzed": 1,
+      "sources": [
+        "ArXiv",
+        "PubMed"
+      ],
+      "analyses": [
+        {
+          "provider": "openai",
+          "analysis": {
+            "summary": "1. Key findings and trends:\n- The first paper, \"FaceAnonyMixer,\" introduces a cancelable face generation framework that mixes real and synthetic latent codes to protect identity while maintaining recognition utility. It achieves superior recognition accuracy and privacy protection compared to existi...",
+            "key_findings": [
+              "Finding 1: 1. Key findings and trends:\n- The first paper, \"FaceAnonyMixer,\" introduces a cancelable face genera",
+              "Finding 2: tion framework that mixes real and synthetic latent codes to protect identity while maintaining reco",
+              "Finding 3: gnition utility. It achieves superior recognition accuracy and privacy protection compared to existi"
+            ],
+            "relevance_score": 8,
+            "recommendations": [
+              "Continue research in this area",
+              "Explore practical applications",
+              "Consider interdisciplinary approaches"
+            ],
+            "provider": "openai",
+            "model": "gpt-3.5-turbo-0125"
+          }
+        }
+      ],
+      "status": "completed",
+      "end_time": "2025-08-10T19:28:21.659738"
+    }
+  ],
+  "providers_available": {
+    "openai": true,
+    "perplexity": true
+  }
+}

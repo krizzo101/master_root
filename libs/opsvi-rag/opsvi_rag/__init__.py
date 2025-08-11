@@ -8,34 +8,37 @@ __author__ = "OPSVI Team"
 __email__ = "team@opsvi.com"
 
 # Core exports
-from .core.base import BaseComponent, ComponentError
-from .config.settings import LibraryConfig, LibrarySettings
-from .exceptions.base import LibraryError, LibraryConfigurationError
-
-# Service-specific exports
+from .core.base import BaseRAGComponent, RAGConfig
+from .config.settings import OpsviRagSettings, get_settings
+from .exceptions.base import (
+    OpsviRagError,
+    OpsviRagConfigurationError,
+    OpsviRagInitializationError,
+)
 
 # RAG-specific exports
-from .datastores.base import True
-from .embeddings.providers import 
-from .processors.base import 
-
-# Manager-specific exports
+from .datastores import QdrantStore, QdrantConfig
 
 __all__ = [
     # Core
-    BaseComponent, ComponentError,
-    LibraryConfig, LibrarySettings,
-    LibraryError, LibraryConfigurationError,
+    "BaseRAGComponent",
+    "RAGConfig",
+    "OpsviRagSettings",
+    "get_settings",
+    "OpsviRagError",
+    "OpsviRagConfigurationError",
+    "OpsviRagInitializationError",
     # RAG
-    True,
-    ,
-    ,
+    "QdrantStore",
+    "QdrantConfig",
 ]
+
 
 # Version info
 def get_version() -> str:
     """Get the library version."""
     return __version__
+
 
 def get_author() -> str:
     """Get the library author."""

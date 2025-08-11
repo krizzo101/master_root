@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "opsvi-ecosystem"
+version = "0.1.0"
+description = "Complete OPSVI Library Ecosystem"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+dependencies = [
+    "opsvi-foundation>=0.1.0",
+    "opsvi-core>=0.1.0",
+    "opsvi-llm>=0.1.0",
+    "opsvi-http>=0.1.0",
+    "opsvi-data>=0.1.0",
+    "opsvi-auth>=0.1.0",
+    "opsvi-memory>=0.1.0",
+    "opsvi-orchestration>=0.1.0",
+    "opsvi-communication>=0.1.0",
+    "opsvi-mcp>=0.1.0",
+    "opsvi-api>=0.1.0",
+    "opsvi-workers>=0.1.0",
+    "opsvi-pipeline>=0.1.0",
+    "opsvi-coordination>=0.1.0",
+    "opsvi-shared>=0.1.0",
+    "opsvi-master>=0.1.0",
+    "opsvi-auto-forge>=0.1.0",
+    "opsvi-fs>=0.1.0",
+    "opsvi-rag>=0.1.0",
+    "opsvi-gateway>=0.1.0",
+    "opsvi-security>=0.1.0",
+    "opsvi-deploy>=0.1.0",
+    "opsvi-monitoring>=0.1.0",
+    "opsvi-agents>=0.1.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--cov --cov-report=term-missing"
+asyncio_mode = "auto"

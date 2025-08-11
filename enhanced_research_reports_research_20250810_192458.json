@@ -1,0 +1,89 @@
+{
+  "session_id": "research_20250810_192458",
+  "timestamp": "2025-08-10T19:25:09.186620",
+  "research_sessions": [
+    {
+      "topic": "Machine Learning in Healthcare",
+      "start_time": "2025-08-10T19:24:58.658113",
+      "papers_found": 8,
+      "papers_analyzed": 1,
+      "sources": [
+        "PubMed",
+        "ArXiv"
+      ],
+      "analyses": [
+        {
+          "provider": "openai",
+          "analysis": {
+            "summary": "1. Key findings and trends:\n- The first paper, \"FaceAnonyMixer,\" introduces a cancelable face generation framework that leverages the latent space of a generative model to synthesize privacy-preserving face images. This method offers superior recognition accuracy while providing strong privacy prote...",
+            "key_findings": [
+              "Finding 1: 1. Key findings and trends:\n- The first paper, \"FaceAnonyMixer,\" introduces a cancelable face genera",
+              "Finding 2: tion framework that leverages the latent space of a generative model to synthesize privacy-preservin",
+              "Finding 3: g face images. This method offers superior recognition accuracy while providing strong privacy prote"
+            ],
+            "relevance_score": 8,
+            "recommendations": [
+              "Continue research in this area",
+              "Explore practical applications",
+              "Consider interdisciplinary approaches"
+            ],
+            "provider": "openai",
+            "model": "gpt-3.5-turbo-0125"
+          }
+        }
+      ],
+      "status": "completed",
+      "end_time": "2025-08-10T19:25:04.545581"
+    },
+    {
+      "topic": "Natural Language Processing",
+      "start_time": "2025-08-10T19:25:04.545605",
+      "papers_found": 8,
+      "papers_analyzed": 0,
+      "sources": [
+        "PubMed",
+        "ArXiv"
+      ],
+      "analyses": [],
+      "status": "completed",
+      "end_time": "2025-08-10T19:25:04.929190"
+    },
+    {
+      "topic": "Quantum Computing Applications",
+      "start_time": "2025-08-10T19:25:04.929213",
+      "papers_found": 8,
+      "papers_analyzed": 1,
+      "sources": [
+        "PubMed",
+        "ArXiv"
+      ],
+      "analyses": [
+        {
+          "provider": "openai",
+          "analysis": {
+            "summary": "1. Key findings and trends:\n- The first paper, \"FaceAnonyMixer,\" introduces a framework for generating cancelable face images that protect privacy while maintaining recognition utility. It achieves superior recognition accuracy and privacy protection compared to existing methods.\n- The second paper,...",
+            "key_findings": [
+              "Finding 1: 1. Key findings and trends:\n- The first paper, \"FaceAnonyMixer,\" introduces a framework for generati",
+              "Finding 2: ng cancelable face images that protect privacy while maintaining recognition utility. It achieves su",
+              "Finding 3: perior recognition accuracy and privacy protection compared to existing methods.\n- The second paper,"
+            ],
+            "relevance_score": 8,
+            "recommendations": [
+              "Continue research in this area",
+              "Explore practical applications",
+              "Consider interdisciplinary approaches"
+            ],
+            "provider": "openai",
+            "model": "gpt-3.5-turbo-0125"
+          }
+        }
+      ],
+      "status": "completed",
+      "end_time": "2025-08-10T19:25:09.186425"
+    }
+  ],
+  "providers_available": {
+    "openai": true,
+    "perplexity": true
+  }
+}

@@ -1,41 +1,88 @@
-"""Exception classes for opsvi-foundation.
+"""Base exceptions for opsvi-foundation.
 
-
+Comprehensive exception handling for the OPSVI ecosystem
 """
 
-from opsvi_foundation.exceptions.base import OPSVIError
+from typing import Optional, Any, Dict
 
-class OpsviFoundationError(OPSVIError):
-    """Base exception for all opsvi-foundation errors."""
+
+class LibraryError(Exception):
+    """Base exception for all OPSVI library errors."""
+
+    def __init__(
+        self,
+        message: str,
+        error_code: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """Initialize library error.
+
+        Args:
+            message: Error message
+            error_code: Optional error code
+            details: Optional error details
+        """
+        super().__init__(message)
+        self.message = message
+        self.error_code = error_code
+        self.details = details or {}
+
+
+class LibraryConfigurationError(LibraryError):
+    """Configuration-related errors."""
+
     pass
 
-class OpsviFoundationConfigurationError(OpsviFoundationError):
-    """Configuration-related errors in opsvi-foundation."""
+
+class LibraryInitializationError(LibraryError):
+    """Initialization-related errors."""
+
     pass
 
-class OpsviFoundationConnectionError(OpsviFoundationError):
-    """Connection-related errors in opsvi-foundation."""
+
+class LibraryValidationError(LibraryError):
+    """Validation-related errors."""
+
     pass
 
-class OpsviFoundationValidationError(OpsviFoundationError):
-    """Validation-related errors in opsvi-foundation."""
+
+class LibraryConnectionError(LibraryError):
+    """Connection-related errors."""
+
     pass
 
-class OpsviFoundationTimeoutError(OpsviFoundationError):
-    """Timeout-related errors in opsvi-foundation."""
+
+class LibraryTimeoutError(LibraryError):
+    """Timeout-related errors."""
+
     pass
 
-class OpsviFoundationResourceError(OpsviFoundationError):
-    """Resource-related errors in opsvi-foundation."""
+
+class LibraryAuthenticationError(LibraryError):
+    """Authentication-related errors."""
+
     pass
 
-class OpsviFoundationInitializationError(OpsviFoundationError):
-    """Initialization-related errors in opsvi-foundation."""
+
+class LibraryAuthorizationError(LibraryError):
+    """Authorization-related errors."""
+
     pass
 
-class OpsviFoundationShutdownError(OpsviFoundationError):
-    """Shutdown-related errors in opsvi-foundation."""
+
+class LibraryResourceError(LibraryError):
+    """Resource-related errors."""
+
     pass
 
-# Library-specific exceptions
 
+class LibraryStateError(LibraryError):
+    """State-related errors."""
+
+    pass
+
+
+class LibraryOperationError(LibraryError):
+    """Operation-related errors."""
+
+    pass

@@ -1,12 +1,20 @@
 """Core module for opsvi-rag.
 
-Provides base classes and core functionality.
+Exports core RAG base component and config types.
 """
 
-from .base import Error, ConfigurationError, InitializationError
+from .base import (
+    BaseRAGComponent,
+    RAGConfig,
+    RAGError,
+    RAGConfigurationError,
+    RAGInitializationError,
+)
 
 __all__ = [
-    "Error",
-    "ConfigurationError",
-    "InitializationError",
+    "BaseRAGComponent",
+    "RAGConfig",
+    "RAGError",
+    "RAGConfigurationError",
+    "RAGInitializationError",
 ]

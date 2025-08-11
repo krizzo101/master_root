@@ -1,0 +1,256 @@
+"""DSL processor for pipeline configuration and knob management."""
+
+import logging
+import yaml
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+from pydantic import BaseModel, Field, field_validator
+
+from auto_forge.config.models import Artifact, Result
+from monitoring.metrics.decision_metrics import (
+    dsl_config_loaded_total,
+    dsl_knobs_applied_total,
+)
+
+logger = logging.getLogger(__name__)
+
+
+class ReasoningConfig(BaseModel):
+    """Configuration for reasoning strategies."""
+
+    strategy: str = Field("auto", description="Reasoning strategy to use")
+    k_samples: int = Field(5, ge=1, le=20, description="Number of samples for ensemble")
+    max_thoughts: int = Field(20, ge=1, le=100, description="Maximum thoughts per reasoning")
+    verifier: str = Field("gpt-4.1", description="Model to use for verification")
+    min_confidence: float = Field(0.85, ge=0.0, le=1.0, description="Minimum confidence threshold")
+
+    @field_validator("strategy")
+    @classmethod
+    def validate_strategy(cls, v: str) -> str:
+        """Validate reasoning strategy."""
+        valid_strategies = [
+            "auto", "single", "self_consistency", "solver_verifier",
+            "tot", "debate", "reflexion"
+        ]
+        if v not in valid_strategies:
+            raise ValueError(f"Invalid strategy: {v}. Must be one of {valid_strategies}")
+        return v
+
+
+class KnowledgeRetriever(BaseModel):
+    """Configuration for a knowledge retriever."""
+
+    name: str = Field(..., description="Retriever name")
+    top_k: int = Field(12, ge=1, le=50, description="Top K results")
+    bm25_k: Optional[int] = Field(8, ge=1, le=50, description="BM25 results")
+    namespaces: List[str] = Field(default_factory=list, description="Search namespaces")
+
+
+class KnowledgeConfig(BaseModel):
+    """Configuration for knowledge retrieval."""
+
+    retrievers: List[KnowledgeRetriever] = Field(default_factory=list)
+    cite_required: bool = Field(True, description="Whether citations are required")
+    freshness_days: int = Field(90, ge=1, le=365, description="Freshness window in days")
+    max_ctx_chars: int = Field(120000, ge=1000, le=500000, description="Max context characters")
+
+
+class QualityGatesConfig(BaseModel):
+    """Configuration for quality gates."""
+
+    overall_threshold: float = Field(0.95, ge=0.0, le=1.0)
+    policy_threshold: float = Field(0.90, ge=0.0, le=1.0)
+
+
+class AutoRepairConfig(BaseModel):
+    """Configuration for auto-repair."""
+
+    max_repair_attempts: int = Field(3, ge=0, le=10)
+    enabled: bool = Field(True)
+
+
+class PipelineConfig(BaseModel):
+    """Complete pipeline configuration from DSL."""
+
+    reasoning: ReasoningConfig = Field(default_factory=ReasoningConfig)
+    knowledge: KnowledgeConfig = Field(default_factory=KnowledgeConfig)
+    quality_gates: QualityGatesConfig = Field(default_factory=QualityGatesConfig)
+    auto_repair: AutoRepairConfig = Field(default_factory=AutoRepairConfig)
+
+    model_config = {
+        "extra": "ignore"
+    }
+
+
+class DSLProcessor:
+    """Processor for DSL configuration and knob management."""
+
+    def __init__(self, config_path: Optional[str] = None):
+        """Initialize DSL processor."""
+        self.config_path = Path(config_path or "config/pipeline.schema.yml")
+        self.config: Optional[PipelineConfig] = None
+        self._load_config()
+
+    def _load_config(self) -> None:
+        """Load configuration from YAML file."""
+        try:
+            if not self.config_path.exists():
+                logger.warning(f"Config file not found: {self.config_path}")
+                self.config = PipelineConfig()
+                return
+
+            with open(self.config_path, 'r') as f:
+                yaml_data = yaml.safe_load(f)
+
+            self.config = PipelineConfig(**yaml_data)
+            dsl_config_loaded_total.inc()
+            logger.info(f"DSL config loaded from {self.config_path}")
+
+        except Exception as e:
+            logger.error(f"Failed to load DSL config: {e}")
+            self.config = PipelineConfig()
+
+    def get_reasoning_config(self) -> ReasoningConfig:
+        """Get reasoning configuration."""
+        return self.config.reasoning if self.config else ReasoningConfig()
+
+    def get_knowledge_config(self) -> KnowledgeConfig:
+        """Get knowledge configuration."""
+        return self.config.knowledge if self.config else KnowledgeConfig()
+
+    def get_quality_gates_config(self) -> QualityGatesConfig:
+        """Get quality gates configuration."""
+        return self.config.quality_gates if self.config else QualityGatesConfig()
+
+    def get_auto_repair_config(self) -> AutoRepairConfig:
+        """Get auto-repair configuration."""
+        return self.config.auto_repair if self.config else AutoRepairConfig()
+
+    def apply_reasoning_knobs(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply reasoning knobs to execution context."""
+        if not self.config:
+            return context
+
+        reasoning = self.config.reasoning
+        context.update({
+            "reasoning_strategy": reasoning.strategy,
+            "k_samples": reasoning.k_samples,
+            "max_thoughts": reasoning.max_thoughts,
+            "verifier_model": reasoning.verifier,
+            "min_confidence": reasoning.min_confidence,
+        })
+
+        dsl_knobs_applied_total.labels(knob_type="reasoning").inc()
+        logger.debug(f"Applied reasoning knobs: {reasoning.strategy}")
+        return context
+
+    def apply_knowledge_knobs(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply knowledge knobs to execution context."""
+        if not self.config:
+            return context
+
+        knowledge = self.config.knowledge
+        context.update({
+            "retrievers": [r.dict() for r in knowledge.retrievers],
+            "cite_required": knowledge.cite_required,
+            "freshness_days": knowledge.freshness_days,
+            "max_ctx_chars": knowledge.max_ctx_chars,
+        })
+
+        dsl_knobs_applied_total.labels(knob_type="knowledge").inc()
+        logger.debug(f"Applied knowledge knobs: {len(knowledge.retrievers)} retrievers")
+        return context
+
+    def apply_quality_gate_knobs(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply quality gate knobs to execution context."""
+        if not self.config:
+            return context
+
+        gates = self.config.quality_gates
+        context.update({
+            "overall_threshold": gates.overall_threshold,
+            "policy_threshold": gates.policy_threshold,
+        })
+
+        dsl_knobs_applied_total.labels(knob_type="quality_gates").inc()
+        logger.debug(f"Applied quality gate knobs: {gates.overall_threshold}")
+        return context
+
+    def apply_auto_repair_knobs(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply auto-repair knobs to execution context."""
+        if not self.config:
+            return context
+
+        repair = self.config.auto_repair
+        context.update({
+            "max_repair_attempts": repair.max_repair_attempts,
+            "auto_repair_enabled": repair.enabled,
+        })
+
+        dsl_knobs_applied_total.labels(knob_type="auto_repair").inc()
+        logger.debug(f"Applied auto-repair knobs: {repair.enabled}")
+        return context
+
+    def apply_all_knobs(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply all DSL knobs to execution context."""
+        context = self.apply_reasoning_knobs(context)
+        context = self.apply_knowledge_knobs(context)
+        context = self.apply_quality_gate_knobs(context)
+        context = self.apply_auto_repair_knobs(context)
+        return context
+
+    def validate_config(self) -> List[str]:
+        """Validate current configuration and return any issues."""
+        issues = []
+
+        if not self.config:
+            issues.append("No configuration loaded")
+            return issues
+
+        # Validate reasoning config
+        reasoning = self.config.reasoning
+        if reasoning.k_samples > reasoning.max_thoughts:
+            issues.append("k_samples cannot be greater than max_thoughts")
+
+        # Validate knowledge config
+        knowledge = self.config.knowledge
+        if knowledge.max_ctx_chars < 1000:
+            issues.append("max_ctx_chars should be at least 1000")
+
+        # Validate quality gates
+        gates = self.config.quality_gates
+        if gates.overall_threshold < gates.policy_threshold:
+            issues.append("overall_threshold should be >= policy_threshold")
+
+        return issues
+
+    def reload_config(self) -> None:
+        """Reload configuration from file."""
+        self._load_config()
+        logger.info("DSL configuration reloaded")
+
+    def get_config_summary(self) -> Dict[str, Any]:
+        """Get a summary of the current configuration."""
+        if not self.config:
+            return {"error": "No configuration loaded"}
+
+        return {
+            "reasoning": {
+                "strategy": self.config.reasoning.strategy,
+                "k_samples": self.config.reasoning.k_samples,
+                "max_thoughts": self.config.reasoning.max_thoughts,
+            },
+            "knowledge": {
+                "retrievers_count": len(self.config.knowledge.retrievers),
+                "cite_required": self.config.knowledge.cite_required,
+                "freshness_days": self.config.knowledge.freshness_days,
+            },
+            "quality_gates": {
+                "overall_threshold": self.config.quality_gates.overall_threshold,
+                "policy_threshold": self.config.quality_gates.policy_threshold,
+            },
+            "auto_repair": {
+                "enabled": self.config.auto_repair.enabled,
+                "max_attempts": self.config.auto_repair.max_repair_attempts,
+            }
+        }

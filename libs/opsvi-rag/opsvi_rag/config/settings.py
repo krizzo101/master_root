@@ -1,20 +1,15 @@
-"""Configuration settings for opsvi-rag.
-
-
-"""
+"""Configuration settings for opsvi-rag."""
 
 from typing import Any, Dict, List, Optional, Union
-from pydantic import BaseSettings, Field, validator
-from pydantic_settings import SettingsConfigDict
+from pydantic import Field, validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 
 class OpsviRagSettings(BaseSettings):
     """Settings for opsvi-rag."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
-        extra="ignore"
+        env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore"
     )
 
     # Core settings
@@ -23,7 +18,12 @@ class OpsviRagSettings(BaseSettings):
     log_level: str = Field(default="INFO", description="Logging level")
 
     # Library-specific settings
-    
+    default_vector_size: int = Field(
+        default=1536, description="Default embedding dimension"
+    )
+    default_distance: str = Field(
+        default="Cosine", description="Default distance metric"
+    )
 
     @validator("log_level")
     def validate_log_level(cls, v: str) -> str:
@@ -33,10 +33,9 @@ class OpsviRagSettings(BaseSettings):
             raise ValueError(f"Invalid log level: {v}")
         return v.upper()
 
-    
-
     class Config:
-        env_prefix = "OPSVI_OPSVI_RAG__"
+        env_prefix = "OPSVI_RAG_"
+
 
 # Convenience function
 def get_settings() -> OpsviRagSettings:

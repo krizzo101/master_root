@@ -25,6 +25,8 @@ from .providers import (
     EmbeddingResponse,
     OpenAIProvider,
     OpenAIConfig,
+    PerplexityProvider,
+    PerplexityConfig,
 )
 
 # OpenAI Interface exports
@@ -46,7 +48,6 @@ from .providers.openai_batch_interface import (
 
 from .providers.openai_responses_interface import (
     OpenAIResponsesInterface,
-    AsyncOpenAIResponsesInterface,
     OpenAIResponsesError,
     StructuredResponse,
 )
@@ -71,6 +72,8 @@ __all__ = [
     # Providers
     "OpenAIProvider",
     "OpenAIConfig",
+    "PerplexityProvider",
+    "PerplexityConfig",
     # OpenAI Interfaces
     "OpenAIEmbeddingsInterface",
     "OpenAIEmbeddingsError",
@@ -80,7 +83,6 @@ __all__ = [
     "OpenAIBatchInterface",
     "OpenAIBatchError",
     "OpenAIResponsesInterface",
-    "AsyncOpenAIResponsesInterface",
     "OpenAIResponsesError",
     "StructuredResponse",
 ]

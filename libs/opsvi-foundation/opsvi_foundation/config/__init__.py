@@ -3,9 +3,10 @@
 Provides configuration management and settings.
 """
 
-from .settings import OpsviFoundationSettings, get_settings
+from .settings import LibraryConfig, LibrarySettings, FoundationConfig
 
 __all__ = [
-    "OpsviFoundationSettings",
-    "get_settings",
+    "LibraryConfig",
+    "LibrarySettings",
+    "FoundationConfig",
 ]

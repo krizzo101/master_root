@@ -1,0 +1,396 @@
+"""Model router for OpenAI Responses API integration."""
+
+import logging
+from typing import Any, Dict, List, Optional, Union
+import uuid
+
+from pydantic import BaseModel, Field
+
+from opsvi_auto_forge.config.models import AgentRole
+from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
+
+# TaskType enum values for routing rules
+from opsvi_auto_forge.application.orchestrator.router import (
+    ModelRouter as BaseModelRouter,
+    ModelConfig,
+    RoutingDecision,
+    RoutingRule,
+    ModelProvider,
+)
+
+from .openai_client import OpenAIResponsesClient
+
+logger = logging.getLogger(__name__)
+
+
+class OpenAIModelConfig(ModelConfig):
+    """OpenAI-specific model configuration."""
+
+    # OpenAI-specific fields
+    parallel_tool_calls: bool = Field(False, description="Allow parallel tool calls")
+    strict_functions: bool = Field(True, description="Enforce strict function schemas")
+    reasoning_effort: Optional[str] = Field(
+        None, description="Reasoning effort for o-series models"
+    )
+    include_encrypted: bool = Field(
+        False, description="Include encrypted reasoning content"
+    )
+    store_reasoning: bool = Field(True, description="Store reasoning items")
+
+
+class OpenAIResponsesRouter(BaseModelRouter):
+    """Router for OpenAI Responses API with modern patterns."""
+
+    def __init__(self, neo4j_client: Optional[Neo4jClient] = None):
+        """Initialize the router with OpenAI client."""
+        super().__init__(neo4j_client)
+        self.openai_client = OpenAIResponsesClient()
+        self._load_openai_rules()
+
+    def _load_openai_rules(self) -> None:
+        """Load OpenAI-specific routing rules."""
+        # Reasoning tasks - use o-series models
+        self.rules.append(
+            RoutingRule(
+                name="reasoning_planning",
+                description="Complex reasoning and planning tasks",
+                agent_role=AgentRole.PLANNER,
+                task_type="planning",
+                complexity="high",
+                priority=10,
+                ai_model_config=OpenAIModelConfig(
+                    provider=ModelProvider.OPENAI,
+                    model="o4-mini",
+                    temperature=0.1,
+                    max_tokens=8000,
+                    reasoning_effort="high",
+                    store_reasoning=True,
+                ),
+                enabled=True,
+            )
+        )
+
+        # Code generation - use GPT-4.1 models
+        self.rules.append(
+            RoutingRule(
+                name="code_generation",
+                description="Code generation and implementation tasks",
+                agent_role=AgentRole.CODER,
+                task_type="coding",
+                complexity="medium",
+                priority=8,
+                ai_model_config=OpenAIModelConfig(
+                    provider=ModelProvider.OPENAI,
+                    model="gpt-4.1-mini",
+                    temperature=0.1,
+                    max_tokens=4000,
+                    parallel_tool_calls=False,
+                    strict_functions=True,
+                ),
+                enabled=True,
+            )
+        )
+
+        # Testing tasks - use GPT-4.1 models
+        self.rules.append(
+            RoutingRule(
+                name="testing_validation",
+                description="Testing and validation tasks",
+                agent_role=AgentRole.TESTER,
+                task_type="testing",
+                complexity="medium",
+                priority=6,
+                ai_model_config=OpenAIModelConfig(
+                    provider=ModelProvider.OPENAI,
+                    model="gpt-4.1-mini",
+                    temperature=0.1,
+                    max_tokens=4000,
+                    parallel_tool_calls=False,
+                ),
+                enabled=True,
+            )
+        )
+
+        # Fast responses - use nano models
+        self.rules.append(
+            RoutingRule(
+                name="fast_responses",
+                description="Fast, simple responses",
+                complexity="low",
+                priority=2,
+                ai_model_config=OpenAIModelConfig(
+                    provider=ModelProvider.OPENAI,
+                    model="gpt-4.1-nano",
+                    temperature=0.1,
+                    max_tokens=1000,
+                ),
+                enabled=True,
+            )
+        )
+
+        # Complex analysis - use o3 for highest reasoning
+        self.rules.append(
+            RoutingRule(
+                name="complex_analysis",
+                description="Complex analysis and decision making",
+                agent_role=AgentRole.CRITIC,
+                task_type="analysis",
+                complexity="high",
+                priority=9,
+                ai_model_config=OpenAIModelConfig(
+                    provider=ModelProvider.OPENAI,
+                    model="o3",
+                    temperature=0.1,
+                    max_tokens=8000,
+                    reasoning_effort="high",
+                    store_reasoning=True,
+                ),
+                enabled=True,
+            )
+        )
+
+    async def execute_task(
+        self,
+        task_id: uuid.UUID,
+        agent_role: AgentRole,
+        task_type: str,
+        input_text: str,
+        context: Dict[str, Any],
+        tools: Optional[List[Dict[str, Any]]] = None,
+        schema: Optional[type[BaseModel]] = None,
+        stream: bool = False,
+    ) -> Union[Dict[str, Any], Any]:
+        """Execute a task using the OpenAI Responses API.
+
+        Args:
+            task_id: Unique task identifier
+            agent_role: Role of the agent executing the task
+            task_type: Type of task to execute
+            input_text: Input text for the model
+            context: Additional context for routing
+            tools: Optional tools to use
+            schema: Optional Pydantic schema for structured output
+            stream: Whether to stream the response
+
+        Returns:
+            Task result or streaming generator
+        """
+        # Route the task to get model configuration
+        routing_decision = await self.route_task(
+            task_id, agent_role, task_type, context
+        )
+
+        # Extract OpenAI-specific configuration
+        model_config = routing_decision.selected_model
+        if not isinstance(model_config, OpenAIModelConfig):
+            raise ValueError("Expected OpenAIModelConfig for OpenAI router")
+
+        try:
+            # Execute based on requirements
+            if schema:
+                # Structured output
+                result = self.openai_client.create_structured(
+                    model=model_config.model,
+                    schema=schema,
+                    input_text=input_text,
+                    temperature=model_config.temperature,
+                    max_tokens=model_config.max_tokens,
+                    strict=True,
+                    parallel_tool_calls=model_config.parallel_tool_calls,
+                )
+                return result.model_dump()
+
+            elif tools:
+                # Tool-based execution
+                if stream:
+                    return self.openai_client.create_with_tools(
+                        model=model_config.model,
+                        tools=tools,
+                        input_text=input_text,
+                        temperature=model_config.temperature,
+                        max_tokens=model_config.max_tokens,
+                        stream=True,
+                        strict_functions=model_config.strict_functions,
+                    )
+                else:
+                    result = self.openai_client.create_with_tools(
+                        model=model_config.model,
+                        tools=tools,
+                        input_text=input_text,
+                        temperature=model_config.temperature,
+                        max_tokens=model_config.max_tokens,
+                        strict_functions=model_config.strict_functions,
+                    )
+                    return {
+                        "output": result.output_text,
+                        "tools_used": result.tool_calls,
+                    }
+
+            elif model_config.reasoning_effort and model_config.model.startswith(
+                ("o3", "o4")
+            ):
+                # Reasoning-based execution
+                result = self.openai_client.create_with_reasoning(
+                    model=model_config.model,
+                    input_text=input_text,
+                    effort=model_config.reasoning_effort,
+                    include_encrypted=model_config.include_encrypted,
+                    store=model_config.store_reasoning,
+                    temperature=model_config.temperature,
+                    max_tokens=model_config.max_tokens,
+                )
+                return {"output": result.output_text, "reasoning": result.reasoning}
+
+            else:
+                # Standard text generation
+                if stream:
+                    return self.openai_client.create_text(
+                        model=model_config.model,
+                        input_text=input_text,
+                        temperature=model_config.temperature,
+                        max_tokens=model_config.max_tokens,
+                        stream=True,
+                    )
+                else:
+                    result = self.openai_client.create_text(
+                        model=model_config.model,
+                        input_text=input_text,
+                        temperature=model_config.temperature,
+                        max_tokens=model_config.max_tokens,
+                    )
+                    return {"output": result.output_text}
+
+        except Exception as e:
+            logger.error(f"Task execution failed: {e}")
+            self.openai_client.handle_api_error(e)
+            raise
+
+    async def execute_background_task(
+        self,
+        task_id: uuid.UUID,
+        agent_role: AgentRole,
+        task_type: str,
+        input_text: str,
+        context: Dict[str, Any],
+        tools: Optional[List[Dict[str, Any]]] = None,
+    ) -> str:
+        """Execute a long-running task in the background.
+
+        Args:
+            task_id: Unique task identifier
+            agent_role: Role of the agent executing the task
+            task_type: Type of task to execute
+            input_text: Input text for the model
+            context: Additional context for routing
+            tools: Optional tools to use
+
+        Returns:
+            Background task ID
+        """
+        routing_decision = await self.route_task(
+            task_id, agent_role, task_type, context
+        )
+        model_config = routing_decision.selected_model
+
+        if not isinstance(model_config, OpenAIModelConfig):
+            raise ValueError("Expected OpenAIModelConfig for OpenAI router")
+
+        try:
+            result = self.openai_client.create_background_task(
+                model=model_config.model,
+                input_text=input_text,
+                tools=tools,
+                temperature=model_config.temperature,
+                max_tokens=model_config.max_tokens,
+            )
+            return result.id
+        except Exception as e:
+            logger.error(f"Background task creation failed: {e}")
+            self.openai_client.handle_api_error(e)
+            raise
+
+    def get_model_performance_stats(
+        self, model: str, time_period: str = "7d"
+    ) -> Dict[str, Any]:
+        """Get performance statistics for a model.
+
+        Args:
+            model: Model name
+            time_period: Time period for statistics
+
+        Returns:
+            Performance statistics
+        """
+        # This would integrate with monitoring/metrics
+        return {
+            "model": model,
+            "time_period": time_period,
+            "total_requests": 0,
+            "success_rate": 1.0,
+            "avg_latency": 0.0,
+            "avg_tokens": 0,
+            "avg_cost": 0.0,
+        }
+
+    async def validate_model_access(self, model: str) -> bool:
+        """Validate that the model is accessible.
+
+        Args:
+            model: Model name to validate
+
+        Returns:
+            True if accessible, False otherwise
+        """
+        try:
+            # Try a minimal request to validate access
+            result = self.openai_client.create_text(
+                model=model,
+                input_text="test",
+                max_tokens=1,
+            )
+            return True
+        except Exception as e:
+            logger.warning(f"Model {model} not accessible: {e}")
+            return False
+
+    def get_available_models(self) -> List[str]:
+        """Get list of available models.
+
+        Returns:
+            List of available model names
+        """
+        return ["o4-mini", "o3", "gpt-4.1-mini", "gpt-4.1", "gpt-4.1-nano"]
+
+
+# Convenience function for quick task execution
+async def execute_openai_task(
+    agent_role: AgentRole,
+    task_type: str,
+    input_text: str,
+    context: Optional[Dict[str, Any]] = None,
+    **kwargs,
+) -> Dict[str, Any]:
+    """Execute a task using the OpenAI router.
+
+    Args:
+        agent_role: Role of the agent
+        task_type: Type of task
+        input_text: Input text
+        context: Optional context
+        **kwargs: Additional arguments
+
+    Returns:
+        Task result
+    """
+    router = OpenAIResponsesRouter()
+    task_id = uuid.uuid4()
+    context = context or {}
+
+    return await router.execute_task(
+        task_id=task_id,
+        agent_role=agent_role,
+        task_type=task_type,
+        input_text=input_text,
+        context=context,
+        **kwargs,
+    )

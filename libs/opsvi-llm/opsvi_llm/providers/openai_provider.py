@@ -142,7 +142,7 @@ class OpenAIProvider(BaseLLMProvider):
             message = Message(
                 role=choice.message.role,
                 content=choice.message.content,
-                name=choice.message.name,
+                name=getattr(choice.message, "name", None),
             )
 
             return ChatResponse(

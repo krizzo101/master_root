@@ -1,0 +1,134 @@
+{
+  "ecosystem_version": "0.1.0",
+  "total_libraries": 26,
+  "total_files": 613,
+  "total_words": 267399,
+  "libraries": {
+    "opsvi-foundation": {
+      "description": "Base components and utilities",
+      "files": 16,
+      "words": 1445
+    },
+    "opsvi-core": {
+      "description": "Service registry, event bus, state management",
+      "files": 16,
+      "words": 2371
+    },
+    "opsvi-llm": {
+      "description": "Language model providers",
+      "files": 24,
+      "words": 6293
+    },
+    "opsvi-http": {
+      "description": "HTTP client interfaces",
+      "files": 23,
+      "words": 4338
+    },
+    "opsvi-data": {
+      "description": "Database providers",
+      "files": 34,
+      "words": 17679
+    },
+    "opsvi-auth": {
+      "description": "Authentication providers",
+      "files": 21,
+      "words": 5059
+    },
+    "opsvi-memory": {
+      "description": "Graph-based memory and lineage tracking",
+      "files": 19,
+      "words": 2606
+    },
+    "opsvi-orchestration": {
+      "description": "Multi-agent orchestration",
+      "files": 21,
+      "words": 3890
+    },
+    "opsvi-communication": {
+      "description": "Inter-agent communication",
+      "files": 18,
+      "words": 2983
+    },
+    "opsvi-mcp": {
+      "description": "Model Context Protocol integrations",
+      "files": 14,
+      "words": 14495
+    },
+    "opsvi-api": {
+      "description": "REST API framework",
+      "files": 2,
+      "words": 1099
+    },
+    "opsvi-workers": {
+      "description": "Background task processing",
+      "files": 3,
+      "words": 1580
+    },
+    "opsvi-pipeline": {
+      "description": "Data processing pipelines",
+      "files": 28,
+      "words": 7222
+    },
+    "opsvi-coordination": {
+      "description": "Agent coordination systems",
+      "files": 6,
+      "words": 9725
+    },
+    "opsvi-shared": {
+      "description": "Shared utilities and interfaces",
+      "files": 73,
+      "words": 41395
+    },
+    "opsvi-master": {
+      "description": "Multi-agent master coordination",
+      "files": 34,
+      "words": 40007
+    },
+    "opsvi-auto-forge": {
+      "description": "Autonomous software factory",
+      "files": 134,
+      "words": 98804
+    },
+    "opsvi-fs": {
+      "description": "File system operations",
+      "files": 24,
+      "words": 1677
+    },
+    "opsvi-rag": {
+      "description": "Retrieval-augmented generation",
+      "files": 18,
+      "words": 794
+    },
+    "opsvi-gateway": {
+      "description": "API gateway",
+      "files": 17,
+      "words": 789
+    },
+    "opsvi-security": {
+      "description": "Security and access control",
+      "files": 17,
+      "words": 788
+    },
+    "opsvi-deploy": {
+      "description": "Deployment utilities",
+      "files": 17,
+      "words": 788
+    },
+    "opsvi-monitoring": {
+      "description": "Observability and monitoring",
+      "files": 17,
+      "words": 787
+    },
+    "opsvi-agents": {
+      "description": "Agent management",
+      "files": 17,
+      "words": 787
+    }
+  },
+  "migration_info": {
+    "source_codebases": ["agent_world", "auto_forge", "master", "docRuleGen", "asea"],
+    "migration_method": "bulk_copy_with_namespace_update",
+    "migration_time": "4.78 seconds",
+    "files_processed": 3366
+  }
+}

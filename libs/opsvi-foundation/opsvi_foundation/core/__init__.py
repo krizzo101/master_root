@@ -1,12 +1,12 @@
-"""Core module for opsvi-foundation.
+"""Core opsvi-foundation functionality.
 
-Provides base classes and core functionality.
+Comprehensive opsvi-foundation library for the OPSVI ecosystem
 """
 
-from .base import Error, ConfigurationError, InitializationError
+from .base import BaseComponent, ComponentError, BaseSettings
 
 __all__ = [
-    "Error",
-    "ConfigurationError",
-    "InitializationError",
+    "BaseComponent",
+    "ComponentError",
+    "BaseSettings",
 ]

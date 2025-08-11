@@ -23,6 +23,12 @@ except ImportError:
     OpenAIProvider = None
     OpenAIConfig = None
 
+try:
+    from .perplexity_provider import PerplexityProvider, PerplexityConfig
+except ImportError:
+    PerplexityProvider = None
+    PerplexityConfig = None
+
 __all__ = [
     "BaseLLMProvider",
     "LLMConfig",
@@ -40,4 +46,6 @@ __all__ = [
     "EmbeddingResponse",
     "OpenAIProvider",
     "OpenAIConfig",
+    "PerplexityProvider",
+    "PerplexityConfig",
 ]
