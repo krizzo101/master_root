@@ -15,18 +15,14 @@ Implements all core endpoints and features:
 Version: Referenced as of July 2024
 """
 
-from collections.abc import AsyncIterator, Generator, Iterator
-from dataclasses import dataclass
 import functools
 import logging
 import os
 import time
+from collections.abc import AsyncIterator, Callable, Generator, Iterator
+from dataclasses import dataclass
 from typing import (
     Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
 )
 
 from openai import AsyncOpenAI, OpenAI
@@ -55,10 +51,10 @@ class OpenAIResponsesError(Exception):
 class StructuredResponse:
     id: str
     status: str
-    output_text: Optional[str] = None
-    tool_calls: Optional[List[Dict[str, Any]]] = None
-    function_results: Optional[List[Dict[str, Any]]] = None
-    raw: Optional[Any] = None
+    output_text: str | None = None
+    tool_calls: list[dict[str, Any]] | None = None
+    function_results: list[dict[str, Any]] | None = None
+    raw: Any | None = None
 
 
 class OpenAIResponsesInterface:
@@ -67,7 +63,7 @@ class OpenAIResponsesInterface:
     Implements all official endpoints and features.
     """
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: str | None = None):
         self.client = OpenAI(api_key=api_key) if api_key else OpenAI()
 
     def create(self, **params) -> Response:
@@ -105,7 +101,7 @@ class AsyncOpenAIResponsesInterface:
     Implements all official endpoints and features.
     """
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: str | None = None):
         self.client = AsyncOpenAI(api_key=api_key) if api_key else AsyncOpenAI()
 
     async def create(self, **params) -> Response:
@@ -265,15 +261,13 @@ class OpenAIResponsesInterface:
         )
 
     # --- Tool/Function Calling and Output Parsing ---
-    def get_output_text(self, response: Response) -> Optional[str]:
+    def get_output_text(self, response: Response) -> str | None:
         return getattr(response, "output_text", None)
 
-    def get_tool_calls(self, response: Response) -> Optional[List[Dict[str, Any]]]:
+    def get_tool_calls(self, response: Response) -> list[dict[str, Any]] | None:
         return getattr(response, "tool_calls", None)
 
-    def get_function_results(
-        self, response: Response
-    ) -> Optional[List[Dict[str, Any]]]:
+    def get_function_results(self, response: Response) -> list[dict[str, Any]] | None:
         return getattr(response, "function_results", None)
 
     def to_structured(self, response: Response) -> StructuredResponse:
@@ -287,7 +281,7 @@ class OpenAIResponsesInterface:
         )
 
     # --- Pagination/Filtering Helpers ---
-    def list_responses(self, **params) -> List[Response]:
+    def list_responses(self, **params) -> list[Response]:
         """
         List all responses (paginated).
         """
@@ -302,7 +296,7 @@ class OpenAIResponsesInterface:
                 break
         return results
 
-    async def alist_responses(self, **params) -> List[Response]:
+    async def alist_responses(self, **params) -> list[Response]:
         results = []
         cursor = None
         while True:
@@ -344,12 +338,12 @@ class OpenAIResponsesInterface:
         raise OpenAIResponsesError("Max retries exceeded (async).")
 
     # --- Metadata/Logs/Audit (if available) ---
-    def get_metadata(self, response_id: str) -> Optional[Dict[str, Any]]:
+    def get_metadata(self, response_id: str) -> dict[str, Any] | None:
         resp = self.retrieve_response(response_id)
         return getattr(resp, "metadata", None)
 
     # --- Utility ---
-    def to_dict(self, response: Response) -> Dict[str, Any]:
+    def to_dict(self, response: Response) -> dict[str, Any]:
         return (
             response.model_dump() if hasattr(response, "model_dump") else dict(response)
         )
@@ -405,8 +399,8 @@ class OpenAIResponsesInterface:
 
     # --- Batch/file helpers (if available) ---
     def batch_create_responses(
-        self, batch_params: List[Dict[str, Any]]
-    ) -> List[Response]:
+        self, batch_params: list[dict[str, Any]]
+    ) -> list[Response]:
         """
         Batch create responses (if OpenAI supports batch endpoint).
         Args:

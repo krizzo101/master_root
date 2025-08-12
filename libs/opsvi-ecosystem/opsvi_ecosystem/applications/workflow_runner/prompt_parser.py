@@ -1,11 +1,11 @@
 import logging
 import os
 import re
-from typing import Any, Dict, List
+from typing import Any
 
 
 class WorkflowPrompt:
-    def __init__(self, name: str, content: str, dependencies: List[str]):
+    def __init__(self, name: str, content: str, dependencies: list[str]):
         self.name = name
         self.content = content
         self.dependencies = dependencies
@@ -15,11 +15,11 @@ class WorkflowPrompt:
 
 
 class ExecutionPlan:
-    def __init__(self, prompts: List[WorkflowPrompt]):
+    def __init__(self, prompts: list[WorkflowPrompt]):
         self.prompts = prompts
         self.plan = self._build_plan()
 
-    def _build_plan(self) -> List[Dict[str, Any]]:
+    def _build_plan(self) -> list[dict[str, Any]]:
         # Topological sort for dependency resolution (simple, assumes no cycles)
         resolved = set()
         plan = []
@@ -47,7 +47,7 @@ class ExecutionPlan:
 class PromptParser:
     def __init__(self, prompt_path: str):
         self.prompt_path = prompt_path
-        self.prompts: List[WorkflowPrompt] = []
+        self.prompts: list[WorkflowPrompt] = []
 
     def parse(self):
         if not os.path.exists(self.prompt_path):

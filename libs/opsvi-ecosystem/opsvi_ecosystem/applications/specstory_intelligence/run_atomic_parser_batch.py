@@ -8,10 +8,10 @@ Reference: docs/applications/agent_intelligence_pipeline.md (authoritative schem
 """
 
 import asyncio
-from dataclasses import asdict
 import enum
 import json
 import logging
+from dataclasses import asdict
 from pathlib import Path
 
 from atomic_parser import AtomicSpecStoryParser

@@ -4,7 +4,7 @@ Output schema for Testing Framework Generator.
 This module defines the Pydantic schema for testing framework generator output results.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -35,10 +35,10 @@ class TestingFrameworkGeneratorOutput(BaseModel):
     message: str = Field(..., description="Status message")
 
     # Metadata
-    generation_time: Optional[float] = Field(
+    generation_time: float | None = Field(
         _default=None, description="Time taken for generation (seconds)"
     )
-    tests_generated: Optional[int] = Field(
+    tests_generated: int | None = Field(
         _default=None, description="Number of test files generated"
     )
     model_used: str = Field(

@@ -328,7 +328,7 @@ def main():
     # Validate results
     success = validate_migration()
 
-    print(f"\\n=== MIGRATION STATUS ===")
+    print("\\n=== MIGRATION STATUS ===")
     print(f"Batches processed: {batch_count}")
     print(f"Validation success: {success}")
 

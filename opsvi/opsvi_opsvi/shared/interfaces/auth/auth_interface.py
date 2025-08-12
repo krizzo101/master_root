@@ -8,7 +8,7 @@ Version: Referenced as of July 2024
 """
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 try:
     import jwt
@@ -38,7 +38,7 @@ class AuthInterface:
         self.algorithm = algorithm
         self.expires_in = expires_in
 
-    def create_token(self, data: Dict[str, Any]) -> str:
+    def create_token(self, data: dict[str, Any]) -> str:
         """
         Create a JWT token with the given data.
         See: https://pyjwt.readthedocs.io/en/stable/usage.html
@@ -51,7 +51,7 @@ class AuthInterface:
         )
         return jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
 
-    def validate_token(self, token: str) -> Dict[str, Any]:
+    def validate_token(self, token: str) -> dict[str, Any]:
         """
         Validate a JWT token and return the payload.
         See: https://pyjwt.readthedocs.io/en/stable/usage.html
@@ -65,7 +65,7 @@ class AuthInterface:
             logger.error("Invalid token.")
             raise
 
-    def get_user(self, token: str) -> Optional[str]:
+    def get_user(self, token: str) -> str | None:
         """
         Extract the user identifier from a JWT token.
         Returns the 'sub' claim if present.

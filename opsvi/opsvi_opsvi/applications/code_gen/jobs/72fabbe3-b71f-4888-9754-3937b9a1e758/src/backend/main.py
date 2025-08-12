@@ -1,50 +1,52 @@
+import asyncio
 import logging
 import os
+
 from fastapi import (
-    FastAPI,
+    APIRouter,
     Depends,
+    FastAPI,
+    HTTPException,
+    Request,
     WebSocket,
     WebSocketDisconnect,
-    Request,
     status,
-    APIRouter,
-    HTTPException,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.staticfiles import StaticFiles
+from sqlmodel import Session, SQLModel
 from starlette.websockets import WebSocketState
-from sqlmodel import SQLModel, Session, create_engine
-from backend.metrics import (
-    metrics_collector_task,
-    get_realtime_metrics,
-    get_historical_metrics,
-)
-from backend.models import MetricSample, Threshold, User, MetricType, AlertEvent
-from backend.auth import (
-    get_current_user,
-    oauth2_scheme,
-    create_access_token,
-    authenticate_user,
-    get_password_hash,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-)
-from backend.websocket_manager import WebSocketManager
+
 from backend.alerts import alert_manager_task, get_active_alerts
+from backend.auth import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    authenticate_user,
+    create_access_token,
+    get_current_user,
+    get_password_hash,
+    oauth2_scheme,
+)
+from backend.config import settings
+from backend.db import engine, get_session
+from backend.metrics import (
+    get_historical_metrics,
+    get_realtime_metrics,
+    metrics_collector_task,
+)
+from backend.models import Threshold, User
 from backend.schemas import (
+    AlertRead,
+    MetricSampleRead,
+    MetricsHistoryQuery,
+    ThresholdRead,
+    ThresholdUpdate,
     Token,
     UserCreate,
     UserRead,
-    MetricSampleRead,
-    ThresholdRead,
-    ThresholdUpdate,
-    AlertRead,
-    MetricsHistoryQuery,
 )
-from backend.config import settings
-from backend.db import get_session, engine
-from fastapi.security import OAuth2PasswordRequestForm
-import asyncio
+from backend.websocket_manager import WebSocketManager
 
 app = FastAPI(
     title="System Monitoring Dashboard API",

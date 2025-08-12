@@ -430,7 +430,7 @@ def main():
 
         # Print summary
         summary = results.get("summary", {})
-        print(f"\nDeployment Summary:")
+        print("\nDeployment Summary:")
         print(
             f"- Services deployed: {summary.get('successfully_deployed', 0)}/{summary.get('total_services', 0)}"
         )
@@ -442,7 +442,7 @@ def main():
         # Print service URLs
         documentation = results.get("documentation", {})
         if documentation.get("services"):
-            print(f"\nDeployed Service URLs:")
+            print("\nDeployed Service URLs:")
             for service in documentation["services"]:
                 print(f"- {service['name']}: {service['full_url']}")
 

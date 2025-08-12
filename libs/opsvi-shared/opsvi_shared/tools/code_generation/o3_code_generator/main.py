@@ -393,7 +393,7 @@ def run_auto_workflow(
             # Resume workflow
             context = workflow.resume_workflow(context_file, from_step)
 
-            logger.log_info(f"Resumed workflow completed")
+            logger.log_info("Resumed workflow completed")
             logger.log_info(f"Final progress: {context.get_workflow_progress()}")
             return
 
@@ -417,7 +417,7 @@ def run_auto_workflow(
 
         # Report final results
         progress = context.get_workflow_progress()
-        logger.log_info(f"Autonomous workflow completed!")
+        logger.log_info("Autonomous workflow completed!")
         logger.log_info(
             f"Progress: {progress['completed_steps']}/{progress['total_steps']} steps ({progress['progress_percent']:.1f}%)"
         )
@@ -433,7 +433,7 @@ def run_auto_workflow(
         )
 
         # Print user-friendly completion message
-        print(f"\n🎉 Autonomous workflow completed successfully!")
+        print("\n🎉 Autonomous workflow completed successfully!")
         print(
             f"📊 Completed {progress['completed_steps']}/{progress['total_steps']} steps ({progress['progress_percent']:.1f}%)"
         )
@@ -448,7 +448,7 @@ def run_auto_workflow(
         print(f"🔄 Context: {context.output_directory}/workflow_context.json")
 
         if progress["completed_steps"] < progress["total_steps"]:
-            print(f"\n⚠️  Workflow partially completed. Use --resume to continue:")
+            print("\n⚠️  Workflow partially completed. Use --resume to continue:")
             print(
                 f"   python -m main.py auto-workflow --resume {context.output_directory}/workflow_context.json"
             )

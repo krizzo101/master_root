@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.shared.interfaces.llm.openai_responses_interface import (
     OpenAIResponsesInterface,
@@ -29,9 +29,9 @@ class OpenAIResponsesClient:
         self,
         prompt: str,
         model: str = "gpt-4.1",
-        tools: Optional[List[Dict[str, Any]]] = None,
+        tools: list[dict[str, Any]] | None = None,
         **kwargs,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Get a structured (JSON) response from the OpenAI Responses API.
         Args:

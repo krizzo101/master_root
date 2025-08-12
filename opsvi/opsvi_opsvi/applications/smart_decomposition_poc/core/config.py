@@ -6,7 +6,7 @@ OpenAI-Exclusive Implementation with Structured Response Enforcement
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import yaml
 
@@ -93,16 +93,16 @@ class PerformanceConfig:
 class MCPToolsConfig:
     """MCP tools configuration"""
 
-    web_search: Dict[str, Any] = field(
+    web_search: dict[str, Any] = field(
         default_factory=lambda: {"enabled": True, "provider": "brave"}
     )
-    knowledge_base: Dict[str, Any] = field(
+    knowledge_base: dict[str, Any] = field(
         default_factory=lambda: {"enabled": True, "provider": "neo4j"}
     )
-    tech_docs: Dict[str, Any] = field(
+    tech_docs: dict[str, Any] = field(
         default_factory=lambda: {"enabled": True, "provider": "context7"}
     )
-    research_papers: Dict[str, Any] = field(
+    research_papers: dict[str, Any] = field(
         default_factory=lambda: {"enabled": True, "provider": "arxiv"}
     )
 
@@ -128,7 +128,7 @@ class SystemConfig:
     mcp_tools: MCPToolsConfig = field(default_factory=MCPToolsConfig)
 
     # Agent model mapping
-    agent_models: Dict[str, str] = field(
+    agent_models: dict[str, str] = field(
         default_factory=lambda: {
             "manager": "reasoning",
             "requirements_expander": "reasoning",
@@ -147,7 +147,7 @@ class SystemConfig:
 class ConfigManager:
     """Configuration manager for loading and accessing configuration"""
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: str | None = None):
         self.config_path = config_path or self._get_default_config_path()
         self.config = self._load_config()
 
@@ -174,7 +174,7 @@ class ConfigManager:
             print("Using default configuration")
             return SystemConfig()
 
-    def _yaml_to_config(self, yaml_config: Dict[str, Any]) -> SystemConfig:
+    def _yaml_to_config(self, yaml_config: dict[str, Any]) -> SystemConfig:
         """Convert YAML configuration to SystemConfig object"""
         config = SystemConfig()
 
@@ -290,7 +290,7 @@ class ConfigManager:
 
 
 # Global configuration instance
-_config_manager: Optional[ConfigManager] = None
+_config_manager: ConfigManager | None = None
 
 
 def get_config() -> SystemConfig:

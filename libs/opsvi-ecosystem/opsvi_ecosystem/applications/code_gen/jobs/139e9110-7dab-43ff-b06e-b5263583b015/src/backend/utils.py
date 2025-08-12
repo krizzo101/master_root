@@ -2,8 +2,8 @@
 Utilities: pagination, rate limiting, common helpers
 """
 import time
-from fastapi import Request, HTTPException
-from functools import lru_cache
+
+from fastapi import HTTPException, Request
 
 # Simple in-memory rate limit for demo (for prod, use Redis)
 RATE_LIMIT = 100  # reqs per minute

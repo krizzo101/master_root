@@ -5,9 +5,9 @@ Complete application generation workflow with parallel execution
 """
 
 import asyncio
-from pathlib import Path
 import sys
 import time
+from pathlib import Path
 
 # Add the POC to the Python path
 poc_path = Path(__file__).parent

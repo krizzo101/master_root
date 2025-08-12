@@ -52,14 +52,14 @@ Add to mcp.json:
 """
 
 import asyncio
-from contextlib import asynccontextmanager
-from dataclasses import dataclass
 import json
 import logging
 import os
-from pathlib import Path
 import sys
-from typing import Any, Dict, List, Optional
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
 # MCP imports
 try:
@@ -100,7 +100,7 @@ class CrawlResult:
     job_id: str
     status: str
     urls_crawled: int = 0
-    pages: List[Dict[str, Any]] = None
+    pages: list[dict[str, Any]] = None
     success: bool = True
     error: str = ""
 
@@ -117,7 +117,7 @@ class FirecrawlMCPClient:
     and content extraction using the Firecrawl service through MCP.
     """
 
-    def __init__(self, mcp_config_path: Optional[str] = None, debug: bool = False):
+    def __init__(self, mcp_config_path: str | None = None, debug: bool = False):
         """
         Initialize the Firecrawl MCP client.
 
@@ -170,7 +170,7 @@ class FirecrawlMCPClient:
     async def scrape(
         self,
         url: str,
-        formats: List[str] = None,
+        formats: list[str] = None,
         only_main_content: bool = True,
         timeout: int = 30000,
     ) -> ScrapingResult:
@@ -322,7 +322,7 @@ class FirecrawlMCPClient:
 
     async def search(
         self, query: str, limit: int = 10, scrape_results: bool = True
-    ) -> List[ScrapingResult]:
+    ) -> list[ScrapingResult]:
         """Search the web and optionally scrape results."""
         if not query.strip():
             raise ValueError("Query cannot be empty")

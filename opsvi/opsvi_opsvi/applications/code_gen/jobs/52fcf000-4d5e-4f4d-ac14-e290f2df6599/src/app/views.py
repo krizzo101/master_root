@@ -2,15 +2,15 @@
 Web UI endpoints for login, sign up, dashboard, and report view pages with Jinja2.
 """
 import logging
-from fastapi import APIRouter, Request, Depends, Form, status, HTTPException
-from fastapi.responses import RedirectResponse, HTMLResponse
+
+from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from passlib.exc import UnknownHashError
+
+from app.auth import authenticate_user, get_password_hash
 from app.db import get_db
-from app.auth import get_password_hash, authenticate_user, get_current_active_user
-from app.models import User, Project, Report
-from app.config import settings
+from app.models import Project, Report, User
 
 logger = logging.getLogger("views")
 

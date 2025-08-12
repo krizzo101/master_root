@@ -1,5 +1,4 @@
 # /home/opsvi/asea/asea_orchestrator/src/asea_orchestrator/plugins/available/qa_plugin.py
-import os
 import requests
 import logging
 from typing import Dict, Any

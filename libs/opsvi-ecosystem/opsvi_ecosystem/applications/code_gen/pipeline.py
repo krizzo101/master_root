@@ -1,40 +1,33 @@
 """Sequential pipeline for code generation with AI agents."""
 
-import asyncio
 import inspect
-import json
 import logging
-import shutil
 import subprocess
 import time
 import zipfile
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-from logging_config import setup_logging
-from project_templates import get_template
-from schemas import (
-    RequirementsSpec,
-    ArchitectureSpec,
-    ArchitectureComponent,
-    CodeBundle,
-    TestReport,
-    DocSet,
-)
 from ai_agents import (
     detect_project_type_with_ai,
     extract_requirements_with_ai,
-    generate_architecture_with_ai,
     extract_research_topics_with_ai,
+    generate_architecture_with_ai,
 )
-from config import config
-from database import update_job
-from ws_router import publish_progress_update
 from audit_logger import (
+    get_audit_logger,
     init_audit_logger,
     log_execution_step,
-    log_prompt,
-    get_audit_logger,
+)
+from database import update_job
+from logging_config import setup_logging
+from ws_router import publish_progress_update
+
+from config import config
+from schemas import (
+    CodeBundle,
+    DocSet,
+    TestReport,
 )
 
 # Setup logging
@@ -42,7 +35,7 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 
-def parse_input(state: Dict[str, Any]) -> Dict[str, Any]:
+def parse_input(state: dict[str, Any]) -> dict[str, Any]:
     """Parse user input and extract requirements using AI."""
     logger.info("Parsing user input")
 
@@ -74,7 +67,7 @@ def parse_input(state: Dict[str, Any]) -> Dict[str, Any]:
         raise
 
 
-async def research_topics(state: Dict[str, Any]) -> Dict[str, Any]:
+async def research_topics(state: dict[str, Any]) -> dict[str, Any]:
     """Research current technologies and best practices using MCP tools."""
     logger.info("Starting research phase")
 
@@ -137,7 +130,7 @@ Research reasoning: {research_topics.reasoning}"""
         return state
 
 
-def generate_requirements(state: Dict[str, Any]) -> Dict[str, Any]:
+def generate_requirements(state: dict[str, Any]) -> dict[str, Any]:
     """Enhance requirements with research insights if available."""
     logger.info("Enhancing requirements with research insights")
 
@@ -154,7 +147,7 @@ def generate_requirements(state: Dict[str, Any]) -> Dict[str, Any]:
             )
             state["requirements"] = enhanced_requirements
 
-            logger.info(f"Requirements enhanced with research insights")
+            logger.info("Requirements enhanced with research insights")
         else:
             logger.info("No research insights available, using original requirements")
 
@@ -165,7 +158,7 @@ def generate_requirements(state: Dict[str, Any]) -> Dict[str, Any]:
         return state
 
 
-def generate_architecture(state: Dict[str, Any]) -> Dict[str, Any]:
+def generate_architecture(state: dict[str, Any]) -> dict[str, Any]:
     """Generate architecture documentation and diagrams using AI."""
     logger.info("Generating architecture documentation with AI")
 
@@ -284,7 +277,7 @@ Project Type: {project_type.value}
         raise
 
 
-def generate_code(state: Dict[str, Any]) -> Dict[str, Any]:
+def generate_code(state: dict[str, Any]) -> dict[str, Any]:
     """Generate application code and tests."""
     logger.info("Generating code")
 
@@ -373,7 +366,7 @@ def generate_code(state: Dict[str, Any]) -> Dict[str, Any]:
         raise
 
 
-def run_tests(state: Dict[str, Any]) -> Dict[str, Any]:
+def run_tests(state: dict[str, Any]) -> dict[str, Any]:
     """Generate AI-powered tests and run them with coverage."""
     logger.info("Generating and running AI-powered tests")
 
@@ -518,7 +511,7 @@ def run_tests(state: Dict[str, Any]) -> Dict[str, Any]:
         raise
 
 
-def generate_docs(state: Dict[str, Any]) -> Dict[str, Any]:
+def generate_docs(state: dict[str, Any]) -> dict[str, Any]:
     """Generate comprehensive documentation."""
     logger.info("Generating documentation")
 
@@ -740,7 +733,7 @@ See the `architecture/` directory for detailed design documents and diagrams.
         raise
 
 
-def save_audit_files(state: Dict[str, Any]) -> Dict[str, Any]:
+def save_audit_files(state: dict[str, Any]) -> dict[str, Any]:
     """Save audit information for transparency and future reference."""
     logger.info("Saving audit files")
 
@@ -766,7 +759,7 @@ def save_audit_files(state: Dict[str, Any]) -> Dict[str, Any]:
         return state
 
 
-def package_artifacts(state: Dict[str, Any]) -> Dict[str, Any]:
+def package_artifacts(state: dict[str, Any]) -> dict[str, Any]:
     """Package generated artifacts into a zip file."""
     import zipfile
 
@@ -816,7 +809,7 @@ class _SequentialPipeline:  # noqa: D401
             package_artifacts,
         ]
 
-    async def invoke(self, state: Dict[str, Any]) -> Dict[str, Any]:  # noqa: D401
+    async def invoke(self, state: dict[str, Any]) -> dict[str, Any]:  # noqa: D401
         total = len(self.steps)
         job_id = state.get("job_id")
 

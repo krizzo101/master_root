@@ -6,11 +6,11 @@ Each node becomes a use case that can generate its own sub-workflow using the sa
 WorkflowManager approach, creating a truly recursive, fractal architecture.
 """
 
+import logging
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-import logging
-from typing import Any, Dict, List
+from typing import Any
 
 from src.applications.oamat.agents.manager.workflow_manager import WorkflowManager
 from src.applications.oamat.agents.models import (
@@ -41,7 +41,7 @@ class RecursiveExecutionContext:
     parent_node_id: str
     parent_agent_role: str
     recursion_depth: RecursionDepth
-    parent_context: Dict[str, Any]
+    parent_context: dict[str, Any]
     complexity_threshold: float = 0.7  # Above this = subdivide
     max_recursion_depth: int = 4
 
@@ -66,8 +66,8 @@ class RecursiveWorkflowOrchestrator:
         self.workflow_executor = None
 
         # Execution tracking
-        self.active_workflows: Dict[str, EnhancedWorkflowPlan] = {}
-        self.execution_hierarchy: Dict[str, List[str]] = {}  # parent_id -> [child_ids]
+        self.active_workflows: dict[str, EnhancedWorkflowPlan] = {}
+        self.execution_hierarchy: dict[str, list[str]] = {}  # parent_id -> [child_ids]
 
     def initialize_components(self):
         """Initialize workflow components for recursive execution"""
@@ -95,7 +95,7 @@ class RecursiveWorkflowOrchestrator:
 
     async def execute_node_with_subdivision(
         self, node_context: RecursiveExecutionContext
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute a node with manager-driven subdivision intelligence.
 
@@ -157,7 +157,7 @@ class RecursiveWorkflowOrchestrator:
         return await self._execute_sub_workflow(node_context, sub_workflow_plan)
 
     async def _generate_sub_workflow_from_manager_intel(
-        self, context: RecursiveExecutionContext, node_metadata: Dict[str, Any]
+        self, context: RecursiveExecutionContext, node_metadata: dict[str, Any]
     ) -> EnhancedWorkflowPlan:
         """
         Generate sub-workflow using SAME WorkflowManager logic (TRUE DRY).
@@ -210,7 +210,7 @@ class RecursiveWorkflowOrchestrator:
             return None
 
     def _create_sub_project_request(
-        self, context: RecursiveExecutionContext, node_metadata: Dict[str, Any]
+        self, context: RecursiveExecutionContext, node_metadata: dict[str, Any]
     ) -> str:
         """Create sub-project request that integrates into larger project structure"""
 
@@ -230,7 +230,7 @@ Please generate a complete workflow for this sub-project that integrates seamles
         self,
         context: RecursiveExecutionContext,
         sub_workflow_plan: EnhancedWorkflowPlan,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute the generated sub-workflow using recursive orchestration.
 
@@ -299,7 +299,7 @@ Please generate a complete workflow for this sub-project that integrates seamles
         self,
         sub_workflow_plan: EnhancedWorkflowPlan,
         parent_context: RecursiveExecutionContext,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Create agent creators that support recursive subdivision.
 
@@ -338,7 +338,7 @@ Please generate a complete workflow for this sub-project that integrates seamles
 
     async def _execute_atomic_task(
         self, context: RecursiveExecutionContext
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute a task atomically (no further subdivision).
 
@@ -410,8 +410,8 @@ Execute this task completely and return results.
             }
 
     async def _execute_with_existing_agent(
-        self, agent_role: str, task_description: str, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, agent_role: str, task_description: str, context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute using existing OAMAT agent infrastructure"""
 
         # This would integrate with the existing agent execution system

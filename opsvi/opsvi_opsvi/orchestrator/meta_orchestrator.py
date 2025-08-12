@@ -1,28 +1,24 @@
 """Meta-orchestrator for coordinating the software factory pipeline."""
 
-import asyncio
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
-from uuid import UUID, uuid4
+from typing import Any
 
 from celery.result import AsyncResult
 
-from .dag_loader import dag_loader
-from .registry import registry
-from .task_models import Project, Run, TaskRecord, TaskStatus, Critique
 from ..memory.graph.neo4j_client import get_neo4j_client
-from ..workers.celery_app import celery_app
 from ..workers.tasks import (
-    execute_plan_task,
-    execute_spec_task,
-    execute_research_task,
     execute_code_task,
+    execute_critic_task,
+    execute_document_task,
+    execute_plan_task,
+    execute_research_task,
+    execute_spec_task,
     execute_test_task,
     execute_validate_task,
-    execute_document_task,
-    execute_critic_task,
 )
+from .dag_loader import dag_loader
+from .task_models import Project, Run
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +46,8 @@ class MetaOrchestrator:
         project_request: str,
         project_name: str,
         project_description: str = "",
-        config: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        config: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Execute a complete pipeline."""
         try:
             # Create project and run
@@ -103,8 +99,8 @@ class MetaOrchestrator:
             }
 
     async def _execute_pipeline_loop(
-        self, execution_state: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, execution_state: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute the pipeline with retry loops."""
         project = execution_state["project"]
         run = execution_state["run"]
@@ -167,8 +163,8 @@ class MetaOrchestrator:
         }
 
     async def _execute_task(
-        self, task_name: str, execution_state: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, task_name: str, execution_state: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute a single task."""
         project = execution_state["project"]
         run = execution_state["run"]
@@ -231,7 +227,7 @@ class MetaOrchestrator:
 
     async def _wait_for_task_completion(
         self, celery_result: AsyncResult, task_name: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Wait for a Celery task to complete."""
         try:
             # Wait for result with timeout
@@ -258,10 +254,10 @@ class MetaOrchestrator:
     async def _apply_gate_policies(
         self,
         task_name: str,
-        task_result: Dict[str, Any],
-        gate_policies: List[str],
-        execution_state: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        task_result: dict[str, Any],
+        gate_policies: list[str],
+        execution_state: dict[str, Any],
+    ) -> dict[str, Any]:
         """Apply gate policies to a task result."""
         try:
             # Prepare input for critic
@@ -295,8 +291,8 @@ class MetaOrchestrator:
             }
 
     async def _execute_critic_task(
-        self, input_data: Dict[str, Any], execution_state: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, input_data: dict[str, Any], execution_state: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute critic task for evaluation."""
         project = execution_state["project"]
         run = execution_state["run"]
@@ -334,8 +330,8 @@ class MetaOrchestrator:
             }
 
     def _prepare_task_input(
-        self, task_name: str, execution_state: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, task_name: str, execution_state: dict[str, Any]
+    ) -> dict[str, Any]:
         """Prepare input data for a task."""
         task_results = execution_state["task_results"]
 
@@ -374,7 +370,7 @@ class MetaOrchestrator:
 
         return input_data
 
-    async def _repair_failed_tasks(self, execution_state: Dict[str, Any]) -> None:
+    async def _repair_failed_tasks(self, execution_state: dict[str, Any]) -> None:
         """Attempt to repair failed tasks."""
         # This is a placeholder for repair logic
         # In practice, you might:
@@ -383,7 +379,7 @@ class MetaOrchestrator:
         # - Apply automatic fixes
         logger.info("Repair logic would be implemented here")
 
-    async def _finalize_run(self, execution_state: Dict[str, Any]) -> None:
+    async def _finalize_run(self, execution_state: dict[str, Any]) -> None:
         """Finalize the run and update status."""
         project = execution_state["project"]
         run = execution_state["run"]
@@ -434,8 +430,8 @@ async def execute_software_factory_pipeline(
     project_name: str,
     project_description: str = "",
     pipeline_name: str = "software_factory_v1",
-    config: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    config: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Execute the software factory pipeline."""
     return await meta_orchestrator.execute_pipeline(
         pipeline_name=pipeline_name,

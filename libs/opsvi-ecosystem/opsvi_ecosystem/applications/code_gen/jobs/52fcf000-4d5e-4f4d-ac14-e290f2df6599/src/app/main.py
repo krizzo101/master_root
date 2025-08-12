@@ -8,12 +8,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 
-from app.config import settings
-from app.db import Base, engine
 from app.api import router as api_router
 from app.auth import router as auth_router
+from app.config import settings
+from app.db import Base, engine
 from app.github import router as github_router
-from app.views import router as view_router, templates
+from app.views import router as view_router
 
 # Initialize database
 Base.metadata.create_all(bind=engine)

@@ -2,7 +2,7 @@
 
 import logging
 import re
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -511,7 +511,6 @@ Fix the security issues and return the response in the specified format.
         self, original_artifact: Artifact, fixed_code: str
     ) -> Artifact:
         """Create a new artifact with the fixed code."""
-        from uuid import uuid4
 
         # Create new metadata with fixed content
         metadata = original_artifact.metadata.copy()

@@ -8,17 +8,16 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import pytest
 import tempfile
-import zipfile
-import json
-from unittest.mock import patch
-import time
 import threading
+import time
+import zipfile
+
+import pytest
 import requests
 import uvicorn
-
 from pipeline import build_pipeline
+
 from api import app
 from config import config
 

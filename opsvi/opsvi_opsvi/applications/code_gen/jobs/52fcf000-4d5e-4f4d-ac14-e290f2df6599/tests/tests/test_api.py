@@ -1,15 +1,16 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 from app.api import (
     create_project,
-    list_projects,
-    get_project,
-    update_project,
     delete_project,
-    upload_python_code,
-    list_project_reports,
-    get_report,
     download_report_html,
+    get_project,
+    get_report,
+    list_project_reports,
+    list_projects,
+    update_project,
+    upload_python_code,
 )
 
 

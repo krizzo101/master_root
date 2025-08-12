@@ -10,7 +10,7 @@ import asyncio
 import structlog
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, Any, Optional, List, Annotated
+from typing import Dict, Any, Optional, List
 from enum import Enum
 
 from langgraph.graph import StateGraph, END
@@ -18,7 +18,6 @@ from langgraph.checkpoint.aio.memory import MemorySaver
 from langgraph.prebuilt import ToolExecutor
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel, Field
 
 # Configure structured logging (Rule 921)
 logger = structlog.get_logger()

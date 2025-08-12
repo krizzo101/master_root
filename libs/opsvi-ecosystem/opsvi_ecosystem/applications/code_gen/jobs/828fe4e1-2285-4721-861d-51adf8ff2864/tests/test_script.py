@@ -6,9 +6,9 @@ CURRENT_DIR = os.path.dirname(__file__)
 SRC_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "src"))
 sys.path.insert(0, SRC_DIR)
 
-import script
-import io
 import sys
+
+import script
 
 
 def test_main_output(capsys):

@@ -14,31 +14,26 @@ meant to be the authoritative FastAPI app.
 """
 
 import logging
-import os
+
 from fastapi import (
-    FastAPI,
-    WebSocket,
-    WebSocketDisconnect,
     Depends,
-    Request,
-    Response,
-    status,
-    HTTPException,
-    UploadFile,
+    FastAPI,
     File,
     Form,
+    HTTPException,
+    Request,
+    UploadFile,
+    WebSocket,
+    status,
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
-from passlib.context import CryptContext
-from typing import List, Optional, Any, Dict
-import uuid
-import asyncio
-from datetime import datetime, timedelta
-from .models import User, Document, DocumentVersion, UserPresence, AuditLog
-from . import crud, auth, config, ai, search, file as filemod, collab
+
+from . import ai, auth, collab, config, crud, search
+from . import file as filemod
+from .models import AuditLog, Document, DocumentVersion, User
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -60,7 +55,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 
 @app.get("/health")
-def health_check() -> Dict[str, str]:
+def health_check() -> dict[str, str]:
     """App health endpoint."""
     return {"status": "ok"}
 
@@ -117,7 +112,7 @@ async def create_document(
     return await crud.create_document(current_user, title, body)
 
 
-@app.get("/documents", response_model=List[Document])
+@app.get("/documents", response_model=list[Document])
 async def list_documents(current_user: User = Depends(get_current_user)):
     """List all documents visible to current user."""
     return await crud.list_documents(current_user)
@@ -150,7 +145,7 @@ async def delete_document(doc_id: str, current_user: User = Depends(get_current_
 # --- DOCUMENT VERSIONING ---
 
 
-@app.get("/documents/{doc_id}/versions", response_model=List[DocumentVersion])
+@app.get("/documents/{doc_id}/versions", response_model=list[DocumentVersion])
 async def get_document_versions(
     doc_id: str, current_user: User = Depends(get_current_user)
 ):
@@ -167,7 +162,7 @@ async def restore_document_version(
 # --- SEARCH ---
 
 
-@app.get("/search", response_model=List[Document])
+@app.get("/search", response_model=list[Document])
 async def search_docs(query: str, current_user: User = Depends(get_current_user)):
     """Fulltext search documents."""
     return await search.search_documents(current_user, query)
@@ -237,7 +232,7 @@ async def collab_ws_endpoint(websocket: WebSocket, doc_id: str, token: str):
 # --- AUDIT LOGS ---
 
 
-@app.get("/audit", response_model=List[AuditLog])
+@app.get("/audit", response_model=list[AuditLog])
 async def get_audit_logs(current_user: User = Depends(get_current_user)):
     """Get audit logs for your documents."""
     return await crud.get_audit_logs(current_user)

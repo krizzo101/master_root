@@ -2,7 +2,7 @@ import asyncio
 import os
 import re
 import subprocess
-from typing import Any, Dict
+from typing import Any
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -19,7 +19,7 @@ def extract_workflow_name(success_str: str) -> str:
     return ""
 
 
-async def call_tool(session, tool_name: str, arguments: Dict[str, Any]) -> Any:
+async def call_tool(session, tool_name: str, arguments: dict[str, Any]) -> Any:
     result = await session.call_tool(tool_name, arguments)
     if result.content:
         return [

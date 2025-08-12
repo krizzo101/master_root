@@ -1,10 +1,8 @@
 """Configuration management for the code generation utility."""
 
 import os
-from pathlib import Path
-from typing import Optional
-import logging
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass
@@ -19,10 +17,10 @@ class Config:
 
     # Logging
     log_level: str = "INFO"
-    log_file: Optional[Path] = None
+    log_file: Path | None = None
 
     # OpenAI settings
-    openai_api_key: Optional[str] = None
+    openai_api_key: str | None = None
     openai_model_o4_mini: str = "o4-mini"
     openai_model_gpt41: str = "gpt-4.1"
     openai_model_gpt41_mini: str = "gpt-4.1-mini"

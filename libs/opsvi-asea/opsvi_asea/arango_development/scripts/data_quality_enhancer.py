@@ -1,5 +1,4 @@
-import os
-from arango import ArangoClient, DocumentInsertError, DocumentUpdateError
+from arango import ArangoClient, DocumentUpdateError
 from datetime import datetime, timezone
 
 # --- Configuration ---
@@ -145,7 +144,7 @@ def enhance_data_quality(db):
             except DocumentUpdateError as e:
                 print(f"  -> FAILED to update doc: {doc['_key']}. Error: {e}")
 
-    print(f"\nData quality enhancement complete.")
+    print("\nData quality enhancement complete.")
     print(
         f"Successfully processed and updated {processed_count} out of {total_docs} documents."
     )

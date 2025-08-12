@@ -1,10 +1,11 @@
 import logging
-from typing import List, Optional
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-from app.models import Todo
-from app.schemas import TodoCreate, TodoUpdate, TodoRead
 from datetime import datetime
+
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
+from app.models import Todo
+from app.schemas import TodoCreate, TodoRead, TodoUpdate
 
 logger = logging.getLogger(__name__)
 
@@ -35,17 +36,17 @@ class TodoService:
             logger.error(f"Error creating todo: {ex}")
             raise
 
-    def get_all_todos(self) -> List[TodoRead]:
+    def get_all_todos(self) -> list[TodoRead]:
         todos = self.db.query(Todo).all()
         return [TodoRead.from_orm(todo) for todo in todos]
 
-    def get_todo_by_id(self, todo_id: int) -> Optional[TodoRead]:
+    def get_todo_by_id(self, todo_id: int) -> TodoRead | None:
         todo = self.db.query(Todo).filter(Todo.id == todo_id).first()
         if todo:
             return TodoRead.from_orm(todo)
         return None
 
-    def update_todo(self, todo_id: int, todo_in: TodoUpdate) -> Optional[TodoRead]:
+    def update_todo(self, todo_id: int, todo_in: TodoUpdate) -> TodoRead | None:
         todo = self.db.query(Todo).filter(Todo.id == todo_id).first()
         if not todo:
             return None

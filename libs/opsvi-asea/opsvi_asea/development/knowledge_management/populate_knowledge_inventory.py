@@ -11,10 +11,8 @@ This bridges the gap between existing rich knowledge and the new dynamic access 
 
 import asyncio
 import json
-from typing import Dict, List, Any
-from collections import defaultdict, Counter
+from typing import Dict, Any
 from datetime import datetime
-import re
 
 
 # Simulated cognitive tools operations for this demo
@@ -549,7 +547,7 @@ class KnowledgeInventoryPopulator:
         }
 
         # Summary for display
-        print(f"\n📊 Knowledge Inventory Summary:")
+        print("\n📊 Knowledge Inventory Summary:")
         print(f"   🎯 {inventory['domain_count']} knowledge domains mapped")
         print(f"   📚 {inventory['total_knowledge_items']} total knowledge items")
         print(

@@ -1,5 +1,5 @@
 import threading
-from typing import Dict, List, Optional
+
 from app.models import Task, TaskCreate, TaskUpdate
 
 
@@ -7,7 +7,7 @@ class TaskStorage:
     """In-memory storage backend for tasks."""
 
     def __init__(self):
-        self._tasks: Dict[int, Task] = {}
+        self._tasks: dict[int, Task] = {}
         self._counter = 1
         self._lock = threading.Lock()
 
@@ -18,15 +18,15 @@ class TaskStorage:
             self._counter += 1
             return task
 
-    def list_tasks(self) -> List[Task]:
+    def list_tasks(self) -> list[Task]:
         with self._lock:
             return list(self._tasks.values())
 
-    def get_task(self, task_id: int) -> Optional[Task]:
+    def get_task(self, task_id: int) -> Task | None:
         with self._lock:
             return self._tasks.get(task_id)
 
-    def update_task(self, task_id: int, updates: TaskUpdate) -> Optional[Task]:
+    def update_task(self, task_id: int, updates: TaskUpdate) -> Task | None:
         with self._lock:
             task = self._tasks.get(task_id)
             if not task:

@@ -13,9 +13,8 @@ DRY IMPROVEMENTS:
 - Uses shared validation (eliminates input validation patterns)
 """
 
-from typing import List, Any, Optional
+from typing import List, Any
 
-from ..base_plugin import BasePlugin
 from ..types import (
     ExecutionContext,
     PluginResult,
@@ -26,7 +25,6 @@ from ..types import (
 from ...shared.plugin_execution_base import StandardPluginBase, execution_wrapper
 from ...shared.logging_manager import get_plugin_logger
 from ...shared.config_manager import (
-    get_config_value,
     PLUGIN_CONFIG_SCHEMA,
     register_config_schema,
 )

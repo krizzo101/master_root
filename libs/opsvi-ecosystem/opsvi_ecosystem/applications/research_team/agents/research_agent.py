@@ -1,8 +1,6 @@
 import asyncio
 import logging
 
-from ..tools.mcp_arxiv_tool import MCPArxivTool
-from ..tools.mcp_context7_tool import MCPContext7Tool
 from ..tools.mcp_firecrawl_tool import MCPFirecrawlTool
 from ..tools.mcp_search_tool import MCPSearchTool
 
@@ -31,7 +29,7 @@ class ResearchAgent:
         }
         results = await asyncio.gather(*tasks.values(), return_exceptions=True)
         output = {}
-        for name, result in zip(tasks.keys(), results):
+        for name, result in zip(tasks.keys(), results, strict=False):
             if isinstance(result, Exception):
                 self.logger.error(f"{name} tool failed: {result}")
                 output[name] = {"error": str(result)}

@@ -4,10 +4,9 @@ Comprehensive model testing script for the O3 code generator.
 Tests all approved models and compares their performance and quality.
 """
 
+import json
 import sys
 import time
-import json
-import os
 from pathlib import Path
 
 # Add the project root to the path

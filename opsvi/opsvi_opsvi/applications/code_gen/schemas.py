@@ -8,12 +8,10 @@ Removed default values that aren't supported by OpenAI's structured outputs.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, List, Optional, Dict, Union
-
-from pydantic import BaseModel, Field
 
 # Import ProjectType from project_templates
 from project_templates import ProjectType
+from pydantic import BaseModel, Field
 
 # Re-export for convenience
 __all__ = ["ProjectType", "RequirementsSpec", "ArchitectureSpec", "ResearchTopics"]
@@ -72,13 +70,13 @@ class ArchitectureSpec(BaseModel):
     )
 
     # Legacy fields for backward compatibility (made optional)
-    adr_paths: Optional[list[str]] = Field(
+    adr_paths: list[str] | None = Field(
         None, description="Paths to Architecture Decision Records (as strings)"
     )
-    diagrams: Optional[list[str]] = Field(
+    diagrams: list[str] | None = Field(
         None, description="Paths to architecture diagrams (as strings)"
     )
-    openapi_spec: Optional[str] = Field(
+    openapi_spec: str | None = Field(
         None, description="Path to generated OpenAPI YAML file (as string)."
     )
 
@@ -97,7 +95,7 @@ class TestReport(BaseModel):
     passed: int = Field(..., description="Number of passed tests")
     failed: int = Field(..., description="Number of failed tests")
     coverage: float = Field(..., ge=0.0, le=1.0, description="Test coverage percentage")
-    mutation_score: Optional[float] = Field(
+    mutation_score: float | None = Field(
         None, ge=0.0, le=1.0, description="Mutation testing score"
     )
 
@@ -106,7 +104,7 @@ class DocSet(BaseModel):
     """Documentation artifacts."""
 
     docs_dir: str = Field(..., description="Documentation directory path")
-    index_file: Optional[str] = Field(
+    index_file: str | None = Field(
         None, description="Path to main documentation index file"
     )
 

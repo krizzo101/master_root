@@ -215,12 +215,12 @@ def compare_approaches():
     print("📊 COMPARISON RESULTS")
     print("=" * 70)
 
-    print(f"Standard Approach:")
+    print("Standard Approach:")
     print(f"  ⏱️ Time: {standard_result['processing_time']:.3f}s")
     print(f"  📊 Depth: {standard_result['analysis_depth']} chars")
     print(f"  🔧 Method: {standard_result['methodology']}")
 
-    print(f"\nEnhanced Approach:")
+    print("\nEnhanced Approach:")
     print(f"  ⏱️ Time: {enhanced_result['processing_time']:.3f}s")
     print(f"  📊 Depth: {enhanced_result['analysis_depth']} chars")
     print(f"  🔧 Method: {enhanced_result['methodology']}")

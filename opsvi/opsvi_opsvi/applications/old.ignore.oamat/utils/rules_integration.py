@@ -7,7 +7,7 @@ security practices, and testing requirements into agent environments.
 
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 logger = logging.getLogger("OAMAT.RulesIntegration")
 
@@ -15,7 +15,7 @@ logger = logging.getLogger("OAMAT.RulesIntegration")
 class RulesManager:
     """Manages development rules and their integration into agent environments"""
 
-    def __init__(self, project_root: Optional[str] = None):
+    def __init__(self, project_root: str | None = None):
         """Initialize rules manager with project root directory"""
         self.project_root = Path(project_root) if project_root else Path.cwd()
         self.rules_dir = self.project_root / ".cursor" / "rules"
@@ -33,7 +33,7 @@ class RulesManager:
             "architecture": ["955-oamat-workflow-architecture"],
         }
 
-    def load_rules_for_category(self, category: str) -> Dict[str, Any]:
+    def load_rules_for_category(self, category: str) -> dict[str, Any]:
         """Load all rules for a specific category"""
         if category not in self.rule_categories:
             logger.warning(f"Unknown rule category: {category}")
@@ -47,7 +47,7 @@ class RulesManager:
 
         return rules
 
-    def load_rule(self, rule_name: str) -> Optional[str]:
+    def load_rule(self, rule_name: str) -> str | None:
         """Load a specific rule by name"""
         if rule_name in self.cached_rules:
             return self.cached_rules[rule_name]
@@ -68,7 +68,7 @@ class RulesManager:
         logger.warning(f"Rule not found: {rule_name}")
         return None
 
-    def get_agent_rules(self, agent_role: str) -> Dict[str, str]:
+    def get_agent_rules(self, agent_role: str) -> dict[str, str]:
         """Get relevant rules for a specific agent role"""
         role_rule_mapping = {
             "coder": ["development", "security"],
@@ -95,7 +95,7 @@ class RulesManager:
 
         return agent_rules
 
-    def format_rules_for_prompt(self, rules: Dict[str, str]) -> str:
+    def format_rules_for_prompt(self, rules: dict[str, str]) -> str:
         """Format rules for inclusion in agent prompts"""
         if not rules:
             return ""
@@ -172,8 +172,8 @@ class RulesManager:
         )
 
     def inject_rules_into_agent_spec(
-        self, agent_spec: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, agent_spec: dict[str, Any]
+    ) -> dict[str, Any]:
         """Inject relevant rules into an agent specification"""
         agent_role = agent_spec.get(
             "role", agent_spec.get("agent_role", agent_spec.get("name", ""))
@@ -313,7 +313,7 @@ def get_rules_manager() -> RulesManager:
     return _rules_manager
 
 
-def inject_rules_into_spec(agent_spec: Dict[str, Any]) -> Dict[str, Any]:
+def inject_rules_into_spec(agent_spec: dict[str, Any]) -> dict[str, Any]:
     """Convenience function to inject rules into agent spec"""
     return get_rules_manager().inject_rules_into_agent_spec(agent_spec)
 

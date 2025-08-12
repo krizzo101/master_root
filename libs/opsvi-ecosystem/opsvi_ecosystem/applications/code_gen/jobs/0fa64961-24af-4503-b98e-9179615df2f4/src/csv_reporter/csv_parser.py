@@ -2,13 +2,14 @@
 CSV Parser & Validator module for csv_reporter.
 Handles schema detection, malformed row handling, and REST API for loading CSV data.
 """
-from pathlib import Path
-from typing import Tuple, Any, List, Optional
-import pandas as pd
 import csv
+from pathlib import Path
+
+import pandas as pd
 from pandas.errors import EmptyDataError, ParserError
-from csv_reporter.logger import logger
+
 from csv_reporter.config import Config
+from csv_reporter.logger import logger
 
 
 class CSVParser:
@@ -20,7 +21,7 @@ class CSVParser:
     def __init__(self, config: Config) -> None:
         self.config = config
 
-    def parse_csv(self, path: Path) -> Tuple[pd.DataFrame, List[str]]:
+    def parse_csv(self, path: Path) -> tuple[pd.DataFrame, list[str]]:
         """
         Parses the CSV file and cleans data.
 
@@ -30,7 +31,7 @@ class CSVParser:
             FileNotFoundError: If file not found.
             ValueError: For empty, malformed or unreadable files.
         """
-        warnings: List[str] = []
+        warnings: list[str] = []
         if not path.is_file():
             raise FileNotFoundError(f"CSV file not found: {path}")
         logger.debug(f"Attempting to load CSV: {path}")
@@ -47,7 +48,7 @@ class CSVParser:
                 f"Pandas failed to parse CSV - {e}. Attempting line-by-line cleanup."
             )
             cleaned_rows = []
-            with open(path, "r", encoding=self.config.csv_encoding) as f:
+            with open(path, encoding=self.config.csv_encoding) as f:
                 reader = csv.reader(f)
                 header = next(reader, None)
                 if not header:

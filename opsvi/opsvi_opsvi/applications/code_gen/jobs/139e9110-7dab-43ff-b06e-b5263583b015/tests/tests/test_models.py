@@ -1,17 +1,17 @@
-import pytest
-from backend.models import (
-    UserRole,
-    User,
-    Project,
-    TaskStatus,
-    Task,
-    Dependency,
-    Comment,
-    File,
-    TimeEntry,
-    AuditLog,
-)
 from datetime import datetime
+
+from backend.models import (
+    AuditLog,
+    Comment,
+    Dependency,
+    File,
+    Project,
+    Task,
+    TaskStatus,
+    TimeEntry,
+    User,
+    UserRole,
+)
 
 
 def test_user_role_enum_contains_expected_roles():

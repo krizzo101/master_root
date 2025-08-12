@@ -1,6 +1,6 @@
 import pytest
-from fastapi.testclient import TestClient
 from app.main import app
+from fastapi.testclient import TestClient
 
 client = TestClient(app, raise_server_exceptions=False)
 
@@ -8,7 +8,7 @@ client = TestClient(app, raise_server_exceptions=False)
 @pytest.fixture(scope="function", autouse=True)
 def clear_db():
     # Clean up the DB before each test for isolation.
-    from app.database import SessionLocal, Base, engine
+    from app.database import Base, engine
     from sqlalchemy.orm import close_all_sessions
 
     Base.metadata.drop_all(bind=engine)

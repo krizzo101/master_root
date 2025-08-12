@@ -13,7 +13,7 @@ from preprocessed document content to rule-ready formats.
 
 import os
 import logging
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Optional
 import re
 
 from .markdown_to_rule import MarkdownToRuleTransformer
@@ -125,7 +125,7 @@ class TransformationManager:
                     doc_content=content, taxonomy=taxonomy or {}, rule_type=rule_type
                 )
 
-                if llm_result and "content" in llm_result and not "error" in llm_result:
+                if llm_result and "content" in llm_result and "error" not in llm_result:
                     # Create transformed content with LLM-generated rule
                     transformed = {
                         "rule_content": llm_result["content"],

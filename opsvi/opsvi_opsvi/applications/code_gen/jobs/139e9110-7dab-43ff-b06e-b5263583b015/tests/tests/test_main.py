@@ -1,4 +1,3 @@
-import pytest
 from backend.main import health
 
 

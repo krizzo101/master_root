@@ -8,7 +8,7 @@ task management, and workflow execution across all components.
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 
@@ -69,11 +69,11 @@ class Message:
 
     sender_id: str
     message_type: MessageType
-    content: Dict[str, Any]
+    content: dict[str, Any]
     id: str = field(default_factory=lambda: str(uuid4()))
-    recipient_id: Optional[str] = None
+    recipient_id: str | None = None
     timestamp: datetime = field(default_factory=datetime.now)
-    correlation_id: Optional[str] = None
+    correlation_id: str | None = None
 
 
 @dataclass
@@ -99,17 +99,17 @@ class Task:
 
     name: str
     description: str
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
     id: str = field(default_factory=lambda: str(uuid4()))
-    agent_id: Optional[str] = None
-    tool_name: Optional[str] = None
-    dependencies: List[str] = field(default_factory=list)
+    agent_id: str | None = None
+    tool_name: str | None = None
+    dependencies: list[str] = field(default_factory=list)
     status: TaskStatus = TaskStatus.PENDING
-    result: Optional[Any] = None
-    error: Optional[str] = None
+    result: Any | None = None
+    error: str | None = None
     created_at: datetime = field(default_factory=datetime.now)
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
 
 
 @dataclass
@@ -130,10 +130,10 @@ class TaskResult:
     task_id: str
     status: TaskStatus
     result: Any = None
-    error: Optional[str] = None
-    execution_time: Optional[float] = None
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    error: str | None = None
+    execution_time: float | None = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
 
 
 @dataclass
@@ -151,9 +151,9 @@ class AgentCapability:
 
     name: str
     description: str
-    input_schema: Dict[str, Any]
-    output_schema: Dict[str, Any]
-    tools_required: List[str] = field(default_factory=list)
+    input_schema: dict[str, Any]
+    output_schema: dict[str, Any]
+    tools_required: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -171,9 +171,9 @@ class ToolSchema:
 
     name: str
     description: str
-    input_schema: Dict[str, Any]
-    output_schema: Dict[str, Any]
-    required_params: List[str] = field(default_factory=list)
+    input_schema: dict[str, Any]
+    output_schema: dict[str, Any]
+    required_params: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -194,12 +194,12 @@ class WorkflowResult:
 
     workflow_id: str
     status: TaskStatus
-    results: Dict[str, Any]
-    errors: List[str] = field(default_factory=list)
-    execution_time: Optional[float] = None
+    results: dict[str, Any]
+    errors: list[str] = field(default_factory=list)
+    execution_time: float | None = None
     task_count: int = 0
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
 
 
 @dataclass
@@ -221,9 +221,9 @@ class WorkflowDefinition:
     name: str
     description: str
     workflow_type: WorkflowType
-    tasks: List[Task]
+    tasks: list[Task]
     id: str = field(default_factory=lambda: str(uuid4()))
-    conditions: Dict[str, Any] = field(default_factory=dict)
+    conditions: dict[str, Any] = field(default_factory=dict)
     max_parallel: int = 5
     timeout: int = 300  # 5 minutes default
 

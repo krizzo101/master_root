@@ -446,7 +446,7 @@ def main():
     print("4. Compare scores and evidence objectively")
     print("5. Document results for cognitive enhancement validation")
 
-    print(f"\n📊 TEST SCENARIOS:")
+    print("\n📊 TEST SCENARIOS:")
     for scenario in test_framework.test_scenarios:
         print(f"   • {scenario['name']}: {scenario['description']}")
 

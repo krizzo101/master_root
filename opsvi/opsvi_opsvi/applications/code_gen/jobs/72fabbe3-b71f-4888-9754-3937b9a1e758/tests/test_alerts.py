@@ -1,4 +1,3 @@
-import pytest
 from backend.alerts import get_active_alerts
 
 

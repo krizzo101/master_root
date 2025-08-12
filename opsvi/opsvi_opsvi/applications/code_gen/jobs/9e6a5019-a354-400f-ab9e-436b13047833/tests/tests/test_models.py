@@ -1,5 +1,4 @@
-import pytest
-from app.models import User, Post, Image, Category, Tag, PostView
+from app.models import Category, Image, Post, PostView, Tag, User
 
 
 def test_user_repr_returns_correct_string():

@@ -1,5 +1,4 @@
 from asea_orchestrator.celery_app import celery_app
-import time
 
 
 def run_inspection():

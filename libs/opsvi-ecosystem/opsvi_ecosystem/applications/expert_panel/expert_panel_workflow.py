@@ -6,6 +6,7 @@ from applications.expert_panel.agents import (
     StatsExpert,
     SystemMessageGeneratorAgent,
 )
+
 from src.shared.logging.shared_logger import SharedLogger
 from src.shared.mcp.mcp_server_template import BaseTool, MCPServerTemplate
 

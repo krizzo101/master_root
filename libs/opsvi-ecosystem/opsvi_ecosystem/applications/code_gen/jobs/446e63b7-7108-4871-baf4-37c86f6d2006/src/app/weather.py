@@ -2,9 +2,9 @@
 Weather Data Service for Flask Weather App: Fetches, caches, and transforms weather data.
 """
 import logging
+from typing import Any
+
 import requests
-from typing import Optional, Dict, Any
-from flask import current_app
 from cachelib.base import BaseCache
 
 
@@ -24,7 +24,7 @@ class WeatherService:
         self.units = app.config["WEATHER_UNITS"]
         self.cache_timeout = app.config["WEATHER_CACHE_TIMEOUT"]
 
-    def fetch_weather(self, location: Optional[str] = None) -> Dict[str, Any]:
+    def fetch_weather(self, location: str | None = None) -> dict[str, Any]:
         """
         Fetches current weather data for a given location (city name).
         Uses a short-lived cache to avoid excessive API calls.
@@ -57,7 +57,7 @@ class WeatherService:
             raise RuntimeError(f"Error parsing weather data: {ex}")
 
     @staticmethod
-    def parse_weather(data: Dict[str, Any]) -> Dict[str, Any]:
+    def parse_weather(data: dict[str, Any]) -> dict[str, Any]:
         """
         Parses weather data from OpenWeatherMap API.
         :param data: Raw JSON response

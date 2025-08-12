@@ -7,8 +7,8 @@ Simple test to verify the structured output enforcer works correctly.
 """
 
 import asyncio
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Add the project root to the path
 project_root = Path(__file__).parent.parent.parent

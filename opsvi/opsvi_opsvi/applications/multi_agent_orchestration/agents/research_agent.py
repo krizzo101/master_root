@@ -6,7 +6,7 @@ data analysis, and knowledge synthesis.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from ..common.types import AgentCapability, AgentError, Task
 from ..tools.data_processor_tool import DataProcessorTool
@@ -32,7 +32,7 @@ class ResearchAgent(BaseAgent):
         agent_id: str = "research_agent",
         name: str = "Research Agent",
         description: str = "Specialized agent for information gathering, web search, and data analysis",
-        logger: Optional[logging.Logger] = None,
+        logger: logging.Logger | None = None,
     ):
         """
         Initialize the research agent.
@@ -124,7 +124,7 @@ class ResearchAgent(BaseAgent):
             f"ResearchAgent {self.agent_id} initialized with {len(self._capabilities)} capabilities"
         )
 
-    async def execute_task(self, task: Task) -> Dict[str, Any]:
+    async def execute_task(self, task: Task) -> dict[str, Any]:
         """
         Execute a research task.
 
@@ -158,7 +158,7 @@ class ResearchAgent(BaseAgent):
             logger.error(f"ResearchAgent task execution failed: {e}")
             raise AgentError(f"Research task failed: {str(e)}")
 
-    def get_capabilities(self) -> List[AgentCapability]:
+    def get_capabilities(self) -> list[AgentCapability]:
         """
         Get the research agent's capabilities.
 
@@ -167,7 +167,7 @@ class ResearchAgent(BaseAgent):
         """
         return self._capabilities.copy()
 
-    async def _execute_web_search(self, task: Task) -> Dict[str, Any]:
+    async def _execute_web_search(self, task: Task) -> dict[str, Any]:
         """
         Execute a web search task.
 
@@ -205,7 +205,7 @@ class ResearchAgent(BaseAgent):
             "search_time_ms": search_data.get("search_time_ms", 0),
         }
 
-    async def _execute_text_analysis(self, task: Task) -> Dict[str, Any]:
+    async def _execute_text_analysis(self, task: Task) -> dict[str, Any]:
         """
         Execute a text analysis task.
 
@@ -250,7 +250,7 @@ class ResearchAgent(BaseAgent):
             "processing_successful": True,
         }
 
-    async def _execute_research_synthesis(self, task: Task) -> Dict[str, Any]:
+    async def _execute_research_synthesis(self, task: Task) -> dict[str, Any]:
         """
         Execute a research synthesis task.
 
@@ -311,7 +311,7 @@ class ResearchAgent(BaseAgent):
             "confidence_score": synthesis.get("confidence_score", 0.8),
         }
 
-    async def _execute_general_research(self, task: Task) -> Dict[str, Any]:
+    async def _execute_general_research(self, task: Task) -> dict[str, Any]:
         """
         Execute a general research task combining multiple capabilities.
 
@@ -394,7 +394,7 @@ class ResearchAgent(BaseAgent):
         }
 
     async def _generate_search_summary(
-        self, query: str, results: List[Dict[str, Any]]
+        self, query: str, results: list[dict[str, Any]]
     ) -> str:
         """
         Generate a summary of search results.
@@ -424,7 +424,7 @@ class ResearchAgent(BaseAgent):
 
         return summary
 
-    async def _generate_text_insights(self, analysis_data: Dict[str, Any]) -> List[str]:
+    async def _generate_text_insights(self, analysis_data: dict[str, Any]) -> list[str]:
         """
         Generate insights from text analysis data.
 
@@ -470,8 +470,8 @@ class ResearchAgent(BaseAgent):
         return insights
 
     async def _synthesize_research_findings(
-        self, source_analyses: List[Dict[str, Any]], focus_areas: List[str]
-    ) -> Dict[str, Any]:
+        self, source_analyses: list[dict[str, Any]], focus_areas: list[str]
+    ) -> dict[str, Any]:
         """
         Synthesize research findings from multiple sources.
 
@@ -555,9 +555,9 @@ class ResearchAgent(BaseAgent):
 
     def _assess_research_quality(
         self,
-        search_results: Dict[str, Any],
-        text_analysis: Dict[str, Any],
-        synthesis: Optional[Dict[str, Any]],
+        search_results: dict[str, Any],
+        text_analysis: dict[str, Any],
+        synthesis: dict[str, Any] | None,
     ) -> str:
         """
         Assess the quality of the research conducted.

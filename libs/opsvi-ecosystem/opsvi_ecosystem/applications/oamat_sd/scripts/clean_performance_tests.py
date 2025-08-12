@@ -6,9 +6,8 @@ This script identifies performance-related test code that should be moved
 to a separate performance test suite, keeping functional tests focused on correctness.
 """
 
-from pathlib import Path
 import re
-from typing import Dict, List, Tuple
+from pathlib import Path
 
 # Performance-related patterns to identify
 PERFORMANCE_PATTERNS = [
@@ -39,7 +38,7 @@ PERFORMANCE_PATTERNS = [
 ]
 
 
-def scan_test_file(file_path: Path) -> Dict[str, List[Tuple[int, str]]]:
+def scan_test_file(file_path: Path) -> dict[str, list[tuple[int, str]]]:
     """Scan a test file for performance-related code"""
     results = {}
 
@@ -62,7 +61,7 @@ def scan_test_file(file_path: Path) -> Dict[str, List[Tuple[int, str]]]:
     return results
 
 
-def scan_all_tests() -> Dict[str, Dict[str, List[Tuple[int, str]]]]:
+def scan_all_tests() -> dict[str, dict[str, list[tuple[int, str]]]]:
     """Scan all test files for performance-related code"""
     test_dir = Path("tests")
     all_results = {}
@@ -75,7 +74,7 @@ def scan_all_tests() -> Dict[str, Dict[str, List[Tuple[int, str]]]]:
     return all_results
 
 
-def generate_report(results: Dict[str, Dict[str, List[Tuple[int, str]]]]) -> None:
+def generate_report(results: dict[str, dict[str, list[tuple[int, str]]]]) -> None:
     """Generate a report of performance-related code found"""
     print("🔍 PERFORMANCE CODE SCAN REPORT")
     print("=" * 60)

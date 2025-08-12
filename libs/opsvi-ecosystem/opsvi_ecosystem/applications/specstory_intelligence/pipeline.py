@@ -4,13 +4,12 @@ Main coordinator for real-time atomic decomposition and intelligence extraction
 """
 
 import asyncio
-from dataclasses import dataclass
-from datetime import datetime
 import logging
-from pathlib import Path
 import signal
 import traceback
-from typing import Dict, List, Optional, Set
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
 
 # from .file_monitor import SpecStoryFileWatcher as SpecStoryFileMonitor
 from .atomic_parser import AtomicSpecStoryParser
@@ -27,7 +26,7 @@ class ProcessingMetrics:
     processing_time_total: float = 0.0
     errors_encountered: int = 0
     last_processed_file: str = ""
-    last_processing_time: Optional[datetime] = None
+    last_processing_time: datetime | None = None
 
     def update_file_processed(
         self,
@@ -48,7 +47,7 @@ class ProcessingMetrics:
         """Record an error"""
         self.errors_encountered += 1
 
-    def get_summary(self) -> Dict:
+    def get_summary(self) -> dict:
         """Get processing summary"""
         avg_processing_time = (
             self.processing_time_total / self.files_processed
@@ -80,7 +79,7 @@ class ProcessingMetrics:
 class SpecStoryIntelligencePipeline:
     """Main pipeline coordinator for real-time SpecStory intelligence"""
 
-    def __init__(self, config: Dict = None):
+    def __init__(self, config: dict = None):
         self.config = config or self._default_config()
 
         # Initialize components
@@ -96,9 +95,9 @@ class SpecStoryIntelligencePipeline:
         # Processing state
         self.metrics = ProcessingMetrics()
         self.processing_queue = asyncio.Queue()
-        self.processed_files: Set[str] = set()
+        self.processed_files: set[str] = set()
         self.is_running = False
-        self.workers: List[asyncio.Task] = []
+        self.workers: list[asyncio.Task] = []
 
         # Logging
         self.logger = logging.getLogger(__name__)
@@ -112,7 +111,7 @@ class SpecStoryIntelligencePipeline:
         # Graceful shutdown
         self._setup_signal_handlers()
 
-    def _default_config(self) -> Dict:
+    def _default_config(self) -> dict:
         """Default pipeline configuration"""
         return {
             "watch_directory": ".specstory/history",
@@ -361,7 +360,7 @@ class SpecStoryIntelligencePipeline:
                 self.metrics.update_error()
                 await asyncio.sleep(5.0)  # Longer pause on error
 
-    async def _process_file(self, file_event: Dict, worker_name: str):
+    async def _process_file(self, file_event: dict, worker_name: str):
         """Process a single SpecStory file"""
         file_path = file_event["file_path"]
 
@@ -526,7 +525,7 @@ class SpecStoryIntelligencePipeline:
         except Exception as e:
             self.logger.error(f"❌ Global pattern detection failed: {e}")
 
-    async def process_file_manually(self, file_path: str) -> Dict:
+    async def process_file_manually(self, file_path: str) -> dict:
         """Manually process a single file (for testing/debugging)"""
         file_event = {
             "file_path": file_path,
@@ -537,7 +536,7 @@ class SpecStoryIntelligencePipeline:
         await self._process_file(file_event, "manual")
         return self.metrics.get_summary()
 
-    def get_status(self) -> Dict:
+    def get_status(self) -> dict:
         """Get current pipeline status"""
         return {
             "is_running": self.is_running,

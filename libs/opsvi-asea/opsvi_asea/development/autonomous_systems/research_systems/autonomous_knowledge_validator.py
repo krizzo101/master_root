@@ -7,8 +7,6 @@ This system provides autonomous validation of knowledge items using multiple
 validation methods with compound learning optimization.
 """
 
-import json
-import os
 from datetime import datetime
 from typing import Dict, List, Any
 
@@ -161,7 +159,7 @@ class AutonomousKnowledgeValidator:
         elif contradiction_count <= 2 and logical_count > contradiction_count:
             return {
                 "score": 0.6,
-                "evidence": f"Some contradictions but logical flow present",
+                "evidence": "Some contradictions but logical flow present",
             }
         else:
             return {
@@ -325,7 +323,7 @@ def main():
     # Run test
     test_results = test_autonomous_knowledge_validator()
 
-    print(f"\n=== VALIDATION SYSTEM PERFORMANCE ===")
+    print("\n=== VALIDATION SYSTEM PERFORMANCE ===")
     print(f"Success Rate: {test_results['validation_success_rate']:.1%}")
     print(f"Average Score: {test_results['average_score']:.2f}")
     print(f"Items Processed: {test_results['total_items']}")

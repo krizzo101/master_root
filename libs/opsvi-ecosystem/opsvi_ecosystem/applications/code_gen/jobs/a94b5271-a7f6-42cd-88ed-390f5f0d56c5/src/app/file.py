@@ -1,17 +1,18 @@
 """
 File upload/download handler (S3-mock, real usage: boto3 or aioboto3 for AWS S3).
 """
-from fastapi import UploadFile
-from typing import Dict
 import uuid
-from .models import User
+
+from fastapi import UploadFile
+
 from . import config
+from .models import User
 
 # In-memory metadata; real: store in DB and S3
 _FILEMETA = {}
 
 
-async def handle_upload(file: UploadFile, current_user: User) -> Dict:
+async def handle_upload(file: UploadFile, current_user: User) -> dict:
     file_id = str(uuid.uuid4())
     filename = file.filename
     # Just read chunk to "store" (simulate S3 upload)
@@ -22,7 +23,7 @@ async def handle_upload(file: UploadFile, current_user: User) -> Dict:
     return {"file_id": file_id, "url": url}
 
 
-async def get_download_url(file_id: str, current_user: User) -> Dict:
+async def get_download_url(file_id: str, current_user: User) -> dict:
     meta = _FILEMETA.get(file_id)
     if not meta or meta["owner"] != current_user.id:
         raise Exception("Not found or forbidden.")

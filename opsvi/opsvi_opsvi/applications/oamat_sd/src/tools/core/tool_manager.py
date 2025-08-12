@@ -7,7 +7,7 @@ Extracted from mcp_tool_registry.py for better modularity.
 
 import logging
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.applications.oamat_sd.src.models.tool_models import (
     ToolCategory,
@@ -30,11 +30,11 @@ class ToolManager:
 
     def __init__(self):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
-        self.tools: Dict[str, ToolMetadata] = {}
-        self.tool_interfaces: Dict[str, Any] = {}
+        self.tools: dict[str, ToolMetadata] = {}
+        self.tool_interfaces: dict[str, Any] = {}
         self.use_real_clients: bool = False
 
-    def initialize_tools(self, use_real_clients: Optional[bool] = None):
+    def initialize_tools(self, use_real_clients: bool | None = None):
         """Initialize all MCP tools with metadata and interfaces"""
         self.use_real_clients = self._determine_client_mode(use_real_clients)
 
@@ -145,7 +145,7 @@ class ToolManager:
 
         self.logger.info(f"Registered {len(self.tools)} tool metadata definitions")
 
-    def _determine_client_mode(self, use_real_clients: Optional[bool]) -> bool:
+    def _determine_client_mode(self, use_real_clients: bool | None) -> bool:
         """Determine whether to use real or mock MCP clients"""
         # 1. Explicit parameter takes priority
         if use_real_clients is not None:
@@ -261,19 +261,19 @@ class ToolManager:
             f"✅ Mock interfaces initialized for {len(self.tool_interfaces)} tools"
         )
 
-    def get_available_tools(self) -> List[str]:
+    def get_available_tools(self) -> list[str]:
         """Get list of available tool names"""
         return list(self.tools.keys())
 
-    def get_tool_metadata(self, tool_name: str) -> Optional[ToolMetadata]:
+    def get_tool_metadata(self, tool_name: str) -> ToolMetadata | None:
         """Get metadata for a specific tool"""
         return self.tools.get(tool_name)
 
-    def get_tool_interface(self, tool_name: str) -> Optional[Any]:
+    def get_tool_interface(self, tool_name: str) -> Any | None:
         """Get interface for a specific tool"""
         return self.tool_interfaces.get(tool_name)
 
-    def get_tools_by_category(self, category: ToolCategory) -> List[str]:
+    def get_tools_by_category(self, category: ToolCategory) -> list[str]:
         """Get tools filtered by category"""
         return [
             name
@@ -291,7 +291,7 @@ class ToolManager:
             tool.status == ToolStatus.OPERATIONAL and tool_name in self.tool_interfaces
         )
 
-    def get_client_info(self) -> Dict[str, Any]:
+    def get_client_info(self) -> dict[str, Any]:
         """Get information about the current client configuration"""
         return {
             "mode": "real" if self.use_real_clients else "mock",

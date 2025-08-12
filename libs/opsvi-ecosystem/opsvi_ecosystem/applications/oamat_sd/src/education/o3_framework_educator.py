@@ -5,14 +5,14 @@ Provides O3 with comprehensive framework knowledge for dynamic generation.
 Extracted from o3_master_agent.py for better modularity.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 
 class O3FrameworkEducator:
     """Provides O3 with comprehensive framework knowledge for dynamic generation"""
 
     @staticmethod
-    def get_tool_catalog() -> Dict[str, Dict[str, str]]:
+    def get_tool_catalog() -> dict[str, dict[str, str]]:
         """Complete catalog of available MCP tools with capabilities"""
         return {
             "write_file": {
@@ -72,7 +72,7 @@ class O3FrameworkEducator:
         }
 
     @staticmethod
-    def get_framework_architecture() -> Dict[str, Any]:
+    def get_framework_architecture() -> dict[str, Any]:
         """LangGraph framework architecture knowledge for O3"""
         return {
             "langgraph_fundamentals": {
@@ -153,7 +153,7 @@ class O3FrameworkEducator:
         }
 
     @staticmethod
-    def get_prompt_engineering_guidelines() -> Dict[str, Any]:
+    def get_prompt_engineering_guidelines() -> dict[str, Any]:
         """Guidelines for creating effective agent prompts"""
         return {
             "prompt_structure": {
@@ -200,7 +200,7 @@ class O3FrameworkEducator:
         }
 
     @staticmethod
-    def get_best_practices() -> Dict[str, Any]:
+    def get_best_practices() -> dict[str, Any]:
         """Best practices for O3-generated workflows"""
         return {
             "dynamic_generation": {
@@ -247,7 +247,7 @@ class O3FrameworkEducator:
         }
 
     @classmethod
-    def get_comprehensive_framework_knowledge(cls) -> Dict[str, Any]:
+    def get_comprehensive_framework_knowledge(cls) -> dict[str, Any]:
         """Complete framework knowledge package for O3 education"""
         return {
             "tool_catalog": cls.get_tool_catalog(),

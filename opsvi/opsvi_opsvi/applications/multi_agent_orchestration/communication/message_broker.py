@@ -6,10 +6,11 @@ mechanisms for agents to communicate and coordinate.
 """
 
 import asyncio
-from collections import defaultdict, deque
-from datetime import datetime, timedelta
 import logging
-from typing import Any, Callable, Dict, List, Optional, Set
+from collections import defaultdict, deque
+from collections.abc import Callable
+from datetime import datetime, timedelta
+from typing import Any
 
 from ..common.types import CommunicationError, Message, MessageType
 
@@ -32,16 +33,16 @@ class MessageBroker:
             max_queue_size: Maximum messages per agent queue
             message_ttl: Message time-to-live in seconds
         """
-        self._agent_queues: Dict[str, deque] = defaultdict(
+        self._agent_queues: dict[str, deque] = defaultdict(
             lambda: deque(maxlen=max_queue_size)
         )
-        self._subscribers: Dict[MessageType, Set[str]] = defaultdict(set)
-        self._message_handlers: Dict[str, Callable] = {}
+        self._subscribers: dict[MessageType, set[str]] = defaultdict(set)
+        self._message_handlers: dict[str, Callable] = {}
         self._message_history: deque = deque(maxlen=10000)
         self._max_queue_size = max_queue_size
         self._message_ttl = message_ttl
         self._running = False
-        self._cleanup_task: Optional[asyncio.Task] = None
+        self._cleanup_task: asyncio.Task | None = None
 
         logger.info("MessageBroker initialized")
 
@@ -70,7 +71,7 @@ class MessageBroker:
         logger.info("MessageBroker stopped")
 
     def register_agent(
-        self, agent_id: str, message_handler: Optional[Callable] = None
+        self, agent_id: str, message_handler: Callable | None = None
     ) -> None:
         """
         Register an agent with the message broker.
@@ -224,7 +225,7 @@ class MessageBroker:
 
     async def receive_messages(
         self, agent_id: str, max_messages: int = 10
-    ) -> List[Message]:
+    ) -> list[Message]:
         """
         Retrieve messages for a specific agent.
 
@@ -260,7 +261,7 @@ class MessageBroker:
         """
         return len(self._agent_queues.get(agent_id, []))
 
-    def get_registered_agents(self) -> List[str]:
+    def get_registered_agents(self) -> list[str]:
         """
         Get list of all registered agents.
 
@@ -269,7 +270,7 @@ class MessageBroker:
         """
         return list(self._agent_queues.keys())
 
-    def get_message_history(self, limit: int = 100) -> List[Message]:
+    def get_message_history(self, limit: int = 100) -> list[Message]:
         """
         Get recent message history.
 
@@ -329,7 +330,7 @@ class MessageBroker:
                 logger.error(f"Error in message cleanup: {e}")
                 await asyncio.sleep(60)
 
-    def get_statistics(self) -> Dict[str, Any]:
+    def get_statistics(self) -> dict[str, Any]:
         """
         Get message broker statistics.
 

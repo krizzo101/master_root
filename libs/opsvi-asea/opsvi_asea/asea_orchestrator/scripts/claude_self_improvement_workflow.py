@@ -180,8 +180,8 @@ async def main():
 
         print("✅ Self-improvement analysis completed!")
         print(f"📊 Status: {result.get('status', 'Unknown')}")
-        print(f"🔍 Failure Patterns Analyzed: Available")
-        print(f"📋 Behavioral Requirements: Available")
+        print("🔍 Failure Patterns Analyzed: Available")
+        print("📋 Behavioral Requirements: Available")
         print(f"📄 Analysis Report: {result.get('report_path', 'Generated')}")
         print(f"💾 Stored in Database: {result.get('improvement_id', 'Success')}")
 

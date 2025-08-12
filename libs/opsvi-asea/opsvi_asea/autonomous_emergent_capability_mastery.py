@@ -4,7 +4,6 @@ Autonomous Emergent Capability Mastery System
 Phase 6: Master emergent capability development through perfect amplification exploitation
 """
 
-import json
 import sys
 from datetime import datetime
 from typing import Dict, List, Any
@@ -89,7 +88,7 @@ class AutonomousEmergentCapabilityMastery:
                     result = collection_obj.insert(doc)
                     if result:
                         inserted_ids.append(result.get("_id", ""))
-                except Exception as e:
+                except Exception:
                     continue
 
             return inserted_ids

@@ -1,8 +1,9 @@
 """
 Weather service client: Handles external API communication and data transformation for weather information.
 """
+from typing import Any
+
 import requests
-from typing import Any, Dict, Optional
 from flask import current_app
 
 
@@ -25,7 +26,7 @@ def kelvin_to_celsius(kelvin: float) -> float:
     return round(kelvin - 273.15, 1)
 
 
-def fetch_weather(location: str) -> Dict[str, Any]:
+def fetch_weather(location: str) -> dict[str, Any]:
     """
     Fetch current weather data for a given location from OpenWeatherMap API.
     Args:
@@ -35,7 +36,7 @@ def fetch_weather(location: str) -> Dict[str, Any]:
     Raises:
         WeatherAPIError: If any API or connection error occurs.
     """
-    api_key: Optional[str] = current_app.config.get("WEATHER_API_KEY")
+    api_key: str | None = current_app.config.get("WEATHER_API_KEY")
     base_url: str = current_app.config.get("WEATHER_API_URL")
     timeout: int = current_app.config.get("WEATHER_API_TIMEOUT", 5)
 

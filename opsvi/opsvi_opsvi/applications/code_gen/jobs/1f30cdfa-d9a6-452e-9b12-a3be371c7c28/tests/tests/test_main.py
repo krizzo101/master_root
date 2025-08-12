@@ -1,9 +1,7 @@
 import pytest
-from fastapi.testclient import TestClient
+from app.database import Base, SessionLocal, engine
 from app.main import app, get_db
-from app.database import Base, engine, SessionLocal
-from sqlalchemy.orm import Session
-import json
+from fastapi.testclient import TestClient
 
 # Set up test database and client
 Base.metadata.drop_all(bind=engine)
@@ -145,8 +143,8 @@ def test_delete_todo_removes_item_and_returns_204():
     assert resp_get.status_code == 404
 
 
-from starlette.requests import Request
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.requests import Request
 
 
 @pytest.mark.asyncio
@@ -162,10 +160,9 @@ def test_not_found_handler_returns_404_on_404_error():
     assert "detail" in content
 
 
+import pytest
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
-import pytest
-import asyncio
 
 
 @pytest.mark.asyncio
@@ -191,7 +188,6 @@ def test_validation_handler_returns_422_on_validation_error():
     assert b"field required" in response.body
 
 
-from fastapi import Request
 import pytest
 
 
@@ -223,10 +219,8 @@ def test_on_startup_registers_event_and_initializes_db():
     assert hasattr(db, "query")
 
 
-from starlette.requests import Request
-from starlette.responses import Response
 from app.main import LoggingMiddleware
-import asyncio
+from starlette.requests import Request
 
 
 class DummyApp:

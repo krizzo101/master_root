@@ -3,11 +3,11 @@ Error handling middleware for FastAPI.
 Catches all expected/unexpected errors and provides user-friendly, consistent error responses.
 """
 import logging
-from fastapi import FastAPI, Request, HTTPException, status
-from fastapi.responses import JSONResponse
+
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from app.models.todo import MessageResponse
 
 
 def add_exception_handlers(app: FastAPI) -> None:

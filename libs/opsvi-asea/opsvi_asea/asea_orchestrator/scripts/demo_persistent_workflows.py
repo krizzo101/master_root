@@ -8,7 +8,6 @@ import asyncio
 import sys
 import os
 import uuid
-from datetime import datetime, timezone
 
 # Add the src directory to Python path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
@@ -91,7 +90,7 @@ async def demo_workflow_execution():
             workflow_name="demo_persistent_workflow", initial_state=initial_state
         )
 
-        print(f"\n✅ Workflow completed successfully!")
+        print("\n✅ Workflow completed successfully!")
         print(f"Final result: {result}")
 
         return result.get("run_id")
@@ -103,7 +102,7 @@ async def demo_workflow_execution():
 
 async def demo_workflow_resumption(run_id: str):
     """Demonstrate workflow resumption from saved state."""
-    print(f"\n🔄 Demonstrating Workflow Resumption")
+    print("\n🔄 Demonstrating Workflow Resumption")
     print("=" * 60)
 
     # Create new orchestrator instance (simulating restart)
@@ -136,21 +135,21 @@ async def demo_workflow_resumption(run_id: str):
         # Load the saved state
         saved_state = await orchestrator.db_client.load_workflow_state(run_id)
         if saved_state:
-            print(f"✓ Found saved state:")
+            print("✓ Found saved state:")
             print(f"  - Workflow: {saved_state['workflow_name']}")
             print(f"  - Status: {saved_state['status']}")
             print(f"  - Current step: {saved_state['current_step']}")
             print(f"  - State keys: {list(saved_state['state'].keys())}")
 
             # Resume execution (this would continue from where it left off)
-            print(f"\n🎯 Resuming workflow execution...")
+            print("\n🎯 Resuming workflow execution...")
             result = await orchestrator.run_workflow(
                 workflow_name="demo_persistent_workflow",
                 initial_state={},  # Will be ignored since we're resuming
                 run_id=run_id,
             )
 
-            print(f"\n✅ Workflow resumption completed!")
+            print("\n✅ Workflow resumption completed!")
             print(f"Final result: {result}")
 
         else:
@@ -162,7 +161,7 @@ async def demo_workflow_resumption(run_id: str):
 
 async def demo_state_inspection():
     """Demonstrate inspection of saved workflow states."""
-    print(f"\n🔍 Demonstrating State Inspection")
+    print("\n🔍 Demonstrating State Inspection")
     print("=" * 60)
 
     # Connect to database
@@ -207,7 +206,7 @@ async def demo_state_inspection():
         checkpoints = list(cursor)
 
         if checkpoints:
-            print(f"\n📋 Recent checkpoints:")
+            print("\n📋 Recent checkpoints:")
             for checkpoint in checkpoints:
                 print(
                     f"  - {checkpoint['workflow_id']}: {checkpoint['step_name']} ({checkpoint['timestamp']})"
@@ -225,7 +224,7 @@ async def demo_state_inspection():
         history = list(cursor)
 
         if history:
-            print(f"\n📈 Recent execution events:")
+            print("\n📈 Recent execution events:")
             for event in history:
                 print(
                     f"  - {event['workflow_id']}: {event['event_type']} ({event['timestamp']})"

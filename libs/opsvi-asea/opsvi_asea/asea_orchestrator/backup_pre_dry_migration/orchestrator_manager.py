@@ -10,9 +10,7 @@ Based on Celery documentation research:
 - Follows production-ready patterns from Celery docs
 """
 
-import os
 import sys
-import time
 import logging
 import subprocess
 import asyncio

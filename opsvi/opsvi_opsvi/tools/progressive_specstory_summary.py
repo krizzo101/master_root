@@ -168,7 +168,7 @@ def progressive_summary(input_path, output_path, target_summary=1200, r=2.0):
     allocations = geometric_allocation(total_lines, target_summary, sections, r)
     bounds = split_sections(total_lines, sections)
     summary_lines = []
-    for (start, end), max_lines in zip(bounds, allocations):
+    for (start, end), max_lines in zip(bounds, allocations, strict=False):
         summary_lines.extend(extract_section_summary(lines, start, end, max_lines))
     else:
         pass

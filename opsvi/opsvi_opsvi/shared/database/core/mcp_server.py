@@ -6,7 +6,7 @@ Provides agent-friendly tools without AQL complexity
 import asyncio
 import json
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 from cognitive_database import CognitiveDatabase
 from mcp.server import Server
@@ -32,7 +32,7 @@ def get_db():
 
 
 @server.list_tools()
-async def list_tools() -> List[Tool]:
+async def list_tools() -> list[Tool]:
     """List available cognitive query tools"""
     return [
         Tool(
@@ -106,7 +106,7 @@ async def list_tools() -> List[Tool]:
 
 
 @server.call_tool()
-async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
+async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     """Handle tool calls"""
 
     try:

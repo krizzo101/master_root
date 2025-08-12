@@ -5,7 +5,6 @@ Tools for running tests, creating test cases, and ensuring code quality.
 """
 
 import logging
-from typing import Optional
 
 from langchain_core.tools import tool
 
@@ -43,7 +42,7 @@ def create_testing_framework_tools(base_agent=None):
 
     @tool
     def create_test_case(
-        module: str, test_type: str = "unit", requirements: Optional[str] = None
+        module: str, test_type: str = "unit", requirements: str | None = None
     ) -> str:
         """
         Generates a test case for a specific module.

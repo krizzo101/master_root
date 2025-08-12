@@ -7,10 +7,8 @@ This system provides autonomous system evolution capabilities including
 capability integration, system optimization, and autonomous development planning.
 """
 
-import json
-import os
 from datetime import datetime
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any
 
 
 class AutonomousSystemEvolution:
@@ -625,7 +623,7 @@ def main():
     # Run test
     test_results = test_autonomous_system_evolution()
 
-    print(f"\n=== SYSTEM EVOLUTION PERFORMANCE ===")
+    print("\n=== SYSTEM EVOLUTION PERFORMANCE ===")
     assessment = test_results["assessment"]
     execution = test_results["execution_results"]
 

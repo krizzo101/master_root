@@ -1,7 +1,7 @@
 """
 SQLAlchemy models for the Task Management API.
 """
-from sqlalchemy import Column, Integer, String, Boolean, Text
+from sqlalchemy import Boolean, Column, Integer, String, Text
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()

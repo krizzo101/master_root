@@ -2,6 +2,7 @@
 Config class for Flask Weather Application
 """
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()

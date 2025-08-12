@@ -1,13 +1,14 @@
+from unittest.mock import MagicMock
+
 import pytest
 from backend.api import (
-    list_projects,
-    create_project,
-    list_tasks,
-    create_task,
-    schedule_suggest,
     add_comment,
+    create_project,
+    create_task,
+    list_projects,
+    list_tasks,
+    schedule_suggest,
 )
-from unittest.mock import AsyncMock, MagicMock
 
 
 @pytest.mark.asyncio

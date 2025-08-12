@@ -3,7 +3,6 @@ import json
 import logging
 import os
 import sys
-from typing import Optional
 
 import openai
 
@@ -108,7 +107,7 @@ def main() -> None:
     """The main function that runs the prompt expansion script."""
     setup_logging()
     args = parse_arguments()
-    user_prompt: Optional[str] = None
+    user_prompt: str | None = None
     if args.json:
         try:
             with open(args.json, encoding="utf-8") as f:

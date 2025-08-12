@@ -1,8 +1,7 @@
-import pytest
-import sys
-import io
-import csv_reporter.cli as cli
 from unittest import mock
+
+import csv_reporter.cli as cli
+import pytest
 
 
 @pytest.fixture

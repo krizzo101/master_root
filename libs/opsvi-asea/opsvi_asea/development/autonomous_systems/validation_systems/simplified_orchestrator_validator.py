@@ -18,8 +18,7 @@ import json
 import os
 import sys
 from datetime import datetime
-from typing import Dict, List, Any, Optional
-from pathlib import Path
+from typing import Dict, List, Any
 
 # Add orchestrator to path
 sys.path.append("/home/opsvi/asea/asea_orchestrator/src")
@@ -332,7 +331,7 @@ class SimplifiedOrchestratorValidator:
         score = validation_results["final_validation_score"]
 
         summary_parts = [
-            f"🤖 SIMPLIFIED ORCHESTRATOR-ENHANCED VALIDATION",
+            "🤖 SIMPLIFIED ORCHESTRATOR-ENHANCED VALIDATION",
             f"Final Validation Score: {score:.1f}/100",
             "",
         ]

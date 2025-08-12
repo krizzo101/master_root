@@ -2,13 +2,13 @@
 Business logic and in-memory data operations for todo items.
 Thread-safe for concurrency.
 """
-from typing import List, Optional, Dict
-from datetime import datetime
-import asyncio
 import logging
-from app.models.todo import TodoItemCreate, TodoItemUpdate, TodoItemModel
-from fastapi import HTTPException, status, Depends
+from datetime import datetime
 from threading import Lock
+
+from fastapi import HTTPException, status
+
+from app.models.todo import TodoItemCreate, TodoItemModel, TodoItemUpdate
 
 
 class InMemoryTodoStore:
@@ -17,7 +17,7 @@ class InMemoryTodoStore:
     """
 
     def __init__(self):
-        self._store: Dict[int, TodoItemModel] = {}
+        self._store: dict[int, TodoItemModel] = {}
         self._id_counter: int = 1
         self._lock: Lock = Lock()
 
@@ -37,12 +37,12 @@ class InMemoryTodoStore:
             self._id_counter += 1
             return item_obj
 
-    def list(self) -> List[TodoItemModel]:
+    def list(self) -> list[TodoItemModel]:
         with self._lock:
             # Return sorted by creation time, recently added last
-            return list(sorted(self._store.values(), key=lambda x: x.created_at))
+            return sorted(self._store.values(), key=lambda x: x.created_at)
 
-    def get(self, item_id: int) -> Optional[TodoItemModel]:
+    def get(self, item_id: int) -> TodoItemModel | None:
         with self._lock:
             return self._store.get(item_id)
 
@@ -91,7 +91,7 @@ class TodoService:
     async def create_item(self, item: TodoItemCreate) -> TodoItemModel:
         return self.store.create(item)
 
-    async def list_items(self) -> List[TodoItemModel]:
+    async def list_items(self) -> list[TodoItemModel]:
         return self.store.list()
 
     async def get_item(self, item_id: int) -> TodoItemModel:

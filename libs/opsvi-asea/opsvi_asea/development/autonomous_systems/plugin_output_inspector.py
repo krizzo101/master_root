@@ -36,10 +36,10 @@ def inspect_plugin_outputs():
     print("\n" + "=" * 50)
     print("DETAILED PLUGIN OUTPUTS:")
 
-    print(f"\nFull Result Structure:")
+    print("\nFull Result Structure:")
     print(json.dumps(result, indent=2))
 
-    print(f"\n🔍 ANALYSIS:")
+    print("\n🔍 ANALYSIS:")
     print(f"Enhancement Applied: {result.get('cognitive_enhancement_applied', False)}")
 
     budget_analysis = result.get("budget_analysis", {})

@@ -11,7 +11,6 @@ This is equivalent to running the installed package with:
 
 import sys
 import os
-from pathlib import Path
 
 # Add the src directory to the path so imports work correctly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))

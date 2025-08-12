@@ -3,7 +3,8 @@ Configure Flask-Admin views for all models.
 """
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user
-from .models import User, Post, Image, Category, Tag
+
+from .models import Category, Image, Post, Tag, User
 
 
 class SecureModelView(ModelView):

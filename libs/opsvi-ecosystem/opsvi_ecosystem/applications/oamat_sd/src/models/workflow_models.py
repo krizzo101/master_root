@@ -5,12 +5,11 @@ Data models, enums, and validation functions for O3-driven workflow specificatio
 Extracted from smart_decomposition_agent.py for better modularity.
 """
 
-from enum import Enum
-from pathlib import Path
-
 # Import StrictBaseModel for OpenAI compatibility
 import sys
-from typing import Annotated, Any, Dict, List, Optional, TypedDict
+from enum import Enum
+from pathlib import Path
+from typing import Annotated, Any, TypedDict
 
 from pydantic import BaseModel, Field
 
@@ -39,9 +38,9 @@ class ToolSpecification(StrictBaseModel):
 
     tool_name: str = Field(description="Exact MCP tool name")
     # NO FALLBACKS RULE: Tool parameters must be explicitly provided
-    parameters: Dict[str, str] = Field(description="Tool configuration parameters")
+    parameters: dict[str, str] = Field(description="Tool configuration parameters")
     usage_context: str = Field(description="When and how this tool should be used")
-    expected_outputs: List[str] = Field(description="Expected tool outputs and formats")
+    expected_outputs: list[str] = Field(description="Expected tool outputs and formats")
 
 
 class FileDeliverable(StrictBaseModel):
@@ -50,7 +49,7 @@ class FileDeliverable(StrictBaseModel):
     filename: str = Field(description="Exact filename with extension")
     file_type: str = Field(description="File type (code, documentation, config, etc.)")
     content_requirements: str = Field(description="Detailed content requirements")
-    validation_criteria: List[str] = Field(
+    validation_criteria: list[str] = Field(
         description="Criteria for validating file quality"
     )
 
@@ -66,11 +65,11 @@ class AgentSpecification(StrictBaseModel):
     complete_prompt: str = Field(
         description="Complete executable prompt for this agent"
     )
-    tools: List[ToolSpecification] = Field(description="Tools this agent can use")
-    required_deliverables: List[FileDeliverable] = Field(
+    tools: list[ToolSpecification] = Field(description="Tools this agent can use")
+    required_deliverables: list[FileDeliverable] = Field(
         description="Files this agent must create"
     )
-    success_criteria: List[str] = Field(
+    success_criteria: list[str] = Field(
         description="Criteria for successful completion"
     )
     # NO FALLBACKS RULE: Max iterations must be explicitly provided
@@ -92,7 +91,7 @@ class RoutingCondition(StrictBaseModel):
     condition_value: str = Field(description="Value to check against")
     next_agent: str = Field(description="Agent ID to route to if condition is met")
     # NO FALLBACKS RULE: State updates must be explicitly provided
-    state_updates: Dict[str, str] = Field(description="State updates to apply")
+    state_updates: dict[str, str] = Field(description="State updates to apply")
 
 
 class WorkflowNode(StrictBaseModel):
@@ -101,26 +100,26 @@ class WorkflowNode(StrictBaseModel):
     node_id: str = Field(description="Unique node identifier")
     agent_id: str = Field(description="Agent to execute at this node")
     execution_mode: ExecutionMode = Field(description="How this node executes")
-    routing_conditions: List[RoutingCondition] = Field(
+    routing_conditions: list[RoutingCondition] = Field(
         description="Conditions for routing after execution"
     )
     # NO FALLBACKS RULE: Parallel nodes must be explicitly provided
-    parallel_nodes: List[str] = Field(description="Nodes that can execute in parallel")
-    required_inputs: List[str] = Field(
+    parallel_nodes: list[str] = Field(description="Nodes that can execute in parallel")
+    required_inputs: list[str] = Field(
         description="Required state inputs for this node"
     )
-    output_mappings: Dict[str, str] = Field(description="How to map outputs to state")
+    output_mappings: dict[str, str] = Field(description="How to map outputs to state")
 
 
 class StateManagement(StrictBaseModel):
     """Complete state management specification"""
 
-    initial_state: Dict[str, str] = Field(description="Initial workflow state")
-    state_schema: Dict[str, str] = Field(
+    initial_state: dict[str, str] = Field(description="Initial workflow state")
+    state_schema: dict[str, str] = Field(
         description="Expected state structure and types"
     )
-    persistence_rules: List[str] = Field(description="How state should be persisted")
-    validation_rules: List[str] = Field(description="State validation requirements")
+    persistence_rules: list[str] = Field(description="How state should be persisted")
+    validation_rules: list[str] = Field(description="State validation requirements")
 
 
 class ErrorHandling(StrictBaseModel):
@@ -128,9 +127,9 @@ class ErrorHandling(StrictBaseModel):
 
     error_type: str = Field(description="Type of error this handles")
     recovery_strategy: str = Field(description="How to recover from this error")
-    fallback_agent: Optional[str] = Field(description="Agent to fallback to if any")
+    fallback_agent: str | None = Field(description="Agent to fallback to if any")
     max_retries: int = Field(description="Maximum retry attempts")
-    escalation_conditions: List[str] = Field(description="When to escalate to O3")
+    escalation_conditions: list[str] = Field(description="When to escalate to O3")
 
 
 class WorkflowSpecification(StrictBaseModel):
@@ -138,18 +137,18 @@ class WorkflowSpecification(StrictBaseModel):
 
     workflow_id: str = Field(description="Unique workflow identifier")
     workflow_description: str = Field(description="High-level workflow description")
-    agents: List[AgentSpecification] = Field(description="All agents in this workflow")
-    execution_graph: List[WorkflowNode] = Field(description="Complete execution flow")
+    agents: list[AgentSpecification] = Field(description="All agents in this workflow")
+    execution_graph: list[WorkflowNode] = Field(description="Complete execution flow")
     state_management: StateManagement = Field(
         description="State management configuration"
     )
-    success_criteria: List[str] = Field(description="Overall workflow success criteria")
-    deliverables: List[FileDeliverable] = Field(
+    success_criteria: list[str] = Field(description="Overall workflow success criteria")
+    deliverables: list[FileDeliverable] = Field(
         description="Final deliverables expected"
     )
-    error_handling: List[ErrorHandling] = Field(description="Error handling strategies")
+    error_handling: list[ErrorHandling] = Field(description="Error handling strategies")
     estimated_duration: str = Field(description="Estimated execution time")
-    performance_requirements: List[str] = Field(
+    performance_requirements: list[str] = Field(
         description="Performance optimization requirements"
     )
 
@@ -165,13 +164,13 @@ class ReasoningAnalysis(StrictBaseModel):
     workflow_specification: WorkflowSpecification = Field(
         description="Complete workflow architecture"
     )
-    adaptive_capabilities: List[str] = Field(
+    adaptive_capabilities: list[str] = Field(
         description="How workflow can adapt during execution"
     )
-    resource_requirements: Dict[str, str] = Field(
+    resource_requirements: dict[str, str] = Field(
         description="Computational and time requirements"
     )
-    risk_assessment: List[str] = Field(
+    risk_assessment: list[str] = Field(
         description="Potential risks and mitigation strategies"
     )
 
@@ -214,7 +213,7 @@ AVAILABLE_MCP_TOOLS = {
 # ================================
 
 
-def validate_agent_specification(agent_spec: AgentSpecification) -> List[str]:
+def validate_agent_specification(agent_spec: AgentSpecification) -> list[str]:
     """Validate that O3's agent specification is safe and executable"""
     errors = []
 
@@ -237,7 +236,7 @@ def validate_agent_specification(agent_spec: AgentSpecification) -> List[str]:
     return errors
 
 
-def validate_workflow_specification(workflow_spec: WorkflowSpecification) -> List[str]:
+def validate_workflow_specification(workflow_spec: WorkflowSpecification) -> list[str]:
     """Validate that O3's workflow specification is executable"""
     errors = []
 
@@ -262,8 +261,8 @@ def validate_workflow_specification(workflow_spec: WorkflowSpecification) -> Lis
 
 # State Reducers for LangGraph Concurrent Updates
 def merge_agent_outputs(
-    existing: Dict[str, Any], new: Dict[str, Any]
-) -> Dict[str, Any]:
+    existing: dict[str, Any], new: dict[str, Any]
+) -> dict[str, Any]:
     """Merge agent outputs from multiple parallel agents"""
     if existing is None:
         existing = {}
@@ -275,7 +274,7 @@ def merge_agent_outputs(
     return merged
 
 
-def merge_context(existing: Dict[str, Any], new: Dict[str, Any]) -> Dict[str, Any]:
+def merge_context(existing: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
     """Merge context updates from multiple agents"""
     if existing is None:
         existing = {}
@@ -286,7 +285,7 @@ def merge_context(existing: Dict[str, Any], new: Dict[str, Any]) -> Dict[str, An
     return merged
 
 
-def merge_errors(existing: List[str], new: List[str]) -> List[str]:
+def merge_errors(existing: list[str], new: list[str]) -> list[str]:
     """Merge error lists from multiple agents"""
     if existing is None:
         existing = []
@@ -300,23 +299,23 @@ class SmartDecompositionState(TypedDict):
     """State for Smart Decomposition workflow - TypedDict for LangGraph compatibility"""
 
     user_request: str
-    project_name: Optional[str]
-    project_path: Optional[str]
-    complexity_analysis: Optional[Dict[str, Any]]
-    workflow_plan: Optional[Dict[str, Any]]
-    specialized_agents: Optional[Dict[str, Any]]  # Dict for Send API
+    project_name: str | None
+    project_path: str | None
+    complexity_analysis: dict[str, Any] | None
+    workflow_plan: dict[str, Any] | None
+    specialized_agents: dict[str, Any] | None  # Dict for Send API
     agent_outputs: Annotated[
-        Dict[str, Any], merge_agent_outputs
+        dict[str, Any], merge_agent_outputs
     ]  # Reducer for parallel updates
-    final_solution: Optional[Dict[str, Any]]
-    context: Annotated[Dict[str, Any], merge_context]  # Reducer for context updates
-    errors: Annotated[List[str], merge_errors]  # Reducer for error aggregation
+    final_solution: dict[str, Any] | None
+    context: Annotated[dict[str, Any], merge_context]  # Reducer for context updates
+    errors: Annotated[list[str], merge_errors]  # Reducer for error aggregation
     # Dynamic pipeline fields
-    pipeline_design: Optional[Dict[str, Any]]
-    pipeline_results: Optional[Dict[str, Any]]
-    workflow_specification: Optional[Dict[str, Any]]
+    pipeline_design: dict[str, Any] | None
+    pipeline_results: dict[str, Any] | None
+    workflow_specification: dict[str, Any] | None
     # Send API support
-    current_agent_role: Optional[str]  # Track current agent for Send API
+    current_agent_role: str | None  # Track current agent for Send API
 
 
 # Request Analysis Models
@@ -324,10 +323,10 @@ class ComplexityAnalysis(BaseModel):
     """O3 reasoning output for request complexity analysis"""
 
     complexity_score: int = Field(description="0-100 complexity rating")
-    required_capabilities: List[str] = Field(
+    required_capabilities: list[str] = Field(
         description="List of required capabilities"
     )
-    recommended_agents: List[str] = Field(description="Recommended specialist agents")
+    recommended_agents: list[str] = Field(description="Recommended specialist agents")
     execution_strategy: str = Field(description="Sequential or parallel execution")
     estimated_steps: int = Field(description="Number of workflow steps")
 
@@ -335,7 +334,7 @@ class ComplexityAnalysis(BaseModel):
 class SolutionOutput(BaseModel):
     """Final solution output"""
 
-    artifacts: List[Dict[str, Any]] = Field(description="Generated files and outputs")
+    artifacts: list[dict[str, Any]] = Field(description="Generated files and outputs")
     execution_summary: str = Field(description="Summary of execution process")
-    performance_metrics: Dict[str, Any] = Field(description="Performance statistics")
-    quality_assessment: Dict[str, Any] = Field(description="Quality metrics")
+    performance_metrics: dict[str, Any] = Field(description="Performance statistics")
+    quality_assessment: dict[str, Any] = Field(description="Quality metrics")

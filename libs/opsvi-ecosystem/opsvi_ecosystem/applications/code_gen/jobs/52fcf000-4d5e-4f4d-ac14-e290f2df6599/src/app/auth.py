@@ -3,17 +3,17 @@ Authentication and authorization (JWT, password hashing, current user dep).
 """
 import logging
 from datetime import datetime, timedelta
-from typing import Optional
-from jose import jwt, JWTError
-from fastapi import APIRouter, HTTPException, Depends, status, Request
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.models import User
 from app.db import get_db
-from app.schemas import UserCreate, UserLogin, UserRead, Token
+from app.models import User
+from app.schemas import Token, UserCreate, UserRead
 
 router = APIRouter()
 logger = logging.getLogger("auth")
@@ -33,9 +33,7 @@ def get_password_hash(password: str) -> str:
 
 
 # JWT token utils
-def create_access_token(
-    subject: dict, expires_delta: Optional[timedelta] = None
-) -> str:
+def create_access_token(subject: dict, expires_delta: timedelta | None = None) -> str:
     """Generate JWT token (user claims)."""
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -51,7 +49,7 @@ def create_access_token(
     return encoded_jwt
 
 
-def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
+def authenticate_user(db: Session, email: str, password: str) -> User | None:
     """Authenticate a user by email/password."""
     user = db.query(User).filter(User.email == email).first()
     if not user:

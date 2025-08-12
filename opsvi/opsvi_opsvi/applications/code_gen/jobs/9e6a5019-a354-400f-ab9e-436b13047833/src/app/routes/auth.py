@@ -1,12 +1,12 @@
 """
 User authentication routes: registration, login, logout, profile.
 """
-from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import RegistrationForm, LoginForm
-from app.models import User
-from app import db, bcrypt
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required, login_user, logout_user
 
+from app import bcrypt, db
+from app.forms import LoginForm, RegistrationForm
+from app.models import User
 
 auth_bp = Blueprint("auth", __name__)
 

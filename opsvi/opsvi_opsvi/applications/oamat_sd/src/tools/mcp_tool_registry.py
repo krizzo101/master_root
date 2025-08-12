@@ -6,7 +6,7 @@ Coordinates specialized modules for tool management, execution, and health monit
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.applications.oamat_sd.src.models.tool_models import (
     ParallelExecutionResult,
@@ -31,7 +31,7 @@ class MCPToolRegistry:
     4. Error Recovery -> Graceful degradation and alternatives
     """
 
-    def __init__(self, use_real_clients: Optional[bool] = None):
+    def __init__(self, use_real_clients: bool | None = None):
         """Initialize the MCP Tool Registry with all modular components"""
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
@@ -157,16 +157,16 @@ class MCPToolRegistry:
         )
 
     async def execute_tools_parallel(
-        self, tool_requests: List[Dict[str, Any]]
+        self, tool_requests: list[dict[str, Any]]
     ) -> ParallelExecutionResult:
         """Execute multiple tool methods in parallel"""
         return await self.execution_engine.execute_tools_parallel(tool_requests)
 
-    def get_available_tools(self) -> List[str]:
+    def get_available_tools(self) -> list[str]:
         """Get list of available tool names"""
         return self.tool_manager.get_available_tools()
 
-    def get_tools_by_category(self, category: ToolCategory) -> List[str]:
+    def get_tools_by_category(self, category: ToolCategory) -> list[str]:
         """Get tools filtered by category"""
         return self.tool_manager.get_tools_by_category(category)
 
@@ -174,15 +174,15 @@ class MCPToolRegistry:
         """Check if a tool is available and operational"""
         return self.tool_manager.check_tool_availability(tool_name)
 
-    async def perform_health_check(self, tool_name: str) -> Dict[str, Any]:
+    async def perform_health_check(self, tool_name: str) -> dict[str, Any]:
         """Perform health check for a specific tool"""
         return await self.health_monitor.perform_health_check(tool_name)
 
-    async def perform_health_check_all(self) -> Dict[str, Any]:
+    async def perform_health_check_all(self) -> dict[str, Any]:
         """Perform health check for all tools"""
         return await self.health_monitor.perform_health_check_all()
 
-    def get_performance_metrics(self) -> Dict[str, Any]:
+    def get_performance_metrics(self) -> dict[str, Any]:
         """Get performance metrics for all tools"""
         return self.health_monitor.get_performance_metrics()
 
@@ -190,11 +190,11 @@ class MCPToolRegistry:
         """Reset performance metrics for all tools"""
         self.health_monitor.reset_metrics()
 
-    async def graceful_degradation(self, failed_tools: List[str]) -> Dict[str, str]:
+    async def graceful_degradation(self, failed_tools: list[str]) -> dict[str, str]:
         """Handle graceful degradation when tools fail"""
         return await self.health_monitor.graceful_degradation(failed_tools)
 
-    def get_client_info(self) -> Dict[str, Any]:
+    def get_client_info(self) -> dict[str, Any]:
         """Get information about the current client configuration"""
         return self.tool_manager.get_client_info()
 
@@ -202,7 +202,7 @@ class MCPToolRegistry:
         """Create an adapter for ResearchWorkflowTool compatibility"""
         return self.RegistryAdapter(self)
 
-    def get_capabilities(self) -> Dict[str, Any]:
+    def get_capabilities(self) -> dict[str, Any]:
         """Return the capabilities of this MCP tool registry"""
         return {
             "registry_name": "MCP Tool Registry",
@@ -229,7 +229,7 @@ class MCPToolRegistry:
 
 # Factory function to match the interface expected by smart_decomposition_agent.py
 def create_mcp_tool_registry(
-    use_real_clients: Optional[bool] = None,
+    use_real_clients: bool | None = None,
 ) -> MCPToolRegistry:
     """Factory function to create and return an MCP tool registry instance.
 

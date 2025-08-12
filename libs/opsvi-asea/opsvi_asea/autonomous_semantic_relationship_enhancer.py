@@ -4,11 +4,9 @@ Autonomous Semantic Relationship Enhancer
 Phase 2: Build compound learning through cross-domain semantic relationships
 """
 
-import json
 import sys
 from datetime import datetime
-from typing import Dict, List, Any, Tuple
-import re
+from typing import Dict, List, Any
 import itertools
 
 # Database configuration

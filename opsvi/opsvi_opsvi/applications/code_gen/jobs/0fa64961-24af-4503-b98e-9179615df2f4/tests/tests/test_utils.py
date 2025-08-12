@@ -1,7 +1,6 @@
-import pytest
-import csv_reporter.utils as utils
-import io
 import sys
+
+import csv_reporter.utils as utils
 
 
 def test_print_progress_bar_context_manager_behavior():

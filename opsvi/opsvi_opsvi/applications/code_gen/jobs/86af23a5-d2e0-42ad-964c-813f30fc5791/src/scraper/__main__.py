@@ -5,14 +5,13 @@ Main Execution Script
 """
 import logging
 import sys
-from typing import List, Dict
 
 from .config import load_config
-from .url_handler import parse_args, normalize_and_validate_urls
-from .robots_checker import RobotsChecker
 from .downloader import Downloader
-from .parser import HeadlineExtractor
 from .output_writer import write_headlines
+from .parser import HeadlineExtractor
+from .robots_checker import RobotsChecker
+from .url_handler import normalize_and_validate_urls, parse_args
 
 
 def setup_logging():
@@ -24,8 +23,8 @@ def setup_logging():
 
 
 def aggregate_headlines(
-    urls: List[str], config: dict, output_fmt: str, output_file: str
-) -> List[Dict[str, str]]:
+    urls: list[str], config: dict, output_fmt: str, output_file: str
+) -> list[dict[str, str]]:
     """
     Orchestrates scraping workflow and aggregates all headlines.
     Returns:

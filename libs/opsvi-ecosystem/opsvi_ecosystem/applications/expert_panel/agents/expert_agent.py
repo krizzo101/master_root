@@ -1,9 +1,8 @@
 import logging
-from typing import Optional
 
 
 class ExpertAgent:
-    def __init__(self, name, specialty, system_message: Optional[str] = None):
+    def __init__(self, name, specialty, system_message: str | None = None):
         self.name = name
         self.specialty = specialty
         self.memory = []
@@ -58,7 +57,7 @@ class ExpertAgent:
 
 
 class MLExpert(ExpertAgent):
-    def __init__(self, system_message: Optional[str] = None):
+    def __init__(self, system_message: str | None = None):
         super().__init__(
             name="MLExpert",
             specialty="Machine Learning",
@@ -68,7 +67,7 @@ class MLExpert(ExpertAgent):
 
 
 class StatsExpert(ExpertAgent):
-    def __init__(self, system_message: Optional[str] = None):
+    def __init__(self, system_message: str | None = None):
         super().__init__(
             name="StatsExpert",
             specialty="Statistics",
@@ -78,7 +77,7 @@ class StatsExpert(ExpertAgent):
 
 
 class EthicsExpert(ExpertAgent):
-    def __init__(self, system_message: Optional[str] = None):
+    def __init__(self, system_message: str | None = None):
         super().__init__(
             name="EthicsExpert",
             specialty="Ethics",

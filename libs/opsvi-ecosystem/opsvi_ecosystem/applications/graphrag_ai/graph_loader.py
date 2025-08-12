@@ -8,7 +8,6 @@ Requires: openai (pip install openai), OPENAI_API_KEY env variable.
 import csv
 import json
 import os
-from typing import List
 
 import networkx as nx
 import openai
@@ -51,7 +50,7 @@ def load_graph_from_neo4j(uri: str, user: str, password: str) -> nx.Graph:
 
 def embed_text_openai(
     text: str, model: str = "text-embedding-3-large", dimensions: int = 1536
-) -> List[float]:
+) -> list[float]:
     """Embed text using OpenAI's embedding API (configurable model/dimensions)."""
     if not os.getenv("OPENAI_API_KEY"):
         raise RuntimeError("OPENAI_API_KEY not set")
@@ -66,7 +65,7 @@ def chunk_markdown(
     chunk_size: int = 300,
     overlap: int = 50,
     encoding_name: str = "cl100k_base",
-) -> List[str]:
+) -> list[str]:
     """Chunk markdown text into segments of chunk_size tokens with overlap using tiktoken."""
     enc = tiktoken.get_encoding(encoding_name)
     tokens = enc.encode(text)

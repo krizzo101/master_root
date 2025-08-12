@@ -4,14 +4,13 @@ Sequential Thinking MCP Client - Complex Problem Solving via MCP
 """
 
 import asyncio
-from contextlib import asynccontextmanager
-from dataclasses import dataclass, field
 import json
 import logging
 import os
-from pathlib import Path
 import sys
-from typing import Dict, List, Optional
+from contextlib import asynccontextmanager
+from dataclasses import dataclass, field
+from pathlib import Path
 
 # MCP imports
 try:
@@ -37,9 +36,9 @@ class ThoughtStep:
     thought_number: int
     thought: str
     is_revision: bool = False
-    revises_thought: Optional[int] = None
-    branch_from_thought: Optional[int] = None
-    branch_id: Optional[str] = None
+    revises_thought: int | None = None
+    branch_from_thought: int | None = None
+    branch_id: str | None = None
 
 
 @dataclass
@@ -47,7 +46,7 @@ class ThinkingSession:
     """Represents a complete thinking session."""
 
     problem: str
-    thoughts: List[ThoughtStep] = field(default_factory=list)
+    thoughts: list[ThoughtStep] = field(default_factory=list)
     total_thoughts: int = 0
     completed: bool = False
     final_answer: str = ""
@@ -56,11 +55,11 @@ class ThinkingSession:
 class SequentialThinkingMCPClient:
     """Client for interacting with Sequential Thinking MCP server."""
 
-    def __init__(self, mcp_config_path: Optional[str] = None, debug: bool = False):
+    def __init__(self, mcp_config_path: str | None = None, debug: bool = False):
         """Initialize the Sequential Thinking MCP client."""
         self.mcp_config_path = mcp_config_path or ".cursor/mcp.json"
         self.debug = debug
-        self.active_sessions: Dict[str, ThinkingSession] = {}
+        self.active_sessions: dict[str, ThinkingSession] = {}
 
         logging.basicConfig(
             level=logging.DEBUG if debug else logging.INFO,

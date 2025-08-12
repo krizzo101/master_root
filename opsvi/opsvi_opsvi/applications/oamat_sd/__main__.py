@@ -6,8 +6,8 @@ Enables running with: python -m src.applications.oamat_sd
 """
 
 import asyncio
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Add project root to path for absolute imports
 project_root = Path(__file__).parents[3]

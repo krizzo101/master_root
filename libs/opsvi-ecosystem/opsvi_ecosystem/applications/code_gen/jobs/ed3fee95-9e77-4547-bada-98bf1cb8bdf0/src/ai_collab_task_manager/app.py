@@ -1,47 +1,42 @@
 import logging
-from flask import (
-    Flask,
-    render_template,
-    redirect,
-    url_for,
-    request,
-    session,
-    flash,
-    abort,
-)
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import (
-    LoginManager,
-    login_user,
-    logout_user,
-    login_required,
-    current_user,
-    UserMixin,
-)
-from flask_wtf.csrf import CSRFProtect
-from flask_bcrypt import Bcrypt
-from flask_socketio import SocketIO, emit, join_room, leave_room
 from datetime import datetime
 from typing import Any
-from openai import OpenAI
-import os
+
 from dotenv import load_dotenv
-from .config import Config
-from .forms import LoginForm, RegisterForm, TaskForm, CommentForm
-from .models import (
-    db,
-    User,
-    Team,
-    Task,
-    TaskAssignment,
-    Comment,
-    TimeEntry,
-    Notification,
+from flask import (
+    Flask,
+    abort,
+    flash,
+    redirect,
+    render_template,
+    url_for,
 )
+from flask_bcrypt import Bcrypt
+from flask_login import (
+    LoginManager,
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
+from flask_socketio import SocketIO, join_room, leave_room
+from flask_wtf.csrf import CSRFProtect
+
 from .ai_service import AIService
-from .calendar import GoogleCalendarService
-from .reporting import ReportingService
 from .audit_log import audit_log_event
+from .calendar import GoogleCalendarService
+from .config import Config
+from .forms import CommentForm, LoginForm, RegisterForm, TaskForm
+from .models import (
+    Comment,
+    Notification,
+    Task,
+    Team,
+    TimeEntry,
+    User,
+    db,
+)
+from .reporting import ReportingService
 
 # --- Logging Setup ---
 logging.basicConfig(level=logging.INFO)
@@ -306,7 +301,7 @@ def sync_calendar():
     try:
         synced = calendar_service.sync_user_tasks(current_user)
         flash(f'Calendar synced! {"Success" if synced else "No update"}', "success")
-    except Exception as e:
+    except Exception:
         logger.exception("Calendar sync failed")
         flash("Failed to sync calendar", "danger")
     return redirect(url_for("dashboard"))

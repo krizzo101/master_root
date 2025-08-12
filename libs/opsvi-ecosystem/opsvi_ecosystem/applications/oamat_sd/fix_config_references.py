@@ -12,9 +12,9 @@ Usage:
     python fix_config_references.py
 """
 
-from pathlib import Path
 import re
 import sys
+from pathlib import Path
 
 
 class ConfigReferenceFixer:

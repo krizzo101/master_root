@@ -6,10 +6,10 @@ Extracted from mcp_tool_registry.py for better modularity.
 """
 
 import asyncio
-from datetime import datetime
 import logging
 import time
-from typing import Any, Dict, List
+from datetime import datetime
+from typing import Any
 
 from src.applications.oamat_sd.src.config.config_manager import ConfigManager
 from src.applications.oamat_sd.src.models.tool_models import ToolStatus
@@ -79,7 +79,7 @@ class ToolHealthMonitor:
 
             self.logger.debug(f"❌ Recorded failure for {tool_name}: {error_message}")
 
-    async def perform_health_check(self, tool_name: str) -> Dict[str, Any]:
+    async def perform_health_check(self, tool_name: str) -> dict[str, Any]:
         """Perform health check for a specific tool"""
         self.logger.info(f"🏥 Performing health check for {tool_name}")
 
@@ -135,7 +135,7 @@ class ToolHealthMonitor:
                 "timestamp": datetime.now().isoformat(),
             }
 
-    async def perform_health_check_all(self) -> Dict[str, Any]:
+    async def perform_health_check_all(self) -> dict[str, Any]:
         """Perform health check for all tools"""
         self.logger.info("🏥 Performing health check for all tools")
 
@@ -206,7 +206,7 @@ class ToolHealthMonitor:
 
         return overall_health
 
-    def get_performance_metrics(self) -> Dict[str, Any]:
+    def get_performance_metrics(self) -> dict[str, Any]:
         """Get performance metrics for all tools"""
         all_tools = self.tool_manager.get_available_tools()
         tool_metrics = {}
@@ -273,7 +273,7 @@ class ToolHealthMonitor:
 
         self.logger.info("🔄 Reset performance metrics for all tools")
 
-    async def graceful_degradation(self, failed_tools: List[str]) -> Dict[str, str]:
+    async def graceful_degradation(self, failed_tools: list[str]) -> dict[str, str]:
         """Handle graceful degradation when tools fail"""
         alternatives = {}
 

@@ -1,6 +1,6 @@
 import pytest
 from app import create_app, db
-from app.models import User, Post, Category, Tag
+from app.models import Category, Post, Tag, User
 
 
 @pytest.fixture

@@ -1,23 +1,13 @@
-import pytest
-from starlette.testclient import TestClient
+from app.main import app
 from app.views import (
     require_auth,
-    home,
-    signup_get,
-    signup_post,
-    login_get,
-    login_post,
-    logout,
-    dashboard,
-    view_report,
 )
-from app.main import app
+from starlette.testclient import TestClient
 
 client = TestClient(app)
 
 
 def test_require_auth_redirects_to_login_if_unauthenticated():
-    from starlette.requests import Request
     from starlette.responses import RedirectResponse
 
     class DummyRequest:

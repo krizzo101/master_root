@@ -104,19 +104,19 @@ async def demonstrate_working_ai_coordination():
             },
         )
 
-        print(f"\n✅ WORKFLOW COMPLETED SUCCESSFULLY!")
+        print("\n✅ WORKFLOW COMPLETED SUCCESSFULLY!")
         print(f"Status: {result.get('success', 'Unknown')}")
 
         # Display meaningful results
         if "budget_result" in result:
-            print(f"\n💰 Budget Analysis:")
+            print("\n💰 Budget Analysis:")
             budget_data = result["budget_result"]
             if isinstance(budget_data, dict):
                 for key, value in budget_data.items():
                     print(f"   {key}: {value}")
 
         if "intelligence_result" in result:
-            print(f"\n🧠 Workflow Intelligence:")
+            print("\n🧠 Workflow Intelligence:")
             intel_data = result["intelligence_result"]
             if isinstance(intel_data, dict):
                 for key, value in intel_data.items():
@@ -125,7 +125,7 @@ async def demonstrate_working_ai_coordination():
                     else:
                         print(f"   {key}: {value}")
 
-        print(f"\n📊 Complete Results:")
+        print("\n📊 Complete Results:")
         for key, value in result.items():
             if key not in ["demo_purpose", "expected_outcome", "run_id"]:
                 print(f"   {key}: {type(value).__name__}")

@@ -25,12 +25,10 @@ Original implementation preserved below for backwards compatibility.
 # @execution_wrapper(validate_input=True, log_execution=True)
 
 from typing import List, Any, Optional, Dict
-import os
 import asyncio
-import logging
 
 from mcp.client.session import ClientSession
-from mcp.client.stdio import StdioServerParameters, stdio_client
+from mcp.client.stdio import StdioServerParameters
 
 from asea_orchestrator.plugins.base_plugin import BasePlugin, EventBus
 from asea_orchestrator.plugins.types import (

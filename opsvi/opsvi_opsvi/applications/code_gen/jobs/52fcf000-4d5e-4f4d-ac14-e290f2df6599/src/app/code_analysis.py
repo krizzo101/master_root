@@ -2,13 +2,11 @@
 Code analysis logic using Bandit (security), Pylint (quality), Radon (complexity), flake8 (style), custom perf.
 Each runs as a Python subprocess; results are parsed and aggregated.
 """
-import subprocess
-import shlex
-import tempfile
-import os
 import json
-from typing import Tuple, Dict, Any, List
 import logging
+import shlex
+import subprocess
+from typing import Any
 
 logger = logging.getLogger("code_analysis")
 
@@ -42,7 +40,7 @@ def run_subprocess(cmd: str, cwd: str = None, timeout: int = 45) -> str:
 
 
 # --- Security: Bandit ---
-def run_bandit(path: str) -> List[Dict[str, Any]]:
+def run_bandit(path: str) -> list[dict[str, Any]]:
     """Run Bandit security analyzer."""
     bandit_cmd = f"bandit -r -f json {path}"
     out = run_subprocess(bandit_cmd)
@@ -52,7 +50,7 @@ def run_bandit(path: str) -> List[Dict[str, Any]]:
 
 
 # --- Quality: pylint ---
-def run_pylint(path: str) -> Dict[str, Any]:
+def run_pylint(path: str) -> dict[str, Any]:
     """Run pylint for code quality and errors."""
     pylint_cmd = f"pylint --output-format=json {path}"
     try:
@@ -67,7 +65,7 @@ def run_pylint(path: str) -> Dict[str, Any]:
 
 
 # --- Complexity: Radon ---
-def run_radon_cc(path: str) -> List[Dict[str, Any]]:
+def run_radon_cc(path: str) -> list[dict[str, Any]]:
     """Run Radon for cyclomatic complexity."""
     cc_cmd = f"radon cc -j {path}"
     out = run_subprocess(cc_cmd)
@@ -75,7 +73,7 @@ def run_radon_cc(path: str) -> List[Dict[str, Any]]:
     return results
 
 
-def run_radon_mi(path: str) -> Dict[str, Any]:
+def run_radon_mi(path: str) -> dict[str, Any]:
     """Run Radon for maintainability index."""
     mi_cmd = f"radon mi -j {path}"
     out = run_subprocess(mi_cmd)
@@ -84,7 +82,7 @@ def run_radon_mi(path: str) -> Dict[str, Any]:
 
 
 # --- Style: flake8 ---
-def run_flake8(path: str) -> List[Dict[str, str]]:
+def run_flake8(path: str) -> list[dict[str, str]]:
     """Run flake8 for style violations."""
     flake8_cmd = f"flake8 --format=json {path}"
     try:
@@ -105,13 +103,13 @@ def run_flake8(path: str) -> List[Dict[str, str]]:
 
 
 # --- Performance: Heuristic ---
-def run_performance_heuristic(path: str) -> List[Dict[str, Any]]:
+def run_performance_heuristic(path: str) -> list[dict[str, Any]]:
     """
     Inspect for performance anti-patterns (e.g., unbounded loops, builtins misuse). Basic regexes.
     """
     issues = []
     try:
-        with open(path, "r", encoding="utf-8") as file:
+        with open(path, encoding="utf-8") as file:
             lines = file.readlines()
         for idx, line in enumerate(lines):
             lstr = line.strip()
@@ -143,7 +141,7 @@ def run_performance_heuristic(path: str) -> List[Dict[str, Any]]:
 
 
 # --- Aggregation/Entry Point ---
-def analyze_code(path: str) -> Dict[str, Any]:
+def analyze_code(path: str) -> dict[str, Any]:
     """
     Analyze a single code file/directory and return structured results.
     """

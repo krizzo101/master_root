@@ -1,13 +1,13 @@
 """Test database operations."""
 
-import pytest
-import tempfile
 import shutil
-from pathlib import Path
+import tempfile
 from datetime import datetime
+from pathlib import Path
 from unittest.mock import patch
 
-from database import init_db, get_session, create_job, update_job, get_job, get_job_data
+import pytest
+from database import create_job, get_job, get_job_data, get_session, init_db, update_job
 
 
 class TestDatabase:
@@ -169,8 +169,8 @@ class TestDatabase:
 
     def test_concurrent_access(self):
         """Test concurrent database access."""
-        import threading
         import queue
+        import threading
 
         results = queue.Queue()
 

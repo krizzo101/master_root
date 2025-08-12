@@ -18,7 +18,7 @@ import json
 import re
 import hashlib
 from datetime import datetime, timezone
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from arango import ArangoClient
 import logging
 
@@ -207,7 +207,7 @@ class AdvancedConceptExtractor:
                 for sentence in sentences:
                     if term in sentence.lower():
                         return sentence.strip()
-        return f"Maintain awareness of principles described in this knowledge area"
+        return "Maintain awareness of principles described in this knowledge area"
 
     def _extract_key_insights(self, content: str) -> List[str]:
         insights = []

@@ -15,7 +15,7 @@ import json
 import asyncio
 import os
 from datetime import datetime
-from typing import Dict, Any, Optional, Tuple, List
+from typing import Dict, Any, Optional, Tuple
 
 from genfilemap.processors.base import FileProcessor
 from genfilemap.prompting.prompts import get_code_system_message, get_code_user_prompt
@@ -128,7 +128,7 @@ class CodeFileProcessor(FileProcessor):
             else:
                 print("DEBUG: Hash does not match, generating new file map")
         else:
-            print(f"DEBUG: No hash file found, will generate new map")
+            print("DEBUG: No hash file found, will generate new map")
 
         # Get the current date
         current_date = datetime.now().strftime("%Y-%m-%d")
@@ -141,18 +141,18 @@ class CodeFileProcessor(FileProcessor):
             # Add 6 blank lines for HTML comments (5 for file map + 1 blank line)
             content_with_blanks = "\n\n\n\n\n\n" + remaining_content
             print(
-                f"DEBUG-CODE: Added six blank lines to beginning of content for HTML comment format"
+                "DEBUG-CODE: Added six blank lines to beginning of content for HTML comment format"
             )
         else:
             # Add 2 blank lines for other file types (1 for file map + 1 blank line)
             content_with_blanks = "\n\n" + remaining_content
             print(
-                f"DEBUG-CODE: Added two blank lines to beginning of content for standard format"
+                "DEBUG-CODE: Added two blank lines to beginning of content for standard format"
             )
 
         # Perform structure analysis
         structure_analysis = await self.analyze_structure(remaining_content)
-        print(f"DEBUG-CODE: Structure analysis completed")
+        print("DEBUG-CODE: Structure analysis completed")
 
         # Get messages for LLM
         system_message = get_code_system_message()

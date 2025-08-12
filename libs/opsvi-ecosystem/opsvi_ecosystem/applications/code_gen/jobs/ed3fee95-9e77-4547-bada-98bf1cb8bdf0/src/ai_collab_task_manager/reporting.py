@@ -1,6 +1,4 @@
 from .models import Task, TimeEntry
-from flask_login import current_user
-from collections import defaultdict
 
 
 def minutes(td) -> int:

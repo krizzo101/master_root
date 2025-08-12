@@ -29,14 +29,12 @@ This module provides functionality to detect document types and extract metadata
 from documentation files.
 """
 
-import os
 import re
 import logging
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any
 import yaml
-import json
 
 # Configure logging
 logging.basicConfig(

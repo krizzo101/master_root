@@ -4,11 +4,10 @@ Provides type-safe, schema-validated AI responses using Pydantic models.
 """
 
 import json
-import asyncio
-from typing import Any, Dict, Optional, Type, TypeVar, Union
+from typing import Any, Dict, Optional, Type, TypeVar
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ValidationError
-from .schemas import get_schema_for_plugin, get_json_schema_for_plugin, PluginResponse
+from .schemas import get_schema_for_plugin
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -99,7 +98,7 @@ class ResponsesAPIClient:
                     else str(validated_response),
                 }
 
-            except Exception as parse_error:
+            except Exception:
                 # Method 2: Fallback to responses.create() with text_format
                 json_schema = response_schema.model_json_schema()
 
@@ -163,7 +162,7 @@ IMPORTANT: You must respond with valid JSON that matches the required schema. Do
                     "raw_response": response.output_text,
                 }
 
-        except Exception as e:
+        except Exception:
             # Final fallback - instruction-driven approach
             return await self.create_fallback_response(
                 model=model,

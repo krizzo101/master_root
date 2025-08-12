@@ -20,4 +20,5 @@ __all__ = [
     "OpsviAgentsValidationError",
     "OpsviAgentsTimeoutError",
     "OpsviAgentsResourceError",
-    "OpsviAgentsInitializationError"]
+    "OpsviAgentsInitializationError",
+]

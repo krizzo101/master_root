@@ -16,13 +16,11 @@ Usage:
     python concept_relationship_mapper.py --similarity-threshold 0.6 --max-relationships 50
 """
 
-import json
 import logging
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from dataclasses import dataclass
 import re
-from collections import Counter
 
 # Configure logging
 logging.basicConfig(

@@ -1,10 +1,9 @@
+import asyncio
+
 import pytest
-from starlette.middleware.base import RequestResponseEndpoint
+from app.main import LoggingMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
-from app.main import LoggingMiddleware
-
-import asyncio
 
 
 @pytest.fixture
@@ -13,10 +12,6 @@ def dummy_call_next():
         return Response(content="OK", status_code=200)
 
     return call_next
-
-
-import io
-import sys
 
 
 def test_loggingmiddleware_calls_next_and_logs(capsys, dummy_call_next):

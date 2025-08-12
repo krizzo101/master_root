@@ -19,7 +19,7 @@ import logging
 import json
 import datetime
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Tuple, Union
+from typing import List, Dict, Any
 
 # Add parent directory to path to allow relative imports when run as script
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -29,11 +29,9 @@ if package_dir not in sys.path:
 
 from docRuleGen.rules_engine.extractors import (
     ContentExtractor,
-    ExtractionManager,
     LLMTaxonomyGenerator,
 )
 from docRuleGen.rules_engine.preprocessors import PreprocessorManager
-from docRuleGen.rules_engine.validators import ValidationManager
 from docRuleGen.rules_engine.transformers import TransformationManager
 from docRuleGen.rules_engine.generators import GeneratorManager
 from docRuleGen.rules_engine.connectors import LLMOrchestrator
@@ -385,7 +383,7 @@ def process_document(
 
                             logger.info(f"Saved improved rule to {improved_path}")
                     else:
-                        logger.info(f"Rule passed validation. No improvement needed.")
+                        logger.info("Rule passed validation. No improvement needed.")
 
         return {
             "status": "success",

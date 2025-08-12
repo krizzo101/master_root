@@ -1,15 +1,15 @@
 from flask_wtf import FlaskForm
 from wtforms import (
-    StringField,
-    TextAreaField,
-    PasswordField,
     BooleanField,
     DateTimeField,
-    IntegerField,
+    PasswordField,
     SelectField,
+    StringField,
     SubmitField,
+    TextAreaField,
 )
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
+from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
+
 from .models import Team, User
 
 

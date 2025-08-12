@@ -1,5 +1,5 @@
 import pytest
-from app.report_generation import generate_report_file, calculate_score
+from app.report_generation import calculate_score, generate_report_file
 
 
 def test_generate_report_file_creates_file_and_returns_path(tmp_path):
@@ -9,7 +9,7 @@ def test_generate_report_file_creates_file_and_returns_path(tmp_path):
     assert isinstance(path, str)
     assert path.endswith(".html")
     # Check file exists and content includes results
-    with open(path, "r") as f:
+    with open(path) as f:
         content = f.read()
     assert "issue" in content
 

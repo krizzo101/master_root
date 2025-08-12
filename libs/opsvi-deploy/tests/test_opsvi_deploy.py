@@ -4,13 +4,11 @@ Tests for opsvi-deploy components
 """
 
 import pytest
-import asyncio
-from unittest.mock import Mock, patch, AsyncMock
-from typing import Any, Dict, List
 
 from opsvi_deploy import OpsviDeployManager
 from opsvi_deploy.config.settings import OpsviDeployConfig
 from opsvi_deploy.exceptions.base import OpsviDeployError
+
 
 class TestOpsviDeploy:
     """Test cases for opsvi-deploy."""
@@ -36,7 +34,7 @@ class TestOpsviDeploy:
         """Test component start and stop."""
         await component.start()
         assert component.is_active()
-        
+
         await component.stop()
         assert not component.is_active()
 
@@ -54,4 +52,3 @@ class TestOpsviDeploy:
             pass
 
     # Component-specific tests
-    

@@ -3,9 +3,8 @@ Pydantic schemas for structured outputs in ASEA orchestrator plugins.
 These schemas ensure type safety and validation for AI model responses.
 """
 
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
-from datetime import datetime
 
 
 # Budget Manager Plugin Schemas

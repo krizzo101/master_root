@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-import os
 import json
+import os
 import shutil
-from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor
 import time
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 
 def migrate_file(mapping):
@@ -20,7 +20,7 @@ def migrate_file(mapping):
 
     # Update imports if it's a Python file
     if target_path.endswith(".py"):
-        with open(target_path, "r") as f:
+        with open(target_path) as f:
             content = f.read()
 
         # Replace imports
@@ -39,7 +39,7 @@ def main():
     start_time = time.time()
 
     # Load mappings
-    with open("migration_mapping.json", "r") as f:
+    with open("migration_mapping.json") as f:
         mappings = json.load(f)
 
     print(f"Starting migration of {len(mappings)} files...")

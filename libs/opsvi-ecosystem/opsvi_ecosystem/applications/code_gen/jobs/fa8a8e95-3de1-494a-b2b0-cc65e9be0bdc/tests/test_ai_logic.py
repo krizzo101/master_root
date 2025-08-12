@@ -1,8 +1,8 @@
 import pytest
 from ai_service.ai_logic import (
-    prioritize_tasks,
-    estimate_completion_times,
     detect_dependencies,
+    estimate_completion_times,
+    prioritize_tasks,
     suggest_optimal_scheduling,
 )
 from ai_service.models import Task, TeamMember

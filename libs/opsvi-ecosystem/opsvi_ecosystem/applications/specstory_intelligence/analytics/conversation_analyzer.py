@@ -5,9 +5,9 @@ Analyzes parsed conversation components to find patterns, insights, and trends
 across individual conversations and entire conversation histories.
 """
 
-from collections import Counter, defaultdict
 import statistics
-from typing import Any, Dict, List
+from collections import Counter, defaultdict
+from typing import Any
 
 
 class ConversationAnalyzer:
@@ -16,7 +16,7 @@ class ConversationAnalyzer:
     def __init__(self, storage_client=None):
         self.storage = storage_client
 
-    def analyze_conversation_flow(self, components: List[Dict]) -> Dict[str, Any]:
+    def analyze_conversation_flow(self, components: list[dict]) -> dict[str, Any]:
         """Analyze flow patterns within a single conversation"""
 
         flow_analysis = {
@@ -32,8 +32,8 @@ class ConversationAnalyzer:
         return flow_analysis
 
     def analyze_cross_conversation_patterns(
-        self, all_components: List[Dict]
-    ) -> Dict[str, Any]:
+        self, all_components: list[dict]
+    ) -> dict[str, Any]:
         """Analyze patterns across multiple conversations"""
 
         # Group by session
@@ -54,7 +54,7 @@ class ConversationAnalyzer:
 
         return cross_analysis
 
-    def find_breakthrough_moments(self, components: List[Dict]) -> List[Dict]:
+    def find_breakthrough_moments(self, components: list[dict]) -> list[dict]:
         """Identify breakthrough insights and key realizations"""
 
         breakthroughs = []
@@ -88,7 +88,7 @@ class ConversationAnalyzer:
 
         return sorted(breakthroughs, key=lambda x: x["impact_score"], reverse=True)
 
-    def analyze_ai_performance_patterns(self, components: List[Dict]) -> Dict[str, Any]:
+    def analyze_ai_performance_patterns(self, components: list[dict]) -> dict[str, Any]:
         """Analyze AI performance patterns across conversations"""
 
         ai_components = [c for c in components if c.get("speaker") == "ai"]
@@ -103,7 +103,7 @@ class ConversationAnalyzer:
 
         return performance_analysis
 
-    def _analyze_speaker_distribution(self, components: List[Dict]) -> Dict[str, Any]:
+    def _analyze_speaker_distribution(self, components: list[dict]) -> dict[str, Any]:
         """Analyze distribution of speakers in conversation"""
         speakers = [c.get("speaker", "unknown") for c in components]
         counter = Counter(speakers)
@@ -114,7 +114,7 @@ class ConversationAnalyzer:
             "turn_taking_ratio": counter.get("ai", 0) / max(1, counter.get("user", 1)),
         }
 
-    def _analyze_component_types(self, components: List[Dict]) -> Dict[str, Any]:
+    def _analyze_component_types(self, components: list[dict]) -> dict[str, Any]:
         """Analyze types of conversation components"""
         types = [c.get("type", "unknown") for c in components]
         counter = Counter(types)
@@ -130,7 +130,7 @@ class ConversationAnalyzer:
             },
         }
 
-    def _analyze_conversation_arc(self, components: List[Dict]) -> Dict[str, Any]:
+    def _analyze_conversation_arc(self, components: list[dict]) -> dict[str, Any]:
         """Analyze the arc/progression of conversation"""
 
         # Divide conversation into phases
@@ -154,7 +154,7 @@ class ConversationAnalyzer:
 
         return arc_analysis
 
-    def _analyze_response_patterns(self, components: List[Dict]) -> Dict[str, Any]:
+    def _analyze_response_patterns(self, components: list[dict]) -> dict[str, Any]:
         """Analyze patterns in responses between speakers"""
 
         patterns = []
@@ -178,7 +178,7 @@ class ConversationAnalyzer:
             "response_chains": self._find_response_chains(patterns),
         }
 
-    def _analyze_complexity_progression(self, components: List[Dict]) -> Dict[str, Any]:
+    def _analyze_complexity_progression(self, components: list[dict]) -> dict[str, Any]:
         """Analyze how complexity changes throughout conversation"""
 
         complexity_scores = []
@@ -210,7 +210,7 @@ class ConversationAnalyzer:
 
         return {"average_complexity": 0, "complexity_trend": "stable"}
 
-    def _analyze_tool_usage(self, components: List[Dict]) -> Dict[str, Any]:
+    def _analyze_tool_usage(self, components: list[dict]) -> dict[str, Any]:
         """Analyze tool usage patterns"""
 
         all_tools = []
@@ -228,7 +228,7 @@ class ConversationAnalyzer:
             "tool_diversity": len(tool_counter) / max(1, len(all_tools)),
         }
 
-    def _find_recurring_patterns(self, components: List[Dict]) -> List[Dict]:
+    def _find_recurring_patterns(self, components: list[dict]) -> list[dict]:
         """Find patterns that recur across conversations"""
 
         # Look for similar content patterns
@@ -258,7 +258,7 @@ class ConversationAnalyzer:
 
         return sorted(recurring, key=lambda x: x["frequency"], reverse=True)
 
-    def _analyze_frustration_triggers(self, components: List[Dict]) -> Dict[str, Any]:
+    def _analyze_frustration_triggers(self, components: list[dict]) -> dict[str, Any]:
         """Analyze what triggers user frustration"""
 
         frustration_components = [
@@ -293,8 +293,8 @@ class ConversationAnalyzer:
         return triggers
 
     def _analyze_learning_progression(
-        self, sessions: Dict[str, List[Dict]]
-    ) -> Dict[str, Any]:
+        self, sessions: dict[str, list[dict]]
+    ) -> dict[str, Any]:
         """Analyze learning progression across sessions"""
 
         session_metrics = []
@@ -338,7 +338,7 @@ class ConversationAnalyzer:
 
         return {"sessions_analyzed": len(session_metrics)}
 
-    def _calculate_trend(self, values: List[float], reverse: bool = False) -> str:
+    def _calculate_trend(self, values: list[float], reverse: bool = False) -> str:
         """Calculate if trend is improving, declining, or stable"""
         if len(values) < 2:
             return "insufficient_data"
@@ -375,7 +375,7 @@ class ConversationAnalyzer:
             return "general"
 
     def _score_breakthrough_impact(
-        self, breakthrough_comp: Dict, all_components: List[Dict]
+        self, breakthrough_comp: dict, all_components: list[dict]
     ) -> float:
         """Score the impact of a breakthrough based on subsequent conversation"""
 
@@ -411,7 +411,7 @@ class ConversationAnalyzer:
         return max(0.1, impact_score)  # Minimum score of 0.1
 
     # Additional helper methods for other analysis functions would be implemented here
-    def _analyze_phase_sentiment(self, components: List[Dict]) -> str:
+    def _analyze_phase_sentiment(self, components: list[dict]) -> str:
         """Analyze sentiment of conversation phase"""
         sentiment_scores = []
         for comp in components:
@@ -434,7 +434,7 @@ class ConversationAnalyzer:
 
         return "neutral"
 
-    def _analyze_phase_complexity(self, components: List[Dict]) -> str:
+    def _analyze_phase_complexity(self, components: list[dict]) -> str:
         """Analyze complexity level of conversation phase"""
         complexities = []
         for comp in components:
@@ -447,45 +447,45 @@ class ConversationAnalyzer:
 
         return most_common[0][0] if most_common else "simple"
 
-    def _find_response_chains(self, patterns: List[Dict]) -> List[str]:
+    def _find_response_chains(self, patterns: list[dict]) -> list[str]:
         """Find common response chain patterns"""
         # This would implement chain detection logic
         # For now, return placeholder
         return ["user_message -> ai_response -> user_follow_up"]
 
-    def _analyze_topic_evolution(self, components: List[Dict]) -> Dict[str, Any]:
+    def _analyze_topic_evolution(self, components: list[dict]) -> dict[str, Any]:
         """Analyze how topics evolve across conversations"""
         # Placeholder implementation
         return {"topic_shifts": 0, "main_topics": []}
 
     def _analyze_efficiency_trends(
-        self, sessions: Dict[str, List[Dict]]
-    ) -> Dict[str, Any]:
+        self, sessions: dict[str, list[dict]]
+    ) -> dict[str, Any]:
         """Analyze efficiency trends across sessions"""
         # Placeholder implementation
         return {"average_session_length": 0, "efficiency_trend": "stable"}
 
-    def _analyze_response_quality(self, ai_components: List[Dict]) -> Dict[str, Any]:
+    def _analyze_response_quality(self, ai_components: list[dict]) -> dict[str, Any]:
         """Analyze quality of AI responses"""
         # Placeholder implementation
         return {"average_quality": 0.5, "quality_trend": "stable"}
 
-    def _analyze_error_patterns(self, ai_components: List[Dict]) -> Dict[str, Any]:
+    def _analyze_error_patterns(self, ai_components: list[dict]) -> dict[str, Any]:
         """Analyze AI error patterns"""
         # Placeholder implementation
         return {"error_rate": 0.1, "common_errors": []}
 
-    def _analyze_improvement_trends(self, ai_components: List[Dict]) -> Dict[str, Any]:
+    def _analyze_improvement_trends(self, ai_components: list[dict]) -> dict[str, Any]:
         """Analyze AI improvement trends"""
         # Placeholder implementation
         return {"improvement_rate": 0.05, "trend": "improving"}
 
-    def _analyze_consistency(self, ai_components: List[Dict]) -> Dict[str, Any]:
+    def _analyze_consistency(self, ai_components: list[dict]) -> dict[str, Any]:
         """Analyze AI consistency metrics"""
         # Placeholder implementation
         return {"consistency_score": 0.7, "variance": 0.2}
 
-    def _analyze_capability_growth(self, ai_components: List[Dict]) -> Dict[str, Any]:
+    def _analyze_capability_growth(self, ai_components: list[dict]) -> dict[str, Any]:
         """Analyze AI capability growth"""
         # Placeholder implementation
         return {"capabilities_gained": [], "growth_rate": 0.1}

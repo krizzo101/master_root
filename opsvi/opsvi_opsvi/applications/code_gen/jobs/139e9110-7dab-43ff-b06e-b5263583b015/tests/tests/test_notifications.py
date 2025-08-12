@@ -1,5 +1,5 @@
 import pytest
-from backend.notifications import send_notification, NotificationManager
+from backend.notifications import NotificationManager, send_notification
 
 
 @pytest.mark.asyncio

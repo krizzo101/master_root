@@ -12,9 +12,9 @@ with agent-guided URL selection for optimal research quality.
 """
 
 import logging
-from pathlib import Path
 import sys
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import Any
 
 # Add src to path if needed
 if "src" not in sys.path:
@@ -38,7 +38,7 @@ class ResearchRequest(BaseModel):
     depth: str = Field(
         "moderate", description="Research depth (basic, moderate, comprehensive)"
     )
-    sources: List[str] = Field(default_factory=list, description="Preferred sources")
+    sources: list[str] = Field(default_factory=list, description="Preferred sources")
 
 
 def create_research_search_tool(registry=None):
@@ -98,7 +98,7 @@ def create_research_scrape_tool(registry=None):
     research_tool = ResearchWorkflowTool(tool_registry)
 
     async def research_scrape(
-        query: str, selected_urls: List[str], max_results: int = 8
+        query: str, selected_urls: list[str], max_results: int = 8
     ) -> str:
         """
         Scrape selected URLs and compile research report
@@ -257,7 +257,7 @@ class AgentResearchTool:
         )
 
     async def scrape_selected_urls(
-        self, query: str, selected_indices: List[int], max_results: int = 8
+        self, query: str, selected_indices: list[int], max_results: int = 8
     ) -> str:
         """
         Scrape selected URLs and compile research report
@@ -358,8 +358,8 @@ def create_knowledge_search_tool(neo4j_client=None):
 
     @tool
     def knowledge_search(
-        query: str, knowledge_types: Optional[List[str]] = None, max_results: int = 10
-    ) -> Dict[str, Any]:
+        query: str, knowledge_types: list[str] | None = None, max_results: int = 10
+    ) -> dict[str, Any]:
         """
         Searches the Neo4j knowledge base for relevant information.
 

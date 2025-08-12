@@ -1,25 +1,14 @@
 import pytest
-from unittest.mock import patch, MagicMock
 from app.code_analysis import (
-    run_subprocess,
-    run_bandit,
-    run_pylint,
-    run_radon_cc,
-    run_radon_mi,
-    run_flake8,
-    run_performance_heuristic,
-    analyze_code,
     AnalysisError,
+    analyze_code,
+    run_subprocess,
 )
 
 
 def test_run_subprocess_executes_command_and_returns_output():
     output = run_subprocess(["echo", "hello"], cwd=None, timeout=5)
     assert "hello" in output
-
-
-import subprocess
-import pytest
 
 
 def test_run_subprocess_raises_on_timeout():

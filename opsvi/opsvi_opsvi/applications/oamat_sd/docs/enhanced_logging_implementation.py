@@ -4,12 +4,12 @@ Enhanced Logging System Implementation Example
 Shows how to integrate the comprehensive logging system into Smart Decomposition Agent.
 """
 
-from dataclasses import dataclass
-from datetime import datetime
 import json
 import logging
+from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 from src.applications.oamat_sd.src.config.config_manager import ConfigManager
 
@@ -171,7 +171,7 @@ class EnhancedLoggerFactory:
 
         logger.info(json.dumps(log_entry))
 
-    def log_agent_lifecycle(self, agent_role: str, stage: str, data: Dict[str, Any]):
+    def log_agent_lifecycle(self, agent_role: str, stage: str, data: dict[str, Any]):
         """Log agent lifecycle events"""
         logger = self.get_agent_logger(agent_role)
 
@@ -185,7 +185,7 @@ class EnhancedLoggerFactory:
         logger.info(json.dumps(log_entry))
 
     def log_component_operation(
-        self, component: str, operation: str, data: Dict[str, Any]
+        self, component: str, operation: str, data: dict[str, Any]
     ):
         """Log component operations"""
         logger = self.get_component_logger(component)
@@ -199,7 +199,7 @@ class EnhancedLoggerFactory:
 
         logger.info(json.dumps(log_entry))
 
-    def log_audit_event(self, audit_type: str, event: str, data: Dict[str, Any]):
+    def log_audit_event(self, audit_type: str, event: str, data: dict[str, Any]):
         """Log audit events"""
         logger = self.get_audit_logger(audit_type)
 
@@ -287,7 +287,7 @@ class EnhancedSmartDecompositionAgent:
 
         return state
 
-    def _create_agent_with_tools(self, agent_role: str, agent_spec: Dict[str, Any]):
+    def _create_agent_with_tools(self, agent_role: str, agent_spec: dict[str, Any]):
         """Enhanced agent creation with lifecycle logging"""
 
         # Log agent creation start

@@ -5,9 +5,9 @@ Demonstrates core parallel execution capabilities and 3-5x efficiency improvemen
 """
 
 import asyncio
-from pathlib import Path
 import sys
 import time
+from pathlib import Path
 
 # Add the POC to the Python path
 poc_path = Path(__file__).parent
@@ -288,7 +288,7 @@ async def demo_wave_based_execution():
         [120, 90, 180, 200, 150, 120, 140, 100, 90, 60, 80]
     )  # All tasks sequential
 
-    for i, (wave, wave_time) in enumerate(zip(waves, wave_times)):
+    for i, (wave, wave_time) in enumerate(zip(waves, wave_times, strict=False)):
         print(f"    Wave {i+1}: Executing {len(wave)} tasks in parallel ({wave_time}s)")
         print(f"      Tasks: {wave}")
 

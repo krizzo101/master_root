@@ -24,7 +24,7 @@ def test_mistake_prevention_real_scenarios():
     bad_aql = "FOR doc IN core_memory RETURN doc SORT doc.created DESC"
     result = system.validate_aql_query(bad_aql)
 
-    print(f"\nTest 1 - AQL SORT after RETURN:")
+    print("\nTest 1 - AQL SORT after RETURN:")
     print(f"Query: {bad_aql}")
     print(f"Caught error: {not result['valid']}")
     print(f"Errors: {result['errors']}")
@@ -42,7 +42,7 @@ def test_mistake_prevention_real_scenarios():
     }
     result = system.validate_tool_result(failed_tool_result)
 
-    print(f"\nTest 2 - Tool failure detection:")
+    print("\nTest 2 - Tool failure detection:")
     print(f"Tool result: {failed_tool_result}")
     print(f"Caught failure: {not result['success']}")
     print(f"Failure type: {result['failure_type']}")
@@ -56,7 +56,7 @@ def test_mistake_prevention_real_scenarios():
     good_aql = "FOR doc IN core_memory FILTER doc.foundational == true SORT doc.created DESC RETURN doc"
     result = system.validate_aql_query(good_aql)
 
-    print(f"\nTest 3 - Valid AQL should pass:")
+    print("\nTest 3 - Valid AQL should pass:")
     print(f"Query: {good_aql}")
     print(f"Valid: {result['valid']}")
 
@@ -77,7 +77,7 @@ def test_session_continuity_real_application():
 
     # Test 1: Get startup checklist
     checklist = system.get_session_startup_checklist()
-    print(f"\nTest 1 - Startup checklist loaded:")
+    print("\nTest 1 - Startup checklist loaded:")
     for item in checklist:
         print(f"  {item}")
 
@@ -90,7 +90,7 @@ def test_session_continuity_real_application():
     bad_shell_command = "python scripts/test.py"  # Relative path - should fail
     result = system.validate_before_operation("shell_command", bad_shell_command)
 
-    print(f"\nTest 2 - Pre-operation validation:")
+    print("\nTest 2 - Pre-operation validation:")
     print(f"Command: {bad_shell_command}")
     print(f"Should proceed: {result['proceed']}")
     print(f"Errors: {result['errors']}")
@@ -102,7 +102,7 @@ def test_session_continuity_real_application():
 
     # Test 3: Context-specific knowledge retrieval
     db_knowledge = system.get_operational_knowledge_for_context("database operations")
-    print(f"\nTest 3 - Context-specific knowledge:")
+    print("\nTest 3 - Context-specific knowledge:")
     print(f"Database knowledge loaded: {len(db_knowledge) > 0}")
 
     if len(db_knowledge) > 0:
@@ -127,7 +127,7 @@ def test_decision_system_real_improvement():
     reactive_rationale = "User recommended this approach so I will implement it"
 
     result = system.assess_decision_quality(reactive_decision, reactive_rationale)
-    print(f"\nTest 1 - Reactive decision assessment:")
+    print("\nTest 1 - Reactive decision assessment:")
     print(f"Decision: {reactive_decision}")
     print(f"Autonomous score: {result['autonomous_score']}")
     print(f"Concerns: {result['concerns']}")
@@ -142,7 +142,7 @@ def test_decision_system_real_improvement():
     autonomous_rationale = "Holistic analysis shows operational problems repeatedly occur despite stored knowledge. Evidence-based assessment indicates mistake prevention builds foundation for compound learning and addresses actual operational needs rather than theoretical improvements."
 
     result = system.assess_decision_quality(autonomous_decision, autonomous_rationale)
-    print(f"\nTest 2 - Autonomous decision assessment:")
+    print("\nTest 2 - Autonomous decision assessment:")
     print(f"Decision: {autonomous_decision}")
     print(f"Autonomous score: {result['autonomous_score']}")
     print(f"Strengths: {result['strengths']}")
@@ -156,7 +156,7 @@ def test_decision_system_real_improvement():
 
     # Test 3: Generate framework summary
     summary = system.generate_decision_framework_summary()
-    print(f"\nTest 3 - Framework summary generated:")
+    print("\nTest 3 - Framework summary generated:")
     print(f"Summary length: {len(summary)} characters")
 
     if len(summary) > 100:

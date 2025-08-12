@@ -1,6 +1,6 @@
 import pytest
+from app.schemas import Config, TodoBase, TodoCreate, TodoRead, TodoUpdate
 from pydantic import ValidationError
-from app.schemas import TodoBase, TodoCreate, TodoUpdate, TodoRead, Config
 
 
 def test_todobase_validation_and_fields():

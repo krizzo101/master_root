@@ -2,9 +2,10 @@
 Configuration management for csv_reporter.
 Supports loading overrides via YAML config file.
 """
-from typing import Any, Dict
-import yaml
 from pathlib import Path
+from typing import Any
+
+import yaml
 
 _DEFAULTS = {
     "csv": {
@@ -33,7 +34,7 @@ class Config:
         """
         Loads YAML config file, updates in-place.
         """
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             user_conf = yaml.safe_load(f)
             if not isinstance(user_conf, dict):
                 raise ValueError(f"Invalid configuration format in {path}")
@@ -43,7 +44,7 @@ class Config:
         self.csv_delimiter = self._config["csv"].get("delimiter", ",")
         self._pandas_args = self._config["pandas"].copy()
 
-    def pandas_csv_args(self) -> Dict[str, Any]:
+    def pandas_csv_args(self) -> dict[str, Any]:
         """
         Returns pandas.read_csv compatible arguments, incorporating config overrides.
         """
@@ -54,7 +55,7 @@ class Config:
         }
 
     @staticmethod
-    def _recursive_update(base: Dict[str, Any], updates: Dict[str, Any]) -> None:
+    def _recursive_update(base: dict[str, Any], updates: dict[str, Any]) -> None:
         """
         Recursively update a dictionary in place with another dict.
         """

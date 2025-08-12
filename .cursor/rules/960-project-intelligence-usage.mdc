@@ -1,0 +1,70 @@
+---
+description: "use when WORKING IN THIS REPO to REFERENCE PROJECT INTELLIGENCE for FASTER, MORE ACCURATE DEVELOPMENT"
+globs:
+alwaysApply: true
+---
+
+## Project Intelligence Usage (Always Apply)
+
+Validation: "Rule 101 Protocol Active"
+
+- What: Centralized project intelligence under `.proj-intel/` and `.consult/` providing indices, maps, and JSONL artifacts for fast, selective context.
+- Where: `.proj-intel/` primary; `.consult/` mirrors for consult-suite. Entry points: `.proj-intel/proj_intel_manifest.json`, `.proj-intel/AGENT_ONBOARDING.md`.
+- Why: Improves accuracy, reduces token waste, accelerates design, debugging, and implementation by targeting the right files and architecture knowledge.
+- How: Use the indices and helper tools below to discover, filter, and attach only relevant context to your tasks.
+
+### Available Artifacts (What/Where)
+- Manifest: `.proj-intel/proj_intel_manifest.json` → lists shards and indices; start here
+- Primary JSONL: `.proj-intel/project_analysis.jsonl` (newline-delimited records)
+- Indices: `.proj-intel/project_analysis.index.json`, `.proj-intel/reverse_index.json`, `.proj-intel/symbol_index.json`, `.proj-intel/blocks.index.json`
+- Shards: `.proj-intel/file_elements.min.jsonl` (fast per-file stats), `.proj-intel/file_elements.jsonl` (full), `.proj-intel/agent_architecture.jsonl`
+- Quick map: `.proj-intel/project_map.yaml`
+- Guide: `.proj-intel/AGENT_ONBOARDING.md` (ingestion order, performance tips)
+
+### Gatekeeper Tools (How)
+- Python APIs (importable):
+  - `src/accf/tools/gatekeeper_data_tools.py`
+    - `ProjectIntelligenceQuerier` → load `reverse_index.json` and `file_elements.min.jsonl`
+    - `DataPackager` → build relevance-ranked file/context packages with limits
+  - `src/accf/tools/gatekeeper_query_templates.py` → `generate_query_template(type, **kwargs)` for common scenarios
+- CLI (examples):
+  - List matches: `python3 src/accf/tools/gatekeeper_cli.py list --patterns src/accf/agents --count`
+  - Quick extract: `python3 src/accf/tools/gatekeeper_cli.py extract --type architecture_question --keywords core agents --summary`
+- Consult-suite uses Gatekeeper to auto-select files; see `src/accf/agents/gatekeeper_agent.py` and `src/accf/agents/consult_agent_optimized.py`.
+
+### Recommended Usage Patterns (When/Why/How)
+- Design/Architecture questions:
+  - Use `generate_query_template('architecture_question', keywords=[...])` then `DataPackager.create_package(...)` to get top files and context.
+- Debugging/troubleshooting:
+  - Use template `'debugging'` with `user_files=["path/to/failing_file.py"]` and error keywords; attach top N ranked files to analysis.
+- New feature/implementation:
+  - Template `'new_development'` with component keywords; include related module files and standards/patterns from context.
+- Code review/refactoring/testing:
+  - Use respective templates; enforce volume limits and truncation strategies from `DataPackager` to keep context lean.
+
+### Minimal Python Example (importable APIs)
+```python
+from src.accf.tools.gatekeeper_data_tools import ProjectIntelligenceQuerier, DataPackager
+from src.accf.tools.gatekeeper_query_templates import generate_query_template
+q = ProjectIntelligenceQuerier('.proj-intel')
+params = generate_query_template('architecture_question', keywords=['agents','core'], session_id='auto')
+package = DataPackager(q).create_package(params)
+files = [f.path for f in package.files][:10]
+```
+
+### Consistency Check and Refresh (Critical)
+- If `.proj-intel/` data does not match the repository reality:
+  - Run (non-interactive) refresh using shell_exec:
+    - `project-intelligence full-package`
+  - Then re-run your query/package selection and validate alignment before proceeding.
+- If refresh does not fix misalignment: STOP and notify the human developer; do not rely on stale/broken intelligence.
+
+### Validation Signals (Success)
+- Selected files are relevant by path/patterns and have high function/class counts when appropriate.
+- Package volume within limits; truncation strategies applied to large files.
+- Architecture questions resolve faster using `.proj-intel/agent_architecture.jsonl` hints.
+- Debug sessions reference actual module neighbors and related files via `reverse_index.json`.
+
+### Notes
+- Prefer `.proj-intel/` over ad-hoc scanning; it is curated and indexed for agent speed.
+- When integrating with consult-suite, Gatekeeper’s selection is already optimized—reuse its patterns and tools.

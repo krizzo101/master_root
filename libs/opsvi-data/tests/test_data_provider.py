@@ -1,9 +1,8 @@
 """Tests for OPSVI Data provider functionality."""
 
 import pytest
-import asyncio
-from typing import Dict, Any, List, Optional
-from unittest.mock import AsyncMock, MagicMock
+from typing import Dict, Any, Optional
+from unittest.mock import AsyncMock
 from datetime import datetime
 
 from opsvi_data import (

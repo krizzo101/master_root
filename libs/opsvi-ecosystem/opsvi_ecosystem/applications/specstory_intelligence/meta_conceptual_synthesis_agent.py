@@ -8,10 +8,10 @@ Persistent, autonomous agent for extracting, synthesizing, and persisting meta-l
 import json
 import logging
 import os
-from pathlib import Path
 import sys
 import time
-from typing import Any, Dict, List
+from pathlib import Path
+from typing import Any
 
 from shared.interfaces.database.arango_interface import DirectArangoDB
 
@@ -22,7 +22,7 @@ DRY_RUN = True  # Set to False to enable DB writes
 
 class MetaConceptualSynthesisAgent:
     def __init__(
-        self, history_dir: str, arango_config: Dict[str, Any], poll_interval: int = 60
+        self, history_dir: str, arango_config: dict[str, Any], poll_interval: int = 60
     ):
         self.history_dir = Path(history_dir)
         self.db_client = DirectArangoDB(**arango_config)
@@ -107,7 +107,7 @@ class MetaConceptualSynthesisAgent:
         return chat_log, plans
 
     def synthesize_conceptual_knowledge(
-        self, session_id: str, chat_log: List[str], plans: List[str]
+        self, session_id: str, chat_log: list[str], plans: list[str]
     ):
         # TODO: Use LLM/NLP/analytics for deep reflection and pattern recognition
         # For now, extract simple meta-level concepts as a stub
@@ -149,7 +149,7 @@ class MetaConceptualSynthesisAgent:
         return conceptual_nodes, conceptual_edges
 
     def persist_conceptual_knowledge(
-        self, conceptual_nodes: List[Dict], conceptual_edges: List[Dict]
+        self, conceptual_nodes: list[dict], conceptual_edges: list[dict]
     ):
         if DRY_RUN:
             self.logger.info("[DRY RUN] Would persist conceptual nodes:")

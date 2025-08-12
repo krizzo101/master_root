@@ -5,13 +5,13 @@ Sophisticated agent using O3-level reasoning for complex analysis, strategy gene
 and execution planning. Acts as the primary intelligence for decomposition decisions.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
 import json
 import logging
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any
 
 from src.applications.oamat_sd.src.agents.complexity_model import (
     ComplexityAnalysisResult,
@@ -52,8 +52,8 @@ class ReasoningStep:
     analysis_type: AnalysisType
     reasoning: str
     confidence: float
-    evidence: List[str] = field(default_factory=list)
-    assumptions: List[str] = field(default_factory=list)
+    evidence: list[str] = field(default_factory=list)
+    assumptions: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -61,28 +61,28 @@ class AgentStrategy:
     """Strategy for agent deployment and coordination."""
 
     execution_strategy: ExecutionStrategy
-    agent_roles: List[str]
+    agent_roles: list[str]
     coordination_pattern: str
-    communication_flow: Dict[str, List[str]]
-    success_criteria: List[str]
-    risk_mitigation: List[str] = field(default_factory=list)
+    communication_flow: dict[str, list[str]]
+    success_criteria: list[str]
+    risk_mitigation: list[str] = field(default_factory=list)
 
 
 @dataclass
 class ExecutionPlan:
     """Detailed execution plan for the request with explicit dependency tracking."""
 
-    phases: List[Dict[str, Any]]
-    dependencies: Dict[str, List[str]]
-    resource_requirements: Dict[str, Any]
-    timeline_estimates: Dict[str, str]
-    quality_gates: List[str]
-    contingency_plans: List[str] = field(default_factory=list)
+    phases: list[dict[str, Any]]
+    dependencies: dict[str, list[str]]
+    resource_requirements: dict[str, Any]
+    timeline_estimates: dict[str, str]
+    quality_gates: list[str]
+    contingency_plans: list[str] = field(default_factory=list)
     # New dependency tracking fields for parallel vs sequential execution
-    parallel_opportunities: List[Dict[str, Any]] = field(default_factory=list)
-    sequential_requirements: List[Dict[str, Any]] = field(default_factory=list)
-    integration_points: List[str] = field(default_factory=list)
-    consistency_checks: List[str] = field(default_factory=list)
+    parallel_opportunities: list[dict[str, Any]] = field(default_factory=list)
+    sequential_requirements: list[dict[str, Any]] = field(default_factory=list)
+    integration_points: list[str] = field(default_factory=list)
+    consistency_checks: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -90,25 +90,25 @@ class PipelineDesign:
     """Dynamic pipeline design determined by O3 for each specific request."""
 
     pipeline_type: str
-    stages: List[Dict[str, Any]]
-    execution_graph: Dict[str, Any]
-    context_management: Dict[str, Any]
+    stages: list[dict[str, Any]]
+    execution_graph: dict[str, Any]
+    context_management: dict[str, Any]
     optimization_rationale: str = ""
     estimated_efficiency: str = ""
-    alternative_approaches: List[str] = field(default_factory=list)
+    alternative_approaches: list[str] = field(default_factory=list)
 
 
 @dataclass
 class O3AnalysisResult:
     """Complete O3-level analysis result."""
 
-    request_analysis: Dict[str, Any]
+    request_analysis: dict[str, Any]
     complexity_assessment: ComplexityAnalysisResult
     agent_strategy: AgentStrategy
     execution_plan: ExecutionPlan
-    reasoning_chain: List[ReasoningStep]
+    reasoning_chain: list[ReasoningStep]
     confidence: float
-    recommendations: List[str]
+    recommendations: list[str]
     timestamp: datetime = field(default_factory=datetime.now)
 
 
@@ -116,7 +116,7 @@ class O3FrameworkEducator:
     """Provides O3 with comprehensive framework knowledge for dynamic generation"""
 
     @staticmethod
-    def get_tool_catalog() -> Dict[str, Dict[str, str]]:
+    def get_tool_catalog() -> dict[str, dict[str, str]]:
         """Complete catalog of available MCP tools with capabilities"""
         return {
             "write_file": {
@@ -206,7 +206,7 @@ class O3FrameworkEducator:
         }
 
     @staticmethod
-    def get_coordination_patterns() -> Dict[str, Dict[str, str]]:
+    def get_coordination_patterns() -> dict[str, dict[str, str]]:
         """Available coordination patterns for agent orchestration"""
         return {
             "sequential": {
@@ -242,7 +242,7 @@ class O3FrameworkEducator:
         }
 
     @staticmethod
-    def get_project_examples() -> List[Dict[str, Any]]:
+    def get_project_examples() -> list[dict[str, Any]]:
         """Diverse examples to guide O3 without hardcoding patterns"""
         return [
             {
@@ -353,7 +353,7 @@ class O3FrameworkEducator:
         ]
 
     @staticmethod
-    def get_schema_requirements() -> Dict[str, Any]:
+    def get_schema_requirements() -> dict[str, Any]:
         """Schema requirements for O3 output validation"""
         return {
             "AgentStrategy": {
@@ -398,7 +398,7 @@ class O3FrameworkEducator:
         }
 
     @staticmethod
-    def get_model_usage_guidelines() -> Dict[str, str]:
+    def get_model_usage_guidelines() -> dict[str, str]:
         """Guidelines for model selection and usage"""
         return {
             "o3-mini": "Use for complex reasoning, planning, and analysis tasks requiring deep thought",
@@ -412,10 +412,10 @@ class O3FrameworkEducator:
 class O3MasterAgent:
     """Advanced reasoning agent using O3-level intelligence."""
 
-    def __init__(self, model_config: Optional[Dict[str, Any]] = None):
+    def __init__(self, model_config: dict[str, Any] | None = None):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.model_config = model_config or self._default_model_config()
-        self.reasoning_history: List[ReasoningStep] = []
+        self.reasoning_history: list[ReasoningStep] = []
 
         # Initialize O3 model (NO FALLBACKS - fail if unavailable)
         try:
@@ -436,7 +436,7 @@ class O3MasterAgent:
                 f"O3 model initialization failed: {e}. System cannot operate without O3."
             )
 
-    def _default_model_config(self) -> Dict[str, Any]:
+    def _default_model_config(self) -> dict[str, Any]:
         """Default configuration for O3 model integration."""
         return {
             "model": "o3-mini",  # Standardized reasoning model
@@ -447,8 +447,8 @@ class O3MasterAgent:
         }
 
     async def analyze_request_complexity(
-        self, request: Dict[str, Any], validation_result: ValidationResult
-    ) -> Tuple[ComplexityAnalysisResult, List[ReasoningStep]]:
+        self, request: dict[str, Any], validation_result: ValidationResult
+    ) -> tuple[ComplexityAnalysisResult, list[ReasoningStep]]:
         """Perform deep complexity analysis with O3-level reasoning."""
         self.logger.info(
             f"O3 analyzing complexity for: {request.get('name', 'unnamed request')}"
@@ -554,8 +554,8 @@ class O3MasterAgent:
         return complexity_result, reasoning_steps
 
     def _analyze_complexity_dimensions(
-        self, request: Dict[str, Any], validation_result: ValidationResult
-    ) -> Dict[str, int]:
+        self, request: dict[str, Any], validation_result: ValidationResult
+    ) -> dict[str, int]:
         """Analyze complexity across six dimensions."""
         request_text = str(request.get("description", "")).lower()
 
@@ -620,7 +620,7 @@ class O3MasterAgent:
             return "extreme"
 
     def _determine_execution_strategy(
-        self, overall_score: float, complexity_factors: Dict[str, int]
+        self, overall_score: float, complexity_factors: dict[str, int]
     ) -> str:
         """Determine optimal execution strategy."""
         if overall_score <= 4.0 and complexity_factors["scope"] <= 4:
@@ -631,8 +631,8 @@ class O3MasterAgent:
             return "multi_agent"
 
     def _generate_agent_requirements(
-        self, strategy: str, complexity_factors: Dict[str, int]
-    ) -> Dict[str, Any]:
+        self, strategy: str, complexity_factors: dict[str, int]
+    ) -> dict[str, Any]:
         """Generate agent requirements based on strategy."""
         if strategy == "simple":
             return {
@@ -674,7 +674,7 @@ class O3MasterAgent:
         self,
         complexity_result: ComplexityAnalysisResult,
         completion_result: CompletionResult,
-    ) -> Tuple[AgentStrategy, List[ReasoningStep]]:
+    ) -> tuple[AgentStrategy, list[ReasoningStep]]:
         """Generate sophisticated agent deployment strategy."""
         self.logger.info(
             f"Generating agent strategy for {complexity_result.execution_strategy} execution"
@@ -742,7 +742,7 @@ class O3MasterAgent:
 
     def _determine_agent_roles(
         self, complexity_result: ComplexityAnalysisResult
-    ) -> List[str]:
+    ) -> list[str]:
         """Determine required agent roles based on complexity."""
         roles = []
 
@@ -777,8 +777,8 @@ class O3MasterAgent:
         return patterns.get(strategy, "collaborative")
 
     def _design_communication_flow(
-        self, agent_roles: List[str]
-    ) -> Dict[str, List[str]]:
+        self, agent_roles: list[str]
+    ) -> dict[str, list[str]]:
         """Design communication flows between agents."""
         if len(agent_roles) == 1:
             return {agent_roles[0]: []}
@@ -797,7 +797,7 @@ class O3MasterAgent:
 
     def _generate_success_criteria(
         self, complexity_result: ComplexityAnalysisResult
-    ) -> List[str]:
+    ) -> list[str]:
         """Generate success criteria based on complexity."""
         criteria = [
             "Functional requirements met",
@@ -816,7 +816,7 @@ class O3MasterAgent:
 
     def _generate_risk_mitigation(
         self, complexity_result: ComplexityAnalysisResult
-    ) -> List[str]:
+    ) -> list[str]:
         """Generate risk mitigation strategies."""
         mitigation = []
 
@@ -833,7 +833,7 @@ class O3MasterAgent:
 
     async def create_execution_plan(
         self, agent_strategy: AgentStrategy, completion_result: CompletionResult
-    ) -> Tuple[ExecutionPlan, List[ReasoningStep]]:
+    ) -> tuple[ExecutionPlan, list[ReasoningStep]]:
         """Create detailed execution plan with AI-driven dynamic planning (NO ALGORITHMS)."""
         self.logger.info(
             f"Creating AI-driven execution plan for {agent_strategy.execution_strategy} strategy"
@@ -1024,7 +1024,7 @@ class O3MasterAgent:
         )
         return execution_plan, reasoning_steps
 
-    def _define_execution_phases(self, strategy: AgentStrategy) -> List[Dict[str, Any]]:
+    def _define_execution_phases(self, strategy: AgentStrategy) -> list[dict[str, Any]]:
         """Define execution phases based on strategy."""
         if strategy.execution_strategy == ExecutionStrategy.SIMPLE:
             return [
@@ -1112,8 +1112,8 @@ class O3MasterAgent:
             ]
 
     def _analyze_phase_dependencies(
-        self, phases: List[Dict[str, Any]]
-    ) -> Dict[str, List[str]]:
+        self, phases: list[dict[str, Any]]
+    ) -> dict[str, list[str]]:
         """Analyze dependencies between phases."""
         dependencies = {}
         phase_names = [p["name"] for p in phases]
@@ -1126,7 +1126,7 @@ class O3MasterAgent:
 
         return dependencies
 
-    def _plan_resources(self, strategy: AgentStrategy) -> Dict[str, Any]:
+    def _plan_resources(self, strategy: AgentStrategy) -> dict[str, Any]:
         """Plan resource requirements."""
         return {
             "agents": len(strategy.agent_roles),
@@ -1136,15 +1136,15 @@ class O3MasterAgent:
         }
 
     def _estimate_timelines(
-        self, phases: List[Dict[str, Any]], strategy: AgentStrategy
-    ) -> Dict[str, str]:
+        self, phases: list[dict[str, Any]], strategy: AgentStrategy
+    ) -> dict[str, str]:
         """Estimate phase timelines."""
         timelines = {}
         for phase in phases:
             timelines[phase["name"]] = phase["duration"]
         return timelines
 
-    def _define_quality_gates(self, strategy: AgentStrategy) -> List[str]:
+    def _define_quality_gates(self, strategy: AgentStrategy) -> list[str]:
         """Define quality gates for execution."""
         gates = [
             "Requirements validation",
@@ -1159,7 +1159,7 @@ class O3MasterAgent:
 
         return gates
 
-    def _generate_contingency_plans(self, strategy: AgentStrategy) -> List[str]:
+    def _generate_contingency_plans(self, strategy: AgentStrategy) -> list[str]:
         """Generate contingency plans for potential issues."""
         plans = [
             "Simplified implementation fallback",
@@ -1180,7 +1180,7 @@ class O3MasterAgent:
 
     async def perform_comprehensive_analysis(
         self,
-        request: Dict[str, Any],
+        request: dict[str, Any],
         validation_result: ValidationResult,
         completion_result: CompletionResult,
     ) -> O3AnalysisResult:
@@ -1232,7 +1232,7 @@ class O3MasterAgent:
         complexity_result: ComplexityAnalysisResult,
         agent_strategy: AgentStrategy,
         execution_plan: ExecutionPlan,
-    ) -> List[str]:
+    ) -> list[str]:
         """Generate strategic recommendations."""
         recommendations = []
 
@@ -1259,8 +1259,8 @@ class O3MasterAgent:
         return recommendations
 
     async def generate_dynamic_agent_strategy(
-        self, request: Dict[str, Any], complexity_result: ComplexityAnalysisResult
-    ) -> Tuple[AgentStrategy, List[ReasoningStep]]:
+        self, request: dict[str, Any], complexity_result: ComplexityAnalysisResult
+    ) -> tuple[AgentStrategy, list[ReasoningStep]]:
         """
         O3 dynamically generates agent strategy based on request analysis
 
@@ -1499,7 +1499,7 @@ Generate your dynamic agent strategy now:
                 f"Stage 2 dynamic agent strategy generation failed: {e}. System cannot proceed without O3 analysis."
             )
 
-    def _parse_strategy_response(self, response_content: str) -> Dict[str, Any]:
+    def _parse_strategy_response(self, response_content: str) -> dict[str, Any]:
         """Parse O3 strategy response and extract structured data"""
         try:
             # Look for JSON in the response
@@ -1533,7 +1533,7 @@ Generate your dynamic agent strategy now:
             }
 
     def _build_agent_strategy_from_o3(
-        self, strategy_data: Dict[str, Any], complexity_result: ComplexityAnalysisResult
+        self, strategy_data: dict[str, Any], complexity_result: ComplexityAnalysisResult
     ) -> AgentStrategy:
         """Build AgentStrategy object from O3's dynamic response"""
 
@@ -1570,8 +1570,8 @@ Generate your dynamic agent strategy now:
         )
 
     async def design_optimal_pipeline(
-        self, request_data: Dict[str, Any], context: Dict[str, Any] = None
-    ) -> Tuple["PipelineDesign", List[ReasoningStep]]:
+        self, request_data: dict[str, Any], context: dict[str, Any] = None
+    ) -> tuple["PipelineDesign", list[ReasoningStep]]:
         """
         Meta-pipeline design: O3 determines optimal pipeline structure for this specific request.
 
@@ -1851,7 +1851,7 @@ Generate your dynamic agent strategy now:
 
     def _parse_json_from_ai_response(
         self, response_content: str, expected_schema: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Parse JSON from AI response with validation (shared utility)"""
         try:
             # Look for JSON in the response
@@ -1876,7 +1876,7 @@ Generate your dynamic agent strategy now:
             )
 
     def _validate_ai_output_schema(
-        self, data: Dict[str, Any], required_fields: List[str], schema_name: str
+        self, data: dict[str, Any], required_fields: list[str], schema_name: str
     ) -> bool:
         """Validate AI output conforms to expected schema"""
         missing_fields = [field for field in required_fields if field not in data]
@@ -1892,7 +1892,7 @@ Generate your dynamic agent strategy now:
         self.logger.info(f"✅ {schema_name} schema validation passed")
         return True
 
-    def _create_execution_phase_template(self) -> Dict[str, Any]:
+    def _create_execution_phase_template(self) -> dict[str, Any]:
         """Create execution phase template with context management guidelines"""
         return {
             "phase_structure": {
@@ -1925,7 +1925,7 @@ Generate your dynamic agent strategy now:
             },
         }
 
-    def _create_workflow_assembly_template(self) -> Dict[str, Any]:
+    def _create_workflow_assembly_template(self) -> dict[str, Any]:
         """Create workflow assembly template with cross-stage coherence requirements"""
         return {
             "agent_specification": {

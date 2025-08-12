@@ -1,11 +1,11 @@
 import logging
+import os
+
+import openai  # For production: replace with Huggingface or local model if desired
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from starlette.responses import JSONResponse
-from typing import List
-import openai  # For production: replace with Huggingface or local model if desired
-import os
 
 # Logging setup
 logging.basicConfig(level=logging.INFO)
@@ -42,7 +42,7 @@ class SuggestRequest(BaseModel):
 
 
 class SuggestResponse(BaseModel):
-    suggestions: List[str]
+    suggestions: list[str]
 
 
 @app.post("/summarize", response_model=SummarizeResponse)

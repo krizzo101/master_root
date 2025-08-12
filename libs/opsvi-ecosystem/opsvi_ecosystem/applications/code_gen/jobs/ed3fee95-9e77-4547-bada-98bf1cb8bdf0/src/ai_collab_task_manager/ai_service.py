@@ -1,14 +1,15 @@
 import logging
-import os
-from typing import Optional, Dict, Any
-from openai import OpenAI
-from threading import Thread
-from .models import db, Task
-from .audit_log import audit_log_event
 from datetime import datetime
+from threading import Thread
+from typing import Any
+
+from openai import OpenAI
+
+from .audit_log import audit_log_event
+from .models import Task, db
 
 
-def anonymize_task_data(task: Task) -> Dict[str, Any]:
+def anonymize_task_data(task: Task) -> dict[str, Any]:
     return {
         "title": task.title,
         "description": "",  # remove sensitive text
@@ -61,7 +62,7 @@ class AIService:
         except Exception as e:
             self.logger.error(f"AI scheduling failed for task {task_id} - {e}")
 
-    def _parse_ai_response(self, text: str) -> Dict[str, Any]:
+    def _parse_ai_response(self, text: str) -> dict[str, Any]:
         import json
         import re
 

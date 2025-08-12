@@ -8,10 +8,10 @@ system including configuration, schemas, prompts, and generated outputs.
 import argparse
 import json
 import os
-from pathlib import Path
 import re
 import sys
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -51,7 +51,7 @@ finally:
 class ValidationFramework:
     """Comprehensive validation framework for O3 code generator tools."""
 
-    def __init__(self, config_path: Optional[str] = None) -> None:
+    def __init__(self, config_path: str | None = None) -> None:
         """Initialize the validation framework.
 
         Args:

@@ -12,13 +12,11 @@ This module defines the base FileProcessor class that all file type-specific pro
 
 import os
 from pathlib import Path
-from typing import Dict, Any, Optional, Tuple, List
+from typing import Dict, Any, Optional, Tuple
 import json
 
 from genfilemap.utils.file_utils import (
     get_file_type,
-    calculate_file_hash,
-    extract_existing_file_map,
 )
 from genfilemap.api.base import APIClient
 from genfilemap.models.schemas import validate_file_map_json, validate_line_numbers

@@ -29,9 +29,7 @@ This module maps content to potential rule categories and establishes source tra
 import os
 import logging
 import yaml
-import json
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Set
+from typing import Dict, Any
 
 from ..inventory.document_inventory import DocumentInventory
 from .cross_reference_detector import CrossReferenceDetector

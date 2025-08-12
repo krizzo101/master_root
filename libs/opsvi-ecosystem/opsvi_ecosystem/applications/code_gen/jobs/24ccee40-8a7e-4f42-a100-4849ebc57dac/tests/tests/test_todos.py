@@ -2,12 +2,13 @@
 Integration and unit tests for todo CRUD endpoints.
 """
 import asyncio
-import pytest
-from httpx import AsyncClient
-from app.main import app
-from app.db.init_db import init_db
-from app.core.config import get_settings
 import os
+
+import pytest
+from app.core.config import get_settings
+from app.db.init_db import init_db
+from app.main import app
+from httpx import AsyncClient
 
 # Use a separate test DB file
 TEST_DB_PATH = "./test_todolist.db"

@@ -4,7 +4,7 @@ Eliminates AQL complexity with agent-friendly parameter-based routing
 """
 
 import logging
-from typing import Dict, List, Any, Optional, Union
+from typing import Dict, List, Any, Optional
 from datetime import datetime, timedelta
 from arango import ArangoClient
 from arango.exceptions import ArangoError

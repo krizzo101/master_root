@@ -14,7 +14,6 @@ This tests COGNITIVE EFFECTIVENESS, not just technical execution.
 import asyncio
 import json
 import sys
-import os
 from datetime import datetime
 from typing import Dict, Any, List
 
@@ -685,7 +684,7 @@ async def main():
 
         print(f"\n{test_name.upper()}:")
         if result.get("success"):
-            print(f"  ✅ Success")
+            print("  ✅ Success")
             for metric_key in [
                 "quality_metrics",
                 "effectiveness_metrics",

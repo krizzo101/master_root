@@ -1,12 +1,13 @@
 """
 Generates HTML report files from analysis results and calculates code score.
 """
-from typing import Any, Dict
-from jinja2 import Environment, FileSystemLoader, select_autoescape
-import os
-from app.config import settings
 import logging
-import pandas as pd
+import os
+from typing import Any
+
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+
+from app.config import settings
 
 logger = logging.getLogger("report_generation")
 
@@ -16,7 +17,7 @@ env = Environment(
 )
 
 
-def generate_report_file(results: Dict[str, Any], report_id: int) -> str:
+def generate_report_file(results: dict[str, Any], report_id: int) -> str:
     """
     Generates HTML report from analysis results using Jinja2 and saves it to UPLOAD_DIR/reports/report-{id}.html
     """
@@ -31,7 +32,7 @@ def generate_report_file(results: Dict[str, Any], report_id: int) -> str:
     return path
 
 
-def calculate_score(results: Dict[str, Any]) -> int:
+def calculate_score(results: dict[str, Any]) -> int:
     """
     Calculate a single code quality score from all categories, between 0-100.
     Uses a basic weighted formula on #issues and their severity/importance per tool.

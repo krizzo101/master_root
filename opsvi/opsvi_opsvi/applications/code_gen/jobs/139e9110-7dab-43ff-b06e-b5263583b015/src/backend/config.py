@@ -1,9 +1,8 @@
 """
 config.py: Configuration management for the backend (env, secrets, etc.)
 """
-from functools import lru_cache
+
 from pydantic import BaseSettings, Field
-from typing import List
 
 
 class Settings(BaseSettings):
@@ -12,12 +11,12 @@ class Settings(BaseSettings):
     session_secret: str = Field(..., env="SESSION_SECRET")
     jwt_secret: str = Field(..., env="JWT_SECRET")
     jwt_algo: str = Field("HS256", env="JWT_ALGO")
-    allowed_hosts: List[str] = Field(["*"], env="ALLOWED_HOSTS")
-    cors_origins: List[str] = Field(["*"], env="CORS_ORIGINS")
+    allowed_hosts: list[str] = Field(["*"], env="ALLOWED_HOSTS")
+    cors_origins: list[str] = Field(["*"], env="CORS_ORIGINS")
     postgres_url: str = Field(..., env="POSTGRES_URL")
     redis_url: str = Field(..., env="REDIS_URL")
     openai_api_key: str = Field(..., env="OPENAI_API_KEY")
-    openai_models: List[str] = Field(["o3", "o4-mini"])
+    openai_models: list[str] = Field(["o3", "o4-mini"])
     s3_endpoint: str = Field(..., env="S3_ENDPOINT")
     s3_access_key: str = Field(..., env="S3_ACCESS_KEY")
     s3_secret_key: str = Field(..., env="S3_SECRET_KEY")

@@ -1,6 +1,5 @@
 """Neo4j client utilities for backward compatibility."""
 
-from typing import Optional
 from neo4j import Driver
 
 from .driver import init_driver, close_driver

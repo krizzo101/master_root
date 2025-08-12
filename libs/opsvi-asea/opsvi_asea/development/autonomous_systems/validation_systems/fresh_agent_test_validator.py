@@ -14,7 +14,7 @@ import json
 import os
 import sys
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 
 
 class FreshAgentTestValidator:

@@ -1,10 +1,11 @@
 """
 Admin dashboard: stats, management views, content admin.
 """
-from flask import Blueprint, render_template, abort
-from flask_login import login_required, current_user
-from app.models import User, Post, Category, Tag, Image
-from app import db, redis_client
+from flask import Blueprint, abort, render_template
+from flask_login import current_user
+
+from app import db
+from app.models import Category, Image, Post, Tag, User
 
 admin_bp = Blueprint("admin", __name__)
 

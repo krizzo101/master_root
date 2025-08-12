@@ -22,7 +22,7 @@ from .shared.database_connection_factory import (
     DatabaseConfigFactory,
 )
 from .shared.logging_manager import get_database_logger
-from .shared.error_handling import with_error_handling, ErrorContext, ErrorResponse
+from .shared.error_handling import with_error_handling
 from .shared.config_manager import (
     get_config,
     DATABASE_CONFIG_SCHEMA,

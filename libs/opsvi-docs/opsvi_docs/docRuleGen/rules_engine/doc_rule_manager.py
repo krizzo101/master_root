@@ -32,12 +32,10 @@ This module coordinates the generation of documentation rules by integrating
 the path manager, hierarchy manager, and content generator components.
 """
 
-import os
 import yaml
-import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any
 from concurrent.futures import ThreadPoolExecutor
 import time
 
@@ -335,9 +333,9 @@ class DocRuleManager:
         )
 
         # Generate the report content
-        report = f"# Documentation Rule Generation Report\n\n"
+        report = "# Documentation Rule Generation Report\n\n"
         report += f"Generated on {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-        report += f"## Summary\n\n"
+        report += "## Summary\n\n"
         report += f"- **Total Rules**: {total_rules}\n"
         report += f"- **Successful**: {successful_rules} ({successful_rules/total_rules*100:.2f}%)\n"
         report += (
@@ -362,7 +360,7 @@ class DocRuleManager:
                 parent_child_map[parent_id].append(result)
 
         # Add details for each parent rule and its children
-        report += f"\n## Generated Rules\n\n"
+        report += "\n## Generated Rules\n\n"
 
         for result in sorted(
             [

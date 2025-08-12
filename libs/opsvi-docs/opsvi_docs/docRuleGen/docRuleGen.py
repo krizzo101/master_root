@@ -34,7 +34,6 @@ import os
 import sys
 import argparse
 import logging
-from pathlib import Path
 
 # Import the rule manager
 from rules_engine.doc_rule_manager import DocRuleManager
@@ -125,7 +124,7 @@ def main():
     successful_rules = sum(1 for result in results if result.get("status") == "success")
     total_rules = len(results)
 
-    print(f"\nRule generation completed!")
+    print("\nRule generation completed!")
     print(f"Generated {successful_rules} of {total_rules} rules successfully")
     print(f"Success rate: {successful_rules/total_rules*100:.2f}%")
     print(f"Check {args.report} for details")

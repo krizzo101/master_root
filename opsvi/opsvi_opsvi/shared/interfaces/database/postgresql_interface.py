@@ -9,7 +9,7 @@ Version: Referenced as of July 2024
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 
 try:
     import psycopg2
@@ -59,14 +59,16 @@ class PostgreSQLInterface:
         return self.pool.getconn()
 
     def execute_query(
-        self, query: str, params: Optional[Union[Tuple, Dict]] = None
-    ) -> List[Dict[str, Any]]:
+        self, query: str, params: tuple | dict | None = None
+    ) -> list[dict[str, Any]]:
         conn = self.get_connection()
         try:
             cursor = conn.cursor()
             cursor.execute(query, params or ())
             columns = [desc[0] for desc in cursor.description]
-            results = [dict(zip(columns, row)) for row in cursor.fetchall()]
+            results = [
+                dict(zip(columns, row, strict=False)) for row in cursor.fetchall()
+            ]
             cursor.close()
             return results
         except PostgresError as e:
@@ -75,9 +77,7 @@ class PostgreSQLInterface:
         finally:
             self.pool.putconn(conn)
 
-    def execute_update(
-        self, query: str, params: Optional[Union[Tuple, Dict]] = None
-    ) -> int:
+    def execute_update(self, query: str, params: tuple | dict | None = None) -> int:
         conn = self.get_connection()
         try:
             cursor = conn.cursor()
@@ -93,7 +93,7 @@ class PostgreSQLInterface:
         finally:
             self.pool.putconn(conn)
 
-    def execute_many(self, query: str, param_list: List[Union[Tuple, Dict]]) -> int:
+    def execute_many(self, query: str, param_list: list[tuple | dict]) -> int:
         conn = self.get_connection()
         try:
             cursor = conn.cursor()
@@ -128,8 +128,8 @@ class PostgreSQLInterface:
 
     # Async support using asyncpg
     async def aexecute_query(
-        self, query: str, params: Optional[Union[Tuple, Dict]] = None
-    ) -> List[Dict[str, Any]]:
+        self, query: str, params: tuple | dict | None = None
+    ) -> list[dict[str, Any]]:
         if not asyncpg:
             raise ImportError(
                 "asyncpg is required for async support. Install with `pip install asyncpg`."
@@ -144,7 +144,7 @@ class PostgreSQLInterface:
             await conn.close()
 
     async def aexecute_update(
-        self, query: str, params: Optional[Union[Tuple, Dict]] = None
+        self, query: str, params: tuple | dict | None = None
     ) -> int:
         if not asyncpg:
             raise ImportError(

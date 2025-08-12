@@ -1,12 +1,13 @@
 """
 Handles HTTP requests and overall headline scraping logic.
 """
-import requests
-import time
 import logging
-from typing import List, Optional
-from .parser import HeadlineParser
+import time
+
+import requests
 from requests.exceptions import RequestException, Timeout
+
+from .parser import HeadlineParser
 
 
 class NewsScraper:
@@ -15,7 +16,7 @@ class NewsScraper:
     """
 
     def __init__(
-        self, url: str, timeout: int = 20, selectors: Optional[list] = None
+        self, url: str, timeout: int = 20, selectors: list | None = None
     ) -> None:
         """
         Initialize NewsScraper.
@@ -58,7 +59,7 @@ class NewsScraper:
             self.logger.error(f"HTTP request failed: {exc}")
             raise
 
-    def fetch_headlines(self) -> List[str]:
+    def fetch_headlines(self) -> list[str]:
         """
         Fetch and extract news headlines from the configured website.
         :returns: List of headline strings

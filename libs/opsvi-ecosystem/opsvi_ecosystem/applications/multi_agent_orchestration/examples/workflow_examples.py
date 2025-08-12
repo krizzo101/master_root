@@ -5,12 +5,12 @@ This module provides pre-built workflow examples demonstrating various
 orchestration patterns and agent collaboration scenarios.
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
 from ..orchestrator.workflow_orchestrator import ExecutionPattern
 
 
-def create_data_analysis_workflow() -> Dict[str, Any]:
+def create_data_analysis_workflow() -> dict[str, Any]:
     """
     Create a data analysis workflow demonstrating sequential processing.
 
@@ -95,7 +95,7 @@ def create_data_analysis_workflow() -> Dict[str, Any]:
     }
 
 
-def create_research_pipeline() -> Dict[str, Any]:
+def create_research_pipeline() -> dict[str, Any]:
     """
     Create a research pipeline workflow demonstrating agent collaboration.
 
@@ -185,7 +185,7 @@ def create_research_pipeline() -> Dict[str, Any]:
     }
 
 
-def create_parallel_processing_workflow() -> Dict[str, Any]:
+def create_parallel_processing_workflow() -> dict[str, Any]:
     """
     Create a parallel processing workflow for high-throughput tasks.
 
@@ -290,7 +290,7 @@ def create_parallel_processing_workflow() -> Dict[str, Any]:
     }
 
 
-def create_conditional_workflow() -> Dict[str, Any]:
+def create_conditional_workflow() -> dict[str, Any]:
     """
     Create a conditional workflow demonstrating decision-based execution.
 
@@ -399,7 +399,7 @@ def create_conditional_workflow() -> Dict[str, Any]:
     }
 
 
-def create_pipeline_workflow() -> Dict[str, Any]:
+def create_pipeline_workflow() -> dict[str, Any]:
     """
     Create a pipeline workflow demonstrating data flow between steps.
 
@@ -494,7 +494,7 @@ def create_pipeline_workflow() -> Dict[str, Any]:
 
 
 # Workflow factory function
-def create_workflow_by_type(workflow_type: str) -> Dict[str, Any]:
+def create_workflow_by_type(workflow_type: str) -> dict[str, Any]:
     """
     Create a workflow by type.
 
@@ -521,7 +521,7 @@ def create_workflow_by_type(workflow_type: str) -> Dict[str, Any]:
     return workflow_factories[workflow_type]()
 
 
-def get_available_workflows() -> List[str]:
+def get_available_workflows() -> list[str]:
     """
     Get list of available workflow types.
 

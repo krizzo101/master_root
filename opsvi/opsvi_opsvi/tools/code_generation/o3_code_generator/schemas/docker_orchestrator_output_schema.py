@@ -4,7 +4,7 @@ Output schema for Docker Orchestrator.
 This module defines the Pydantic schema for Docker orchestrator output results.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -36,7 +36,7 @@ class DockerOrchestratorOutput(BaseModel):
     message: str = Field(..., description="Status message")
 
     # Metadata
-    generation_time: Optional[float] = Field(
+    generation_time: float | None = Field(
         _default=None, description="Time taken for generation (seconds)"
     )
     model_used: str = Field(

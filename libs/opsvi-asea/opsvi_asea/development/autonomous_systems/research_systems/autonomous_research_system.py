@@ -4,10 +4,8 @@ Autonomous Research and Knowledge Synthesis System
 Enables self-directed knowledge acquisition and synthesis for autonomous development
 """
 
-import json
 import sys
-from typing import Dict, List, Any, Optional, Tuple
-from datetime import datetime
+from typing import Dict, List, Any
 
 # Import foundational systems (Rule 502 enforcement)
 sys.path.append("/home/opsvi/asea/development/autonomous_systems/core_systems")
@@ -387,11 +385,11 @@ if __name__ == "__main__":
     for cap in cycle_result["synthesized_capabilities"]["synthesized_capabilities"]:
         print(f"  - {cap['capability']}")
 
-    print(f"\nCompound Learning Effects:")
+    print("\nCompound Learning Effects:")
     for effect in cycle_result["compound_learning_effects"]:
         print(f"  • {effect}")
 
-    print(f"\nNext Autonomous Actions:")
+    print("\nNext Autonomous Actions:")
     for action in cycle_result["next_autonomous_actions"]:
         print(f"  → {action}")
 

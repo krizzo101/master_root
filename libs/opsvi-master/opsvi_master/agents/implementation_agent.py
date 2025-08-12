@@ -8,13 +8,12 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
-from .base_agent import BaseAgent, AgentCapability, AgentMessage, MessageType
-from .error_handling import with_retry, with_circuit_breaker, RetryConfig, ErrorSeverity
+from .base_agent import BaseAgent, AgentCapability
+from .error_handling import with_retry, with_circuit_breaker, RetryConfig
 
 logger = logging.getLogger(__name__)
 

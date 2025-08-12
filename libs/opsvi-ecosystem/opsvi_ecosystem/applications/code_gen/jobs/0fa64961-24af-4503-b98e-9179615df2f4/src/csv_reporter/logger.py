@@ -2,7 +2,6 @@
 Logging configuration and utility.
 """
 import logging
-from typing import Optional
 
 logger = logging.getLogger("csv_reporter")
 

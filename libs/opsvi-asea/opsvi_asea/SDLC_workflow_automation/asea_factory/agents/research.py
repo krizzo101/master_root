@@ -1,7 +1,6 @@
 from asea_factory.schemas import ResearchFinding
 from asea_factory.agents.base_agent import BaseAgent
 from typing import List
-import uuid
 
 
 class ResearchAgent(BaseAgent):

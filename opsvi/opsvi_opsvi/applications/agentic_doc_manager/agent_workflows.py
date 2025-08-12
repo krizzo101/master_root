@@ -39,7 +39,7 @@ def run_workflows():
     print(f"Ingested {len(artifacts)} artifacts.")
     embeddings = embed_all(artifacts[:2])  # Limit for quick test
     print(f"Embedded {len(embeddings)} artifacts.")
-    for (path, content), (_, embedding) in zip(artifacts[:2], embeddings):
+    for (path, content), (_, embedding) in zip(artifacts[:2], embeddings, strict=False):
         add_artifact(path, content)
         add_embedding(path, embedding)
     print("Artifacts and embeddings added to graph.")
@@ -952,7 +952,7 @@ def artifact_ingestion_embedding_workflow(root_dir=None):
         logger.info(f"Ingested {len(artifacts)} artifacts.")
         embeddings = embed_all(artifacts)
         logger.info(f"Embedded {len(embeddings)} artifacts.")
-        for (path, content), (_, embedding) in zip(artifacts, embeddings):
+        for (path, content), (_, embedding) in zip(artifacts, embeddings, strict=False):
             add_artifact(path, content)
             add_embedding(path, embedding)
         logger.info("Artifacts and embeddings added to graph.")

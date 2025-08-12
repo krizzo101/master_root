@@ -2,9 +2,11 @@
 Report Generator module: Formats data processor output to various report formats (text, json).
 Supports Jinja2-based templating for extensibility.
 """
-from typing import Dict, Any
-from jinja2 import Environment, BaseLoader
 import json
+from typing import Any
+
+from jinja2 import BaseLoader, Environment
+
 from csv_reporter.config import Config
 
 SUPPORTED_FORMATS = ["text", "json"]
@@ -48,7 +50,7 @@ class ReportGenerator:
         self.config = config
         self.env = Environment(loader=BaseLoader())
 
-    def generate_report(self, summary: Dict[str, Any], format: str = "text") -> str:
+    def generate_report(self, summary: dict[str, Any], format: str = "text") -> str:
         """
         Generates a formatted report string in the requested format.
 

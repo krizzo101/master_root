@@ -42,7 +42,7 @@ def clean_log_file(input_file: str, output_file: str):
     print(f"Processing {input_file}...")
 
     # Read all lines
-    with open(input_file, "r", encoding="utf-8") as f:
+    with open(input_file, encoding="utf-8") as f:
         lines = f.readlines()
 
     print(f"Original file has {len(lines)} lines")

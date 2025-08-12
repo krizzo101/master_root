@@ -1,9 +1,8 @@
 """FastAPI web application."""
+
+import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Optional
-import uvicorn
-
 
 app = FastAPI(title="Web API", version="1.0.0")
 
@@ -11,13 +10,13 @@ app = FastAPI(title="Web API", version="1.0.0")
 class Item(BaseModel):
     """Item model."""
 
-    id: Optional[int] = None
+    id: int | None = None
     name: str
-    description: Optional[str] = None
+    description: str | None = None
 
 
 # In-memory storage (replace with database in production)
-items: List[Item] = []
+items: list[Item] = []
 next_id = 1
 
 
@@ -27,7 +26,7 @@ async def root():
     return {"message": "Web API is running"}
 
 
-@app.get("/items", response_model=List[Item])
+@app.get("/items", response_model=list[Item])
 async def get_items():
     """Get all items."""
     return items

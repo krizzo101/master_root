@@ -1,17 +1,18 @@
 """
 Auth module: JWT login, registration, OIDC callback, role check, password hashing
 """
-from fastapi import APIRouter, HTTPException, Depends, status, Request
-from fastapi.security import OAuth2PasswordRequestForm
-from passlib.context import CryptContext
-from jose import JWTError, jwt
-from typing import Optional, Callable
-from datetime import datetime, timedelta
-from backend.models import User, UserRole
-from backend.database import get_db
-from sqlalchemy.orm import Session
-from backend.config import get_settings
 import logging
+from datetime import datetime, timedelta
+
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordRequestForm
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from sqlalchemy.orm import Session
+
+from backend.config import get_settings
+from backend.database import get_db
+from backend.models import User, UserRole
 
 logger = logging.getLogger("taskmgmt.auth")
 router = APIRouter()
@@ -37,11 +38,11 @@ def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def get_user(email: str, db: Session) -> Optional[User]:
+def get_user(email: str, db: Session) -> User | None:
     return db.query(User).filter(User.email.ilike(email)).first()
 
 
-def authenticate(email: str, password: str, db: Session) -> Optional[User]:
+def authenticate(email: str, password: str, db: Session) -> User | None:
     user = get_user(email, db)
     if user and verify_password(password, user.hashed_password):
         return user
@@ -64,7 +65,7 @@ def decode_access_token(token: str) -> TokenData:
         user_id: str = payload.get("sub")
         role: str = payload.get("role")
         return TokenData(user_id, role)
-    except JWTError as e:
+    except JWTError:
         logger.exception("JWT Decode failed")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

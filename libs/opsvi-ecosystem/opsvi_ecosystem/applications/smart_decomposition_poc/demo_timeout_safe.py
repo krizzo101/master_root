@@ -5,10 +5,10 @@ Demonstrates parallel execution capabilities with proper timeout handling
 """
 
 import asyncio
-from pathlib import Path
 import signal
 import sys
 import time
+from pathlib import Path
 
 # Add the POC to the Python path
 poc_path = Path(__file__).parent

@@ -12,7 +12,7 @@ Complements the main execution engine for subdivision scenarios.
 """
 
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 from langgraph.constants import Send
 from langgraph.graph import END, START, StateGraph
@@ -43,7 +43,7 @@ class SubdivisionExecutor:
     async def execute_subdivision_workflow(
         self,
         state: SmartDecompositionState,
-        subdivision_agents: Dict[str, Any],
+        subdivision_agents: dict[str, Any],
         debug: bool = False,
     ) -> SmartDecompositionState:
         """
@@ -118,7 +118,7 @@ class SubdivisionExecutor:
             raise RuntimeError(f"Subdivision execution failed: {e}")
 
     def _build_subdivision_graph(
-        self, subdivision_agents: Dict[str, Any], debug: bool = False
+        self, subdivision_agents: dict[str, Any], debug: bool = False
     ) -> StateGraph:
         """Build LangGraph StateGraph for subdivision execution"""
 
@@ -165,7 +165,7 @@ class SubdivisionExecutor:
 
         return workflow.compile()
 
-    def _subdivision_coordinator_node(self, state: Dict[str, Any]) -> Dict[str, Any]:
+    def _subdivision_coordinator_node(self, state: dict[str, Any]) -> dict[str, Any]:
         """Coordinate subdivision workflow execution using Send API"""
 
         self.logger.info(
@@ -202,7 +202,7 @@ class SubdivisionExecutor:
 
         return state
 
-    def _create_subdivision_routing(self, state: Dict[str, Any]) -> List[Send]:
+    def _create_subdivision_routing(self, state: dict[str, Any]) -> list[Send]:
         """Create Send objects for parallel subdivision agent execution"""
 
         subdivision_agents = state.get("specialized_agents", {})
@@ -227,10 +227,10 @@ class SubdivisionExecutor:
 
         return send_objects
 
-    def _create_agent_execution_node(self, agent_id: str, agent_data: Dict[str, Any]):
+    def _create_agent_execution_node(self, agent_id: str, agent_data: dict[str, Any]):
         """Create execution node for a specific subdivision agent"""
 
-        async def execute_subdivision_agent(state: Dict[str, Any]) -> Dict[str, Any]:
+        async def execute_subdivision_agent(state: dict[str, Any]) -> dict[str, Any]:
             """Execute a single subdivision agent"""
 
             self.logger.info(f"🤖 Executing subdivision agent: {agent_id}")
@@ -307,7 +307,7 @@ Provide your specialized contribution to this subdivided workflow.
 
         return execute_subdivision_agent
 
-    def _aggregate_results_node(self, state: Dict[str, Any]) -> Dict[str, Any]:
+    def _aggregate_results_node(self, state: dict[str, Any]) -> dict[str, Any]:
         """Aggregate results from all subdivision agents"""
 
         self.logger.info("🔄 RESULT AGGREGATION: Combining subdivision agent outputs...")
@@ -338,8 +338,8 @@ Provide your specialized contribution to this subdivided workflow.
         return state
 
     def get_subdivision_execution_metrics(
-        self, state: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, state: dict[str, Any]
+    ) -> dict[str, Any]:
         """Get metrics about subdivision execution"""
 
         agent_outputs = state.get("agent_outputs", {})

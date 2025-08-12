@@ -15,15 +15,13 @@ Assignment: Integration of workflow engine with agent coordination layer
 import asyncio
 import logging
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Set, Union, Callable
+from typing import Any, Dict, List, Optional, Callable
 from dataclasses import dataclass, field
 from enum import Enum
 
 from .agent_registry import AgentRegistry, get_registry, RegistrationStatus
 from .message_bus import MessageBus, get_message_bus, MessagePriority, SubscriptionType
-from ..agents.base_agent import AgentMessage, MessageType, BaseAgent
-from ..workflow.workflow_executor import WorkflowExecutor
-from ..workflow.workflow_parser import WorkflowParser
+from ..agents.base_agent import AgentMessage, MessageType
 
 
 class WorkflowExecutionStatus(Enum):

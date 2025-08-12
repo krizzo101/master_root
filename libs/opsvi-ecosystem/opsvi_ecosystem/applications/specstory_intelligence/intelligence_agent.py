@@ -12,9 +12,8 @@ Links each insight to atomic component IDs (if available).
 Reference: docs/applications/agent_intelligence_pipeline.md (authoritative schema)
 """
 
-from datetime import datetime
-from typing import Dict, List, Optional
 import uuid
+from datetime import datetime
 
 
 class IntelligenceAgent:
@@ -22,8 +21,8 @@ class IntelligenceAgent:
         pass
 
     def extract_insights(
-        self, cleaned_lines: List[str], atomic_components: Optional[List[Dict]] = None
-    ) -> List[Dict]:
+        self, cleaned_lines: list[str], atomic_components: list[dict] | None = None
+    ) -> list[dict]:
         """
         Extract intelligence insights from cleaned log lines and/or atomic components.
         Returns a list of dicts matching the minimal intelligence schema.
@@ -104,8 +103,8 @@ class IntelligenceAgent:
         return insights
 
     def _find_related_components(
-        self, line_idx: int, atomic_components: Optional[List[Dict]]
-    ) -> List[str]:
+        self, line_idx: int, atomic_components: list[dict] | None
+    ) -> list[str]:
         """
         Prototype: Link insight to atomic component IDs based on line number proximity.
         TODO: Improve with richer mapping logic.

@@ -1,11 +1,14 @@
 """
 DataProcessor module: Handles aggregation, summary statistics, and data analysis.
 """
-from typing import Any, Callable, Dict, Optional
-import pandas as pd
+from collections.abc import Callable
+from typing import Any
+
 import numpy as np
-from csv_reporter.logger import logger
+import pandas as pd
+
 from csv_reporter.config import Config
+from csv_reporter.logger import logger
 
 
 class DataProcessor:
@@ -19,8 +22,8 @@ class DataProcessor:
         self.config = config
 
     def process(
-        self, df: pd.DataFrame, progress_cb: Optional[Callable[[int], None]] = None
-    ) -> Dict[str, Any]:
+        self, df: pd.DataFrame, progress_cb: Callable[[int], None] | None = None
+    ) -> dict[str, Any]:
         """
         Process data and return a summary suitable for reporting.
 
@@ -33,7 +36,7 @@ class DataProcessor:
             ValueError: On failure to process.
         """
         logger.debug(f"Processing {len(df)} rows, {df.columns.tolist()} columns.")
-        summary: Dict[str, Any] = {}
+        summary: dict[str, Any] = {}
         row_total = len(df)
         for idx, col in enumerate(df.columns):
             col_data = df[col]

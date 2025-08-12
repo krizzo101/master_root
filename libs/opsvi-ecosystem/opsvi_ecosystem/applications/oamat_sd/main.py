@@ -9,9 +9,9 @@ Handles CLI parsing, dependency injection, and orchestration.
 import argparse
 import asyncio
 import logging
-from pathlib import Path
 import sys
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any
 
 # Add project root to path for absolute imports
 project_root = Path(__file__).parents[3]
@@ -32,7 +32,7 @@ from src.shared.openai_interfaces.chat_completions_interface import (
 
 async def run_smart_decomposition(
     request: str, debug: bool = False, no_review: bool = False
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Run the Smart Decomposition Agent with request preprocessing and dynamic configuration generation"""
 
     # Initialize beautiful console interface
@@ -153,7 +153,7 @@ async def run_smart_decomposition(
     return result
 
 
-def print_results(result: Dict[str, Any]) -> None:
+def print_results(result: dict[str, Any]) -> None:
     """Print results in a user-friendly format"""
     print("\n" + "=" * 80)
     print("🧠 SMART DECOMPOSITION AGENT - RESULTS")

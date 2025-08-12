@@ -3,13 +3,11 @@
 Comprehensive authentication and authorization abstraction for the OPSVI ecosystem
 """
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Union, AsyncIterator
-import asyncio
+from abc import abstractmethod
+from typing import Any, Dict, List, Optional
 import logging
 from enum import Enum
-from datetime import datetime, timedelta
-from contextlib import asynccontextmanager
+from datetime import datetime
 
 from pydantic import BaseModel, Field, ConfigDict
 

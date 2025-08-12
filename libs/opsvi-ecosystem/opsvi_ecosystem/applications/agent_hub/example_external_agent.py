@@ -5,7 +5,6 @@ Demonstrates how another AI agent would discover and use our Agent Hub.
 """
 
 import asyncio
-from typing import Dict
 
 import httpx
 
@@ -73,7 +72,7 @@ class ExternalAIAgent:
             return None
 
     async def use_agent_protocol(
-        self, task_description: str, additional_params: Dict = None
+        self, task_description: str, additional_params: dict = None
     ):
         """Step 3: Use standardized Agent Protocol for communication"""
         print(f"🤖 [{self.name}] Using Agent Protocol for task: {task_description}")
@@ -117,7 +116,7 @@ class ExternalAIAgent:
             print(f"❌ Agent Protocol error: {e}")
             return None
 
-    async def use_direct_rpc(self, method: str, params: Dict):
+    async def use_direct_rpc(self, method: str, params: dict):
         """Step 4: Use direct JSON-RPC for specific agent methods"""
         print(f"🎯 [{self.name}] Direct RPC call: {method}")
 

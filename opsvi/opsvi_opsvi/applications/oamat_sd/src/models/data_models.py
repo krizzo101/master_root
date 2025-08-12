@@ -4,10 +4,10 @@ Smart Decomposition Data Models Implementation
 Implements all Pydantic models from DATA_MODELS_SPECIFICATION.md
 """
 
+import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
-import uuid
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -58,13 +58,13 @@ class RequestInput(BaseModel):
     content: str = Field(
         ..., min_length=10, max_length=10000, description="Raw user request content"
     )
-    request_type: Optional[RequestType] = Field(
+    request_type: RequestType | None = Field(
         None, description="Detected or specified request type"
     )
-    context: Dict[str, Any] = Field(
+    context: dict[str, Any] = Field(
         default_factory=dict, description="Additional context information"
     )
-    user_preferences: Dict[str, Any] = Field(
+    user_preferences: dict[str, Any] = Field(
         default_factory=dict, description="User preferences and constraints"
     )
     correlation_id: str = Field(
@@ -87,19 +87,19 @@ class ValidationResult(BaseModel):
     """Request validation outcome"""
 
     is_valid: bool = Field(..., description="Overall validation status")
-    detected_type: Optional[RequestType] = Field(
+    detected_type: RequestType | None = Field(
         None, description="Auto-detected request type"
     )
     confidence_score: float = Field(
         ..., ge=0.0, le=1.0, description="Detection confidence (0-1)"
     )
-    extracted_info: Dict[str, Any] = Field(
+    extracted_info: dict[str, Any] = Field(
         default_factory=dict, description="Extracted structured information"
     )
-    validation_errors: List[str] = Field(
+    validation_errors: list[str] = Field(
         default_factory=list, description="Validation error messages"
     )
-    schema_matches: List[str] = Field(
+    schema_matches: list[str] = Field(
         default_factory=list, description="Matching schema identifiers"
     )
 
@@ -111,22 +111,18 @@ class InformationGap(BaseModel):
     description: str = Field(..., description="Human-readable gap description")
     priority: Priority = Field(..., description="Gap priority level")
     required_for_execution: bool = Field(..., description="Blocks execution if missing")
-    suggested_default: Optional[Any] = Field(
-        None, description="Suggested default value"
-    )
-    research_strategy: Optional[str] = Field(
-        None, description="How to research this gap"
-    )
+    suggested_default: Any | None = Field(None, description="Suggested default value")
+    research_strategy: str | None = Field(None, description="How to research this gap")
 
 
 class GapAnalysisResult(BaseModel):
     """Complete gap analysis outcome"""
 
     total_gaps: int = Field(..., ge=0, description="Total number of gaps identified")
-    critical_gaps: List[InformationGap] = Field(
+    critical_gaps: list[InformationGap] = Field(
         default_factory=list, description="Critical gaps requiring user input"
     )
-    auto_fillable_gaps: List[InformationGap] = Field(
+    auto_fillable_gaps: list[InformationGap] = Field(
         default_factory=list, description="Gaps that can be auto-completed"
     )
     completion_percentage: float = Field(
@@ -145,7 +141,7 @@ class CompletionAction(BaseModel):
     action_type: str = Field(..., description="Type of completion action")
     data_source: str = Field(..., description="Source of completion data")
     confidence: float = Field(..., ge=0.0, le=1.0, description="Completion confidence")
-    assumptions_made: List[str] = Field(
+    assumptions_made: list[str] = Field(
         default_factory=list, description="Assumptions made during completion"
     )
 
@@ -153,13 +149,13 @@ class CompletionAction(BaseModel):
 class InformationCompletionResult(BaseModel):
     """Result of information completion process"""
 
-    completion_actions: List[CompletionAction] = Field(
+    completion_actions: list[CompletionAction] = Field(
         default_factory=list, description="Actions taken to complete information"
     )
-    filled_data: Dict[str, Any] = Field(
+    filled_data: dict[str, Any] = Field(
         default_factory=dict, description="Data that was filled in"
     )
-    remaining_gaps: List[InformationGap] = Field(
+    remaining_gaps: list[InformationGap] = Field(
         default_factory=list, description="Gaps that could not be filled"
     )
     completion_confidence: float = Field(
@@ -174,7 +170,7 @@ class ComplexityFactor(BaseModel):
     name: str = Field(..., description="Factor name")
     score: int = Field(..., ge=1, le=10, description="Complexity score (1-10)")
     reasoning: str = Field(..., description="Explanation for the score")
-    indicators: List[str] = Field(
+    indicators: list[str] = Field(
         default_factory=list,
         description="Specific indicators that influenced the score",
     )
@@ -186,18 +182,18 @@ class ComplexityFactor(BaseModel):
 class ComplexityAnalysis(BaseModel):
     """Complete complexity analysis result"""
 
-    factors: Dict[str, ComplexityFactor] = Field(
+    factors: dict[str, ComplexityFactor] = Field(
         ..., description="Six complexity factors"
     )
     overall_score: float = Field(
         ..., ge=0.0, le=100.0, description="Overall complexity score"
     )
     execution_strategy: str = Field(..., description="Recommended execution strategy")
-    agent_requirements: Dict[str, Any] = Field(
+    agent_requirements: dict[str, Any] = Field(
         default_factory=dict, description="Required agent capabilities"
     )
     estimated_effort: str = Field(..., description="Effort estimation")
-    reasoning_chain: List[str] = Field(
+    reasoning_chain: list[str] = Field(
         default_factory=list, description="Step-by-step reasoning"
     )
     confidence: float = Field(
@@ -226,7 +222,7 @@ class AgentCommand(BaseModel):
     command_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     agent_role: str = Field(..., description="Target agent role")
     action: str = Field(..., description="Action to perform")
-    parameters: Dict[str, Any] = Field(default_factory=dict)
+    parameters: dict[str, Any] = Field(default_factory=dict)
     priority: int = Field(default=1, ge=1, le=5)
     timeout: int = Field(default=300, description="Timeout in seconds")
 
@@ -237,8 +233,8 @@ class AgentResult(BaseModel):
     command_id: str = Field(..., description="Source command ID")
     agent_role: str = Field(..., description="Agent that produced result")
     success: bool = Field(..., description="Whether execution succeeded")
-    result_data: Dict[str, Any] = Field(default_factory=dict)
-    error_message: Optional[str] = Field(None)
+    result_data: dict[str, Any] = Field(default_factory=dict)
+    error_message: str | None = Field(None)
     execution_time: float = Field(..., description="Execution time in seconds")
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
@@ -248,10 +244,10 @@ class AgentState(BaseModel):
 
     state_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     current_phase: str = Field(..., description="Current execution phase")
-    active_agents: List[str] = Field(default_factory=list)
-    completed_commands: List[str] = Field(default_factory=list)
-    pending_commands: List[AgentCommand] = Field(default_factory=list)
-    state_data: Dict[str, Any] = Field(default_factory=dict)
+    active_agents: list[str] = Field(default_factory=list)
+    completed_commands: list[str] = Field(default_factory=list)
+    pending_commands: list[AgentCommand] = Field(default_factory=list)
+    state_data: dict[str, Any] = Field(default_factory=dict)
     last_updated: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -262,7 +258,7 @@ class SystemError(BaseModel):
     error_message: str = Field(..., description="Human-readable error message")
     component: str = Field(..., description="Component that generated the error")
     severity: str = Field(..., description="Error severity level")
-    context: Dict[str, Any] = Field(default_factory=dict)
+    context: dict[str, Any] = Field(default_factory=dict)
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     recovery_suggested: bool = Field(default=False)
 
@@ -273,11 +269,11 @@ class ExecutionResult(BaseModel):
     execution_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     status: ExecutionStatus = Field(..., description="Final execution status")
     start_time: datetime = Field(default_factory=datetime.utcnow)
-    end_time: Optional[datetime] = Field(None)
-    final_output: Dict[str, Any] = Field(default_factory=dict)
-    agent_contributions: Dict[str, AgentResult] = Field(default_factory=dict)
-    errors: List[SystemError] = Field(default_factory=list)
-    performance_metrics: Dict[str, float] = Field(default_factory=dict)
+    end_time: datetime | None = Field(None)
+    final_output: dict[str, Any] = Field(default_factory=dict)
+    agent_contributions: dict[str, AgentResult] = Field(default_factory=dict)
+    errors: list[SystemError] = Field(default_factory=list)
+    performance_metrics: dict[str, float] = Field(default_factory=dict)
     success: bool = Field(..., description="Overall success indicator")
 
     @field_validator("end_time")
@@ -294,7 +290,7 @@ class GapAnalysisInput(BaseModel):
     request_id: str = Field(
         ..., description="Unique identifier for the gap analysis request"
     )
-    input_data: Dict[str, Any] = Field(
+    input_data: dict[str, Any] = Field(
         default_factory=dict, description="Input data for gap analysis"
     )
     timestamp: datetime = Field(
@@ -308,7 +304,7 @@ class InformationCompletionInput(BaseModel):
     request_id: str = Field(
         ..., description="Unique identifier for the information completion request"
     )
-    input_data: Dict[str, Any] = Field(
+    input_data: dict[str, Any] = Field(
         default_factory=dict, description="Input data for information completion"
     )
     timestamp: datetime = Field(

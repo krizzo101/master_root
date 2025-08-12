@@ -1,11 +1,11 @@
 """Authentication dependencies for FastAPI routes."""
 
 import logging
-from typing import Optional, List
+from typing import List
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from .jwt_handler import jwt_manager, TokenData, User
+from .jwt_handler import jwt_manager, User
 from .user_management import user_manager
 
 logger = logging.getLogger(__name__)

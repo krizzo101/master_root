@@ -1,5 +1,4 @@
 from typing import List, Any, Optional, Dict
-import json
 from datetime import datetime, timedelta
 from dataclasses import dataclass, asdict
 from statistics import mean, median

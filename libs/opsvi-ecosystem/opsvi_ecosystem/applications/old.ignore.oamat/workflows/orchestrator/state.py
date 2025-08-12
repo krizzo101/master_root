@@ -2,12 +2,12 @@
 OAMAT Workflow Orchestrator State Management
 """
 
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, Any
 
 from typing_extensions import TypedDict
 
 
-def add_unique_nodes(left: List[str], right: List[str]) -> List[str]:
+def add_unique_nodes(left: list[str], right: list[str]) -> list[str]:
     """
     Custom reducer for completed_nodes that maintains uniqueness.
     Prevents massive duplication that was occurring with operator.add.
@@ -33,35 +33,35 @@ class AgenticWorkflowState(TypedDict, total=False):
     """State model for agentic workflows"""
 
     user_request: str
-    context: Dict[str, Any]
-    current_node: Optional[str]
+    context: dict[str, Any]
+    current_node: str | None
     # Use custom unique reducer to prevent duplication bug
-    completed_nodes: Annotated[List[str], add_unique_nodes]
-    results: Dict[str, Any]
-    errors: List[str]
-    metadata: Dict[str, Any]
+    completed_nodes: Annotated[list[str], add_unique_nodes]
+    results: dict[str, Any]
+    errors: list[str]
+    metadata: dict[str, Any]
 
     # OAMAT project context
-    project_name: Optional[str]
-    project_path: Optional[str]
+    project_name: str | None
+    project_path: str | None
 
     # Additional fields that might be used by the workflow
-    planned_nodes: List[Dict[str, Any]]
-    workflow_plan: Optional[Any]  # EnhancedWorkflowPlan for supervisor routing
-    sdlc_context: Dict[str, Any]
-    node_outputs: Dict[str, Any]
-    agent_outputs: Dict[str, Any]  # Agent execution outputs
-    current_task: Optional[Dict[str, Any]]
-    failed_nodes: List[str]
+    planned_nodes: list[dict[str, Any]]
+    workflow_plan: Any | None  # EnhancedWorkflowPlan for supervisor routing
+    sdlc_context: dict[str, Any]
+    node_outputs: dict[str, Any]
+    agent_outputs: dict[str, Any]  # Agent execution outputs
+    current_task: dict[str, Any] | None
+    failed_nodes: list[str]
 
     # Workflow completion status
-    success: Optional[bool]
-    error: Optional[str]
-    total_files_created: Optional[int]
+    success: bool | None
+    error: str | None
+    total_files_created: int | None
 
 
 def create_initial_state(
-    user_request: str, context: Dict[str, Any] = None, **kwargs
+    user_request: str, context: dict[str, Any] = None, **kwargs
 ) -> AgenticWorkflowState:
     """Create the initial state for a workflow execution"""
 

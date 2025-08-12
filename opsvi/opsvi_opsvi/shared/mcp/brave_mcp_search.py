@@ -63,15 +63,14 @@ python brave_mcp_search.py "search query here"
 """
 
 import asyncio
-from contextlib import asynccontextmanager
-from dataclasses import dataclass
 import json
 import logging
 import os
-from pathlib import Path
 import subprocess
 import sys
-from typing import List, Optional
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
+from pathlib import Path
 
 # MCP imports
 try:
@@ -125,7 +124,7 @@ class SearchResponse:
     """Represents a collection of search results."""
 
     query: str
-    results: List[SearchResult]
+    results: list[SearchResult]
     total_results: int
 
     def __str__(self) -> str:
@@ -149,9 +148,9 @@ class BraveMCPSearch:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
+        api_key: str | None = None,
         debug: bool = False,
-        mcp_config_path: Optional[str] = None,
+        mcp_config_path: str | None = None,
     ):
         """
         Initialize the Brave MCP Search client.
@@ -184,7 +183,7 @@ class BraveMCPSearch:
                 "3. Configure it in mcp.json under mcpServers.web_search.env.BRAVE_API_KEY"
             )
 
-    def _get_api_key_from_config(self) -> Optional[str]:
+    def _get_api_key_from_config(self) -> str | None:
         """
         Attempt to read the Brave API key from mcp.json configuration file.
 
@@ -310,7 +309,7 @@ class BraveMCPSearch:
         return SearchResponse(query=query, results=[], total_results=0)
 
     async def search(
-        self, query: str, count: int = 10, freshness: Optional[str] = None
+        self, query: str, count: int = 10, freshness: str | None = None
     ) -> SearchResponse:
         """
         Perform a web search using Brave Search API.
@@ -381,7 +380,7 @@ class BraveMCPSearch:
                 raise BraveMCPError(f"Image search failed: {e}")
 
     async def news_search(
-        self, query: str, count: int = 10, freshness: Optional[str] = None
+        self, query: str, count: int = 10, freshness: str | None = None
     ) -> SearchResponse:
         """
         Search for news articles using Brave Search API.
@@ -414,7 +413,7 @@ class BraveMCPSearch:
                 raise BraveMCPError(f"News search failed: {e}")
 
     async def video_search(
-        self, query: str, count: int = 10, freshness: Optional[str] = None
+        self, query: str, count: int = 10, freshness: str | None = None
     ) -> SearchResponse:
         """
         Search for videos using Brave Search API.
@@ -481,7 +480,7 @@ class BraveMCPSearch:
 async def quick_search(
     query: str,
     search_type: str = "web",
-    mcp_config_path: Optional[str] = None,
+    mcp_config_path: str | None = None,
     **kwargs,
 ) -> SearchResponse:
     """

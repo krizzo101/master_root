@@ -11,7 +11,7 @@ This module provides the base class for all content preprocessors.
 """
 
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 

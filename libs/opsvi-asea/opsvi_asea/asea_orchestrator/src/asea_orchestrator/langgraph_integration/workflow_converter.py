@@ -7,13 +7,11 @@ preserving all functionality while adding LangGraph capabilities.
 
 import json
 from typing import Dict, Any, List, Optional, Callable
-from pathlib import Path
 
 from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
 
 from .state import ASEAState, create_initial_state
-from .plugin_adapter import create_plugin_node
 from ..plugins.plugin_manager import PluginManager
 
 

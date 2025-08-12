@@ -9,15 +9,15 @@ Stream 4: Performance & Security Analysis
 """
 
 import asyncio
-from datetime import datetime
 import gc
 import json
-from pathlib import Path
 import statistics
 import subprocess
 import sys
 import time
-from typing import Any, Dict
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 import psutil
 
@@ -34,7 +34,7 @@ class PerformanceBaseline:
             "sophistication_analysis": {},
         }
 
-    def _get_system_info(self) -> Dict[str, Any]:
+    def _get_system_info(self) -> dict[str, Any]:
         """Get system information for baseline context"""
         return {
             "cpu_count": psutil.cpu_count(),
@@ -45,7 +45,7 @@ class PerformanceBaseline:
 
     async def _measure_asyncio_gather_performance(
         self, task_count: int = 10
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Measure performance of forbidden asyncio.gather pattern"""
         print(f"📊 Measuring asyncio.gather performance ({task_count} tasks)...")
 
@@ -83,7 +83,7 @@ class PerformanceBaseline:
 
     async def _simulate_send_api_performance(
         self, task_count: int = 10
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Simulate expected Send API performance (target sophistication)"""
         print(f"📊 Simulating Send API performance ({task_count} tasks)...")
 
@@ -124,7 +124,7 @@ class PerformanceBaseline:
             "improvement_factor": 3.0,  # Expected 3x improvement
         }
 
-    def _measure_validation_performance(self) -> Dict[str, Any]:
+    def _measure_validation_performance(self) -> dict[str, Any]:
         """Measure sophistication validation script performance"""
         print("📊 Measuring validation script performance...")
 
@@ -157,7 +157,7 @@ class PerformanceBaseline:
         else:
             return {"status": "FAILED", "error": "All validation runs failed"}
 
-    def _analyze_memory_usage(self) -> Dict[str, Any]:
+    def _analyze_memory_usage(self) -> dict[str, Any]:
         """Analyze memory usage patterns"""
         print("📊 Analyzing memory usage...")
 
@@ -171,7 +171,7 @@ class PerformanceBaseline:
             "available_mb": psutil.virtual_memory().available / 1024 / 1024,
         }
 
-    def _security_analysis(self) -> Dict[str, Any]:
+    def _security_analysis(self) -> dict[str, Any]:
         """Basic security analysis of sophistication patterns"""
         print("🔒 Performing security analysis...")
 
@@ -205,7 +205,7 @@ class PerformanceBaseline:
 
         return security_analysis
 
-    async def run_baseline_analysis(self) -> Dict[str, Any]:
+    async def run_baseline_analysis(self) -> dict[str, Any]:
         """Run complete performance baseline analysis"""
         print("🚀 Starting Performance Baseline Analysis...")
         print("=" * 60)

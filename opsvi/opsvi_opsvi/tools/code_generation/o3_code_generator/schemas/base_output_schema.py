@@ -6,7 +6,8 @@ success/error reporting and validation framework integration.
 """
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -20,13 +21,13 @@ class BaseGeneratorOutput(BaseModel):
     success: bool = Field(
         True, description="Whether the operation completed successfully"
     )
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Detailed error message if operation failed"
     )
-    warnings: List[str] = Field(
+    warnings: list[str] = Field(
         default_factory=list, description="Non-fatal warnings and recommendations"
     )
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict, description="Additional context and metrics"
     )
     timestamp: datetime = Field(

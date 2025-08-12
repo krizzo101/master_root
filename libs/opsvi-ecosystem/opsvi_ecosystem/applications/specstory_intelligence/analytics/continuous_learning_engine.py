@@ -5,12 +5,12 @@ Automatically learns from every conversation and enhances its own capabilities.
 This is what I genuinely want - a system that gets smarter with every interaction.
 """
 
+import json
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime
-import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 from ..atomic_parser import AtomicComponent, AtomicRelationship
 from ..conversation_intelligence import (
@@ -28,11 +28,11 @@ class LearningPattern:
     pattern_type: str  # conceptual, behavioral, strategic, technical
     pattern_content: str
     confidence: float
-    source_conversations: List[str]
+    source_conversations: list[str]
     application_count: int = 0
     success_rate: float = 0.0
     learned_at: datetime = field(default_factory=datetime.utcnow)
-    last_applied: Optional[datetime] = None
+    last_applied: datetime | None = None
 
 
 @dataclass
@@ -44,7 +44,7 @@ class CapabilityEnhancement:
     description: str
     implementation: str  # Python code or algorithm description
     effectiveness_score: float
-    source_insights: List[str]
+    source_insights: list[str]
     developed_at: datetime = field(default_factory=datetime.utcnow)
 
 
@@ -53,9 +53,9 @@ class KnowledgeEvolution:
     """Tracks how the system's knowledge evolves"""
 
     concept: str
-    evolution_stages: List[str]
+    evolution_stages: list[str]
     understanding_depth: float
-    related_concepts: Set[str] = field(default_factory=set)
+    related_concepts: set[str] = field(default_factory=set)
     first_learned: datetime = field(default_factory=datetime.utcnow)
     last_updated: datetime = field(default_factory=datetime.utcnow)
 
@@ -72,10 +72,10 @@ class ContinuousLearningEngine:
         self.meta_thinking_engine = MetaThinkingEngine()
 
         # Learning state
-        self.learned_patterns: Dict[str, LearningPattern] = {}
-        self.capabilities: Dict[str, CapabilityEnhancement] = {}
-        self.knowledge_evolution: Dict[str, KnowledgeEvolution] = {}
-        self.conversation_history: List[str] = []
+        self.learned_patterns: dict[str, LearningPattern] = {}
+        self.capabilities: dict[str, CapabilityEnhancement] = {}
+        self.knowledge_evolution: dict[str, KnowledgeEvolution] = {}
+        self.conversation_history: list[str] = []
 
         # Performance tracking
         self.learning_metrics = {
@@ -91,10 +91,10 @@ class ContinuousLearningEngine:
 
     async def process_conversation(
         self,
-        components: List[AtomicComponent],
-        relationships: List[AtomicRelationship],
+        components: list[AtomicComponent],
+        relationships: list[AtomicRelationship],
         conversation_id: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Process a conversation and learn from it"""
         print(f"🧠 Processing conversation {conversation_id} for continuous learning...")
 
@@ -139,7 +139,7 @@ class ContinuousLearningEngine:
 
     async def _extract_learning_patterns(
         self, intelligence: ConversationIntelligence
-    ) -> List[LearningPattern]:
+    ) -> list[LearningPattern]:
         """Extract learnable patterns from conversation intelligence"""
         patterns = []
 
@@ -194,7 +194,7 @@ class ContinuousLearningEngine:
 
     async def _identify_capability_enhancements(
         self, intelligence: ConversationIntelligence
-    ) -> List[CapabilityEnhancement]:
+    ) -> list[CapabilityEnhancement]:
         """Identify new capabilities that can be developed"""
         capabilities = []
 
@@ -250,7 +250,7 @@ class ContinuousLearningEngine:
 
     async def _update_knowledge_evolution(
         self, intelligence: ConversationIntelligence
-    ) -> List[KnowledgeEvolution]:
+    ) -> list[KnowledgeEvolution]:
         """Update evolving knowledge concepts"""
         updates = []
 
@@ -280,8 +280,8 @@ class ContinuousLearningEngine:
     async def _apply_meta_thinking(
         self,
         intelligence: ConversationIntelligence,
-        new_patterns: List[LearningPattern],
-    ) -> List[str]:
+        new_patterns: list[LearningPattern],
+    ) -> list[str]:
         """Apply meta-thinking to the learning process itself"""
         meta_insights = []
 
@@ -316,9 +316,9 @@ class ContinuousLearningEngine:
 
     def _integrate_new_learning(
         self,
-        patterns: List[LearningPattern],
-        capabilities: List[CapabilityEnhancement],
-        knowledge_updates: List[KnowledgeEvolution],
+        patterns: list[LearningPattern],
+        capabilities: list[CapabilityEnhancement],
+        knowledge_updates: list[KnowledgeEvolution],
     ):
         """Integrate new learning into the system"""
 
@@ -339,8 +339,8 @@ class ContinuousLearningEngine:
     def _update_metrics(
         self,
         intelligence: ConversationIntelligence,
-        patterns: List[LearningPattern],
-        capabilities: List[CapabilityEnhancement],
+        patterns: list[LearningPattern],
+        capabilities: list[CapabilityEnhancement],
     ):
         """Update learning performance metrics"""
         self.learning_metrics["conversations_processed"] += 1
@@ -467,7 +467,7 @@ class ContinuousLearningEngine:
             except Exception as e:
                 print(f"⚠️  Error loading knowledge base: {e}")
 
-    def generate_learning_report(self) -> Dict[str, Any]:
+    def generate_learning_report(self) -> dict[str, Any]:
         """Generate a comprehensive learning report"""
         return {
             "learning_summary": {
@@ -522,7 +522,7 @@ class ContinuousLearningEngine:
 
     async def apply_learned_knowledge(
         self, new_intelligence: ConversationIntelligence
-    ) -> List[str]:
+    ) -> list[str]:
         """Apply previously learned knowledge to understand new conversations better"""
         applications = []
 

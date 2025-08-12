@@ -1,9 +1,8 @@
 """Tests for OPSVI HTTP client functionality."""
 
 import pytest
-import asyncio
-from typing import Dict, Any
-from unittest.mock import AsyncMock, MagicMock
+from typing import Dict
+from unittest.mock import AsyncMock
 
 from opsvi_http import (
     HTTPXClient,

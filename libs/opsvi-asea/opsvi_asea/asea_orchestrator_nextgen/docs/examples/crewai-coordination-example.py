@@ -13,10 +13,8 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 from enum import Enum
 from dataclasses import dataclass, field
-from pydantic import BaseModel, Field
 
 from crewai import Agent, Task, Crew, Process
-from crewai.memory import ShortTermMemory, LongTermMemory
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from src.shared.openai_interfaces.base import OpenAIBaseInterface
 
@@ -19,7 +19,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
 
     # No __init__ override; base class sets self.client
 
-    def create_assistant(self, **kwargs) -> Dict[str, Any]:
+    def create_assistant(self, **kwargs) -> dict[str, Any]:
         if not hasattr(self, "client") or self.client is None:
             raise RuntimeError(
                 "OpenAIAssistantsInterface: self.client is not set. Ensure base class __init__ is called."
@@ -35,7 +35,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def retrieve_assistant(self, assistant_id: str) -> Dict[str, Any]:
+    def retrieve_assistant(self, assistant_id: str) -> dict[str, Any]:
         """
         Retrieve an assistant by ID.
         GET /v1/assistants/{assistant_id}
@@ -50,7 +50,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def modify_assistant(self, assistant_id: str, **kwargs) -> Dict[str, Any]:
+    def modify_assistant(self, assistant_id: str, **kwargs) -> dict[str, Any]:
         """
         Modify an assistant.
         POST /v1/assistants/{assistant_id}
@@ -65,7 +65,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def delete_assistant(self, assistant_id: str) -> Dict[str, Any]:
+    def delete_assistant(self, assistant_id: str) -> dict[str, Any]:
         """
         Delete an assistant.
         DELETE /v1/assistants/{assistant_id}
@@ -80,7 +80,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def list_assistants(self) -> List[Dict[str, Any]]:
+    def list_assistants(self) -> list[dict[str, Any]]:
         """
         List all assistants.
         GET /v1/assistants
@@ -95,7 +95,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def create_thread(self, **kwargs) -> Dict[str, Any]:
+    def create_thread(self, **kwargs) -> dict[str, Any]:
         """
         Create a thread.
         POST /v1/threads
@@ -110,7 +110,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def retrieve_thread(self, thread_id: str) -> Dict[str, Any]:
+    def retrieve_thread(self, thread_id: str) -> dict[str, Any]:
         """
         Retrieve a thread by ID.
         GET /v1/threads/{thread_id}
@@ -125,7 +125,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def modify_thread(self, thread_id: str, **kwargs) -> Dict[str, Any]:
+    def modify_thread(self, thread_id: str, **kwargs) -> dict[str, Any]:
         """
         Modify a thread.
         POST /v1/threads/{thread_id}
@@ -140,7 +140,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def delete_thread(self, thread_id: str) -> Dict[str, Any]:
+    def delete_thread(self, thread_id: str) -> dict[str, Any]:
         """
         Delete a thread.
         DELETE /v1/threads/{thread_id}
@@ -155,7 +155,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def list_threads(self) -> List[Dict[str, Any]]:
+    def list_threads(self) -> list[dict[str, Any]]:
         """
         List all threads.
         GET /v1/threads
@@ -170,7 +170,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def create_message(self, thread_id: str, **kwargs) -> Dict[str, Any]:
+    def create_message(self, thread_id: str, **kwargs) -> dict[str, Any]:
         """
         Create a message in a thread.
         POST /v1/threads/{thread_id}/messages
@@ -187,7 +187,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def list_messages(self, thread_id: str) -> List[Dict[str, Any]]:
+    def list_messages(self, thread_id: str) -> list[dict[str, Any]]:
         """
         List all messages in a thread.
         GET /v1/threads/{thread_id}/messages
@@ -202,7 +202,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def retrieve_message(self, thread_id: str, message_id: str) -> Dict[str, Any]:
+    def retrieve_message(self, thread_id: str, message_id: str) -> dict[str, Any]:
         """
         Retrieve a message by ID.
         GET /v1/threads/{thread_id}/messages/{message_id}
@@ -219,7 +219,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def run_thread(self, thread_id: str, **kwargs) -> Dict[str, Any]:
+    def run_thread(self, thread_id: str, **kwargs) -> dict[str, Any]:
         """
         Run a thread.
         POST /v1/threads/{thread_id}/runs
@@ -236,7 +236,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def retrieve_run(self, thread_id: str, run_id: str) -> Dict[str, Any]:
+    def retrieve_run(self, thread_id: str, run_id: str) -> dict[str, Any]:
         """
         Retrieve a run by ID.
         GET /v1/threads/{thread_id}/runs/{run_id}
@@ -253,7 +253,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def list_runs(self, thread_id: str) -> List[Dict[str, Any]]:
+    def list_runs(self, thread_id: str) -> list[dict[str, Any]]:
         """
         List all runs in a thread.
         GET /v1/threads/{thread_id}/runs
@@ -268,7 +268,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def cancel_run(self, thread_id: str, run_id: str) -> Dict[str, Any]:
+    def cancel_run(self, thread_id: str, run_id: str) -> dict[str, Any]:
         """
         Cancel a run.
         POST /v1/threads/{thread_id}/runs/{run_id}/cancel
@@ -285,7 +285,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def list_run_steps(self, thread_id: str, run_id: str) -> List[Dict[str, Any]]:
+    def list_run_steps(self, thread_id: str, run_id: str) -> list[dict[str, Any]]:
         """
         List all run steps in a run.
         GET /v1/threads/{thread_id}/runs/{run_id}/steps
@@ -304,7 +304,7 @@ class OpenAIAssistantsInterface(OpenAIBaseInterface):
 
     def retrieve_run_step(
         self, thread_id: str, run_id: str, step_id: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Retrieve a run step by ID.
         GET /v1/threads/{thread_id}/runs/{run_id}/steps/{step_id}

@@ -1,5 +1,6 @@
+from unittest.mock import MagicMock
+
 import pytest
-from unittest.mock import MagicMock, patch
 from ai_collab_task_manager.calendar import GoogleCalendarService
 
 

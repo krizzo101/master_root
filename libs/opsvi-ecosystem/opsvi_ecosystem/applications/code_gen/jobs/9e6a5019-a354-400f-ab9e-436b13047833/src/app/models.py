@@ -2,9 +2,9 @@
 SQLAlchemy models for CMS core entities: User, Post, Category, Tag, Image, PostView.
 """
 from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
+
 from flask_login import UserMixin
-from sqlalchemy.dialects.postgresql import JSONB, ARRAY
+
 from . import db
 
 # Association tables for many-to-many relationships

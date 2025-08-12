@@ -8,14 +8,14 @@ Extracted from manager.py for better modularity and maintainability.
 import json
 import logging
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.applications.oamat.agents.models import EnhancedRequestAnalysis
 
 logger = logging.getLogger("OAMAT.ManagerUtilities")
 
 
-def extract_structured_info(text: str, pattern: str) -> Optional[str]:
+def extract_structured_info(text: str, pattern: str) -> str | None:
     """
     Extract structured information from text using regex pattern.
 
@@ -59,7 +59,7 @@ def clean_json_response(response_text: str) -> str:
     return response_text
 
 
-def extract_json_from_response(response_text: str) -> Dict[str, Any]:
+def extract_json_from_response(response_text: str) -> dict[str, Any]:
     """
     Extract and parse JSON from response text.
 
@@ -98,7 +98,7 @@ def serialize_analysis(analysis: EnhancedRequestAnalysis) -> str:
     return json.dumps(analysis_dict, indent=2)
 
 
-def format_list_for_display(items: List[str], title: str = None) -> str:
+def format_list_for_display(items: list[str], title: str = None) -> str:
     """
     Format a list of items for display in console output.
 
@@ -123,7 +123,7 @@ def format_list_for_display(items: List[str], title: str = None) -> str:
     return formatted
 
 
-def format_dict_for_display(data: Dict[str, Any], title: str = None) -> str:
+def format_dict_for_display(data: dict[str, Any], title: str = None) -> str:
     """
     Format a dictionary for display in console output.
 
@@ -166,7 +166,7 @@ def truncate_text(text: str, max_length: int = 100) -> str:
     return text[: max_length - 3] + "..."
 
 
-def validate_json_structure(data: Dict[str, Any], required_keys: List[str]) -> bool:
+def validate_json_structure(data: dict[str, Any], required_keys: list[str]) -> bool:
     """
     Validate that a JSON structure contains required keys.
 
@@ -182,7 +182,7 @@ def validate_json_structure(data: Dict[str, Any], required_keys: List[str]) -> b
 
 
 def safe_get_nested_value(
-    data: Dict[str, Any], keys: List[str], default: Any = None
+    data: dict[str, Any], keys: list[str], default: Any = None
 ) -> Any:
     """
     Safely get a nested value from a dictionary.
@@ -210,7 +210,7 @@ def safe_get_nested_value(
         return default
 
 
-def merge_dictionaries(dict1: Dict[str, Any], dict2: Dict[str, Any]) -> Dict[str, Any]:
+def merge_dictionaries(dict1: dict[str, Any], dict2: dict[str, Any]) -> dict[str, Any]:
     """
     Merge two dictionaries, with dict2 values taking precedence.
 

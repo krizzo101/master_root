@@ -1,11 +1,10 @@
 import pytest
 from backend.graphql_schema import (
-    resolve_projects,
-    resolve_tasks,
     resolve_create_project,
     resolve_create_task,
+    resolve_projects,
+    resolve_tasks,
 )
-from unittest.mock import AsyncMock, MagicMock
 
 
 @pytest.mark.asyncio

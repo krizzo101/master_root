@@ -5,8 +5,8 @@ Test script to demonstrate project-specific logging
 This shows how logs are now created within each project directory.
 """
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parents[3]

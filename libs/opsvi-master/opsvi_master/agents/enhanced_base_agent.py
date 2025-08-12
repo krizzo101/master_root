@@ -13,7 +13,6 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import pickle
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,8 +21,6 @@ from typing import Any, Dict, List, Optional, Protocol
 from .base_agent import (
     BaseAgent,
     AgentMessage,
-    AgentState,
-    MessageType,
     AgentCapability,
     ToolProtocol,
 )
@@ -32,9 +29,8 @@ from .error_handling import (
     ErrorSeverity,
     RetryConfig,
     with_retry,
-    with_circuit_breaker,
 )
-from .monitoring import AgentMonitor, get_agent_monitor
+from .monitoring import get_agent_monitor
 
 logger = logging.getLogger(__name__)
 

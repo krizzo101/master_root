@@ -8,9 +8,9 @@ for various programming languages and frameworks.
 import argparse
 import json
 import os
-from pathlib import Path
 import sys
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 if script_dir not in sys.path:
@@ -308,7 +308,7 @@ class TestGenerator:
 
     def _generate_component_tests(
         self, component: dict[str, Any], framework: str, config: dict[str, Any]
-    ) -> Optional[str]:
+    ) -> str | None:
         """Generate tests for a specific component."""
         try:
             with open(component["file"]) as f:
@@ -424,7 +424,7 @@ class FrameworkConfigGenerator:
         analysis: dict[str, Any],
         framework: str,
         config: dict[str, Any],
-    ) -> Optional[str]:
+    ) -> str | None:
         """Generate main configuration file for the testing framework."""
         prompt = f'\nGenerate a comprehensive {framework} configuration for the project "{project_name}".\n\nProject Analysis:\n{json.dumps(analysis, indent=2)}\n\nRequirements:\n1. Configure test discovery patterns\n2. Set up test reporting\n3. Configure test coverage\n4. Set up test environment\n5. Configure test timeouts\n6. Set up test parallelization if supported\n7. Configure test filtering\n8. Set up test data management\n9. Configure test logging\n10. Set up CI/CD integration\n\nConfiguration:\n{json.dumps(config, indent=2)}\n\nGenerate only the configuration file content, no additional text.\n'
         try:

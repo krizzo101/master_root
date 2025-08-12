@@ -15,8 +15,8 @@ import json
 import logging
 import time
 import statistics
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
+from datetime import datetime
+from typing import Dict, List, Any
 from arango import ArangoClient
 
 # Configure logging
@@ -719,7 +719,7 @@ def main():
 
         # Print summary
         system_health = report.get("system_health", {})
-        print(f"\nSystem Health Summary:")
+        print("\nSystem Health Summary:")
         print(f"- Overall Health: {system_health.get('overall_health', 'unknown')}")
         print(f"- Search Performance: {system_health.get('search_health', 'unknown')}")
         print(f"- Graph Performance: {system_health.get('graph_health', 'unknown')}")
@@ -733,7 +733,7 @@ def main():
         # Print key recommendations
         recommendations = report.get("recommendations", [])
         if recommendations:
-            print(f"\nKey Recommendations:")
+            print("\nKey Recommendations:")
             for i, rec in enumerate(recommendations[:5], 1):
                 print(f"{i}. {rec}")
 

@@ -1,5 +1,3 @@
-from typing import List
-
 from shared.openai_interfaces.base import OpenAIBaseInterface
 from shared.openai_interfaces.types import ModelInfo
 
@@ -13,7 +11,7 @@ class OpenAIModelsInterface(OpenAIBaseInterface):
     All methods are standards-compliant and mapped to the official OpenAI Python SDK.
     """
 
-    def list_models(self) -> List[ModelInfo]:
+    def list_models(self) -> list[ModelInfo]:
         """
         List all available models.
         GET /v1/models
@@ -35,7 +33,7 @@ class OpenAIModelsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def alist_models(self) -> List[ModelInfo]:
+    async def alist_models(self) -> list[ModelInfo]:
         """
         Async: List all available models.
         GET /v1/models

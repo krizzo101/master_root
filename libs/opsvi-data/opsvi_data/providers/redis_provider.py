@@ -21,7 +21,7 @@ Version: Referenced as of July 2024
 
 import logging
 import os
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 try:
     import redis

@@ -15,7 +15,6 @@ Focus areas:
 
 import asyncio
 import sys
-import os
 from pathlib import Path
 
 # Add the src directory to Python path
@@ -139,7 +138,7 @@ async def main():
     }
 
     try:
-        print(f"🚀 Executing self-improvement workflow...")
+        print("🚀 Executing self-improvement workflow...")
 
         result = await orchestrator.run_workflow(
             workflow_name="self_improvement_analysis",
@@ -148,7 +147,7 @@ async def main():
             run_id="self-improvement-" + str(hash(str(initial_state)))[-8:],
         )
 
-        print(f"✅ Self-improvement workflow completed!")
+        print("✅ Self-improvement workflow completed!")
         print(f"📊 Final Status: {result.get('status', 'Unknown')}")
         print(
             f"📈 Improvement Opportunities Identified: {result.get('opportunities', 'Analysis in progress')}"
@@ -157,7 +156,7 @@ async def main():
 
         # Display key insights
         if "failure_patterns" in result:
-            print(f"\n🔍 Failure Pattern Analysis:")
+            print("\n🔍 Failure Pattern Analysis:")
             patterns = result["failure_patterns"]
             if isinstance(patterns, list):
                 for i, pattern in enumerate(patterns[:3], 1):

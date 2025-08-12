@@ -3,17 +3,18 @@
 Configuration module for the Python News Headlines Scraper.
 Handles loading and validation of scraper settings and per-site parsing rules.
 """
-import os
-import yaml
 import logging
-from typing import Dict, Any
+import os
+from typing import Any
+
+import yaml
 
 DEFAULT_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "../config.yaml")
 
 logger = logging.getLogger("scraper.config")
 
 
-def load_config(config_path: str = None) -> Dict[str, Any]:
+def load_config(config_path: str = None) -> dict[str, Any]:
     """
     Loads YAML configuration from the specified file.
 
@@ -29,7 +30,7 @@ def load_config(config_path: str = None) -> Dict[str, Any]:
     """
     config_path = config_path or DEFAULT_CONFIG_PATH
     try:
-        with open(config_path, "r", encoding="utf-8") as f:
+        with open(config_path, encoding="utf-8") as f:
             config = yaml.safe_load(f)
         logger.info(f"Loaded configuration from {config_path}")
     except FileNotFoundError as e:

@@ -3,6 +3,7 @@ App configuration and settings management.
 Uses pydantic settings for environment variable based config.
 """
 from pathlib import Path
+
 from pydantic import BaseSettings, Field
 
 

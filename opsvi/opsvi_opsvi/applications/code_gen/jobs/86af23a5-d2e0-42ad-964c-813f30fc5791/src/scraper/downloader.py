@@ -3,17 +3,17 @@
 HTTP Downloader with Rate Limiting and Retry
 Handles downloading HTML content and rate limiting between requests.
 """
+import logging
+import time
+
 import requests
+from requests import Response
 from tenacity import (
     retry,
+    retry_if_exception_type,
     stop_after_attempt,
     wait_exponential,
-    retry_if_exception_type,
 )
-import time
-import logging
-from typing import Optional
-from requests import Response
 
 logger = logging.getLogger("scraper.downloader")
 
@@ -40,7 +40,7 @@ class Downloader:
         retry=retry_if_exception_type(requests.RequestException),
         reraise=True,
     )
-    def get(self, url: str) -> Optional[Response]:
+    def get(self, url: str) -> Response | None:
         """
         Fetches the content of the specified URL, with rate limiting and retries.
         Args:

@@ -1,5 +1,3 @@
-from typing import Dict
-
 from applications.expert_panel.agents.expert_agent import (
     EthicsExpert,
     ExpertAgent,
@@ -68,10 +66,10 @@ class ExpertPanel:
             "transcript": self.transcript,
         }
 
-    def check_consensus(self, answers: Dict) -> bool:
+    def check_consensus(self, answers: dict) -> bool:
         return len(set(answers.values())) == 1
 
-    def get_consensus_answer(self, answers: Dict) -> str:
+    def get_consensus_answer(self, answers: dict) -> str:
         if self.check_consensus(answers):
             return next(iter(answers.values()))
         return "[No consensus reached]"

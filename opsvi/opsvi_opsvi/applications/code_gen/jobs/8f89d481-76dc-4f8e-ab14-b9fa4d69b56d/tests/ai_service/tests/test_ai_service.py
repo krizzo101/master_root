@@ -2,11 +2,11 @@
 Pytest-based test suite for AI service endpoints.
 Mocks inference pipelines for speed and predictability.
 """
-import os
-import pytest
-from fastapi.testclient import TestClient
 from unittest.mock import patch
+
+import pytest
 from ai_service.main import app
+from fastapi.testclient import TestClient
 
 DUMMY_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMSIsImV4cCI6MTk0MTA4Mzg5MH0.TD-7Df7Bn2Dkt4LnOA31jzR_VOXhxEDjvOLx28Lpvh8"
 

@@ -7,19 +7,18 @@ Uses OpenAI to understand code structure and generate meaningful tests.
 
 from __future__ import annotations
 
-import logging
 import ast
-from typing import Dict, Any, List, Optional
-from pathlib import Path
+import logging
+from typing import Any
 
-from pydantic import BaseModel, Field
-
-from config import get_config
-from schemas import RequirementsSpec, ArchitectureSpec
 from local_shared.openai_interfaces.responses_interface import get_openai_interface
 
 # Model selector imported locally where needed
 from project_templates import ProjectType
+from pydantic import BaseModel, Field
+
+from config import get_config
+from schemas import ArchitectureSpec, RequirementsSpec
 
 logger = logging.getLogger(__name__)
 
@@ -37,19 +36,19 @@ class TestFile(BaseModel):
     """Represents a complete test file."""
 
     filename: str = Field(..., description="Test file name")
-    imports: List[str] = Field(..., description="Required import statements")
+    imports: list[str] = Field(..., description="Required import statements")
     setup_code: str = Field(..., description="Test setup/fixture code")
-    test_cases: List[TestCase] = Field(..., description="Individual test cases")
+    test_cases: list[TestCase] = Field(..., description="Individual test cases")
     teardown_code: str = Field(..., description="Test cleanup code")
 
 
 class TestSuite(BaseModel):
     """Complete test suite generation."""
 
-    test_files: List[TestFile] = Field(..., description="Generated test files")
+    test_files: list[TestFile] = Field(..., description="Generated test files")
     test_config: str = Field(..., description="pytest.ini or test configuration")
     coverage_config: str = Field(..., description=".coveragerc configuration")
-    test_requirements: List[str] = Field(..., description="Testing dependencies")
+    test_requirements: list[str] = Field(..., description="Testing dependencies")
 
 
 class AITestGenerator:
@@ -61,7 +60,7 @@ class AITestGenerator:
 
     def generate_test_suite(
         self,
-        generated_files: List[Dict[str, str]],  # filename -> content
+        generated_files: list[dict[str, str]],  # filename -> content
         requirements: RequirementsSpec,
         architecture: ArchitectureSpec,
         project_type: ProjectType,
@@ -124,8 +123,8 @@ class AITestGenerator:
             )
 
     def _analyze_code_structure(
-        self, generated_files: List[Dict[str, str]]
-    ) -> Dict[str, Any]:
+        self, generated_files: list[dict[str, str]]
+    ) -> dict[str, Any]:
         """Analyze the structure of generated code to understand what to test."""
 
         analysis = {
@@ -308,8 +307,8 @@ SCRIPT TESTING SPECIFIC REQUIREMENTS:
 
     def _build_test_user_prompt(
         self,
-        generated_files: List[Dict[str, str]],
-        code_analysis: Dict[str, Any],
+        generated_files: list[dict[str, str]],
+        code_analysis: dict[str, Any],
         requirements: RequirementsSpec,
         architecture: ArchitectureSpec,
         project_type: ProjectType,
@@ -370,7 +369,7 @@ Make sure tests are production-ready and follow pytest best practices."""
 
     def _fallback_test_generation(
         self,
-        generated_files: List[Dict[str, str]],
+        generated_files: list[dict[str, str]],
         requirements: RequirementsSpec,
         project_type: ProjectType,
     ) -> TestSuite:
@@ -452,7 +451,7 @@ exclude_lines =
 
 
 def generate_ai_tests(
-    generated_files: List[Dict[str, str]],
+    generated_files: list[dict[str, str]],
     requirements: RequirementsSpec,
     architecture: ArchitectureSpec,
     project_type: ProjectType,

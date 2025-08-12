@@ -5,11 +5,10 @@ Tests the coordination and interaction between multiple agents
 in Smart Decomposition workflows.
 """
 
-from pathlib import Path
-
 # Import fixes
 import sys
 import time
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest

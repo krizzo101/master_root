@@ -4,7 +4,6 @@ Input schema for code review.
 This module defines the Pydantic models for code review input data.
 """
 
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -32,7 +31,7 @@ class CodeReviewInput(BaseModel):
         _pattern="^(json|html|markdown)$",
     )
 
-    output_directory: Optional[str] = Field(
+    output_directory: str | None = Field(
         None, description="Output directory for reports"
     )
 

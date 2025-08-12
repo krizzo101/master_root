@@ -6,12 +6,12 @@ This uses subprocess to directly communicate with the MCP server over JSON-RPC.
 
 import json
 import os
-from queue import Empty, Queue
 import subprocess
 import threading
 import time
-from typing import Any, Dict, Optional
 import uuid
+from queue import Empty, Queue
+from typing import Any
 
 from src.shared.interfaces.database.arango_interface import (
     DirectArangoDB as ArangoInterface,
@@ -112,9 +112,9 @@ class MCPDatabaseClient:
     """Simple subprocess-based MCP client for cognitive_tools communication"""
 
     def __init__(self):
-        self.process: Optional[subprocess.Popen] = None
+        self.process: subprocess.Popen | None = None
         self.response_queue = Queue()
-        self.reader_thread: Optional[threading.Thread] = None
+        self.reader_thread: threading.Thread | None = None
         self._lock = threading.Lock()
 
     def _start_process(self):
@@ -171,7 +171,7 @@ class MCPDatabaseClient:
         initialized_msg = {"jsonrpc": "2.0", "method": "notifications/initialized"}
         self._send_message(initialized_msg)
 
-    def _send_message(self, message: Dict[str, Any]):
+    def _send_message(self, message: dict[str, Any]):
         """Send a message to MCP server"""
         if self.process and self.process.stdin:
             json.dump(message, self.process.stdin)
@@ -180,7 +180,7 @@ class MCPDatabaseClient:
 
     def _wait_for_response(
         self, request_id: str, timeout: float = 10.0
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Wait for response with specific ID"""
         start_time = time.time()
         while time.time() - start_time < timeout:
@@ -195,7 +195,7 @@ class MCPDatabaseClient:
 
         return {"error": "Timeout waiting for response"}
 
-    def call_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
+    def call_tool(self, tool_name: str, arguments: dict[str, Any]) -> dict[str, Any]:
         """Call a tool via MCP"""
         with self._lock:
             try:
@@ -247,22 +247,22 @@ _client = MCPDatabaseClient()
 
 
 # Synchronous wrapper functions for compatibility with existing code
-def search(**kwargs) -> Dict[str, Any]:
+def search(**kwargs) -> dict[str, Any]:
     """Proxy to arango_search"""
     return _client.call_tool("arango_search", kwargs)
 
 
-def modify(**kwargs) -> Dict[str, Any]:
+def modify(**kwargs) -> dict[str, Any]:
     """Proxy to arango_modify"""
     return _client.call_tool("arango_modify", kwargs)
 
 
-def manage(**kwargs) -> Dict[str, Any]:
+def manage(**kwargs) -> dict[str, Any]:
     """Proxy to arango_manage"""
     return _client.call_tool("arango_manage", kwargs)
 
 
-def test_connection() -> Dict[str, Any]:
+def test_connection() -> dict[str, Any]:
     """Test the MCP connection"""
     try:
         result = manage(action="health")

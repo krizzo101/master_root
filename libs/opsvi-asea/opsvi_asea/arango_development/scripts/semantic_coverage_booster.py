@@ -7,7 +7,7 @@ Uses MCP database tools to add ontology mappings and concept hierarchies to all 
 import json
 import logging
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 # Configure logging
 logging.basicConfig(

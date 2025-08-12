@@ -1,6 +1,6 @@
 """Task models for the orchestrator."""
 
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 from uuid import UUID

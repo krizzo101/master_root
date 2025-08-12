@@ -6,15 +6,14 @@ Comprehensive test suite for the gatekeeper functionality.
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add the gatekeeper module to the path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from gatekeeper_agent import GatekeeperAgent
-from context_analyzer import ContextAnalyzer
 from auto_attach import AutoAttach
+from context_analyzer import ContextAnalyzer
+from gatekeeper_agent import GatekeeperAgent
 
 
 def test_context_analyzer():
@@ -29,23 +28,23 @@ def test_context_analyzer():
         {
             "request": "Fix the bug in the authentication module",
             "files": ["libs/opsvi-security/opsvi_security/core.py"],
-            "expected_type": "bug_fix"
+            "expected_type": "bug_fix",
         },
         {
             "request": "Add a new feature for user management",
             "files": ["libs/opsvi-core/opsvi_core/core/base.py"],
-            "expected_type": "feature_development"
+            "expected_type": "feature_development",
         },
         {
             "request": "Write unit tests for the logging module",
             "files": ["libs/opsvi-security/opsvi_security/logging.py"],
-            "expected_type": "testing"
+            "expected_type": "testing",
         },
         {
             "request": "Update the documentation for the API",
             "files": [],
-            "expected_type": "documentation"
-        }
+            "expected_type": "documentation",
+        },
     ]
 
     for i, test_case in enumerate(test_cases, 1):
@@ -59,7 +58,10 @@ def test_context_analyzer():
 
         # Check if expected type is detected
         request_types = [rec.context_type for rec in analysis.recommended_context]
-        if test_case["expected_type"] in request_types or analysis.confidence_score > 0.05:
+        if (
+            test_case["expected_type"] in request_types
+            or analysis.confidence_score > 0.05
+        ):
             print("   ✅ Test passed")
         else:
             print("   ❌ Test failed")
@@ -113,20 +115,20 @@ def test_gatekeeper_agent():
             "name": "Bug Fix Request",
             "request": "Fix the authentication bug in the security module",
             "files": ["libs/opsvi-security/opsvi_security/core.py"],
-            "max_files": 10
+            "max_files": 10,
         },
         {
             "name": "Feature Development",
             "request": "Add a new configuration option to the core module",
             "files": ["libs/opsvi-core/opsvi_core/core/base.py"],
-            "max_files": 15
+            "max_files": 15,
         },
         {
             "name": "Testing Request",
             "request": "Write unit tests for the logging functionality",
             "files": ["libs/opsvi-security/opsvi_security/logging.py"],
-            "max_files": 8
-        }
+            "max_files": 8,
+        },
     ]
 
     for scenario in test_scenarios:
@@ -135,9 +137,7 @@ def test_gatekeeper_agent():
         print(f"Files: {scenario['files']}")
 
         result = gatekeeper.process_request(
-            scenario["request"],
-            scenario["files"],
-            max_files=scenario["max_files"]
+            scenario["request"], scenario["files"], max_files=scenario["max_files"]
         )
 
         print(f"Original files: {len(result.original_files)}")
@@ -147,9 +147,11 @@ def test_gatekeeper_agent():
         print(f"Summary: {result.processing_summary}")
 
         # Validate results
-        if (len(result.final_files) > 0 and
-            len(result.final_files) <= scenario["max_files"] and
-            result.confidence_score > 0.3):
+        if (
+            len(result.final_files) > 0
+            and len(result.final_files) <= scenario["max_files"]
+            and result.confidence_score > 0.3
+        ):
             print("   ✅ Scenario passed")
         else:
             print("   ❌ Scenario failed")
@@ -171,14 +173,19 @@ def test_integration():
 
     # Test a complex scenario
     request = "Refactor the security module to improve performance and add better error handling"
-    files = ["libs/opsvi-security/opsvi_security/core.py", "libs/opsvi-security/opsvi_security/logging.py"]
+    files = [
+        "libs/opsvi-security/opsvi_security/core.py",
+        "libs/opsvi-security/opsvi_security/logging.py",
+    ]
 
     print(f"Complex request: {request}")
     print(f"Files: {files}")
 
-    result = gatekeeper.process_request(request, files, max_files=20, min_confidence=0.4)
+    result = gatekeeper.process_request(
+        request, files, max_files=20, min_confidence=0.4
+    )
 
-    print(f"Final result:")
+    print("Final result:")
     print(f"  - Original files: {len(result.original_files)}")
     print(f"  - Recommended files: {len(result.recommended_files)}")
     print(f"  - Final files: {len(result.final_files)}")
@@ -188,8 +195,10 @@ def test_integration():
     # Export result for inspection
     gatekeeper.export_result(result, "test_gatekeeper_result.json")
 
-    if (len(result.final_files) > len(result.original_files) and
-        result.confidence_score > 0.5):
+    if (
+        len(result.final_files) > len(result.original_files)
+        and result.confidence_score > 0.5
+    ):
         print("✅ Integration test passed")
         return True
     else:
@@ -206,7 +215,7 @@ def main():
         ("Context Analyzer", test_context_analyzer),
         ("Auto-Attach", test_auto_attach),
         ("Gatekeeper Agent", test_gatekeeper_agent),
-        ("Integration", test_integration)
+        ("Integration", test_integration),
     ]
 
     passed = 0
@@ -222,6 +231,7 @@ def main():
         except Exception as e:
             print(f"❌ {test_name} failed with exception: {e}")
             import traceback
+
             traceback.print_exc()
 
     print("\n" + "=" * 60)

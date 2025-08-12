@@ -1,18 +1,17 @@
 """
 AI-powered summarization and suggestion (mocked: returns simple string, replace with call to LLM OpenAI/GPT). 
 """
-from typing import Dict, Any
-import logging
 import random
+from typing import Any
 
 
-async def summarize(body: str) -> Dict[str, Any]:
+async def summarize(body: str) -> dict[str, Any]:
     # Replace with LLM API integration
     first_sent = body.split(".")[0].strip() if "." in body else body[:100]
     return {"summary": f"Summary: {first_sent[:80]}..."}
 
 
-async def suggest(body: str) -> Dict[str, Any]:
+async def suggest(body: str) -> dict[str, Any]:
     # Replace with LLM API
     suggestions = [
         "Consider splitting long paragraphs.",

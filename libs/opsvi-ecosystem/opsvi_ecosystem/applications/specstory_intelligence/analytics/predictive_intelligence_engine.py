@@ -8,7 +8,7 @@ This is the next level - intelligence that predicts its own learning needs.
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -28,8 +28,8 @@ class LearningPrediction:
     expected_timeframe: (
         str  # 'next_conversation', 'within_3_conversations', 'long_term'
     )
-    preparation_suggestions: List[str]
-    based_on_patterns: List[str]
+    preparation_suggestions: list[str]
+    based_on_patterns: list[str]
     predicted_at: datetime = field(default_factory=datetime.utcnow)
 
 
@@ -41,7 +41,7 @@ class PreparationStrategy:
     strategy_name: str
     description: str
     target_learning_type: str
-    preparation_actions: List[str]
+    preparation_actions: list[str]
     expected_effectiveness: float
     implementation_priority: int  # 1-10, 10 being highest
 
@@ -51,11 +51,11 @@ class LearningTrajectory:
     """Predicted trajectory of learning progression"""
 
     trajectory_id: str
-    current_state: Dict[str, Any]
-    predicted_milestones: List[Dict[str, Any]]
-    convergence_points: List[str]  # Areas where learning might accelerate
-    potential_breakthroughs: List[str]
-    confidence_envelope: Tuple[float, float]  # (min_confidence, max_confidence)
+    current_state: dict[str, Any]
+    predicted_milestones: list[dict[str, Any]]
+    convergence_points: list[str]  # Areas where learning might accelerate
+    potential_breakthroughs: list[str]
+    confidence_envelope: tuple[float, float]  # (min_confidence, max_confidence)
 
 
 class PredictiveIntelligenceEngine:
@@ -63,9 +63,9 @@ class PredictiveIntelligenceEngine:
 
     def __init__(self, continuous_learning_engine: ContinuousLearningEngine):
         self.learning_engine = continuous_learning_engine
-        self.predictions: Dict[str, LearningPrediction] = {}
-        self.preparation_strategies: Dict[str, PreparationStrategy] = {}
-        self.learning_trajectories: List[LearningTrajectory] = []
+        self.predictions: dict[str, LearningPrediction] = {}
+        self.preparation_strategies: dict[str, PreparationStrategy] = {}
+        self.learning_trajectories: list[LearningTrajectory] = []
 
         # Prediction models (simplified statistical models)
         self.pattern_emergence_model = PatternEmergencePredictor()
@@ -80,7 +80,7 @@ class PredictiveIntelligenceEngine:
             "learning_acceleration_achieved": 0.0,
         }
 
-    async def generate_predictions(self) -> List[LearningPrediction]:
+    async def generate_predictions(self) -> list[LearningPrediction]:
         """Generate predictions about future learning opportunities"""
         print("🔮 Generating predictive intelligence analysis...")
 
@@ -107,7 +107,7 @@ class PredictiveIntelligenceEngine:
         print(f"✅ Generated {len(predictions)} predictions for future learning")
         return predictions
 
-    async def _predict_pattern_emergence(self) -> List[LearningPrediction]:
+    async def _predict_pattern_emergence(self) -> list[LearningPrediction]:
         """Predict what new patterns are likely to emerge"""
         predictions = []
 
@@ -175,7 +175,7 @@ class PredictiveIntelligenceEngine:
 
         return predictions
 
-    async def _predict_capability_needs(self) -> List[LearningPrediction]:
+    async def _predict_capability_needs(self) -> list[LearningPrediction]:
         """Predict what new capabilities will be needed"""
         predictions = []
 
@@ -220,7 +220,7 @@ class PredictiveIntelligenceEngine:
 
         return predictions
 
-    async def _predict_knowledge_gaps(self) -> List[LearningPrediction]:
+    async def _predict_knowledge_gaps(self) -> list[LearningPrediction]:
         """Predict knowledge gaps that will become important"""
         predictions = []
 
@@ -243,8 +243,8 @@ class PredictiveIntelligenceEngine:
         return predictions
 
     async def create_preparation_strategies(
-        self, predictions: List[LearningPrediction]
-    ) -> List[PreparationStrategy]:
+        self, predictions: list[LearningPrediction]
+    ) -> list[PreparationStrategy]:
         """Create strategies to prepare for predicted learning opportunities"""
         print("🎯 Creating preparation strategies...")
 
@@ -387,7 +387,7 @@ class PredictiveIntelligenceEngine:
         print(f"✅ Generated learning trajectory with {len(milestones)} milestones")
         return trajectory
 
-    def generate_predictive_report(self) -> Dict[str, Any]:
+    def generate_predictive_report(self) -> dict[str, Any]:
         """Generate comprehensive predictive intelligence report"""
         return {
             "prediction_summary": {
@@ -443,7 +443,7 @@ class PredictiveIntelligenceEngine:
 class PatternEmergencePredictor:
     """Predicts when new patterns will emerge"""
 
-    def predict_emergence_probability(self, pattern_history: List[str]) -> float:
+    def predict_emergence_probability(self, pattern_history: list[str]) -> float:
         """Simplified emergence probability calculation"""
         if len(pattern_history) > 10:
             return min(0.9, len(pattern_history) * 0.05)
@@ -454,8 +454,8 @@ class CapabilityGapAnalyzer:
     """Analyzes gaps in current capabilities"""
 
     def identify_gaps(
-        self, current_capabilities: Dict, performance_data: Dict
-    ) -> List[str]:
+        self, current_capabilities: dict, performance_data: dict
+    ) -> list[str]:
         """Simplified gap identification"""
         gaps = []
         if len(current_capabilities) < 5:
@@ -468,7 +468,7 @@ class CapabilityGapAnalyzer:
 class LearningVelocityPredictor:
     """Predicts learning velocity changes"""
 
-    def predict_velocity_change(self, historical_velocity: List[float]) -> float:
+    def predict_velocity_change(self, historical_velocity: list[float]) -> float:
         """Simplified velocity prediction"""
         if len(historical_velocity) > 3:
             return np.mean(historical_velocity) * 1.2  # Predict 20% improvement

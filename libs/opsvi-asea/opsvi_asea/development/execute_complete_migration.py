@@ -197,20 +197,20 @@ def main():
     print("🎯 COGNITIVE ARCHITECTURE MIGRATION COMPLETE")
     print("=" * 60)
 
-    print(f"\n📈 RESULTS:")
+    print("\n📈 RESULTS:")
     print(f"   Total Cognitive Concepts: {summary['total_concepts']}")
     print(f"   Total Semantic Relationships: {summary['total_relationships']}")
     print(f"   Relationship Density: {summary['relationship_density']:.3f}")
 
-    print(f"\n🏗️ DOMAIN DISTRIBUTION:")
+    print("\n🏗️ DOMAIN DISTRIBUTION:")
     for domain, count in summary["domain_distribution"].items():
         print(f"   {domain}: {count} concepts")
 
-    print(f"\n🧩 CONCEPT TYPE DISTRIBUTION:")
+    print("\n🧩 CONCEPT TYPE DISTRIBUTION:")
     for concept_type, count in summary["concept_type_distribution"].items():
         print(f"   {concept_type}: {count} concepts")
 
-    print(f"\n🔗 HIGH-VALUE RELATIONSHIPS:")
+    print("\n🔗 HIGH-VALUE RELATIONSHIPS:")
     high_value_rels = [
         r for r in relationships if r["compound_learning_potential"] > 0.85
     ]
@@ -218,7 +218,7 @@ def main():
         f"   {len(high_value_rels)} relationships with >0.85 compound learning potential"
     )
 
-    print(f"\n💾 READY FOR DATABASE INSERTION:")
+    print("\n💾 READY FOR DATABASE INSERTION:")
     print(f"   {len(all_concepts)} cognitive concepts")
     print(f"   {len(relationships)} semantic relationships")
 
@@ -231,7 +231,7 @@ def main():
     ) as f:
         json.dump(relationships, f, indent=2)
 
-    print(f"\n✅ Batch files saved for database insertion")
+    print("\n✅ Batch files saved for database insertion")
     print(f"   cognitive_concepts_batch.json: {len(all_concepts)} concepts")
     print(f"   semantic_relationships_batch.json: {len(relationships)} relationships")
 

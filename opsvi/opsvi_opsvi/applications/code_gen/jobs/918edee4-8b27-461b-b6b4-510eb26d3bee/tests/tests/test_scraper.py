@@ -1,5 +1,6 @@
-import pytest
 from unittest import mock
+
+import pytest
 from simple_news_scraper.scraper import NewsScraper
 
 

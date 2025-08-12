@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from typing import Optional
 
 
 class TodoBase(BaseModel):
@@ -16,10 +15,10 @@ class TodoCreate(TodoBase):
 
 
 class TodoUpdate(BaseModel):
-    title: Optional[str] = Field(
+    title: str | None = Field(
         None, min_length=1, max_length=100, description="Title of the todo item"
     )
-    description: Optional[str] = Field(
+    description: str | None = Field(
         None, min_length=1, max_length=1000, description="Description of the todo item"
     )
 

@@ -10,8 +10,8 @@ complete multi-modal ArangoDB system with advanced analytics.
 import json
 import logging
 import time
-from typing import Dict, List, Any
-from datetime import datetime, timedelta
+from typing import Dict, Any
+from datetime import datetime
 from arango import ArangoClient
 
 # Configure logging
@@ -930,9 +930,9 @@ def main():
         system_health = summary.get("system_health", {})
         readiness = results.get("readiness_assessment", {})
 
-        print(f"\n" + "=" * 60)
-        print(f"EXECUTIVE SUMMARY - ArangoDB Multi-Modal System")
-        print(f"=" * 60)
+        print("\n" + "=" * 60)
+        print("EXECUTIVE SUMMARY - ArangoDB Multi-Modal System")
+        print("=" * 60)
         print(f"Monitoring Date: {summary.get('monitoring_timestamp', 'Unknown')}")
         print(
             f"System Health: {system_health.get('overall_grade', 'Unknown')} ({system_health.get('overall_score', 0):.2f})"
@@ -943,7 +943,7 @@ def main():
         # System overview
         sys_overview = results.get("system_overview", {})
         collections = sys_overview.get("collections", {})
-        print(f"\nSystem Overview:")
+        print("\nSystem Overview:")
         print(f"- Collections: {collections.get('total_collections', 0)}")
         print(f"- Documents: {collections.get('total_documents', 0)}")
         print(f"- Indexes: {collections.get('total_indexes', 0)}")
@@ -955,7 +955,7 @@ def main():
 
         # Performance metrics
         perf_metrics = results.get("performance_metrics", {})
-        print(f"\nPerformance Metrics:")
+        print("\nPerformance Metrics:")
         print(
             f"- Tests Passed: {perf_metrics.get('successful_tests', 0)}/{perf_metrics.get('total_tests', 0)}"
         )
@@ -968,7 +968,7 @@ def main():
 
         # Feature validation
         feature_val = results.get("feature_validation", {})
-        print(f"\nFeature Validation:")
+        print("\nFeature Validation:")
         print(
             f"- Features Working: {feature_val.get('working_features', 0)}/{feature_val.get('total_features', 0)}"
         )
@@ -978,7 +978,7 @@ def main():
 
         # Data quality
         data_quality = results.get("data_quality_assessment", {})
-        print(f"\nData Quality:")
+        print("\nData Quality:")
         print(
             f"- Overall Quality Score: {data_quality.get('overall_quality_score', 0):.2f}"
         )
@@ -987,11 +987,11 @@ def main():
         # Recommendations
         recommendations = readiness.get("recommendations", [])
         if recommendations:
-            print(f"\nRecommendations:")
+            print("\nRecommendations:")
             for i, rec in enumerate(recommendations[:5], 1):
                 print(f"{i}. {rec}")
 
-        print(f"\n" + "=" * 60)
+        print("\n" + "=" * 60)
 
         return results
 

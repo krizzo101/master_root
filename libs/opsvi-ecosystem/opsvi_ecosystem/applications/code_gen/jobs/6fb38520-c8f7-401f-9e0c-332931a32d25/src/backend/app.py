@@ -8,34 +8,29 @@ This Python backend focuses on security, scalability, and composability, providi
 
 Note: Some platform integrations involving JavaScript (e.g. Passport.js, Apollo Server) are referenced but not implemented in this Python-centric project.
 """
-import os
 import logging
-from typing import Optional, List
+import os
+import secrets
+import uuid
+from datetime import datetime, timedelta
 
+import aiohttp
+import jwt
+import psycopg2
+import redis
 from fastapi import (
     FastAPI,
-    WebSocket,
-    WebSocketDisconnect,
-    HTTPException,
-    Request,
-    status,
-    Depends,
-    UploadFile,
     File,
     Form,
+    HTTPException,
+    Request,
+    UploadFile,
+    WebSocket,
+    WebSocketDisconnect,
 )
-from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2AuthorizationCodeBearer
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-import jwt
-import secrets
-from datetime import datetime, timedelta
-import psycopg2
-from passlib.hash import bcrypt_sha256
-import uuid
-import redis
-import aiohttp
 
 # Logging Setup
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -117,8 +112,8 @@ redis_conn = redis.Redis(connection_pool=redis_pool)
 class User(BaseModel):
     id: str
     email: str
-    name: Optional[str] = None
-    avatar_url: Optional[str] = None
+    name: str | None = None
+    avatar_url: str | None = None
 
 
 class Document(BaseModel):
@@ -142,7 +137,7 @@ class DocumentVersion(BaseModel):
 
 class AIRequest(BaseModel):
     document: str
-    instruction: Optional[str] = "Summarize this document."
+    instruction: str | None = "Summarize this document."
 
 
 # Exception Handlers
@@ -162,7 +157,7 @@ def issue_jwt(user: User) -> str:
     return jwt.encode(payload, SECRET_KEY, algorithm=JWT_ALGORITHM)
 
 
-def verify_jwt(token: str) -> Optional[User]:
+def verify_jwt(token: str) -> User | None:
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=[JWT_ALGORITHM])
         return User(id=decoded["sub"], email=decoded["email"])
@@ -171,7 +166,7 @@ def verify_jwt(token: str) -> Optional[User]:
         return None
 
 
-def get_current_user(request: Request) -> Optional[User]:
+def get_current_user(request: Request) -> User | None:
     authorization = request.headers.get("Authorization")
     if not authorization:
         return None
@@ -268,8 +263,8 @@ async def create_document(
         raise HTTPException(status_code=500, detail="Failed to create document.")
 
 
-@app.get("/api/documents", response_model=List[Document])
-async def list_documents(request: Request, search: Optional[str] = None):
+@app.get("/api/documents", response_model=list[Document])
+async def list_documents(request: Request, search: str | None = None):
     user = get_current_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated.")
@@ -427,7 +422,7 @@ async def delete_document(doc_id: str, request: Request):
 
 
 # Document Versioning
-@app.get("/api/documents/{doc_id}/history", response_model=List[DocumentVersion])
+@app.get("/api/documents/{doc_id}/history", response_model=list[DocumentVersion])
 async def get_document_history(doc_id: str, request: Request):
     user = get_current_user(request)
     if not user:

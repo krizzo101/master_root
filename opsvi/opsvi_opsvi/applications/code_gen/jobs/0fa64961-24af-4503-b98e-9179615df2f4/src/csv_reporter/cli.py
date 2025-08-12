@@ -2,15 +2,15 @@
 CLI interface for the CSV Report Generator tool.
 Handles command-line parsing, entry point logic, and command dispatch.
 """
-import sys
 import argparse
+import sys
 from pathlib import Path
-from typing import Optional
-from csv_reporter.logger import configure_logging, logger
+
+from csv_reporter.config import Config
 from csv_reporter.csv_parser import CSVParser
 from csv_reporter.data_processor import DataProcessor
-from csv_reporter.report_generator import ReportGenerator, SUPPORTED_FORMATS
-from csv_reporter.config import Config
+from csv_reporter.logger import configure_logging, logger
+from csv_reporter.report_generator import SUPPORTED_FORMATS, ReportGenerator
 from csv_reporter.utils import print_progress_bar
 
 __version__ = "1.0.0"

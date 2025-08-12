@@ -7,7 +7,7 @@ without overwhelming users with technical details.
 
 import asyncio
 import time
-from typing import Any, Dict
+from typing import Any
 
 from sd_logging import (
     ConsoleInterface,
@@ -19,7 +19,7 @@ from sd_logging import (
 from src.applications.oamat_sd.src.config.config_manager import ConfigManager
 
 
-async def simulate_complexity_analysis() -> Dict[str, Any]:
+async def simulate_complexity_analysis() -> dict[str, Any]:
     """Simulate the 6-factor complexity analysis"""
 
     # Get specialized loggers
@@ -42,7 +42,11 @@ async def simulate_complexity_analysis() -> Dict[str, Any]:
     # Calculate weighted score
     weights = [0.2, 0.25, 0.15, 0.1, 0.15, 0.15]
     overall_score = (
-        sum(score * weight for score, weight in zip(factors.values(), weights)) * 10
+        sum(
+            score * weight
+            for score, weight in zip(factors.values(), weights, strict=False)
+        )
+        * 10
     )
 
     decision = "DAG Orchestration" if overall_score >= 60 else "Linear Workflow"

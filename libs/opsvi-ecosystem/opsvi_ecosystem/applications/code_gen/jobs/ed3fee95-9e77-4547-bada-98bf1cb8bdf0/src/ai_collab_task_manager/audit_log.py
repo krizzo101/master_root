@@ -1,6 +1,7 @@
-from .models import db, AuditLog
-from datetime import datetime
 import logging
+from datetime import datetime
+
+from .models import AuditLog, db
 
 
 def audit_log_event(event: str, user_id: int) -> None:

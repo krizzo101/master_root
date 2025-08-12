@@ -5,7 +5,7 @@ SDLC phase management and integration for workflow orchestration.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.applications.oamat.workflows.orchestrator.state import AgenticWorkflowState
 from src.applications.oamat.workflows.sdlc_phase_manager import SDLCPhaseManager
@@ -16,7 +16,7 @@ logger = logging.getLogger("SDLCIntegration")
 class SDLCWorkflowIntegrator:
     """Integrates SDLC phase management with workflow orchestration"""
 
-    def __init__(self, sdlc_manager: Optional[SDLCPhaseManager] = None):
+    def __init__(self, sdlc_manager: SDLCPhaseManager | None = None):
         self.sdlc_manager = sdlc_manager
 
     def initialize_sdlc_phase(
@@ -50,7 +50,7 @@ class SDLCWorkflowIntegrator:
 
     def validate_phase_requirements(
         self, state: AgenticWorkflowState
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Validate current workflow against SDLC phase requirements"""
         if not self.sdlc_manager or "sdlc_context" not in state:
             return {"valid": True, "warnings": []}
@@ -167,7 +167,7 @@ class SDLCWorkflowIntegrator:
         except Exception as e:
             logger.warning(f"Failed to update SDLC progress: {e}")
 
-    def get_next_phase_recommendations(self, state: AgenticWorkflowState) -> List[str]:
+    def get_next_phase_recommendations(self, state: AgenticWorkflowState) -> list[str]:
         """Get recommendations for next SDLC phase based on current workflow"""
         if not self.sdlc_manager:
             return []

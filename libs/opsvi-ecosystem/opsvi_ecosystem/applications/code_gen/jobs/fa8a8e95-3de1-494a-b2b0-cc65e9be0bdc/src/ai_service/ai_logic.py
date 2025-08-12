@@ -1,7 +1,8 @@
 import logging
-from typing import List, Dict
 from datetime import datetime, timedelta
+
 import numpy as np
+
 from .models import Task, TeamMember
 
 logger = logging.getLogger("ai_service.ai_logic")
@@ -9,7 +10,7 @@ logger = logging.getLogger("ai_service.ai_logic")
 # --- AI Simulations ---
 
 
-def prioritize_tasks(tasks: List[Task], members: List[TeamMember]) -> Dict:
+def prioritize_tasks(tasks: list[Task], members: list[TeamMember]) -> dict:
     """
     Return prioritized ordering of tasks based on importance, deadlines, and dependencies.
     Real implementation: Use transformer or ranking ML models on task+user data.
@@ -24,7 +25,7 @@ def prioritize_tasks(tasks: List[Task], members: List[TeamMember]) -> Dict:
                     datetime.fromisoformat(t.deadline) - datetime.now()
                 ).total_seconds() / 3600
                 deadline_score = max(0, 10 - delta / 24)  # Higher if soon
-            except Exception as e:
+            except Exception:
                 logger.warning(f"Invalid deadline: {t.deadline}")
         assigned_factor = 0 if t.assigned_to else -2
         score = t.importance + deadline_score - len(t.dependencies) + assigned_factor
@@ -34,7 +35,7 @@ def prioritize_tasks(tasks: List[Task], members: List[TeamMember]) -> Dict:
     return {"ordered_ids": [x[0] for x in priorities]}
 
 
-def estimate_completion_times(tasks: List[Task]) -> Dict:
+def estimate_completion_times(tasks: list[Task]) -> dict:
     """
     Use pretend ML regression over historical durations, importance, and description features.
     """
@@ -51,12 +52,12 @@ def estimate_completion_times(tasks: List[Task]) -> Dict:
     return {"estimates": output}
 
 
-def detect_dependencies(tasks: List[Task]) -> Dict:
+def detect_dependencies(tasks: list[Task]) -> dict:
     """
     Detect blocking relationships via NLP keyword overlap as a simulation.
     Real: use embedding similarity/NLP labelling.
     """
-    result: Dict[str, List[str]] = {t.id: [] for t in tasks}
+    result: dict[str, list[str]] = {t.id: [] for t in tasks}
     n = len(tasks)
     for i in range(n):
         for j in range(n):
@@ -72,7 +73,7 @@ def detect_dependencies(tasks: List[Task]) -> Dict:
     return {"dependencies": result}
 
 
-def suggest_optimal_scheduling(tasks: List[Task], members: List[TeamMember]) -> Dict:
+def suggest_optimal_scheduling(tasks: list[Task], members: list[TeamMember]) -> dict:
     """
     Assign tasks to members, respecting availability/role, schedule so dependencies are honored.
     Use a simple greedy/deterministic simulation; can be replaced with OR-tools ML scheduling.

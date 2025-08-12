@@ -167,7 +167,7 @@ def test_modify_operations(db):
             result = db.modify("update", test_collection, key=doc_key, updates=updates)
 
             if result.get("success"):
-                print(f"    ✅ Update successful")
+                print("    ✅ Update successful")
                 results["update"] = {"status": "success"}
             else:
                 print(f"    ❌ Update failed: {result.get('error')}")
@@ -195,7 +195,7 @@ def test_modify_operations(db):
         )
 
         if result.get("success"):
-            print(f"    ✅ Upsert successful")
+            print("    ✅ Upsert successful")
             results["upsert"] = {"status": "success"}
         else:
             print(f"    ❌ Upsert failed: {result.get('error')}")

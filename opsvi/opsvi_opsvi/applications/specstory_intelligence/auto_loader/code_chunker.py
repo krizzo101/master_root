@@ -5,10 +5,10 @@ Splits code files into logical chunks (functions, classes) for ingestion.
 
 import ast
 import os
-from typing import Any, Dict, List
+from typing import Any
 
 
-def chunk_python_code(source_code: str) -> List[Dict[str, Any]]:
+def chunk_python_code(source_code: str) -> list[dict[str, Any]]:
     """
     Chunk Python code into functions and classes.
     Returns (chunks, relationships, imports):
@@ -133,7 +133,7 @@ def chunk_python_code(source_code: str) -> List[Dict[str, Any]]:
     return chunks, relationships, imports
 
 
-def chunk_code_file(filepath: str) -> List[Dict[str, Any]]:
+def chunk_code_file(filepath: str) -> list[dict[str, Any]]:
     """
     Detect language by extension and chunk code accordingly.
     Currently supports Python. Stubs for other languages.

@@ -2,8 +2,8 @@
 """PerplexityProvider with offline stub capability."""
 from __future__ import annotations
 
-import os
 import json
+import os
 
 from pydantic import BaseModel
 

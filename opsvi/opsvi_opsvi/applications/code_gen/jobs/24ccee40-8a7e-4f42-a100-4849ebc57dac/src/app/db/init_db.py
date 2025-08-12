@@ -2,9 +2,9 @@
 Database initializer - creates all tables if not present, used in server startup.
 """
 import asyncio
-from app.db.session import engine
+
 from app.db.base import Base
-from app.models import todo
+from app.db.session import engine
 
 
 async def init_db():

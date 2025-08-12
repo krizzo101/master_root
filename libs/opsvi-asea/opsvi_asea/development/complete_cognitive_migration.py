@@ -4,7 +4,6 @@ Complete Cognitive Architecture Migration System
 Transforms ALL foundational knowledge into semantic cognitive concepts
 """
 
-import json
 import hashlib
 from datetime import datetime
 import re
@@ -133,7 +132,7 @@ class CompleteCognitiveMigrator:
             problem_match = re.search(r"problem:([^.]+)", content, re.IGNORECASE)
             solution_match = re.search(r"solution:([^.]+)", content, re.IGNORECASE)
             if problem_match and solution_match:
-                insights.append(f"Problem-solution pair identified")
+                insights.append("Problem-solution pair identified")
 
         return insights[:5]  # Limit to top 5 insights
 
@@ -334,7 +333,7 @@ def main():
 
     # This would be called with actual memory data
     print("✅ Cognitive migration system ready")
-    print(f"📊 Prepared for systematic knowledge transformation")
+    print("📊 Prepared for systematic knowledge transformation")
 
     return migrator
 

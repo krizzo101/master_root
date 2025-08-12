@@ -9,7 +9,7 @@ import logging
 import logging.handlers
 import sys
 from pathlib import Path
-from typing import Dict, Any, Optional, Union
+from typing import Dict, Optional, Union
 from datetime import datetime
 import json
 

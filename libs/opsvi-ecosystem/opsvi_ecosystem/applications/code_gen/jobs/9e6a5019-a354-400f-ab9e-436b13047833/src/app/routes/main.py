@@ -3,18 +3,15 @@ Main non-authenticated views: homepage, about, post detail.
 """
 from flask import (
     Blueprint,
-    render_template,
-    current_app,
-    request,
     abort,
-    redirect,
-    url_for,
-    flash,
+    render_template,
+    request,
 )
-from sqlalchemy.orm import joinedload
-from app.models import Post, Category, Tag, PostView
-from app import db, redis_client
 from flask_login import current_user
+from sqlalchemy.orm import joinedload
+
+from app import db, redis_client
+from app.models import Post, PostView
 
 main_bp = Blueprint("main", __name__)
 

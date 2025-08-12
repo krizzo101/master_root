@@ -5,10 +5,8 @@ Centralizes all AI API calls, cost tracking, and error handling in one place.
 
 from typing import Any, Dict, Optional, Type, TypeVar, List
 import json
-import asyncio
 from pydantic import BaseModel
 from ..responses_api_client_fixed import ResponsesAPIClientFixed
-from ..simplified_schemas import get_simplified_schema_for_operation
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -174,7 +172,7 @@ Provide a clear, structured analysis focusing on actionable insights.
         """
         constraints_str = ""
         if constraints:
-            constraints_str = f"\nConstraints to consider:\n" + "\n".join(
+            constraints_str = "\nConstraints to consider:\n" + "\n".join(
                 f"- {c}" for c in constraints
             )
 

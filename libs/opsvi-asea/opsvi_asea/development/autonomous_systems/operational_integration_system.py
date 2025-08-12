@@ -8,7 +8,7 @@ import json
 import sys
 import os
 from datetime import datetime
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 
 # Add project root to path
 sys.path.append("/home/opsvi/asea")

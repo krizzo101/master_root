@@ -11,9 +11,9 @@ Author: Agent Pipeline Engineer
 Created: 2025-06-28
 """
 
-from datetime import datetime
 import logging
-from typing import Any, Dict
+from datetime import datetime
+from typing import Any
 
 logger = logging.getLogger("RealMCPInterface")
 
@@ -25,7 +25,7 @@ class RealMCPToolsInterface:
         """Initialize real MCP tools interface"""
         logger.info("🔗 Initializing REAL MCP cognitive tools interface")
 
-    async def arango_search(self, **kwargs) -> Dict[str, Any]:
+    async def arango_search(self, **kwargs) -> dict[str, Any]:
         """Call actual mcp_cognitive_tools_arango_search"""
         try:
             logger.info(
@@ -49,7 +49,7 @@ class RealMCPToolsInterface:
             logger.error(f"Real database search error: {str(e)}")
             return {"success": False, "error": str(e)}
 
-    async def arango_modify(self, **kwargs) -> Dict[str, Any]:
+    async def arango_modify(self, **kwargs) -> dict[str, Any]:
         """Call actual mcp_cognitive_tools_arango_modify"""
         try:
             operation = kwargs.get("operation", "unknown")
@@ -72,7 +72,7 @@ class RealMCPToolsInterface:
             logger.error(f"Real database modify error: {str(e)}")
             return {"success": False, "error": str(e)}
 
-    async def arango_manage(self, **kwargs) -> Dict[str, Any]:
+    async def arango_manage(self, **kwargs) -> dict[str, Any]:
         """Call actual mcp_cognitive_tools_arango_manage"""
         try:
             action = kwargs.get("action", "unknown")

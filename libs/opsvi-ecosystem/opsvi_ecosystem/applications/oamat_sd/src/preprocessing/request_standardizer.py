@@ -8,9 +8,9 @@ Uses GPT-4.1-mini with structured outputs to intelligently analyze and fill
 in missing details with reasonable assumptions.
 """
 
-from datetime import datetime
 import json
-from typing import Any, Dict
+from datetime import datetime
+from typing import Any
 
 from src.applications.oamat_sd.src.reasoning.structured_output_enforcer import (
     StructuredOutputEnforcer,
@@ -315,7 +315,7 @@ Generate the complete standardized request JSON:"""
 
     def validate_standardized_request(
         self, standardized_request: StandardizedRequest
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Validate the quality and completeness of a standardized request.
 

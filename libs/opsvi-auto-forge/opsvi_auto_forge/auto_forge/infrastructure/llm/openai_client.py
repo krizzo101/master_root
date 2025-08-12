@@ -1,6 +1,5 @@
 """OpenAI Responses API client for autonomous software factory."""
 
-import asyncio
 import json
 import logging
 from typing import (
@@ -13,12 +12,11 @@ from typing import (
     Union,
     TypeVar,
 )
-from uuid import uuid4
 
 import jsonschema
 from openai import OpenAI, AsyncOpenAI
 from openai.types.responses import Response, ResponseStreamEvent
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, ValidationError
 
 logger = logging.getLogger(__name__)
 

@@ -109,7 +109,7 @@ class SubdivisionStateManager:
         self,
         state: SmartDecompositionState,
         subdivision_metadata: dict,
-        parent_context_id: Optional[str] = None,
+        parent_context_id: str | None = None,
         debug: bool = False,
     ) -> SubdivisionStateContext:
         """

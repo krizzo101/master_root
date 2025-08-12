@@ -5,7 +5,6 @@ import sys
 #       and serves as a REFERENCE implementation for integrating advanced MCP-based
 #       research into the CodeGen application. It is NOT yet wired into CodeGen.
 #       Future tasks will adapt imports and integrate with CodeGen pipeline.
-
 from src.applications.research_team.agents.research_agent import ResearchAgent
 from src.applications.research_team.agents.synthesis_agent import SynthesisAgent
 from src.applications.research_team.db.db_writer import write_research_to_db

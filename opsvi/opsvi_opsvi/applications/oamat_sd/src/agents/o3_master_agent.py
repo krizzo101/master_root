@@ -6,7 +6,7 @@ Coordinates specialized modules for complexity analysis, strategy generation, an
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from src.applications.oamat_sd.src.agents.request_validation import (
     CompletionResult,
@@ -41,7 +41,7 @@ class O3MasterAgent:
     5. Comprehensive Analysis -> Combine all results
     """
 
-    def __init__(self, model_config: Optional[Dict[str, Any]] = None):
+    def __init__(self, model_config: dict[str, Any] | None = None):
         """Initialize the O3 Master Agent with all modular components"""
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
@@ -55,13 +55,13 @@ class O3MasterAgent:
         self.framework_educator = O3FrameworkEducator()
 
         # Store reasoning history for analysis
-        self.reasoning_history: List[ReasoningStep] = []
+        self.reasoning_history: list[ReasoningStep] = []
 
         self.logger.info("✅ O3 Master Agent initialized with modular architecture")
 
     async def analyze_request_complexity(
-        self, request: Dict[str, Any], validation_result: ValidationResult
-    ) -> Tuple[any, List[ReasoningStep]]:
+        self, request: dict[str, Any], validation_result: ValidationResult
+    ) -> tuple[any, list[ReasoningStep]]:
         """Delegate complexity analysis to specialized module"""
         self.logger.info("🧠 Delegating to Complexity Analyzer...")
 
@@ -79,7 +79,7 @@ class O3MasterAgent:
 
     async def generate_agent_strategy(
         self, complexity_result, completion_result: CompletionResult
-    ) -> Tuple[any, List[ReasoningStep]]:
+    ) -> tuple[any, list[ReasoningStep]]:
         """Delegate strategy generation to specialized module"""
         self.logger.info("🎯 Delegating to Strategy Generator...")
 
@@ -96,8 +96,8 @@ class O3MasterAgent:
         return agent_strategy, reasoning_steps
 
     async def generate_execution_plan(
-        self, strategy, request_data: Dict[str, Any]
-    ) -> Tuple[any, List[ReasoningStep]]:
+        self, strategy, request_data: dict[str, Any]
+    ) -> tuple[any, list[ReasoningStep]]:
         """Delegate execution planning to specialized module"""
         self.logger.info("📋 Delegating to Strategy Generator for execution planning...")
 
@@ -114,8 +114,8 @@ class O3MasterAgent:
         return execution_plan, reasoning_steps
 
     async def design_optimal_pipeline(
-        self, request_data: Dict[str, Any], context: Dict[str, Any] = None
-    ) -> Tuple[PipelineDesign, List[ReasoningStep]]:
+        self, request_data: dict[str, Any], context: dict[str, Any] = None
+    ) -> tuple[PipelineDesign, list[ReasoningStep]]:
         """
         Meta-pipeline design: O3 determines optimal pipeline structure for this specific request.
         NO ASSUMPTIONS about stages - O3 decides what pipeline is needed.
@@ -268,7 +268,7 @@ class O3MasterAgent:
 
     async def perform_comprehensive_analysis(
         self,
-        request: Dict[str, Any],
+        request: dict[str, Any],
         validation_result: ValidationResult,
         completion_result: CompletionResult,
     ) -> O3AnalysisResult:
@@ -338,7 +338,7 @@ class O3MasterAgent:
                 f"O3 comprehensive analysis failed: {e}. Cannot proceed without complete analysis."
             )
 
-    def get_reasoning_history(self) -> List[ReasoningStep]:
+    def get_reasoning_history(self) -> list[ReasoningStep]:
         """Get the complete reasoning history for analysis"""
         return self.reasoning_history.copy()
 
@@ -347,7 +347,7 @@ class O3MasterAgent:
         self.reasoning_history.clear()
         self.logger.info("🧹 Reasoning history cleared")
 
-    def get_capabilities(self) -> Dict[str, Any]:
+    def get_capabilities(self) -> dict[str, Any]:
         """Return the capabilities of this O3 master agent"""
         return {
             "agent_name": "O3 Master Agent",

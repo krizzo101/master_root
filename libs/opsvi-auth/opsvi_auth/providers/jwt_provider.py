@@ -1,10 +1,9 @@
 """JWT-based authentication provider for OPSVI Auth library."""
 
-import asyncio
 import logging
 import secrets
 import hashlib
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 from datetime import datetime, timedelta
 
 import jwt
@@ -18,9 +17,7 @@ from .base import (
     Token,
     AuthStatus,
     Permission,
-    AuthError,
     AuthenticationError,
-    TokenError,
 )
 
 logger = logging.getLogger(__name__)

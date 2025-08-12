@@ -8,10 +8,10 @@ including component specifications, interface definitions, dependency management
 import argparse
 import json
 import os
-from pathlib import Path
 import sys
 import time
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
 
 from openai import OpenAI
 
@@ -40,6 +40,7 @@ finally:
     pass
 try:
     from prompts.architecture_prompts import COMPONENT_SYSTEM_PROMPT
+
     from schemas.architecture_schemas import ComponentInput, ComponentOutput
 except ImportError:
     sys.exit(1)
@@ -611,7 +612,7 @@ class ComponentDiagramGenerator:
 class ComponentDesigner:
     """Main component designer class."""
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: str | None = None):
         """Initialize the component designer.
 
         Args:

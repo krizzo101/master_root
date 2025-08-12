@@ -6,7 +6,6 @@ Extracted from agent_factory.py for better modularity and maintainability.
 """
 
 import logging
-from typing import List, Optional
 
 from langchain_core.tools import tool
 from pydantic import BaseModel, Field
@@ -21,8 +20,8 @@ class CodeRequest(BaseModel):
         ..., min_length=10, description="Code task description"
     )
     language: str = Field("python", description="Programming language")
-    framework: Optional[str] = Field(None, description="Framework or library to use")
-    requirements: List[str] = Field(
+    framework: str | None = Field(None, description="Framework or library to use")
+    requirements: list[str] = Field(
         default_factory=list, description="Specific requirements"
     )
 
@@ -54,8 +53,8 @@ def create_code_generation_tool(base_agent=None):
     def generate_code(
         task_description: str,
         language: str = "python",
-        framework: Optional[str] = None,
-        requirements: List[str] = None,
+        framework: str | None = None,
+        requirements: list[str] = None,
     ) -> str:
         """
         Generates code based on the task description and requirements.

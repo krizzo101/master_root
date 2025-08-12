@@ -2,9 +2,11 @@
 Initialize Flask app, extensions, and configuration
 """
 import logging
+
+from cachelib import SimpleCache
 from flask import Flask
 from flask_restful import Api
-from cachelib import SimpleCache
+
 from .weather import WeatherService
 
 
@@ -30,8 +32,8 @@ def create_app() -> Flask:
     api = Api(app)
 
     # Import and register blueprints/routes
-    from .views import main_bp
     from .api import WeatherResource
+    from .views import main_bp
 
     app.register_blueprint(main_bp)
     api.add_resource(

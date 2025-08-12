@@ -5,9 +5,7 @@ Thin wrapper around ResearchAgent + SynthesisAgent to provide
 up-to-date technical insights for AI prompt enrichment.
 """
 
-import asyncio
 import logging
-from typing import Optional
 
 from cachetools import TTLCache
 
@@ -126,8 +124,8 @@ class ResearchService:
         """Test research service connectivity and return status."""
         try:
             # Add src directory to Python path for imports
-            import sys
             import os
+            import sys
 
             src_path = os.path.join(os.path.dirname(__file__), "..", "..")
             if src_path not in sys.path:

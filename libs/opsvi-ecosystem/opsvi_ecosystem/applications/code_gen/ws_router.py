@@ -9,6 +9,7 @@ from typing import Any
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi_websocket_pubsub import PubSubEndpoint
+
 from config import config
 
 logger = logging.getLogger(__name__)
@@ -139,8 +140,9 @@ async def websocket_pubsub_endpoint(websocket: WebSocket) -> None:
 def publish_progress_update(job_id: str, data: dict[str, Any]) -> None:
     """Publish a progress update for a specific job."""
     try:
-        import redis
         import json
+
+        import redis
 
         # Direct Redis pub/sub for more reliable progress updates
         progress_topic = f"job_progress_{job_id}"

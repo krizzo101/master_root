@@ -7,9 +7,9 @@ detailed debug logging for developers. Focuses on user experience
 with pretty-printing, progress tracking, and clear status indicators.
 """
 
-from datetime import datetime
 import json
-from typing import Any, Dict, List
+from datetime import datetime
+from typing import Any
 
 from rich.console import Console
 from rich.panel import Panel
@@ -45,7 +45,7 @@ class ConsoleInterface:
         )
         self.console.print()
 
-    def show_request_analysis(self, request: str, analysis: Dict[str, Any]):
+    def show_request_analysis(self, request: str, analysis: dict[str, Any]):
         """Display request analysis in beautiful format"""
         self._show_step("Request Analysis")
 
@@ -71,7 +71,7 @@ class ConsoleInterface:
         self.console.print(table)
         self.console.print()
 
-    def show_workflow_specification(self, workflow_spec: Dict[str, Any]):
+    def show_workflow_specification(self, workflow_spec: dict[str, Any]):
         """Display workflow specification with pretty formatting"""
         self._show_step("Workflow Generation")
 
@@ -118,7 +118,7 @@ class ConsoleInterface:
         )
         self.console.print()
 
-    def show_agent_creation(self, agents: Dict[str, Any], subdivision: bool = False):
+    def show_agent_creation(self, agents: dict[str, Any], subdivision: bool = False):
         """Display agent creation results"""
         workflow_type = "Subdivision" if subdivision else "Standard"
         self._show_step(f"{workflow_type} Agent Creation")
@@ -197,7 +197,7 @@ class ConsoleInterface:
         )
         self.console.print()
 
-    def show_file_generation(self, files_queued: List[str], files_created: List[str]):
+    def show_file_generation(self, files_queued: list[str], files_created: list[str]):
         """Display file generation results"""
         self._show_step("File Generation")
 
@@ -285,7 +285,7 @@ class ConsoleInterface:
         )
         self.console.print()
 
-    def show_pretty_json(self, data: Dict[str, Any], title: str = "Data"):
+    def show_pretty_json(self, data: dict[str, Any], title: str = "Data"):
         """Display JSON data with pretty formatting"""
         json_str = json.dumps(data, indent=2, ensure_ascii=False)
         syntax = Syntax(json_str, "json", theme="monokai", line_numbers=True)

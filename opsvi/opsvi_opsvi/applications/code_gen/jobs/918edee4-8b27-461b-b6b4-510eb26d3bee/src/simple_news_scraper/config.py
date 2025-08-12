@@ -1,10 +1,11 @@
 """
 Centralized configuration and logging setup.
 """
-import os
 import logging
+import os
+from typing import Any
+
 import yaml
-from typing import Any, Dict
 
 DEFAULT_CONFIG_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "config.yaml"
@@ -20,7 +21,7 @@ DEFAULT_CONFIG = {
 }
 
 
-def load_config(config_path: str = DEFAULT_CONFIG_FILE) -> Dict[str, Any]:
+def load_config(config_path: str = DEFAULT_CONFIG_FILE) -> dict[str, Any]:
     """
     Loads configuration from YAML file (if exists), merged with defaults.
     :param config_path: Path to config.yaml
@@ -29,7 +30,7 @@ def load_config(config_path: str = DEFAULT_CONFIG_FILE) -> Dict[str, Any]:
     config = DEFAULT_CONFIG.copy()
     if os.path.exists(config_path):
         try:
-            with open(config_path, "r", encoding="utf-8") as f:
+            with open(config_path, encoding="utf-8") as f:
                 data = yaml.safe_load(f)
                 if isinstance(data, dict):
                     config.update(data)

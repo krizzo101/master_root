@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from typing import Optional
+
 from app import models, schemas
 from app.exceptions import ValidationException
 
@@ -9,7 +9,7 @@ def get_todos(db: Session, skip: int = 0, limit: int = 100) -> list[models.Todo]
     return db.query(models.Todo).offset(skip).limit(limit).all()
 
 
-def get_todo(db: Session, todo_id: int) -> Optional[models.Todo]:
+def get_todo(db: Session, todo_id: int) -> models.Todo | None:
     """Retrieve a todo by ID."""
     return db.query(models.Todo).filter(models.Todo.id == todo_id).first()
 
@@ -29,7 +29,7 @@ def create_todo(db: Session, todo_in: schemas.TodoCreate) -> models.Todo:
 
 def update_todo(
     db: Session, todo_id: int, todo_in: schemas.TodoUpdate
-) -> Optional[models.Todo]:
+) -> models.Todo | None:
     """Update fields on a todo by ID."""
     todo = get_todo(db, todo_id)
     if not todo:
@@ -49,7 +49,7 @@ def update_todo(
 
 def replace_todo(
     db: Session, todo_id: int, todo_in: schemas.TodoCreate
-) -> Optional[models.Todo]:
+) -> models.Todo | None:
     """Replace a todo with new title and description."""
     todo = get_todo(db, todo_id)
     if not todo:

@@ -8,10 +8,9 @@ Smart Decomposition system including coverage, performance, and security.
 
 import argparse
 import json
-from pathlib import Path
 import sys
-from typing import Dict, List
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 
 class QualityGateValidator:
@@ -109,7 +108,7 @@ class QualityGateValidator:
             self.failures.append(f"Failed to parse benchmark file: {e}")
             return False
 
-    def validate_security(self, security_files: List[str]) -> bool:
+    def validate_security(self, security_files: list[str]) -> bool:
         """Validate security scan results"""
         print("🔒 Security Scan Results:")
 
@@ -137,7 +136,7 @@ class QualityGateValidator:
 
         return security_passed
 
-    def _determine_security_file_type(self, filename: str, data: Dict) -> str:
+    def _determine_security_file_type(self, filename: str, data: dict) -> str:
         """Determine the type of security report"""
         if "safety" in filename.lower():
             return "safety"
@@ -152,7 +151,7 @@ class QualityGateValidator:
         else:
             return "unknown"
 
-    def _validate_safety_report(self, data: Dict) -> bool:
+    def _validate_safety_report(self, data: dict) -> bool:
         """Validate Safety dependency security report"""
         vulnerabilities = data.get("vulnerabilities", [])
 
@@ -173,7 +172,7 @@ class QualityGateValidator:
             print("  ✅ Safety: No vulnerabilities found in dependencies")
             return True
 
-    def _validate_bandit_report(self, data: Dict) -> bool:
+    def _validate_bandit_report(self, data: dict) -> bool:
         """Validate Bandit security scan report"""
         results = data.get("results", [])
 
@@ -203,7 +202,7 @@ class QualityGateValidator:
             print("  ✅ Bandit: No high severity security issues found")
             return True
 
-    def _validate_semgrep_report(self, data: Dict) -> bool:
+    def _validate_semgrep_report(self, data: dict) -> bool:
         """Validate Semgrep security scan report"""
         results = data.get("results", [])
 
@@ -266,7 +265,7 @@ class QualityGateValidator:
         self,
         coverage_file: str,
         benchmark_file: str,
-        security_files: List[str],
+        security_files: list[str],
         fail_on_security: bool = True,
     ) -> bool:
         """Run all quality gate validations"""

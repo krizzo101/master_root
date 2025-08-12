@@ -10,7 +10,7 @@ Section Validator
 This module contains utilities for validating rule sections.
 """
 
-from typing import Dict, Any, Tuple, Optional, List
+from typing import Dict, Any, Tuple, Optional
 import logging
 import re
 import yaml
@@ -380,7 +380,7 @@ def post_process_danger_section(
         fixed_content["critical_violations"] = [
             v
             for v in fixed_content["critical_violations"]
-            if not v.endswith("principles") and not "rules" in v.lower()
+            if not v.endswith("principles") and "rules" not in v.lower()
         ]
 
         # If we removed too many, add at least one specific one

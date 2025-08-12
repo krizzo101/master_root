@@ -1,11 +1,12 @@
 """
 Middleware for logging and CORS in the Task Management API.
 """
-from fastapi import FastAPI, Request
-from starlette.middleware.cors import CORSMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware
 import logging
 import time
+
+from fastapi import FastAPI, Request
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.cors import CORSMiddleware
 
 logger = logging.getLogger(__name__)
 

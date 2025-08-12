@@ -10,7 +10,8 @@ Version: Referenced as of July 2024
 
 import functools
 import logging
-from typing import Any, Callable, Dict, Optional
+from collections.abc import Callable
+from typing import Any
 
 try:
     import requests
@@ -34,7 +35,7 @@ class HTTPClientInterface:
     """
 
     def __init__(
-        self, base_url: Optional[str] = None, headers: Optional[Dict[str, str]] = None
+        self, base_url: str | None = None, headers: dict[str, str] | None = None
     ):
         self.base_url = base_url
         self.headers = headers or {}
@@ -45,7 +46,7 @@ class HTTPClientInterface:
         self,
         timeout: int = 60,
         max_retries: int = 2,
-        proxies: Optional[Dict[str, str]] = None,
+        proxies: dict[str, str] | None = None,
     ):
         """Set client config: timeout, retries, proxies."""
         self.timeout = timeout
@@ -118,7 +119,7 @@ class HTTPClientInterface:
     def get(
         self,
         url: str,
-        params: Optional[Dict[str, Any]] = None,
+        params: dict[str, Any] | None = None,
         stream: bool = False,
         **kwargs,
     ):
@@ -152,7 +153,7 @@ class HTTPClientInterface:
     async def aget(
         self,
         url: str,
-        params: Optional[Dict[str, Any]] = None,
+        params: dict[str, Any] | None = None,
         stream: bool = False,
         **kwargs,
     ):

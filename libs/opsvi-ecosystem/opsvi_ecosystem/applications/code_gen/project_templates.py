@@ -1,10 +1,8 @@
 """Project templates and type detection for code generation."""
 
 import logging
-from enum import Enum
-from typing import Dict, Optional, List
-from pathlib import Path
 from dataclasses import dataclass
+from enum import Enum
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +22,9 @@ class ProjectTemplate:
     """Template definition for a project type."""
 
     project_type: ProjectType
-    files: Dict[str, str]  # filename -> content
-    dependencies: List[str]
-    test_files: Dict[str, str]  # test filename -> content
+    files: dict[str, str]  # filename -> content
+    dependencies: list[str]
+    test_files: dict[str, str]  # test filename -> content
 
 
 # CLI Tool Template
@@ -705,7 +703,7 @@ def test_main_output(capsys):
 # See code_gen.ai_agents.detect_project_type_with_ai() for intelligent project type detection
 
 # Template registry
-TEMPLATES: Dict[ProjectType, ProjectTemplate] = {
+TEMPLATES: dict[ProjectType, ProjectTemplate] = {
     ProjectType.CLI_TOOL: CLI_TOOL_TEMPLATE,
     ProjectType.WEB_API: WEB_API_TEMPLATE,
     ProjectType.DATA_PROCESSOR: DATA_PROCESSOR_TEMPLATE,

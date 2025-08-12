@@ -8,7 +8,7 @@ import asyncio
 import json
 import logging
 import sys
-from typing import Any, Dict
+from typing import Any
 
 # Add core module to path
 sys.path.append("/home/opsvi/asea/development/cognitive_interface/core")
@@ -27,8 +27,8 @@ class CognitiveMCPServer:
         self.db = CognitiveDatabase()
 
     async def handle_tool_call(
-        self, name: str, arguments: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, name: str, arguments: dict[str, Any]
+    ) -> dict[str, Any]:
         """Handle MCP tool calls"""
 
         try:
@@ -212,7 +212,7 @@ class CognitiveMCPServer:
                 ]
             }
 
-    async def handle_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+    async def handle_request(self, request: dict[str, Any]) -> dict[str, Any]:
         """Handle MCP JSONRPC requests"""
 
         method = request.get("method")

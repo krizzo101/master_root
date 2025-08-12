@@ -4,7 +4,7 @@ Shows how parent nodes integrate the context abstraction system to prevent
 information overload while maintaining essential information flow.
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
 from langchain_core.runnables import RunnableLambda
 from langgraph.graph import START, StateGraph
@@ -47,7 +47,7 @@ class ContextAwareWorkflowNode(EnhancedWorkflowNode):
         )
 
     async def process_child_workflows(
-        self, child_workflow_results: List[Dict[str, Any]]
+        self, child_workflow_results: list[dict[str, Any]]
     ) -> AbstractedSummary:
         """
         Process results from child workflows with intelligent context abstraction
@@ -94,7 +94,7 @@ class ContextAwareWorkflowManager:
         }
 
     def create_workflow_node(
-        self, node_spec: Dict[str, Any], hierarchy_depth: int, parent_context: str
+        self, node_spec: dict[str, Any], hierarchy_depth: int, parent_context: str
     ) -> ContextAwareWorkflowNode:
         """
         Create a workflow node with appropriate abstraction level
@@ -120,7 +120,7 @@ class ContextAwareWorkflowManager:
         )
 
     async def create_enhanced_workflow_plan(
-        self, user_request: str, complexity_assessment: Dict[str, Any]
+        self, user_request: str, complexity_assessment: dict[str, Any]
     ) -> StateGraph:
         """
         Create enhanced workflow plan with context abstraction at each level
@@ -175,7 +175,7 @@ class ContextAwareWorkflowManager:
         )
         context_manager = ParentNodeContextManager(abstraction_level, parent_context)
 
-        async def supervisor_logic(state: OAMATState) -> Dict[str, Any]:
+        async def supervisor_logic(state: OAMATState) -> dict[str, Any]:
             """
             Supervisor logic with context abstraction
             """
@@ -228,7 +228,7 @@ class ContextAwareWorkflowManager:
             hierarchy_depth, AbstractionLevel.TECHNICAL
         )
 
-        async def execution_logic(state: OAMATState) -> Dict[str, Any]:
+        async def execution_logic(state: OAMATState) -> dict[str, Any]:
             """
             Execution logic that produces results appropriate for parent abstraction level
             """
@@ -285,7 +285,7 @@ class ContextAwareWorkflowManager:
     async def _add_subdivided_nodes(
         self,
         workflow_graph: StateGraph,
-        complexity_assessment: Dict[str, Any],
+        complexity_assessment: dict[str, Any],
         hierarchy_depth: int,
         parent_context: str,
     ) -> None:
@@ -341,7 +341,7 @@ class ContextAwareWorkflowManager:
         )
         context_manager = ParentNodeContextManager(abstraction_level, context)
 
-        async def wrapped_execution(state: OAMATState) -> Dict[str, Any]:
+        async def wrapped_execution(state: OAMATState) -> dict[str, Any]:
             """
             Execute sub-graph and abstract results for parent consumption
             """
@@ -402,7 +402,7 @@ class ContextAwareWorkflowManager:
         # Continue processing
         return "continue"
 
-    async def _execute_agent_work(self, state: OAMATState) -> Dict[str, Any]:
+    async def _execute_agent_work(self, state: OAMATState) -> dict[str, Any]:
         """
         Execute actual agent work (placeholder for real agent execution)
         """
@@ -435,7 +435,7 @@ class ContextAwareWorkflowManager:
     def _create_start_node(self) -> RunnableLambda:
         """Create workflow start node"""
 
-        def start_logic(state: OAMATState) -> Dict[str, Any]:
+        def start_logic(state: OAMATState) -> dict[str, Any]:
             return {**state, "status": "started"}
 
         return RunnableLambda(start_logic)
@@ -443,7 +443,7 @@ class ContextAwareWorkflowManager:
     def _create_end_node(self) -> RunnableLambda:
         """Create workflow end node"""
 
-        def end_logic(state: OAMATState) -> Dict[str, Any]:
+        def end_logic(state: OAMATState) -> dict[str, Any]:
             return {**state, "status": "completed"}
 
         return RunnableLambda(end_logic)

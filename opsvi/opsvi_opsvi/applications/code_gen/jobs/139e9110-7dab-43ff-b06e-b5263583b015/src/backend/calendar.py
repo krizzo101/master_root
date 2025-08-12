@@ -1,15 +1,17 @@
 """
 Google Calendar integration: bi-directional sync, event creation, OAuth2
 """
+from datetime import timedelta
+
 from fastapi import APIRouter, Depends, HTTPException
-from backend.auth import get_current_user
-from backend.models import User, Task
-from backend.database import get_db
-from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
-from backend.config import get_settings
+from googleapiclient.discovery import build
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+
+from backend.auth import get_current_user
+from backend.config import get_settings
+from backend.database import get_db
+from backend.models import Task, User
 
 settings = get_settings()
 calendar_router = APIRouter()

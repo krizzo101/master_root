@@ -3,7 +3,6 @@ Simplified schemas optimized for OpenAI Responses API structured outputs.
 These schemas avoid complex nested structures that cause validation issues.
 """
 
-from typing import List, Optional
 from pydantic import BaseModel, Field
 
 

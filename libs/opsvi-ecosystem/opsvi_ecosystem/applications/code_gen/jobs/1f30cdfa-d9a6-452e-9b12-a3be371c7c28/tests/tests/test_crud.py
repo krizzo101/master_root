@@ -1,15 +1,23 @@
-import pytest
 from app.crud import (
-    get_todos,
-    get_todo as crud_get_todo,
     create_todo as crud_create_todo,
-    update_todo as crud_update_todo,
-    replace_todo as crud_replace_todo,
+)
+from app.crud import (
     delete_todo as crud_delete_todo,
 )
-from app.database import Base, engine, SessionLocal
+from app.crud import (
+    get_todo as crud_get_todo,
+)
+from app.crud import (
+    get_todos,
+)
+from app.crud import (
+    replace_todo as crud_replace_todo,
+)
+from app.crud import (
+    update_todo as crud_update_todo,
+)
+from app.database import Base, SessionLocal, engine
 from app.models import Todo
-from sqlalchemy.orm import Session
 
 Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)

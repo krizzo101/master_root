@@ -1,6 +1,6 @@
 import logging
-from logging.handlers import RotatingFileHandler
 import os
+from logging.handlers import RotatingFileHandler
 
 LOG_PATH = os.environ.get("LOG_PATH", "logs/json_processor.log")
 

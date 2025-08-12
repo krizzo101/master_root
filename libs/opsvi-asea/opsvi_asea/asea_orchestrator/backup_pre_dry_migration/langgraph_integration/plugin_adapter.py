@@ -6,10 +6,7 @@ to work as LangGraph nodes while preserving all existing functionality.
 """
 
 import time
-import json
-import re
-from typing import Dict, Any, Optional, Callable
-from datetime import datetime
+from typing import Dict, Any, Optional
 
 from ..plugins.base_plugin import BasePlugin
 from .state import ASEAState, update_state_for_plugin

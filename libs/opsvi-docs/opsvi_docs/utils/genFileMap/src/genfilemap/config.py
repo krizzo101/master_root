@@ -13,7 +13,6 @@ for the genfilemap utility.
 
 import os
 import json
-from pathlib import Path
 from typing import Dict, Any, Optional
 
 # Default configuration file path

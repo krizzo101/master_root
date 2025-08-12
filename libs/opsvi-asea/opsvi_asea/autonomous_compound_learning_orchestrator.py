@@ -4,10 +4,9 @@ Autonomous Compound Learning Orchestrator
 Phase 3: Implement systematic compound learning through relationship exploitation
 """
 
-import json
 import sys
 from datetime import datetime
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any
 
 # Database configuration
 DATABASE_CONFIG = {

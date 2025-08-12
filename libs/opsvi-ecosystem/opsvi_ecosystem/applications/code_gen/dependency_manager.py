@@ -12,16 +12,16 @@ Ensures the application runs as designed without manual setup.
 from __future__ import annotations
 
 import logging
-import subprocess
-import time
-import threading
-import signal
 import os
+import signal
+import subprocess
 import sys
+import threading
+import time
 from pathlib import Path
-from typing import Optional
 
 import redis
+
 from config import get_config
 
 logger = logging.getLogger(__name__)
@@ -32,8 +32,8 @@ class DependencyManager:
 
     def __init__(self):
         self.config = get_config()
-        self.redis_process: Optional[subprocess.Popen] = None
-        self.celery_process: Optional[subprocess.Popen] = None
+        self.redis_process: subprocess.Popen | None = None
+        self.celery_process: subprocess.Popen | None = None
         self.shutdown_event = threading.Event()
 
     def start_all_dependencies(self) -> bool:
@@ -107,7 +107,7 @@ class DependencyManager:
             logger.error(f"Failed to start Redis: {e}")
             return False
 
-    def _get_redis_start_command(self) -> Optional[list[str]]:
+    def _get_redis_start_command(self) -> list[str] | None:
         """Get the appropriate Redis start command for this system."""
         # Try different Redis start methods
         commands_to_try = [
@@ -132,7 +132,7 @@ class DependencyManager:
         # Try to install Redis if not found
         return self._try_install_redis()
 
-    def _try_install_redis(self) -> Optional[list[str]]:
+    def _try_install_redis(self) -> list[str] | None:
         """Attempt to install Redis automatically."""
         logger.info("Redis not found, attempting automatic installation...")
 
@@ -324,7 +324,7 @@ class DependencyManager:
 
 
 # Global dependency manager instance
-_dependency_manager: Optional[DependencyManager] = None
+_dependency_manager: DependencyManager | None = None
 
 
 def get_dependency_manager() -> DependencyManager:

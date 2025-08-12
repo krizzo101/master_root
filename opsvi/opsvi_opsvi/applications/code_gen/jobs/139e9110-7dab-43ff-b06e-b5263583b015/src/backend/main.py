@@ -6,25 +6,26 @@ main.py: Entry point for the FastAPI backend server.
 - Handles graceful shutdown
 """
 import logging
+
 import uvicorn
-from fastapi import FastAPI, Request, Depends, status
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
-from backend.config import get_settings, Settings
-from backend.auth import auth_router
+
 from backend.api import api_router
-from backend.ws import ws_router
+from backend.audit import setup_audit_logging
+from backend.auth import auth_router
+from backend.calendar import calendar_router
+from backend.config import Settings, get_settings
+from backend.database import engine
+from backend.files import storage_router
 from backend.graphql_app import graphql_app
 from backend.models import Base
-from backend.database import engine
-from backend.audit import setup_audit_logging
-from backend.notifications import notification_manager
-from backend.files import storage_router
-from backend.calendar import calendar_router
 from backend.utils import rate_limit_middleware
+from backend.ws import ws_router
 
 settings: Settings = get_settings()
 logger = logging.getLogger("taskmgmt")

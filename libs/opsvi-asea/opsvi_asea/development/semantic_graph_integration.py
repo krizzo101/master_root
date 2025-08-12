@@ -4,9 +4,8 @@ Semantic Graph Integration
 Integrates vector embeddings with ArangoDB graph for semantic search
 """
 
-import json
 import numpy as np
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Optional
 from datetime import datetime
 import hashlib
 
@@ -202,19 +201,19 @@ class SemanticGraphIntegration:
         """Generate AQL query to find similar concepts"""
 
         # This would be more sophisticated in production with vector indexes
-        aql_query = f"""
+        aql_query = """
         FOR concept IN research_concepts
         FILTER concept.semantic_embedding != null
         LET similarity = COSINE_SIMILARITY(@query_vector, concept.semantic_embedding.vector)
         FILTER similarity > @threshold
         SORT similarity DESC
         LIMIT 10
-        RETURN {{
+        RETURN {
             concept: concept,
             similarity: similarity,
             title: concept.knowledge_content.title,
             domain: concept.knowledge_domain
-        }}
+        }
         """
 
         return aql_query

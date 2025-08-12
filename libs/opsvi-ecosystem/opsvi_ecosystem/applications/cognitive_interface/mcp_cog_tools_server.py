@@ -9,7 +9,7 @@ Provides 3 agent-friendly tools that eliminate AQL complexity:
 import asyncio
 import json
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 from src.shared.interfaces.database.consolidated_arango import ConsolidatedArangoDB
 from src.shared.mcp.mcp_server_template import BaseTool, MCPServerTemplate, TextContent
@@ -130,7 +130,7 @@ class ArangoSearchTool(BaseTool):
             },
         )
 
-    async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
+    async def execute(self, arguments: dict[str, Any]) -> list[TextContent]:
         database = get_db()
         search_type = arguments["search_type"]
         collection = arguments["collection"]
@@ -216,7 +216,7 @@ class ArangoModifyTool(BaseTool):
             },
         )
 
-    async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
+    async def execute(self, arguments: dict[str, Any]) -> list[TextContent]:
         database = get_db()
         operation = arguments["operation"]
         collection = arguments["collection"]
@@ -295,7 +295,7 @@ class ArangoManageTool(BaseTool):
             },
         )
 
-    async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
+    async def execute(self, arguments: dict[str, Any]) -> list[TextContent]:
         database = get_db()
         action = arguments["action"]
         AGENT_PARAMS_TO_IGNORE = {"explanation", "description", "reason", "context"}

@@ -13,11 +13,11 @@ The WorkflowManager transforms natural language requests into sophisticated,
 executable workflows with runtime adaptation capabilities.
 """
 
-from datetime import datetime
 import json
 import logging
 import traceback
-from typing import Any, Dict, List, Optional, Tuple
+from datetime import datetime
+from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -99,7 +99,7 @@ class WorkflowManager(LLMBaseAgent):
     def _generate_dynamic_persona(
         self,
         user_request: str,
-        task_context: Dict[str, Any],
+        task_context: dict[str, Any],
         understanding_level: str = "initial",
     ) -> str:
         """
@@ -166,7 +166,7 @@ Your persona and approach should evolve as you gain deeper understanding of the 
         )
 
     def _update_persona_for_understanding_evolution(
-        self, new_understanding: Dict[str, Any]
+        self, new_understanding: dict[str, Any]
     ) -> None:
         """Update the current understanding and regenerate persona if needed"""
         phase = new_understanding.get("phase", "analysis")
@@ -186,8 +186,8 @@ Your persona and approach should evolve as you gain deeper understanding of the 
             )
 
     def _analyze_task_context(
-        self, user_request: str, context: Dict[str, Any] = None
-    ) -> Dict[str, Any]:
+        self, user_request: str, context: dict[str, Any] = None
+    ) -> dict[str, Any]:
         """Analyze the task context for persona generation"""
         # This would typically involve more sophisticated analysis
         # For now, provide basic context analysis
@@ -200,7 +200,7 @@ Your persona and approach should evolve as you gain deeper understanding of the 
         }
 
     def _get_contextual_system_identity(
-        self, task_context: Dict[str, Any] = None, understanding_level: str = "initial"
+        self, task_context: dict[str, Any] = None, understanding_level: str = "initial"
     ) -> str:
         """Get system identity with contextual enhancements"""
         base_identity = self.system_identity
@@ -224,7 +224,7 @@ Your responses should be tailored to the specific domain and complexity level wh
 
         return base_identity + contextual_enhancement
 
-    def process_request(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+    def process_request(self, input_data: dict[str, Any]) -> dict[str, Any]:
         """Process a request and return structured response"""
         request = ProcessingRequest(**input_data)
 
@@ -249,7 +249,7 @@ Your responses should be tailored to the specific domain and complexity level wh
         self,
         original_plan: EnhancedWorkflowPlan,
         modification_request: str,
-        context: Optional[Dict] = None,
+        context: dict | None = None,
     ) -> EnhancedWorkflowPlan:
         """Modifies an existing workflow plan based on user feedback."""
         modification_prompt = f"""
@@ -273,7 +273,7 @@ Return only the new, modified EnhancedWorkflowPlan JSON object.
     def create_enhanced_workflow_plan(
         self,
         user_request: str,
-        context: Optional[Dict] = None,
+        context: dict | None = None,
         interactive: bool = False,
     ) -> EnhancedWorkflowPlan:
         """Creates a new workflow plan, typically for regeneration."""
@@ -339,7 +339,7 @@ NODE DETAILS:
         self,
         analysis: EnhancedRequestAnalysis,
         user_request: str,
-        context: Dict[str, Any] = None,
+        context: dict[str, Any] = None,
     ) -> EnhancedWorkflowPlan:
         """
         Generate sophisticated workflow based on comprehensive analysis
@@ -524,9 +524,9 @@ STRATEGY: {getattr(workflow_plan, 'strategy', 'N/A') if workflow_plan else "N/A"
     def generate_enhanced_workflow_with_clarification(
         self,
         user_request: str,
-        context: Dict[str, Any] = None,
+        context: dict[str, Any] = None,
         interactive: bool = True,
-    ) -> Optional[EnhancedWorkflowPlan]:
+    ) -> EnhancedWorkflowPlan | None:
         """
         Generate workflow with optional user clarification for complex requests
         """
@@ -589,7 +589,7 @@ STRATEGY: {getattr(workflow_plan, 'strategy', 'N/A') if workflow_plan else "N/A"
         self,
         refined_spec: RefinedSpecification,
         original_request: str,
-        context: Dict[str, Any] = None,
+        context: dict[str, Any] = None,
     ) -> EnhancedWorkflowPlan:
         """
         Generate a workflow from a refined specification
@@ -643,7 +643,7 @@ STRATEGY: {getattr(workflow_plan, 'strategy', 'N/A') if workflow_plan else "N/A"
                 f"Workflow generation from refined spec failed: {str(e)}"
             )
 
-    def _extract_agents_from_spec(self, spec: RefinedSpecification) -> List[str]:
+    def _extract_agents_from_spec(self, spec: RefinedSpecification) -> list[str]:
         """Extract recommended agents from refined specification"""
         agents = []
 
@@ -680,7 +680,7 @@ STRATEGY: {getattr(workflow_plan, 'strategy', 'N/A') if workflow_plan else "N/A"
 
         return agents
 
-    def _extract_tools_from_spec(self, spec: RefinedSpecification) -> List[str]:
+    def _extract_tools_from_spec(self, spec: RefinedSpecification) -> list[str]:
         """Extract required tools from refined specification"""
         tools = []
 
@@ -731,10 +731,10 @@ STRATEGY: {getattr(workflow_plan, 'strategy', 'N/A') if workflow_plan else "N/A"
     def make_intelligent_routing_decision(
         self,
         node_id: str,
-        workflow_state: Dict[str, Any],
-        available_options: List[str],
-        context: Dict[str, Any] = None,
-    ) -> Dict[str, Any]:
+        workflow_state: dict[str, Any],
+        available_options: list[str],
+        context: dict[str, Any] = None,
+    ) -> dict[str, Any]:
         """
         Make intelligent routing decisions during workflow execution
         """
@@ -911,7 +911,7 @@ Return decision in structured JSON format.
 
     # Enhanced clarification and specification methods
     def analyze_user_request(
-        self, user_request: str, context: Dict[str, Any] = None
+        self, user_request: str, context: dict[str, Any] = None
     ) -> ExpandedPrompt:
         """Analyze and expand user request to better understand requirements"""
         # Use the real RequestAnalyzer implementation
@@ -919,7 +919,7 @@ Return decision in structured JSON format.
 
     def gather_user_clarifications(
         self, expanded_prompt: ExpandedPrompt, interactive: bool = True
-    ) -> Tuple[UserClarificationResponse, RefinedSpecification]:
+    ) -> tuple[UserClarificationResponse, RefinedSpecification]:
         """Gather user clarifications for complex requests"""
         if not expanded_prompt.clarification_questions or not interactive:
             # No clarification needed or non-interactive mode
@@ -1021,7 +1021,7 @@ Return decision in structured JSON format.
 
     def _gather_dynamic_clarifications(
         self, expanded_prompt: ExpandedPrompt, interactive: bool = True
-    ) -> Tuple[UserClarificationResponse, RefinedSpecification]:
+    ) -> tuple[UserClarificationResponse, RefinedSpecification]:
         """
         Gathers user clarifications with dynamic question generation and understanding updates.
         Adapted from working commits b966b80 and 255b9b5.
@@ -1040,7 +1040,7 @@ Return decision in structured JSON format.
         priority_map = {"high": 0, "medium": 1, "low": 2}
         questions_to_ask.sort(key=lambda q: priority_map.get(q.priority, 99))
 
-        answered_questions: List[QuestionAnswer] = []
+        answered_questions: list[QuestionAnswer] = []
         max_questions = 10  # Safety limit
         questions_asked = 0
 
@@ -1156,9 +1156,9 @@ Return decision in structured JSON format.
         self,
         current_spec: RefinedSpecification,
         latest_answer: QuestionAnswer,
-        remaining_questions: List[ClarificationQuestion],
+        remaining_questions: list[ClarificationQuestion],
         answered_question: ClarificationQuestion,
-    ) -> Tuple[RefinedSpecification, List[ClarificationQuestion]]:
+    ) -> tuple[RefinedSpecification, list[ClarificationQuestion]]:
         """
         Dynamically update specification based on latest answer and regenerate questions.
         Adapted from working commits b966b80 and 255b9b5.
@@ -1251,9 +1251,9 @@ Return the updated specification as JSON following the RefinedSpecification sche
         self,
         updated_spec: RefinedSpecification,
         latest_answer: QuestionAnswer,
-        remaining_questions: List[ClarificationQuestion],
+        remaining_questions: list[ClarificationQuestion],
         answered_question: ClarificationQuestion,
-    ) -> List[ClarificationQuestion]:
+    ) -> list[ClarificationQuestion]:
         """Regenerate questions based on updated understanding with inference analysis"""
         try:
             # Create list of all answered questions for context
@@ -1400,7 +1400,7 @@ Return the updated questions as JSON following the DynamicQuestionUpdate schema.
 
     def _present_expanded_understanding_for_approval(
         self, expanded_prompt: ExpandedPrompt, user_request: str, interactive: bool
-    ) -> Tuple[bool, Optional[str]]:
+    ) -> tuple[bool, str | None]:
         """
         Present the agent's expanded understanding to the user for approval before asking clarifying questions.
         Adapted from working commit a1bba2d.
@@ -1489,7 +1489,7 @@ Return the updated questions as JSON following the DynamicQuestionUpdate schema.
 
     def _present_for_approval(
         self, spec: RefinedSpecification, interactive: bool
-    ) -> Tuple[bool, Optional[str]]:
+    ) -> tuple[bool, str | None]:
         """Present specification for user approval"""
         if not interactive:
             return True, None
@@ -1585,14 +1585,14 @@ You can:
 
     def _generate_examples_for_question(
         self, question: ClarificationQuestion, spec: RefinedSpecification
-    ) -> List[str]:
+    ) -> list[str]:
         """Generate examples for a clarification question"""
         # Simplified implementation
         return ["Example answer 1", "Example answer 2", "Example answer 3"]
 
     def _generate_options_for_question(
         self, question: ClarificationQuestion, spec: RefinedSpecification
-    ) -> List[Dict[str, str]]:
+    ) -> list[dict[str, str]]:
         """Generate options for a clarification question"""
         # Use predefined options if available
         if question.options:
@@ -1613,8 +1613,8 @@ You can:
         answer: str,
         question: ClarificationQuestion,
         spec: RefinedSpecification,
-        history: List[Dict],
-    ) -> Dict:
+        history: list[dict],
+    ) -> dict:
         """Process conversational answer and extract structured information"""
         # Simplified implementation
         return {

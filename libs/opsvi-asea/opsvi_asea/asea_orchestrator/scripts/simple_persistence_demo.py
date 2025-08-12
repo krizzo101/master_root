@@ -222,7 +222,7 @@ async def demo_basic_persistence():
             print(f"✅ Logged: {event['type']}")
 
     # Query execution history
-    print(f"\n📊 Retrieving execution history...")
+    print("\n📊 Retrieving execution history...")
     history = await db_client.get_execution_history(workflow_id)
     if history:
         print(f"✅ Retrieved {len(history)} history entries:")

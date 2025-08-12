@@ -1,11 +1,11 @@
-import pytest
-from fastapi.testclient import TestClient
-from backend.main import app
-from backend.db import engine
-from sqlmodel import Session
-from backend.models import MetricSample, MetricType
 from datetime import datetime, timedelta
-import time
+
+import pytest
+from backend.db import engine
+from backend.main import app
+from backend.models import MetricSample, MetricType
+from fastapi.testclient import TestClient
+from sqlmodel import Session
 
 
 @pytest.fixture()

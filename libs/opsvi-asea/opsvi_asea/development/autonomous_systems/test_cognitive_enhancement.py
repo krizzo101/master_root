@@ -226,7 +226,7 @@ def test_enhancement_vs_standard():
         },
     }
 
-    print(f"📊 Comparison Results:")
+    print("📊 Comparison Results:")
     print(
         f"   Enhanced: {enhanced_time:.3f}s, Depth: {comparison['enhanced_approach']['result_depth']} chars"
     )

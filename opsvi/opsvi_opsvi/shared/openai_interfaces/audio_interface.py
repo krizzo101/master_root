@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import openai
 
@@ -14,7 +14,7 @@ class OpenAIAudioInterface(OpenAIBaseInterface):
     All methods are standards-compliant and mapped to the official OpenAI Python SDK.
     """
 
-    def create_transcription(self, audio_file: bytes, **kwargs) -> Dict[str, Any]:
+    def create_transcription(self, audio_file: bytes, **kwargs) -> dict[str, Any]:
         """
         Transcribe audio into text.
         POST /v1/audio/transcriptions
@@ -25,7 +25,7 @@ class OpenAIAudioInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def create_translation(self, audio_file: bytes, **kwargs) -> Dict[str, Any]:
+    def create_translation(self, audio_file: bytes, **kwargs) -> dict[str, Any]:
         """
         Translate audio into English.
         POST /v1/audio/translations
@@ -49,7 +49,7 @@ class OpenAIAudioInterface(OpenAIBaseInterface):
 
     async def acreate_transcription(
         self, audio_file: bytes, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Async: Transcribe audio into text.
         POST /v1/audio/transcriptions
@@ -60,7 +60,7 @@ class OpenAIAudioInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def acreate_translation(self, audio_file: bytes, **kwargs) -> Dict[str, Any]:
+    async def acreate_translation(self, audio_file: bytes, **kwargs) -> dict[str, Any]:
         """
         Async: Translate audio into English.
         POST /v1/audio/translations

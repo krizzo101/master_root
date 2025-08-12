@@ -1,20 +1,19 @@
 import json
 import logging
-from typing import Any, Dict, Union
-from pathlib import Path
+from typing import Any
 
-import pandas as pd
-import numpy as np
-from fastapi import HTTPException
 import dicttoxml
+import numpy as np
+import pandas as pd
 import yaml
+from fastapi import HTTPException
 
 logger = logging.getLogger(__name__)
 
 SUPPORTED_FORMATS = {"xml", "csv", "yaml"}
 
 
-def validate_json_data(data: Union[str, dict]) -> dict:
+def validate_json_data(data: str | dict) -> dict:
     """
     Validates that the provided data is valid JSON and returns it as a dict.
     Raises HTTPException if invalid.
@@ -99,7 +98,7 @@ def json_to_yaml(json_data: dict) -> str:
         raise HTTPException(status_code=500, detail="Could not convert JSON to YAML.")
 
 
-def convert_json(json_data: dict, output_format: str) -> Union[bytes, str]:
+def convert_json(json_data: dict, output_format: str) -> bytes | str:
     """
     Convert JSON data to the specified output format.
     """

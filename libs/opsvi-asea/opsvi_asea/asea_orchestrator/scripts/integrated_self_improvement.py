@@ -12,7 +12,6 @@ This workflow properly integrates with the existing database ecosystem:
 import asyncio
 import sys
 import os
-from pathlib import Path
 
 # --- Absolute Path Setup ---
 WORKSPACE_ROOT = "/home/opsvi/asea"
@@ -152,7 +151,7 @@ async def main():
     }
 
     try:
-        print(f"🚀 Executing integrated workflow using existing collections...")
+        print("🚀 Executing integrated workflow using existing collections...")
         print(
             f"   📊 Available collections: {len([c for c in ['core_memory', 'cognitive_patterns', 'knowledge_graph']])}"
         )
@@ -163,7 +162,7 @@ async def main():
             run_id="integrated-improvement-001",
         )
 
-        print(f"✅ Integrated workflow completed!")
+        print("✅ Integrated workflow completed!")
         print(f"📊 Status: {result.get('status', 'Unknown')}")
         print(f"🔍 Failure Patterns Analyzed: {len(result.get('failure_patterns', []))}")
         print(f"🎯 Capabilities Reviewed: {len(result.get('capabilities', []))}")

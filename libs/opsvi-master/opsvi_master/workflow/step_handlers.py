@@ -6,8 +6,6 @@ Supports Schema v2.0 workflow format with enhanced handlers for different phases
 """
 from typing import Any, Dict, Callable, List, Optional
 import time
-import os
-import json
 from datetime import datetime
 
 
@@ -467,7 +465,7 @@ def shell_handler(step: Dict[str, Any], state: Dict[str, Any]) -> None:
         state[f"{step_id}_timestamp"] = datetime.now().isoformat()
 
         if result.returncode == 0:
-            print(f"[StepHandler] Shell command completed successfully", flush=True)
+            print("[StepHandler] Shell command completed successfully", flush=True)
         else:
             print(
                 f"[StepHandler] Shell command failed with exit code {result.returncode}",
@@ -475,7 +473,7 @@ def shell_handler(step: Dict[str, Any], state: Dict[str, Any]) -> None:
             )
 
     except subprocess.TimeoutExpired:
-        print(f"[StepHandler] Shell command timed out", flush=True)
+        print("[StepHandler] Shell command timed out", flush=True)
         state[f"{step_id}_error"] = "timeout"
     except Exception as e:
         print(f"[StepHandler] Shell command error: {e}", flush=True)

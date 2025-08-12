@@ -6,7 +6,7 @@ Extracted from complexity_model.py for better modularity.
 """
 
 import logging
-from typing import Any, Dict
+from typing import Any
 
 from src.applications.oamat_sd.src.config.config_manager import ConfigManager
 from src.applications.oamat_sd.src.models.complexity_models import (
@@ -93,7 +93,7 @@ class ScoringEngine:
 
     def generate_agent_requirements(
         self, factors: ComplexityFactors, strategy: ExecutionStrategy
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate agent requirements based on complexity analysis."""
         requirements = {
             "agent_count": ConfigManager().agent_factory.counts.single_agent,

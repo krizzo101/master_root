@@ -1,10 +1,10 @@
 """
 App routes and view logic for Flask Weather Information Web App.
 """
-from flask import Blueprint, render_template, request, current_app, flash
-from .weather import fetch_weather, WeatherAPIError
+from flask import Blueprint, current_app, flash, render_template, request
+
 from .config import Config
-from werkzeug.exceptions import BadRequest
+from .weather import WeatherAPIError, fetch_weather
 
 main_bp = Blueprint("main", __name__)
 

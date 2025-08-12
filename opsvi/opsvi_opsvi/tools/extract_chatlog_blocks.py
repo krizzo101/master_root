@@ -7,10 +7,9 @@ Extracts all code blocks (any type) from a markdown chat log, writes each to a t
 import argparse
 import logging
 import os
-from pathlib import Path
 import re
 import sys
-from typing import Dict, List, Optional
+from pathlib import Path
 
 
 def setup_logger() -> logging.Logger:
@@ -55,9 +54,9 @@ class Block:
         self.block_type = block_type or "plain"
         self.start_line = start_line
         self.start_idx = start_idx
-        self.end_line: Optional[int] = None
-        self.end_idx: Optional[int] = None
-        self.lines: List[str] = []
+        self.end_line: int | None = None
+        self.end_idx: int | None = None
+        self.lines: list[str] = []
 
     def set_end(self, end_line: int, end_idx: int):
         self.end_line = end_line
@@ -73,7 +72,7 @@ class Block:
 
 def extract_blocks(
     input_path: str, output_dir: Path, main_output_path: Path
-) -> List[Dict]:
+) -> list[dict]:
     output_dir.mkdir(parents=True, exist_ok=True)
     with open(input_path, encoding="utf-8") as infile:
         lines = infile.readlines()
@@ -88,8 +87,8 @@ def extract_blocks(
         pass
     lines = preprocessed_lines
     found_types = set()
-    extracted_blocks: List[Dict] = []
-    all_blocks: List[Block] = []
+    extracted_blocks: list[dict] = []
+    all_blocks: list[Block] = []
     mapped_blocks = []
     in_block_map = False
     block_type_map = None
@@ -452,7 +451,7 @@ def extract_blocks(
     return extracted_blocks
 
 
-def print_summary(blocks: List[Dict], output_dir: Path):
+def print_summary(blocks: list[dict], output_dir: Path):
     if not blocks:
         return
     else:

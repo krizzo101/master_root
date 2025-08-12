@@ -12,16 +12,14 @@ import time
 import hashlib
 import asyncio
 import multiprocessing
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from fnmatch import fnmatch
 from pathlib import Path
 import argparse
 import json
-from functools import lru_cache
-from typing import Dict, Tuple, List, Optional, Set, Any
+from typing import List, Optional
 
 # For API clients
-from openai import OpenAI, AsyncOpenAI
+from openai import AsyncOpenAI
 from openai import RateLimitError, APIError, APITimeoutError
 
 # Configuration

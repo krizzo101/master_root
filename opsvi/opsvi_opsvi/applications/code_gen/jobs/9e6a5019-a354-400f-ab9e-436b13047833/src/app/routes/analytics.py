@@ -1,11 +1,11 @@
 """
 Analytics endpoints for admin dashboard/charts.
 """
+
 from flask import Blueprint, jsonify
-from flask_login import login_required, current_user
-from app.models import Post, PostView
+from flask_login import login_required
+
 from app import redis_client
-import datetime
 
 analytics_bp = Blueprint("analytics", __name__)
 

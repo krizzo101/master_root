@@ -2,10 +2,11 @@
 Celery tasks: AI content/alt-text generation, tag/category suggestion.
 """
 import os
-from celery import Celery
+
 import requests
-from app.models import Post, Tag, Category, Image, db
-from flask import current_app
+from celery import Celery
+
+from app.models import Image, db
 
 celery = Celery(
     __name__, broker=os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379/0")

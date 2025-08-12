@@ -6,11 +6,11 @@ This module provides comprehensive configuration management for user control
 and settings in the bulletproofing system.
 """
 
+import json
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
-import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import yaml
 
@@ -95,7 +95,7 @@ class BulletproofingConfig:
 class BulletproofingConfigManager:
     """Configuration manager for bulletproofing settings."""
 
-    def __init__(self, config_file: Optional[Path] = None):
+    def __init__(self, config_file: Path | None = None):
         """Initialize the configuration manager."""
         setup_logger(LogConfig())
         self.logger = get_logger()
@@ -154,7 +154,7 @@ class BulletproofingConfigManager:
             self.logger.log_error(f"Failed to save configuration: {e}")
             return False
 
-    def _update_config_from_dict(self, config_data: Dict[str, Any]):
+    def _update_config_from_dict(self, config_data: dict[str, Any]):
         """Update configuration from dictionary."""
         # Update performance config
         if "performance" in config_data:
@@ -186,7 +186,7 @@ class BulletproofingConfigManager:
         """Get current configuration."""
         return self.config
 
-    def update_config(self, updates: Dict[str, Any]) -> bool:
+    def update_config(self, updates: dict[str, Any]) -> bool:
         """Update configuration with new values."""
         try:
             # Update performance settings
@@ -229,7 +229,7 @@ class BulletproofingConfigManager:
             self.logger.log_error(f"Failed to reset configuration: {e}")
             return False
 
-    def validate_config(self) -> List[str]:
+    def validate_config(self) -> list[str]:
         """Validate configuration settings."""
         errors = []
 
@@ -288,7 +288,7 @@ class BulletproofingConfigManager:
         """Check if configuration is valid."""
         return len(self.validate_config()) == 0
 
-    def get_config_summary(self) -> Dict[str, Any]:
+    def get_config_summary(self) -> dict[str, Any]:
         """Get a summary of current configuration."""
         return {
             "config_version": self.config.config_version,
@@ -424,7 +424,7 @@ class BulletproofingConfigManager:
 
 
 # Global configuration manager instance
-_global_config_manager: Optional[BulletproofingConfigManager] = None
+_global_config_manager: BulletproofingConfigManager | None = None
 
 
 def get_config_manager() -> BulletproofingConfigManager:
@@ -440,12 +440,12 @@ def get_config() -> BulletproofingConfig:
     return get_config_manager().get_config()
 
 
-def update_config(updates: Dict[str, Any]) -> bool:
+def update_config(updates: dict[str, Any]) -> bool:
     """Update the bulletproofing configuration."""
     return get_config_manager().update_config(updates)
 
 
-def validate_config() -> List[str]:
+def validate_config() -> list[str]:
     """Validate the current configuration."""
     return get_config_manager().validate_config()
 

@@ -5,8 +5,8 @@ Tools for real-time database querying, schema validation, and access to current
 database best practices to ensure high-quality, current database implementations.
 """
 
-from datetime import datetime
 import logging
+from datetime import datetime
 
 from langchain_core.tools import tool
 

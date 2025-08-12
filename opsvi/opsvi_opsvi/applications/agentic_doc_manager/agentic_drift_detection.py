@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from src.applications.agentic_doc_manager.agent_utils import (
     extract_code_summary,
     extract_doc_section,
@@ -8,7 +6,7 @@ from src.applications.agentic_doc_manager.agent_utils import (
 from src.shared.openai_interfaces.responses_interface import OpenAIResponsesInterface
 
 
-def monitor_changes(base_ref: str = "HEAD~1", target_ref: str = "HEAD") -> List[str]:
+def monitor_changes(base_ref: str = "HEAD~1", target_ref: str = "HEAD") -> list[str]:
     """
     Detect changed files between two git refs.
     """
@@ -18,8 +16,8 @@ def monitor_changes(base_ref: str = "HEAD~1", target_ref: str = "HEAD") -> List[
 
 
 def detect_drift(
-    changed_files: List[str], docs_dir: str = "docs/applications/agentic_doc_manager/"
-) -> List[Dict]:
+    changed_files: list[str], docs_dir: str = "docs/applications/agentic_doc_manager/"
+) -> list[dict]:
     """
     For each changed file, compare code and docs using OpenAI. Return list of drift flags.
     """
@@ -49,8 +47,8 @@ def detect_drift(
 
 
 def trigger_correction(
-    drift_flags: List[Dict], docs_dir: str = "docs/applications/agentic_doc_manager/"
-) -> List[Dict]:
+    drift_flags: list[dict], docs_dir: str = "docs/applications/agentic_doc_manager/"
+) -> list[dict]:
     """
     For each drift, generate a correction task (draft doc update using OpenAI). Return list of correction tasks.
     """

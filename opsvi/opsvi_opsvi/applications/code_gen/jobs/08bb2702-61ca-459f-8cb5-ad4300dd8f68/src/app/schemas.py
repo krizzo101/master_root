@@ -1,14 +1,14 @@
 """
 Pydantic schemas for the Task Management API.
 """
+
 from pydantic import BaseModel, Field
-from typing import Optional
 
 
 class TaskBase(BaseModel):
     title: str = Field(..., title="Title", max_length=255)
-    description: Optional[str] = Field(None, title="Description")
-    is_completed: Optional[bool] = Field(False, title="Completion Status")
+    description: str | None = Field(None, title="Description")
+    is_completed: bool | None = Field(False, title="Completion Status")
 
 
 class TaskCreate(TaskBase):
@@ -21,9 +21,9 @@ class TaskCreate(TaskBase):
 
 
 class TaskUpdate(BaseModel):
-    title: Optional[str] = Field(None, min_length=1, max_length=255)
-    description: Optional[str] = None
-    is_completed: Optional[bool] = None
+    title: str | None = Field(None, min_length=1, max_length=255)
+    description: str | None = None
+    is_completed: bool | None = None
 
 
 class TaskInDB(TaskBase):

@@ -2,17 +2,18 @@
 WTForms forms: User Registration, Login, Post Editor, Image Upload, Category, Tag.
 """
 from flask_wtf import FlaskForm
-from wtforms import (
-    StringField,
-    PasswordField,
-    BooleanField,
-    TextAreaField,
-    SubmitField,
-    SelectMultipleField,
-    FileField,
-)
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_wtf.file import FileAllowed, FileRequired
+from wtforms import (
+    BooleanField,
+    FileField,
+    PasswordField,
+    SelectMultipleField,
+    StringField,
+    SubmitField,
+    TextAreaField,
+)
+from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
+
 from .models import User
 
 
@@ -26,14 +27,10 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField("Register")
 
     def validate_username(self, username: StringField) -> None:
-        from .models import User
-
         if User.query.filter_by(username=username.data).first():
             raise ValidationError("Username already taken.")
 
     def validate_email(self, email: StringField) -> None:
-        from .models import User
-
         if User.query.filter_by(email=email.data).first():
             raise ValidationError("Email already registered.")
 

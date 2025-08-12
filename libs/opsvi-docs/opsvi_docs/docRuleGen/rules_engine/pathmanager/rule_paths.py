@@ -11,10 +11,9 @@ This module provides functions for managing paths and directory structures
 for documentation rules, ensuring rules are created in the correct location.
 """
 
-import os
 import logging
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, Any, Optional, Tuple
 
 # Configure logging
 logging.basicConfig(

@@ -1,9 +1,10 @@
 """
 Error handling for the Flask web application. Registers custom error handlers.
 """
+import logging
+
 from flask import render_template
 from werkzeug.exceptions import HTTPException
-import logging
 
 
 def register_error_handlers(app):

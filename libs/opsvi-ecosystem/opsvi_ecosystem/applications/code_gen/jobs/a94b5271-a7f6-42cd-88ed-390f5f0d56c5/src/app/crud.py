@@ -2,12 +2,11 @@
 CRUD operations and business logic for User, Document, Version, Audit.
 Uses simple in-memory/persistent implementations -- swap for ORM/DB in real-life.
 """
-from typing import List, Optional
-from datetime import datetime
 import uuid
-from .models import User, Document, DocumentVersion, AuditLog
+from datetime import datetime
+
 from .auth import get_password_hash, verify_password
-import logging
+from .models import AuditLog, Document, DocumentVersion, User
 
 # In-memory emulation/datastore for demo; replace with DB/ORM logic
 _USERS = {
@@ -26,7 +25,7 @@ _VERSIONS = {}
 _AUDIT_LOGS = []
 
 
-async def authenticate_user(username: str, password: str) -> Optional[User]:
+async def authenticate_user(username: str, password: str) -> User | None:
     user = _USERS.get(username)
     if not user:
         return None
@@ -35,7 +34,7 @@ async def authenticate_user(username: str, password: str) -> Optional[User]:
     return user
 
 
-async def get_user_by_username(username: str) -> Optional[User]:
+async def get_user_by_username(username: str) -> User | None:
     return _USERS.get(username)
 
 
@@ -86,7 +85,7 @@ async def delete_document(user: User, doc_id: str) -> None:
     await _log(user.id, doc_id, "delete_document", "Deleted")
 
 
-async def list_documents(user: User) -> List[Document]:
+async def list_documents(user: User) -> list[Document]:
     return [
         doc
         for doc in _DOCUMENTS.values()
@@ -107,7 +106,7 @@ async def _add_version(doc: Document, author: User) -> None:
     _VERSIONS.setdefault(doc.id, []).append(ver)
 
 
-async def get_document_versions(user: User, doc_id: str) -> List[DocumentVersion]:
+async def get_document_versions(user: User, doc_id: str) -> list[DocumentVersion]:
     doc = await get_document(user, doc_id)
     return _VERSIONS.get(doc_id, [])
 
@@ -129,7 +128,7 @@ async def restore_document_version(
     return doc
 
 
-async def get_audit_logs(user: User) -> List[AuditLog]:
+async def get_audit_logs(user: User) -> list[AuditLog]:
     return [l for l in _AUDIT_LOGS if l.user_id == user.id]
 
 

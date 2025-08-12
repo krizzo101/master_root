@@ -15,14 +15,10 @@ import asyncio
 import json
 import time
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
-from pathlib import Path
 
 from arango import ArangoClient
-from arango.database import StandardDatabase
-from arango.graph import Graph
-from arango.collection import StandardCollection
 
 
 @dataclass
@@ -798,7 +794,7 @@ async def main():
     with open("arango_graph_enhancement_results.json", "w") as f:
         json.dump(results, f, indent=2)
 
-    print(f"\n📊 Results saved to arango_graph_enhancement_results.json")
+    print("\n📊 Results saved to arango_graph_enhancement_results.json")
     print(f"📈 Graphs created: {results.get('summary', {}).get('graphs_created', 0)}")
 
     return results

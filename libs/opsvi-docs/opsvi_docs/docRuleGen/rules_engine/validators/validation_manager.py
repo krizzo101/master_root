@@ -11,10 +11,8 @@ This module provides functionality for coordinating rule validation
 using different validation strategies.
 """
 
-import os
 import logging
-from typing import Dict, Any, List, Optional, Union
-from pathlib import Path
+from typing import Dict, Any, List, Optional
 
 from .rule_validator import RuleValidator
 from .section_validator import SectionValidator

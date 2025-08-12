@@ -12,7 +12,6 @@ Results: development/database/results/knowledge_base_purge_v1_results_{timestamp
 
 import json
 import sys
-import os
 from datetime import datetime
 from pathlib import Path
 
@@ -328,7 +327,7 @@ class KnowledgeBasePurge:
             "purge_success": True,
         }
 
-        print(f"\nPurge Summary:")
+        print("\nPurge Summary:")
         print(f"  Documents before: {pre_total}")
         print(f"  Documents after: {post_total}")
         print(f"  Documents removed: {pre_total - post_total}")

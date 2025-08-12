@@ -6,7 +6,7 @@ Extracted from request_validation.py for better modularity.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
@@ -27,7 +27,7 @@ class ValidationEngine:
     def __init__(
         self,
         schema_registry: RequestSchemaRegistry,
-        model_config: Optional[Dict[str, Any]] = None,
+        model_config: dict[str, Any] | None = None,
     ):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.schema_registry = schema_registry
@@ -175,7 +175,7 @@ Example: "web_application:0.9" """
 
     async def _ai_extract_information(
         self, request_content: str, request_type: RequestType
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Use AI to extract information from request"""
         schema = self.schema_registry.get_schema(request_type)
         if not schema:
@@ -207,8 +207,8 @@ Example: {{"name": "My App", "framework": "React", "database": "PostgreSQL"}}"""
         self,
         request_content: str,
         request_type: RequestType,
-        extracted_info: Dict[str, Any],
-    ) -> List[str]:
+        extracted_info: dict[str, Any],
+    ) -> list[str]:
         """Use AI to detect missing critical fields"""
         schema = self.schema_registry.get_schema(request_type)
         if not schema:
@@ -327,7 +327,7 @@ Example: ["database", "authentication", "deployment"]"""
 
         return RequestType.UNKNOWN
 
-    def _pattern_extract_information(self, request_content: str) -> Dict[str, Any]:
+    def _pattern_extract_information(self, request_content: str) -> dict[str, Any]:
         """Pattern-based information extraction"""
         content_lower = request_content.lower()
         extracted = {}
@@ -358,8 +358,8 @@ Example: ["database", "authentication", "deployment"]"""
         return extracted
 
     def _pattern_detect_missing_fields(
-        self, request_type: RequestType, extracted_info: Dict[str, Any]
-    ) -> List[str]:
+        self, request_type: RequestType, extracted_info: dict[str, Any]
+    ) -> list[str]:
         """Pattern-based missing field detection"""
         schema = self.schema_registry.get_schema(request_type)
         if not schema:
@@ -419,7 +419,7 @@ Example: ["database", "authentication", "deployment"]"""
             self.logger.error(f"Failed to parse AI response as JSON: {e}")
             raise RuntimeError(f"JSON parsing failed - no fallbacks allowed: {e}")
 
-    def _parse_missing_fields_response(self, ai_response: str) -> List[str]:
+    def _parse_missing_fields_response(self, ai_response: str) -> list[str]:
         """Parse AI missing fields response"""
         try:
             import json

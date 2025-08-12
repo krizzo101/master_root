@@ -5,7 +5,7 @@ Pydantic models for structured OpenAI responses with validation
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field, validator
 
@@ -43,10 +43,10 @@ class RequirementsResponse(BaseModel):
     expanded_requirements: str = Field(
         description="Comprehensive technical requirements analysis", min_length=50
     )
-    technical_specifications: List[str] = Field(
+    technical_specifications: list[str] = Field(
         description="Detailed technical specifications list", min_items=1
     )
-    dependencies: List[str] = Field(
+    dependencies: list[str] = Field(
         description="External dependencies and integrations required",
         default_factory=list,
     )
@@ -56,13 +56,13 @@ class RequirementsResponse(BaseModel):
     estimated_effort: int = Field(
         description="Estimated effort in hours", ge=1, le=1000
     )
-    validation_criteria: List[str] = Field(
+    validation_criteria: list[str] = Field(
         description="Success validation criteria", min_items=1
     )
-    architecture_considerations: Optional[str] = Field(
+    architecture_considerations: str | None = Field(
         description="High-level architecture notes", default=None
     )
-    risk_factors: List[str] = Field(
+    risk_factors: list[str] = Field(
         description="Potential risks and mitigation strategies", default_factory=list
     )
 
@@ -80,7 +80,7 @@ class WorkDecompositionTask(BaseModel):
     title: str = Field(description="Task title", min_length=5)
     description: str = Field(description="Detailed task description", min_length=10)
     agent_role: str = Field(description="Required agent role for execution")
-    dependencies: List[str] = Field(
+    dependencies: list[str] = Field(
         description="Task dependencies", default_factory=list
     )
     estimated_duration: int = Field(
@@ -88,20 +88,20 @@ class WorkDecompositionTask(BaseModel):
     )
     priority: Priority = Field(description="Task priority level")
     complexity: ComplexityLevel = Field(description="Task complexity")
-    deliverables: List[str] = Field(description="Expected deliverables", min_items=1)
+    deliverables: list[str] = Field(description="Expected deliverables", min_items=1)
 
 
 class CoordinationResponse(BaseModel):
     """Structured response schema for coordination and planning agents"""
 
-    task_assignments: Dict[str, str] = Field(description="Agent role to task mapping")
-    execution_order: List[str] = Field(
+    task_assignments: dict[str, str] = Field(description="Agent role to task mapping")
+    execution_order: list[str] = Field(
         description="Recommended task execution sequence", min_items=1
     )
-    dependencies_mapped: Dict[str, List[str]] = Field(
+    dependencies_mapped: dict[str, list[str]] = Field(
         description="Task dependency relationships"
     )
-    parallel_opportunities: List[List[str]] = Field(
+    parallel_opportunities: list[list[str]] = Field(
         description="Groups of tasks that can execute in parallel", default_factory=list
     )
     risk_assessment: str = Field(
@@ -110,10 +110,10 @@ class CoordinationResponse(BaseModel):
     estimated_total_time: int = Field(
         description="Total estimated execution time in minutes", ge=10
     )
-    critical_path: List[str] = Field(
+    critical_path: list[str] = Field(
         description="Critical path through task dependencies"
     )
-    work_decomposition: List[WorkDecompositionTask] = Field(
+    work_decomposition: list[WorkDecompositionTask] = Field(
         description="Detailed work breakdown structure", min_items=1
     )
     success: bool = Field(description="Coordination planning success status")
@@ -131,7 +131,7 @@ class CodeFile(BaseModel):
 class ImplementationResponse(BaseModel):
     """Structured response schema for implementation agents"""
 
-    code_files: List[CodeFile] = Field(description="Generated code files", min_items=1)
+    code_files: list[CodeFile] = Field(description="Generated code files", min_items=1)
     documentation: str = Field(
         description="Implementation documentation", min_length=50
     )
@@ -139,10 +139,10 @@ class ImplementationResponse(BaseModel):
     deployment_config: str = Field(
         description="Deployment configuration files", min_length=10
     )
-    implementation_notes: List[str] = Field(
+    implementation_notes: list[str] = Field(
         description="Important implementation details", default_factory=list
     )
-    dependencies_installed: List[str] = Field(
+    dependencies_installed: list[str] = Field(
         description="Required dependencies to install", default_factory=list
     )
     setup_instructions: str = Field(
@@ -160,17 +160,17 @@ class ImplementationResponse(BaseModel):
 class ValidationResponse(BaseModel):
     """Structured response schema for validation agents"""
 
-    validation_results: Dict[str, bool] = Field(description="Validation test results")
-    issues_found: List[str] = Field(
+    validation_results: dict[str, bool] = Field(description="Validation test results")
+    issues_found: list[str] = Field(
         description="Issues identified during validation", default_factory=list
     )
-    recommendations: List[str] = Field(
+    recommendations: list[str] = Field(
         description="Improvement recommendations", default_factory=list
     )
     quality_score: float = Field(
         description="Overall quality score (0-1)", ge=0.0, le=1.0
     )
-    performance_metrics: Dict[str, Any] = Field(
+    performance_metrics: dict[str, Any] = Field(
         description="Performance measurement results", default_factory=dict
     )
     compliance_status: bool = Field(description="Requirements compliance status")
@@ -181,7 +181,7 @@ class SystemResponse(BaseModel):
     """Generic system response wrapper"""
 
     success: bool = Field(description="Operation success status")
-    result: Dict[str, Any] = Field(description="Operation result data")
+    result: dict[str, Any] = Field(description="Operation result data")
     agent_id: str = Field(description="Executing agent identifier")
     role: str = Field(description="Agent role")
     model: str = Field(description="OpenAI model used")
@@ -189,7 +189,7 @@ class SystemResponse(BaseModel):
     timestamp: datetime = Field(
         description="Response timestamp", default_factory=datetime.utcnow
     )
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         description="Additional metadata", default_factory=dict
     )
 
@@ -200,14 +200,14 @@ class ErrorResponse(BaseModel):
     success: bool = Field(default=False, description="Always false for errors")
     error_type: str = Field(description="Error type classification")
     error_message: str = Field(description="Human-readable error message")
-    error_details: Dict[str, Any] = Field(
+    error_details: dict[str, Any] = Field(
         description="Detailed error information", default_factory=dict
     )
-    agent_id: Optional[str] = Field(description="Agent that encountered error")
+    agent_id: str | None = Field(description="Agent that encountered error")
     timestamp: datetime = Field(
         description="Error timestamp", default_factory=datetime.utcnow
     )
-    recovery_suggestions: List[str] = Field(
+    recovery_suggestions: list[str] = Field(
         description="Suggested recovery actions", default_factory=list
     )
 
@@ -222,7 +222,7 @@ class PerformanceMetrics(BaseModel):
     task_count: int = Field(description="Number of tasks executed")
     success_rate: float = Field(description="Success rate (0-1)", ge=0, le=1)
     memory_usage: float = Field(description="Peak memory usage in MB")
-    model_usage: Dict[str, int] = Field(
+    model_usage: dict[str, int] = Field(
         description="Token usage per model", default_factory=dict
     )
 
@@ -247,7 +247,7 @@ def get_schema_for_role(role: str) -> BaseModel:
     return AGENT_RESPONSE_SCHEMAS.get(role, SystemResponse)
 
 
-def validate_response(role: str, response_data: Dict[str, Any]) -> BaseModel:
+def validate_response(role: str, response_data: dict[str, Any]) -> BaseModel:
     """Validate response data against role-specific schema"""
     schema_class = get_schema_for_role(role)
     return schema_class(**response_data)

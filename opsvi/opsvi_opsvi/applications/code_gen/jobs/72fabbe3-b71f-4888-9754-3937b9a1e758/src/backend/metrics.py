@@ -1,13 +1,15 @@
 import asyncio
-from datetime import datetime, timedelta
-import psutil
-from sqlmodel import select, Session
-from typing import Any
-from backend.models import MetricSample, MetricType
-from backend.db import engine
-from backend.websocket_manager import ws_manager
-from backend.config import settings
 import logging
+from datetime import datetime, timedelta
+from typing import Any
+
+import psutil
+from sqlmodel import Session, select
+
+from backend.config import settings
+from backend.db import engine
+from backend.models import MetricSample, MetricType
+from backend.websocket_manager import ws_manager
 
 _metrics_state: dict[str, Any] = {"current": {}, "history": {}}
 history_length_sec = 3600  # keep 1 hour history in memory for chart querying

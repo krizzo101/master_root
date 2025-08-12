@@ -4,7 +4,6 @@ ASEA-LangGraph Production Deployment Verification
 """
 
 import requests
-import json
 import subprocess
 import time
 
@@ -119,7 +118,7 @@ def run_deployment_verification():
                         else:
                             print(f"   ❌ {container}: {state}")
         else:
-            print(f"❌ Container status check failed")
+            print("❌ Container status check failed")
     except Exception as e:
         print(f"❌ Container status error: {e}")
 
@@ -176,7 +175,7 @@ def run_deployment_verification():
         if response.status_code == 200:
             print(f"✅ Health Endpoint: {response_time:.1f}ms")
         else:
-            print(f"❌ Health Endpoint: Failed")
+            print("❌ Health Endpoint: Failed")
     except Exception as e:
         print(f"❌ Health Endpoint: {e}")
 

@@ -3,7 +3,6 @@ from ai_collab_task_manager.app import create_app as create_ai_app
 from ai_collab_task_manager.models import Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy_utils import create_database, drop_database
 
 
 @pytest.fixture(scope="session")

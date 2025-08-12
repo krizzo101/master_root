@@ -4,13 +4,11 @@ Research Data Management System
 Captures, processes, and stores research results with semantic capabilities
 """
 
-import json
 import hashlib
 import re
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
-import requests
 
 
 @dataclass

@@ -10,7 +10,6 @@ File Utilities
 This module contains utilities for file operations.
 """
 
-import os
 from pathlib import Path
 from typing import Optional
 

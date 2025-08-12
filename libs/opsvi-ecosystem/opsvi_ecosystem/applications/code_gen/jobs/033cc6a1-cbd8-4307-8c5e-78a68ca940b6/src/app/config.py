@@ -2,6 +2,7 @@
 Application configuration using environment variables (dotenv).
 """
 import os
+
 from dotenv import load_dotenv
 
 # Load environment variables from .env if present

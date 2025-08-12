@@ -1,8 +1,9 @@
+from unittest.mock import patch
+
 import pytest
-from flask import url_for
 from ai_collab_task_manager.app import create_app, load_user
-from ai_collab_task_manager.models import User, Task
-from unittest.mock import patch, MagicMock
+from ai_collab_task_manager.models import Task, User
+from flask import url_for
 
 
 @pytest.fixture

@@ -1,10 +1,9 @@
 """ArXiv MCP client for research papers."""
 
-import asyncio
 import json
 import logging
 from contextlib import asynccontextmanager
-from typing import List, Optional
+from typing import List
 
 try:
     from mcp import ClientSession, StdioServerParameters

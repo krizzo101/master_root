@@ -5,8 +5,7 @@ Volume-specific utility functions and helpers.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
-from datetime import datetime
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +21,7 @@ class VolumeUtils:
     """
 
     @staticmethod
-    def analyze_volume_config(volume_info: Dict[str, Any]) -> Dict[str, Any]:
+    def analyze_volume_config(volume_info: dict[str, Any]) -> dict[str, Any]:
         """Analyze Docker volume configuration."""
         analysis = {
             "volume_type": None,
@@ -76,7 +75,7 @@ class VolumeUtils:
         return analysis
 
     @staticmethod
-    def validate_volume_config(volume_config: Dict[str, Any]) -> Dict[str, Any]:
+    def validate_volume_config(volume_config: dict[str, Any]) -> dict[str, Any]:
         """Validate volume configuration parameters."""
         validation = {
             "valid": True,
@@ -122,7 +121,7 @@ class VolumeUtils:
         return validation
 
     @staticmethod
-    def get_volume_usage_stats(volume_info: Dict[str, Any]) -> Dict[str, Any]:
+    def get_volume_usage_stats(volume_info: dict[str, Any]) -> dict[str, Any]:
         """Get volume usage statistics."""
         stats = {
             "size_bytes": 0,
@@ -161,7 +160,7 @@ class VolumeUtils:
         return f"{size_bytes:.1f} PB"
 
     @staticmethod
-    def troubleshoot_volume_issues(volume_info: Dict[str, Any]) -> Dict[str, Any]:
+    def troubleshoot_volume_issues(volume_info: dict[str, Any]) -> dict[str, Any]:
         """Troubleshoot volume-related issues."""
         troubleshooting = {"issues": [], "diagnostic_steps": [], "recommendations": []}
 
@@ -205,7 +204,7 @@ class VolumeUtils:
         return troubleshooting
 
     @staticmethod
-    def optimize_volume_config(volume_config: Dict[str, Any]) -> Dict[str, Any]:
+    def optimize_volume_config(volume_config: dict[str, Any]) -> dict[str, Any]:
         """Suggest volume configuration optimizations."""
         optimizations = {
             "driver_optimizations": [],
@@ -257,7 +256,7 @@ class VolumeUtils:
         return optimizations
 
     @staticmethod
-    def format_volume_info(volume_info: Dict[str, Any]) -> str:
+    def format_volume_info(volume_info: dict[str, Any]) -> str:
         """Format volume information for display."""
         lines = []
 
@@ -282,7 +281,7 @@ class VolumeUtils:
         return "\n".join(lines)
 
     @staticmethod
-    def calculate_volume_space_usage(volume_info: Dict[str, Any]) -> Dict[str, Any]:
+    def calculate_volume_space_usage(volume_info: dict[str, Any]) -> dict[str, Any]:
         """Calculate detailed volume space usage."""
         usage = {
             "total_space": 0,

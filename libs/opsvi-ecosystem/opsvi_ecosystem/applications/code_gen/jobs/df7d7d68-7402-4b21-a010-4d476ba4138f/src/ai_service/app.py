@@ -1,15 +1,14 @@
 """
 FastAPI application for AI-powered document summarization and suggestion service.
 """
-import os
 import logging
-from typing import List, Optional
+import os
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, constr
-from transformers import pipeline, Pipeline
+from transformers import Pipeline, pipeline
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -33,8 +32,8 @@ app.add_middleware(
 
 class SummarizeRequest(BaseModel):
     text: constr(min_length=50, max_length=5000)
-    max_summary_length: Optional[int] = 150
-    min_summary_length: Optional[int] = 40
+    max_summary_length: int | None = 150
+    min_summary_length: int | None = 40
 
 
 class SummarizeResponse(BaseModel):
@@ -43,11 +42,11 @@ class SummarizeResponse(BaseModel):
 
 class SuggestionRequest(BaseModel):
     prompt: constr(min_length=1, max_length=300)
-    max_tokens: Optional[int] = 90
+    max_tokens: int | None = 90
 
 
 class SuggestionResponse(BaseModel):
-    suggestions: List[str]
+    suggestions: list[str]
 
 
 @app.on_event("startup")
@@ -82,7 +81,7 @@ def summarize(request: SummarizeRequest) -> SummarizeResponse:
         )
         result = summary[0]["summary_text"]
         return SummarizeResponse(summary=result)
-    except Exception as e:
+    except Exception:
         logger.exception("Error during summarization.")
         raise HTTPException(status_code=500, detail="AI summarization failed.")
 
@@ -106,7 +105,7 @@ def suggest(request: SuggestionRequest) -> SuggestionResponse:
         # Post-process suggestions (remove empty/duplicate)
         unique_suggestions = list({s for s in suggestions if s})
         return SuggestionResponse(suggestions=unique_suggestions)
-    except Exception as e:
+    except Exception:
         logger.exception("Error during suggestion generation.")
         raise HTTPException(status_code=500, detail="AI suggestion failed.")
 

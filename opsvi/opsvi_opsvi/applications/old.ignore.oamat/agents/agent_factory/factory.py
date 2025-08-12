@@ -5,9 +5,9 @@ Factory for creating LangGraph agents with standardized tools and configurations
 Extracted from agent_factory.py for better modularity and maintainability.
 """
 
-from datetime import datetime
 import logging
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any
 
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langgraph.prebuilt import create_react_agent
@@ -36,7 +36,7 @@ logger = logging.getLogger("OAMAT.AgentFactory")
 class AgentFactory:
     """Factory for creating LangGraph agents with standardized tools and configurations."""
 
-    def __init__(self, llm_config: Optional[Dict] = None, neo4j_client=None):
+    def __init__(self, llm_config: dict | None = None, neo4j_client=None):
         import sys
 
         timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
@@ -247,7 +247,7 @@ class AgentFactory:
 """
         return development_rules
 
-    def create_researcher_agent(self, handoff_agents: Optional[List[str]] = None):
+    def create_researcher_agent(self, handoff_agents: list[str] | None = None):
         """Creates a researcher agent with knowledge and web search tools."""
         tools = [
             self.tools.create_knowledge_search_tool(),
@@ -269,7 +269,7 @@ class AgentFactory:
         )
         return create_react_agent(self.model, tools=tools, prompt=prompt)
 
-    def create_coder_agent(self, handoff_agents: Optional[List[str]] = None):
+    def create_coder_agent(self, handoff_agents: list[str] | None = None):
         """Creates a coder agent with file system and code generation tools."""
         tools = [
             self.tools.create_code_generation_tool(),
@@ -304,7 +304,7 @@ class AgentFactory:
         )
         return create_react_agent(self.model, tools=tools, prompt=prompt)
 
-    def create_reviewer_agent(self, handoff_agents: Optional[List[str]] = None):
+    def create_reviewer_agent(self, handoff_agents: list[str] | None = None):
         """Creates a reviewer agent for quality assessment."""
         tools = self.tools.create_review_tool()
         handoff_agents = handoff_agents or []
@@ -337,7 +337,7 @@ class AgentFactory:
         )
         return create_react_agent(self.model, tools=tools, prompt=prompt)
 
-    def create_doc_agent(self, handoff_agents: Optional[List[str]] = None):
+    def create_doc_agent(self, handoff_agents: list[str] | None = None):
         """Creates a documentation agent."""
         tools = [self.tools.create_documentation_tool()]
         handoff_agents = handoff_agents or []
@@ -355,7 +355,7 @@ class AgentFactory:
         )
         return create_react_agent(self.model, tools=tools, prompt=prompt)
 
-    def create_agent_with_tools(self, spec: Dict[str, Any]) -> Any:
+    def create_agent_with_tools(self, spec: dict[str, Any]) -> Any:
         """
         Dynamically creates an agent with a set of tools based on a spec.
         This is the primary method for creating agents in the OAMAT system.
@@ -389,7 +389,7 @@ class AgentFactory:
         return create_react_agent(self.model, tools=tools, prompt=prompt)
 
     def create_agent(
-        self, agent_spec: Dict[str, Any], handoff_agents: Optional[List[str]] = None
+        self, agent_spec: dict[str, Any], handoff_agents: list[str] | None = None
     ):
         """
         Creates an agent based on a provided specification.
@@ -416,7 +416,7 @@ class AgentFactory:
             )
 
     def create_dynamic_agent(
-        self, agent_spec: Dict[str, Any], handoff_agents: Optional[List[str]] = None
+        self, agent_spec: dict[str, Any], handoff_agents: list[str] | None = None
     ):
         """
         Creates a dynamic agent based on a provided specification.

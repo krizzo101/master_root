@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from shared.openai_interfaces.base import OpenAIBaseInterface
 
@@ -12,7 +12,7 @@ class OpenAICompletionsInterface(OpenAIBaseInterface):
     All methods are standards-compliant and mapped to the official OpenAI Python SDK.
     """
 
-    def create_completion(self, prompt: str, **kwargs) -> Dict[str, Any]:
+    def create_completion(self, prompt: str, **kwargs) -> dict[str, Any]:
         """
         Create a completion for the provided prompt and parameters.
         POST /v1/completions
@@ -23,7 +23,7 @@ class OpenAICompletionsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def acreate_completion(self, prompt: str, **kwargs) -> Dict[str, Any]:
+    async def acreate_completion(self, prompt: str, **kwargs) -> dict[str, Any]:
         """
         Async: Create a completion for the provided prompt and parameters.
         POST /v1/completions

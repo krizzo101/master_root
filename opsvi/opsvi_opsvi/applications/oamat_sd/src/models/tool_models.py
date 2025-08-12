@@ -8,7 +8,7 @@ Extracted from mcp_tool_registry.py for better modularity.
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 def _get_tools_config():
@@ -51,10 +51,10 @@ class ToolMetadata:
     name: str
     category: ToolCategory
     description: str
-    methods: List[str]
+    methods: list[str]
     status: ToolStatus = ToolStatus.OPERATIONAL
-    performance_metrics: Dict[str, Any] = field(default_factory=dict)
-    last_health_check: Optional[datetime] = None
+    performance_metrics: dict[str, Any] = field(default_factory=dict)
+    last_health_check: datetime | None = None
     error_count: int = 0
     success_count: int = 0
 
@@ -67,7 +67,7 @@ class ToolExecutionResult:
     method: str
     success: bool
     result: Any = None
-    error: Optional[str] = None
+    error: str | None = None
     execution_time: float = field(
         default_factory=lambda: _get_tools_config().defaults["avg_response_time"]
     )
@@ -78,7 +78,7 @@ class ToolExecutionResult:
 class ParallelExecutionResult:
     """Result of parallel tool execution."""
 
-    results: List[ToolExecutionResult]
+    results: list[ToolExecutionResult]
     total_time: float
     success_rate: float
-    failed_executions: List[ToolExecutionResult] = field(default_factory=list)
+    failed_executions: list[ToolExecutionResult] = field(default_factory=list)

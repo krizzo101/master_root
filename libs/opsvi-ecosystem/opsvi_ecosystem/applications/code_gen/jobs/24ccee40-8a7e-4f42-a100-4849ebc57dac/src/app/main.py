@@ -3,12 +3,14 @@ FastAPI Todo List Web Service main application entry point.
 """
 
 import logging
+
 from fastapi import FastAPI, Request, status
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-from app.routers import todos
+
 from app.core.config import Settings, get_settings
+from app.routers import todos
 
 # Configure logging
 logging.basicConfig(

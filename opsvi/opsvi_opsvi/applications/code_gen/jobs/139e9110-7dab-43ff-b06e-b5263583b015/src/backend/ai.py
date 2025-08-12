@@ -1,11 +1,13 @@
 """
 AI Integration logic using OpenAI o3 and o4-mini models for prioritizing, estimating, dependency-detecting, and scheduling tasks.
 """
-from backend.config import get_settings
-from backend.models import Task, Dependency
-from sqlalchemy.orm import Session
 import logging
+
 import openai
+from sqlalchemy.orm import Session
+
+from backend.config import get_settings
+from backend.models import Dependency, Task
 
 settings = get_settings()
 logger = logging.getLogger("taskmgmt.ai")
@@ -28,7 +30,7 @@ def prioritize_tasks(db: Session, tasks: list, user):
             if t.id in priorities:
                 t.priority = priorities[t.id]
         db.commit()
-    except Exception as e:
+    except Exception:
         logger.exception("AI prioritize failed")
 
 
@@ -41,7 +43,7 @@ def estimate_duration(db: Session, task: Task):
         est = resp.choices[0].message["content"]
         task.estimated_duration = float(est.strip())
         db.commit()
-    except Exception as e:
+    except Exception:
         logger.exception("AI duration estimate failed")
 
 
@@ -64,7 +66,7 @@ def detect_dependencies(db: Session, project_ids: list):
                 t, d = dep[0], dep[1]
                 db.add(Dependency(task_id=t, depends_on_task_id=d))
             db.commit()
-        except Exception as e:
+        except Exception:
             logger.exception("AI dependency detection failed")
 
 
@@ -91,6 +93,6 @@ def suggest_schedule(db: Session, project_id: str, user):
         import json
 
         return json.loads(schedule)
-    except Exception as e:
+    except Exception:
         logger.exception("AI scheduling failed")
         return []

@@ -13,12 +13,12 @@ Implements OpenAI structured output enforcement with comprehensive:
 """
 
 import asyncio
-from datetime import datetime
 import json
 import logging
-from pathlib import Path
 import time
-from typing import Any, Dict, List, Optional, Type
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 import jsonschema
 from jsonschema import Draft7Validator
@@ -90,7 +90,7 @@ class StructuredOutputEnforcer:
             "✅ Structured Output Enforcer initialized with comprehensive schema validation"
         )
 
-    def _load_schemas(self) -> Dict[str, Any]:
+    def _load_schemas(self) -> dict[str, Any]:
         """Load all JSON schemas for structured output enforcement and resolve references recursively"""
         try:
             schema_file = (
@@ -125,7 +125,7 @@ class StructuredOutputEnforcer:
             raise StructuredOutputError(f"Schema loading failed: {e}")
 
     def _resolve_schema_references(
-        self, schema: Any, definitions: Dict[str, Any]
+        self, schema: Any, definitions: dict[str, Any]
     ) -> Any:
         """Recursively resolve $ref references in a schema"""
         if isinstance(schema, dict):
@@ -158,8 +158,8 @@ class StructuredOutputEnforcer:
             return schema
 
     def _resolve_refs(
-        self, schema: Dict[str, Any], definitions: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, schema: dict[str, Any], definitions: dict[str, Any]
+    ) -> dict[str, Any]:
         """Resolve $ref references using the definitions"""
         if isinstance(schema, dict):
             if "$ref" in schema:
@@ -192,7 +192,7 @@ class StructuredOutputEnforcer:
             # Return primitive values as-is
             return schema
 
-    def _make_openai_compliant_schema(self, schema: Dict[str, Any]) -> Dict[str, Any]:
+    def _make_openai_compliant_schema(self, schema: dict[str, Any]) -> dict[str, Any]:
         """
         Convert a Pydantic-generated schema to OpenAI structured output compliant format.
 
@@ -270,11 +270,11 @@ class StructuredOutputEnforcer:
     async def enforce_request_standardization(
         self,
         prompt: str,
-        model_config: Dict[str, Any],
-        context: Dict[str, Any] = None,
+        model_config: dict[str, Any],
+        context: dict[str, Any] = None,
         max_attempts: int = None,
         timeout_seconds: int = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Enforce structured output for request standardization using GPT-4.1-mini.
 
@@ -416,9 +416,9 @@ Make sure to fill in all required fields with appropriate default values where i
     async def enforce_workflow_specification(
         self,
         prompt: str,
-        model_config: Dict[str, Any],
-        context: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        model_config: dict[str, Any],
+        context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Enforce structured output for WorkflowSpecification generation with O3
         """
@@ -434,9 +434,9 @@ Make sure to fill in all required fields with appropriate default values where i
     async def enforce_dynamic_config(
         self,
         prompt: str,
-        model_config: Dict[str, Any],
-        context: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        model_config: dict[str, Any],
+        context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Enforce structured output for Dynamic Configuration generation with O3
         """
@@ -452,9 +452,9 @@ Make sure to fill in all required fields with appropriate default values where i
     async def enforce_complexity_analysis(
         self,
         prompt: str,
-        model_config: Dict[str, Any],
-        context: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        model_config: dict[str, Any],
+        context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Enforce structured output for Complexity Analysis generation with O3
         """
@@ -470,9 +470,9 @@ Make sure to fill in all required fields with appropriate default values where i
     async def enforce_agent_strategy(
         self,
         prompt: str,
-        model_config: Dict[str, Any],
-        context: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        model_config: dict[str, Any],
+        context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Enforce structured output for Agent Strategy generation with O3
         """
@@ -488,9 +488,9 @@ Make sure to fill in all required fields with appropriate default values where i
     async def enforce_agent_response(
         self,
         prompt: str,
-        model_config: Dict[str, Any],
-        context: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        model_config: dict[str, Any],
+        context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Enforce structured output for Agent Response processing using function calling
         """
@@ -551,10 +551,10 @@ Make sure to fill in all required fields with appropriate default values where i
         self,
         prompt: str,
         schema_name: str,
-        model_config: Dict[str, Any],
-        context: Dict[str, Any],
+        model_config: dict[str, Any],
+        context: dict[str, Any],
         operation_name: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Core method for enforcing structured outputs with comprehensive validation
         """
@@ -626,7 +626,7 @@ Make sure to fill in all required fields with appropriate default values where i
         )
 
     def _create_schema_enforced_prompt(
-        self, prompt: str, schema: Dict[str, Any], schema_name: str
+        self, prompt: str, schema: dict[str, Any], schema_name: str
     ) -> str:
         """
         Create an enhanced prompt that enforces schema compliance
@@ -675,7 +675,7 @@ Return ONLY valid JSON matching the schema exactly. No other text.
 
         return enhanced_prompt
 
-    def _generate_schema_description(self, schema: Dict[str, Any]) -> str:
+    def _generate_schema_description(self, schema: dict[str, Any]) -> str:
         """
         Generate human-readable description of schema constraints
         """
@@ -712,11 +712,11 @@ Return ONLY valid JSON matching the schema exactly. No other text.
     async def _execute_structured_call(
         self,
         prompt: str,
-        schema: Dict[str, Any],
-        model_config: Dict[str, Any],
+        schema: dict[str, Any],
+        model_config: dict[str, Any],
         operation_name: str,
         attempt: int,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute OpenAI API call with structured output enforcement using response_format
         """
@@ -797,7 +797,7 @@ Return ONLY valid JSON matching the schema exactly. No other text.
             raise StructuredOutputError(f"O3 API call failed: {e}")
 
     def _validate_against_schema(
-        self, result: Dict[str, Any], validator: Draft7Validator, schema_name: str
+        self, result: dict[str, Any], validator: Draft7Validator, schema_name: str
     ) -> None:
         """
         Validate result against JSON schema with detailed error reporting
@@ -814,7 +814,7 @@ Return ONLY valid JSON matching the schema exactly. No other text.
             raise SchemaValidationError(f"Schema validation failed: {error_details}")
 
     def _validate_business_logic(
-        self, result: Dict[str, Any], schema_name: str, context: Dict[str, Any]
+        self, result: dict[str, Any], schema_name: str, context: dict[str, Any]
     ) -> None:
         """
         Additional business logic validation beyond schema compliance
@@ -838,7 +838,7 @@ Return ONLY valid JSON matching the schema exactly. No other text.
             raise SchemaValidationError(f"Business logic validation failed: {e}")
 
     def _validate_workflow_business_logic(
-        self, result: Dict[str, Any], context: Dict[str, Any]
+        self, result: dict[str, Any], context: dict[str, Any]
     ) -> None:
         """Validate WorkflowSpecification business logic"""
         # Ensure agent count makes sense for complexity
@@ -854,7 +854,7 @@ Return ONLY valid JSON matching the schema exactly. No other text.
             )
 
     def _validate_config_business_logic(
-        self, result: Dict[str, Any], context: Dict[str, Any]
+        self, result: dict[str, Any], context: dict[str, Any]
     ) -> None:
         """Validate Dynamic Configuration business logic"""
         # Ensure reasoning effort matches expected complexity
@@ -870,7 +870,7 @@ Return ONLY valid JSON matching the schema exactly. No other text.
             )
 
     def _validate_complexity_business_logic(
-        self, result: Dict[str, Any], context: Dict[str, Any]
+        self, result: dict[str, Any], context: dict[str, Any]
     ) -> None:
         """Validate Complexity Analysis business logic"""
         # Ensure overall score matches factor scores
@@ -889,7 +889,7 @@ Return ONLY valid JSON matching the schema exactly. No other text.
             )
 
     def _validate_strategy_business_logic(
-        self, result: Dict[str, Any], context: Dict[str, Any]
+        self, result: dict[str, Any], context: dict[str, Any]
     ) -> None:
         """Validate Agent Strategy business logic"""
         # Ensure execution orders are sequential and valid
@@ -939,7 +939,7 @@ Return ONLY valid JSON matching the schema exactly. No other text.
             self.logger.warning(f"Failed to save raw response: {e}")
 
     def _log_success_metrics(
-        self, result: Dict[str, Any], schema_name: str, attempt: int
+        self, result: dict[str, Any], schema_name: str, attempt: int
     ) -> None:
         """Log success metrics for monitoring"""
         self.logger.debug(f"📊 SUCCESS METRICS for {schema_name}:")
@@ -952,7 +952,7 @@ Return ONLY valid JSON matching the schema exactly. No other text.
         self,
         prompt: str,
         model_config: dict[str, Any],
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """
         Enforce structured output for Subdivision Metadata generation with O3
@@ -970,7 +970,7 @@ Return ONLY valid JSON matching the schema exactly. No other text.
         self,
         prompt: str,
         model_config: dict[str, Any],
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> Any:
         """
         Enforce structured JSON output for dynamic O3 generation
@@ -1001,18 +1001,18 @@ Return ONLY valid JSON matching the schema exactly. No other text.
             self.logger.error(f"❌ JSON output enforcement failed: {e}")
             raise RuntimeError(f"JSON output enforcement failed: {e}")
 
-    def get_available_schemas(self) -> List[str]:
+    def get_available_schemas(self) -> list[str]:
         """Get list of available schema names"""
         return list(self.schemas.keys())
 
-    def get_schema(self, schema_name: str) -> Dict[str, Any]:
+    def get_schema(self, schema_name: str) -> dict[str, Any]:
         """Get specific schema by name"""
         if schema_name not in self.schemas:
             raise ValueError(f"Schema '{schema_name}' not found")
         return self.schemas[schema_name]
 
     async def validate_existing_data(
-        self, data: Dict[str, Any], schema_name: str
+        self, data: dict[str, Any], schema_name: str
     ) -> bool:
         """
         Validate existing data against schema (for testing/debugging)
@@ -1029,7 +1029,7 @@ Return ONLY valid JSON matching the schema exactly. No other text.
     async def enforce_structured_output(
         self,
         prompt: str,
-        output_schema: Type[BaseModel],
+        output_schema: type[BaseModel],
         model_config: dict,
         context: dict = None,
     ) -> BaseModel:

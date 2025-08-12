@@ -1,5 +1,5 @@
 import pytest
-from ai_service.models import TeamMember, Task, TaskInput, AIResponse
+from ai_service.models import AIResponse, Task, TaskInput, TeamMember
 
 
 def test_team_member_creation_and_attributes():

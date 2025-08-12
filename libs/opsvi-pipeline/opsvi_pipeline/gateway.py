@@ -3,8 +3,7 @@
 import json
 import logging
 import time
-from typing import Any, Dict, List, Optional, Union, Generator, Type
-from datetime import datetime
+from typing import Any, Dict, List, Optional, Union, Generator
 
 from openai.types.responses import Response, ResponseStreamEvent
 

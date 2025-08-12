@@ -4,7 +4,6 @@ Input schema for dependency analysis.
 This module defines the Pydantic models for dependency analysis input data.
 """
 
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -22,7 +21,7 @@ class DependencyAnalysisInput(BaseModel):
         _pattern="^(json|html|markdown)$",
     )
 
-    output_directory: Optional[str] = Field(
+    output_directory: str | None = Field(
         None, description="Output directory for reports"
     )
 

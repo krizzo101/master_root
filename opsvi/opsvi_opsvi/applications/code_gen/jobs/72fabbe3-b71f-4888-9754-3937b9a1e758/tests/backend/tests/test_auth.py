@@ -1,9 +1,7 @@
 import pytest
-from fastapi.testclient import TestClient
-from backend.main import app
 from backend.db import engine
-from backend.models import User
-from sqlmodel import Session
+from backend.main import app
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture()

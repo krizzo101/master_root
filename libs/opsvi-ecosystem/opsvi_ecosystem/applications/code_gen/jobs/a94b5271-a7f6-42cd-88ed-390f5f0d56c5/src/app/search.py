@@ -2,13 +2,12 @@
 ElasticSearch document search integration and filter logic.
 (Mocks: returns substring-matching from in-memory.)
 """
-from typing import List
-from .models import User, Document
-import logging
+
 from .crud import list_documents
+from .models import Document, User
 
 
-async def search_documents(user: User, query: str) -> List[Document]:
+async def search_documents(user: User, query: str) -> list[Document]:
     # Real: query Elasticsearch with security filter (user permitted docs)
     # Here: substring search on titles
     docs = await list_documents(user)

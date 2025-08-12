@@ -1,6 +1,5 @@
 """Specifier agent for the autonomous software factory."""
 
-import json
 import logging
 from typing import Any, Dict, List, Optional
 

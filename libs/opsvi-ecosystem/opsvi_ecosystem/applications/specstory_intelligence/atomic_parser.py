@@ -4,15 +4,14 @@ Implements complete atomic decomposition per SPECSTORY_FORMAT_SCHEMA.md
 Breaks down SpecStory files into 15 atomic component types with full relationships
 """
 
+import logging
+import re
+import sys
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-import logging
 from pathlib import Path
-import re
-import sys
-from typing import Dict, List, Optional, Tuple
-import uuid
 
 
 # Reference: docs/applications/agent_intelligence_pipeline.md (authoritative schema)
@@ -85,32 +84,32 @@ class AtomicComponent:
 
     # Positioning
     boundaries: ComponentBoundaries = None
-    turn_sequence: Optional[int] = None
+    turn_sequence: int | None = None
     component_sequence: int = 0
     nesting_level: int = 0
 
     # Content
     raw_content: str = ""
-    processed_content: Dict = field(default_factory=dict)
-    formatting: Dict = field(default_factory=dict)
+    processed_content: dict = field(default_factory=dict)
+    formatting: dict = field(default_factory=dict)
 
     # Metadata
     session_id: str = ""
     session_title: str = ""
-    session_timestamp: Optional[datetime] = None
+    session_timestamp: datetime | None = None
     extraction_confidence: float = 1.0
-    validation_errors: List[str] = field(default_factory=list)
+    validation_errors: list[str] = field(default_factory=list)
 
     # Analysis
-    analysis: Dict = field(default_factory=dict)
+    analysis: dict = field(default_factory=dict)
 
     # Graph metadata
-    graph_metadata: Dict = field(default_factory=dict)
+    graph_metadata: dict = field(default_factory=dict)
 
     # Reconstruction
-    reconstruction: Dict = field(default_factory=dict)
+    reconstruction: dict = field(default_factory=dict)
 
-    def to_arango_document(self) -> Dict:
+    def to_arango_document(self) -> dict:
         """Convert to ArangoDB document format"""
         return {
             "_key": self.component_id,
@@ -168,9 +167,9 @@ class AtomicRelationship:
     relationship_strength: float = 1.0
 
     # Context
-    context: Dict = field(default_factory=dict)
+    context: dict = field(default_factory=dict)
 
-    def to_arango_edge(self) -> Dict:
+    def to_arango_edge(self) -> dict:
         """Convert to ArangoDB edge format"""
         return {
             "_key": self.relationship_id,
@@ -209,7 +208,7 @@ if not logger.hasHandlers():
 
 class AtomicAnalysis:
     @staticmethod
-    def analyze_turn_content(patterns, lines: List[str]) -> Dict:
+    def analyze_turn_content(patterns, lines: list[str]) -> dict:
         content = "\n".join(lines)
         return {
             "contains_tools": "<function_calls>" in content
@@ -245,7 +244,7 @@ class AtomicAnalysis:
             return "text_data"
 
     @staticmethod
-    def analyze_code_block(language: str, content: str) -> Dict:
+    def analyze_code_block(language: str, content: str) -> dict:
         lines = content.split("\n")
         return {
             "syntax_valid": True,
@@ -269,8 +268,8 @@ class AtomicSpecStoryParser:
     """Complete atomic decomposition parser"""
 
     def __init__(self):
-        self.components: List[AtomicComponent] = []
-        self.relationships: List[AtomicRelationship] = []
+        self.components: list[AtomicComponent] = []
+        self.relationships: list[AtomicRelationship] = []
         self.current_session_id = ""
         self.current_turn_sequence = 0
         self.current_component_sequence = 0
@@ -350,7 +349,7 @@ class AtomicSpecStoryParser:
 
     async def parse_file(
         self, filepath: str
-    ) -> Tuple[List[AtomicComponent], List[AtomicRelationship]]:
+    ) -> tuple[list[AtomicComponent], list[AtomicRelationship]]:
         logger.debug(f"Parsing file: {filepath}")
         self.components = []
         self.relationships = []
@@ -503,9 +502,7 @@ class AtomicSpecStoryParser:
         )
         return self.components, self.relationships
 
-    def _parse_session_header(
-        self, header_lines: List[str]
-    ) -> Optional[AtomicComponent]:
+    def _parse_session_header(self, header_lines: list[str]) -> AtomicComponent | None:
         """Parse session header component"""
         if len(header_lines) < 2:
             return None
@@ -563,8 +560,8 @@ class AtomicSpecStoryParser:
         return component
 
     def _parse_conversation_turn(
-        self, lines: List[str], start_line: int, start_char: int
-    ) -> Tuple[Optional[AtomicComponent], int]:
+        self, lines: list[str], start_line: int, start_char: int
+    ) -> tuple[AtomicComponent | None, int]:
         """Parse complete conversation turn and emit granular turn types"""
         speaker_match = self.patterns["speaker_marker"].match(lines[start_line])
         if not speaker_match:
@@ -798,8 +795,8 @@ class AtomicSpecStoryParser:
         return component, end_line - start_line + 1
 
     def _parse_nested_content(
-        self, lines: List[str], start_line_offset: int, start_char_offset: int
-    ) -> List[AtomicComponent]:
+        self, lines: list[str], start_line_offset: int, start_char_offset: int
+    ) -> list[AtomicComponent]:
         """Parse nested content within conversation turns (extended for block markers)"""
         nested_components = []
         current_line = 0
@@ -938,7 +935,7 @@ class AtomicSpecStoryParser:
 
     def _parse_file_references(
         self, line: str, line_number: int, start_char: int
-    ) -> List[AtomicComponent]:
+    ) -> list[AtomicComponent]:
         """Parse file references from a line"""
         refs = []
         for match in self.patterns["file_reference"].finditer(line):
@@ -997,8 +994,8 @@ class AtomicSpecStoryParser:
         return components, current_line - start_line + 1
 
     def _parse_tool_results(
-        self, lines: List[str], start_line: int, start_char: int
-    ) -> Tuple[List[AtomicComponent], int]:
+        self, lines: list[str], start_line: int, start_char: int
+    ) -> tuple[list[AtomicComponent], int]:
         """Parse tool function results into atomic components"""
         components = []
         current_line = start_line + 1  # Skip opening tag
@@ -1301,7 +1298,7 @@ class AtomicSpecStoryParser:
                         self.relationships.append(contains_rel)
 
     # Helper methods for analysis
-    def _analyze_turn_content(self, lines: List[str]) -> Dict:
+    def _analyze_turn_content(self, lines: list[str]) -> dict:
         """Analyze conversation turn content"""
         return AtomicAnalysis.analyze_turn_content(self.patterns, lines)
 
@@ -1309,7 +1306,7 @@ class AtomicSpecStoryParser:
         """Classify the type of tool output"""
         return AtomicAnalysis.classify_output_type(content)
 
-    def _analyze_code_block(self, language: str, content: str) -> Dict:
+    def _analyze_code_block(self, language: str, content: str) -> dict:
         """Analyze code block characteristics"""
         return AtomicAnalysis.analyze_code_block(language, content)
 
@@ -1341,7 +1338,7 @@ class AtomicSpecStoryParser:
         else:
             return "word"
 
-    def _analyze_token(self, token: str, language: str) -> Dict:
+    def _analyze_token(self, token: str, language: str) -> dict:
         """Analyze token characteristics"""
         return {
             "is_keyword": self._is_programming_keyword(token, language),
@@ -1365,7 +1362,7 @@ class AtomicSpecStoryParser:
         else:
             return "symbol"
 
-    def _analyze_character(self, char: str) -> Dict:
+    def _analyze_character(self, char: str) -> dict:
         """Analyze character properties"""
         return {
             "is_alphanumeric": char.isalnum(),
@@ -1376,7 +1373,7 @@ class AtomicSpecStoryParser:
         }
 
     # Additional helper methods would continue here...
-    def _extract_thinking_content(self, lines: List[str]) -> str:
+    def _extract_thinking_content(self, lines: list[str]) -> str:
         """Extract thinking content between summary and end tags"""
         content_lines = []
         in_content = False
@@ -1413,7 +1410,7 @@ class AtomicSpecStoryParser:
         return time_estimates.get(tool_name, 500)
 
     def _calculate_tool_complexity(
-        self, tool_name: str, parameters: List[AtomicComponent]
+        self, tool_name: str, parameters: list[AtomicComponent]
     ) -> float:
         """Calculate tool call complexity score"""
         base_complexity = {

@@ -23,10 +23,8 @@ import logging
 import schedule
 import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
-import subprocess
-import os
 
 # Configure logging
 logging.basicConfig(

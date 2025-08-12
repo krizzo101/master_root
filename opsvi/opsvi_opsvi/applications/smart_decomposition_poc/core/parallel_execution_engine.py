@@ -4,11 +4,11 @@ Orchestrates parallel agent execution with 3-5x efficiency improvements
 """
 
 import asyncio
+import time
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-import time
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .agent_factory import AgentFactory, AgentWrapper
 from .config import SystemConfig, get_config
@@ -30,8 +30,8 @@ class ExecutionTask:
 
     task_id: str
     agent_role: str
-    input_data: Dict[str, Any]
-    dependencies: List[str]
+    input_data: dict[str, Any]
+    dependencies: list[str]
     priority: int
     estimated_duration: int
     max_retries: int = 3
@@ -43,10 +43,10 @@ class ExecutionResult:
 
     task_id: str
     success: bool
-    result: Dict[str, Any]
+    result: dict[str, Any]
     execution_time: float
     agent_id: str
-    error: Optional[str] = None
+    error: str | None = None
     retry_count: int = 0
 
 
@@ -56,7 +56,7 @@ class ParallelExecutionEngine:
     Achieves 3-5x performance improvements through intelligent coordination.
     """
 
-    def __init__(self, config: Optional[SystemConfig] = None):
+    def __init__(self, config: SystemConfig | None = None):
         self.config = config or get_config()
         self.dependency_manager = DependencyManager(self.config)
         self.agent_factory = AgentFactory(self.config)
@@ -71,7 +71,7 @@ class ParallelExecutionEngine:
         await self.dependency_manager.initialize()
         print("✅ Parallel execution engine initialized")
 
-    async def execute_workflow(self, tasks: List[ExecutionTask]) -> Dict[str, Any]:
+    async def execute_workflow(self, tasks: list[ExecutionTask]) -> dict[str, Any]:
         """
         Execute a complete workflow with parallel optimization.
 
@@ -136,7 +136,7 @@ class ParallelExecutionEngine:
             "parallel_efficiency": performance_metrics.parallel_efficiency,
         }
 
-    async def _register_tasks(self, tasks: List[ExecutionTask]):
+    async def _register_tasks(self, tasks: list[ExecutionTask]):
         """Register tasks with dependency manager"""
         for task in tasks:
             await self.dependency_manager.add_task(
@@ -150,8 +150,8 @@ class ParallelExecutionEngine:
             )
 
     async def _execute_wave(
-        self, wave_task_ids: List[str], all_tasks: List[ExecutionTask]
-    ) -> Dict[str, ExecutionResult]:
+        self, wave_task_ids: list[str], all_tasks: list[ExecutionTask]
+    ) -> dict[str, ExecutionResult]:
         """Execute a wave of tasks in parallel"""
 
         # Find task objects for this wave
@@ -280,8 +280,8 @@ class ParallelExecutionEngine:
 
     async def _calculate_performance_metrics(
         self,
-        tasks: List[ExecutionTask],
-        results: Dict[str, ExecutionResult],
+        tasks: list[ExecutionTask],
+        results: dict[str, ExecutionResult],
         total_execution_time: float,
     ) -> PerformanceMetrics:
         """Calculate comprehensive performance metrics"""
@@ -316,7 +316,7 @@ class ParallelExecutionEngine:
             model_usage=model_usage,
         )
 
-    async def get_execution_status(self) -> Dict[str, Any]:
+    async def get_execution_status(self) -> dict[str, Any]:
         """Get current execution status"""
         return {
             "active_tasks": len(self.active_tasks),
@@ -352,7 +352,7 @@ class ParallelPerformanceTracker:
             return 1.0
         return sum(self.efficiency_trends) / len(self.efficiency_trends)
 
-    def get_performance_summary(self) -> Dict[str, Any]:
+    def get_performance_summary(self) -> dict[str, Any]:
         """Get performance summary statistics"""
         if not self.execution_history:
             return {"message": "No execution history available"}
@@ -377,8 +377,8 @@ class WorkflowOptimizer:
         self.execution_engine = execution_engine
 
     async def optimize_task_order(
-        self, tasks: List[ExecutionTask]
-    ) -> List[ExecutionTask]:
+        self, tasks: list[ExecutionTask]
+    ) -> list[ExecutionTask]:
         """Optimize task ordering for maximum parallelization"""
 
         # Sort by priority and estimated duration
@@ -388,7 +388,7 @@ class WorkflowOptimizer:
 
         return optimized_tasks
 
-    async def identify_bottlenecks(self, execution_plan: List[List[str]]) -> List[str]:
+    async def identify_bottlenecks(self, execution_plan: list[list[str]]) -> list[str]:
         """Identify potential bottlenecks in execution plan"""
         bottlenecks = []
 
@@ -398,7 +398,7 @@ class WorkflowOptimizer:
 
         return bottlenecks
 
-    async def suggest_optimizations(self, tasks: List[ExecutionTask]) -> List[str]:
+    async def suggest_optimizations(self, tasks: list[ExecutionTask]) -> list[str]:
         """Suggest optimizations for better parallel execution"""
         suggestions = []
 
@@ -426,7 +426,7 @@ class WorkflowOptimizer:
 
 
 # Utility functions for creating common execution patterns
-async def create_simple_workflow(user_prompt: str) -> List[ExecutionTask]:
+async def create_simple_workflow(user_prompt: str) -> list[ExecutionTask]:
     """Create a simple workflow from user prompt"""
     tasks = [
         ExecutionTask(

@@ -2,18 +2,19 @@
 GitHub OAuth and repo integration endpoints.
 """
 import logging
-from fastapi import APIRouter, Depends, HTTPException, status
+import os
+
+import requests
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import RedirectResponse
+from github import Github, GithubException
 from sqlalchemy.orm import Session
+
 from app.auth import get_current_active_user
+from app.config import settings
 from app.db import get_db
 from app.models import User
-from app.schemas import GitHubRepo, GitHubAnalyzeRequest, Msg
-from app.config import settings
-import requests
-from fastapi.responses import RedirectResponse
-import os
-from github import Github, GithubException
-from typing import List
+from app.schemas import GitHubAnalyzeRequest, GitHubRepo, Msg
 
 router = APIRouter()
 logger = logging.getLogger("github.integration")
@@ -66,7 +67,7 @@ def github_oauth_callback(
         raise HTTPException(status_code=500, detail="GitHub OAuth failed")
 
 
-@router.get("/repos", response_model=List[GitHubRepo])
+@router.get("/repos", response_model=list[GitHubRepo])
 def github_list_repos(
     db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)
 ):
@@ -109,7 +110,6 @@ def github_analyze(
         repo = client.get_repo(req.repo_full_name)
         branch = req.branch or repo.default_branch
         temp_dir = f"{settings.UPLOAD_DIR}/github-{current_user.id}-{repo.name}"
-        from git import Repo as GitRepo
 
         # Clone using pygit2 or git - use local shell git for now
         import subprocess

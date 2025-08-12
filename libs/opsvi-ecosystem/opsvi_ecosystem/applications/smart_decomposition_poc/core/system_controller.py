@@ -4,10 +4,10 @@ Main orchestration system with parallel execution capabilities
 """
 
 import asyncio
+import time
 from dataclasses import dataclass
 from datetime import datetime
-import time
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .agent_factory import AgentFactory, SpecializedAgentFactory
 from .config import SystemConfig, get_config
@@ -31,15 +31,15 @@ class WorkflowResult:
     """Result of a complete workflow execution"""
 
     success: bool
-    generated_application: Dict[str, Any]
-    requirements: Optional[RequirementsResponse]
-    work_plan: Optional[CoordinationResponse]
-    implementation: Optional[ImplementationResponse]
-    validation: Optional[ValidationResponse]
+    generated_application: dict[str, Any]
+    requirements: RequirementsResponse | None
+    work_plan: CoordinationResponse | None
+    implementation: ImplementationResponse | None
+    validation: ValidationResponse | None
     performance_metrics: PerformanceMetrics
     execution_time: float
     parallel_efficiency: float
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
 
 
 class SystemController:
@@ -48,7 +48,7 @@ class SystemController:
     Orchestrates autonomous application generation with parallel execution.
     """
 
-    def __init__(self, config: Optional[SystemConfig] = None):
+    def __init__(self, config: SystemConfig | None = None):
         self.config = config or get_config()
         self.agent_factory = AgentFactory(self.config)
         self.specialized_factory = SpecializedAgentFactory(self.agent_factory)
@@ -261,7 +261,7 @@ class SystemController:
 
     async def _create_parallel_execution_tasks(
         self, user_prompt: str
-    ) -> List[ExecutionTask]:
+    ) -> list[ExecutionTask]:
         """Create execution tasks optimized for parallel processing"""
 
         # Create initial requirements analysis task
@@ -359,8 +359,8 @@ class SystemController:
         ]
 
     def _extract_requirements_from_results(
-        self, task_results: Dict[str, ExecutionResult]
-    ) -> Optional[RequirementsResponse]:
+        self, task_results: dict[str, ExecutionResult]
+    ) -> RequirementsResponse | None:
         """Extract requirements response from task results"""
         if "requirements_analysis" in task_results:
             result = task_results["requirements_analysis"]
@@ -372,8 +372,8 @@ class SystemController:
         return None
 
     def _extract_work_plan_from_results(
-        self, task_results: Dict[str, ExecutionResult]
-    ) -> Optional[CoordinationResponse]:
+        self, task_results: dict[str, ExecutionResult]
+    ) -> CoordinationResponse | None:
         """Extract work plan from task results"""
         if "work_planning" in task_results:
             result = task_results["work_planning"]
@@ -385,8 +385,8 @@ class SystemController:
         return None
 
     def _extract_implementation_from_results(
-        self, task_results: Dict[str, ExecutionResult]
-    ) -> Optional[ImplementationResponse]:
+        self, task_results: dict[str, ExecutionResult]
+    ) -> ImplementationResponse | None:
         """Extract implementation from task results"""
         if "implementation" in task_results:
             result = task_results["implementation"]
@@ -398,8 +398,8 @@ class SystemController:
         return None
 
     def _extract_validation_from_results(
-        self, task_results: Dict[str, ExecutionResult]
-    ) -> Optional[ValidationResponse]:
+        self, task_results: dict[str, ExecutionResult]
+    ) -> ValidationResponse | None:
         """Extract validation from task results"""
         if "validation" in task_results:
             result = task_results["validation"]
@@ -411,8 +411,8 @@ class SystemController:
         return None
 
     def _package_application_from_results(
-        self, task_results: Dict[str, ExecutionResult]
-    ) -> Dict[str, Any]:
+        self, task_results: dict[str, ExecutionResult]
+    ) -> dict[str, Any]:
         """Package complete application from all task results"""
         application = {
             "metadata": {
@@ -539,7 +539,7 @@ class SystemController:
 
     def _package_application(
         self, implementation: ImplementationResponse
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Legacy sequential application packaging"""
         application = {
             "metadata": {
@@ -578,11 +578,11 @@ class SystemController:
             model_usage={},
         )
 
-    def get_workflow_history(self) -> List[WorkflowResult]:
+    def get_workflow_history(self) -> list[WorkflowResult]:
         """Get history of all workflow executions"""
         return self.workflow_history
 
-    def get_performance_summary(self) -> Dict[str, Any]:
+    def get_performance_summary(self) -> dict[str, Any]:
         """Get performance summary across all workflows"""
         if not self.workflow_history:
             return {"message": "No workflows executed yet"}

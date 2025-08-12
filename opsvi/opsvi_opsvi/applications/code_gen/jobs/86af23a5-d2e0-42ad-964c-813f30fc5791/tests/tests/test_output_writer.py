@@ -1,8 +1,9 @@
 # tests/test_output_writer.py
-import unittest
-import os
-import json
 import csv
+import json
+import os
+import unittest
+
 from scraper.output_writer import write_headlines
 
 
@@ -32,7 +33,7 @@ class TestOutputWriter(unittest.TestCase):
     def test_write_txt(self):
         fname = "test_out.txt"
         write_headlines(self.data, fname, "txt")
-        with open(fname, "r", encoding="utf-8") as f:
+        with open(fname, encoding="utf-8") as f:
             lines = f.readlines()
         self.assertIn("[https://example.com] Alpha\n", lines)
         os.remove(fname)

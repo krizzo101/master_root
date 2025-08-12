@@ -1,10 +1,11 @@
+from unittest.mock import MagicMock
+
 import pytest
-from unittest.mock import MagicMock, patch
 from app.github import (
-    github_oauth_login,
-    github_oauth_callback,
-    github_list_repos,
     github_analyze,
+    github_list_repos,
+    github_oauth_callback,
+    github_oauth_login,
 )
 
 

@@ -19,8 +19,8 @@ Usage:
     markdown = formatter.to_markdown(data, "Title")
 """
 
-from datetime import datetime
 import json
+from datetime import datetime
 from typing import Any
 
 import yaml

@@ -1,7 +1,7 @@
-from typing import Optional
 from datetime import datetime
-from sqlmodel import SQLModel, Field, Relationship
 from enum import Enum
+
+from sqlmodel import Field, SQLModel
 
 
 class MetricType(str, Enum):
@@ -12,14 +12,14 @@ class MetricType(str, Enum):
 
 
 class MetricSample(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     metric_type: MetricType
     value: float
     ts: datetime = Field(index=True)
 
 
 class Threshold(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     cpu: float = 90.0  # %
     memory: float = 90.0  # %
     disk: float = 90.0  # %
@@ -27,15 +27,15 @@ class Threshold(SQLModel, table=True):
 
 
 class User(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     username: str = Field(index=True, unique=True)
     hashed_password: str
 
 
 class AlertEvent(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     metric_type: MetricType
     value: float
     triggered_at: datetime
-    resolved_at: Optional[datetime] = None
-    resolved_value: Optional[float] = None
+    resolved_at: datetime | None = None
+    resolved_value: float | None = None

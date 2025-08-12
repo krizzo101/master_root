@@ -10,11 +10,9 @@ Usage:
     python3 cognitive_enhancement_processor.py --interactive
 """
 import sys
-import os
 import asyncio
 import argparse
 import json
-from pathlib import Path
 from typing import Dict, Any, Optional
 
 # Add orchestrator to path

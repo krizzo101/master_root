@@ -24,9 +24,7 @@ Implements hybrid storage strategy:
 - Quality filtering: prevents knowledge pollution
 """
 
-import asyncio
 import hashlib
-import logging
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timedelta
 from dataclasses import dataclass

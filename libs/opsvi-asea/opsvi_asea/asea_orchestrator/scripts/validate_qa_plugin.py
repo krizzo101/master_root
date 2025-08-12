@@ -10,7 +10,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "s
 
 # The testing worker is no longer needed
 # from celery.contrib.testing.worker import start_worker
-from asea_orchestrator.celery_app import app as celery_app
 from asea_orchestrator.core import Orchestrator
 from asea_orchestrator.workflow import WorkflowManager
 from asea_orchestrator.plugins.types import PluginConfig

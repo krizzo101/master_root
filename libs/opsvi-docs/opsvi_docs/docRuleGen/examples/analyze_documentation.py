@@ -14,7 +14,6 @@ map them to a taxonomy, and generate analysis results.
 """
 
 import os
-import sys
 import json
 from pathlib import Path
 

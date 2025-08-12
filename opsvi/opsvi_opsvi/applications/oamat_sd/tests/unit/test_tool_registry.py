@@ -5,8 +5,8 @@ Tests the MCP tool registry that manages and provides access to all
 operational intelligence tools in the Smart Decomposition system.
 """
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -16,6 +16,7 @@ sys.path.insert(0, str(project_root))
 
 # REAL IMPORTS - No mocking (TDD Compliance)
 from oamat_sd.src.tools.mcp_tool_registry import MCPToolRegistry
+
 from tests.fixtures.mcp_mocks import MCPRegistryMock
 
 

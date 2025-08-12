@@ -6,7 +6,7 @@ Extracted from agent_factory.py for better modularity and maintainability.
 """
 
 import logging
-from typing import Annotated, Any, Dict, Optional
+from typing import Annotated, Any
 
 from langchain_core.tools import InjectedToolCallId, tool
 from langgraph.prebuilt import InjectedState
@@ -48,7 +48,7 @@ class LangGraphAgentTools:
 
     def __init__(
         self,
-        llm_config: Optional[Dict] = None,
+        llm_config: dict | None = None,
         neo4j_client=None,
         mcp_registry=None,
     ):
@@ -75,7 +75,7 @@ class LangGraphAgentTools:
             def parse_output(self, output: Any) -> Any:
                 return output
 
-            def process_request(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+            def process_request(self, input_data: dict[str, Any]) -> dict[str, Any]:
                 """
                 Process tool requests using LLM execution
 

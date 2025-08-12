@@ -1,7 +1,6 @@
 from __future__ import annotations
 import asyncio
 from uuid import uuid4
-from typing import Any, Dict
 
 from opsvi_auto_forge.core.decision_kernel import (
     analyze_task,
@@ -10,7 +9,6 @@ from opsvi_auto_forge.core.decision_kernel import (
     calibrate_confidence,
     persist_decision,
 )
-from opsvi_auto_forge.core.decision_kernel.router_bridge import apply_router_hints
 from opsvi_auto_forge.core.retrieval_orchestrator.models import RetrievalConfig
 from opsvi_auto_forge.core.retrieval_orchestrator.assembler import build_context_pack
 

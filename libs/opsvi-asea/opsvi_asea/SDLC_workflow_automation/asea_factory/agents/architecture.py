@@ -1,6 +1,5 @@
 from asea_factory.schemas import ArchitectureSpec
-from typing import List, Dict, Any
-import uuid
+from typing import List
 from asea_factory.agents.base_agent import BaseAgent
 
 

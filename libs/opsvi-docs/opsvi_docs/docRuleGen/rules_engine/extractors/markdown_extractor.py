@@ -13,7 +13,7 @@ This module provides functionality to extract content from Markdown files.
 import re
 import yaml
 import logging
-from typing import Dict, Any, List, Tuple, Optional
+from typing import Dict, Any, Tuple
 
 from .base_extractor import BaseExtractor
 

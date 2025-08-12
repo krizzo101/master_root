@@ -22,7 +22,6 @@ import time
 
 from ..extractors.documentation_extractor import (
     extract_documentation_for_rule,
-    extract_documentation_for_taxonomy,
     generate_glob_patterns,
 )
 
@@ -32,12 +31,6 @@ from ..transformers.markdown_to_rule import (
 )
 
 # Import existing LLM-based generators
-from ..generators.rule_generator import generate_rule_sections_parallel
-from ..generators.section_generator import (
-    generate_rule_section,
-    _call_openai_with_retries,
-)
-from ..generators.enhanced_rule_generator import create_rule_with_feedback
 
 # Import OpenAI client
 from openai import OpenAI

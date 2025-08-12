@@ -6,7 +6,7 @@ Coordinates specialized modules for factor analysis, scoring, and AI reasoning.
 """
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 from src.applications.oamat_sd.src.analysis.ai_reasoning import AIReasoningEngine
 from src.applications.oamat_sd.src.analysis.factor_analyzer import FactorAnalyzer
@@ -36,7 +36,7 @@ class ComplexityModel(IComplexityAnalysisModel):
     4. Result Synthesis -> Combine all analysis into final result
     """
 
-    def __init__(self, model_config: Optional[Dict[str, Any]] = None):
+    def __init__(self, model_config: dict[str, Any] | None = None):
         """Initialize the Complexity Model with all modular components"""
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
@@ -168,7 +168,7 @@ class ComplexityModel(IComplexityAnalysisModel):
         )
 
     def _enhance_factors_with_ai(
-        self, factors: ComplexityFactors, ai_factors: Dict[str, Any]
+        self, factors: ComplexityFactors, ai_factors: dict[str, Any]
     ) -> ComplexityFactors:
         """Enhance factor analysis with AI insights"""
 
@@ -311,14 +311,14 @@ class ComplexityModel(IComplexityAnalysisModel):
 
     # Abstract method implementations for IComplexityAnalysisModel interface
     async def analyze_complexity_dynamically(
-        self, request, context: Dict[str, Any] = None
+        self, request, context: dict[str, Any] = None
     ) -> ComplexityAnalysisResult:
         """Dynamic complexity analysis - main interface method"""
         return await self.analyze(request)
 
     async def generate_complexity_factors(
-        self, request, context: Dict[str, Any] = None
-    ) -> Dict[str, Any]:
+        self, request, context: dict[str, Any] = None
+    ) -> dict[str, Any]:
         """Generate complexity factors - interface method"""
         factors = await self._analyze_all_factors(request)
         return {
@@ -331,8 +331,8 @@ class ComplexityModel(IComplexityAnalysisModel):
         }
 
     async def reason_about_complexity(
-        self, factors: Dict[str, Any], context: Dict[str, Any] = None
-    ) -> Dict[str, Any]:
+        self, factors: dict[str, Any], context: dict[str, Any] = None
+    ) -> dict[str, Any]:
         """Reason about complexity - interface method"""
         if self.ai_reasoning and context:
             return await self.ai_reasoning.analyze_complexity_reasoning(
@@ -350,7 +350,7 @@ class ComplexityModel(IComplexityAnalysisModel):
                 "confidence": 0.7,
             }
 
-    def get_capabilities(self) -> Dict[str, Any]:
+    def get_capabilities(self) -> dict[str, Any]:
         """Return the capabilities of this complexity model"""
         return {
             "model_name": "Complexity Model",

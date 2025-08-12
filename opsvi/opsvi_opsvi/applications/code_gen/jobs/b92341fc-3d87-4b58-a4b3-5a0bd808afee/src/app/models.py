@@ -1,4 +1,3 @@
-from typing import Optional
 from pydantic import BaseModel, Field
 
 
@@ -6,7 +5,7 @@ class TaskBase(BaseModel):
     title: str = Field(
         ..., title="Task Title", max_length=200, description="Short title for the task"
     )
-    description: Optional[str] = Field(
+    description: str | None = Field(
         None,
         title="Task Description",
         max_length=1000,
@@ -22,9 +21,9 @@ class TaskCreate(TaskBase):
 
 
 class TaskUpdate(BaseModel):
-    title: Optional[str] = Field(None, title="Task Title", max_length=200)
-    description: Optional[str] = Field(None, title="Task Description", max_length=1000)
-    completed: Optional[bool] = Field(None, title="Completed")
+    title: str | None = Field(None, title="Task Title", max_length=200)
+    description: str | None = Field(None, title="Task Description", max_length=1000)
+    completed: bool | None = Field(None, title="Completed")
 
 
 class Task(TaskBase):

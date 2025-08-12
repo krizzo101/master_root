@@ -4,11 +4,8 @@ Code Generation Utility - Stop All Script (Python Version)
 This script stops all code generation processes and related services
 """
 
-import os
 import subprocess
 import time
-import signal
-import psutil
 
 
 def is_running(pattern):

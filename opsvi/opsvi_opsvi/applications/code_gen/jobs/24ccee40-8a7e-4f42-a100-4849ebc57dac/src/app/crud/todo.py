@@ -1,14 +1,15 @@
 """
 CRUD operations for Todo items (DAL/repository layer)
 """
-from typing import List, Optional
-from sqlalchemy.future import select
+import logging
+from datetime import datetime
+
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+
 from app.models.todo import Todo
 from app.schemas.todo import TodoCreate, TodoUpdate
-from datetime import datetime
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -39,18 +40,16 @@ class TodoDAL:
             logger.error("Failed to create todo: %s", e)
             raise
 
-    async def get_todo(self, todo_id: int) -> Optional[Todo]:
+    async def get_todo(self, todo_id: int) -> Todo | None:
         result = await self.db_session.execute(select(Todo).where(Todo.id == todo_id))
         todo = result.scalar_one_or_none()
         return todo
 
-    async def get_all_todos(self) -> List[Todo]:
+    async def get_all_todos(self) -> list[Todo]:
         result = await self.db_session.execute(select(Todo).order_by(Todo.id.asc()))
         return result.scalars().all()
 
-    async def update_todo(
-        self, todo_id: int, todo_update: TodoUpdate
-    ) -> Optional[Todo]:
+    async def update_todo(self, todo_id: int, todo_update: TodoUpdate) -> Todo | None:
         todo = await self.get_todo(todo_id)
         if not todo:
             return None

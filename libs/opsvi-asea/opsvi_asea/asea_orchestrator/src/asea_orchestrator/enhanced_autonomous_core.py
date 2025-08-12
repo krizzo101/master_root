@@ -17,7 +17,6 @@ sys.path.append(
 from typing import Any, Dict, Optional, List, Type
 import asyncio
 import uuid
-import logging
 from dataclasses import asdict
 
 from .tasks import execute_plugin_task

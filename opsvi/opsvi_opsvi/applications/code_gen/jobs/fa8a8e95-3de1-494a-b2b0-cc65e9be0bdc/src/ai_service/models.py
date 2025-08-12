@@ -1,6 +1,4 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict
-from uuid import UUID
 
 
 class TeamMember(BaseModel):
@@ -16,18 +14,18 @@ class Task(BaseModel):
     title: str
     description: str
     importance: int = 5  # 1-10
-    deadline: Optional[str] = None  # ISO datetime string
-    estimated_duration: Optional[float] = None  # Hours
-    assigned_to: Optional[str] = None  # TeamMember.id
+    deadline: str | None = None  # ISO datetime string
+    estimated_duration: float | None = None  # Hours
+    assigned_to: str | None = None  # TeamMember.id
     status: str = "pending"
-    previous_duration: Optional[float] = None  # historical actual
-    dependencies: List[str] = Field(default_factory=list)
+    previous_duration: float | None = None  # historical actual
+    dependencies: list[str] = Field(default_factory=list)
 
 
 class TaskInput(BaseModel):
-    tasks: List[Task]
-    members: List[TeamMember]
+    tasks: list[Task]
+    members: list[TeamMember]
 
 
 class AIResponse(BaseModel):
-    result: Dict
+    result: dict

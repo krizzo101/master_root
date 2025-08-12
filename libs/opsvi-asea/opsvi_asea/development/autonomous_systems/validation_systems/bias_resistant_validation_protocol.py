@@ -7,8 +7,7 @@ Implements systematic cross-reference validation with skeptical defaults.
 """
 
 import json
-import os
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from datetime import datetime
 
 

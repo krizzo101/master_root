@@ -7,11 +7,10 @@ to perform real research tasks and provide genuine value.
 
 import asyncio
 import json
-import sys
 import os
+import sys
 from datetime import datetime
-from typing import List, Dict, Any, Optional
-from pathlib import Path
+from typing import Any
 
 # Add libs to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "libs"))
@@ -42,8 +41,9 @@ class RealResearchAssistant:
             await self.http_client.initialize()
 
             # Initialize real LLM provider for actual analysis
-            from opsvi_llm import OpenAIProvider, OpenAIConfig
             import os
+
+            from opsvi_llm import OpenAIConfig, OpenAIProvider
 
             llm_config = OpenAIConfig(
                 provider_name="openai",
@@ -79,8 +79,8 @@ class RealResearchAssistant:
             print(f"❌ Shutdown error: {e}")
 
     async def fetch_real_research_data(
-        self, topic: str, keywords: List[str]
-    ) -> List[Dict[str, Any]]:
+        self, topic: str, keywords: list[str]
+    ) -> list[dict[str, Any]]:
         """Fetch real research data from actual APIs."""
         print(f"🔍 Fetching real research data for: {topic}")
 
@@ -130,7 +130,7 @@ class RealResearchAssistant:
 
     def _parse_arxiv_response(
         self, response_data: Any, topic: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Parse real ArXiv API response."""
         try:
             # Real XML parsing for ArXiv
@@ -169,7 +169,7 @@ class RealResearchAssistant:
 
     def _parse_pubmed_response(
         self, response_data: Any, topic: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Parse real PubMed API response."""
         try:
             # Real JSON parsing for PubMed
@@ -193,7 +193,7 @@ class RealResearchAssistant:
             print(f"  ⚠️  Error parsing PubMed response: {e}")
             return []
 
-    async def analyze_with_real_llm(self, content: str, topic: str) -> Dict[str, Any]:
+    async def analyze_with_real_llm(self, content: str, topic: str) -> dict[str, Any]:
         """Analyze content using real LLM."""
         print(f"🧠 Analyzing content with real LLM for: {topic}")
 
@@ -254,8 +254,8 @@ class RealResearchAssistant:
             return {"error": str(e)}
 
     async def conduct_real_research(
-        self, topic: str, keywords: List[str]
-    ) -> Dict[str, Any]:
+        self, topic: str, keywords: list[str]
+    ) -> dict[str, Any]:
         """Conduct real research using actual APIs and LLM."""
         print(f"\n🚀 Starting REAL research on: {topic}")
         print("=" * 60)
@@ -307,7 +307,7 @@ class RealResearchAssistant:
             print(f"❌ Research failed: {e}")
             return {}
 
-    async def get_research_status(self) -> Dict[str, Any]:
+    async def get_research_status(self) -> dict[str, Any]:
         """Get real research status."""
         try:
             research_topics = list(self.state_manager.keys())

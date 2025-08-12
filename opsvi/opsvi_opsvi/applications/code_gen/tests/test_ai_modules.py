@@ -1,19 +1,19 @@
 """Test AI modules with mocked OpenAI responses."""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from pydantic import BaseModel
+from unittest.mock import Mock, patch
 
+import pytest
 from ai_agents import (
+    analyze_request_security_with_ai,
     detect_project_type_with_ai,
     extract_requirements_with_ai,
     generate_architecture_with_ai,
-    analyze_request_security_with_ai,
 )
 from ai_code_generator import AICodeGenerator
-from ai_test_generator import AITestGenerator
 from ai_documentation_generator import AIDocumentationGenerator
-from schemas import ProjectType, RequirementsSpec, ArchitectureSpec
+from ai_test_generator import AITestGenerator
+
+from schemas import ArchitectureSpec, ProjectType, RequirementsSpec
 
 
 class TestAIAgents:

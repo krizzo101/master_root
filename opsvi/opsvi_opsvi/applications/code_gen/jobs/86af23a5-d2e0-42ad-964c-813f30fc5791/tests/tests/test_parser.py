@@ -1,5 +1,6 @@
 # tests/test_parser.py
 import unittest
+
 from scraper.parser import HeadlineExtractor
 
 EXAMPLE_HTML = """<html><body>

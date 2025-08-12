@@ -4,9 +4,9 @@ Contract Compliance Validation Script
 Validates that the OAMAT_SD application adheres to the NO FALLBACKS RULE
 """
 
-from pathlib import Path
 import re
 import sys
+from pathlib import Path
 
 
 def check_for_fallback_mechanisms():

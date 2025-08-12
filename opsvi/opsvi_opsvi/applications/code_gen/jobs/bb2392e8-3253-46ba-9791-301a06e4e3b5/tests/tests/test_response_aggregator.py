@@ -1,5 +1,4 @@
-import pytest
-from multiagent_cli.response_aggregator import aggregate_responses, AgentResultModel
+from multiagent_cli.response_aggregator import AgentResultModel, aggregate_responses
 
 
 def test_aggregate_responses_returns_aggregated_structure():

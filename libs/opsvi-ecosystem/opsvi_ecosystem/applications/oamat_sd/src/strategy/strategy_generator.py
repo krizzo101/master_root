@@ -7,7 +7,7 @@ Extracted from o3_master_agent.py for better modularity.
 
 import json
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from src.applications.oamat_sd.src.agents.request_validation import CompletionResult
 from src.applications.oamat_sd.src.config.config_manager import ConfigManager
@@ -38,7 +38,7 @@ class StrategyGenerator:
         self,
         complexity_result: ComplexityAnalysisResult,
         completion_result: CompletionResult,
-    ) -> Tuple[AgentStrategy, List[ReasoningStep]]:
+    ) -> tuple[AgentStrategy, list[ReasoningStep]]:
         """Generate sophisticated agent deployment strategy."""
 
         self.logger.info(
@@ -160,8 +160,8 @@ class StrategyGenerator:
             )
 
     async def generate_execution_plan(
-        self, strategy: AgentStrategy, request_data: Dict[str, Any]
-    ) -> Tuple[ExecutionPlan, List[ReasoningStep]]:
+        self, strategy: AgentStrategy, request_data: dict[str, Any]
+    ) -> tuple[ExecutionPlan, list[ReasoningStep]]:
         """Generate detailed execution plan using O3 reasoning."""
 
         self.logger.info("Generating detailed execution plan using O3 reasoning")
@@ -302,7 +302,7 @@ class StrategyGenerator:
                 f"Execution plan generation failed: {e}. Cannot proceed without valid plan."
             )
 
-    def _parse_strategy_response(self, response_content: str) -> Dict[str, Any]:
+    def _parse_strategy_response(self, response_content: str) -> dict[str, Any]:
         """Parse O3 strategy response and extract structured data"""
         try:
             # Look for JSON in the response
@@ -325,7 +325,7 @@ class StrategyGenerator:
             )
 
     def _build_agent_strategy_from_o3(
-        self, strategy_data: Dict[str, Any], complexity_result: ComplexityAnalysisResult
+        self, strategy_data: dict[str, Any], complexity_result: ComplexityAnalysisResult
     ) -> AgentStrategy:
         """Build AgentStrategy object from O3's dynamic response"""
 

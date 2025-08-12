@@ -1,11 +1,8 @@
 """
 AgentManager manages agent instances and agent task execution using Langgraph and OpenAI API.
 """
-from typing import Any, Dict
-from loguru import logger
 from multiagent_cli.config import AppConfig
 from multiagent_cli.openai_interface import OpenAIReasoningInterface
-import asyncio
 
 
 class AgentManager:

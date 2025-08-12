@@ -4,12 +4,10 @@ import asyncio
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict
 from uuid import UUID, uuid4
-from enum import Enum
 
 from celery.result import AsyncResult
-from pydantic import BaseModel
 
 from opsvi_auto_forge.config.models import TaskStatus
 from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient

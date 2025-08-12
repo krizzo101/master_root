@@ -2,14 +2,14 @@
 AI Assistance Service for Real-Time Collaborative Document Editing
 Provides endpoints for summarization and suggestions using OpenAI API or HuggingFace Transformers
 """
-import os
 import logging
-from fastapi import FastAPI, HTTPException, Request, status
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, validator
-from typing import Optional
+import os
+
 import httpx
+from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
 
 # Optional import for OpenAI, fallback to transformers
 try:
@@ -37,7 +37,7 @@ class SummarizationRequest(BaseModel):
         max_length=10000,
         description="Document content for summarization.",
     )
-    language: Optional[str] = Field(None, description="Language of the document.")
+    language: str | None = Field(None, description="Language of the document.")
 
 
 class SuggestionRequest(BaseModel):
@@ -47,14 +47,14 @@ class SuggestionRequest(BaseModel):
         max_length=10000,
         description="Document content for suggestion.",
     )
-    context: Optional[str] = Field(
+    context: str | None = Field(
         None, description="Additional context about the document."
     )
 
 
 class AIResponse(BaseModel):
-    summary: Optional[str] = None
-    suggestions: Optional[str] = None
+    summary: str | None = None
+    suggestions: str | None = None
 
 
 app = FastAPI(
@@ -81,7 +81,7 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 
-async def summarize_with_openai(content: str, language: Optional[str]) -> str:
+async def summarize_with_openai(content: str, language: str | None) -> str:
     if not OPENAI_API_KEY:
         raise HTTPException(status_code=503, detail="OpenAI API key not configured.")
     openai.api_key = OPENAI_API_KEY
@@ -97,12 +97,12 @@ async def summarize_with_openai(content: str, language: Optional[str]) -> str:
             temperature=0.5,
         )
         return resp.choices[0].text.strip()
-    except Exception as e:
+    except Exception:
         logger.exception("OpenAI API summarization failed.")
         raise HTTPException(status_code=502, detail="AI summarization failed.")
 
 
-async def suggest_with_openai(content: str, context: Optional[str]) -> str:
+async def suggest_with_openai(content: str, context: str | None) -> str:
     if not OPENAI_API_KEY:
         raise HTTPException(status_code=503, detail="OpenAI API key not configured.")
     openai.api_key = OPENAI_API_KEY
@@ -117,7 +117,7 @@ async def suggest_with_openai(content: str, context: Optional[str]) -> str:
             temperature=0.6,
         )
         return resp.choices[0].text.strip()
-    except Exception as e:
+    except Exception:
         logger.exception("OpenAI API suggestion failed.")
         raise HTTPException(status_code=502, detail="AI suggestion failed.")
 

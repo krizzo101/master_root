@@ -1,9 +1,8 @@
-import pytest
 from backend.auth import (
-    verify_password,
-    get_password_hash,
     authenticate_user,
     create_access_token,
+    get_password_hash,
+    verify_password,
 )
 
 

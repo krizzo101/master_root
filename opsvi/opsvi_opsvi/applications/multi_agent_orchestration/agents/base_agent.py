@@ -5,10 +5,10 @@ Defines the abstract base class that all agents must implement,
 providing a consistent interface for agent creation and interaction.
 """
 
+import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
-import logging
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 from ..common.types import (
     AgentCapability,
@@ -38,7 +38,7 @@ class BaseAgent(ABC):
         agent_id: str,
         name: str = "Base Agent",
         description: str = "Generic agent base class",
-        logger: Optional[logging.Logger] = None,
+        logger: logging.Logger | None = None,
     ):
         """
         Initialize the base agent.
@@ -57,22 +57,22 @@ class BaseAgent(ABC):
 
         # Agent state
         self._is_active = False
-        self._current_task: Optional[Task] = None
-        self._task_history: List[Task] = []
-        self._message_broker: Optional[MessageBroker] = None
+        self._current_task: Task | None = None
+        self._task_history: list[Task] = []
+        self._message_broker: MessageBroker | None = None
 
         # Tools and capabilities
-        self._tools: Dict[str, BaseTool] = {}
-        self._capabilities: List[AgentCapability] = []
+        self._tools: dict[str, BaseTool] = {}
+        self._capabilities: list[AgentCapability] = []
 
         # Collaboration
-        self._collaborators: Set[str] = set()
-        self._pending_messages: List[Message] = []
+        self._collaborators: set[str] = set()
+        self._pending_messages: list[Message] = []
 
         logger.info(f"Agent {self.agent_id} ({self.name}) initialized")
 
     @abstractmethod
-    async def execute_task(self, task: Task) -> Dict[str, Any]:
+    async def execute_task(self, task: Task) -> dict[str, Any]:
         """
         Execute a specific task.
 
@@ -88,7 +88,7 @@ class BaseAgent(ABC):
         pass
 
     @abstractmethod
-    def get_capabilities(self) -> List[AgentCapability]:
+    def get_capabilities(self) -> list[AgentCapability]:
         """
         Get the agent's capabilities.
 
@@ -154,7 +154,7 @@ class BaseAgent(ABC):
             return True
         return False
 
-    def get_available_tools(self) -> List[str]:
+    def get_available_tools(self) -> list[str]:
         """
         Get list of available tool names.
 
@@ -164,8 +164,8 @@ class BaseAgent(ABC):
         return list(self._tools.keys())
 
     async def use_tool(
-        self, tool_name: str, parameters: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, tool_name: str, parameters: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Use a specific tool with given parameters.
 
@@ -201,8 +201,8 @@ class BaseAgent(ABC):
         self,
         recipient_id: str,
         message_type: MessageType,
-        content: Dict[str, Any],
-        correlation_id: Optional[str] = None,
+        content: dict[str, Any],
+        correlation_id: str | None = None,
     ) -> bool:
         """
         Send a message to another agent.
@@ -242,7 +242,7 @@ class BaseAgent(ABC):
             raise CommunicationError(f"Failed to send message: {str(e)}")
 
     async def broadcast_message(
-        self, message_type: MessageType, content: Dict[str, Any]
+        self, message_type: MessageType, content: dict[str, Any]
     ) -> int:
         """
         Broadcast a message to all agents.
@@ -273,7 +273,7 @@ class BaseAgent(ABC):
             raise CommunicationError(f"Failed to broadcast message: {str(e)}")
 
     async def request_collaboration(
-        self, recipient_id: str, task_description: str, required_capabilities: List[str]
+        self, recipient_id: str, task_description: str, required_capabilities: list[str]
     ) -> bool:
         """
         Request collaboration from another agent.
@@ -297,7 +297,7 @@ class BaseAgent(ABC):
             recipient_id, MessageType.COLLABORATION_REQUEST, content
         )
 
-    async def safe_execute_task(self, task: Task) -> Dict[str, Any]:
+    async def safe_execute_task(self, task: Task) -> dict[str, Any]:
         """
         Safely execute a task with comprehensive error handling.
 
@@ -473,7 +473,7 @@ class BaseAgent(ABC):
             f"Agent {self.agent_id} received generic message from {message.sender_id}"
         )
 
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """
         Get the current status of the agent.
 

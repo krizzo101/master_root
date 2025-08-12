@@ -7,8 +7,8 @@ Validates that the meta-intelligence system works with operational MCP tools.
 
 import asyncio
 import logging
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Add project root for imports
 project_root = Path(__file__).parents[3]

@@ -1,6 +1,6 @@
-from datetime import datetime
 import logging
-from typing import Any, Dict, Optional
+from datetime import datetime
+from typing import Any
 
 from src.shared.interfaces.database.arango_interface import DirectArangoDB
 
@@ -13,14 +13,14 @@ class WorkflowDB:
     Uses DirectArangoDB for all operations.
     """
 
-    def __init__(self, db: Optional[DirectArangoDB] = None):
+    def __init__(self, db: DirectArangoDB | None = None):
         self.db = db or DirectArangoDB()
         self.workflows_col = "workflows"
         self.runs_col = "workflow_runs"
 
     # ========== WORKFLOWS CRUD ==========
 
-    def create_workflow(self, workflow: Dict[str, Any]) -> Dict[str, Any]:
+    def create_workflow(self, workflow: dict[str, Any]) -> dict[str, Any]:
         """Insert a new workflow document."""
         logger.debug(f"create_workflow called with: {workflow}")
         workflow["created_at"] = datetime.utcnow().isoformat()
@@ -29,7 +29,7 @@ class WorkflowDB:
         logger.debug(f"create_workflow result: {result}")
         return result
 
-    def get_workflow(self, workflow_id: str) -> Dict[str, Any]:
+    def get_workflow(self, workflow_id: str) -> dict[str, Any]:
         """Retrieve a workflow by _key."""
         logger.debug(f"get_workflow called with: {workflow_id}")
         result = self.db.get_document(self.workflows_col, workflow_id)
@@ -37,8 +37,8 @@ class WorkflowDB:
         return result
 
     def list_workflows(
-        self, filters: Optional[Dict[str, Any]] = None, skip: int = 0, limit: int = 50
-    ) -> Dict[str, Any]:
+        self, filters: dict[str, Any] | None = None, skip: int = 0, limit: int = 50
+    ) -> dict[str, Any]:
         """List workflows, optionally filtered."""
         logger.debug(
             f"list_workflows called with filters={filters}, skip={skip}, limit={limit}"
@@ -51,8 +51,8 @@ class WorkflowDB:
         return result
 
     def update_workflow(
-        self, workflow_id: str, updates: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, workflow_id: str, updates: dict[str, Any]
+    ) -> dict[str, Any]:
         """Update a workflow by _key."""
         logger.debug(
             f"update_workflow called with workflow_id={workflow_id}, updates={updates}"
@@ -63,7 +63,7 @@ class WorkflowDB:
         logger.debug(f"update_workflow result: {result}")
         return result
 
-    def delete_workflow(self, workflow_id: str) -> Dict[str, Any]:
+    def delete_workflow(self, workflow_id: str) -> dict[str, Any]:
         """Delete a workflow by _key."""
         logger.debug(f"delete_workflow called with: {workflow_id}")
         result = self.db.delete_document(self.workflows_col, workflow_id)
@@ -72,7 +72,7 @@ class WorkflowDB:
 
     # ========== WORKFLOW RUNS CRUD ==========
 
-    def create_run(self, run: Dict[str, Any]) -> Dict[str, Any]:
+    def create_run(self, run: dict[str, Any]) -> dict[str, Any]:
         """Insert a new workflow run document."""
         logger.debug(f"create_run called with: {run}")
         run["started_at"] = datetime.utcnow().isoformat()
@@ -81,7 +81,7 @@ class WorkflowDB:
         logger.debug(f"create_run result: {result}")
         return result
 
-    def get_run(self, run_id: str) -> Dict[str, Any]:
+    def get_run(self, run_id: str) -> dict[str, Any]:
         """Retrieve a workflow run by _key."""
         logger.debug(f"get_run called with: {run_id}")
         result = self.db.get_document(self.runs_col, run_id)
@@ -89,8 +89,8 @@ class WorkflowDB:
         return result
 
     def list_runs(
-        self, filters: Optional[Dict[str, Any]] = None, skip: int = 0, limit: int = 50
-    ) -> Dict[str, Any]:
+        self, filters: dict[str, Any] | None = None, skip: int = 0, limit: int = 50
+    ) -> dict[str, Any]:
         """List workflow runs, optionally filtered."""
         logger.debug(
             f"list_runs called with filters={filters}, skip={skip}, limit={limit}"
@@ -100,7 +100,7 @@ class WorkflowDB:
         logger.debug(f"list_runs result: {result}")
         return result
 
-    def update_run(self, run_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:
+    def update_run(self, run_id: str, updates: dict[str, Any]) -> dict[str, Any]:
         """Update a workflow run by _key."""
         logger.debug(f"update_run called with run_id={run_id}, updates={updates}")
         updates["_key"] = run_id
@@ -113,7 +113,7 @@ class WorkflowDB:
         logger.debug(f"update_run result: {result}")
         return result
 
-    def delete_run(self, run_id: str) -> Dict[str, Any]:
+    def delete_run(self, run_id: str) -> dict[str, Any]:
         """Delete a workflow run by _key."""
         logger.debug(f"delete_run called with: {run_id}")
         result = self.db.delete_document(self.runs_col, run_id)

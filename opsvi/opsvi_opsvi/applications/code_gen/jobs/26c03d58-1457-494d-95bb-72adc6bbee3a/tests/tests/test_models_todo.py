@@ -1,6 +1,6 @@
 import pytest
-from pydantic import ValidationError
 from app.models import todo
+from pydantic import ValidationError
 
 
 @pytest.fixture
@@ -32,7 +32,6 @@ def test_title_must_not_be_blank_blank_string():
 
 
 import pytest
-from pydantic import ValidationError
 
 
 def test_todoitemcreate_rejects_blank_title():
@@ -46,7 +45,6 @@ def test_todoitemcreate_rejects_blank_title():
 
 
 import pytest
-from pydantic import ValidationError
 
 
 def test_todoitemupdate_allows_partial_and_validates_title():

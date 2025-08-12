@@ -7,7 +7,7 @@ dynamically loaded rules from project_rules.md. No more hardcoded patterns!
 
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import (
     LogConfig,
@@ -306,7 +306,7 @@ class DynamicAlignmentScanner:
             self.logger.log_error(e, "Failed to reload rules")
             raise
 
-    def get_rule_summary(self) -> Dict[str, Any]:
+    def get_rule_summary(self) -> dict[str, Any]:
         """Get a summary of currently loaded rules."""
         return {
             "total_rules": len(self.rule_config.rules),

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Start the code generation app with debug logging to files."""
 
-import sys
 import os
 import subprocess
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 
 def main():
@@ -39,7 +39,7 @@ def main():
     )
 
     print("🎯 Starting with these settings:")
-    print(f"   • Web Interface: http://localhost:8010")
+    print("   • Web Interface: http://localhost:8010")
     print(f"   • App Log File: {env['LOG_FILE']}")
     print(f"   • Celery Log File: {env['CELERY_LOG_FILE']}")
     print(f"   • Debug Level: {env['LOG_LEVEL']}")

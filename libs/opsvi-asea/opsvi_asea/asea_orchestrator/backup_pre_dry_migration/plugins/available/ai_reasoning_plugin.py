@@ -1,8 +1,6 @@
 from typing import List, Any, Optional, Dict
 import os
 import json
-import asyncio
-from datetime import datetime
 from openai import AsyncOpenAI
 from asea_orchestrator.plugins.base_plugin import BasePlugin, EventBus
 from asea_orchestrator.plugins.types import (
@@ -62,7 +60,7 @@ class AIReasoningPlugin(BasePlugin):
         try:
             self.client = AsyncOpenAI(api_key=api_key)
             self.responses_client = ResponsesAPIClient(api_key)
-        except TypeError as e:
+        except TypeError:
             # Fallback for older OpenAI versions
             self.client = AsyncOpenAI(api_key=api_key)
             self.responses_client = ResponsesAPIClient(api_key)
@@ -318,7 +316,7 @@ class AIReasoningPlugin(BasePlugin):
 
             try:
                 optimization_data = json.loads(response.output_text)
-            except json.JSONDecodeError as e:
+            except json.JSONDecodeError:
                 # Fallback for JSON parsing issues
                 raw_content = response.output_text
                 optimization_data = {
@@ -429,7 +427,7 @@ class AIReasoningPlugin(BasePlugin):
 
             try:
                 selection_data = json.loads(response.choices[0].message.content)
-            except json.JSONDecodeError as e:
+            except json.JSONDecodeError:
                 # Fallback for JSON parsing issues
                 raw_content = response.choices[0].message.content
                 selection_data = {
@@ -533,7 +531,7 @@ class AIReasoningPlugin(BasePlugin):
 
             try:
                 tuning_data = json.loads(response.choices[0].message.content)
-            except json.JSONDecodeError as e:
+            except json.JSONDecodeError:
                 # Fallback for JSON parsing issues
                 raw_content = response.choices[0].message.content
                 tuning_data = {
@@ -639,7 +637,7 @@ class AIReasoningPlugin(BasePlugin):
 
             try:
                 analysis_data = json.loads(response.choices[0].message.content)
-            except json.JSONDecodeError as e:
+            except json.JSONDecodeError:
                 # Fallback for JSON parsing issues
                 raw_content = response.choices[0].message.content
                 analysis_data = {
@@ -741,7 +739,7 @@ class AIReasoningPlugin(BasePlugin):
 
             try:
                 recovery_data = json.loads(response.choices[0].message.content)
-            except json.JSONDecodeError as e:
+            except json.JSONDecodeError:
                 # Fallback for JSON parsing issues
                 raw_content = response.choices[0].message.content
                 recovery_data = {
@@ -936,7 +934,7 @@ APPROACH:
             # Parse response from Responses API
             try:
                 parsed_data = json.loads(response.output_text)
-            except json.JSONDecodeError as e:
+            except json.JSONDecodeError:
                 # Fallback if JSON parsing fails
                 parsed_data = {
                     "error": "JSON parsing failed",

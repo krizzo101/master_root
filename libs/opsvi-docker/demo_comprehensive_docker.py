@@ -13,42 +13,40 @@ Demonstrates all capabilities of the opsvi-docker library:
 - Utility functions and best practices
 """
 
+import asyncio
 import os
 import sys
-import asyncio
-import time
 from datetime import datetime
-from typing import Dict, List, Any
 
 # Add the library to the path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 try:
     from opsvi_docker import (
-        DockerProvider,
-        DockerConfig,
-        ContainerConfig,
-        ImageConfig,
-        NetworkConfig,
-        VolumeConfig,
         ComposeConfig,
-        RegistryConfig,
-        DockerUtils,
+        ContainerConfig,
         ContainerUtils,
-        ImageUtils,
-        NetworkUtils,
-        VolumeUtils,
+        DockerConfig,
+        DockerProvider,
+        DockerUtils,
         HealthUtils,
+        ImageConfig,
+        ImageUtils,
         MonitoringUtils,
+        NetworkConfig,
+        NetworkUtils,
+        RegistryConfig,
         SecurityUtils,
+        VolumeConfig,
+        VolumeUtils,
         VulnerabilityScanner,
     )
     from opsvi_docker.schemas import (
+        ComposeUpRequest,
         ContainerCreateRequest,
         ImageBuildRequest,
         NetworkCreateRequest,
         VolumeCreateRequest,
-        ComposeUpRequest,
     )
 except ImportError as e:
     print(f"❌ Failed to import opsvi-docker components: {e}")
@@ -327,7 +325,7 @@ class DockerDemo:
                 # Connect container to network (if we have one)
                 if self.demo_containers:
                     container_id = self.demo_containers[0]
-                    print(f"🔌 Connecting container to network...")
+                    print("🔌 Connecting container to network...")
 
                     connected = await network_manager.connect_container(
                         network_info.id, container_id
@@ -480,7 +478,7 @@ class DockerDemo:
 
                 # Scan an image for vulnerabilities
                 if self.demo_images:
-                    print(f"\n🔍 Scanning image for vulnerabilities...")
+                    print("\n🔍 Scanning image for vulnerabilities...")
                     image_id = self.demo_images[0]
 
                     # Get image name for scanning
@@ -521,7 +519,7 @@ class DockerDemo:
 
             # Security scan of containers
             if self.demo_containers:
-                print(f"\n🔍 Security scanning containers...")
+                print("\n🔍 Security scanning containers...")
                 container_manager = self.docker_provider.container_manager
 
                 for container_id in self.demo_containers[:1]:  # Scan first container

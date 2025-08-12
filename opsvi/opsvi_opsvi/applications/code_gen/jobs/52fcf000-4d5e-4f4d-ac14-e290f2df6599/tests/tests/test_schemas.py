@@ -1,21 +1,16 @@
 import pytest
-from pydantic import ValidationError
 from app.schemas import (
-    UserCreate,
-    UserLogin,
-    UserRead,
+    GitHubAnalyzeRequest,
+    GitHubRepo,
+    Msg,
     ProjectCreate,
     ProjectUpdate,
-    ProjectRead,
-    FileRead,
-    ReportCreate,
-    ReportRead,
     Token,
     TokenData,
-    Msg,
-    GitHubRepo,
-    GitHubAnalyzeRequest,
+    UserCreate,
+    UserLogin,
 )
+from pydantic import ValidationError
 
 
 def test_user_create_validation_and_fields():

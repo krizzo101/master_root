@@ -9,7 +9,7 @@ import json
 import yaml
 from pathlib import Path
 from typing import Dict, Any, Optional, Union, List, Type
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from abc import ABC, abstractmethod
 
 

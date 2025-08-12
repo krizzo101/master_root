@@ -41,7 +41,7 @@ This module provides functionality to preprocess markdown content into a standar
 
 import re
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 
 from .base_preprocessor import BasePreprocessor
 

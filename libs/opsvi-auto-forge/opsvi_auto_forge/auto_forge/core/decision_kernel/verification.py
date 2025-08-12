@@ -3,7 +3,6 @@ import json
 import time
 import logging
 from typing import Any, Dict, Tuple, Optional, Union
-from datetime import datetime
 
 from pydantic import ValidationError, BaseModel
 from opsvi_auto_forge.infrastructure.monitoring.metrics.decision_metrics import (
@@ -12,7 +11,6 @@ from opsvi_auto_forge.infrastructure.monitoring.metrics.decision_metrics import 
     dk_verification_failure_total,
     dk_verifier_disagreement_total,
 )
-from opsvi_auto_forge.infrastructure.llm.openai_client import OpenAIResponsesClient
 from .models import Verification
 
 logger = logging.getLogger(__name__)
@@ -255,7 +253,7 @@ async def verify_decision_output(
     Returns:
         Verification result
     """
-    from .models import RouteDecision, Verification
+    from .models import Verification
 
     verifier = verifier_model or decision.verifier_model or "gpt-4o-mini"
 

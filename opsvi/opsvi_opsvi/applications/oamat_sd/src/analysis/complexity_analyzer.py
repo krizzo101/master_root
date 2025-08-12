@@ -6,7 +6,7 @@ Extracted from o3_master_agent.py for better modularity.
 """
 
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from src.applications.oamat_sd.src.agents.request_validation import ValidationResult
 from src.applications.oamat_sd.src.config.config_manager import ConfigManager
@@ -30,8 +30,8 @@ class ComplexityAnalyzer:
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
     async def analyze_complexity(
-        self, request: Dict[str, Any], validation_result: ValidationResult
-    ) -> Tuple[ComplexityAnalysisResult, List[ReasoningStep]]:
+        self, request: dict[str, Any], validation_result: ValidationResult
+    ) -> tuple[ComplexityAnalysisResult, list[ReasoningStep]]:
         """Perform deep complexity analysis with O3-level reasoning."""
 
         self.logger.info(
@@ -133,8 +133,8 @@ class ComplexityAnalyzer:
         return complexity_result, reasoning_steps
 
     def _analyze_complexity_dimensions(
-        self, request: Dict[str, Any], validation_result: ValidationResult
-    ) -> Dict[str, int]:
+        self, request: dict[str, Any], validation_result: ValidationResult
+    ) -> dict[str, int]:
         """Analyze complexity across six dimensions."""
         # NO FALLBACKS - use config default for missing description
         request_text = str(
@@ -217,7 +217,7 @@ class ComplexityAnalyzer:
             return "extreme"
 
     def _determine_execution_strategy(
-        self, overall_score: float, complexity_factors: Dict[str, int]
+        self, overall_score: float, complexity_factors: dict[str, int]
     ) -> str:
         """Determine optimal execution strategy - NO HARDCODED THRESHOLDS"""
         if (
@@ -239,8 +239,8 @@ class ComplexityAnalyzer:
             return "multi_agent"
 
     def _generate_agent_requirements(
-        self, strategy: str, complexity_factors: Dict[str, int]
-    ) -> Dict[str, Any]:
+        self, strategy: str, complexity_factors: dict[str, int]
+    ) -> dict[str, Any]:
         """Generate agent requirements based on strategy."""
         if strategy == "simple":
             return {

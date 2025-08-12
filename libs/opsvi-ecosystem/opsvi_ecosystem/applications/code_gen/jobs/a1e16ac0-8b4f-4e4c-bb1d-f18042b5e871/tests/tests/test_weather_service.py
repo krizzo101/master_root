@@ -1,6 +1,6 @@
-import pytest
-from app.weather_service import WeatherService
 from unittest.mock import patch
+
+from app.weather_service import WeatherService
 
 MOCK_API_RESPONSE = {
     "name": "Testville",

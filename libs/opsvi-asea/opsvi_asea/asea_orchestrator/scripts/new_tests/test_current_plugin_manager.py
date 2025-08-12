@@ -30,7 +30,7 @@ def main():
         # Test plugin discovery
         print("\n2. Discovering plugins...")
         manager.discover_plugins()
-        print(f"✓ Plugin discovery completed")
+        print("✓ Plugin discovery completed")
 
         # List discovered plugins
         print("\n3. Available plugins:")

@@ -10,8 +10,6 @@ Base API client for LLM providers.
 This module defines the base APIClient class that all provider-specific clients must implement.
 """
 
-from typing import Optional, Dict, Any, List
-
 
 class APIClient:
     """Base class for API clients"""

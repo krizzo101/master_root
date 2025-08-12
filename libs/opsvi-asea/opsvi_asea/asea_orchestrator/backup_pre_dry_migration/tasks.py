@@ -2,7 +2,6 @@
 from dataclasses import asdict
 
 from .celery_app import app
-from .plugins.plugin_manager import PluginManager
 from .plugins.types import ExecutionContext, PluginConfig, PluginResult
 
 

@@ -7,8 +7,6 @@ This system prevents mistakes like forgetting to update database references
 or project rules when making infrastructure changes.
 """
 
-import json
-import os
 from datetime import datetime
 from typing import Dict, List, Any
 

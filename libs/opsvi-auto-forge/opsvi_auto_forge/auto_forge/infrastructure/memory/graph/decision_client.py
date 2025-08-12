@@ -7,14 +7,10 @@ Cited in AUDIT_action_plan.md: A4 steps & acceptance.
 from __future__ import annotations
 import logging
 from typing import List, Dict, Any, Optional
-from datetime import datetime
-from uuid import UUID
 from neo4j import GraphDatabase, Session
-from opsvi_auto_forge.core.decision_kernel.evidence import Claim, Evidence
+from opsvi_auto_forge.core.decision_kernel.evidence import Evidence
 from opsvi_auto_forge.core.decision_kernel.models import (
     DecisionRecord,
-    RouteDecision,
-    Verification,
 )
 from opsvi_auto_forge.infrastructure.memory.graph.queries_decision import (
     create_decision_evidence_query,

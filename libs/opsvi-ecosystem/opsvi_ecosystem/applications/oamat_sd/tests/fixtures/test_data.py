@@ -6,7 +6,6 @@ sample requests, complexity analysis scenarios, and expected outputs.
 """
 
 from dataclasses import dataclass
-from typing import Dict, List
 
 
 @dataclass
@@ -16,7 +15,7 @@ class TestRequest:
     text: str
     expected_complexity_range: tuple
     expected_strategy: str
-    expected_agents: List[str]
+    expected_agents: list[str]
     description: str
 
 
@@ -25,7 +24,7 @@ class ComplexityTestCase:
     """Test case for complexity analysis validation"""
 
     request: str
-    expected_factors: Dict[str, int]
+    expected_factors: dict[str, int]
     expected_score_range: tuple
     expected_strategy: str
     rationale: str

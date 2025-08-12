@@ -1,13 +1,14 @@
 """
 FastAPI router for todo CRUD endpoints.
 """
-from typing import List
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.todo import TodoCreate, TodoUpdate, TodoResponse
+
 from app.crud.todo import TodoDAL
 from app.db.session import get_session
-import logging
+from app.schemas.todo import TodoCreate, TodoResponse, TodoUpdate
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ async def create_todo(todo_create: TodoCreate, dal: TodoDAL = Depends(get_todo_d
 
 @router.get(
     "/",
-    response_model=List[TodoResponse],
+    response_model=list[TodoResponse],
     status_code=status.HTTP_200_OK,
     summary="List all todo items",
 )

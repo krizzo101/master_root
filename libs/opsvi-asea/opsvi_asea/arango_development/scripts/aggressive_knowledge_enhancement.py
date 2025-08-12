@@ -13,7 +13,7 @@ import json
 import time
 import re
 from datetime import datetime, timezone
-from typing import Dict, List, Any, Set, Tuple
+from typing import Dict, List, Any, Tuple
 from arango import ArangoClient
 
 # ArangoDB Connection Configuration
@@ -370,7 +370,7 @@ class AggressiveKnowledgeEnhancer:
                                 )
                                 created += 1
                                 strategies["type_based"] += 1
-                            except Exception as e:
+                            except Exception:
                                 continue
 
         return created
@@ -417,7 +417,7 @@ class AggressiveKnowledgeEnhancer:
                                 )
                                 created += 1
                                 strategies["category_based"] += 1
-                            except Exception as e:
+                            except Exception:
                                 continue
 
         return created
@@ -468,7 +468,7 @@ class AggressiveKnowledgeEnhancer:
                             )
                             created += 1
                             strategies["semantic_similarity"] += 1
-                        except Exception as e:
+                        except Exception:
                             continue
 
         return created
@@ -510,7 +510,7 @@ class AggressiveKnowledgeEnhancer:
                             )
                             created += 1
                             strategies["hierarchical"] += 1
-                        except Exception as e:
+                        except Exception:
                             continue
 
         return created
@@ -568,7 +568,7 @@ class AggressiveKnowledgeEnhancer:
                             )
                             created += 1
                             strategies["domain_knowledge"] += 1
-                        except Exception as e:
+                        except Exception:
                             continue
 
         return created
@@ -620,7 +620,7 @@ class AggressiveKnowledgeEnhancer:
                 "additional_relationships_created": additional_needed,
             }
 
-            print(f"Validation complete:")
+            print("Validation complete:")
             print(f"  Semantic coverage: {semantic_coverage * 100:.1f}% (target: 95%)")
             print(f"  Relationship density: {relationship_density:.2f} (target: 3.0)")
 
@@ -723,7 +723,7 @@ class AggressiveKnowledgeEnhancer:
                 "metrics_collected": True,
             }
 
-            print(f"Final Enhancement Results:")
+            print("Final Enhancement Results:")
             print(f"  Semantic Coverage: {semantic_coverage * 100:.1f}%")
             print(f"  Relationship Density: {relationship_density:.2f}")
             print(

@@ -1,8 +1,8 @@
-import pytest
-from backend.files import upload_file, download_file
-
 import io
 from unittest.mock import AsyncMock
+
+import pytest
+from backend.files import download_file, upload_file
 
 
 @pytest.mark.asyncio

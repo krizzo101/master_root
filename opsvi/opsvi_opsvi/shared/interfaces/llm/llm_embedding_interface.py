@@ -11,7 +11,6 @@ Version: Referenced as of July 2024
 """
 
 import logging
-from typing import Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +24,8 @@ class LLMEmbeddingInterface:
     def __init__(
         self,
         provider: str,
-        api_key: Optional[str] = None,
-        model: Optional[str] = None,
+        api_key: str | None = None,
+        model: str | None = None,
         **kwargs,
     ):
         """
@@ -114,7 +113,7 @@ class LLMEmbeddingInterface:
             logger.error(f"Completion failed: {e}")
             raise
 
-    def chat(self, messages: List[Dict[str, str]], **kwargs) -> str:
+    def chat(self, messages: list[dict[str, str]], **kwargs) -> str:
         """
         Generate a chat response given a list of messages (role/content dicts).
         See:
@@ -151,7 +150,7 @@ class LLMEmbeddingInterface:
             logger.error(f"Chat failed: {e}")
             raise
 
-    def embed(self, texts: Union[str, List[str]], **kwargs) -> List[List[float]]:
+    def embed(self, texts: str | list[str], **kwargs) -> list[list[float]]:
         """
         Generate embeddings for one or more texts.
         See:
@@ -187,10 +186,10 @@ class LLMEmbeddingInterface:
     async def acomplete(self, prompt: str, **kwargs) -> str:
         raise NotImplementedError("Async completion not implemented.")
 
-    async def achat(self, messages: List[Dict[str, str]], **kwargs) -> str:
+    async def achat(self, messages: list[dict[str, str]], **kwargs) -> str:
         raise NotImplementedError("Async chat not implemented.")
 
-    async def aembed(self, texts: Union[str, List[str]], **kwargs) -> List[List[float]]:
+    async def aembed(self, texts: str | list[str], **kwargs) -> list[list[float]]:
         raise NotImplementedError("Async embedding not implemented.")
 
 

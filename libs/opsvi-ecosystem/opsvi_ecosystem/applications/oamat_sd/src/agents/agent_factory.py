@@ -6,12 +6,12 @@ create_react_agent. Handles agent configuration, tool assignment, and context ma
 """
 
 import asyncio
+import logging
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-import logging
-from typing import Any, Dict, List, Optional
-import uuid
+from typing import Any
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
@@ -53,12 +53,12 @@ class AgentConfiguration:
     """Configuration for creating an agent."""
 
     role: AgentRole
-    tools: List[str]
+    tools: list[str]
     system_prompt: str
-    context: Dict[str, Any] = field(default_factory=dict)
-    memory_config: Dict[str, Any] = field(default_factory=dict)
-    performance_config: Dict[str, Any] = field(default_factory=dict)
-    specialization_params: Dict[str, Any] = field(default_factory=dict)
+    context: dict[str, Any] = field(default_factory=dict)
+    memory_config: dict[str, Any] = field(default_factory=dict)
+    performance_config: dict[str, Any] = field(default_factory=dict)
+    specialization_params: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -70,10 +70,10 @@ class AgentInstance:
     configuration: AgentConfiguration
     status: AgentStatus
     created_at: datetime
-    tools_assigned: List[str]
-    context: Dict[str, Any] = field(default_factory=dict)
-    performance_metrics: Dict[str, Any] = field(default_factory=dict)
-    agent_object: Optional[Any] = None  # The actual LangGraph agent
+    tools_assigned: list[str]
+    context: dict[str, Any] = field(default_factory=dict)
+    performance_metrics: dict[str, Any] = field(default_factory=dict)
+    agent_object: Any | None = None  # The actual LangGraph agent
 
 
 @dataclass
@@ -81,10 +81,10 @@ class AgentCreationRequest:
     """Request for creating a new agent."""
 
     role: AgentRole
-    context: Dict[str, Any]
-    tools: List[str] = field(default_factory=list)
-    specialization_requirements: Dict[str, Any] = field(default_factory=dict)
-    performance_requirements: Dict[str, Any] = field(default_factory=dict)
+    context: dict[str, Any]
+    tools: list[str] = field(default_factory=list)
+    specialization_requirements: dict[str, Any] = field(default_factory=dict)
+    performance_requirements: dict[str, Any] = field(default_factory=dict)
 
 
 class DynamicAgentFactory:
@@ -93,16 +93,16 @@ class DynamicAgentFactory:
     def __init__(self, tool_registry=None):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.tool_registry = tool_registry
-        self.active_agents: Dict[str, AgentInstance] = {}
+        self.active_agents: dict[str, AgentInstance] = {}
         self.agent_templates = self._initialize_agent_templates()
         self.system_prompts = self._initialize_system_prompts()
 
-    def _initialize_agent_templates(self) -> Dict[AgentRole, Dict[str, Any]]:
+    def _initialize_agent_templates(self) -> dict[AgentRole, dict[str, Any]]:
         """NO FALLBACKS RULE: Templates deprecated - agents must be created with explicit specifications."""
         # Templates removed to enforce O3-first architecture
         return {}
 
-    def _initialize_system_prompts(self) -> Dict[AgentRole, str]:
+    def _initialize_system_prompts(self) -> dict[AgentRole, str]:
         """Initialize system prompts for different agent roles."""
         return {
             AgentRole.GENERALIST: """
@@ -347,7 +347,7 @@ security without compromising functionality.
             )
             raise RuntimeError(error_msg)
 
-    def create_research_agent(self, context: Dict[str, Any]) -> AgentInstance:
+    def create_research_agent(self, context: dict[str, Any]) -> AgentInstance:
         """Create a specialized research agent."""
         creation_request = AgentCreationRequest(
             role=AgentRole.RESEARCHER,
@@ -364,7 +364,7 @@ security without compromising functionality.
         finally:
             loop.close()
 
-    def create_implementation_agent(self, context: Dict[str, Any]) -> AgentInstance:
+    def create_implementation_agent(self, context: dict[str, Any]) -> AgentInstance:
         """Create a specialized implementation agent."""
         creation_request = AgentCreationRequest(
             role=AgentRole.IMPLEMENTER,
@@ -380,7 +380,7 @@ security without compromising functionality.
         finally:
             loop.close()
 
-    def create_analysis_agent(self, context: Dict[str, Any]) -> AgentInstance:
+    def create_analysis_agent(self, context: dict[str, Any]) -> AgentInstance:
         """Create a specialized analysis agent."""
         creation_request = AgentCreationRequest(
             role=AgentRole.TECHNICAL_SPECIALIST,
@@ -396,7 +396,7 @@ security without compromising functionality.
         finally:
             loop.close()
 
-    def create_synthesis_agent(self, context: Dict[str, Any]) -> AgentInstance:
+    def create_synthesis_agent(self, context: dict[str, Any]) -> AgentInstance:
         """Create a specialized synthesis agent."""
         creation_request = AgentCreationRequest(
             role=AgentRole.INTEGRATOR,
@@ -412,7 +412,7 @@ security without compromising functionality.
         finally:
             loop.close()
 
-    def create_coding_agent(self, context: Dict[str, Any]) -> AgentInstance:
+    def create_coding_agent(self, context: dict[str, Any]) -> AgentInstance:
         """Create a specialized coding agent."""
         creation_request = AgentCreationRequest(
             role=AgentRole.IMPLEMENTER,
@@ -429,8 +429,8 @@ security without compromising functionality.
             loop.close()
 
     async def create_multiple_agents(
-        self, requests: List[AgentCreationRequest]
-    ) -> List[AgentInstance]:
+        self, requests: list[AgentCreationRequest]
+    ) -> list[AgentInstance]:
         """Create multiple agents concurrently."""
         self.logger.info(f"Creating {len(requests)} agents concurrently")
 
@@ -453,17 +453,17 @@ security without compromising functionality.
 
         return successful_agents
 
-    def get_agent(self, agent_id: str) -> Optional[AgentInstance]:
+    def get_agent(self, agent_id: str) -> AgentInstance | None:
         """Retrieve an agent by ID."""
         return self.active_agents.get(
             agent_id
         )  # Returns None if not found - acceptable for lookup
 
-    def list_agents(self) -> List[AgentInstance]:
+    def list_agents(self) -> list[AgentInstance]:
         """List all active agents."""
         return list(self.active_agents.values())
 
-    def get_agents_by_role(self, role: AgentRole) -> List[AgentInstance]:
+    def get_agents_by_role(self, role: AgentRole) -> list[AgentInstance]:
         """Get all agents with a specific role."""
         return [agent for agent in self.active_agents.values() if agent.role == role]
 
@@ -474,7 +474,7 @@ security without compromising functionality.
             return True
         return False
 
-    def configure_agent_tools(self, agent_id: str, tools: List[str]) -> bool:
+    def configure_agent_tools(self, agent_id: str, tools: list[str]) -> bool:
         """Update agent tool configuration."""
         if agent_id in self.active_agents:
             agent = self.active_agents[agent_id]
@@ -484,7 +484,7 @@ security without compromising functionality.
         return False
 
     def update_agent_context(
-        self, agent_id: str, context_update: Dict[str, Any]
+        self, agent_id: str, context_update: dict[str, Any]
     ) -> bool:
         """Update agent context."""
         if agent_id in self.active_agents:
@@ -494,7 +494,7 @@ security without compromising functionality.
             return True
         return False
 
-    def get_agent_performance_metrics(self, agent_id: str) -> Optional[Dict[str, Any]]:
+    def get_agent_performance_metrics(self, agent_id: str) -> dict[str, Any] | None:
         """Get performance metrics for an agent."""
         agent = self.active_agents.get(agent_id)
         if agent:
@@ -515,7 +515,7 @@ security without compromising functionality.
         self.logger.info(f"Cleaned up {len(completed_agents)} completed agents")
         return len(completed_agents)
 
-    def get_factory_status(self) -> Dict[str, Any]:
+    def get_factory_status(self) -> dict[str, Any]:
         """Get factory status and statistics."""
         status_counts = {}
         role_counts = {}

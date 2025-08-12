@@ -5,11 +5,11 @@ This engine solves the AI context reset problem by compressing conversations int
 essential insights that can rapidly restore shared understanding in new AI instances.
 """
 
+import json
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from enum import Enum
-import json
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class InsightCriticality(Enum):
@@ -41,13 +41,13 @@ class ContextPackage:
     original_length: int  # Original conversation tokens
     compressed_length: int  # Compressed package tokens
     compression_ratio: float
-    critical_insights: List[CompressedInsight]
-    important_insights: List[CompressedInsight]
-    useful_insights: List[CompressedInsight]
-    shared_understanding: Dict[str, Any]  # Core concepts both parties understood
-    decisions_made: List[Dict[str, Any]]  # Key decisions and rationale
-    project_state: Dict[str, Any]  # Current state of work
-    next_steps: List[str]  # What should happen next
+    critical_insights: list[CompressedInsight]
+    important_insights: list[CompressedInsight]
+    useful_insights: list[CompressedInsight]
+    shared_understanding: dict[str, Any]  # Core concepts both parties understood
+    decisions_made: list[dict[str, Any]]  # Key decisions and rationale
+    project_state: dict[str, Any]  # Current state of work
+    next_steps: list[str]  # What should happen next
     created_at: str
     restoration_instructions: str  # How to use this package
 
@@ -66,8 +66,8 @@ class ContextCompressionEngine:
         ]
 
     def analyze_conversation_for_compression(
-        self, conversation_components: List[Dict]
-    ) -> Dict[str, Any]:
+        self, conversation_components: list[dict]
+    ) -> dict[str, Any]:
         """Analyze conversation to identify what can be compressed vs what must be preserved"""
 
         analysis = {
@@ -99,7 +99,7 @@ class ContextCompressionEngine:
         return analysis
 
     def compress_conversation(
-        self, conversation_components: List[Dict], target_compression_ratio: float = 0.3
+        self, conversation_components: list[dict], target_compression_ratio: float = 0.3
     ) -> ContextPackage:
         """Compress conversation to essential insights with target compression ratio"""
 
@@ -167,7 +167,7 @@ class ContextCompressionEngine:
             restoration_instructions=restoration_instructions,
         )
 
-    def _group_similar_content(self, components: List[Dict]) -> Dict[str, List[Dict]]:
+    def _group_similar_content(self, components: list[dict]) -> dict[str, list[dict]]:
         """Group similar conversation components for redundancy analysis"""
         groups = {
             "explanations": [],
@@ -197,7 +197,7 @@ class ContextCompressionEngine:
 
         return groups
 
-    def _analyze_redundancy(self, similar_items: List[Dict]) -> Dict[str, Any]:
+    def _analyze_redundancy(self, similar_items: list[dict]) -> dict[str, Any]:
         """Analyze redundancy within similar content items"""
         if len(similar_items) <= 1:
             return {"can_compress": False, "reason": "insufficient_items"}
@@ -225,7 +225,7 @@ class ContextCompressionEngine:
             ),
         }
 
-    def _assess_criticality(self, component: Dict) -> InsightCriticality:
+    def _assess_criticality(self, component: dict) -> InsightCriticality:
         """Assess how critical a conversation component is for context restoration"""
         content = component.get("content", "").lower()
 
@@ -275,8 +275,8 @@ class ContextCompressionEngine:
         return InsightCriticality.USEFUL
 
     def _extract_insights_by_criticality(
-        self, components: List[Dict], criticality: InsightCriticality
-    ) -> List[CompressedInsight]:
+        self, components: list[dict], criticality: InsightCriticality
+    ) -> list[CompressedInsight]:
         """Extract insights of specific criticality level"""
         insights = []
 
@@ -296,7 +296,7 @@ class ContextCompressionEngine:
 
         return insights
 
-    def _extract_shared_understanding(self, components: List[Dict]) -> Dict[str, Any]:
+    def _extract_shared_understanding(self, components: list[dict]) -> dict[str, Any]:
         """Extract concepts and understanding both parties shared"""
         shared_concepts = {}
 
@@ -324,7 +324,7 @@ class ContextCompressionEngine:
 
         return shared_concepts
 
-    def _extract_key_decisions(self, components: List[Dict]) -> List[Dict[str, Any]]:
+    def _extract_key_decisions(self, components: list[dict]) -> list[dict[str, Any]]:
         """Extract key decisions made during conversation"""
         decisions = []
 
@@ -353,7 +353,7 @@ class ContextCompressionEngine:
 
         return decisions
 
-    def _determine_project_state(self, components: List[Dict]) -> Dict[str, Any]:
+    def _determine_project_state(self, components: list[dict]) -> dict[str, Any]:
         """Determine current state of the project/work"""
         state = {
             "completed_tasks": [],
@@ -379,7 +379,7 @@ class ContextCompressionEngine:
 
         return state
 
-    def _identify_next_steps(self, components: List[Dict]) -> List[str]:
+    def _identify_next_steps(self, components: list[dict]) -> list[str]:
         """Identify what should happen next"""
         next_steps = []
 
@@ -403,9 +403,9 @@ class ContextCompressionEngine:
 
     def _generate_restoration_instructions(
         self,
-        critical_insights: List[CompressedInsight],
-        important_insights: List[CompressedInsight],
-        shared_understanding: Dict[str, Any],
+        critical_insights: list[CompressedInsight],
+        important_insights: list[CompressedInsight],
+        shared_understanding: dict[str, Any],
     ) -> str:
         """Generate instructions for how to use this context package"""
 
@@ -442,12 +442,12 @@ vs full conversation history.
         # Keep the most information-dense sentences
         return ". ".join(sentences[:2]) if len(sentences) > 2 else content
 
-    def _needs_context(self, component: Dict) -> bool:
+    def _needs_context(self, component: dict) -> bool:
         """Determine if this component needs surrounding context"""
         content = component.get("content", "").lower()
         return any(word in content for word in ["this", "that", "it", "which"])
 
-    def _estimate_tokens_saved(self, component: Dict) -> int:
+    def _estimate_tokens_saved(self, component: dict) -> int:
         """Estimate tokens saved by compressing this component"""
         original_length = len(component.get("content", "").split())
         compressed_length = len(
@@ -466,11 +466,11 @@ vs full conversation history.
         else:
             return len(str(data).split())
 
-    def _estimate_insight_tokens(self, insights: List[CompressedInsight]) -> int:
+    def _estimate_insight_tokens(self, insights: list[CompressedInsight]) -> int:
         """Estimate tokens for compressed insights"""
         return sum(len(insight.content.split()) for insight in insights)
 
-    def _extract_concept_from_agreement(self, content: str) -> Optional[str]:
+    def _extract_concept_from_agreement(self, content: str) -> str | None:
         """Extract the concept being agreed upon"""
         # Simple extraction - could be enhanced with NLP
         words = content.split()
@@ -493,7 +493,7 @@ vs full conversation history.
                 return parts[1][:100] + "..." if len(parts[1]) > 100 else parts[1]
         return ""
 
-    def _extract_completed_task(self, content: str) -> Optional[str]:
+    def _extract_completed_task(self, content: str) -> str | None:
         """Extract completed task from content"""
         if "completed" in content:
             words = content.split()
@@ -502,7 +502,7 @@ vs full conversation history.
                 return " ".join(words[max(0, idx - 3) : idx + 3])
         return None
 
-    def _extract_current_focus(self, content: str) -> Optional[str]:
+    def _extract_current_focus(self, content: str) -> str | None:
         """Extract current focus from content"""
         focus_indicators = ["working on", "currently", "focusing on"]
         for indicator in focus_indicators:
@@ -515,7 +515,7 @@ vs full conversation history.
                 )
         return None
 
-    def _extract_next_step(self, content: str) -> Optional[str]:
+    def _extract_next_step(self, content: str) -> str | None:
         """Extract next step from content"""
         step_indicators = ["next step", "should do", "need to"]
         for indicator in step_indicators:
@@ -538,7 +538,7 @@ vs full conversation history.
             print(f"Error saving context package: {e}")
             return False
 
-    def load_context_package(self, filepath: str) -> Optional[ContextPackage]:
+    def load_context_package(self, filepath: str) -> ContextPackage | None:
         """Load compressed context package from file"""
         try:
             with open(filepath) as f:

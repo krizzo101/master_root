@@ -1,9 +1,9 @@
 """
 Pydantic schemas for Todo models (request/response validation & serialization)
 """
-from pydantic import BaseModel, Field, validator
-from typing import Optional
 from datetime import datetime
+
+from pydantic import BaseModel, Field, validator
 
 
 class TodoBase(BaseModel):
@@ -16,10 +16,10 @@ class TodoCreate(TodoBase):
 
 
 class TodoUpdate(BaseModel):
-    description: Optional[str] = Field(
+    description: str | None = Field(
         None, min_length=1, max_length=256, example="Do laundry"
     )
-    is_completed: Optional[bool] = Field(None, example=True)
+    is_completed: bool | None = Field(None, example=True)
 
     @validator("description")
     def validate_description(cls, v):

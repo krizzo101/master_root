@@ -1,17 +1,15 @@
 """Health check endpoints for production monitoring."""
 
-import asyncio
 import time
 import psutil
 from datetime import datetime, timezone
-from typing import Dict, Any, List
+from typing import Dict, Any
 from fastapi import APIRouter, Depends, HTTPException
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
-from fastapi.responses import Response, JSONResponse
+from fastapi.responses import Response
 
 from opsvi_auto_forge.infrastructure.monitoring.metrics.system_metrics import (
     update_health_status,
-    SYSTEM_UP,
     CPU_USAGE_PERCENT,
     MEMORY_USAGE_PERCENT,
     DB_CONNECTION_POOL_ACTIVE,
@@ -229,10 +227,6 @@ class HealthChecker:
 
         # Check task execution service
         try:
-            from opsvi_auto_forge.application.orchestrator.task_execution_engine import (
-                TaskExecutionEngine,
-            )
-
             # Basic check - could be enhanced with actual engine status
             services["task_execution"] = {"status": "healthy", "engine_available": True}
         except Exception as e:

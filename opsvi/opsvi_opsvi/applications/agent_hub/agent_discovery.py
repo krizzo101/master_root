@@ -6,14 +6,14 @@ for AI agent discovery and inter-agent communication.
 Based on OWASP ANS v1.0 and Agent Protocol standards.
 """
 
-from datetime import datetime, timezone
 import json
 import logging
-from typing import Any, Dict, List, Optional
 import uuid
+from datetime import datetime, timezone
+from typing import Any
 
-from fastapi import FastAPI, HTTPException
 import httpx
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -21,35 +21,35 @@ logger = logging.getLogger(__name__)
 
 # Agent Protocol Models (standardized schemas)
 class TaskInput(BaseModel):
-    input: Optional[str] = None
-    additional_input: Optional[Dict[str, Any]] = {}
+    input: str | None = None
+    additional_input: dict[str, Any] | None = {}
 
 
 class Task(BaseModel):
     task_id: str
-    input: Optional[str] = None
-    additional_input: Optional[Dict[str, Any]] = {}
-    artifacts: List[Dict] = []
-    steps: List[Dict] = []
+    input: str | None = None
+    additional_input: dict[str, Any] | None = {}
+    artifacts: list[dict] = []
+    steps: list[dict] = []
     created_at: str
     status: str = "created"
 
 
 class StepInput(BaseModel):
-    input: Optional[str] = None
-    additional_input: Optional[Dict[str, Any]] = {}
+    input: str | None = None
+    additional_input: dict[str, Any] | None = {}
 
 
 class Step(BaseModel):
     task_id: str
     step_id: str
-    input: Optional[str] = None
-    additional_input: Optional[Dict[str, Any]] = {}
-    name: Optional[str] = None
+    input: str | None = None
+    additional_input: dict[str, Any] | None = {}
+    name: str | None = None
     status: str = "created"
-    output: Optional[str] = None
-    additional_output: Optional[Dict[str, Any]] = {}
-    artifacts: List[Dict] = []
+    output: str | None = None
+    additional_output: dict[str, Any] | None = {}
+    artifacts: list[dict] = []
     is_last: bool = False
     created_at: str
 
@@ -59,9 +59,9 @@ class AgentCapability(BaseModel):
 
     name: str
     description: str
-    input_schema: Dict[str, Any]
-    output_schema: Dict[str, Any]
-    tags: List[str] = []
+    input_schema: dict[str, Any]
+    output_schema: dict[str, Any]
+    tags: list[str] = []
     version: str = "1.0"
 
 
@@ -74,10 +74,10 @@ class AgentManifest(BaseModel):
     version: str
     provider: str
     protocol: str = "agent-protocol"
-    endpoints: Dict[str, str]
-    capabilities: List[AgentCapability]
-    authentication: Dict[str, Any] = {}
-    metadata: Dict[str, Any] = {}
+    endpoints: dict[str, str]
+    capabilities: list[AgentCapability]
+    authentication: dict[str, Any] = {}
+    metadata: dict[str, Any] = {}
 
 
 class AgentDiscoveryService:
@@ -85,9 +85,9 @@ class AgentDiscoveryService:
 
     def __init__(self, app: FastAPI):
         self.app = app
-        self.tasks: Dict[str, Task] = {}
-        self.steps: Dict[str, Dict[str, Step]] = {}  # task_id -> step_id -> step
-        self.agent_registry: Dict[str, AgentManifest] = {}
+        self.tasks: dict[str, Task] = {}
+        self.steps: dict[str, dict[str, Step]] = {}  # task_id -> step_id -> step
+        self.agent_registry: dict[str, AgentManifest] = {}
         self.setup_routes()
 
     def setup_routes(self):
@@ -205,7 +205,7 @@ class AgentDiscoveryService:
             return self._generate_manifest()
 
         @self.app.get("/discovery/capabilities")
-        async def get_capabilities() -> List[AgentCapability]:
+        async def get_capabilities() -> list[AgentCapability]:
             """List agent capabilities"""
             return self._get_capabilities()
 
@@ -216,16 +216,16 @@ class AgentDiscoveryService:
             return {"status": "registered", "agent_id": manifest.agent_id}
 
         @self.app.get("/discovery/agents")
-        async def list_agents() -> List[AgentManifest]:
+        async def list_agents() -> list[AgentManifest]:
             """List known agents"""
             return list(self.agent_registry.values())
 
         @self.app.get("/discovery/agents/search")
         async def search_agents(
-            capability: Optional[str] = None,
-            protocol: Optional[str] = None,
-            provider: Optional[str] = None,
-        ) -> List[AgentManifest]:
+            capability: str | None = None,
+            protocol: str | None = None,
+            provider: str | None = None,
+        ) -> list[AgentManifest]:
             """Search agents by capabilities"""
             agents = list(self.agent_registry.values())
 
@@ -280,7 +280,7 @@ class AgentDiscoveryService:
                     status_code=400, detail=f"Invalid ANS name: {str(e)}"
                 )
 
-    async def _execute_agent_step(self, task_id: str, step: Step) -> Dict[str, Any]:
+    async def _execute_agent_step(self, task_id: str, step: Step) -> dict[str, Any]:
         """Execute step using our agent hub with capability-based routing"""
         input_text = step.input or ""
 
@@ -461,7 +461,7 @@ class AgentDiscoveryService:
             },
         )
 
-    def _get_capabilities(self) -> List[AgentCapability]:
+    def _get_capabilities(self) -> list[AgentCapability]:
         """Get list of agent capabilities"""
         return [
             AgentCapability(

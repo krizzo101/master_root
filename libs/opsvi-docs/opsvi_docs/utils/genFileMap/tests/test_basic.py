@@ -9,7 +9,6 @@ correctly and its core functionality is accessible.
 import os
 import sys
 import unittest
-from pathlib import Path
 
 # Add the src directory to the path for importing the package
 sys.path.insert(

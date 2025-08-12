@@ -1,7 +1,7 @@
 import pytest
+from app.middleware import error_handling
 from fastapi import FastAPI
 from starlette.testclient import TestClient
-from app.middleware import error_handling
 
 
 @pytest.fixture

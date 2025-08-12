@@ -1,9 +1,9 @@
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import logging
 import os
-from pathlib import Path
 import time
-from typing import Any, Dict, List
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+from typing import Any
 
 from shared.interfaces.database.arango_interface import DirectArangoDB
 
@@ -46,7 +46,7 @@ class ConceptualSynthesisAgent:
     def __init__(
         self,
         atomic_dir: str,
-        arango_config: Dict[str, Any],
+        arango_config: dict[str, Any],
         collection_prefix: str = "specstory",
     ):
         self.atomic_dir = Path(atomic_dir)
@@ -96,7 +96,7 @@ class ConceptualSynthesisAgent:
         self.persist_conceptual_knowledge(conceptual_nodes, conceptual_edges)
         self.logger.info(f"Completed conceptual synthesis for {atomic_path}")
 
-    def _load_atomic_data(self, atomic_path: Path) -> Dict[str, Any]:
+    def _load_atomic_data(self, atomic_path: Path) -> dict[str, Any]:
         try:
             import json
 
@@ -107,15 +107,15 @@ class ConceptualSynthesisAgent:
             return {"nodes": [], "edges": []}
 
     def synthesize_conceptual_knowledge(
-        self, atomic_nodes: List[Dict], atomic_edges: List[Dict]
-    ) -> (List[Dict], List[Dict]):
+        self, atomic_nodes: list[dict], atomic_edges: list[dict]
+    ) -> (list[dict], list[dict]):
         """
         Aggregate, cluster, and interpret atomic data to form conceptual nodes/edges.
         Implements advanced synthesis logic for decisions, blockers, Q&A, themes, pivots, and advanced relationships.
         Returns conceptual_nodes, conceptual_edges.
         """
-        from collections import Counter, defaultdict
         import re
+        from collections import Counter, defaultdict
 
         conceptual_nodes = []
         conceptual_edges = []
@@ -453,8 +453,8 @@ class ConceptualSynthesisAgent:
     def validate_and_log_evidence(
         self,
         atomic_path: Path,
-        conceptual_nodes: List[Dict],
-        conceptual_edges: List[Dict],
+        conceptual_nodes: list[dict],
+        conceptual_edges: list[dict],
     ):
         """Validate conceptual structures and log evidence for traceability."""
         evidence_path = (
@@ -472,7 +472,7 @@ class ConceptualSynthesisAgent:
             self.logger.error(f"Failed to log evidence: {e}")
 
     def persist_conceptual_knowledge(
-        self, conceptual_nodes: List[Dict], conceptual_edges: List[Dict]
+        self, conceptual_nodes: list[dict], conceptual_edges: list[dict]
     ):
         """Persist conceptual nodes/edges in ArangoDB, always linking to atomic evidence."""
         if conceptual_nodes:
@@ -484,13 +484,13 @@ class ConceptualSynthesisAgent:
                 f"{self.collection_prefix}_conceptual_relationships", conceptual_edges
             )
 
-    def post_batch_actions(self, files: List[Path]):
+    def post_batch_actions(self, files: list[Path]):
         """Trigger review, documentation/diagram updates, and self-improvement after each batch."""
         self.trigger_distributed_review(files)
         self.trigger_documentation_and_diagram_updates(files)
         self.reflect_and_log_self_improvement(files)
 
-    def trigger_distributed_review(self, files: List[Path]):
+    def trigger_distributed_review(self, files: list[Path]):
         # Placeholder: Integrate with collab tools/agents for distributed review/validation
         review_log = self.atomic_dir / "conceptual_synthesis_collab_review.log"
         try:
@@ -502,7 +502,7 @@ class ConceptualSynthesisAgent:
         except Exception as e:
             self.logger.error(f"Failed to log collab_tools review: {e}")
 
-    def trigger_documentation_and_diagram_updates(self, files: List[Path]):
+    def trigger_documentation_and_diagram_updates(self, files: list[Path]):
         # Placeholder: Automate documentation/diagram generation (Mermaid, C4, etc.)
         doc_path = self.atomic_dir / "conceptual_synthesis_autodoc_update.log"
         try:
@@ -514,7 +514,7 @@ class ConceptualSynthesisAgent:
         except Exception as e:
             self.logger.error(f"Failed to update documentation/diagrams: {e}")
 
-    def reflect_and_log_self_improvement(self, files: List[Path]):
+    def reflect_and_log_self_improvement(self, files: list[Path]):
         # Placeholder: Log self-improvement suggestions after each batch
         improvement_log = self.atomic_dir / "conceptual_synthesis_self_improvement.log"
         try:
@@ -527,7 +527,7 @@ class ConceptualSynthesisAgent:
             self.logger.error(f"Failed to log self-improvement: {e}")
 
     def submit_for_review(
-        self, conceptual_nodes: List[Dict], conceptual_edges: List[Dict]
+        self, conceptual_nodes: list[dict], conceptual_edges: list[dict]
     ):
         """
         Submit conceptual nodes/edges for distributed review via collab agents.
@@ -545,7 +545,7 @@ class ConceptualSynthesisAgent:
         self.logger.info(f"Submitted {len(review_tasks)} nodes/edges for review.")
         return review_tasks
 
-    def collect_feedback_and_update(self, review_tasks: List[Dict]):
+    def collect_feedback_and_update(self, review_tasks: list[dict]):
         """
         Collect feedback, votes, or comments from reviewers and update conceptual node/edge status.
         Persist all review actions, feedback, and consensus decisions in the knowledgebase.
@@ -568,7 +568,7 @@ class ConceptualSynthesisAgent:
         return True
 
     def escalate_contentious(
-        self, conceptual_nodes: List[Dict], conceptual_edges: List[Dict]
+        self, conceptual_nodes: list[dict], conceptual_edges: list[dict]
     ):
         """
         Flag unresolved or contentious concepts for further review or escalation.
@@ -585,8 +585,8 @@ class ConceptualSynthesisAgent:
 
     def generate_mermaid_diagram(
         self,
-        conceptual_nodes: List[Dict],
-        conceptual_edges: List[Dict],
+        conceptual_nodes: list[dict],
+        conceptual_edges: list[dict],
         output_path: str,
     ):
         """
@@ -608,8 +608,8 @@ class ConceptualSynthesisAgent:
 
     def generate_documentation(
         self,
-        conceptual_nodes: List[Dict],
-        conceptual_edges: List[Dict],
+        conceptual_nodes: list[dict],
+        conceptual_edges: list[dict],
         output_path: str,
     ):
         """
@@ -632,7 +632,7 @@ class ConceptualSynthesisAgent:
         self.logger.info(f"Documentation saved to {output_path}")
 
     def trigger_continuous_update(
-        self, conceptual_nodes: List[Dict], conceptual_edges: List[Dict]
+        self, conceptual_nodes: list[dict], conceptual_edges: list[dict]
     ):
         """
         Trigger regeneration of diagrams/docs after every batch or significant change.
@@ -641,7 +641,7 @@ class ConceptualSynthesisAgent:
         self.logger.info("Continuous update triggered.")
 
     def meta_analyze_and_improve(
-        self, batch_results: Dict, ambiguous: List[Dict], feedback: List[Dict]
+        self, batch_results: dict, ambiguous: list[dict], feedback: list[dict]
     ):
         """
         After each batch, analyze what worked, what failed, and what was ambiguous.
@@ -672,7 +672,7 @@ class ConceptualSynthesisAgent:
             self.logger.error(f"Failed to log self-improvement: {e}")
 
     def run_autonomous_cycle(
-        self, atomic_nodes: List[Dict], atomic_edges: List[Dict], output_dir: str
+        self, atomic_nodes: list[dict], atomic_edges: list[dict], output_dir: str
     ):
         """
         Orchestrate the full conceptual synthesis cycle:

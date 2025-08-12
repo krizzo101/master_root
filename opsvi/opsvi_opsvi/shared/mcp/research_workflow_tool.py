@@ -16,12 +16,12 @@ Features:
 - Research report generation
 """
 
-from dataclasses import dataclass
 import logging
-from pathlib import Path
 import re
 import sys
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 from urllib.parse import urlparse
 
 # Add src to path if needed
@@ -90,9 +90,9 @@ class ResearchReport:
     """Compiled research report"""
 
     query: str
-    search_results: List[SearchResultURL]
-    selected_urls: List[str]
-    scraped_results: List[ResearchResult]
+    search_results: list[SearchResultURL]
+    selected_urls: list[str]
+    scraped_results: list[ResearchResult]
     total_search_time: float = 0.0
     total_scrape_time: float = 0.0
     created_at: str = ""
@@ -144,7 +144,7 @@ class ResearchWorkflowTool:
 
     def _mock_search_results(
         self, query: str, max_results: int
-    ) -> List[SearchResultURL]:
+    ) -> list[SearchResultURL]:
         """Provide mock search results for demo purposes"""
         # Generate realistic mock results based on the query
         mock_results = [
@@ -207,7 +207,7 @@ class ResearchWorkflowTool:
         return relevant_results
 
     def _format_urls_for_agent(
-        self, urls: List[SearchResultURL], max_display: int = 10
+        self, urls: list[SearchResultURL], max_display: int = 10
     ) -> str:
         """Format URLs for agent consumption with scores and metadata"""
         if not urls:
@@ -256,7 +256,7 @@ class ResearchWorkflowTool:
 
     def extract_urls_from_text(
         self, text: str, source: str = "unknown"
-    ) -> List[SearchResultURL]:
+    ) -> list[SearchResultURL]:
         """Extract URLs from plain text search results"""
         urls = []
 
@@ -351,7 +351,7 @@ class ResearchWorkflowTool:
 
     async def search_and_extract_urls(
         self, query: str, max_results: int = 10
-    ) -> List[SearchResultURL]:
+    ) -> list[SearchResultURL]:
         """
         Search for information and extract URLs from results
 
@@ -466,7 +466,7 @@ class ResearchWorkflowTool:
         self,
         url_obj: SearchResultURL,
         query: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> float:
         """Calculate relevance score for a URL using intelligent LLM analysis"""
 
@@ -537,7 +537,7 @@ class ResearchWorkflowTool:
         return score
 
     def present_urls_for_selection(
-        self, urls: List[SearchResultURL], max_display: int = 10
+        self, urls: list[SearchResultURL], max_display: int = 10
     ) -> str:
         """
         Present URLs to the agent for selection
@@ -595,7 +595,7 @@ class ResearchWorkflowTool:
 
     async def search_and_present_urls(
         self, query: str, max_results: int = 10, use_intelligent_scoring: bool = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Search for URLs and present them with scores for agent selection
 
@@ -675,8 +675,8 @@ class ResearchWorkflowTool:
             self.use_intelligent_scoring = original_scoring
 
     async def scrape_selected_urls(
-        self, urls: List[SearchResultURL], selected_indices: List[int]
-    ) -> List[ResearchResult]:
+        self, urls: list[SearchResultURL], selected_indices: list[int]
+    ) -> list[ResearchResult]:
         """
         Scrape the selected URLs for detailed content
 
@@ -755,9 +755,9 @@ class ResearchWorkflowTool:
     def compile_research_report(
         self,
         query: str,
-        urls: List[SearchResultURL],
-        selected_indices: List[int],
-        results: List[ResearchResult],
+        urls: list[SearchResultURL],
+        selected_indices: list[int],
+        results: list[ResearchResult],
     ) -> ResearchReport:
         """
         Compile a research report from the results

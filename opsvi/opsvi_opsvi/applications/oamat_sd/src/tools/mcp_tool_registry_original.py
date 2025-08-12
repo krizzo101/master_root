@@ -7,14 +7,14 @@ error recovery, and graceful degradation. Manages 6 core operational tools.
 
 import asyncio
 import concurrent.futures
+import logging
+import os
+import time
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-import logging
-import os
 from pathlib import Path
-import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 # Enhanced logging integration
 
@@ -48,10 +48,10 @@ class ToolMetadata:
     name: str
     category: ToolCategory
     description: str
-    methods: List[str]
+    methods: list[str]
     status: ToolStatus = ToolStatus.OPERATIONAL
-    performance_metrics: Dict[str, Any] = field(default_factory=dict)
-    last_health_check: Optional[datetime] = None
+    performance_metrics: dict[str, Any] = field(default_factory=dict)
+    last_health_check: datetime | None = None
     error_count: int = 0
     success_count: int = 0
 
@@ -64,7 +64,7 @@ class ToolExecutionResult:
     method: str
     success: bool
     result: Any = None
-    error: Optional[str] = None
+    error: str | None = None
     execution_time: float = 0.0
     timestamp: datetime = field(default_factory=datetime.now)
 
@@ -73,19 +73,19 @@ class ToolExecutionResult:
 class ParallelExecutionResult:
     """Result of parallel tool execution."""
 
-    results: List[ToolExecutionResult]
+    results: list[ToolExecutionResult]
     total_time: float
     success_rate: float
-    failed_executions: List[ToolExecutionResult] = field(default_factory=list)
+    failed_executions: list[ToolExecutionResult] = field(default_factory=list)
 
 
 class MCPToolRegistry:
     """Registry and interface for MCP tools with parallel execution support."""
 
-    def __init__(self, use_real_clients: Optional[bool] = None):
+    def __init__(self, use_real_clients: bool | None = None):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
-        self.tools: Dict[str, ToolMetadata] = {}
-        self.tool_interfaces: Dict[str, Any] = {}
+        self.tools: dict[str, ToolMetadata] = {}
+        self.tool_interfaces: dict[str, Any] = {}
         self.parallel_executor = concurrent.futures.ThreadPoolExecutor(max_workers=6)
 
         # Enhanced logging integration
@@ -208,7 +208,7 @@ class MCPToolRegistry:
         else:
             self._initialize_mock_interfaces()
 
-    def _determine_client_mode(self, use_real_clients: Optional[bool]) -> bool:
+    def _determine_client_mode(self, use_real_clients: bool | None) -> bool:
         """Determine whether to use real or mock MCP clients."""
         # 1. Explicit parameter takes priority
         if use_real_clients is not None:
@@ -569,11 +569,11 @@ class MCPToolRegistry:
         self.tool_interfaces[metadata.name] = interface
         self.logger.info(f"Registered tool: {metadata.name}")
 
-    def list_available_tools(self) -> List[str]:
+    def list_available_tools(self) -> list[str]:
         """List all available tool names."""
         return list(self.tools.keys())
 
-    def get_tool_metadata(self, tool_name: str) -> Optional[ToolMetadata]:
+    def get_tool_metadata(self, tool_name: str) -> ToolMetadata | None:
         """Get metadata for a specific tool."""
         return self.tools.get(tool_name)
 
@@ -699,7 +699,7 @@ class MCPToolRegistry:
 
     async def _arxiv_search_and_ingest(
         self, arxiv_interface: Any, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Enhanced ArXiv workflow: search papers, download them, and ingest for context."""
         query = kwargs.get("query", "")
         max_results = kwargs.get("max_results", 3)
@@ -814,7 +814,7 @@ class MCPToolRegistry:
 
     async def _research_search_and_present(
         self, research_interface: Any, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Search multiple sources and present URLs for agent selection."""
         query = kwargs.get("query", "")
         max_results = kwargs.get("max_results", 8)
@@ -855,7 +855,7 @@ class MCPToolRegistry:
 
     async def _research_scrape_selected(
         self, research_interface: Any, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Scrape agent-selected URLs and compile research report."""
         query = kwargs.get("query", "")
         selected_urls = kwargs.get("selected_urls", [])
@@ -922,7 +922,7 @@ class MCPToolRegistry:
 
     async def _research_complete_workflow(
         self, research_interface: Any, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Complete auto-workflow with intelligent URL selection and scraping."""
         query = kwargs.get("query", "")
         max_results = kwargs.get("max_results", 5)
@@ -1156,7 +1156,7 @@ class MCPToolRegistry:
             )
 
     async def execute_parallel_tools(
-        self, tool_requests: List[Tuple[str, str, Dict[str, Any]]]
+        self, tool_requests: list[tuple[str, str, dict[str, Any]]]
     ) -> ParallelExecutionResult:
         """Execute multiple tool methods in parallel."""
         start_time = time.time()
@@ -1213,11 +1213,11 @@ class MCPToolRegistry:
             failed_executions=failed_executions,
         )
 
-    def get_tools_by_category(self, category: ToolCategory) -> List[str]:
+    def get_tools_by_category(self, category: ToolCategory) -> list[str]:
         """Get all tools in a specific category."""
         return [name for name, tool in self.tools.items() if tool.category == category]
 
-    def get_client_info(self) -> Dict[str, Any]:
+    def get_client_info(self) -> dict[str, Any]:
         """Get information about current client implementations."""
         info = {
             "client_mode": "real" if self.use_real_clients else "mock",
@@ -1245,7 +1245,7 @@ class MCPToolRegistry:
 
         return info
 
-    async def health_check_all_tools(self) -> Dict[str, bool]:
+    async def health_check_all_tools(self) -> dict[str, bool]:
         """Perform health check on all tools."""
         health_status = {}
 
@@ -1270,7 +1270,7 @@ class MCPToolRegistry:
 
         return health_status
 
-    def get_performance_metrics(self) -> Dict[str, Any]:
+    def get_performance_metrics(self) -> dict[str, Any]:
         """Get overall performance metrics with client information."""
         total_executions = sum(
             tool.success_count + tool.error_count for tool in self.tools.values()
@@ -1308,7 +1308,7 @@ class MCPToolRegistry:
             tool.error_count = 0
         self.logger.info("Reset performance metrics for all tools")
 
-    async def graceful_degradation(self, failed_tools: List[str]) -> Dict[str, str]:
+    async def graceful_degradation(self, failed_tools: list[str]) -> dict[str, str]:
         """Handle graceful degradation when tools fail."""
         alternatives = {}
 
@@ -1339,7 +1339,7 @@ class MCPToolRegistry:
 class MockBraveSearch:
     """Mock Brave Search interface."""
 
-    async def web_search(self, query: str, **kwargs) -> Dict[str, Any]:
+    async def web_search(self, query: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.1)  # Simulate network delay
         return {
             "query": query,
@@ -1358,21 +1358,21 @@ class MockBraveSearch:
             "total": 2,
         }
 
-    async def news_search(self, query: str, **kwargs) -> Dict[str, Any]:
+    async def news_search(self, query: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.1)
         return {
             "query": query,
             "news": [{"title": "Mock News", "source": "Mock Source"}],
         }
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         return {"status": "healthy", "service": "brave_search"}
 
 
 class MockArxivResearch:
     """Mock ArXiv Research interface."""
 
-    async def search_papers(self, query: str, **kwargs) -> Dict[str, Any]:
+    async def search_papers(self, query: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.2)
         return {
             "query": query,
@@ -1382,40 +1382,40 @@ class MockArxivResearch:
             ],
         }
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         return {"status": "healthy", "service": "arxiv_research"}
 
 
 class MockFirecrawl:
     """Mock Firecrawl interface."""
 
-    async def scrape(self, url: str, **kwargs) -> Dict[str, Any]:
+    async def scrape(self, url: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.3)
         return {"url": url, "content": "Mock scraped content", "success": True}
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         return {"status": "healthy", "service": "firecrawl"}
 
 
 class MockContext7Docs:
     """Mock Context7 Docs interface."""
 
-    async def resolve_library_id(self, library_name: str, **kwargs) -> Dict[str, Any]:
+    async def resolve_library_id(self, library_name: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.1)
         return {"library_name": library_name, "library_id": f"/{library_name}/docs"}
 
-    async def get_library_docs(self, library_id: str, **kwargs) -> Dict[str, Any]:
+    async def get_library_docs(self, library_id: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.2)
         return {"library_id": library_id, "docs": "Mock documentation content"}
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         return {"status": "healthy", "service": "context7_docs"}
 
 
 class MockSequentialThinking:
     """Mock Sequential Thinking interface."""
 
-    async def think(self, problem: str, **kwargs) -> Dict[str, Any]:
+    async def think(self, problem: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.5)  # Thinking takes time
         return {
             "problem": problem,
@@ -1423,29 +1423,29 @@ class MockSequentialThinking:
             "conclusion": "Mock conclusion",
         }
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         return {"status": "healthy", "service": "sequential_thinking"}
 
 
 class MockNeo4j:
     """Mock Neo4j interface."""
 
-    async def get_schema(self, **kwargs) -> Dict[str, Any]:
+    async def get_schema(self, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.1)
         return {"nodes": ["Node1", "Node2"], "relationships": ["REL1", "REL2"]}
 
-    async def read_cypher(self, query: str, **kwargs) -> Dict[str, Any]:
+    async def read_cypher(self, query: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.1)
         return {"query": query, "results": [{"mock": "data"}]}
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         return {"status": "healthy", "service": "neo4j"}
 
 
 class MockResearchWorkflow:
     """Mock Research Workflow interface."""
 
-    async def search_and_present(self, query: str, max_results: int) -> List[Any]:
+    async def search_and_present(self, query: str, max_results: int) -> list[Any]:
         await asyncio.sleep(0.4)
         return [
             MockResearchUrl("https://example.com/1", "Example 1", 0.9),
@@ -1453,8 +1453,8 @@ class MockResearchWorkflow:
         ]
 
     async def scrape_selected_urls(
-        self, urls: List[Any], selected_indices: List[int]
-    ) -> List[Any]:
+        self, urls: list[Any], selected_indices: list[int]
+    ) -> list[Any]:
         await asyncio.sleep(0.5)
         return [
             MockResearchResult(True, "Scraped content 1"),
@@ -1464,10 +1464,10 @@ class MockResearchWorkflow:
     async def compile_research_report(
         self,
         query: str,
-        urls: List[Any],
-        selected_indices: List[int],
-        results: List[Any],
-    ) -> Dict[str, Any]:
+        urls: list[Any],
+        selected_indices: list[int],
+        results: list[Any],
+    ) -> dict[str, Any]:
         await asyncio.sleep(0.3)
         return {
             "query": query,
@@ -1476,11 +1476,11 @@ class MockResearchWorkflow:
             "results": results,
         }
 
-    async def format_research_report(self, report: Dict[str, Any]) -> str:
+    async def format_research_report(self, report: dict[str, Any]) -> str:
         await asyncio.sleep(0.2)
         return f"Mock Research Report for {report['query']}"
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         return {"status": "healthy", "service": "research_workflow"}
 
 
@@ -1503,7 +1503,7 @@ class MockResearchResult:
 
 # Factory function to match the interface expected by smart_decomposition_agent.py
 def create_mcp_tool_registry(
-    use_real_clients: Optional[bool] = None,
+    use_real_clients: bool | None = None,
 ) -> MCPToolRegistry:
     """Factory function to create and return an MCP tool registry instance.
 

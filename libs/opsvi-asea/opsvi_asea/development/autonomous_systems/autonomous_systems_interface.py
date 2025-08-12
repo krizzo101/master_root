@@ -7,7 +7,7 @@ Provides easy access to validated operational tools.
 """
 import sys
 import os
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 # Add current directory to path for imports
 current_dir = os.path.dirname(os.path.abspath(__file__))

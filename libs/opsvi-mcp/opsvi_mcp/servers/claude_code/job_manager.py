@@ -174,7 +174,9 @@ class JobManager:
         # IMPORTANT: Remove ANTHROPIC_API_KEY as it conflicts with CLAUDE_CODE_TOKEN
         removed_vars = []
         for key in list(env.keys()):
-            if (key.startswith("CLAUDE_") and key != "CLAUDE_CODE_TOKEN") or key == "ANTHROPIC_API_KEY":
+            if (
+                key.startswith("CLAUDE_") and key != "CLAUDE_CODE_TOKEN"
+            ) or key == "ANTHROPIC_API_KEY":
                 del env[key]
                 removed_vars.append(key)
 

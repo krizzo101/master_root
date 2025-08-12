@@ -4,10 +4,10 @@ OpenAI-exclusive agent creation using create_react_agent with structured respons
 """
 
 import asyncio
-from datetime import datetime
 import json
-from typing import Any, Dict, List, Optional
 import uuid
+from datetime import datetime
+from typing import Any
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.tools import Tool
@@ -276,8 +276,8 @@ class AgentWrapper:
         model: str,
         response_schema,
         openai_client: Any,  # Changed to Any for POC compatibility
-        tools: List[Tool],
-        capabilities: List[str],
+        tools: list[Tool],
+        capabilities: list[str],
         config: SystemConfig,
     ):
         self.agent = agent
@@ -294,8 +294,8 @@ class AgentWrapper:
         self.created_at = datetime.utcnow()
 
     async def process_with_structured_response(
-        self, input_data: Dict[str, Any], dependencies: Optional[List[str]] = None
-    ) -> Dict[str, Any]:
+        self, input_data: dict[str, Any], dependencies: list[str] | None = None
+    ) -> dict[str, Any]:
         """
         Process input with structured JSON response validation.
         Implements REQ-002: Dependency and Context Management
@@ -356,7 +356,7 @@ class AgentWrapper:
                 "partial_results": self._extract_partial_results(e),
             }
 
-    def _validate_and_structure_response(self, raw_result: Any) -> Dict[str, Any]:
+    def _validate_and_structure_response(self, raw_result: Any) -> dict[str, Any]:
         """Validate response against Pydantic schema and return structured data"""
         if not self.response_schema:
             return {"raw_response": str(raw_result)}
@@ -406,14 +406,14 @@ class AgentWrapper:
                     return last_message["content"]
         return str(raw_result)
 
-    def _inject_context(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _inject_context(self, input_data: dict[str, Any]) -> dict[str, Any]:
         """Inject stored context into input data"""
         enriched = input_data.copy()
         if self.context_store:
             enriched["context"] = self.context_store
         return enriched
 
-    def _update_context(self, result: Dict[str, Any]):
+    def _update_context(self, result: dict[str, Any]):
         """Update context store with results"""
         self.context_store.update(
             {
@@ -443,16 +443,16 @@ class AgentWrapper:
         metrics["average_time"] = metrics["total_time"] / metrics["total_executions"]
         metrics["success_rate"] = metrics["success_count"] / metrics["total_executions"]
 
-    def _extract_tools_used(self, raw_result: Any) -> List[str]:
+    def _extract_tools_used(self, raw_result: Any) -> list[str]:
         """Extract tools used during execution"""
         # Implementation would parse agent execution logs
         return []
 
-    def _extract_partial_results(self, error: Exception) -> Dict[str, Any]:
+    def _extract_partial_results(self, error: Exception) -> dict[str, Any]:
         """Extract any partial results from failed execution"""
         return {"error_type": type(error).__name__}
 
-    async def _validate_dependencies(self, dependencies: List[str]):
+    async def _validate_dependencies(self, dependencies: list[str]):
         """Validate that dependencies are satisfied (placeholder)"""
         # This would integrate with dependency manager
         pass
@@ -464,7 +464,7 @@ class AgentFactory:
     All agents created using create_react_agent with JSON schema validation.
     """
 
-    def __init__(self, config: Optional[SystemConfig] = None):
+    def __init__(self, config: SystemConfig | None = None):
         self.config = config or get_config()
         # Use available OpenAI interface or mock for POC
         if OPENAI_INTERFACE_AVAILABLE:
@@ -474,7 +474,7 @@ class AgentFactory:
         self.response_schemas = AGENT_RESPONSE_SCHEMAS
         self.created_agents = {}
 
-    def create_agent(self, spec: Dict[str, Any]) -> AgentWrapper:
+    def create_agent(self, spec: dict[str, Any]) -> AgentWrapper:
         """
         Create OpenAI-powered agent with structured response capabilities.
 
@@ -586,7 +586,7 @@ Begin your analysis and respond with valid JSON:"""
             )
         )
 
-    def _get_base_tools(self) -> List[Tool]:
+    def _get_base_tools(self) -> list[Tool]:
         """Get base tools available to all agents"""
         return [
             Tool(
@@ -601,7 +601,7 @@ Begin your analysis and respond with valid JSON:"""
             ),
         ]
 
-    def _get_research_tools(self) -> List[Tool]:
+    def _get_research_tools(self) -> list[Tool]:
         """Get research-specific tools"""
         return [
             Tool(
@@ -616,7 +616,7 @@ Begin your analysis and respond with valid JSON:"""
             ),
         ]
 
-    def _get_development_tools(self) -> List[Tool]:
+    def _get_development_tools(self) -> list[Tool]:
         """Get development-specific tools"""
         return [
             Tool(
@@ -631,7 +631,7 @@ Begin your analysis and respond with valid JSON:"""
             ),
         ]
 
-    def _get_testing_tools(self) -> List[Tool]:
+    def _get_testing_tools(self) -> list[Tool]:
         """Get testing-specific tools"""
         return [
             Tool(
@@ -679,7 +679,7 @@ Begin your analysis and respond with valid JSON:"""
         """Quality analysis tool implementation"""
         return f"Quality analysis for: {code}"
 
-    def _build_tools_for_role(self, role: str) -> List[Tool]:
+    def _build_tools_for_role(self, role: str) -> list[Tool]:
         """Build appropriate tools for a specific agent role"""
         all_tools = []
 
@@ -698,7 +698,7 @@ Begin your analysis and respond with valid JSON:"""
 
         return all_tools
 
-    def get_agent_performance_metrics(self) -> Dict[str, Any]:
+    def get_agent_performance_metrics(self) -> dict[str, Any]:
         """Get performance metrics for all created agents"""
         metrics = {}
         for agent_id, agent in self.created_agents.items():

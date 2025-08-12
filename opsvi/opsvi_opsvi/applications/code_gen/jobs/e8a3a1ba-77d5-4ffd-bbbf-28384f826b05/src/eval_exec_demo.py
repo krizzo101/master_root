@@ -6,8 +6,8 @@ Both are powerful functions, but must be used with great care and never on untru
 Refer to the in-code comments for explanations.
 """
 
-import sys
 import logging
+import sys
 from typing import Any
 
 

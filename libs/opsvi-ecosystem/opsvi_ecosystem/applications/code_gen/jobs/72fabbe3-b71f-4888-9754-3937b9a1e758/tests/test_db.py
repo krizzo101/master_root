@@ -1,4 +1,3 @@
-import pytest
 from backend.db import get_session
 
 

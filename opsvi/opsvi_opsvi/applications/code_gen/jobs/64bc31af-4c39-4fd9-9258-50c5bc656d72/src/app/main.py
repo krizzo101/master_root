@@ -1,11 +1,12 @@
-import uvicorn
-from fastapi import FastAPI, Request
-from starlette.middleware.cors import CORSMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware
 import logging
 
-from app.routes import tasks
+import uvicorn
+from fastapi import FastAPI, Request
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.cors import CORSMiddleware
+
 from app.core.config import settings
+from app.routes import tasks
 
 logger = logging.getLogger("uvicorn.error")
 

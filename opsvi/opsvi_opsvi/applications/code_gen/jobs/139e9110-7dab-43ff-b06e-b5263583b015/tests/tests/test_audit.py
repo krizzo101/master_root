@@ -1,7 +1,7 @@
-import pytest
-from backend.audit import setup_audit_logging, log_audit
-
 import logging
+
+import pytest
+from backend.audit import log_audit, setup_audit_logging
 
 
 @pytest.fixture

@@ -6,11 +6,11 @@ Comprehensive validation system that checks all enforcement mechanisms
 and provides detailed compliance reporting for oamat_sd implementation.
 """
 
-from datetime import datetime
 import json
-from pathlib import Path
 import sys
-from typing import Any, Dict, List
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 # Add the enforcement module to path
 sys.path.append(str(Path(__file__).parent / "src" / "enforcement"))
@@ -44,7 +44,7 @@ except ImportError:
             "dynamic_synthesis": ["synthesize_agent_from_specification"],
         }
 
-        def check_forbidden_patterns(self, code: str) -> List[str]:
+        def check_forbidden_patterns(self, code: str) -> list[str]:
             violations = []
             for category, patterns in self.FORBIDDEN_PATTERNS.items():
                 for pattern in patterns:
@@ -52,7 +52,7 @@ except ImportError:
                         violations.append(f"FORBIDDEN {category}: {pattern}")
             return violations
 
-        def check_required_patterns(self, code: str) -> List[str]:
+        def check_required_patterns(self, code: str) -> list[str]:
             validations = []
             for category, patterns in self.REQUIRED_PATTERNS.items():
                 for pattern in patterns:
@@ -78,7 +78,7 @@ class SophisticationValidator:
             "recommendations": [],
         }
 
-    def validate_implementation_contract(self) -> Dict[str, Any]:
+    def validate_implementation_contract(self) -> dict[str, Any]:
         """Validate against the implementation contract requirements"""
 
         contract_path = self.project_root / "IMPLEMENTATION_CONTRACT.md"
@@ -87,7 +87,7 @@ class SophisticationValidator:
 
         return {"status": "PRESENT", "message": "Implementation contract exists"}
 
-    def validate_specification_lock_in(self) -> Dict[str, Any]:
+    def validate_specification_lock_in(self) -> dict[str, Any]:
         """Validate against specification lock-in requirements"""
 
         spec_path = self.project_root / "SPECIFICATION_LOCK_IN.md"
@@ -96,7 +96,7 @@ class SophisticationValidator:
 
         return {"status": "PRESENT", "message": "Specification lock-in exists"}
 
-    def analyze_codebase_patterns(self) -> Dict[str, Any]:
+    def analyze_codebase_patterns(self) -> dict[str, Any]:
         """Analyze entire codebase for sophistication patterns"""
 
         if not self.src_path.exists():
@@ -146,7 +146,7 @@ class SophisticationValidator:
 
         return analysis
 
-    def validate_checkpoint_25_percent(self) -> Dict[str, Any]:
+    def validate_checkpoint_25_percent(self) -> dict[str, Any]:
         """Validate 25% checkpoint: O3 Analysis Engine"""
 
         main_agent_path = self.src_path.parent / "smart_decomposition_agent.py"
@@ -167,7 +167,7 @@ class SophisticationValidator:
 
         return {"status": status, "details": details}
 
-    def validate_checkpoint_50_percent(self) -> Dict[str, Any]:
+    def validate_checkpoint_50_percent(self) -> dict[str, Any]:
         """Validate 50% checkpoint: Dynamic Agent Synthesis"""
 
         agent_factory_path = self.src_path / "agents" / "agent_factory.py"
@@ -189,7 +189,7 @@ class SophisticationValidator:
 
         return {"status": status, "details": details}
 
-    def validate_checkpoint_75_percent(self) -> Dict[str, Any]:
+    def validate_checkpoint_75_percent(self) -> dict[str, Any]:
         """Validate 75% checkpoint: Send API Orchestration"""
 
         python_files = list(self.src_path.rglob("*.py"))
@@ -219,7 +219,7 @@ class SophisticationValidator:
 
         return {"status": status, "details": details}
 
-    def validate_checkpoint_100_percent(self) -> Dict[str, Any]:
+    def validate_checkpoint_100_percent(self) -> dict[str, Any]:
         """Validate 100% checkpoint: Full Sophistication"""
 
         # Run all previous checkpoints
@@ -260,7 +260,7 @@ class SophisticationValidator:
         }
 
     def _calculate_file_compliance(
-        self, violations: List[str], validations: List[str]
+        self, violations: list[str], validations: list[str]
     ) -> float:
         """Calculate compliance score for a file"""
         if not violations and not validations:
@@ -272,7 +272,7 @@ class SophisticationValidator:
 
         return (len(validations) / total_patterns) * 100
 
-    def generate_comprehensive_report(self) -> Dict[str, Any]:
+    def generate_comprehensive_report(self) -> dict[str, Any]:
         """Generate comprehensive sophistication compliance report"""
 
         print("🔍 Running comprehensive sophistication validation...")

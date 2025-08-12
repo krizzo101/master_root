@@ -3,9 +3,9 @@ HTML parser module for extracting news headlines with BeautifulSoup.
 """
 import logging
 import re
-from typing import List, Optional
-from bs4 import BeautifulSoup
 from urllib.parse import urlparse
+
+from bs4 import BeautifulSoup
 
 
 class HeadlineParser:
@@ -71,8 +71,8 @@ class HeadlineParser:
         return domain
 
     def get_selectors_for_url(
-        self, url: str, selectors: Optional[list] = None
-    ) -> List[str]:
+        self, url: str, selectors: list | None = None
+    ) -> list[str]:
         """
         Get a selector list appropriate for the URL, or fall back to GENERIC_SELECTORS.
         """
@@ -92,8 +92,8 @@ class HeadlineParser:
         return self.GENERIC_SELECTORS
 
     def extract_headlines(
-        self, html: str, url: str, selectors: Optional[list] = None
-    ) -> List[str]:
+        self, html: str, url: str, selectors: list | None = None
+    ) -> list[str]:
         """
         Given HTML and URL, extract a list of headline text.
         :param html: Raw HTML

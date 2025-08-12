@@ -17,10 +17,10 @@ Usage Examples:
 
 import argparse
 import os
-from pathlib import Path
 import subprocess
 import sys
 import time
+from pathlib import Path
 
 
 def setup_environment(real_api=False, slow_tests=True):

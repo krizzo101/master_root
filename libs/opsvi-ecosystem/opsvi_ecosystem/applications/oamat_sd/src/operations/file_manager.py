@@ -5,11 +5,11 @@ Handles file extraction, creation, and management for the Smart Decomposition Ag
 Extracted from smart_decomposition_agent.py for better modularity.
 """
 
-from datetime import datetime
 import json
-from pathlib import Path
 import re
-from typing import Any, Dict, List, Optional, Tuple
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 from src.applications.oamat_sd.src.config.config_manager import ConfigManager
 from src.applications.oamat_sd.src.models.workflow_models import SmartDecompositionState
@@ -62,8 +62,8 @@ class FileOperationsManager:
                     extracted_files = []
                 else:
                     # Scan for files created during this execution
-                    from pathlib import Path
                     import time
+                    from pathlib import Path
 
                     project_dir = Path(project_path)
                     current_time = time.time()
@@ -236,8 +236,8 @@ class FileOperationsManager:
             return str(agent_output)
 
     async def _parse_files_from_content(
-        self, content: str, agent_role: Optional[str] = None
-    ) -> List[Dict[str, str]]:
+        self, content: str, agent_role: str | None = None
+    ) -> list[dict[str, str]]:
         """Parse files from agent response content using comprehensive modern patterns"""
         # Use config default if agent_role not specified - NO HARDCODED VALUES
         if agent_role is None:
@@ -774,7 +774,7 @@ class FileOperationsManager:
 
     def _extract_filename_from_hint(
         self, hint: str, language: str, agent_role: str
-    ) -> Optional[str]:
+    ) -> str | None:
         """Extract filename from various hint formats"""
         if not hint:
             return self._generate_default_filename(language, agent_role)
@@ -1002,7 +1002,7 @@ class FileOperationsManager:
 
     async def _extract_files_from_json_deliverables(
         self, content: str
-    ) -> List[Dict[str, str]]:
+    ) -> list[dict[str, str]]:
         """
         Extract files directly from JSON deliverables format.
         Returns list of dicts with 'filename' and 'content' keys.
@@ -1054,7 +1054,7 @@ class FileOperationsManager:
             self.logger.error(f"❌ Error extracting files from JSON deliverables: {e}")
             return []
 
-    def _deduplicate_files(self, files: List[Dict[str, str]]) -> List[Dict[str, str]]:
+    def _deduplicate_files(self, files: list[dict[str, str]]) -> list[dict[str, str]]:
         """Remove duplicate files based on content similarity"""
         unique_files = []
         seen_contents = set()
@@ -1103,7 +1103,7 @@ class FileOperationsManager:
             self.logger.error(f"Failed to create file {filename}: {e}")
             raise
 
-    def create_project_context(self, user_request: str) -> Tuple[str, Path]:
+    def create_project_context(self, user_request: str) -> tuple[str, Path]:
         """Create project context and directory structure"""
         # Generate project name from user request
         project_name = re.sub(r"[^\w\s-]", "", user_request.lower())

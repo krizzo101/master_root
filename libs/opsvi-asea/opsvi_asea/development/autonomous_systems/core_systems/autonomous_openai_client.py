@@ -6,11 +6,9 @@ UPDATED: Uses modern OpenAI patterns (1.88+) with comprehensive logging.
 """
 
 import json
-import asyncio
 from typing import Any, Dict, Optional, Type, TypeVar
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ValidationError
-from datetime import datetime
 
 from comprehensive_logging_config import get_logger
 

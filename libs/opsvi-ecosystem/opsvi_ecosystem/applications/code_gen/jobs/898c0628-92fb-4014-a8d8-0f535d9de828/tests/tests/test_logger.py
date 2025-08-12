@@ -1,6 +1,7 @@
+import logging
+
 import pytest
 from json_data_processor import logger
-import logging
 
 
 def test_setup_logger_creates_logger_with_expected_level_and_handlers():

@@ -7,7 +7,7 @@ NO HARDCODED VALUES - All settings must come from configuration files.
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import yaml
 
@@ -18,9 +18,9 @@ class ModelConfig:
 
     model_name: str
     max_tokens: int
-    temperature: Optional[float] = None
+    temperature: float | None = None
     supports_temperature: bool = True
-    reasoning_effort: Optional[str] = None
+    reasoning_effort: str | None = None
 
 
 @dataclass
@@ -31,7 +31,7 @@ class APIConfig:
     timeout_seconds: int
     max_retries: int
     backoff_multiplier: float
-    rate_limits: Dict[str, int]
+    rate_limits: dict[str, int]
 
 
 @dataclass
@@ -48,9 +48,9 @@ class ExecutionConfig:
 class ComplexityConfig:
     """Complexity analysis configuration"""
 
-    scoring_thresholds: Dict[str, float]
+    scoring_thresholds: dict[str, float]
     execution_mode_threshold: float
-    score_mapping: Dict[str, float]  # ADDED - score mapping configuration
+    score_mapping: dict[str, float]  # ADDED - score mapping configuration
 
 
 @dataclass
@@ -67,8 +67,8 @@ class ReasoningConfig:
 class SynthesisConfig:
     """Synthesis configuration for solution scoring"""
 
-    completeness_scoring: Dict[str, float]
-    quality_scoring_weights: Dict[str, float]
+    completeness_scoring: dict[str, float]
+    quality_scoring_weights: dict[str, float]
 
 
 @dataclass
@@ -86,36 +86,36 @@ class ValidationConfig:
 
     missing_fields_threshold: int
     gap_scoring_divisor: float
-    confidence_scores: Dict[str, float]
+    confidence_scores: dict[str, float]
 
 
 @dataclass
 class ToolsConfig:
     """Tools configuration"""
 
-    defaults: Dict[str, Any]
-    recommendations: Dict[str, Any]
-    performance: Dict[str, int]
-    initialization: Dict[str, int]
+    defaults: dict[str, Any]
+    recommendations: dict[str, Any]
+    performance: dict[str, int]
+    initialization: dict[str, int]
 
 
 @dataclass
 class AgentFactoryConfig:
     """Agent factory configuration"""
 
-    memory_defaults: Dict[str, Any]
-    performance_defaults: Dict[str, str]
-    role_templates: Dict[str, str]
-    prompt_defaults: Dict[str, Any]
-    counts: Dict[str, int]
+    memory_defaults: dict[str, Any]
+    performance_defaults: dict[str, str]
+    role_templates: dict[str, str]
+    prompt_defaults: dict[str, Any]
+    counts: dict[str, int]
 
 
 @dataclass
 class FileProcessingConfig:
     """File processing configuration"""
 
-    language_defaults: Dict[str, str]
-    content_processing: Dict[str, Any]
+    language_defaults: dict[str, str]
+    content_processing: dict[str, Any]
 
 
 @dataclass
@@ -160,72 +160,72 @@ class EnforcementConfig:
 class ConstantsConfig:
     """System constants"""
 
-    env_vars: Dict[str, str]
-    log_levels: Dict[str, str]
-    status: Dict[str, str]
-    ui: Dict[str, Dict[str, str]]
-    agent_roles: Dict[str, str]
-    file_extensions: Dict[str, str]
-    config_files: Dict[str, str]
-    ui_icons: Dict[str, str]
+    env_vars: dict[str, str]
+    log_levels: dict[str, str]
+    status: dict[str, str]
+    ui: dict[str, dict[str, str]]
+    agent_roles: dict[str, str]
+    file_extensions: dict[str, str]
+    config_files: dict[str, str]
+    ui_icons: dict[str, str]
 
 
 @dataclass
 class DefaultsConfig:
     """Default values for components"""
 
-    frameworks: Dict[str, str]
-    api: Dict[str, str]
-    scripts: Dict[str, str]
-    data_analysis: Dict[str, str]
-    automation: Dict[str, str]
+    frameworks: dict[str, str]
+    api: dict[str, str]
+    scripts: dict[str, str]
+    data_analysis: dict[str, str]
+    automation: dict[str, str]
 
 
 @dataclass
 class PatternsConfig:
     """Regex patterns and templates"""
 
-    file_parsing: Dict[str, str]
-    validation: Dict[str, str]
+    file_parsing: dict[str, str]
+    validation: dict[str, str]
 
 
 @dataclass
 class MessagesConfig:
     """Message templates"""
 
-    progress: Dict[str, str]
+    progress: dict[str, str]
 
 
 @dataclass
 class ErrorMessagesConfig:
     """Error message templates"""
 
-    configuration: Dict[str, str]
-    agent: Dict[str, str]
-    validation: Dict[str, str]
-    strategy: Dict[str, str]
-    synthesis: Dict[str, str]
+    configuration: dict[str, str]
+    agent: dict[str, str]
+    validation: dict[str, str]
+    strategy: dict[str, str]
+    synthesis: dict[str, str]
 
 
 @dataclass
 class StatusValuesConfig:
     """Status value constants"""
 
-    health: Dict[str, str]
-    execution: Dict[str, str]
-    tools: Dict[str, str]
-    agents: Dict[str, str]
+    health: dict[str, str]
+    execution: dict[str, str]
+    tools: dict[str, str]
+    agents: dict[str, str]
 
 
 @dataclass
 class AnalysisConfig:
     """Analysis configuration settings"""
 
-    confidence: Dict[str, float]
-    complexity: Dict[str, Any]
-    ai_integration: Dict[str, Any]
-    request_processing: Dict[str, str]
-    scoring: Dict[str, Any]
+    confidence: dict[str, float]
+    complexity: dict[str, Any]
+    ai_integration: dict[str, Any]
+    request_processing: dict[str, str]
+    scoring: dict[str, Any]
 
 
 class ConfigManager:
@@ -267,7 +267,7 @@ class ConfigManager:
                 f"Failed to load configuration: {e} - NO FALLBACKS ALLOWED"
             )
 
-    def _parse_config(self, raw_config: Dict[str, Any]) -> Dict[str, Any]:
+    def _parse_config(self, raw_config: dict[str, Any]) -> dict[str, Any]:
         """Parse raw configuration into typed objects"""
         try:
             return {
@@ -312,7 +312,7 @@ class ConfigManager:
             )
 
     @property
-    def models(self) -> Dict[str, ModelConfig]:
+    def models(self) -> dict[str, ModelConfig]:
         """Get model configurations"""
         return self._config["models"]
 

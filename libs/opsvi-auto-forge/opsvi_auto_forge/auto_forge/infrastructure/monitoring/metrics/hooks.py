@@ -1,12 +1,7 @@
 from __future__ import annotations
 import time
 from opsvi_auto_forge.infrastructure.monitoring.metrics.decision_metrics import (
-    decision_success,
-    decision_failure,
-    dk_verifier_disagreement_total,
     retrieval_latency,
-    evidence_coverage,
-    cost_per_pass_gate,
 )
 
 

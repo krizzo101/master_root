@@ -9,7 +9,8 @@ Version: Referenced as of July 2024
 """
 
 import logging
-from typing import Any, Callable, Optional, Type, Union
+from collections.abc import Callable
+from typing import Any
 
 try:
     from langgraph.checkpoint.memory import InMemorySaver
@@ -34,9 +35,9 @@ class LangGraphInterface:
 
     def __init__(
         self,
-        state_type: Type,
-        checkpointer: Optional[Any] = None,
-        store: Optional[BaseStore] = None,
+        state_type: type,
+        checkpointer: Any | None = None,
+        store: BaseStore | None = None,
     ):
         self.state_type = state_type
         self.builder = StateGraph(state_type)
@@ -53,14 +54,14 @@ class LangGraphInterface:
         self,
         name: str,
         tools: list,
-        handle_tool_errors: Union[bool, str, Callable] = True,
+        handle_tool_errors: bool | str | Callable = True,
     ) -> None:
         node = ToolNode(tools=tools, handle_tool_errors=handle_tool_errors)
         self.builder.add_node(name, node)
         logger.debug(f"ToolNode '{name}' added.")
 
     def add_edge(
-        self, from_node: str, to_node: str, condition: Optional[Callable] = None
+        self, from_node: str, to_node: str, condition: Callable | None = None
     ) -> None:
         if condition is not None:
             self.builder.add_edge(from_node, to_node, condition=condition)
@@ -83,7 +84,7 @@ class LangGraphInterface:
         self._compiled_graph = self.builder.compile(checkpointer=self.checkpointer)
         logger.info("Graph compiled.")
 
-    def invoke(self, state: dict, config: Optional[dict] = None) -> Any:
+    def invoke(self, state: dict, config: dict | None = None) -> Any:
         if not self._compiled_graph:
             self.compile()
         # --- PATCH: Log state before and after, and ensure dict outputs are merged into Pydantic state ---
@@ -112,17 +113,17 @@ class LangGraphInterface:
         _log_state("[invoke] result", result)
         return result
 
-    async def ainvoke(self, state: dict, config: Optional[dict] = None) -> Any:
+    async def ainvoke(self, state: dict, config: dict | None = None) -> Any:
         if not self._compiled_graph:
             self.compile()
         return await self._compiled_graph.ainvoke(state, config=config)
 
-    def stream(self, state: dict, config: Optional[dict] = None):
+    def stream(self, state: dict, config: dict | None = None):
         if not self._compiled_graph:
             self.compile()
         yield from self._compiled_graph.stream(state, config=config)
 
-    async def astream(self, state: dict, config: Optional[dict] = None):
+    async def astream(self, state: dict, config: dict | None = None):
         if not self._compiled_graph:
             self.compile()
         async for chunk in self._compiled_graph.astream(state, config=config):

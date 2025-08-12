@@ -8,7 +8,6 @@ import json
 import sys
 from datetime import datetime
 from arango import ArangoClient
-from arango.exceptions import DocumentInsertError
 
 
 class DatabaseMigrator:
@@ -250,7 +249,7 @@ class DatabaseMigrator:
         # Validate results
         success = self.validate_migration()
 
-        print(f"\n=== MIGRATION COMPLETE ===")
+        print("\n=== MIGRATION COMPLETE ===")
         print(f"Successfully migrated: {self.migrated_count}")
         print(f"Migration success: {success}")
 

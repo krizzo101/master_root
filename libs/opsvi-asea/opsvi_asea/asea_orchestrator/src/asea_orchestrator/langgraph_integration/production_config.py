@@ -14,7 +14,6 @@ import logging
 import json
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
-from pathlib import Path
 import redis
 from concurrent.futures import ThreadPoolExecutor
 import asyncio

@@ -4,9 +4,8 @@ Enables concurrent execution of multiple agents using asyncio
 """
 
 import asyncio
-from datetime import datetime
 import logging
-from typing import Dict, List
+from datetime import datetime
 
 
 class ParallelAgentExecutor:
@@ -17,8 +16,8 @@ class ParallelAgentExecutor:
         self.logger = logging.getLogger("OAMAT.ParallelExecutor")
 
     async def execute_agents_parallel(
-        self, parallel_candidates: List[Dict], user_request: str, base_state: Dict
-    ) -> Dict:
+        self, parallel_candidates: list[dict], user_request: str, base_state: dict
+    ) -> dict:
         """
         Execute multiple agents in parallel and combine their results
 
@@ -57,7 +56,7 @@ class ParallelAgentExecutor:
             self.logger.error(f"Parallel execution failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _create_agent_task(self, candidate: Dict, user_request: str, state: Dict):
+    async def _create_agent_task(self, candidate: dict, user_request: str, state: dict):
         """Create an async task for a single agent"""
         node_id = candidate["node_id"]
         agent_role = candidate["agent_role"]
@@ -100,7 +99,7 @@ class ParallelAgentExecutor:
                 "error": str(e),
             }
 
-    def _combine_parallel_results(self, results: List, candidates: List[Dict]) -> Dict:
+    def _combine_parallel_results(self, results: list, candidates: list[dict]) -> dict:
         """Combine results from parallel agent execution"""
         combined = {
             "success": True,
@@ -140,7 +139,7 @@ class AsyncAgentBridge:
         self.oamat = oamat_instance
         self.executor = None
 
-    async def run_agent_async(self, state: Dict, config: Dict, node_id: str):
+    async def run_agent_async(self, state: dict, config: dict, node_id: str):
         """Run a single agent asynchronously"""
         if self.executor is None:
             # Create thread pool executor for CPU-bound agent work

@@ -1,5 +1,4 @@
 import run
-import pytest
 
 
 def test_run_module_has_main_callable():

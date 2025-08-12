@@ -3,6 +3,7 @@ Session manager for SQLAlchemy ORM (for SQLite database)
 """
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+
 from app.core.config import get_settings
 
 DATABASE_URL = get_settings().DATABASE_URL

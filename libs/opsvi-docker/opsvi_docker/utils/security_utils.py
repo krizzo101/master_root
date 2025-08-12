@@ -7,12 +7,10 @@ Provides security assessment and compliance checking capabilities.
 
 import logging
 import subprocess
-import json
-import re
-from typing import Any, Dict, List, Optional, Set
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +35,8 @@ class SecurityFinding:
     severity: Severity
     category: str
     remediation: str
-    references: List[str] = field(default_factory=list)
-    affected_components: List[str] = field(default_factory=list)
+    references: list[str] = field(default_factory=list)
+    affected_components: list[str] = field(default_factory=list)
     timestamp: datetime = field(default_factory=datetime.now)
 
 
@@ -50,8 +48,8 @@ class VulnerabilityReport:
     scan_type: str
     timestamp: datetime
     total_findings: int
-    findings_by_severity: Dict[str, int]
-    findings: List[SecurityFinding]
+    findings_by_severity: dict[str, int]
+    findings: list[SecurityFinding]
     scan_duration_ms: float
     scanner_version: str = ""
 
@@ -69,8 +67,8 @@ class SecurityUtils:
 
     @staticmethod
     def scan_container_security(
-        container_info: Dict[str, Any]
-    ) -> List[SecurityFinding]:
+        container_info: dict[str, Any]
+    ) -> list[SecurityFinding]:
         """Scan container for security issues."""
         findings = []
 

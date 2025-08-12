@@ -1,10 +1,11 @@
 import logging
-from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+
+from app.database import get_db
 from app.schemas import TodoCreate, TodoRead, TodoUpdate
 from app.services.todo_service import TodoService
-from app.database import get_db
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +24,8 @@ def create_todo(todo_in: TodoCreate, db: Session = Depends(get_db)) -> TodoRead:
         raise HTTPException(status_code=500, detail="Failed to create todo item.")
 
 
-@router.get("/", response_model=List[TodoRead])
-def get_all_todos(db: Session = Depends(get_db)) -> List[TodoRead]:
+@router.get("/", response_model=list[TodoRead])
+def get_all_todos(db: Session = Depends(get_db)) -> list[TodoRead]:
     """Retrieve all todo items."""
     try:
         todo_service = TodoService(db)

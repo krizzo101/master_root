@@ -5,11 +5,11 @@ This module implements sophisticated O3 reasoning capabilities for the master ag
 to perform meta-intelligence analysis and dynamic workflow generation.
 """
 
-from dataclasses import dataclass
-from datetime import datetime
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any
 
 try:
     from langchain_openai import ChatOpenAI
@@ -66,18 +66,18 @@ class WorkflowPlan:
 
     request_analysis: str
     complexity_analysis: ComplexityAnalysis
-    recommended_agents: List[str]
+    recommended_agents: list[str]
     execution_strategy: str
-    parallel_opportunities: List[str]
-    risk_mitigation: List[str]
-    success_criteria: List[str]
+    parallel_opportunities: list[str]
+    risk_mitigation: list[str]
+    success_criteria: list[str]
     estimated_duration: str
 
 
 class O3ReasoningEngine:
     """O3 reasoning engine for meta-intelligence planning"""
 
-    def __init__(self, config: Optional[Dict] = None):
+    def __init__(self, config: dict | None = None):
         self.config = config or {}
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -94,7 +94,7 @@ class O3ReasoningEngine:
             self.model = None
 
     def analyze_request_complexity(
-        self, request: str, context: Dict[str, Any] = None
+        self, request: str, context: dict[str, Any] = None
     ) -> ComplexityAnalysis:
         """
         Analyze request complexity using O3 reasoning
@@ -181,8 +181,8 @@ class O3ReasoningEngine:
         self,
         request: str,
         complexity: ComplexityAnalysis,
-        available_agents: List[str],
-        context: Dict[str, Any] = None,
+        available_agents: list[str],
+        context: dict[str, Any] = None,
     ) -> WorkflowPlan:
         """
         Generate dynamic workflow plan using O3 reasoning
@@ -274,8 +274,8 @@ class O3ReasoningEngine:
             )
 
     def meta_intelligence_analysis(
-        self, request: str, context: Dict[str, Any] = None
-    ) -> Dict[str, Any]:
+        self, request: str, context: dict[str, Any] = None
+    ) -> dict[str, Any]:
         """
         Perform comprehensive meta-intelligence analysis
 
@@ -347,6 +347,6 @@ class O3ReasoningEngine:
 
 
 # Factory function for easy integration
-def create_o3_reasoning_engine(config: Optional[Dict] = None) -> O3ReasoningEngine:
+def create_o3_reasoning_engine(config: dict | None = None) -> O3ReasoningEngine:
     """Create O3 reasoning engine instance"""
     return O3ReasoningEngine(config)

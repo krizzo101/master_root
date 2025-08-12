@@ -225,7 +225,7 @@ class ValidationComparisonDemo:
             report_lines.extend(
                 [
                     "1️⃣ BASIC VALIDATION (Pattern Matching)",
-                    f"   Status: ❌ FAILED",
+                    "   Status: ❌ FAILED",
                     f"   Error: {basic.get('error', 'Unknown error')}",
                     "",
                 ]
@@ -241,11 +241,11 @@ class ValidationComparisonDemo:
                     f"   Duration: {orchestrator['duration_seconds']:.2f}s",
                     f"   Validation Score: {orchestrator_results.get('final_validation_score', 'N/A')}/100",
                     f"   Method: {orchestrator['method']}",
-                    f"   Enhanced Capabilities Used:",
-                    f"     - AI-powered authenticity assessment",
-                    f"     - Sophisticated capability verification",
-                    f"     - Advanced evidence synthesis",
-                    f"     - Workflow intelligence optimization",
+                    "   Enhanced Capabilities Used:",
+                    "     - AI-powered authenticity assessment",
+                    "     - Sophisticated capability verification",
+                    "     - Advanced evidence synthesis",
+                    "     - Workflow intelligence optimization",
                     "",
                 ]
             )
@@ -253,7 +253,7 @@ class ValidationComparisonDemo:
             report_lines.extend(
                 [
                     "2️⃣ ORCHESTRATOR-ENHANCED VALIDATION (AI Reasoning)",
-                    f"   Status: ❌ FAILED",
+                    "   Status: ❌ FAILED",
                     f"   Error: {orchestrator.get('error', 'Unknown error')}",
                     "",
                 ]

@@ -21,17 +21,17 @@ import argparse
 import json
 import os
 import sys
-from pathlib import Path
-from typing import Iterable, Optional
-from datetime import datetime, timezone
 import time
+from collections.abc import Iterable
+from datetime import datetime, timezone
+from pathlib import Path
 
 STUB_MARKER = "AUTO-GENERATED STUB"
 TODO_MARKER = "# TODO(ai):"
 APPROVED_MODELS = {"o3", "o4-mini", "gpt-5", "gpt-5-mini", "gpt-5-nano"}
 
 # Global log file path (set via --log-file). When set, all prints are also written to this file.
-LOG_FILE_PATH: Optional[str] = None
+LOG_FILE_PATH: str | None = None
 
 
 class _TeeWriter:
@@ -87,7 +87,7 @@ def write_placeholder(path: Path) -> None:
         f.write(header)
 
 
-def get_env_var(name: str, default: Optional[str] = None) -> Optional[str]:
+def get_env_var(name: str, default: str | None = None) -> str | None:
     val = os.environ.get(name)
     return val if val else default
 
@@ -105,7 +105,9 @@ def select_model() -> str:
 
 
 def ts() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return (
+        datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    )
 
 
 def _choose_model_for_content(content: str) -> str:
@@ -123,12 +125,15 @@ def _estimate_output_tokens(basis: str) -> int:
     return 16000
 
 
-def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[str], content_hint: str = "") -> Optional[dict]:
+def _call_responses_with_schema(
+    prompt: str, *, model: str, base_url: str | None, content_hint: str = ""
+) -> dict | None:
     """Call OpenAI Responses API using proven working pattern from ACCF agents."""
     try:
         from openai import OpenAI  # type: ignore
+
         try:
-            from openai import APIError, RateLimitError, APITimeoutError  # type: ignore
+            from openai import APIError, APITimeoutError, RateLimitError  # type: ignore
         except Exception:  # noqa: BLE001
             APIError = Exception  # type: ignore[assignment]
             RateLimitError = Exception  # type: ignore[assignment]
@@ -162,7 +167,9 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
 
     for attempt in range(1, 4):
         try:
-            print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt} max_tokens={max_tokens}")
+            print(
+                f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt} max_tokens={max_tokens}"
+            )
             resp = client.responses.create(**params)
 
             # Extract output like the working ACCF interface
@@ -183,8 +190,15 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
             if output_text and output_text.strip():
                 try:
                     obj = json.loads(output_text)
-                    if isinstance(obj, dict) and isinstance(obj.get("code"), str) and obj["code"].strip():
-                        return {"code": obj.get("code"), "reasoning": obj.get("reasoning", "")}
+                    if (
+                        isinstance(obj, dict)
+                        and isinstance(obj.get("code"), str)
+                        and obj["code"].strip()
+                    ):
+                        return {
+                            "code": obj.get("code"),
+                            "reasoning": obj.get("reasoning", ""),
+                        }
                 except Exception:
                     pass
 
@@ -212,7 +226,7 @@ def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[s
     return None
 
 
-def call_openai_responses(prompt: str, *, content_hint: str = "") -> Optional[dict]:
+def call_openai_responses(prompt: str, *, content_hint: str = "") -> dict | None:
     """Call OpenAI Responses API using a version-tolerant helper.
 
     Returns {'code': str, 'reasoning': str} or None.
@@ -222,7 +236,9 @@ def call_openai_responses(prompt: str, *, content_hint: str = "") -> Optional[di
         return None
     base_url = get_env_var("OPENAI_BASE_URL")
     model = _choose_model_for_content(content_hint)
-    return _call_responses_with_schema(prompt, model=model, base_url=base_url, content_hint=content_hint)
+    return _call_responses_with_schema(
+        prompt, model=model, base_url=base_url, content_hint=content_hint
+    )
 
 
 # Removed chat fallback: GPT-5 is only served by Responses API
@@ -237,7 +253,7 @@ def build_prompt(file_path: Path, rel_path: str, lib_name: str, content: str) ->
         "- Keep code under ~200 lines if possible; no external network calls.\n\n"
         f"Library: {lib_name}\nFile: {rel_path}\n\n"
         "Current content:\n---BEGIN---\n" + content + "\n---END---\n\n"
-        "Return a JSON object only: {\"code\": \"<FULL FILE CODE>\"}. "
+        'Return a JSON object only: {"code": "<FULL FILE CODE>"}. '
         "The code must be complete, valid Python. No explanations outside the JSON."
     )
 
@@ -257,8 +273,14 @@ def main() -> int:
     parser.add_argument("--type", dest="only_type", nargs="*", default=None)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--write", action="store_true")
-    parser.add_argument("--offline", action="store_true", help="Disable network/AI calls; write deterministic placeholders only (use only for diagnostics)")
-    parser.add_argument("--log-file", help="Path to write detailed logs (also echoed to console)")
+    parser.add_argument(
+        "--offline",
+        action="store_true",
+        help="Disable network/AI calls; write deterministic placeholders only (use only for diagnostics)",
+    )
+    parser.add_argument(
+        "--log-file", help="Path to write detailed logs (also echoed to console)"
+    )
     parser.add_argument(
         "--mode",
         choices=["append", "replace"],
@@ -308,26 +330,40 @@ def main() -> int:
                     prompt = build_prompt(s, rel, lib_name, content)
                     print(f"[{ts()}] invoking AI for {rel} (mode={args.mode})")
                     result = call_openai_responses(prompt, content_hint=content)
-                    code = (result or {}).get("code") if isinstance(result, dict) else None
+                    code = (
+                        (result or {}).get("code") if isinstance(result, dict) else None
+                    )
                     if not code:
                         # Fallback to placeholder if AI failed
-                        print(f"[{ts()}] AI failed; aborting. lib={lib_name} file={rel}")
-                        print(f"[{ts()}] HINT: Ensure OPENAI_API_KEY and OPENAI_BASE_URL (if custom) are set; model={select_model()}; timeout={get_timeout_seconds()}s")
+                        print(
+                            f"[{ts()}] AI failed; aborting. lib={lib_name} file={rel}"
+                        )
+                        print(
+                            f"[{ts()}] HINT: Ensure OPENAI_API_KEY and OPENAI_BASE_URL (if custom) are set; model={select_model()}; timeout={get_timeout_seconds()}s"
+                        )
                         return 2
                     else:
                         took = time.time() - t0
-                        print(f"[{ts()}] AI returned code ({len(code)} chars) in {took:.1f}s; applying -> {rel}")
+                        print(
+                            f"[{ts()}] AI returned code ({len(code)} chars) in {took:.1f}s; applying -> {rel}"
+                        )
                         apply_generated_code(s, args.mode, code)
                         completed_in_lib += 1
                     any_changes = True
                 else:
-                    print(f"[{ts()}] OFFLINE mode enabled — skipping AI and failing fast by design")
+                    print(
+                        f"[{ts()}] OFFLINE mode enabled — skipping AI and failing fast by design"
+                    )
                     return 3
         libs_processed += 1
-        print(f"[{ts()}] Completed {lib_name}: wrote {completed_in_lib}/{len(targets)} files in {time.time()-start_lib:.1f}s")
+        print(
+            f"[{ts()}] Completed {lib_name}: wrote {completed_in_lib}/{len(targets)} files in {time.time()-start_lib:.1f}s"
+        )
 
     if any_changes:
-        print(f"[{ts()}] WROTE AI-generated code to target files. Libraries processed: {libs_processed}")
+        print(
+            f"[{ts()}] WROTE AI-generated code to target files. Libraries processed: {libs_processed}"
+        )
     else:
         print(f"[{ts()}] No changes written.")
 

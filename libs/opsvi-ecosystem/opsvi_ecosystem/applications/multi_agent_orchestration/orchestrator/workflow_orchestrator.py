@@ -7,11 +7,12 @@ execution patterns.
 """
 
 import asyncio
+import logging
+import uuid
+from collections.abc import Callable
 from datetime import datetime
 from enum import Enum
-import logging
-from typing import Any, Callable, Dict, List, Optional, Set
-import uuid
+from typing import Any
 
 from ..agents.base_agent import BaseAgent
 from ..common.types import (
@@ -41,10 +42,10 @@ class WorkflowStep:
         step_id: str,
         agent_id: AgentId,
         task_type: str,
-        task_data: Dict[str, Any],
-        dependencies: Optional[List[str]] = None,
-        conditions: Optional[Dict[str, Any]] = None,
-        timeout: Optional[float] = None,
+        task_data: dict[str, Any],
+        dependencies: list[str] | None = None,
+        conditions: dict[str, Any] | None = None,
+        timeout: float | None = None,
     ):
         self.step_id = step_id
         self.agent_id = agent_id
@@ -54,12 +55,12 @@ class WorkflowStep:
         self.conditions = conditions or {}
         self.timeout = timeout
         self.status = WorkflowStatus.PENDING
-        self.result: Optional[Any] = None
-        self.error: Optional[str] = None
-        self.start_time: Optional[datetime] = None
-        self.end_time: Optional[datetime] = None
+        self.result: Any | None = None
+        self.error: str | None = None
+        self.start_time: datetime | None = None
+        self.end_time: datetime | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert step to dictionary representation."""
         return {
             "step_id": self.step_id,
@@ -84,10 +85,10 @@ class Workflow:
         self,
         workflow_id: WorkflowId,
         name: str,
-        steps: List[WorkflowStep],
+        steps: list[WorkflowStep],
         execution_pattern: ExecutionPattern = ExecutionPattern.SEQUENTIAL,
         max_retries: int = 3,
-        timeout: Optional[float] = None,
+        timeout: float | None = None,
     ):
         self.workflow_id = workflow_id
         self.name = name
@@ -96,12 +97,12 @@ class Workflow:
         self.max_retries = max_retries
         self.timeout = timeout
         self.status = WorkflowStatus.PENDING
-        self.start_time: Optional[datetime] = None
-        self.end_time: Optional[datetime] = None
-        self.results: Dict[str, Any] = {}
-        self.errors: List[str] = []
+        self.start_time: datetime | None = None
+        self.end_time: datetime | None = None
+        self.results: dict[str, Any] = {}
+        self.errors: list[str] = []
 
-    def get_ready_steps(self) -> List[WorkflowStep]:
+    def get_ready_steps(self) -> list[WorkflowStep]:
         """Get steps that are ready to execute (dependencies satisfied)."""
         ready_steps = []
 
@@ -143,7 +144,7 @@ class WorkflowOrchestrator:
     """
 
     def __init__(
-        self, message_broker: MessageBroker, logger: Optional[logging.Logger] = None
+        self, message_broker: MessageBroker, logger: logging.Logger | None = None
     ):
         """
         Initialize the workflow orchestrator.
@@ -156,15 +157,15 @@ class WorkflowOrchestrator:
         self.logger = logger or logging.getLogger(__name__)
 
         # Agent registry
-        self.agents: Dict[AgentId, BaseAgent] = {}
+        self.agents: dict[AgentId, BaseAgent] = {}
 
         # Workflow management
-        self.workflows: Dict[WorkflowId, Workflow] = {}
-        self.active_workflows: Set[WorkflowId] = set()
+        self.workflows: dict[WorkflowId, Workflow] = {}
+        self.active_workflows: set[WorkflowId] = set()
 
         # Execution tracking
-        self.execution_history: List[Dict[str, Any]] = []
-        self.metrics: Dict[str, Any] = {
+        self.execution_history: list[dict[str, Any]] = []
+        self.metrics: dict[str, Any] = {
             "workflows_executed": 0,
             "workflows_successful": 0,
             "workflows_failed": 0,
@@ -173,7 +174,7 @@ class WorkflowOrchestrator:
         }
 
         # Event handlers
-        self.event_handlers: Dict[str, List[Callable]] = {}
+        self.event_handlers: dict[str, list[Callable]] = {}
 
         self.logger.info("WorkflowOrchestrator initialized")
 
@@ -204,10 +205,10 @@ class WorkflowOrchestrator:
     def create_workflow(
         self,
         name: str,
-        steps: List[Dict[str, Any]],
+        steps: list[dict[str, Any]],
         execution_pattern: ExecutionPattern = ExecutionPattern.SEQUENTIAL,
         max_retries: int = 3,
-        timeout: Optional[float] = None,
+        timeout: float | None = None,
     ) -> WorkflowId:
         """
         Create a new workflow.
@@ -252,7 +253,7 @@ class WorkflowOrchestrator:
 
         return workflow_id
 
-    async def execute_workflow(self, workflow_id: WorkflowId) -> Dict[str, Any]:
+    async def execute_workflow(self, workflow_id: WorkflowId) -> dict[str, Any]:
         """
         Execute a workflow.
 
@@ -501,7 +502,7 @@ class WorkflowOrchestrator:
             step.end_time = datetime.now()
 
     async def _evaluate_conditions(
-        self, conditions: Dict[str, Any], workflow: Workflow
+        self, conditions: dict[str, Any], workflow: Workflow
     ) -> bool:
         """Evaluate conditional expressions."""
         # Simple condition evaluation - can be extended
@@ -521,7 +522,7 @@ class WorkflowOrchestrator:
 
         return True
 
-    def _get_workflow_results(self, workflow: Workflow) -> Dict[str, Any]:
+    def _get_workflow_results(self, workflow: Workflow) -> dict[str, Any]:
         """Get comprehensive workflow results."""
         return {
             "workflow_id": workflow.workflow_id,
@@ -548,7 +549,7 @@ class WorkflowOrchestrator:
             "errors": workflow.errors,
         }
 
-    def get_workflow_status(self, workflow_id: WorkflowId) -> Optional[Dict[str, Any]]:
+    def get_workflow_status(self, workflow_id: WorkflowId) -> dict[str, Any] | None:
         """Get current status of a workflow."""
         if workflow_id not in self.workflows:
             return None
@@ -556,17 +557,15 @@ class WorkflowOrchestrator:
         workflow = self.workflows[workflow_id]
         return self._get_workflow_results(workflow)
 
-    def get_active_workflows(self) -> List[WorkflowId]:
+    def get_active_workflows(self) -> list[WorkflowId]:
         """Get list of currently active workflows."""
         return list(self.active_workflows)
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get orchestrator metrics."""
         return self.metrics.copy()
 
-    def get_execution_history(
-        self, limit: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+    def get_execution_history(self, limit: int | None = None) -> list[dict[str, Any]]:
         """Get workflow execution history."""
         if limit:
             return self.execution_history[-limit:]

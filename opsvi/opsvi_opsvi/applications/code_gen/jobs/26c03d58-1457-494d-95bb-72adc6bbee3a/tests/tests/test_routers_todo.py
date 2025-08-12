@@ -1,9 +1,8 @@
 import pytest
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
 from app.routers import todo as todo_router
 from app.services.todo_service import InMemoryTodoStore, TodoService
-from app.models.todo import TodoItemCreate, TodoItemUpdate
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture

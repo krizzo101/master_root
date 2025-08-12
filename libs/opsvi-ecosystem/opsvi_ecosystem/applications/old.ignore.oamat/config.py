@@ -1,8 +1,8 @@
 import os
 
+import yaml
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-import yaml
 
 
 class Neo4jSettings(BaseSettings):

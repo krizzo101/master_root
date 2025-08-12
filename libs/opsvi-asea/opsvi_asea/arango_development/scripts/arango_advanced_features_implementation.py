@@ -15,9 +15,8 @@ Following SDLC methodology for systematic implementation.
 import json
 import logging
 import time
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from arango import ArangoClient, ArangoServerError
-from arango.database import StandardDatabase
 
 # Configure logging
 logging.basicConfig(
@@ -736,11 +735,11 @@ def main():
             json.dump(results, f, indent=2, default=str)
 
         print("ArangoDB Advanced Features Implementation Complete!")
-        print(f"Results saved to: arango_advanced_features_results.json")
+        print("Results saved to: arango_advanced_features_results.json")
 
         # Print summary
         deployment = results["deployment"]
-        print(f"\nDeployment Summary:")
+        print("\nDeployment Summary:")
         print(f"- Analyzers deployed: {deployment['analyzers_deployed']}")
         print(f"- Views deployed: {deployment['views_deployed']}")
         print(f"- Queries optimized: {deployment['queries_optimized']}")

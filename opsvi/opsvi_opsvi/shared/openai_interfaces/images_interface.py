@@ -1,7 +1,6 @@
-from typing import Any, Dict
+from typing import Any
 
 import openai
-
 from shared.openai_interfaces.base import OpenAIBaseInterface
 
 
@@ -14,7 +13,7 @@ class OpenAIImagesInterface(OpenAIBaseInterface):
     All methods are standards-compliant and mapped to the official OpenAI Python SDK.
     """
 
-    def create_image(self, prompt: str, **kwargs) -> Dict[str, Any]:
+    def create_image(self, prompt: str, **kwargs) -> dict[str, Any]:
         """
         Generate an image from a prompt.
         POST /v1/images/generations
@@ -27,7 +26,7 @@ class OpenAIImagesInterface(OpenAIBaseInterface):
 
     def edit_image(
         self, image: bytes, mask: bytes, prompt: str, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Edit an image based on a prompt and a mask.
         POST /v1/images/edits
@@ -40,7 +39,7 @@ class OpenAIImagesInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def create_image_variation(self, image: bytes, **kwargs) -> Dict[str, Any]:
+    def create_image_variation(self, image: bytes, **kwargs) -> dict[str, Any]:
         """
         Create a variation of a given image.
         POST /v1/images/variations
@@ -51,7 +50,7 @@ class OpenAIImagesInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def acreate_image(self, prompt: str, **kwargs) -> Dict[str, Any]:
+    async def acreate_image(self, prompt: str, **kwargs) -> dict[str, Any]:
         """
         Async: Generate an image from a prompt.
         POST /v1/images/generations
@@ -64,7 +63,7 @@ class OpenAIImagesInterface(OpenAIBaseInterface):
 
     async def aedit_image(
         self, image: bytes, mask: bytes, prompt: str, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Async: Edit an image based on a prompt and a mask.
         POST /v1/images/edits
@@ -77,7 +76,7 @@ class OpenAIImagesInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def acreate_image_variation(self, image: bytes, **kwargs) -> Dict[str, Any]:
+    async def acreate_image_variation(self, image: bytes, **kwargs) -> dict[str, Any]:
         """
         Async: Create a variation of a given image.
         POST /v1/images/variations

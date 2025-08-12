@@ -6,7 +6,7 @@ Extracted from smart_decomposition_agent.py for better modularity.
 """
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 from langchain_openai import ChatOpenAI
 
@@ -147,7 +147,7 @@ class SolutionSynthesisEngine:
         return state
 
     def _create_synthesis_prompt(
-        self, user_request: str, agent_outputs: Dict[str, Any]
+        self, user_request: str, agent_outputs: dict[str, Any]
     ) -> str:
         """Create a comprehensive synthesis prompt for O3 reasoning"""
 
@@ -260,7 +260,7 @@ Now apply your advanced reasoning capabilities to create the perfect synthesized
         else:
             return "general_solution"
 
-    def _validate_solution(self, solution_content: str) -> Dict[str, Any]:
+    def _validate_solution(self, solution_content: str) -> dict[str, Any]:
         """Validate the synthesized solution"""
         validation_results = {
             "completeness_score": 0.0,
@@ -351,7 +351,7 @@ Now apply your advanced reasoning capabilities to create the perfect synthesized
         return validation_results
 
     def _calculate_synthesis_quality(
-        self, final_solution: Dict[str, Any], agent_outputs: Dict[str, Any]
+        self, final_solution: dict[str, Any], agent_outputs: dict[str, Any]
     ) -> float:
         """Calculate the quality score of the synthesized solution"""
         from src.applications.oamat_sd.src.config.config_manager import ConfigManager

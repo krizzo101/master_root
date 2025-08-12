@@ -8,16 +8,17 @@ Intelligent workflow orchestration using LangGraph-based agentic planning.
 
 import argparse
 import asyncio
-from datetime import datetime
 import json
 import logging
 import os
-from pathlib import Path
 import re
 import sys
 import time
 import traceback
-from typing import Any, Callable, Dict, List, Tuple
+from collections.abc import Callable
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
@@ -106,7 +107,7 @@ from typing import Union
 class HandoffCommand:
     target_agent: str
     task_description: str
-    context: Dict[str, Any]
+    context: dict[str, Any]
 
 
 @dataclass
@@ -356,7 +357,7 @@ class OAMATMain:
 
     def _get_agent_context(
         self, state: AgenticWorkflowState, node_id: str, role: str, project_path: Path
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Get the context for the agent, including previous outputs."""
         # Ensure context key exists
         if "context" not in state:
@@ -389,7 +390,7 @@ class OAMATMain:
 
     def _extract_file_generation_history(
         self, state: AgenticWorkflowState
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Extract file generation history from previous agent outputs"""
         file_history = {
             "total_files_generated": 0,
@@ -437,7 +438,7 @@ class OAMATMain:
 
     def _extract_dependency_file_context(
         self, state: AgenticWorkflowState, current_role: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Extract file contents from dependency nodes for current agent to reference"""
         dependency_files = {}
 
@@ -483,7 +484,7 @@ class OAMATMain:
 
         return dependency_files
 
-    def _create_project_context(self, state: AgenticWorkflowState) -> Tuple[str, Path]:
+    def _create_project_context(self, state: AgenticWorkflowState) -> tuple[str, Path]:
         """Generates a unique project name and creates its directory, or reuses existing context if available."""
         self.logger.debug("🔍 _create_project_context() called")
         self.logger.info(
@@ -558,7 +559,7 @@ class OAMATMain:
         return project_name, project_path
 
     def _run_agent_node(
-        self, state: AgenticWorkflowState, config: Dict[str, Any], node_id: str
+        self, state: AgenticWorkflowState, config: dict[str, Any], node_id: str
     ):
         """Runs a single agent node in the workflow."""
         try:
@@ -1145,8 +1146,8 @@ RISK ASSESSMENT: {decision.get('risk_assessment', 'N/A')}
         )
 
     def _identify_parallel_candidates(
-        self, eligible_nodes: List[Dict], workflow_plan: Dict
-    ) -> List[Dict]:
+        self, eligible_nodes: list[dict], workflow_plan: dict
+    ) -> list[dict]:
         """Identify nodes that can run in parallel (no interdependencies)"""
         parallel_candidates = []
 
@@ -1179,8 +1180,8 @@ RISK ASSESSMENT: {decision.get('risk_assessment', 'N/A')}
         return parallel_candidates
 
     def _create_parallel_dispatch(
-        self, parallel_nodes: List[Dict], user_request: str, state: Dict
-    ) -> List[Send]:
+        self, parallel_nodes: list[dict], user_request: str, state: dict
+    ) -> list[Send]:
         """Create Send commands for parallel execution"""
         send_commands = []
 
@@ -1362,9 +1363,9 @@ RISK ASSESSMENT: {decision.get('risk_assessment', 'N/A')}
     async def run_workflow(
         self,
         user_request: str,
-        context: Dict[str, Any] = None,
+        context: dict[str, Any] = None,
         interactive: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute sophisticated agentic workflow using dynamic planning and orchestration.
 
@@ -1554,7 +1555,7 @@ RISK ASSESSMENT: {decision.get('risk_assessment', 'N/A')}
                 f"Sophisticated workflow execution failed: {str(e)}"
             ) from e
 
-    async def _create_mcp_enabled_agents(self, workflow_plan) -> Dict[str, Callable]:
+    async def _create_mcp_enabled_agents(self, workflow_plan) -> dict[str, Callable]:
         """Create MCP-enabled agents for each node in the workflow plan"""
         timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
         print(
@@ -1618,7 +1619,7 @@ RISK ASSESSMENT: {decision.get('risk_assessment', 'N/A')}
         return agent_creators
 
     def _run_mcp_enabled_agent_node(
-        self, state: AgenticWorkflowState, agent_spec: Dict[str, Any]
+        self, state: AgenticWorkflowState, agent_spec: dict[str, Any]
     ):
         """Execute an MCP-enabled agent node using AgentFactory with enhanced tools"""
         from datetime import datetime
@@ -1833,7 +1834,7 @@ Please complete this task and save your results to appropriate files.
 
         return state
 
-    def _get_mcp_tools_for_role(self, role: str) -> List[str]:
+    def _get_mcp_tools_for_role(self, role: str) -> list[str]:
         """Get appropriate MCP tools for an agent role (DEPRECATED - use _get_mcp_tool_instances_for_role)"""
         if not self.mcp_registry:
             return []
@@ -1861,7 +1862,7 @@ Please complete this task and save your results to appropriate files.
 
         return role_tool_mapping.get(role.lower(), role_tool_mapping["default"])
 
-    def _get_mcp_tool_instances_for_role(self, role: str) -> List[Any]:
+    def _get_mcp_tool_instances_for_role(self, role: str) -> list[Any]:
         """Get actual MCP tool instances for an agent role"""
         if not self.mcp_registry:
             return []
@@ -1937,9 +1938,9 @@ Please complete this task and save your results to appropriate files.
     async def _run_legacy_workflow(
         self,
         user_request: str,
-        context: Dict[str, Any] = None,
+        context: dict[str, Any] = None,
         interactive: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Legacy workflow execution method (kept for fallback compatibility).
         This is the original static workflow that gets replaced by sophisticated orchestration.
@@ -2163,7 +2164,7 @@ Type 'quit', 'exit', or 'q' to exit.
                     traceback.print_exc()
 
     def run_single_request(
-        self, user_request: str, context: Dict[str, Any] = None
+        self, user_request: str, context: dict[str, Any] = None
     ) -> None:
         """Run a single request and exit."""
         self.logger.debug("🔍 run_single_request() called")

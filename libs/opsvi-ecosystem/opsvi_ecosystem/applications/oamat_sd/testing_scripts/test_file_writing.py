@@ -6,8 +6,8 @@ This script tests the new file writing pattern based on old OAMAT.
 """
 
 import asyncio
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Add the src directory to path for local imports
 app_src_root = Path(__file__).parent / "src"

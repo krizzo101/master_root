@@ -6,9 +6,9 @@ Pydantic models and SQLAlchemy ORM schema for core entities:
 - UserPresence
 - AuditLog
 """
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
+
+from pydantic import BaseModel, EmailStr
 
 # Orm definitions for DB integration omitted for brevity
 
@@ -17,8 +17,8 @@ class User(BaseModel):
     id: str
     username: str
     email: EmailStr
-    full_name: Optional[str]
-    disabled: Optional[bool] = False
+    full_name: str | None
+    disabled: bool | None = False
     created_at: datetime
 
 
@@ -29,7 +29,7 @@ class Document(BaseModel):
     body: str
     created_at: datetime
     updated_at: datetime
-    collaborators: List[str] = []
+    collaborators: list[str] = []
     current_version: int = 1
 
 
@@ -53,8 +53,8 @@ class UserPresence(BaseModel):
 class AuditLog(BaseModel):
     id: str
     user_id: str
-    doc_id: Optional[str]
+    doc_id: str | None
     action: str
-    detail: Optional[str]
+    detail: str | None
     timestamp: datetime
-    ip: Optional[str]
+    ip: str | None

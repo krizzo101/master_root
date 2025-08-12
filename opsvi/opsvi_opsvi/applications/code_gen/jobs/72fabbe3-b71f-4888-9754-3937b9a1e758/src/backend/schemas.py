@@ -1,7 +1,7 @@
 from datetime import datetime
-from pydantic import BaseModel, Field
-from enum import Enum
-from typing import Optional
+
+from pydantic import BaseModel
+
 from backend.models import MetricType
 
 
@@ -34,10 +34,10 @@ class ThresholdRead(BaseModel):
 
 
 class ThresholdUpdate(BaseModel):
-    cpu: Optional[float]
-    memory: Optional[float]
-    disk: Optional[float]
-    network: Optional[float]
+    cpu: float | None
+    memory: float | None
+    disk: float | None
+    network: float | None
 
 
 class AlertRead(BaseModel):

@@ -11,7 +11,6 @@ This module provides the OpenAI-specific implementation of the APIClient.
 """
 
 from openai import AsyncOpenAI
-from openai import RateLimitError, APIError, APITimeoutError
 
 from genfilemap.api.base import APIClient
 from genfilemap.config import Config

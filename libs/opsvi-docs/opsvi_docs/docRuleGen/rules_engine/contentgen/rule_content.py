@@ -11,13 +11,11 @@ This module provides functions for generating rule content from documentation,
 including extracting relevant sections and transforming them to rule format.
 """
 
-import os
 import json
 import yaml
 import logging
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
-from concurrent.futures import ThreadPoolExecutor
+from typing import Dict, List, Any, Optional
 import time
 
 from openai import OpenAI
@@ -276,12 +274,12 @@ class RuleContentGenerator:
                 # Try to parse as JSON
                 try:
                     data = json.loads(content)
-                    logger.info(f"Successfully parsed response as JSON")
+                    logger.info("Successfully parsed response as JSON")
                     return data
                 except json.JSONDecodeError:
                     # If it's not valid JSON, try to extract JSON content from markdown code blocks
                     logger.warning(
-                        f"Response is not valid JSON, attempting to extract JSON from markdown"
+                        "Response is not valid JSON, attempting to extract JSON from markdown"
                     )
 
                     # Look for JSON inside markdown code blocks
@@ -295,7 +293,7 @@ class RuleContentGenerator:
                             )
                             data = json.loads(json_content)
                             logger.info(
-                                f"Successfully extracted JSON from markdown code block"
+                                "Successfully extracted JSON from markdown code block"
                             )
                             return data
                         except (IndexError, json.JSONDecodeError) as e:

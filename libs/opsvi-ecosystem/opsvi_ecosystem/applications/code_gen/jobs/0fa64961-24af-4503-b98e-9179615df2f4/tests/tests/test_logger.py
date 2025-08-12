@@ -1,6 +1,6 @@
-import logging
 import io
-import pytest
+import logging
+
 import csv_reporter.logger as logger
 
 

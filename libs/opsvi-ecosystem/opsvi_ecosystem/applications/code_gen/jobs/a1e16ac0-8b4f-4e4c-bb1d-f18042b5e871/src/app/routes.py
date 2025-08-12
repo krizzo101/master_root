@@ -1,23 +1,22 @@
 """
 Main blueprint containing the app's routes for weather display, refresh API, index, and favicon.
 """
+import logging
+
 from flask import (
     Blueprint,
-    render_template,
-    request,
     current_app,
+    flash,
     jsonify,
     redirect,
+    render_template,
     url_for,
-    flash,
 )
-from flask_wtf.csrf import generate_csrf
-from .weather_service import WeatherService
-from wtforms import Form, SubmitField
 from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired
-from flask import session
-import logging
+from flask_wtf.csrf import generate_csrf
+from wtforms import SubmitField
+
+from .weather_service import WeatherService
 
 main = Blueprint("main", __name__)
 
@@ -66,8 +65,9 @@ def api_weather():
 
 @main.route("/favicon.ico")
 def favicon():
-    from flask import send_from_directory
     import os
+
+    from flask import send_from_directory
 
     return send_from_directory(
         os.path.join(current_app.root_path, "static"),

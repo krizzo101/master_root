@@ -7,12 +7,10 @@ Core AI agent framework that leverages our multi-modal ArangoDB platform
 for autonomous knowledge discovery, reasoning, and optimization.
 """
 
-import json
 import logging
 import time
-import asyncio
-from typing import Dict, List, Any, Optional, Tuple
-from datetime import datetime, timedelta
+from typing import Dict, List, Any
+from datetime import datetime
 from arango import ArangoClient
 from dataclasses import dataclass
 from enum import Enum

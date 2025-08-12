@@ -4,13 +4,11 @@ Tests for opsvi-auth components
 """
 
 import pytest
-import asyncio
-from unittest.mock import Mock, patch, AsyncMock
-from typing import Any, Dict, List
 
 from opsvi_auth import OpsviAuthManager
 from opsvi_auth.config.settings import OpsviAuthConfig
 from opsvi_auth.exceptions.base import OpsviAuthError
+
 
 class TestOpsviAuth:
     """Test cases for opsvi-auth."""
@@ -36,7 +34,7 @@ class TestOpsviAuth:
         """Test component start and stop."""
         await component.start()
         assert component.is_active()
-        
+
         await component.stop()
         assert not component.is_active()
 
@@ -54,4 +52,3 @@ class TestOpsviAuth:
             pass
 
     # Component-specific tests
-    

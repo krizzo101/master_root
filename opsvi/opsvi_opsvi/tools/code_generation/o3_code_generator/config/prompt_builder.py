@@ -16,7 +16,7 @@ Usage:
     prompt = builder.build()
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.tools.code_generation.o3_code_generator.utils.input_loader import (
     UniversalInputLoader,
@@ -36,7 +36,7 @@ class PromptBuilder:
         variables: Dictionary of keys and values for template substitution.
     """
 
-    def __init__(self, template: Optional[str] = None) -> None:
+    def __init__(self, template: str | None = None) -> None:
         """
         Initialize the PromptBuilder.
 
@@ -45,8 +45,8 @@ class PromptBuilder:
         """
         self.logger = O3Logger().get_logger()
         self.template: str = template or ""
-        self.context_parts: List[str] = []
-        self.variables: Dict[str, Any] = {}
+        self.context_parts: list[str] = []
+        self.variables: dict[str, Any] = {}
 
     def load_template(self, template_str: str) -> None:
         """
@@ -109,7 +109,7 @@ class PromptBuilder:
             self.logger.log_error(f"Error adding variable {key}: {e}")
             raise
 
-    def add_variables(self, vars_dict: Dict[str, Any]) -> None:
+    def add_variables(self, vars_dict: dict[str, Any]) -> None:
         """
         Add multiple variables for template substitution.
 
@@ -133,7 +133,7 @@ class PromptBuilder:
             The fully constructed prompt.
         """
         try:
-            parts: List[str] = []
+            parts: list[str] = []
             if self.context_parts:
                 parts.extend(self.context_parts)
             parts.append(self.template)

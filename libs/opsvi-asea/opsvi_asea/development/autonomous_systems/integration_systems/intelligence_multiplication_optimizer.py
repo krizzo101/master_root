@@ -7,8 +7,6 @@ This system optimizes compound learning effects across all capabilities to achie
 intelligence multiplication and emergent autonomous capabilities.
 """
 
-import json
-import os
 from datetime import datetime
 from typing import Dict, List, Any, Tuple
 from itertools import combinations
@@ -791,7 +789,7 @@ def main():
     # Run test
     test_results = test_intelligence_multiplication_optimizer()
 
-    print(f"\n=== INTELLIGENCE MULTIPLICATION PERFORMANCE ===")
+    print("\n=== INTELLIGENCE MULTIPLICATION PERFORMANCE ===")
     analysis = test_results["compound_analysis"]
     optimization = test_results["optimization_results"]
 

@@ -1,8 +1,7 @@
 """API endpoint smoke tests."""
 
-from fastapi.testclient import TestClient
-
 from applications.code_gen.api import app
+from fastapi.testclient import TestClient
 
 client = TestClient(app)
 

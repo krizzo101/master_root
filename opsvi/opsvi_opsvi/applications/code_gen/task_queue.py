@@ -2,14 +2,15 @@ from __future__ import annotations
 
 """Celery application used for asynchronous pipeline execution."""
 
-from celery import Celery
-from logging import getLogger
-from applications.code_gen.config import config
-from applications.code_gen.pipeline import build_pipeline
-from applications.code_gen.database import update_job, get_job_data
-from applications.code_gen.ws_router import publish_progress_update
-from pathlib import Path
 import traceback
+from logging import getLogger
+from pathlib import Path
+
+from applications.code_gen.config import config
+from applications.code_gen.database import get_job_data, update_job
+from applications.code_gen.pipeline import build_pipeline
+from applications.code_gen.ws_router import publish_progress_update
+from celery import Celery
 
 logger = getLogger(__name__)
 
@@ -24,8 +25,6 @@ celery = Celery(
 def run_pipeline(job_id: str, options: dict = None) -> None:  # noqa: D401
     """Celery task to execute the generation pipeline for a job."""
     import os
-    import sys
-    from pathlib import Path
 
     logger.info(f"[celery] Task starting - Working directory: {os.getcwd()}")
     logger.info(f"[celery] Job ID: {job_id}")

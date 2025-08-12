@@ -7,7 +7,7 @@ Extracted from complexity_model.py for better modularity.
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Any
 
 
 def _get_complexity_config():
@@ -50,7 +50,7 @@ class ComplexityFactor:
     weight: float = field(
         default_factory=lambda: _get_complexity_config().defaults["factor_weight"]
     )
-    indicators: List[str] = field(default_factory=list)
+    indicators: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -64,7 +64,7 @@ class ComplexityFactors:
     timeline: ComplexityFactor
     risk: ComplexityFactor
 
-    def get_all_factors(self) -> List[ComplexityFactor]:
+    def get_all_factors(self) -> list[ComplexityFactor]:
         """Get all factors as a list."""
         return [
             self.scope,
@@ -75,7 +75,7 @@ class ComplexityFactors:
             self.risk,
         ]
 
-    def to_dict(self) -> Dict[str, int]:
+    def to_dict(self) -> dict[str, int]:
         """Convert to dictionary of scores."""
         return {
             "scope": self.scope.score,
@@ -96,6 +96,6 @@ class ComplexityAnalysisResult:
     category: ComplexityCategory
     execution_strategy: ExecutionStrategy
     reasoning: str
-    agent_requirements: Dict[str, Any]
+    agent_requirements: dict[str, Any]
     estimated_effort: str
     confidence: float

@@ -1,7 +1,5 @@
 import pytest
-from backend.utils import rate_limit_middleware, paginate
-
-import asyncio
+from backend.utils import paginate, rate_limit_middleware
 from starlette.requests import Request
 from starlette.responses import Response
 

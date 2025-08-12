@@ -15,7 +15,7 @@ import time
 import asyncio
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Optional
 
 from genfilemap.config import Config
 from genfilemap.api import create_api_client
@@ -113,12 +113,12 @@ async def update_file_with_map(
         print(f"DEBUG: Using processor: {processor.__class__.__name__}")
 
         # Generate a new file map
-        print(f"DEBUG: Generating file map...")
+        print("DEBUG: Generating file map...")
         new_map = await processor.generate_file_map(content, comment_style)
 
         # If the file map generator decided no changes are needed, exit
         if new_map is None:
-            print(f"DEBUG: No new map generated (None returned)")
+            print("DEBUG: No new map generated (None returned)")
             print(f"File map for {file_path} is already up to date. No changes made.")
             report_data["skipped_files"] += 1
             report_data["detailed_logs"].append(
@@ -142,20 +142,20 @@ async def update_file_with_map(
             return True
 
         # Write the updated content
-        print(f"DEBUG: Writing updated content to file...")
+        print("DEBUG: Writing updated content to file...")
         print(f"DEBUG: Content starts with: {(new_map + remaining_content)[:50]}...")
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(new_map + remaining_content)
 
         # Verify the file was written correctly
-        print(f"DEBUG: Verifying file was written correctly...")
+        print("DEBUG: Verifying file was written correctly...")
         with open(file_path, "r", encoding="utf-8") as f:
             updated_content = f.read()
             if updated_content.startswith(new_map):
-                print(f"DEBUG: File verification successful")
+                print("DEBUG: File verification successful")
             else:
                 print(
-                    f"DEBUG: ERROR - File verification failed! Content doesn't start with file map"
+                    "DEBUG: ERROR - File verification failed! Content doesn't start with file map"
                 )
                 print(f"DEBUG: First 50 chars: {updated_content[:50]}")
 

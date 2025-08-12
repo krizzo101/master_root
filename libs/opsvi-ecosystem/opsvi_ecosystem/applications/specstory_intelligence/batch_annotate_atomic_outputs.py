@@ -1,7 +1,7 @@
-from datetime import datetime
 import json
 import os
 import sys
+from datetime import datetime
 
 SAMPLE_ANNOTATION = {
     "annotation_id": "AUTO-ANNOTATE-001",

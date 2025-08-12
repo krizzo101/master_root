@@ -1,6 +1,5 @@
 import pytest
 from app.weather import WeatherService
-from unittest.mock import MagicMock
 from cachelib import SimpleCache
 
 

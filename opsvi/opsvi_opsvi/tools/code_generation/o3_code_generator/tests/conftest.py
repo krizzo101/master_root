@@ -6,10 +6,10 @@ This module provides shared fixtures and test configuration for all tests
 in the O3 Code Generator application.
 """
 
-from pathlib import Path
 import shutil
 import tempfile
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any
 from unittest.mock import Mock
 
 import pytest
@@ -64,7 +64,7 @@ def mock_openai_client():
 
 
 @pytest.fixture
-def sample_input_data() -> Dict[str, Any]:
+def sample_input_data() -> dict[str, Any]:
     """Provide sample input data for testing."""
     return {
         "prompt": "Generate a simple Python function",
@@ -77,7 +77,7 @@ def sample_input_data() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def sample_output_data() -> Dict[str, Any]:
+def sample_output_data() -> dict[str, Any]:
     """Provide sample output data for testing."""
     return {
         "generated_code": "def test_function():\n    return 'Hello, World!'",
@@ -116,7 +116,7 @@ class SampleClass:
 
 
 @pytest.fixture
-def sample_json_data() -> Dict[str, Any]:
+def sample_json_data() -> dict[str, Any]:
     """Provide sample JSON data for testing."""
     return {
         "project_name": "test_project",

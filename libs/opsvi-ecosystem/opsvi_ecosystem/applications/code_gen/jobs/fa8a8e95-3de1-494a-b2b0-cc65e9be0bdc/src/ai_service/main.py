@@ -1,25 +1,20 @@
+import asyncio
 import logging
-from fastapi import FastAPI, HTTPException, Request, status
+
+import uvicorn
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict
-from uuid import uuid4
-import uvicorn
-import asyncio
-import random
-import numpy as np
-from ai_service.models import (
-    Task,
-    TeamMember,
-    TaskInput,
-    AIResponse,
-)
+
 from ai_service.ai_logic import (
-    prioritize_tasks,
-    estimate_completion_times,
     detect_dependencies,
+    estimate_completion_times,
+    prioritize_tasks,
     suggest_optimal_scheduling,
+)
+from ai_service.models import (
+    AIResponse,
+    TaskInput,
 )
 
 logger = logging.getLogger("ai_service")

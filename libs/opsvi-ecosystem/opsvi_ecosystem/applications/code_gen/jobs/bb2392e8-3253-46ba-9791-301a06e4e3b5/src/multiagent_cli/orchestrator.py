@@ -3,12 +3,13 @@ Orchestration Engine for Multi-Agent Workflow Execution
 Uses Langgraph to build and execute the agent workflow graph.
 """
 import asyncio
-from loguru import logger
-from typing import Any, Dict, List
+from typing import Any
+
 from rich.progress import Progress
-from multiagent_cli.input_parser import InputModel
+
 from multiagent_cli.agent_manager import AgentManager
 from multiagent_cli.config import AppConfig
+from multiagent_cli.input_parser import InputModel
 
 
 class OrchestrationEngine:
@@ -25,7 +26,7 @@ class OrchestrationEngine:
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
 
-    def run(self, progress: Progress, progress_task: int) -> Dict[str, Any]:
+    def run(self, progress: Progress, progress_task: int) -> dict[str, Any]:
         """
         Synchronously runs the orchestration workflow with progress reporting.
         Returns a dictionary of all agent task outputs.
@@ -40,7 +41,7 @@ class OrchestrationEngine:
                 t.cancel()
             self.loop.close()
 
-    async def _run_all(self, progress: Progress, progress_task: int) -> Dict[str, Any]:
+    async def _run_all(self, progress: Progress, progress_task: int) -> dict[str, Any]:
         workloads = self.input.workloads
         total_tasks = sum(len(w.tasks) for w in workloads)
         completed_tasks = 0

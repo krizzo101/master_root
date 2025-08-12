@@ -5,11 +5,11 @@ AI-driven complexity analysis using dynamic factor generation rather than
 predetermined scoring rules. Adapts analysis approach to request context.
 """
 
-from dataclasses import dataclass, field
-from enum import Enum
 import logging
 import re
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
@@ -53,7 +53,7 @@ class ComplexityFactor:
     score: int  # 1-10 scale
     reasoning: str
     weight: float = 1.0
-    indicators: List[str] = field(default_factory=list)
+    indicators: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -67,7 +67,7 @@ class ComplexityFactors:
     timeline: ComplexityFactor
     risk: ComplexityFactor
 
-    def get_all_factors(self) -> List[ComplexityFactor]:
+    def get_all_factors(self) -> list[ComplexityFactor]:
         """Get all factors as a list."""
         return [
             self.scope,
@@ -78,7 +78,7 @@ class ComplexityFactors:
             self.risk,
         ]
 
-    def to_dict(self) -> Dict[str, int]:
+    def to_dict(self) -> dict[str, int]:
         """Convert to dictionary of scores."""
         return {
             "scope": self.scope.score,
@@ -99,7 +99,7 @@ class ComplexityAnalysisResult:
     category: ComplexityCategory
     execution_strategy: ExecutionStrategy
     reasoning: str
-    agent_requirements: Dict[str, Any]
+    agent_requirements: dict[str, Any]
     estimated_effort: str
     confidence: float
 
@@ -111,7 +111,7 @@ class ComplexityModel(IComplexityAnalysisModel):
     NO PREDETERMINED SCORING RULES - uses AI to dynamically analyze complexity
     """
 
-    def __init__(self, model_config: Optional[Dict[str, Any]] = None):
+    def __init__(self, model_config: dict[str, Any] | None = None):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
         # Use AI model for intelligent complexity analysis - APPROVED MODELS ONLY
@@ -142,7 +142,7 @@ class ComplexityModel(IComplexityAnalysisModel):
         # Complexity indicators for automated detection
         self.complexity_indicators = self._initialize_indicators()
 
-    def _initialize_indicators(self) -> Dict[str, Dict[str, List[str]]]:
+    def _initialize_indicators(self) -> dict[str, dict[str, list[str]]]:
         """Initialize complexity indicators for automated detection."""
         return {
             "scope": {
@@ -318,7 +318,7 @@ class ComplexityModel(IComplexityAnalysisModel):
         )
 
     def analyze_technical_depth_factor(
-        self, request: Dict[str, Any]
+        self, request: dict[str, Any]
     ) -> ComplexityFactor:
         """Analyze technical depth complexity (1-10)."""
         # Handle both dict and Pydantic model inputs - prioritize content over description
@@ -392,7 +392,7 @@ class ComplexityModel(IComplexityAnalysisModel):
         )
 
     def analyze_domain_knowledge_factor(
-        self, request: Dict[str, Any]
+        self, request: dict[str, Any]
     ) -> ComplexityFactor:
         """Analyze domain knowledge complexity (1-10)."""
         # Handle both dict and Pydantic model inputs - prioritize content over description
@@ -708,7 +708,7 @@ class ComplexityModel(IComplexityAnalysisModel):
 
     def generate_agent_requirements(
         self, factors: ComplexityFactors, strategy: ExecutionStrategy
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate agent requirements based on complexity analysis."""
         requirements = {
             "agent_count": 1,
@@ -811,7 +811,7 @@ class ComplexityModel(IComplexityAnalysisModel):
         return max(0.5, min(1.0, confidence))
 
     async def analyze_complexity_dynamically(
-        self, request: RequestInput, context: Dict[str, Any]
+        self, request: RequestInput, context: dict[str, Any]
     ) -> ComplexityAnalysis:
         """
         Dynamically analyze complexity using AI reasoning
@@ -872,8 +872,8 @@ class ComplexityModel(IComplexityAnalysisModel):
             )
 
     async def generate_complexity_factors(
-        self, request_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, request_context: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Dynamically generate complexity factors specific to this request
 
@@ -922,7 +922,7 @@ class ComplexityModel(IComplexityAnalysisModel):
                 f"Complexity factor generation failed: {e}. Cannot proceed without AI-generated factors."
             )
 
-    async def reason_about_complexity(self, factors: Dict[str, Any]) -> Dict[str, Any]:
+    async def reason_about_complexity(self, factors: dict[str, Any]) -> dict[str, Any]:
         """
         Use AI reasoning to understand complexity implications
         """
@@ -1012,8 +1012,8 @@ class ComplexityModel(IComplexityAnalysisModel):
     # System must fail completely if AI factor generation fails - no fallback factors allowed
 
     async def _parse_factors_response(
-        self, ai_response: str, request_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, ai_response: str, request_context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Parse AI response into the 6 required complexity factors"""
         factors = {}
         response_lower = ai_response.lower()
@@ -1106,8 +1106,8 @@ class ComplexityModel(IComplexityAnalysisModel):
         return factors
 
     async def _parse_reasoning_response(
-        self, ai_response: str, factors: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, ai_response: str, factors: dict[str, Any]
+    ) -> dict[str, Any]:
         """Parse AI reasoning response into structured analysis"""
         response_lower = ai_response.lower()
 

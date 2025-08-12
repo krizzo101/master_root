@@ -7,7 +7,7 @@ is needed based on contextual analysis.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
@@ -28,7 +28,7 @@ class GapAnalysisAgent(IGapAnalysisAgent):
     NO PREDEFINED SCHEMAS OR RULES - uses AI to understand what's needed
     """
 
-    def __init__(self, model_config: Optional[Dict[str, Any]] = None):
+    def __init__(self, model_config: dict[str, Any] | None = None):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
         # Use AI model for intelligent gap analysis
@@ -50,7 +50,7 @@ class GapAnalysisAgent(IGapAnalysisAgent):
         self.ai_model = ChatOpenAI(**model_kwargs)
 
     async def analyze_gaps_intelligently(
-        self, request: GapAnalysisInput, extracted_info: Dict[str, Any]
+        self, request: GapAnalysisInput, extracted_info: dict[str, Any]
     ) -> GapAnalysisResult:
         """
         Use AI reasoning to identify and prioritize information gaps
@@ -138,7 +138,7 @@ class GapAnalysisAgent(IGapAnalysisAgent):
                 estimated_completion_time=0,
             )
 
-    async def generate_completion_strategy(self, gaps: List[Any]) -> Dict[str, Any]:
+    async def generate_completion_strategy(self, gaps: list[Any]) -> dict[str, Any]:
         """
         Dynamically generate strategy for filling information gaps
         """
@@ -181,8 +181,8 @@ class GapAnalysisAgent(IGapAnalysisAgent):
             return {"strategy": "fallback", "error": str(e)}
 
     async def prioritize_gaps_contextually(
-        self, gaps: List[Any], context: Dict[str, Any]
-    ) -> List[Any]:
+        self, gaps: list[Any], context: dict[str, Any]
+    ) -> list[Any]:
         """
         Use contextual reasoning to prioritize gaps
         """
@@ -231,8 +231,8 @@ class GapAnalysisAgent(IGapAnalysisAgent):
         self,
         ai_analysis: str,
         request: GapAnalysisInput,
-        extracted_info: Dict[str, Any],
-    ) -> List[InformationGap]:
+        extracted_info: dict[str, Any],
+    ) -> list[InformationGap]:
         """
         Parse AI analysis into structured InformationGap objects
         """

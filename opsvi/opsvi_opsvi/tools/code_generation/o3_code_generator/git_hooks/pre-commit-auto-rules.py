@@ -10,10 +10,9 @@ Usage:
 """
 
 import os
-from pathlib import Path
 import subprocess
 import sys
-from typing import List
+from pathlib import Path
 
 
 class AutoRulesPreCommitHook:
@@ -78,7 +77,7 @@ class AutoRulesPreCommitHook:
             pass
         raise FileNotFoundError("Could not find project root (no .git directory found)")
 
-    def _get_staged_files(self) -> List[str]:
+    def _get_staged_files(self) -> list[str]:
         """Get list of staged files for the current commit."""
         try:
             result = subprocess.run(
@@ -132,7 +131,7 @@ class AutoRulesPreCommitHook:
             pass
         return False
 
-    def _has_relevant_changes(self, staged_files: List[str]) -> bool:
+    def _has_relevant_changes(self, staged_files: list[str]) -> bool:
         """Check if any staged files are relevant for rule regeneration."""
         relevant_files = [f for f in staged_files if self._is_relevant_file(f)]
         if relevant_files:

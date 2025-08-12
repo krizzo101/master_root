@@ -1,8 +1,7 @@
-import pytest
 from app.tasks import (
     ai_generate_post_content,
-    ai_suggest_tags,
     ai_suggest_categories,
+    ai_suggest_tags,
     generate_alt_text,
 )
 

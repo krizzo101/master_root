@@ -8,7 +8,7 @@ Extracted from o3_master_agent.py for better modularity.
 import json
 import logging
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
@@ -17,7 +17,7 @@ from langchain_openai import ChatOpenAI
 class AIReasoningUtils:
     """Handles AI reasoning infrastructure and utilities"""
 
-    def __init__(self, model_config: Optional[Dict[str, Any]] = None):
+    def __init__(self, model_config: dict[str, Any] | None = None):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.model_config = model_config or self._default_model_config()
 
@@ -38,7 +38,7 @@ class AIReasoningUtils:
                 f"O3 model initialization failed: {e}. System cannot operate without O3."
             )
 
-    def _default_model_config(self) -> Dict[str, Any]:
+    def _default_model_config(self) -> dict[str, Any]:
         """Default configuration for O3 model integration."""
         return {
             "model": "o3-mini",  # Standardized reasoning model
@@ -149,7 +149,7 @@ class AIReasoningUtils:
 
     def parse_json_from_ai_response(
         self, response_content: str, expected_schema: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Parse JSON from AI response with validation (shared utility)"""
         try:
             # Look for JSON in the response
@@ -174,7 +174,7 @@ class AIReasoningUtils:
             )
 
     def validate_ai_output_schema(
-        self, data: Dict[str, Any], required_fields: List[str], schema_name: str
+        self, data: dict[str, Any], required_fields: list[str], schema_name: str
     ) -> bool:
         """Validate AI output conforms to expected schema"""
         missing_fields = [field for field in required_fields if field not in data]
@@ -194,9 +194,9 @@ class AIReasoningUtils:
         self,
         system_role: str,
         task_description: str,
-        context_data: Dict[str, Any],
+        context_data: dict[str, Any],
         output_format: str,
-        examples: Optional[List[str]] = None,
+        examples: list[str] | None = None,
     ) -> str:
         """Create a structured prompt for AI reasoning"""
 
@@ -230,8 +230,8 @@ Please analyze the above and provide your response in the specified format."""
     def create_analysis_prompt(
         self,
         analysis_type: str,
-        data_to_analyze: Dict[str, Any],
-        specific_requirements: List[str],
+        data_to_analyze: dict[str, Any],
+        specific_requirements: list[str],
         output_schema: str,
     ) -> str:
         """Create a prompt specifically for analysis tasks"""
@@ -259,9 +259,9 @@ Provide a thorough analysis following the specified schema."""
     def create_generation_prompt(
         self,
         generation_type: str,
-        input_data: Dict[str, Any],
-        constraints: List[str],
-        quality_criteria: List[str],
+        input_data: dict[str, Any],
+        constraints: list[str],
+        quality_criteria: list[str],
         output_format: str,
     ) -> str:
         """Create a prompt for generation tasks"""
@@ -291,8 +291,8 @@ Generate the requested output following all constraints and quality criteria."""
         return prompt
 
     def extract_json_from_response(
-        self, response: str, fallback: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        self, response: str, fallback: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Extract JSON from AI response with optional fallback"""
         try:
             return self.parse_json_from_ai_response(response, "structured_response")
@@ -306,8 +306,8 @@ Generate the requested output following all constraints and quality criteria."""
     def log_reasoning_step(
         self,
         step_name: str,
-        input_data: Dict[str, Any],
-        output_data: Dict[str, Any],
+        input_data: dict[str, Any],
+        output_data: dict[str, Any],
         confidence: float,
         duration_ms: float,
     ):
@@ -322,7 +322,7 @@ Generate the requested output following all constraints and quality criteria."""
         self,
         failed_task: str,
         error_details: str,
-        context: Dict[str, Any],
+        context: dict[str, Any],
         alternative_approach: str,
     ) -> str:
         """Create a prompt for error recovery scenarios"""

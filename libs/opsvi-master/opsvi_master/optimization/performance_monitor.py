@@ -16,8 +16,6 @@ from contextlib import asynccontextmanager
 import logging
 import statistics
 
-from .exceptions import PerformanceError, OptimizationError
-
 
 class MetricType(Enum):
     """Types of performance metrics."""

@@ -5,13 +5,13 @@ Neo4j-based dependency graph with parallel execution and context propagation
 
 import asyncio
 import copy
+import json
+import time
+import uuid
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-import json
-import time
-from typing import Any, Dict, List, Optional
-import uuid
+from typing import Any
 
 # Neo4j integration with fallback for POC
 try:
@@ -54,8 +54,8 @@ class TaskNode:
     agent_role: str
     task_type: str
     status: TaskStatus
-    dependencies: List[str]
-    context_requirements: Dict[str, Any]
+    dependencies: list[str]
+    context_requirements: dict[str, Any]
     estimated_duration: int
     created_at: datetime
     priority: int = 1
@@ -184,7 +184,7 @@ class Neo4jDependencyGraph:
             record = await result.single()
             return record and record["created"] > 0
 
-    async def get_ready_tasks(self) -> List[str]:
+    async def get_ready_tasks(self) -> list[str]:
         """Get tasks ready for execution (all dependencies satisfied)"""
         if not self.initialized:
             await self.initialize()
@@ -204,7 +204,7 @@ class Neo4jDependencyGraph:
 
             return [record["task_id"] async for record in result]
 
-    async def get_parallel_execution_waves(self) -> List[List[str]]:
+    async def get_parallel_execution_waves(self) -> list[list[str]]:
         """
         Identify waves of tasks that can execute in parallel.
         Returns list of waves, each wave contains tasks with no dependencies between them.
@@ -238,7 +238,7 @@ class Neo4jDependencyGraph:
 
             return [waves[depth] for depth in sorted(waves.keys())]
 
-    async def mark_task_completed(self, task_id: str, result_context: Dict[str, Any]):
+    async def mark_task_completed(self, task_id: str, result_context: dict[str, Any]):
         """Mark task as completed and store result context"""
         if not self.initialized:
             await self.initialize()
@@ -261,7 +261,7 @@ class Neo4jDependencyGraph:
             if task_id in self.task_nodes:
                 self.task_nodes[task_id].status = TaskStatus.COMPLETED
 
-    async def detect_cycles(self) -> List[List[str]]:
+    async def detect_cycles(self) -> list[list[str]]:
         """Detect dependency cycles using Neo4j graph algorithms"""
         if not self.initialized:
             await self.initialize()
@@ -276,7 +276,7 @@ class Neo4jDependencyGraph:
 
             return [record["cycle"] async for record in result]
 
-    async def get_task_context(self, task_id: str) -> Dict[str, Any]:
+    async def get_task_context(self, task_id: str) -> dict[str, Any]:
         """Get accumulated context for a task"""
         if not self.initialized:
             await self.initialize()
@@ -418,8 +418,8 @@ class ContextPropagator:
         self.contamination_detectors = {}
 
     async def propagate_context(
-        self, from_task: str, to_tasks: List[str], context: Dict[str, Any]
-    ) -> Dict[str, bool]:
+        self, from_task: str, to_tasks: list[str], context: dict[str, Any]
+    ) -> dict[str, bool]:
         """
         Propagate context with state isolation and contamination prevention.
         Returns success status for each target task.
@@ -455,7 +455,7 @@ class ContextPropagator:
 
         return results
 
-    async def _create_isolated_context(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def _create_isolated_context(self, context: dict[str, Any]) -> dict[str, Any]:
         """Create deep isolated copy with serialization safety"""
         try:
             # Use JSON serialization for deep copy and type safety
@@ -482,7 +482,7 @@ class ContextPropagator:
             }
             return isolated
 
-    async def _validate_context_integrity(self, context: Dict[str, Any]) -> bool:
+    async def _validate_context_integrity(self, context: dict[str, Any]) -> bool:
         """Validate context integrity and detect potential contamination"""
         try:
             # Check for required isolation metadata
@@ -511,8 +511,8 @@ class ContextPropagator:
         return self.isolation_locks[task_id]
 
     async def _create_task_specific_context(
-        self, isolated_context: Dict[str, Any], task_id: str
-    ) -> Dict[str, Any]:
+        self, isolated_context: dict[str, Any], task_id: str
+    ) -> dict[str, Any]:
         """Create task-specific context with additional task metadata"""
         task_context = copy.deepcopy(isolated_context)
         task_context["_task_metadata"] = {
@@ -523,7 +523,7 @@ class ContextPropagator:
         return task_context
 
     async def _store_context_with_detection(
-        self, task_id: str, context: Dict[str, Any]
+        self, task_id: str, context: dict[str, Any]
     ):
         """Store context with contamination detection setup"""
         # Store pre-state hash for contamination detection
@@ -537,7 +537,7 @@ class ContextPropagator:
         # Store the actual context
         self.context_store[task_id] = context
 
-    async def detect_state_contamination(self, task_id: str) -> Dict[str, Any]:
+    async def detect_state_contamination(self, task_id: str) -> dict[str, Any]:
         """Detect if task context has been contaminated"""
         if task_id not in self.contamination_detectors:
             return {"contaminated": False, "reason": "no_detection_setup"}
@@ -560,7 +560,7 @@ class ContextPropagator:
             "checked_at": datetime.utcnow().isoformat(),
         }
 
-    async def get_context_for_task(self, task_id: str) -> Dict[str, Any]:
+    async def get_context_for_task(self, task_id: str) -> dict[str, Any]:
         """Get context for a specific task"""
         return self.context_store.get(task_id, {})
 
@@ -582,7 +582,7 @@ class BlockingManager:
         self.completion_status = {}
 
     async def wait_for_dependencies(
-        self, task_id: str, dependencies: List[str]
+        self, task_id: str, dependencies: list[str]
     ) -> bool:
         """Wait for dependencies based on configured strategy"""
 
@@ -597,7 +597,7 @@ class BlockingManager:
         else:
             raise ValueError(f"Unknown blocking strategy: {self.strategy}")
 
-    async def _strict_blocking(self, task_id: str, dependencies: List[str]) -> bool:
+    async def _strict_blocking(self, task_id: str, dependencies: list[str]) -> bool:
         """Strict blocking: wait until ALL dependencies complete"""
         timeout_start = time.time()
         timeout_duration = 10  # 10 second timeout for demo
@@ -615,7 +615,7 @@ class BlockingManager:
 
             await asyncio.sleep(0.1)
 
-    async def _timeout_blocking(self, task_id: str, dependencies: List[str]) -> bool:
+    async def _timeout_blocking(self, task_id: str, dependencies: list[str]) -> bool:
         """Timeout blocking: strict with timeout fallback"""
         start_time = datetime.utcnow()
         timeout = start_time + timedelta(
@@ -635,7 +635,7 @@ class BlockingManager:
         print(f"⚠️  Timeout waiting for dependencies {missing_deps} for task {task_id}")
         return False
 
-    async def _optimistic_blocking(self, task_id: str, dependencies: List[str]) -> bool:
+    async def _optimistic_blocking(self, task_id: str, dependencies: list[str]) -> bool:
         """Optimistic blocking: proceed if safe subset of dependencies ready"""
         # For POC, proceed if at least 50% of dependencies are ready
         ready_deps = [
@@ -645,7 +645,7 @@ class BlockingManager:
         return len(ready_deps) >= len(dependencies) * 0.5
 
     async def _conditional_blocking(
-        self, task_id: str, dependencies: List[str]
+        self, task_id: str, dependencies: list[str]
     ) -> bool:
         """Conditional blocking: strategy based on dependency types"""
         # For POC, use timeout strategy
@@ -655,7 +655,7 @@ class BlockingManager:
         """Mark task as completed for dependency resolution"""
         self.completion_status[task_id] = True
 
-    def get_completion_status(self) -> Dict[str, bool]:
+    def get_completion_status(self) -> dict[str, bool]:
         """Get current completion status for all tasks"""
         return self.completion_status.copy()
 
@@ -667,7 +667,7 @@ class DependencyManager:
     and blocking strategies for parallel execution.
     """
 
-    def __init__(self, config: Optional[SystemConfig] = None):
+    def __init__(self, config: SystemConfig | None = None):
         self.config = config or get_config()
         self.dependency_graph = Neo4jDependencyGraph()
         self.context_propagator = ContextPropagator(self.dependency_graph)
@@ -688,8 +688,8 @@ class DependencyManager:
         task_id: str,
         agent_role: str,
         task_type: str,
-        dependencies: List[str] = None,
-        context_requirements: Dict[str, Any] = None,
+        dependencies: list[str] = None,
+        context_requirements: dict[str, Any] = None,
         estimated_duration: int = 60,
         priority: int = 1,
     ) -> bool:
@@ -711,7 +711,7 @@ class DependencyManager:
 
         return await self.dependency_graph.add_task(task)
 
-    async def get_next_ready_tasks(self, max_tasks: int = 5) -> List[str]:
+    async def get_next_ready_tasks(self, max_tasks: int = 5) -> list[str]:
         """Get next batch of tasks ready for execution"""
         if not self.initialized:
             await self.initialize()
@@ -719,7 +719,7 @@ class DependencyManager:
         ready_tasks = await self.dependency_graph.get_ready_tasks()
         return ready_tasks[:max_tasks]
 
-    async def get_parallel_execution_plan(self) -> List[List[str]]:
+    async def get_parallel_execution_plan(self) -> list[list[str]]:
         """Get parallel execution plan organized by waves"""
         if not self.initialized:
             await self.initialize()
@@ -736,7 +736,7 @@ class DependencyManager:
             task_id, task.dependencies
         )
 
-    async def complete_task(self, task_id: str, result_context: Dict[str, Any]) -> bool:
+    async def complete_task(self, task_id: str, result_context: dict[str, Any]) -> bool:
         """Mark task as completed and propagate context"""
         if not self.initialized:
             await self.initialize()
@@ -756,12 +756,12 @@ class DependencyManager:
 
         return True
 
-    async def _get_dependent_tasks(self, completed_task_id: str) -> List[str]:
+    async def _get_dependent_tasks(self, completed_task_id: str) -> list[str]:
         """Get tasks that depend on the completed task"""
         # For POC, return empty list - would query Neo4j in full implementation
         return []
 
-    async def get_task_context(self, task_id: str) -> Dict[str, Any]:
+    async def get_task_context(self, task_id: str) -> dict[str, Any]:
         """Get accumulated context for a task"""
         if not self.initialized:
             await self.initialize()
@@ -774,14 +774,14 @@ class DependencyManager:
         merged_context = {**graph_context, **propagated_context}
         return merged_context
 
-    async def detect_cycles(self) -> List[List[str]]:
+    async def detect_cycles(self) -> list[list[str]]:
         """Detect dependency cycles"""
         if not self.initialized:
             await self.initialize()
 
         return await self.dependency_graph.detect_cycles()
 
-    async def get_performance_metrics(self) -> Dict[str, Any]:
+    async def get_performance_metrics(self) -> dict[str, Any]:
         """Get dependency management performance metrics"""
         return {
             "total_tasks": len(self.dependency_graph.task_nodes),

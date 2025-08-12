@@ -10,7 +10,7 @@ Version: Referenced as of July 2024
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -63,13 +63,13 @@ class NotificationInterface:
         to: str,
         subject: str,
         body: str,
-        from_addr: Optional[str] = None,
-        cc: Optional[List[str]] = None,
-        bcc: Optional[List[str]] = None,
-        reply_to: Optional[str] = None,
-        attachments: Optional[List[Any]] = None,
+        from_addr: str | None = None,
+        cc: list[str] | None = None,
+        bcc: list[str] | None = None,
+        reply_to: str | None = None,
+        attachments: list[Any] | None = None,
         html: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Send an email using the configured provider. Supports CC, BCC, reply-to, attachments, and HTML.
         Returns structured result: {success, error, result}
@@ -142,8 +142,8 @@ class NotificationInterface:
             return {"success": False, "error": str(e)}
 
     def batch_send_email(
-        self, recipients: List[Dict[str, Any]], subject: str, body: str, **kwargs
-    ) -> List[Dict[str, Any]]:
+        self, recipients: list[dict[str, Any]], subject: str, body: str, **kwargs
+    ) -> list[dict[str, Any]]:
         """
         Batch send emails to multiple recipients. Each recipient is a dict with keys: to, cc, bcc, reply_to, etc.
         Returns a list of structured results.
@@ -164,7 +164,7 @@ class NotificationInterface:
             results.append(res)
         return results
 
-    async def async_send_email(self, *args, **kwargs) -> Dict[str, Any]:
+    async def async_send_email(self, *args, **kwargs) -> dict[str, Any]:
         """
         Async send_email (SMTP via aiosmtplib, SES via aiobotocore, SendGrid via async HTTP if available).
         Not implemented for all providers.
@@ -215,7 +215,7 @@ class NotificationInterface:
                 f"Async send_email not implemented for {self.provider}."
             )
 
-    def send_notification(self, to: str, message: str) -> Dict[str, Any]:
+    def send_notification(self, to: str, message: str) -> dict[str, Any]:
         """
         Send a notification (Slack, Teams, SMS). Not implemented.
         Returns structured result.

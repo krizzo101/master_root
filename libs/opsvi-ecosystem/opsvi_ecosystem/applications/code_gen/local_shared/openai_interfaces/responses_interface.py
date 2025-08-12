@@ -8,10 +8,10 @@ Updated for July 2025 best practices.
 """
 
 import logging
-from typing import TypeVar, Type, Optional, Any, Dict
-from pydantic import BaseModel
+from typing import TypeVar
+
 from openai import OpenAI
-from openai.types.chat import ChatCompletion
+from pydantic import BaseModel
 
 from .model_selector import validate_model_constraints
 
@@ -35,7 +35,7 @@ class OpenAIResponsesInterface:
     def create_structured_response(
         self,
         prompt: str,
-        response_model: Type[BaseModel],
+        response_model: type[BaseModel],
         model: str = "gpt-4.1",
         system_prompt: str = "",
         **kwargs,
@@ -87,7 +87,7 @@ class OpenAIResponsesInterface:
 
             # Return parsed response
             if message.parsed:
-                logger.info(f"Successfully parsed structured response")
+                logger.info("Successfully parsed structured response")
                 return message.parsed
             else:
                 raise ValueError("Response was not properly parsed despite no refusal")
@@ -157,7 +157,7 @@ class OpenAIResponsesInterface:
 
 
 # Global instance for lazy initialization
-_openai_interface: Optional[OpenAIResponsesInterface] = None
+_openai_interface: OpenAIResponsesInterface | None = None
 
 
 def get_openai_interface(*args, **kwargs) -> OpenAIResponsesInterface:

@@ -6,14 +6,12 @@ Provides comprehensive container operations and monitoring.
 """
 
 import logging
-import asyncio
-from typing import Any, Dict, List, Optional, Union
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any
 
 from docker import DockerClient
-from docker.errors import DockerException, APIError, ImageNotFound, ContainerError
-
+from docker.errors import ContainerError
 from opsvi_foundation import BaseComponent, ComponentError
 
 logger = logging.getLogger(__name__)
@@ -30,54 +28,54 @@ class ContainerConfig:
     """Configuration for container operations."""
 
     # Basic settings
-    name: Optional[str] = None
+    name: str | None = None
     image: str = ""
-    command: Optional[Union[str, List[str]]] = None
-    entrypoint: Optional[Union[str, List[str]]] = None
+    command: str | list[str] | None = None
+    entrypoint: str | list[str] | None = None
 
     # Environment and working directory
-    environment: Dict[str, str] = field(default_factory=dict)
-    working_dir: Optional[str] = None
+    environment: dict[str, str] = field(default_factory=dict)
+    working_dir: str | None = None
 
     # Port mappings
-    ports: Dict[str, Union[str, int, None]] = field(default_factory=dict)
+    ports: dict[str, str | int | None] = field(default_factory=dict)
     publish_all_ports: bool = False
 
     # Volume mounts
-    volumes: Dict[str, Dict[str, str]] = field(default_factory=dict)
-    binds: List[str] = field(default_factory=list)
+    volumes: dict[str, dict[str, str]] = field(default_factory=dict)
+    binds: list[str] = field(default_factory=list)
 
     # Network settings
-    network_mode: Optional[str] = None
-    networks: List[str] = field(default_factory=list)
+    network_mode: str | None = None
+    networks: list[str] = field(default_factory=list)
 
     # Resource limits
-    cpu_quota: Optional[int] = None
-    cpu_period: Optional[int] = None
-    mem_limit: Optional[str] = None
-    memswap_limit: Optional[str] = None
+    cpu_quota: int | None = None
+    cpu_period: int | None = None
+    mem_limit: str | None = None
+    memswap_limit: str | None = None
 
     # Security settings
-    user: Optional[str] = None
+    user: str | None = None
     privileged: bool = False
     read_only: bool = False
-    security_opt: List[str] = field(default_factory=list)
+    security_opt: list[str] = field(default_factory=list)
 
     # Restart policy
-    restart_policy: Dict[str, str] = field(default_factory=lambda: {"Name": "no"})
+    restart_policy: dict[str, str] = field(default_factory=lambda: {"Name": "no"})
 
     # Health check
-    healthcheck: Optional[Dict[str, Any]] = None
+    healthcheck: dict[str, Any] | None = None
 
     # Labels and metadata
-    labels: Dict[str, str] = field(default_factory=dict)
+    labels: dict[str, str] = field(default_factory=dict)
 
     # Auto-remove and detach
     auto_remove: bool = False
     detach: bool = True
 
     # Logging
-    log_config: Optional[Dict[str, Any]] = None
+    log_config: dict[str, Any] | None = None
 
 
 @dataclass
@@ -90,18 +88,18 @@ class ContainerInfo:
     status: str
     state: str
     created: datetime
-    ports: Dict[str, List[Dict[str, str]]]
-    labels: Dict[str, str]
-    network_settings: Dict[str, Any]
-    mounts: List[Dict[str, Any]]
-    config: Dict[str, Any]
-    host_config: Dict[str, Any]
+    ports: dict[str, list[dict[str, str]]]
+    labels: dict[str, str]
+    network_settings: dict[str, Any]
+    mounts: list[dict[str, Any]]
+    config: dict[str, Any]
+    host_config: dict[str, Any]
 
     # Runtime information
-    cpu_usage: Optional[float] = None
-    memory_usage: Optional[int] = None
-    network_io: Optional[Dict[str, int]] = None
-    disk_io: Optional[Dict[str, int]] = None
+    cpu_usage: float | None = None
+    memory_usage: int | None = None
+    network_io: dict[str, int] | None = None
+    disk_io: dict[str, int] | None = None
 
 
 @dataclass
@@ -115,7 +113,7 @@ class ContainerStats:
     cpu_percent: float
     cpu_usage: int
     cpu_system_usage: int
-    cpu_throttling_data: Dict[str, int]
+    cpu_throttling_data: dict[str, int]
 
     # Memory statistics
     memory_usage: int
@@ -161,7 +159,7 @@ class ContainerManager(BaseComponent):
 
         self.client = client
         self.config = config
-        self._containers: Dict[str, Any] = {}
+        self._containers: dict[str, Any] = {}
 
         logger.debug("ContainerManager initialized")
 
@@ -469,10 +467,10 @@ class ContainerManager(BaseComponent):
     async def execute_command(
         self,
         container_id: str,
-        command: Union[str, List[str]],
-        user: Optional[str] = None,
+        command: str | list[str],
+        user: str | None = None,
         privileged: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Execute a command in a running container.
 
         Args:
@@ -501,8 +499,8 @@ class ContainerManager(BaseComponent):
             raise ContainerError(f"Command execution failed: {e}")
 
     async def list_containers(
-        self, all_containers: bool = False, filters: Optional[Dict[str, Any]] = None
-    ) -> List[ContainerInfo]:
+        self, all_containers: bool = False, filters: dict[str, Any] | None = None
+    ) -> list[ContainerInfo]:
         """List containers.
 
         Args:
@@ -552,8 +550,8 @@ class ContainerManager(BaseComponent):
             raise ContainerError(f"Failed to get container status: {e}")
 
     async def wait_for_container(
-        self, container_id: str, timeout: Optional[int] = None
-    ) -> Dict[str, Any]:
+        self, container_id: str, timeout: int | None = None
+    ) -> dict[str, Any]:
         """Wait for container to finish.
 
         Args:

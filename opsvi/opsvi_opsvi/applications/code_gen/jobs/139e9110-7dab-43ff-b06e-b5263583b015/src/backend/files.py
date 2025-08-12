@@ -1,15 +1,17 @@
 """
 File storage using AWS S3-compatible endpoint and signed URLs; upload/download; associates files with comments or tasks
 """
-from fastapi import APIRouter, UploadFile, File as FastAPIFile, Depends, HTTPException
-import boto3
-from backend.config import get_settings
-from backend.models import File as FileModel
-from backend.database import get_db
-from backend.auth import get_current_user
-from datetime import datetime, timedelta
-from sqlalchemy.orm import Session
 import uuid
+
+import boto3
+from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi import File as FastAPIFile
+from sqlalchemy.orm import Session
+
+from backend.auth import get_current_user
+from backend.config import get_settings
+from backend.database import get_db
+from backend.models import File as FileModel
 
 settings = get_settings()
 s3 = boto3.client(

@@ -5,7 +5,6 @@ Tests all implemented semantic search capabilities in the cognitive database arc
 """
 
 import requests
-import json
 from arango import ArangoClient
 from datetime import datetime
 
@@ -210,7 +209,7 @@ def test_foxx_service():
         )
         if response.status_code == 200:
             analytics = response.json()
-            print(f"✓ Cognitive analytics available")
+            print("✓ Cognitive analytics available")
             print(
                 f"  - Cognitive maturity score: {analytics['analysis_summary']['cognitive_maturity_score']:.3f}"
             )

@@ -7,11 +7,11 @@ computational operations within multi-agent workflows.
 
 import asyncio
 import csv
-from datetime import datetime
 import json
 import logging
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from ..common.types import AgentCapability, Task, TaskResult
 from ..tools.data_processor_tool import DataProcessorTool
@@ -39,8 +39,8 @@ class TaskAgent(BaseAgent):
         agent_id: str = "task_agent",
         name: str = "Task Agent",
         description: str = "Agent for data processing, computation, and automation",
-        logger: Optional[logging.Logger] = None,
-        work_directory: Optional[Union[str, Path]] = None,
+        logger: logging.Logger | None = None,
+        work_directory: str | Path | None = None,
     ):
         """
         Initialize the task agent.
@@ -93,7 +93,7 @@ class TaskAgent(BaseAgent):
 
         self.logger.info("Task-specific tools registered")
 
-    async def _execute_task_logic(self, task: Dict[str, Any]) -> TaskResult:
+    async def _execute_task_logic(self, task: dict[str, Any]) -> TaskResult:
         """
         Execute task-specific logic.
 
@@ -175,7 +175,7 @@ class TaskAgent(BaseAgent):
                 metadata={"task_type": task_type, "agent_id": self.agent_id},
             )
 
-    async def _handle_data_processing(self, task_data: Dict[str, Any]) -> Any:
+    async def _handle_data_processing(self, task_data: dict[str, Any]) -> Any:
         """Handle data processing tasks."""
         operation = task_data.get("operation", "")
         data = task_data.get("data", [])
@@ -207,7 +207,7 @@ class TaskAgent(BaseAgent):
         else:
             raise ValueError(f"Unsupported data processing operation: {operation}")
 
-    async def _handle_file_operation(self, task_data: Dict[str, Any]) -> Any:
+    async def _handle_file_operation(self, task_data: dict[str, Any]) -> Any:
         """Handle file operations."""
         operation = task_data.get("operation", "")
         file_path = task_data.get("file_path", "")
@@ -234,7 +234,7 @@ class TaskAgent(BaseAgent):
         else:
             raise ValueError(f"Unsupported file operation: {operation}")
 
-    async def _handle_computation(self, task_data: Dict[str, Any]) -> Any:
+    async def _handle_computation(self, task_data: dict[str, Any]) -> Any:
         """Handle computational tasks."""
         operation = task_data.get("operation", "")
         data = task_data.get("data", [])
@@ -262,7 +262,7 @@ class TaskAgent(BaseAgent):
         else:
             raise ValueError(f"Unsupported computation operation: {operation}")
 
-    async def _handle_data_validation(self, task_data: Dict[str, Any]) -> Any:
+    async def _handle_data_validation(self, task_data: dict[str, Any]) -> Any:
         """Handle data validation tasks."""
         data = task_data.get("data", [])
         schema = task_data.get("schema", {})
@@ -296,7 +296,7 @@ class TaskAgent(BaseAgent):
 
         return validation_results
 
-    async def _handle_data_transformation(self, task_data: Dict[str, Any]) -> Any:
+    async def _handle_data_transformation(self, task_data: dict[str, Any]) -> Any:
         """Handle data transformation tasks."""
         data = task_data.get("data", [])
         transformations = task_data.get("transformations", [])
@@ -337,7 +337,7 @@ class TaskAgent(BaseAgent):
 
         return transformed_data
 
-    async def _handle_batch_processing(self, task_data: Dict[str, Any]) -> Any:
+    async def _handle_batch_processing(self, task_data: dict[str, Any]) -> Any:
         """Handle batch processing tasks."""
         batch_size = task_data.get("batch_size", 100)
         data = task_data.get("data", [])
@@ -371,7 +371,7 @@ class TaskAgent(BaseAgent):
         return results
 
     async def _handle_with_tools(
-        self, task_type: str, task_data: Dict[str, Any]
+        self, task_type: str, task_data: dict[str, Any]
     ) -> Any:
         """Handle tasks using registered tools."""
         for tool in self.tools.values():
@@ -382,7 +382,7 @@ class TaskAgent(BaseAgent):
 
     # Data processing helper methods
 
-    def _filter_data(self, data: List[Dict], criteria: Dict[str, Any]) -> List[Dict]:
+    def _filter_data(self, data: list[dict], criteria: dict[str, Any]) -> list[dict]:
         """Filter data based on criteria."""
         filtered = []
         for item in data:
@@ -391,8 +391,8 @@ class TaskAgent(BaseAgent):
         return filtered
 
     def _aggregate_data(
-        self, data: List[Dict], group_by: List[str], aggregations: Dict[str, str]
-    ) -> List[Dict]:
+        self, data: list[dict], group_by: list[str], aggregations: dict[str, str]
+    ) -> list[dict]:
         """Aggregate data by groups."""
         from collections import defaultdict
 
@@ -406,7 +406,7 @@ class TaskAgent(BaseAgent):
         # Aggregate each group
         results = []
         for key, group_items in groups.items():
-            result = dict(zip(group_by, key))
+            result = dict(zip(group_by, key, strict=False))
 
             for field, agg_func in aggregations.items():
                 values = [
@@ -431,14 +431,14 @@ class TaskAgent(BaseAgent):
         return results
 
     def _sort_data(
-        self, data: List[Dict], sort_key: str, reverse: bool = False
-    ) -> List[Dict]:
+        self, data: list[dict], sort_key: str, reverse: bool = False
+    ) -> list[dict]:
         """Sort data by key."""
         return sorted(data, key=lambda x: x.get(sort_key, ""), reverse=reverse)
 
     def _merge_data(
-        self, data1: List[Dict], data2: List[Dict], merge_key: str
-    ) -> List[Dict]:
+        self, data1: list[dict], data2: list[dict], merge_key: str
+    ) -> list[dict]:
         """Merge two datasets on a key."""
         # Create lookup for data2
         lookup = {item.get(merge_key): item for item in data2}
@@ -520,7 +520,7 @@ class TaskAgent(BaseAgent):
             return True
         return False
 
-    async def _list_files(self, directory: str, pattern: str = "*") -> List[str]:
+    async def _list_files(self, directory: str, pattern: str = "*") -> list[str]:
         """List files in directory."""
         import glob
 
@@ -530,7 +530,7 @@ class TaskAgent(BaseAgent):
 
     # Computation helper methods
 
-    def _calculate_statistics(self, data: List[Union[int, float]]) -> Dict[str, float]:
+    def _calculate_statistics(self, data: list[int | float]) -> dict[str, float]:
         """Calculate basic statistics."""
         if not data:
             return {}
@@ -549,7 +549,7 @@ class TaskAgent(BaseAgent):
             "max": max(data),
         }
 
-    def _evaluate_expression(self, expression: str, variables: Dict[str, Any]) -> Any:
+    def _evaluate_expression(self, expression: str, variables: dict[str, Any]) -> Any:
         """Safely evaluate mathematical expression."""
         # Simple expression evaluation - can be extended with more sophisticated parser
         import ast
@@ -627,8 +627,8 @@ class TaskAgent(BaseAgent):
     # Validation helper methods
 
     def _validate_against_schema(
-        self, data: List[Dict], schema: Dict[str, Any]
-    ) -> List[str]:
+        self, data: list[dict], schema: dict[str, Any]
+    ) -> list[str]:
         """Validate data against schema."""
         errors = []
         required_fields = schema.get("required", [])
@@ -651,7 +651,7 @@ class TaskAgent(BaseAgent):
 
         return errors
 
-    def _validate_against_rules(self, data: List[Dict], rules: List[Dict]) -> List[str]:
+    def _validate_against_rules(self, data: list[dict], rules: list[dict]) -> list[str]:
         """Validate data against custom rules."""
         errors = []
 
@@ -688,7 +688,7 @@ class TaskAgent(BaseAgent):
 
         return errors
 
-    def _check_data_quality(self, data: List[Dict]) -> List[str]:
+    def _check_data_quality(self, data: list[dict]) -> list[str]:
         """Check data quality issues."""
         warnings = []
 
@@ -726,7 +726,7 @@ class TaskAgent(BaseAgent):
 
         return warnings
 
-    def _calculate_validation_statistics(self, data: List[Dict]) -> Dict[str, Any]:
+    def _calculate_validation_statistics(self, data: list[dict]) -> dict[str, Any]:
         """Calculate validation statistics."""
         if not data:
             return {}
@@ -751,7 +751,7 @@ class TaskAgent(BaseAgent):
 
     # Transformation helper methods
 
-    def _map_data(self, data: List[Dict], mapping: Dict[str, str]) -> List[Dict]:
+    def _map_data(self, data: list[dict], mapping: dict[str, str]) -> list[dict]:
         """Apply field mapping to data."""
         mapped_data = []
         for item in data:
@@ -762,7 +762,7 @@ class TaskAgent(BaseAgent):
             mapped_data.append(mapped_item)
         return mapped_data
 
-    def _normalize_data(self, data: List[Dict], method: str = "min_max") -> List[Dict]:
+    def _normalize_data(self, data: list[dict], method: str = "min_max") -> list[dict]:
         """Normalize numerical data."""
         if not data:
             return data
@@ -799,8 +799,8 @@ class TaskAgent(BaseAgent):
         return data
 
     def _pivot_data(
-        self, data: List[Dict], index: str, columns: str, values: str
-    ) -> List[Dict]:
+        self, data: list[dict], index: str, columns: str, values: str
+    ) -> list[dict]:
         """Pivot data (simplified implementation)."""
         from collections import defaultdict
 
@@ -825,7 +825,7 @@ class TaskAgent(BaseAgent):
 
     def _flatten_data(
         self, data: Any, parent_key: str = "", sep: str = "."
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Flatten nested data structure."""
 
         def _flatten_dict(d, parent_key="", sep="."):
@@ -849,8 +849,8 @@ class TaskAgent(BaseAgent):
             return data
 
     def _group_data(
-        self, data: List[Dict], group_by: List[str]
-    ) -> Dict[str, List[Dict]]:
+        self, data: list[dict], group_by: list[str]
+    ) -> dict[str, list[dict]]:
         """Group data by specified fields."""
         from collections import defaultdict
 
@@ -862,11 +862,11 @@ class TaskAgent(BaseAgent):
 
         return dict(groups)
 
-    def get_task_metrics(self) -> Dict[str, Any]:
+    def get_task_metrics(self) -> dict[str, Any]:
         """Get task execution metrics."""
         return self.task_metrics.copy()
 
-    def get_capabilities(self) -> List[AgentCapability]:
+    def get_capabilities(self) -> list[AgentCapability]:
         """
         Get the agent's capabilities as a list of AgentCapability objects.
         """
@@ -915,7 +915,7 @@ class TaskAgent(BaseAgent):
             ),
         ]
 
-    async def execute_task(self, task: Task) -> Dict[str, Any]:
+    async def execute_task(self, task: Task) -> dict[str, Any]:
         """
         Execute a task using the agent's processing logic.
 

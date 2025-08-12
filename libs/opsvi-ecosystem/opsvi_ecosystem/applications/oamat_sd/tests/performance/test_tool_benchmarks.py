@@ -7,10 +7,10 @@ we're using real APIs rather than mocks by measuring network latency.
 """
 
 import logging
-from pathlib import Path
 import statistics
 import sys
 import time
+from pathlib import Path
 
 import pytest
 

@@ -4,10 +4,7 @@ Autonomous Database Discovery System
 Enables agents to understand unfamiliar databases and generate appropriate queries
 """
 
-import json
-import re
 from typing import Dict, List, Any, Tuple
-from collections import defaultdict, Counter
 
 
 class AutonomousDatabaseDiscovery:

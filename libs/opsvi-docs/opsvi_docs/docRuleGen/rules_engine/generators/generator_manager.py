@@ -15,7 +15,7 @@ import logging
 import jinja2
 import re
 import json
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 

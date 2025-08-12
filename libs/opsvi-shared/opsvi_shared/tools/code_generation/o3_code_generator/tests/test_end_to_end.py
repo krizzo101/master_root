@@ -335,7 +335,6 @@ dependencies = [
         """Test complete CLI workflow end-to-end."""
         # This would test the main CLI entry point
         # For now, we verify the main function exists and is callable
-        from src.tools.code_generation.o3_code_generator.main import main
 
         assert callable(main)
 

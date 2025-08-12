@@ -1,14 +1,14 @@
 import asyncio
 import logging
+
 from fastapi import WebSocket
-from typing import Set
 
 
 class WebSocketManager:
     """Manages connected WebSocket clients and broadcasts events."""
 
     def __init__(self):
-        self.active_connections: Set[WebSocket] = set()
+        self.active_connections: set[WebSocket] = set()
         self._lock = asyncio.Lock()
 
     async def connect(self, websocket: WebSocket):

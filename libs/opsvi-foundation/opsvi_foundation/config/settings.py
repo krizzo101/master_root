@@ -3,8 +3,8 @@
 Comprehensive configuration management for the OPSVI ecosystem
 """
 
-from typing import Optional, Dict, Any
-from pydantic import BaseModel, Field
+from typing import Optional
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 from ..core.base import BaseSettings as BaseComponentSettings

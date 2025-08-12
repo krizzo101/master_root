@@ -30,13 +30,11 @@ Content Extractor Module for Documentation Rule Generator.
 This module provides functionality to extract content from various document types.
 """
 
-import os
-import json
 import yaml
 import logging
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 # Configure logging
 logging.basicConfig(

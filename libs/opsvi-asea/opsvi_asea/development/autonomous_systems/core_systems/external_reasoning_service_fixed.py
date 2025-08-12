@@ -10,8 +10,7 @@ This service delivers actual value through AI-powered reasoning or fails complet
 
 import asyncio
 import json
-from typing import Dict, Any, Optional
-from datetime import datetime
+from typing import Dict, Any
 
 from openai import AsyncOpenAI
 import sys

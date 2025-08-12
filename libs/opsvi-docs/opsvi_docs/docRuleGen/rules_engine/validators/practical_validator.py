@@ -15,7 +15,7 @@ import os
 import json
 import logging
 import re
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List
 from pathlib import Path
 import openai
 
@@ -269,7 +269,7 @@ def generate_test_scenarios(
             with open(cursor_rules_generation_path, "r", encoding="utf-8") as f:
                 cursor_rules_generation_content = f.read()
             logger.info(
-                f"Successfully loaded rule 012 for standalone rules generation standards"
+                "Successfully loaded rule 012 for standalone rules generation standards"
             )
         except Exception as e:
             logger.warning(f"Could not load rule 012: {str(e)}")
@@ -284,7 +284,7 @@ def generate_test_scenarios(
             with open(ai_interpretability_path, "r", encoding="utf-8") as f:
                 ai_interpretability_content = f.read()
             logger.info(
-                f"Successfully loaded rule 015 for AI interpretability standards"
+                "Successfully loaded rule 015 for AI interpretability standards"
             )
         except Exception as e:
             logger.warning(f"Could not load rule 015: {str(e)}")
@@ -449,7 +449,7 @@ def apply_rule_to_scenario(
             with open(ai_interpretability_path, "r", encoding="utf-8") as f:
                 ai_interpretability_content = f.read()
             logger.info(
-                f"Successfully loaded rule 015 for AI interpretability standards"
+                "Successfully loaded rule 015 for AI interpretability standards"
             )
         except Exception as e:
             logger.warning(f"Could not load rule 015: {str(e)}")
@@ -570,7 +570,7 @@ def evaluate_content_against_criteria(
             with open(ai_interpretability_path, "r", encoding="utf-8") as f:
                 ai_interpretability_content = f.read()
             logger.info(
-                f"Successfully loaded rule 015 for AI interpretability standards"
+                "Successfully loaded rule 015 for AI interpretability standards"
             )
         except Exception as e:
             logger.warning(f"Could not load rule 015: {str(e)}")
@@ -616,7 +616,7 @@ def evaluate_content_against_criteria(
     Consider whether the AI correctly followed explicit directives and properly interpreted the rule according to these standards.
     """
 
-    prompt += f"""
+    prompt += """
     ## Evaluation Instructions
     Evaluate the content against each success criterion and expected behavior.
     For each criterion/behavior, determine if it's fully met, partially met, or not met.
@@ -633,23 +633,23 @@ def evaluate_content_against_criteria(
     ## Response Format
     Respond with a JSON object in the following format:
     ```json
-    {{
+    {
         "overall_score": 0-10 score representing how effectively the AI interpreted and applied the rule,
         "criteria_evaluations": [
-            {{
+            {
                 "criterion": "Success criterion text",
                 "status": "fully_met|partially_met|not_met",
                 "evidence": "Evidence from content supporting this evaluation",
                 "score": 0-10 score for this specific criterion
-            }},
+            },
             // Additional criteria evaluations...
         ],
         "behavior_evaluations": [
-            {{
+            {
                 "behavior": "Expected behavior text",
                 "status": "fully_met|partially_met|not_met",
                 "evidence": "Evidence from content supporting this evaluation"
-            }},
+            },
             // Additional behavior evaluations...
         ],
         "strengths": [
@@ -665,7 +665,7 @@ def evaluate_content_against_criteria(
             "Specific suggestion for improving the rule to make it more effective for AI interpretation",
             "Another specific rule improvement suggestion"
         ]
-    }}
+    }
     ```
     """
 
@@ -884,7 +884,7 @@ def _identify_practical_improvements(validation_results: Dict[str, Any]) -> List
             with open(ai_interpretability_path, "r", encoding="utf-8") as f:
                 ai_interpretability_content = f.read()
             logger.info(
-                f"Successfully loaded rule 015 for AI interpretability standards"
+                "Successfully loaded rule 015 for AI interpretability standards"
             )
         except Exception as e:
             logger.warning(f"Could not load rule 015: {str(e)}")
@@ -937,7 +937,7 @@ def _identify_practical_improvements(validation_results: Dict[str, Any]) -> List
     Your suggestions should align with these standards for optimal AI interpretability.
     """
 
-    prompt += f"""
+    prompt += """
     ## Task
     Based on these weaknesses, suggest specific improvements that would make the rule more effective 
     for AI interpretation and application in real-world development scenarios.

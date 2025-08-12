@@ -20,7 +20,6 @@ Original implementation preserved below for backwards compatibility.
 # @execution_wrapper(validate_input=True, log_execution=True)
 
 from typing import List, Any, Optional, Dict
-import os
 from datetime import datetime, date
 from dataclasses import dataclass, asdict
 from asea_orchestrator.plugins.base_plugin import BasePlugin, EventBus

@@ -5,8 +5,8 @@ Demonstrates basic functionality of the migrated ecosystem.
 """
 
 import asyncio
-import sys
 import os
+import sys
 
 # Add libs to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "libs"))
@@ -16,7 +16,7 @@ async def demo_foundation():
     """Demo foundation components."""
     print("=== Foundation Demo ===")
     try:
-        from opsvi_foundation import BaseComponent, ComponentError, BaseSettings
+        from opsvi_foundation import BaseComponent
 
         class DemoComponent(BaseComponent):
             async def _initialize_impl(self):
@@ -43,7 +43,7 @@ async def demo_core():
     """Demo core services."""
     print("=== Core Services Demo ===")
     try:
-        from opsvi_core import ServiceRegistry, EventBus, StateManager
+        from opsvi_core import EventBus, ServiceRegistry, StateManager
 
         registry = ServiceRegistry("demo-registry")
         event_bus = EventBus("demo-events")
@@ -68,7 +68,7 @@ async def demo_llm():
     """Demo LLM services."""
     print("=== LLM Services Demo ===")
     try:
-        from opsvi_llm.providers.base import BaseLLMProvider, LLMConfig
+        from opsvi_llm.providers.base import LLMConfig
 
         config = LLMConfig(provider="openai")
         print(f"  ✅ LLM config created: {config.provider}")
@@ -82,7 +82,7 @@ async def demo_http():
     """Demo HTTP services."""
     print("=== HTTP Services Demo ===")
     try:
-        from opsvi_http.client.base import BaseHTTPClient, HTTPConfig
+        from opsvi_http.client.base import HTTPConfig
 
         config = HTTPConfig(timeout=30)
         print(f"  ✅ HTTP config created: timeout={config.timeout}")
@@ -96,7 +96,7 @@ async def demo_data():
     """Demo data services."""
     print("=== Data Services Demo ===")
     try:
-        from opsvi_data.providers.base import BaseDatabaseProvider, DataConfig
+        from opsvi_data.providers.base import DataConfig
 
         config = DataConfig(database_type="postgresql")
         print(f"  ✅ Data config created: {config.database_type}")
@@ -110,7 +110,7 @@ async def demo_auth():
     """Demo auth services."""
     print("=== Auth Services Demo ===")
     try:
-        from opsvi_auth.providers.base import BaseAuthProvider, AuthConfig
+        from opsvi_auth.providers.base import AuthConfig
 
         config = AuthConfig(auth_type="jwt")
         print(f"  ✅ Auth config created: {config.auth_type}")

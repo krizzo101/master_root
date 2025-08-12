@@ -5,8 +5,8 @@ Continuously monitors .specstory/history and loads conversations with atomic par
 """
 
 import asyncio
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent.parent

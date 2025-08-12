@@ -15,7 +15,7 @@ import os
 import yaml
 import logging
 import concurrent.futures
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Tuple
 
 from rules_engine.generators.enhanced_rule_generator import create_and_verify_rule
 

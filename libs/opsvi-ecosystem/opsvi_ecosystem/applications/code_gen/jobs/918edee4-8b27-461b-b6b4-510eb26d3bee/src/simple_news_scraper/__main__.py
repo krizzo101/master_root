@@ -2,14 +2,14 @@
 Entry point for Simple Python Web Scraper for News Headlines.
 Handles CLI interface, configuration, and calls main logic.
 """
+import logging
+import os
 import sys
 from argparse import ArgumentParser, Namespace
-from typing import Optional, List
-import os
-from .scraper import NewsScraper
+
+from .config import DEFAULT_CONFIG_FILE, load_config, setup_logging
 from .output import OutputHandler
-from .config import setup_logging, DEFAULT_CONFIG_FILE, load_config
-import logging
+from .scraper import NewsScraper
 
 
 def parse_args() -> Namespace:

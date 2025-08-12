@@ -10,7 +10,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "../../src"))
 
 from asea_orchestrator.core import Orchestrator
 from asea_orchestrator.workflow import WorkflowManager
-from asea_orchestrator.plugins.types import PluginConfig, ExecutionContext
+from asea_orchestrator.plugins.types import PluginConfig
 
 
 def main():
@@ -51,7 +51,7 @@ def main():
         print("✓ Orchestrator created successfully")
 
         # The orchestrator should have discovered plugins during initialization
-        print(f"\n3. Plugins discovered by orchestrator:")
+        print("\n3. Plugins discovered by orchestrator:")
         for plugin_class in orchestrator.plugin_manager.plugins:
             print(f"   - {plugin_class.get_name()} ({plugin_class.__name__})")
 
@@ -110,7 +110,7 @@ async def test_workflow_execution():
         # Note: This might fail due to Celery requirements, but let's see
         result = await orchestrator.run_workflow("simple_test", {"initial": "state"})
 
-        print(f"✓ Workflow completed successfully!")
+        print("✓ Workflow completed successfully!")
         print(f"Result: {result}")
 
         return True

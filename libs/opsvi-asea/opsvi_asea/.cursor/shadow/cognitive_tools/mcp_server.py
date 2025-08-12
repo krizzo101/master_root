@@ -8,8 +8,7 @@ import asyncio
 import json
 import sys
 import logging
-from typing import Any, Dict, List, Optional
-from contextlib import asynccontextmanager
+from typing import Any, Dict
 
 # Add core module to path
 sys.path.append("/home/opsvi/asea/development/cognitive_interface/core")

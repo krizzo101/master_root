@@ -1,8 +1,17 @@
-import pytest
-import jwt
 from unittest.mock import MagicMock, patch
-from backend.app import get_db_connection, issue_jwt, verify_jwt, get_current_user
-from backend.app import User, Document, DocumentVersion, AIRequest
+
+import jwt
+import pytest
+from backend.app import (
+    AIRequest,
+    Document,
+    DocumentVersion,
+    User,
+    get_current_user,
+    get_db_connection,
+    issue_jwt,
+    verify_jwt,
+)
 from fastapi import Request
 from sqlalchemy.exc import OperationalError
 
@@ -278,7 +287,6 @@ def test_file_upload_backend_integration_mock(mock_upload):
     assert url == "https://mockstorage.example.com/file123"
 
 
-from unittest.mock import AsyncMock
 import asyncio
 
 
@@ -370,7 +378,6 @@ def test_session_management_and_cookie_handling():
     assert "session=;" in set_cookie_logout or "Max-Age=0" in set_cookie_logout
 
 
-import time
 import random
 import string
 

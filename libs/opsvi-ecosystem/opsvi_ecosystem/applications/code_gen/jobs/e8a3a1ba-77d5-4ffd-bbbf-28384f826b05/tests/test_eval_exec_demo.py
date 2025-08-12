@@ -1,6 +1,7 @@
-import pytest
-import sys
 import io
+import sys
+
+import pytest
 from eval_exec_demo import demonstrate_eval, demonstrate_exec, main
 
 
@@ -54,9 +55,6 @@ def test_demonstrate_exec_executes_code_and_prints(capture_stdout):
     assert "Sum calculated by exec" in output
     # Should include correct sum result 15 from range 5
     assert "15" in output
-
-
-import builtins
 
 
 def test_demonstrate_eval_handles_invalid_expression_gracefully(
@@ -165,9 +163,6 @@ def test_main_can_be_called_multiple_times_cleanly(capture_stdout):
         assert "Sum calculated by exec" in output
 
 
-import builtins
-
-
 @pytest.mark.parametrize(
     "expression,expected",
     [
@@ -242,9 +237,6 @@ def test_demonstrate_exec_with_various_code(code_snippet, expected_output, capsy
 
 
 import runpy
-import sys
-import io
-import types
 
 
 def test_script_runnable_from_command_line_invokes_main(capsys):

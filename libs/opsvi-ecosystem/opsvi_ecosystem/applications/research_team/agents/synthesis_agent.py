@@ -1,4 +1,5 @@
 import logging
+
 from ..db.db_writer import write_research_to_db
 
 

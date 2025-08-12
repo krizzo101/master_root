@@ -8,7 +8,6 @@ Consolidated from experimental intelligence pipeline with production-ready struc
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, List, Set
 
 from .atomic_parser import AtomicComponent, AtomicRelationship
 
@@ -20,9 +19,9 @@ class ConceptEvolution:
     concept: str
     first_mention: int  # component sequence
     last_mention: int
-    mentions: List[int]  # all component sequences where mentioned
-    evolution_stages: List[str]  # how the concept changes
-    related_concepts: Set[str] = field(default_factory=set)
+    mentions: list[int]  # all component sequences where mentioned
+    evolution_stages: list[str]  # how the concept changes
+    related_concepts: set[str] = field(default_factory=set)
 
 
 @dataclass
@@ -30,10 +29,10 @@ class InsightPattern:
     """Represents a pattern of insight or realization"""
 
     pattern_type: str  # recursive, meta-cognitive, strategic, technical
-    trigger_components: List[str]  # what triggered this insight
+    trigger_components: list[str]  # what triggered this insight
     insight_content: str
     confidence: float
-    context: Dict = field(default_factory=dict)
+    context: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -41,15 +40,15 @@ class ConversationIntelligence:
     """Complete intelligence analysis of a conversation"""
 
     conversation_id: str
-    participants: List[str]
-    concept_evolution: Dict[str, ConceptEvolution]
-    insight_patterns: List[InsightPattern]
-    recursive_loops: List[Dict]
-    meta_cognitive_moments: List[Dict]
-    strategic_decisions: List[Dict]
-    knowledge_building_sequences: List[Dict]
-    compound_learning_indicators: List[Dict]
-    philosophical_explorations: List[Dict]
+    participants: list[str]
+    concept_evolution: dict[str, ConceptEvolution]
+    insight_patterns: list[InsightPattern]
+    recursive_loops: list[dict]
+    meta_cognitive_moments: list[dict]
+    strategic_decisions: list[dict]
+    knowledge_building_sequences: list[dict]
+    compound_learning_indicators: list[dict]
+    philosophical_explorations: list[dict]
 
 
 class ConversationIntelligenceEngine:
@@ -142,8 +141,8 @@ class ConversationIntelligenceEngine:
 
     async def analyze_conversation(
         self,
-        components: List[AtomicComponent],
-        relationships: List[AtomicRelationship] = None,
+        components: list[AtomicComponent],
+        relationships: list[AtomicRelationship] = None,
     ) -> ConversationIntelligence:
         """Perform comprehensive conversation intelligence analysis"""
         print("🧠 Starting deep conversation intelligence analysis...")
@@ -182,7 +181,7 @@ class ConversationIntelligenceEngine:
         print(f"✅ Analysis complete: {len(insight_patterns)} patterns found")
         return intelligence
 
-    def _identify_participants(self, components: List[AtomicComponent]) -> List[str]:
+    def _identify_participants(self, components: list[AtomicComponent]) -> list[str]:
         """Identify conversation participants"""
         participants = set()
         for component in components:
@@ -194,8 +193,8 @@ class ConversationIntelligenceEngine:
         return list(participants)
 
     async def _analyze_concept_evolution(
-        self, components: List[AtomicComponent]
-    ) -> Dict[str, ConceptEvolution]:
+        self, components: list[AtomicComponent]
+    ) -> dict[str, ConceptEvolution]:
         """Track how concepts evolve through the conversation"""
         concept_tracking = defaultdict(list)
         all_concepts = (
@@ -240,8 +239,8 @@ class ConversationIntelligenceEngine:
         return evolution_map
 
     async def _identify_insight_patterns(
-        self, components: List[AtomicComponent]
-    ) -> List[InsightPattern]:
+        self, components: list[AtomicComponent]
+    ) -> list[InsightPattern]:
         """Identify patterns of insights and realizations"""
         patterns = []
 
@@ -287,9 +286,9 @@ class ConversationIntelligenceEngine:
 
     async def _detect_recursive_loops(
         self,
-        components: List[AtomicComponent],
-        relationships: List[AtomicRelationship] = None,
-    ) -> List[Dict]:
+        components: list[AtomicComponent],
+        relationships: list[AtomicRelationship] = None,
+    ) -> list[dict]:
         """Detect recursive patterns and self-referential loops"""
         recursive_patterns = []
 
@@ -345,8 +344,8 @@ class ConversationIntelligenceEngine:
         return recursive_patterns
 
     async def _find_meta_cognitive_moments(
-        self, components: List[AtomicComponent]
-    ) -> List[Dict]:
+        self, components: list[AtomicComponent]
+    ) -> list[dict]:
         """Identify moments of meta-cognition and thinking about thinking"""
         meta_moments = []
 
@@ -393,8 +392,8 @@ class ConversationIntelligenceEngine:
         return meta_moments
 
     async def _extract_strategic_decisions(
-        self, components: List[AtomicComponent]
-    ) -> List[Dict]:
+        self, components: list[AtomicComponent]
+    ) -> list[dict]:
         """Extract strategic decisions and direction changes"""
         decisions = []
         decision_indicators = [
@@ -432,8 +431,8 @@ class ConversationIntelligenceEngine:
         return decisions
 
     async def _trace_knowledge_building(
-        self, components: List[AtomicComponent]
-    ) -> List[Dict]:
+        self, components: list[AtomicComponent]
+    ) -> list[dict]:
         """Trace sequences of knowledge building and learning"""
         knowledge_sequences = []
         learning_indicators = [
@@ -493,8 +492,8 @@ class ConversationIntelligenceEngine:
         return knowledge_sequences
 
     async def _detect_compound_learning(
-        self, components: List[AtomicComponent]
-    ) -> List[Dict]:
+        self, components: list[AtomicComponent]
+    ) -> list[dict]:
         """Detect indicators of compound learning - learning from learning"""
         compound_indicators = []
         compound_patterns = [
@@ -524,8 +523,8 @@ class ConversationIntelligenceEngine:
         return compound_indicators
 
     async def _analyze_philosophical_content(
-        self, components: List[AtomicComponent]
-    ) -> List[Dict]:
+        self, components: list[AtomicComponent]
+    ) -> list[dict]:
         """Analyze philosophical explorations and deep questions"""
         philosophical_content = []
 
@@ -571,7 +570,7 @@ class ConversationIntelligenceEngine:
 
     def generate_intelligence_summary(
         self, intelligence: ConversationIntelligence
-    ) -> Dict:
+    ) -> dict:
         """Generate comprehensive intelligence summary"""
         return {
             "conversation_overview": {
@@ -594,7 +593,7 @@ class ConversationIntelligenceEngine:
 
     def _extract_key_insights(
         self, intelligence: ConversationIntelligence
-    ) -> List[str]:
+    ) -> list[str]:
         """Extract key insights from the analysis"""
         insights = []
 
@@ -627,7 +626,7 @@ class ConversationIntelligenceEngine:
 
     def _analyze_conversation_characteristics(
         self, intelligence: ConversationIntelligence
-    ) -> Dict:
+    ) -> dict:
         """Analyze overall characteristics of the conversation"""
         return {
             "cognitive_complexity": (
@@ -642,7 +641,7 @@ class ConversationIntelligenceEngine:
 
     def _analyze_evolution_patterns(
         self, intelligence: ConversationIntelligence
-    ) -> Dict:
+    ) -> dict:
         """Analyze how concepts evolved through the conversation"""
         evolution_analysis = {}
 

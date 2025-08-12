@@ -6,9 +6,10 @@ This demonstrates how the enhanced critic would work with structured feedback
 and severity-based iteration approach.
 """
 
-from optimized_critic_implementation import OptimizedCriticAgent, CriticResult
-from optimized_nano_instructions import get_optimized_nano_prompt
 import json
+
+from optimized_critic_implementation import OptimizedCriticAgent
+from optimized_nano_instructions import get_optimized_nano_prompt
 
 
 def test_critic_with_sample_code():
@@ -79,7 +80,7 @@ if __name__ == "__main__":
         print(f"   {i}. {action}")
 
     # Test second iteration (moderate)
-    print(f"\n\n2. SECOND ITERATION (MODERATE REVIEW)")
+    print("\n\n2. SECOND ITERATION (MODERATE REVIEW)")
     print("=" * 50)
 
     # Simulate some fixes

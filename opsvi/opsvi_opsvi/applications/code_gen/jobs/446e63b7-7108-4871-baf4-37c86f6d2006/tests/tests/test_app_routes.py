@@ -1,8 +1,8 @@
+import os
+from unittest.mock import patch
+
 import pytest
 from app import create_app
-import os
-from flask import url_for
-from unittest.mock import patch
 
 
 @pytest.fixture

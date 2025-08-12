@@ -32,13 +32,10 @@ and prepares them for conversion to rule format.
 """
 
 import os
-import glob
-import re
 import logging
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any
 from pathlib import Path
 
-from .markdown_parser import parse_markdown_file
 from .section_extractor import extract_rule_sections
 
 # Configure logging

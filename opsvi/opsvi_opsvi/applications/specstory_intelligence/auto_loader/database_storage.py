@@ -3,17 +3,16 @@ Simplified Database Storage for Auto-Loader
 Uses consolidated ArangoDB interface directly for atomic components
 """
 
-from datetime import datetime
 import hashlib
 import json
 import logging
-from pathlib import Path
 import re
 
 # Import the atomic parser types
 import sys
 import time
-from typing import Dict, List
+from datetime import datetime
+from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent.parent
@@ -85,12 +84,12 @@ class SimplifiedSpecStoryStorage:
     async def store_parsed_file(
         self,
         file_path: str,
-        components: List[AtomicComponent],
-        relationships: List[AtomicRelationship],
-        metadata: Dict = None,
+        components: list[AtomicComponent],
+        relationships: list[AtomicRelationship],
+        metadata: dict = None,
         intelligence=None,
-        intelligence_summary: Dict = None,
-    ) -> Dict:
+        intelligence_summary: dict = None,
+    ) -> dict:
         """Store parsed file components and relationships, embedding each component's text."""
         # Defensive: ensure components is always a list
         if not isinstance(components, list):

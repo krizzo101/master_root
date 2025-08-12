@@ -1,11 +1,11 @@
 """Rate limiting middleware for the code generation API."""
 
-import time
 import hashlib
-from typing import Dict, Tuple
-from collections import defaultdict, deque
-from fastapi import Request, HTTPException
 import logging
+import time
+from collections import defaultdict, deque
+
+from fastapi import HTTPException, Request
 
 from config import config
 
@@ -20,10 +20,10 @@ class RateLimiter:
         self.window_seconds = window_seconds
 
         # Store request timestamps per IP
-        self._requests: Dict[str, deque] = defaultdict(lambda: deque())
+        self._requests: dict[str, deque] = defaultdict(lambda: deque())
 
         # Track blocked IPs with expiry
-        self._blocked_ips: Dict[str, float] = {}
+        self._blocked_ips: dict[str, float] = {}
 
         # Cleanup interval
         self._last_cleanup = time.time()
@@ -72,7 +72,7 @@ class RateLimiter:
 
         self._last_cleanup = now
 
-    def is_allowed(self, request: Request) -> Tuple[bool, Dict[str, any]]:
+    def is_allowed(self, request: Request) -> tuple[bool, dict[str, any]]:
         """
         Check if request is allowed under rate limits.
 
@@ -143,7 +143,7 @@ class RateLimiter:
 
         return True, info
 
-    def get_status(self) -> Dict[str, any]:
+    def get_status(self) -> dict[str, any]:
         """Get rate limiter status."""
         self._cleanup_old_requests()
 

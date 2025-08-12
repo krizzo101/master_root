@@ -1,14 +1,10 @@
 """
 WebSocket manager (Socket.IO-compatible) for FastAPI, providing real-time events for task updates, comments, assignment, deadline warnings.
 """
-import json
-import asyncio
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, status
-from fastapi.websockets import WebSocketState
-from backend.auth import get_current_user
-from backend.models import User
 import logging
-from typing import Dict, Set
+
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi.websockets import WebSocketState
 
 logger = logging.getLogger("taskmgmt.ws")
 ws_router = APIRouter()
@@ -16,7 +12,7 @@ ws_router = APIRouter()
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: Dict[str, Set[WebSocket]] = {}
+        self.active_connections: dict[str, set[WebSocket]] = {}
 
     async def connect(self, project_id: str, websocket: WebSocket):
         await websocket.accept()

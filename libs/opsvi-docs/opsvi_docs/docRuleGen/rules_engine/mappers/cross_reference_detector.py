@@ -29,8 +29,7 @@ This module detects cross-references between documentation files.
 import os
 import re
 import logging
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Set
+from typing import Dict, List, Any
 
 from ..inventory.document_inventory import DocumentInventory
 

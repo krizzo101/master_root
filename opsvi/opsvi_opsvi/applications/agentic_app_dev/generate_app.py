@@ -4,14 +4,14 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 import concurrent.futures
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import dataclasses
 import json
 import logging
-from pathlib import Path
 import re
 import subprocess
-from typing import Any, Dict, List, Optional, Tuple, Union
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+from typing import Any
 
 from src.applications.agentic_app_dev.prompt_schema import AgentPromptSchema
 from src.shared.openai_interfaces.responses_interface import OpenAIResponsesInterface
@@ -41,7 +41,7 @@ CHECKPOINT_FILE = Path(".generate_app_checkpoint.json")
 @dataclasses.dataclass
 class ArtifactResult:
     fname: str
-    out_path: Union[str, Path]
+    out_path: str | Path
     audit: list
 
 
@@ -73,7 +73,7 @@ def _to_json_safe(obj: Any) -> Any:
             return str(obj)
 
 
-def save_checkpoint(stage: str, data: Dict[str, Any]) -> None:
+def save_checkpoint(stage: str, data: dict[str, Any]) -> None:
     """
     Save the current pipeline stage and data to a checkpoint file.
     All data is converted to JSON-serializable form.
@@ -92,7 +92,7 @@ def save_checkpoint(stage: str, data: Dict[str, Any]) -> None:
     logger.debug(f"Checkpoint saved at stage: {stage}")
 
 
-def load_checkpoint() -> Tuple[Optional[str], Optional[Dict[str, Any]]]:
+def load_checkpoint() -> tuple[str | None, dict[str, Any] | None]:
     """
     Load the last saved checkpoint, if it exists.
     Returns (stage, data) or (None, None) if no checkpoint exists.
@@ -255,8 +255,8 @@ def write_and_validate_file(
     out_path: Path,
     validator: Any,
     output_type: str,
-    language: Optional[str] = None,
-) -> Tuple[bool, str, List[Any]]:
+    language: str | None = None,
+) -> tuple[bool, str, list[Any]]:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w") as f:
         f.write(content)
@@ -299,8 +299,8 @@ class CriticAgent:
 
 class Validator:
     def validate(self, content, output_type, language=None, filepath=None):
-        from pathlib import Path
         import subprocess
+        from pathlib import Path
 
         results = []
         if output_type == "code" and language == "python":
@@ -1036,7 +1036,7 @@ def generate_artifacts(
     spec_doc: str,
     user_prompt: str,
     target_dir: str,
-) -> List[ArtifactResult]:
+) -> list[ArtifactResult]:
     """
     For each artifact in the manifest, generate the artifact using the appropriate agent.
     Returns a list of ArtifactResult objects.

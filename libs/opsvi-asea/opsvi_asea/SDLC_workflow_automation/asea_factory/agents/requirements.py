@@ -1,5 +1,4 @@
 from asea_factory.schemas import RequirementsSpec, Requirement
-from typing import List, Dict, Any
 import uuid
 from pydantic import ValidationError
 from asea_factory.agents.base_agent import BaseAgent

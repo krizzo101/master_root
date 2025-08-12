@@ -1,5 +1,4 @@
-import pytest
-from app.core.config import get_settings, Settings
+from app.core.config import Settings, get_settings
 
 
 def test_get_settings_and_settings_attributes():

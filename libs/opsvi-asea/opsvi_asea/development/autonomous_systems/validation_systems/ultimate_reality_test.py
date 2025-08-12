@@ -114,8 +114,8 @@ def test_practical_usage_workflow():
         print("✓ I could fix the query before running it")
 
         # Show what the corrected query should be
-        print(f"\nCorrected query should be:")
-        print(f"FOR doc IN core_memory SORT doc.created RETURN doc")
+        print("\nCorrected query should be:")
+        print("FOR doc IN core_memory SORT doc.created RETURN doc")
 
         return True
     else:

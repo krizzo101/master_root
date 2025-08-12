@@ -1,8 +1,8 @@
 """
 RESTful API resource for AJAX-based weather data refresh (JSON)
 """
-from flask_restful import Resource, reqparse
 from flask import current_app
+from flask_restful import Resource, reqparse
 
 
 class WeatherResource(Resource):

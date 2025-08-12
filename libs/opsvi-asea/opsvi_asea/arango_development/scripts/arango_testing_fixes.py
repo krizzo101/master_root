@@ -644,18 +644,18 @@ def main():
             json.dump(results, f, indent=2, default=str)
 
         print("ArangoDB Testing Fixes Complete!")
-        print(f"Results saved to: arango_testing_fixes_results.json")
+        print("Results saved to: arango_testing_fixes_results.json")
 
         # Print summary
         summary = results.get("summary", {})
-        print(f"\nFixed Test Summary:")
+        print("\nFixed Test Summary:")
         print(f"- Total tests: {summary.get('total_tests', 0)}")
         print(f"- Successful tests: {summary.get('successful_tests', 0)}")
         print(f"- Success rate: {summary.get('success_rate', 0) * 100:.1f}%")
 
         # Print validation summary
         validation = results.get("validation", {})
-        print(f"\nValidation Summary:")
+        print("\nValidation Summary:")
         for component, result in validation.items():
             status = result.get("status", "unknown")
             print(f"- {component}: {status}")

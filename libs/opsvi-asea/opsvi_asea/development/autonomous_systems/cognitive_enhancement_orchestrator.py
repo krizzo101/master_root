@@ -8,7 +8,7 @@ Uses cognitive_pre_analysis, ai_reasoning, and cognitive_critic plugins that cal
 import sys
 import os
 import asyncio
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 
 # Add orchestrator to path
 ORCHESTRATOR_PATH = "/home/opsvi/asea/asea_orchestrator/src"

@@ -2,7 +2,8 @@
 UI routes (Jinja2 views) for Flask Weather App
 """
 import logging
-from flask import Blueprint, render_template, request, current_app, flash
+
+from flask import Blueprint, current_app, render_template, request
 
 main_bp = Blueprint("main", __name__)
 

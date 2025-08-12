@@ -10,9 +10,9 @@ to:
 from src.applications.oamat_sd.src.config.config_manager import ConfigManager
 """
 
-from pathlib import Path
 import re
 import sys
+from pathlib import Path
 
 
 def fix_malformed_imports(project_root: str):

@@ -3,7 +3,7 @@
 import importlib
 import inspect
 import logging
-from typing import Any, Callable, Dict, List, Optional, Type
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

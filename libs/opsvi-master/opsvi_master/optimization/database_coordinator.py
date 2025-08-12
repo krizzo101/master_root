@@ -15,7 +15,7 @@ import logging
 import json
 from pathlib import Path
 
-from .exceptions import DatabaseConnectionError, PerformanceError, ValidationError
+from .exceptions import DatabaseConnectionError
 from .performance_monitor import PerformanceMonitor, MetricType
 from .cache_manager import CacheManager, CacheType
 

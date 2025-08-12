@@ -4,7 +4,7 @@ Input schema for CI/CD Pipeline Generator.
 This module defines the Pydantic schema for CI/CD pipeline generator input configuration.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -106,7 +106,7 @@ class CICDPipelineGeneratorInput(BaseModel):
     write_files: bool = Field(
         _default=True, description="Write pipeline files to project directory"
     )
-    output_file: Optional[str] = Field(
+    output_file: str | None = Field(
         _default=None, description="Output file for results"
     )
 

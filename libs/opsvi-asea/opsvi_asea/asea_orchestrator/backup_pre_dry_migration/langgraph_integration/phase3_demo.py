@@ -24,14 +24,9 @@ from .multi_agent_orchestration import (
     MultiAgentWorkflowBuilder,
     AgentRole,
     ExecutionMode,
-    AgentCoordinator,
-    AgentDefinition,
 )
 from .advanced_monitoring import (
     create_default_monitoring_setup,
-    MetricsCollector,
-    WorkflowMonitor,
-    AlertManager,
     AlertSeverity,
 )
 from ..plugins.available.cognitive_reminder_plugin import CognitiveReminderPlugin
@@ -283,9 +278,9 @@ def demo_phase3_capabilities():
     compiled_workflow = workflow.compile(checkpointer=checkpointer)
 
     print("✅ Multi-agent workflow built successfully!")
-    print(f"📊 Monitoring components initialized:")
-    print(f"   - Metrics Collector: Active")
-    print(f"   - Workflow Monitor: Active")
+    print("📊 Monitoring components initialized:")
+    print("   - Metrics Collector: Active")
+    print("   - Workflow Monitor: Active")
     print(f"   - Alert Manager: {len(alerts.alerts)} alerts configured")
     print()
 
@@ -366,7 +361,7 @@ def demo_phase3_capabilities():
 
                 if "synthesized_result" in multi_agent_results:
                     synthesis = multi_agent_results["synthesized_result"]
-                    print(f"\n   🎯 SYNTHESIS SUMMARY:")
+                    print("\n   🎯 SYNTHESIS SUMMARY:")
                     print(
                         f"      Key Insights: {len(synthesis.get('key_insights', []))}"
                     )

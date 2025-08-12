@@ -6,7 +6,7 @@ Extracted from request_validation.py for better modularity.
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from src.applications.oamat_sd.src.models.validation_models import (
     RequestField,
@@ -20,7 +20,7 @@ class RequestSchemaRegistry:
 
     def __init__(self):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
-        self._schemas: Dict[RequestType, RequestSchema] = {}
+        self._schemas: dict[RequestType, RequestSchema] = {}
         self._initialize_default_schemas()
 
     def _initialize_default_schemas(self):
@@ -189,7 +189,7 @@ class RequestSchemaRegistry:
 
         self.logger.info(f"Initialized {len(self._schemas)} default schemas")
 
-    def get_schema(self, request_type: RequestType) -> Optional[RequestSchema]:
+    def get_schema(self, request_type: RequestType) -> RequestSchema | None:
         """Get schema for a specific request type."""
         return self._schemas.get(request_type)
 
@@ -198,13 +198,13 @@ class RequestSchemaRegistry:
         self._schemas[schema.request_type] = schema
         self.logger.info(f"Registered schema for {schema.request_type}")
 
-    def list_schemas(self) -> List[RequestType]:
+    def list_schemas(self) -> list[RequestType]:
         """List all available schema types."""
         return list(self._schemas.keys())
 
     def validate_compliance(
-        self, request_type: RequestType, data: Dict[str, Any]
-    ) -> Tuple[bool, List[str]]:
+        self, request_type: RequestType, data: dict[str, Any]
+    ) -> tuple[bool, list[str]]:
         """Validate data compliance with schema."""
         schema = self.get_schema(request_type)
         if not schema:
@@ -225,7 +225,7 @@ class RequestSchemaRegistry:
 
     def get_field_by_name(
         self, request_type: RequestType, field_name: str
-    ) -> Optional[RequestField]:
+    ) -> RequestField | None:
         """Get a specific field from a schema by name."""
         schema = self.get_schema(request_type)
         if not schema:
@@ -236,7 +236,7 @@ class RequestSchemaRegistry:
                 return field
         return None
 
-    def get_all_field_names(self, request_type: RequestType) -> List[str]:
+    def get_all_field_names(self, request_type: RequestType) -> list[str]:
         """Get all field names for a request type."""
         schema = self.get_schema(request_type)
         if not schema:
@@ -244,7 +244,7 @@ class RequestSchemaRegistry:
 
         return [field.name for field in schema.fields]
 
-    def get_required_field_names(self, request_type: RequestType) -> List[str]:
+    def get_required_field_names(self, request_type: RequestType) -> list[str]:
         """Get all required field names for a request type."""
         schema = self.get_schema(request_type)
         if not schema:

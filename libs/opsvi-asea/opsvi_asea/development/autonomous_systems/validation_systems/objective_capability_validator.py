@@ -15,7 +15,7 @@ import json
 import os
 import sys
 from datetime import datetime
-from typing import Dict, List, Any, Optional
+from typing import Dict, Any
 
 
 class ObjectiveCapabilityValidator:
@@ -471,17 +471,17 @@ class ObjectiveCapabilityValidator:
         """Generate objective validation report with no interpretation"""
 
         report_lines = [
-            f"OBJECTIVE CAPABILITY VALIDATION REPORT",
+            "OBJECTIVE CAPABILITY VALIDATION REPORT",
             f"Capability: {validation_result['capability_name']}",
             f"Timestamp: {validation_result['timestamp']}",
             f"Overall Result: {validation_result['overall_validation']}",
-            f"",
-            f"QUANTITATIVE EVIDENCE:",
+            "",
+            "QUANTITATIVE EVIDENCE:",
             f"- Total tool executions: {validation_result['quantitative_evidence']['total_tool_executions']}",
             f"- Tools executed: {validation_result['quantitative_evidence']['tools_executed']}",
             f"- Structured data outputs: {validation_result['quantitative_evidence']['structured_data_count']}",
-            f"",
-            f"OBJECTIVE MEASUREMENTS:",
+            "",
+            "OBJECTIVE MEASUREMENTS:",
         ]
 
         for standard_name, measurement in validation_result[
@@ -497,8 +497,8 @@ class ObjectiveCapabilityValidator:
         if validation_result["failure_reasons"]:
             report_lines.extend(
                 [
-                    f"",
-                    f"FAILURE REASONS:",
+                    "",
+                    "FAILURE REASONS:",
                     *[f"- {reason}" for reason in validation_result["failure_reasons"]],
                 ]
             )

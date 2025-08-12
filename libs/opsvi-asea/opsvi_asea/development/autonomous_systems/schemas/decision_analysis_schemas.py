@@ -3,7 +3,7 @@ Pydantic schemas for external reasoning service decision analysis.
 These schemas ensure type safety and validation for AI model responses.
 """
 
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from pydantic import BaseModel, Field
 from datetime import datetime
 

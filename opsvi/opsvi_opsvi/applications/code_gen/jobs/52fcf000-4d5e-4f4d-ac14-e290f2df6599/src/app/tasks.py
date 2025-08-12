@@ -2,15 +2,16 @@
 Celery worker tasks for asynchronous code analysis.
 Handles code report creation, status, and report persistence.
 """
-import os
 import logging
+
 from celery import Celery
 from sqlalchemy.orm import Session
+
+from app.code_analysis import analyze_code
 from app.config import settings
 from app.db import SessionLocal
-from app.models import Report, File
-from app.code_analysis import analyze_code
-from app.report_generation import generate_report_file, calculate_score
+from app.models import Report
+from app.report_generation import calculate_score, generate_report_file
 
 celery = Celery(
     "tasks", broker=settings.CELERY_BROKER_URL, backend=settings.CELERY_RESULT_BACKEND

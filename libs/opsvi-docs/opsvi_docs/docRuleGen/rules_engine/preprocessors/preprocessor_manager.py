@@ -11,7 +11,7 @@ This module provides functionality to manage the preprocessing of extracted cont
 """
 
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any
 
 from .base_preprocessor import BasePreprocessor
 from .markdown_preprocessor import MarkdownPreprocessor

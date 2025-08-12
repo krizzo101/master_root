@@ -16,11 +16,10 @@ Vector Index:
 - On Chunk.embedding (3072 dims, euclidean)
 """
 
-from typing import Optional
+import json
+import logging
 import uuid
 from datetime import datetime
-import logging
-import json
 
 logger = logging.getLogger("Neo4jClient")
 logging.basicConfig(level=logging.INFO)
@@ -209,7 +208,7 @@ class Neo4jClient:
         }
 
     def list_workflows(
-        self, agent_id: Optional[str] = None, status: Optional[str] = None
+        self, agent_id: str | None = None, status: str | None = None
     ) -> list:
         """
         List workflows, optionally filtered by agent or status.
@@ -585,7 +584,9 @@ class Neo4jClient:
         """
         Create a User node.
         """
-        import uuid, datetime, json
+        import datetime
+        import json
+        import uuid
 
         user_id = str(uuid.uuid4())
         created_at = datetime.datetime.utcnow().isoformat()
@@ -632,7 +633,9 @@ class Neo4jClient:
         """
         Create a Step node and attach PERFORMED_BY edge to Agent, HAS_STEP to Workflow.
         """
-        import uuid, datetime, json
+        import datetime
+        import json
+        import uuid
 
         step_id = str(uuid.uuid4())
         started_at = started_at or datetime.datetime.utcnow().isoformat()
@@ -679,7 +682,8 @@ class Neo4jClient:
         """
         Create a Tag node.
         """
-        import uuid, json
+        import json
+        import uuid
 
         tag_id = str(uuid.uuid4())
         meta = metadata or {}
@@ -716,7 +720,9 @@ class Neo4jClient:
         """
         Create a Comment node and attach WROTE and COMMENTED_ON edges.
         """
-        import uuid, datetime, json
+        import datetime
+        import json
+        import uuid
 
         comment_id = str(uuid.uuid4())
         created_at = datetime.datetime.utcnow().isoformat()
@@ -754,7 +760,9 @@ class Neo4jClient:
         """
         Create an Approval node and attach GAVE and APPROVED edges.
         """
-        import uuid, datetime, json
+        import datetime
+        import json
+        import uuid
 
         approval_id = str(uuid.uuid4())
         timestamp = datetime.datetime.utcnow().isoformat()
@@ -798,7 +806,9 @@ class Neo4jClient:
         """
         Create an Annotation node and attach MADE edge to User and target.
         """
-        import uuid, datetime, json
+        import datetime
+        import json
+        import uuid
 
         annotation_id = str(uuid.uuid4())
         created_at = datetime.datetime.utcnow().isoformat()
@@ -922,7 +932,7 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"[AuthTest] ERROR: {e}")
         if attempt < max_retries:
-            print(f"[AuthTest] Retrying in 2 seconds...")
+            print("[AuthTest] Retrying in 2 seconds...")
             time.sleep(2)
     else:
         print(

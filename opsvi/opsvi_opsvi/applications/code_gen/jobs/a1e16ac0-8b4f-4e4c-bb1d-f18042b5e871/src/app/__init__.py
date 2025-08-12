@@ -2,12 +2,14 @@
 App factory for the Weather Flask web application.
 Sets up extensions, blueprints, error handlers, and configuration.
 """
-from flask import Flask
-from flask_wtf.csrf import CSRFProtect
-from flask_talisman import Talisman
-from flask_apscheduler import APScheduler
 import logging
 import os
+
+from flask import Flask
+from flask_apscheduler import APScheduler
+from flask_talisman import Talisman
+from flask_wtf.csrf import CSRFProtect
+
 from .weather_service import WeatherService
 
 csrf = CSRFProtect()

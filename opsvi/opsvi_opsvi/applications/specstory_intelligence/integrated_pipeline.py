@@ -4,15 +4,14 @@ Combines cleaning, file mapping, concept extraction, atomic parsing, embedding, 
 """
 
 import asyncio
-from dataclasses import dataclass, field
-from datetime import datetime
 import json
 import logging
-from pathlib import Path
 
 # Import shared utilities
 import sys
-from typing import Dict, List
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
 
 # Import existing components
 from .atomic_parser import AtomicComponent, AtomicRelationship, AtomicSpecStoryParser
@@ -26,12 +25,12 @@ sys.path.append(str(Path(__file__).parent.parent.parent / "shared"))
 class ConceptExtraction:
     """High-level concept/idea extraction before atomic decomposition"""
 
-    concepts: List[Dict] = field(default_factory=list)
-    ideas: List[Dict] = field(default_factory=list)
-    themes: List[Dict] = field(default_factory=list)
-    decisions: List[Dict] = field(default_factory=list)
-    learnings: List[Dict] = field(default_factory=list)
-    patterns: List[Dict] = field(default_factory=list)
+    concepts: list[dict] = field(default_factory=list)
+    ideas: list[dict] = field(default_factory=list)
+    themes: list[dict] = field(default_factory=list)
+    decisions: list[dict] = field(default_factory=list)
+    learnings: list[dict] = field(default_factory=list)
+    patterns: list[dict] = field(default_factory=list)
 
 
 @dataclass
@@ -39,15 +38,15 @@ class ProcessingResult:
     """Complete processing result for a file"""
 
     file_path: str
-    file_map: Dict
+    file_map: dict
     concepts: ConceptExtraction
-    components: List[AtomicComponent]
-    relationships: List[AtomicRelationship]
-    embeddings: Dict
-    storage_results: Dict
+    components: list[AtomicComponent]
+    relationships: list[AtomicRelationship]
+    embeddings: dict
+    storage_results: dict
     processing_time: float
     success: bool
-    errors: List[str] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
 
 
 class IntegratedSpecStoryPipeline:
@@ -56,7 +55,7 @@ class IntegratedSpecStoryPipeline:
     def __init__(
         self,
         input_dir: str = ".cursor/import",
-        db_config: Dict = None,
+        db_config: dict = None,
         enable_embeddings: bool = True,
         enable_concept_extraction: bool = True,
     ):
@@ -155,7 +154,7 @@ class IntegratedSpecStoryPipeline:
 
         return result
 
-    async def _generate_file_map(self, file_path: str) -> Dict:
+    async def _generate_file_map(self, file_path: str) -> dict:
         """Generate or extract file map from the file"""
         try:
             # Check if file already has a file map
@@ -182,7 +181,7 @@ class IntegratedSpecStoryPipeline:
             self.logger.error(f"Failed to generate file map for {file_path}: {e}")
             return {}
 
-    async def _create_file_map_from_content(self, content: str, file_path: str) -> Dict:
+    async def _create_file_map_from_content(self, content: str, file_path: str) -> dict:
         """Create file map from content analysis"""
         lines = content.split("\n")
         sections = []
@@ -217,7 +216,7 @@ class IntegratedSpecStoryPipeline:
         }
 
     async def _extract_concepts(
-        self, file_path: str, file_map: Dict
+        self, file_path: str, file_map: dict
     ) -> ConceptExtraction:
         """Extract high-level concepts and ideas before atomic decomposition"""
         extraction = ConceptExtraction()
@@ -279,7 +278,7 @@ class IntegratedSpecStoryPipeline:
 
         return extraction
 
-    async def _generate_embeddings(self, components: List[AtomicComponent]) -> Dict:
+    async def _generate_embeddings(self, components: list[AtomicComponent]) -> dict:
         """Generate embeddings for components"""
         embeddings = {}
 
@@ -309,12 +308,12 @@ class IntegratedSpecStoryPipeline:
     async def _store_multi_database(
         self,
         file_path: str,
-        file_map: Dict,
+        file_map: dict,
         concepts: ConceptExtraction,
-        components: List[AtomicComponent],
-        relationships: List[AtomicRelationship],
-        embeddings: Dict,
-    ) -> Dict:
+        components: list[AtomicComponent],
+        relationships: list[AtomicRelationship],
+        embeddings: dict,
+    ) -> dict:
         """Store data across multiple database collections/types"""
         storage_results = {}
 
@@ -351,18 +350,18 @@ class IntegratedSpecStoryPipeline:
 
     async def _store_concepts_graph(
         self, concepts: ConceptExtraction, file_path: str
-    ) -> Dict:
+    ) -> dict:
         """Store concepts in graph database for relationship analysis"""
         # Implementation would create concept nodes and relationships
         # This is where high-level concepts get stored separately from atomic components
         return {"concepts_stored": len(concepts.concepts)}
 
-    async def _store_embeddings_vector(self, embeddings: Dict, file_path: str) -> Dict:
+    async def _store_embeddings_vector(self, embeddings: dict, file_path: str) -> dict:
         """Store embeddings in vector database for similarity search"""
         # Implementation would store embeddings for vector similarity search
         return {"embeddings_stored": len(embeddings)}
 
-    async def _store_file_map(self, file_map: Dict, file_path: str) -> Dict:
+    async def _store_file_map(self, file_map: dict, file_path: str) -> dict:
         """Store file map as structured document"""
         # Implementation would store the file map for navigation
         return {"file_map_stored": True}
@@ -375,7 +374,7 @@ class IntegratedSpecStoryPipeline:
         self.metrics["embeddings_generated"] += len(result.embeddings)
         self.metrics["total_processing_time"] += result.processing_time
 
-    async def process_directory(self, directory: str = None) -> List[ProcessingResult]:
+    async def process_directory(self, directory: str = None) -> list[ProcessingResult]:
         """Process all files in a directory"""
         if directory is None:
             directory = self.input_dir

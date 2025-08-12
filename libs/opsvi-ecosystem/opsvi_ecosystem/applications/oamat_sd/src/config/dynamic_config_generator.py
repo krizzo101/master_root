@@ -14,7 +14,7 @@ NO HARDCODED VALUES - All configuration is generated dynamically based on:
 
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 from src.applications.oamat_sd.src.reasoning.structured_output_enforcer import (
     StructuredOutputEnforcer,
@@ -23,7 +23,7 @@ from src.applications.oamat_sd.src.reasoning.structured_output_enforcer import (
 
 async def generate_dynamic_config(
     user_request: str, debug: bool = False, standardized_request=None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Master Agent Dynamic Configuration Generation
 
@@ -203,7 +203,7 @@ Return ONLY the JSON configuration - no other text.
         )
 
 
-def _display_config_analysis(config: Dict[str, Any], user_request: str):
+def _display_config_analysis(config: dict[str, Any], user_request: str):
     """Display the configuration analysis in a user-friendly way"""
 
     print("\n🎯 MASTER AGENT CONFIGURATION ANALYSIS:")

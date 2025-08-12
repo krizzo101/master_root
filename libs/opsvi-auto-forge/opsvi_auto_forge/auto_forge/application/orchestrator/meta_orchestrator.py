@@ -6,46 +6,33 @@ import asyncio
 import logging
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, ConfigDict
 
-from opsvi_auto_forge.config.models import Project, Run, TaskRecord, TaskStatus
+from opsvi_auto_forge.config.models import TaskStatus
 from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
 from opsvi_auto_forge.infrastructure.memory.graph.decision_client import (
     get_decision_client,
 )
-from opsvi_auto_forge.core.prompting.schema_registry import get_schema
 
-from .budgets import BudgetManager, BudgetType, BudgetPeriod
+from .budgets import BudgetManager
 from .dag_loader import DAGLoader, ExecutionDAG, DAGNode
 from .policies import PolicyManager, QualityGateResult
 from .registry import TaskRegistryManager
 from .router import ModelRouter
 from .dsl_processor import DSLProcessor
-from opsvi_auto_forge.config.settings import settings
 from .task_models import (
-    TaskDefinition,
     TaskExecution,
     TaskResult,
     TaskExecutionPlan,
-    TaskPriority,
-    TaskType,
 )
 from .exceptions import OrchestrationError, ValidationError
 
 # Decision kernel imports
-from opsvi_auto_forge.core.decision_kernel.analyzer import TaskAnalyzer, analyze_task
+from opsvi_auto_forge.core.decision_kernel.analyzer import analyze_task
 from opsvi_auto_forge.core.decision_kernel.strategies import select_strategy
-from opsvi_auto_forge.core.decision_kernel.models import (
-    RouteDecision,
-    DecisionRecord,
-    DecisionLifecycle,
-    Claim,
-    Evidence,
-    Verification,
-)
 
 # Monitoring imports
 from opsvi_auto_forge.infrastructure.monitoring.metrics.decision_metrics import (
@@ -54,14 +41,11 @@ from opsvi_auto_forge.infrastructure.monitoring.metrics.decision_metrics import 
     dk_decision_confidence_bucket,
     quality_gate_passed_total,
     quality_gate_failed_total,
-    quality_gate_repair_attempts_total,
     quality_gate_repair_success_total,
     quality_gate_repair_failure_total,
     auto_repair_attempts_total,
     auto_repair_success_total,
     auto_repair_failure_total,
-    dsl_config_loaded_total,
-    dsl_knobs_applied_total,
     cost_per_pass_gate,
 )
 

@@ -2,8 +2,8 @@
 Tests for Todo List REST API endpoints and input validation.
 """
 import pytest
-from httpx import AsyncClient
 from app.main import app
+from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
@@ -53,7 +53,7 @@ async def test_create_and_get_lifecycle():
         assert not updated["completed"]
 
         # List
-        list_resp = await ac.get(f"/todos")
+        list_resp = await ac.get("/todos")
         assert list_resp.status_code == 200
         todos = list_resp.json()
         assert isinstance(todos, list)

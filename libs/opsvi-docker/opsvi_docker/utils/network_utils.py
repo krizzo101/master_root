@@ -5,8 +5,7 @@ Network-specific utility functions and helpers.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
-from datetime import datetime
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +21,7 @@ class NetworkUtils:
     """
 
     @staticmethod
-    def analyze_network_config(network_info: Dict[str, Any]) -> Dict[str, Any]:
+    def analyze_network_config(network_info: dict[str, Any]) -> dict[str, Any]:
         """Analyze Docker network configuration."""
         analysis = {
             "network_type": None,
@@ -86,7 +85,7 @@ class NetworkUtils:
         return analysis
 
     @staticmethod
-    def validate_network_config(network_config: Dict[str, Any]) -> Dict[str, Any]:
+    def validate_network_config(network_config: dict[str, Any]) -> dict[str, Any]:
         """Validate network configuration parameters."""
         validation = {
             "valid": True,
@@ -186,7 +185,7 @@ class NetworkUtils:
             return False
 
     @staticmethod
-    def get_network_statistics(network_info: Dict[str, Any]) -> Dict[str, Any]:
+    def get_network_statistics(network_info: dict[str, Any]) -> dict[str, Any]:
         """Get network usage statistics."""
         stats = {
             "total_containers": 0,
@@ -232,8 +231,8 @@ class NetworkUtils:
 
     @staticmethod
     def troubleshoot_network_connectivity(
-        network_info: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        network_info: dict[str, Any]
+    ) -> dict[str, Any]:
         """Troubleshoot network connectivity issues."""
         troubleshooting = {
             "connectivity_issues": [],
@@ -282,7 +281,7 @@ class NetworkUtils:
         return troubleshooting
 
     @staticmethod
-    def optimize_network_config(network_config: Dict[str, Any]) -> Dict[str, Any]:
+    def optimize_network_config(network_config: dict[str, Any]) -> dict[str, Any]:
         """Suggest network configuration optimizations."""
         optimizations = {
             "driver_optimizations": [],
@@ -330,7 +329,7 @@ class NetworkUtils:
         return optimizations
 
     @staticmethod
-    def format_network_info(network_info: Dict[str, Any]) -> str:
+    def format_network_info(network_info: dict[str, Any]) -> str:
         """Format network information for display."""
         lines = []
 

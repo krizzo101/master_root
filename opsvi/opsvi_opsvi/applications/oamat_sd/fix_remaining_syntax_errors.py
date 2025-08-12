@@ -6,8 +6,8 @@ Fix Remaining Syntax Errors Script
 Fixes all remaining syntax errors from malformed imports and invalid statements
 """
 
-from pathlib import Path
 import re
+from pathlib import Path
 
 
 def fix_all_syntax_errors():

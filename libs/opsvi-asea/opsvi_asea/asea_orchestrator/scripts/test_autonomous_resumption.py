@@ -14,12 +14,9 @@ import asyncio
 import sys
 import os
 import uuid
-import traceback
-import time
 from pathlib import Path
 from asea_orchestrator.core import Orchestrator
 from asea_orchestrator.database import ArangoDBClient
-from asea_orchestrator.plugins.plugin_manager import PluginManager
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -36,7 +33,6 @@ sys.path.insert(0, SRC_PATH)
 project_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(project_root / "src"))
 
-from asea_orchestrator.core import Orchestrator
 from asea_orchestrator.workflow import WorkflowManager
 from asea_orchestrator.plugins.types import PluginConfig
 
@@ -178,12 +174,12 @@ async def run_definitive_test():
     assert (
         saved_state_doc["status"] == "FAILED"
     ), f"Test Failed: Expected status FAILED, got {saved_state_doc['status']}"
-    print(f"✓ Workflow status correctly marked as FAILED.")
+    print("✓ Workflow status correctly marked as FAILED.")
 
     assert (
         saved_state_doc["current_step"] == 1
     ), f"Test Failed: Expected to fail on step 1, but last completed was {saved_state_doc['current_step']}"
-    print(f"✓ Failure occurred at the correct step (step index 1).")
+    print("✓ Failure occurred at the correct step (step index 1).")
 
     persisted_state = saved_state_doc["state"]
     assert (

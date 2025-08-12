@@ -5,9 +5,9 @@ Demonstrates 3-5x parallel efficiency improvements with OpenAI-exclusive archite
 """
 
 import asyncio
-from pathlib import Path
 import sys
 import time
+from pathlib import Path
 
 # Add the POC to the Python path
 poc_path = Path(__file__).parent

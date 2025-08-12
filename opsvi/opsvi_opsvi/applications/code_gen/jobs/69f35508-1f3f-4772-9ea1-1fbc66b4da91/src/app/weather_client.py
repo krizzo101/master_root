@@ -1,9 +1,10 @@
 """
 External OpenWeatherMap API Client module.
 """
-import requests
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
+
+import requests
 
 
 class WeatherAPIError(Exception):
@@ -33,7 +34,7 @@ class WeatherAPIClient:
         self.timeout = timeout
         self.logger = logging.getLogger("app.weather_client")
 
-    def get_weather_by_city(self, city: str) -> Dict[str, Any]:
+    def get_weather_by_city(self, city: str) -> dict[str, Any]:
         """
         Fetch current weather data for a city.
         Args:

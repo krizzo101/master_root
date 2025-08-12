@@ -6,14 +6,11 @@ Provides comprehensive image operations and registry management.
 """
 
 import logging
-import os
-from typing import Any, Dict, List, Optional, Union, BinaryIO
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any, BinaryIO
 
 from docker import DockerClient
-from docker.errors import DockerException, APIError, ImageNotFound, BuildError
-
 from opsvi_foundation import BaseComponent, ComponentError
 
 logger = logging.getLogger(__name__)
@@ -32,30 +29,30 @@ class ImageConfig:
     # Basic settings
     name: str = ""
     tag: str = "latest"
-    repository: Optional[str] = None
+    repository: str | None = None
 
     # Build settings
     dockerfile: str = "Dockerfile"
     context_path: str = "."
-    build_args: Dict[str, str] = field(default_factory=dict)
-    labels: Dict[str, str] = field(default_factory=dict)
+    build_args: dict[str, str] = field(default_factory=dict)
+    labels: dict[str, str] = field(default_factory=dict)
 
     # Registry settings
-    registry_url: Optional[str] = None
-    username: Optional[str] = None
-    password: Optional[str] = None
+    registry_url: str | None = None
+    username: str | None = None
+    password: str | None = None
 
     # Pull settings
     pull_policy: str = "if-not-present"  # always, if-not-present, never
 
     # Security settings
-    platform: Optional[str] = None
-    security_opt: List[str] = field(default_factory=list)
+    platform: str | None = None
+    security_opt: list[str] = field(default_factory=list)
 
     # Build optimization
-    cache_from: List[str] = field(default_factory=list)
-    target: Optional[str] = None
-    network_mode: Optional[str] = None
+    cache_from: list[str] = field(default_factory=list)
+    target: str | None = None
+    network_mode: str | None = None
 
     # Output settings
     quiet: bool = False
@@ -68,22 +65,22 @@ class ImageInfo:
     """Image information and metadata."""
 
     id: str
-    tags: List[str]
+    tags: list[str]
     size: int
     created: datetime
     architecture: str
     os: str
-    variant: Optional[str]
-    digest: Optional[str]
-    labels: Dict[str, str]
-    config: Dict[str, Any]
-    layers: List[str]
+    variant: str | None
+    digest: str | None
+    labels: dict[str, str]
+    config: dict[str, Any]
+    layers: list[str]
 
     # Additional metadata
-    parent: Optional[str] = None
-    comment: Optional[str] = None
-    author: Optional[str] = None
-    repo_digests: List[str] = field(default_factory=list)
+    parent: str | None = None
+    comment: str | None = None
+    author: str | None = None
+    repo_digests: list[str] = field(default_factory=list)
 
 
 class ImageManager(BaseComponent):
@@ -111,7 +108,7 @@ class ImageManager(BaseComponent):
 
         self.client = client
         self.config = config
-        self._images: Dict[str, Any] = {}
+        self._images: dict[str, Any] = {}
 
         logger.debug("ImageManager initialized")
 
@@ -130,7 +127,7 @@ class ImageManager(BaseComponent):
             raise ImageError(f"Failed to initialize ImageManager: {e}")
 
     async def build_image(
-        self, config: ImageConfig, fileobj: Optional[BinaryIO] = None
+        self, config: ImageConfig, fileobj: BinaryIO | None = None
     ) -> ImageInfo:
         """Build a Docker image.
 
@@ -372,8 +369,8 @@ class ImageManager(BaseComponent):
             raise ImageError(f"Failed to get image info: {e}")
 
     async def list_images(
-        self, filters: Optional[Dict[str, Any]] = None, all_images: bool = False
-    ) -> List[ImageInfo]:
+        self, filters: dict[str, Any] | None = None, all_images: bool = False
+    ) -> list[ImageInfo]:
         """List images.
 
         Args:
@@ -401,8 +398,8 @@ class ImageManager(BaseComponent):
             raise ImageError(f"Failed to list images: {e}")
 
     async def search_images(
-        self, term: str, limit: int = 25, filters: Optional[Dict[str, Any]] = None
-    ) -> List[Dict[str, Any]]:
+        self, term: str, limit: int = 25, filters: dict[str, Any] | None = None
+    ) -> list[dict[str, Any]]:
         """Search for images in registry.
 
         Args:
@@ -476,7 +473,7 @@ class ImageManager(BaseComponent):
             logger.error(f"Failed to load image from {input_path}: {e}")
             raise ImageError(f"Image load failed: {e}")
 
-    async def get_image_history(self, image_id: str) -> List[Dict[str, Any]]:
+    async def get_image_history(self, image_id: str) -> list[dict[str, Any]]:
         """Get image history.
 
         Args:
@@ -494,7 +491,7 @@ class ImageManager(BaseComponent):
             logger.error(f"Failed to get image history for {image_id}: {e}")
             raise ImageError(f"Failed to get image history: {e}")
 
-    async def inspect_image(self, image_id: str) -> Dict[str, Any]:
+    async def inspect_image(self, image_id: str) -> dict[str, Any]:
         """Inspect image details.
 
         Args:

@@ -3,7 +3,6 @@ Session Consolidator - Merge multiple AI conversations into master knowledge
 """
 
 import json
-from typing import Dict, List
 
 from .context_compression_engine import ContextCompressionEngine, ContextPackage
 
@@ -14,7 +13,7 @@ class SessionConsolidator:
     def __init__(self):
         self.compressor = ContextCompressionEngine()
 
-    def consolidate_sessions(self, session_files: List[str]) -> ContextPackage:
+    def consolidate_sessions(self, session_files: list[str]) -> ContextPackage:
         """Merge multiple session logs into master context"""
 
         all_components = []
@@ -51,7 +50,7 @@ class SessionConsolidator:
 
         return master_package
 
-    def _detect_frustration_patterns(self, session_data: Dict) -> List[Dict]:
+    def _detect_frustration_patterns(self, session_data: dict) -> list[dict]:
         """Find user frustration indicators"""
         patterns = []
 
@@ -82,7 +81,7 @@ class SessionConsolidator:
 
         return patterns
 
-    def _analyze_ai_performance(self, session_data: Dict) -> Dict:
+    def _analyze_ai_performance(self, session_data: dict) -> dict:
         """Analyze AI performance in this session"""
 
         startup_quality = self._assess_startup_performance(session_data)
@@ -97,7 +96,7 @@ class SessionConsolidator:
             / 3,
         }
 
-    def _load_session(self, filepath: str) -> Dict:
+    def _load_session(self, filepath: str) -> dict:
         """Load session data from file"""
         try:
             with open(filepath) as f:
@@ -106,7 +105,7 @@ class SessionConsolidator:
             return {"components": []}
 
     def _extract_preceding_context(
-        self, session_data: Dict, target_component: Dict
+        self, session_data: dict, target_component: dict
     ) -> str:
         """Get context leading up to frustration"""
         # Simple implementation - get previous 2 components
@@ -118,7 +117,7 @@ class SessionConsolidator:
         except:
             return ""
 
-    def _assess_startup_performance(self, session_data: Dict) -> float:
+    def _assess_startup_performance(self, session_data: dict) -> float:
         """Rate startup sequence performance 0-1"""
         # Look for startup indicators
         startup_components = [
@@ -142,7 +141,7 @@ class SessionConsolidator:
 
         return max(0, 1 - (error_count / len(startup_components)))
 
-    def _assess_task_completion(self, session_data: Dict) -> float:
+    def _assess_task_completion(self, session_data: dict) -> float:
         """Rate task completion quality 0-1"""
         components = session_data.get("components", [])
 
@@ -169,7 +168,7 @@ class SessionConsolidator:
 
         return completion_indicators / (completion_indicators + error_indicators)
 
-    def _calculate_error_rate(self, session_data: Dict) -> float:
+    def _calculate_error_rate(self, session_data: dict) -> float:
         """Calculate error rate for session"""
         components = session_data.get("components", [])
 
@@ -187,7 +186,7 @@ class SessionConsolidator:
 
         return error_count / len(components)
 
-    def _analyze_frustration_trends(self, patterns: List[Dict]) -> Dict:
+    def _analyze_frustration_trends(self, patterns: list[dict]) -> dict:
         """Analyze patterns in user frustration"""
         if not patterns:
             return {"total_incidents": 0, "common_triggers": []}
@@ -213,7 +212,7 @@ class SessionConsolidator:
             ),
         }
 
-    def _analyze_performance_variance(self, performance_data: List[Dict]) -> Dict:
+    def _analyze_performance_variance(self, performance_data: list[dict]) -> dict:
         """Analyze variance in AI performance across sessions"""
         if not performance_data:
             return {"variance": 0, "average_performance": 0.5}

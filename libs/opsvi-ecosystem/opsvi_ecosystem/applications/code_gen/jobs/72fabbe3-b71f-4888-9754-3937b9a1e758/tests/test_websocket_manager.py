@@ -1,6 +1,6 @@
-import pytest
-from backend.websocket_manager import WebSocketManager
 from unittest.mock import MagicMock
+
+from backend.websocket_manager import WebSocketManager
 
 
 def test_websocket_manager_initialization():

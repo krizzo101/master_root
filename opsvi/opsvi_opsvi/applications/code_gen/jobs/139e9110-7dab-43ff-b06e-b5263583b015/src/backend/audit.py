@@ -2,9 +2,9 @@
 Audit logging with Python (using Winston-like splitting via RotatingFileHandler and DB)
 """
 import logging
-from backend.models import AuditLog
+
 from backend.database import get_db
-from datetime import datetime
+from backend.models import AuditLog
 
 
 def setup_audit_logging(settings):

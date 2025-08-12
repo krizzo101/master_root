@@ -2,15 +2,14 @@
 """Main entry point for the Code Generation Utility."""
 import argparse
 import sys
-import uvicorn
 from pathlib import Path
 
-import sys
-from pathlib import Path
+import uvicorn
 
 sys.path.insert(0, str(Path(__file__).parent))
-from config import config, reload_config
 from applications.code_gen.logging_config import setup_logging
+
+from config import config, reload_config
 
 
 def main() -> int:
@@ -104,8 +103,8 @@ def main() -> int:
     # Start all dependencies first
     print("🔧 Starting dependencies...")
     from applications.code_gen.dependency_manager import (
-        start_dependencies,
         shutdown_dependencies,
+        start_dependencies,
     )
 
     if not start_dependencies():
@@ -126,9 +125,7 @@ def main() -> int:
     print("  GET /metrics - Application metrics")
     print("  GET /info - Application information")
     print("  WS /ws/{job_id} - Real-time progress updates")
-    print(
-        "\n🎯 Ready! Visit http://localhost:{} for the web interface".format(config.port)
-    )
+    print(f"\n🎯 Ready! Visit http://localhost:{config.port} for the web interface")
     print("Press Ctrl+C to stop the server")
 
     try:

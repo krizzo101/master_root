@@ -2,8 +2,10 @@
 Flask App initialization and factory function.
 """
 import logging
+
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
+
 from .config import Config
 
 

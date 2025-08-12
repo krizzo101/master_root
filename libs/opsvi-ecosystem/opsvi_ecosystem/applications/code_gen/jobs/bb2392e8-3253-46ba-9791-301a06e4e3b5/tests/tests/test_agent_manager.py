@@ -1,5 +1,5 @@
-import pytest
 from unittest import mock
+
 from multiagent_cli.agent_manager import AgentManager
 
 

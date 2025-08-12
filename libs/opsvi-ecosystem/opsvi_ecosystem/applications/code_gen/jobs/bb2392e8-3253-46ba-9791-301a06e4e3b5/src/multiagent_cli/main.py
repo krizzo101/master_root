@@ -4,21 +4,22 @@ Entry point and CLI command definitions.
 """
 import sys
 from pathlib import Path
+
 import typer
+from loguru import logger
 from rich.console import Console
 from rich.progress import (
+    BarColumn,
     Progress,
     SpinnerColumn,
-    BarColumn,
     TextColumn,
     TimeElapsedColumn,
 )
-import logging
-from loguru import logger
-from multiagent_cli.config import AppConfig, get_config, load_dotenv_config
+
+from multiagent_cli.config import get_config, load_dotenv_config
 from multiagent_cli.input_parser import parse_and_validate_input
-from multiagent_cli.orchestrator import OrchestrationEngine
 from multiagent_cli.logs import configure_logging, get_log_file_path
+from multiagent_cli.orchestrator import OrchestrationEngine
 from multiagent_cli.response_aggregator import aggregate_responses
 
 app = typer.Typer(
@@ -130,8 +131,9 @@ def run(
         import rich
 
         console.print("[bold cyan]Aggregated agent results:[/bold cyan]")
-        from rich.syntax import Syntax
         import json
+
+        from rich.syntax import Syntax
 
         syntax = Syntax(
             json.dumps(results, indent=2), "json", theme="monokai", line_numbers=True
@@ -182,8 +184,9 @@ def validate(
 @app.command()
 def show_schema():
     """Show the expected workload JSON schema."""
-    from multiagent_cli.input_parser import WORKLOAD_JSON_SCHEMA
     import json
+
+    from multiagent_cli.input_parser import WORKLOAD_JSON_SCHEMA
 
     print(json.dumps(WORKLOAD_JSON_SCHEMA, indent=2))
 

@@ -7,7 +7,7 @@ through all generation phases with intelligent context management.
 
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import get_logger
 from .workflow_context import WorkflowContext
@@ -303,9 +303,6 @@ class AutonomousWorkflow:
         from src.tools.code_generation.o3_code_generator.schemas.idea_formation_schemas import (
             MarketResearchInput,
         )
-        from src.tools.code_generation.o3_code_generator.market_research_integrator import (
-            MarketResearchProcessor,
-        )
 
         # Extract relevant information from context
         selected_idea = step_context.get("selected_idea")
@@ -328,9 +325,6 @@ class AutonomousWorkflow:
             # Import the components directly to avoid logger initialization conflicts
             from src.tools.code_generation.o3_code_generator.market_research_integrator import (
                 MarketResearchIntegrator,
-            )
-            from src.tools.code_generation.o3_code_generator.utils.o3_model_generator import (
-                O3ModelGenerator,
             )
 
             # Create market research integrator directly without processor wrapper
@@ -683,7 +677,6 @@ class AutonomousWorkflow:
         from src.tools.code_generation.o3_code_generator.utils.o3_model_generator import (
             O3ModelGenerator,
         )
-        from datetime import datetime
 
         requirements = step_context.get("requirements-analyze", {})
         system_design = step_context.get("system-design", {})
@@ -1389,7 +1382,6 @@ class AutonomousWorkflow:
         interfaces = []
 
         # Look for UI patterns
-        import re
 
         ui_keywords = [
             "dashboard",
@@ -2408,15 +2400,15 @@ class AutonomousWorkflow:
         progress = context.get_workflow_progress()
 
         summary_content = [
-            f"# Autonomous Workflow Summary",
-            f"",
+            "# Autonomous Workflow Summary",
+            "",
             f"**Workflow ID:** {context.workflow_id}",
             f"**Problem Statement:** {context.initial_problem}",
             f"**Execution Time:** {total_duration:.2f} seconds",
             f"**Completion:** {progress['completed_steps']}/{progress['total_steps']} steps ({progress['progress_percent']:.1f}%)",
-            f"",
-            f"## Selected Solution",
-            f"",
+            "",
+            "## Selected Solution",
+            "",
         ]
 
         if context.selected_idea:
@@ -2425,17 +2417,17 @@ class AutonomousWorkflow:
                     f"**Title:** {context.selected_idea.get('title', 'Untitled')}",
                     f"**Description:** {context.selected_idea.get('description', 'No description')}",
                     f"**Category:** {context.selected_idea.get('category', 'General')}",
-                    f"",
-                    f"### Selection Rationale",
+                    "",
+                    "### Selection Rationale",
                     f"{context.idea_selection_rationale}",
-                    f"",
+                    "",
                 ]
             )
 
         summary_content.extend(
             [
-                f"## Execution Timeline",
-                f"",
+                "## Execution Timeline",
+                "",
             ]
         )
 
@@ -2450,9 +2442,9 @@ class AutonomousWorkflow:
 
         summary_content.extend(
             [
-                f"",
-                f"## Generated Outputs",
-                f"",
+                "",
+                "## Generated Outputs",
+                "",
             ]
         )
 
@@ -2479,24 +2471,24 @@ class AutonomousWorkflow:
                     )
 
                 else:
-                    summary_content.append(f"- Completed successfully")
+                    summary_content.append("- Completed successfully")
 
                 summary_content.append("")
 
         summary_content.extend(
             [
-                f"## Workflow Configuration",
-                f"",
+                "## Workflow Configuration",
+                "",
                 f"- **Enabled Steps:** {', '.join(context.enabled_steps)}",
                 f"- **Output Directory:** `{context.output_directory}`",
-                f"- **Context File:** `workflow_context.json`",
-                f"",
-                f"## Next Steps",
-                f"",
-                f"1. Review generated outputs in step-specific directories",
-                f"2. Validate technical specifications against requirements",
-                f"3. Use architecture outputs for implementation planning",
-                f"4. Consider iterating on specific steps if needed",
+                "- **Context File:** `workflow_context.json`",
+                "",
+                "## Next Steps",
+                "",
+                "1. Review generated outputs in step-specific directories",
+                "2. Validate technical specifications against requirements",
+                "3. Use architecture outputs for implementation planning",
+                "4. Consider iterating on specific steps if needed",
             ]
         )
 

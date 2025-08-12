@@ -1,14 +1,14 @@
+import uuid
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional
-import uuid
+from typing import Any
 
 
 @dataclass
 class Reviewer:
     type: str  # 'agent' or 'human'
     id: str
-    role: Optional[str] = None
+    role: str | None = None
 
 
 @dataclass
@@ -19,13 +19,13 @@ class AgenticAnnotation:
     reviewer: Reviewer
     timestamp: str
     review_status: str  # 'approved', 'flagged', etc.
-    categories: List[str]
+    categories: list[str]
     summary: str
     details: str
-    suggested_action: Optional[str] = None
-    evidence_refs: List[str] = field(default_factory=list)
-    child_annotations: List["AgenticAnnotation"] = field(default_factory=list)
-    metadata: Optional[Dict[str, Any]] = field(default_factory=dict)
+    suggested_action: str | None = None
+    evidence_refs: list[str] = field(default_factory=list)
+    child_annotations: list["AgenticAnnotation"] = field(default_factory=list)
+    metadata: dict[str, Any] | None = field(default_factory=dict)
 
     def to_dict(self):
         d = asdict(self)
@@ -39,13 +39,13 @@ class AgenticAnnotation:
         scope_ref: str,
         reviewer: Reviewer,
         review_status: str,
-        categories: List[str],
+        categories: list[str],
         summary: str,
         details: str,
-        suggested_action: Optional[str] = None,
-        evidence_refs: Optional[List[str]] = None,
-        child_annotations: Optional[List["AgenticAnnotation"]] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        suggested_action: str | None = None,
+        evidence_refs: list[str] | None = None,
+        child_annotations: list["AgenticAnnotation"] | None = None,
+        metadata: dict[str, Any] | None = None,
     ):
         return AgenticAnnotation(
             annotation_id=str(uuid.uuid4()),

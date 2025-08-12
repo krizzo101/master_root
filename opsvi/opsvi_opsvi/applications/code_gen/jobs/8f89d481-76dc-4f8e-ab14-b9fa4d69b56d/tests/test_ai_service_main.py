@@ -1,18 +1,18 @@
+from unittest.mock import patch
+
 import pytest
-from ai_service import main
 from ai_service.main import (
-    get_summarizer,
-    get_suggestion_generator,
-    verify_jwt,
-    health_check,
-    summarize,
-    suggest,
-    SummarizeRequest,
-    SummarizeResponse,
     SuggestionRequest,
     SuggestionResponse,
+    SummarizeRequest,
+    SummarizeResponse,
+    get_suggestion_generator,
+    get_summarizer,
+    health_check,
+    suggest,
+    summarize,
+    verify_jwt,
 )
-from unittest.mock import patch, MagicMock
 
 
 @pytest.fixture

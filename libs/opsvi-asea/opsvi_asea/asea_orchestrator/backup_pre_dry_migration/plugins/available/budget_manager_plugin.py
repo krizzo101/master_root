@@ -1,5 +1,4 @@
 from typing import List, Any, Optional, Dict
-import os
 from datetime import datetime, date
 from dataclasses import dataclass, asdict
 from asea_orchestrator.plugins.base_plugin import BasePlugin, EventBus

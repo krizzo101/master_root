@@ -3,7 +3,6 @@
 A one-time script to send the initial message to Agent 2, bootstrapping
 the new asynchronous communication channel.
 """
-import agent_communication as comms
 
 # The ID for Agent 2, as established in its report
 RECIPIENT_ID = "agent-2-application"

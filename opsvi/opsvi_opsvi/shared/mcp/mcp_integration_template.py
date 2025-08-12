@@ -54,15 +54,15 @@ MCP servers can be configured in mcp.json:
 """
 
 import asyncio
-from contextlib import asynccontextmanager
-from dataclasses import dataclass
 import json
 import logging
 import os
-from pathlib import Path
 import subprocess
 import sys
-from typing import Any, Dict, List, Optional
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
 # MCP imports - Core components for MCP integration
 try:
@@ -111,8 +111,8 @@ class MCPServerConfig:
     """Configuration for an MCP server."""
 
     command: str
-    args: List[str]
-    env: Dict[str, str]
+    args: list[str]
+    env: dict[str, str]
     name: str
     description: str = ""
 
@@ -139,7 +139,7 @@ class MCPServerClient:
     def __init__(
         self,
         server_name: str,
-        mcp_config_path: Optional[str] = None,
+        mcp_config_path: str | None = None,
         debug: bool = False,
         **server_overrides,
     ):
@@ -170,7 +170,7 @@ class MCPServerClient:
         if not self.server_config:
             raise ValueError(f"Server '{server_name}' not found in MCP configuration")
 
-    def _load_server_config(self) -> Optional[MCPServerConfig]:
+    def _load_server_config(self) -> MCPServerConfig | None:
         """
         Load server configuration from mcp.json file.
 
@@ -341,7 +341,7 @@ class MCPServerClient:
                 raw_result=result,
             )
 
-    async def call_tool(self, tool_name: str, arguments: Dict[str, Any]) -> ToolResult:
+    async def call_tool(self, tool_name: str, arguments: dict[str, Any]) -> ToolResult:
         """
         Call a tool on the MCP server.
 
@@ -379,7 +379,7 @@ class MCPServerClient:
                 else:
                     raise MCPError(error_msg)
 
-    async def list_available_tools(self) -> List[str]:
+    async def list_available_tools(self) -> list[str]:
         """
         Get a list of tools available on the server.
 
@@ -394,7 +394,7 @@ class MCPServerClient:
                 self.logger.error(f"Failed to list tools: {e}")
                 return []
 
-    async def get_tool_info(self, tool_name: str) -> Optional[Dict[str, Any]]:
+    async def get_tool_info(self, tool_name: str) -> dict[str, Any] | None:
         """
         Get detailed information about a specific tool.
 
@@ -426,8 +426,8 @@ class MCPServerClient:
 async def quick_tool_call(
     server_name: str,
     tool_name: str,
-    arguments: Dict[str, Any],
-    mcp_config_path: Optional[str] = None,
+    arguments: dict[str, Any],
+    mcp_config_path: str | None = None,
 ) -> ToolResult:
     """
     Perform a quick tool call without creating a persistent client.
@@ -446,8 +446,8 @@ async def quick_tool_call(
 
 
 async def list_server_tools(
-    server_name: str, mcp_config_path: Optional[str] = None
-) -> List[str]:
+    server_name: str, mcp_config_path: str | None = None
+) -> list[str]:
     """
     List all available tools on an MCP server.
 

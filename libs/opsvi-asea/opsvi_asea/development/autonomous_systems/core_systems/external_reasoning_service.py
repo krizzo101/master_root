@@ -20,9 +20,6 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "schemas"))
 from decision_analysis_schemas import (
     ExternalReasoningAnalysis,
-    DecisionOutcome,
-    ReasoningPattern,
-    ExternalReasoningConfig,
 )
 
 

@@ -2,7 +2,6 @@ from __future__ import annotations
 import logging
 from typing import List
 from uuid import uuid4
-from datetime import datetime, timedelta
 import time
 
 from .models import ContextPack, RetrievalConfig, Snippet, GraphPath

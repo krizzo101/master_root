@@ -87,7 +87,6 @@ def create_simple_arango_enhancement():
 async def execute_simple_enhancement():
     """Execute the simplified enhancement workflow."""
     import sys
-    import os
 
     # Add orchestrator to path
     sys.path.append("/home/opsvi/asea/asea_orchestrator/src")
@@ -129,7 +128,7 @@ async def execute_simple_enhancement():
         print("✅ Analysis completed successfully!")
         print(f"📊 Results: {list(final_state.keys())}")
         print(
-            f"📁 Architecture file created: /home/opsvi/asea/arango_graph_architecture_simple.md"
+            "📁 Architecture file created: /home/opsvi/asea/arango_graph_architecture_simple.md"
         )
 
         return final_state

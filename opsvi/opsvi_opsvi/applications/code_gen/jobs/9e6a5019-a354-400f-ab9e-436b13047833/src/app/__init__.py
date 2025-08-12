@@ -3,19 +3,20 @@ Main Flask application factory and blueprint registration
 """
 import logging
 from logging.handlers import RotatingFileHandler
+
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from flask_migrate import Migrate
+from flask_admin import Admin
 from flask_bcrypt import Bcrypt
-from flask_wtf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_talisman import Talisman
-from flask_admin import Admin
+from flask_login import LoginManager
+from flask_migrate import Migrate
 from flask_redis import FlaskRedis
-from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_sqlalchemy import SQLAlchemy
+from flask_talisman import Talisman
 from flask_uploads import configure_uploads
+from flask_wtf import CSRFProtect
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from .config import Config
 from .uploads import images
@@ -57,13 +58,13 @@ def create_app(config_class=Config) -> Flask:
     configure_uploads(app, images)
 
     # Register blueprints
-    from .routes.main import main_bp
-    from .routes.auth import auth_bp
-    from .routes.posts import posts_bp
     from .routes.admin import admin_bp
-    from .routes.api import api_bp
     from .routes.ai import ai_bp
     from .routes.analytics import analytics_bp
+    from .routes.api import api_bp
+    from .routes.auth import auth_bp
+    from .routes.main import main_bp
+    from .routes.posts import posts_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
@@ -96,7 +97,7 @@ def create_app(config_class=Config) -> Flask:
 
 
 def setup_error_handlers(app):
-    from .routes.errors import page_not_found, internal_error
+    from .routes.errors import internal_error, page_not_found
 
     app.register_error_handler(404, page_not_found)
     app.register_error_handler(500, internal_error)

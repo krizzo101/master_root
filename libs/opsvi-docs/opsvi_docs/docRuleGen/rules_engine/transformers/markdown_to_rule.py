@@ -12,11 +12,9 @@ documentation standards into rule format.
 """
 
 import re
-import json
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional
 import logging
 
-from ..extractors.documentation_extractor import generate_glob_patterns
 
 # Configure logging
 logging.basicConfig(

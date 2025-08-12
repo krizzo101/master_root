@@ -5,7 +5,6 @@ Tests the core Phase 2 enhancements without complex workflows.
 """
 
 import sys
-import time
 import uuid
 from pathlib import Path
 
@@ -22,7 +21,6 @@ from .enhanced_workflows import (
     StreamingManager,
 )
 from .error_recovery import (
-    ErrorRecoveryManager,
     create_default_error_patterns,
     RetryStrategy,
 )

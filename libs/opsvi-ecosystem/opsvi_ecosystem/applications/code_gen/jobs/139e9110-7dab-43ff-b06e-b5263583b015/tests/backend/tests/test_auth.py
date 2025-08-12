@@ -1,9 +1,8 @@
 """
 Unit tests for authentication module
 """
-import pytest
-from fastapi.testclient import TestClient
 from backend.main import app
+from fastapi.testclient import TestClient
 
 client = TestClient(app)
 

@@ -5,7 +5,7 @@ Creates dynamic LangGraph workflows from workflow plans.
 """
 
 import logging
-from typing import Callable, Dict
+from collections.abc import Callable
 
 from langgraph.graph import END, START, StateGraph
 
@@ -27,7 +27,7 @@ class WorkflowGraphBuilder:
         self.logger = logger
 
     def create_dynamic_workflow_graph(
-        self, workflow_plan: EnhancedWorkflowPlan, agent_creators: Dict[str, Callable]
+        self, workflow_plan: EnhancedWorkflowPlan, agent_creators: dict[str, Callable]
     ) -> StateGraph:
         """Create a dynamic workflow graph based on the enhanced workflow plan"""
         graph = StateGraph(AgenticWorkflowState)

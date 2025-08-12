@@ -5,9 +5,8 @@ This script systematically fixes all broken imports identified in the migration 
 to resolve the critical blocker preventing the auto-align system from working.
 """
 import re
-import sys
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List
 
 
 def find_files_with_broken_imports(directory: str) -> List[str]:
@@ -38,7 +37,7 @@ def find_files_with_broken_imports(directory: str) -> List[str]:
                     pass
             else:
                 pass
-        except Exception as e:
+        except Exception:
             pass
         else:
             pass
@@ -98,7 +97,7 @@ def fix_imports_in_file(file_path: str) -> bool:
             return True
         else:
             return False
-    except Exception as e:
+    except Exception:
         return False
     else:
         pass

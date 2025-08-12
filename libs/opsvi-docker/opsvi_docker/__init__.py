@@ -6,78 +6,78 @@ Provides unified access to Docker operations, monitoring, and security.
 """
 
 # Core provider
-from .providers.docker_provider import DockerProvider, DockerConfig, DockerError
+from .providers.compose_manager import (
+    ComposeConfig,
+    ComposeError,
+    ComposeManager,
+    ComposeService,
+)
 
 # Manager components
 from .providers.container_manager import (
-    ContainerManager,
     ContainerConfig,
-    ContainerInfo,
-    ContainerStats,
     ContainerError,
+    ContainerInfo,
+    ContainerManager,
+    ContainerStats,
 )
-from .providers.image_manager import ImageManager, ImageConfig, ImageInfo, ImageError
-from .providers.network_manager import (
-    NetworkManager,
-    NetworkConfig,
-    NetworkInfo,
-    NetworkError,
-)
-from .providers.volume_manager import (
-    VolumeManager,
-    VolumeConfig,
-    VolumeInfo,
-    VolumeError,
-)
-from .providers.compose_manager import (
-    ComposeManager,
-    ComposeConfig,
-    ComposeService,
-    ComposeError,
-)
-from .providers.registry_manager import (
-    RegistryManager,
-    RegistryConfig,
-    RegistryInfo,
-    RegistryError,
-)
+from .providers.docker_provider import DockerConfig, DockerError, DockerProvider
+from .providers.image_manager import ImageConfig, ImageError, ImageInfo, ImageManager
 from .providers.monitoring import (
     DockerMonitor,
     HealthChecker,
     ResourceMonitor,
     ResourceStats,
 )
-
-# Utility classes
-from .utils import (
-    DockerUtils,
-    ContainerUtils,
-    ImageUtils,
-    NetworkUtils,
-    VolumeUtils,
-    HealthUtils,
-    MonitoringUtils,
-    SecurityUtils,
-    VulnerabilityScanner,
+from .providers.network_manager import (
+    NetworkConfig,
+    NetworkError,
+    NetworkInfo,
+    NetworkManager,
+)
+from .providers.registry_manager import (
+    RegistryConfig,
+    RegistryError,
+    RegistryInfo,
+    RegistryManager,
+)
+from .providers.volume_manager import (
+    VolumeConfig,
+    VolumeError,
+    VolumeInfo,
+    VolumeManager,
 )
 
 # Schema classes
 from .schemas import (
+    ComposeDownRequest,
+    ComposeServiceRequest,
+    ComposeUpRequest,
     ContainerCreateRequest,
-    ContainerUpdateRequest,
     ContainerLogsRequest,
+    ContainerUpdateRequest,
     ImageBuildRequest,
     ImagePullRequest,
     ImagePushRequest,
-    NetworkCreateRequest,
     NetworkConnectRequest,
-    VolumeCreateRequest,
-    VolumeMountRequest,
-    ComposeUpRequest,
-    ComposeDownRequest,
-    ComposeServiceRequest,
+    NetworkCreateRequest,
     RegistryAuthRequest,
     RegistrySearchRequest,
+    VolumeCreateRequest,
+    VolumeMountRequest,
+)
+
+# Utility classes
+from .utils import (
+    ContainerUtils,
+    DockerUtils,
+    HealthUtils,
+    ImageUtils,
+    MonitoringUtils,
+    NetworkUtils,
+    SecurityUtils,
+    VolumeUtils,
+    VulnerabilityScanner,
 )
 
 __version__ = "1.0.0"

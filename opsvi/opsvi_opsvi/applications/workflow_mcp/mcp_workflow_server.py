@@ -11,10 +11,10 @@ MCP server for workflow generation, registration, management, and execution.
 import asyncio
 import importlib
 import os
-from pathlib import Path
 import sys
 import tempfile
-from typing import Any, Dict, List, Type
+from pathlib import Path
+from typing import Any
 
 # --- Ensure project root is in sys.path for src.shared imports ---
 project_root = Path(__file__).resolve().parents[3]
@@ -46,9 +46,9 @@ class MCPClientRegistry:
     """
 
     def __init__(self):
-        self._registry: Dict[str, Type] = {}
+        self._registry: dict[str, type] = {}
 
-    def register(self, name: str, client_cls: Type) -> None:
+    def register(self, name: str, client_cls: type) -> None:
         self._registry[name] = client_cls
 
     def get(self, name: str, *args, **kwargs):
@@ -56,7 +56,7 @@ class MCPClientRegistry:
             raise ValueError(f"MCP client '{name}' not registered.")
         return self._registry[name](*args, **kwargs)
 
-    def available(self) -> List[str]:
+    def available(self) -> list[str]:
         return list(self._registry.keys())
 
 
@@ -90,7 +90,7 @@ class GenerateWorkflowTool(BaseTool):
         self.logger = logger
         self.mcp_registry = mcp_registry
 
-    async def execute(self, arguments: Dict[str, Any]) -> List[Any]:
+    async def execute(self, arguments: dict[str, Any]) -> list[Any]:
         self.logger.debug(
             f"[generate_workflow] execute called with arguments: {arguments}"
         )
@@ -153,7 +153,7 @@ class ListWorkflowsTool(BaseTool):
         self.db = db
         self.logger = logger
 
-    async def execute(self, arguments: Dict[str, Any]) -> List[Any]:
+    async def execute(self, arguments: dict[str, Any]) -> list[Any]:
         self.logger.debug(
             f"[list_workflows] execute called with arguments: {arguments}"
         )
@@ -212,7 +212,7 @@ class DeleteWorkflowTool(BaseTool):
         self.db = db
         self.logger = logger
 
-    async def execute(self, arguments: Dict[str, Any]) -> List[Any]:
+    async def execute(self, arguments: dict[str, Any]) -> list[Any]:
         self.logger.debug(
             f"[delete_workflow] execute called with arguments: {arguments}"
         )
@@ -298,7 +298,7 @@ class RunWorkflowTool(BaseTool):
         self.logger = logger
         self.mcp_registry = mcp_registry
 
-    async def execute(self, arguments: Dict[str, Any]) -> List[Any]:
+    async def execute(self, arguments: dict[str, Any]) -> list[Any]:
         self.logger.debug(f"[run_workflow] execute called with arguments: {arguments}")
         self.validate_input(arguments)
         workflow_id = arguments["workflow_id"]

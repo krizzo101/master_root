@@ -4,13 +4,11 @@ Tests for opsvi-agents components
 """
 
 import pytest
-import asyncio
-from unittest.mock import Mock, patch, AsyncMock
-from typing import Any, Dict, List
 
 from opsvi_agents import OpsviAgentsManager
 from opsvi_agents.config.settings import OpsviAgentsConfig
 from opsvi_agents.exceptions.base import OpsviAgentsError
+
 
 class TestOpsviAgents:
     """Test cases for opsvi-agents."""
@@ -36,7 +34,7 @@ class TestOpsviAgents:
         """Test component start and stop."""
         await component.start()
         assert component.is_active()
-        
+
         await component.stop()
         assert not component.is_active()
 
@@ -54,4 +52,3 @@ class TestOpsviAgents:
             pass
 
     # Component-specific tests
-    

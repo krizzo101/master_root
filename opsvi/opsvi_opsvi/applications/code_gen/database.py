@@ -7,10 +7,10 @@ The file is self-contained so we avoid scattering ORM helpers.
 from __future__ import annotations
 
 import logging
+from collections.abc import Generator
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Generator, Optional
 
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
@@ -32,7 +32,7 @@ class Job(SQLModel, table=True):
     status: str = Field(
         index=True, default="queued"
     )  # queued | in_progress | completed | failed
-    phase: Optional[str] = Field(default=None, index=True)
+    phase: str | None = Field(default=None, index=True)
     progress: float = 0.0  # 0.0-1.0 normalized
 
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -40,8 +40,8 @@ class Job(SQLModel, table=True):
         default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow}
     )
 
-    error: Optional[str] = None  # Truncated error message if failed
-    artifacts_path: Optional[str] = None  # Path to zip or S3 key
+    error: str | None = None  # Truncated error message if failed
+    artifacts_path: str | None = None  # Path to zip or S3 key
 
 
 # ---------------------------------------------------------------------------
@@ -97,13 +97,13 @@ def update_job(job_id: str, **fields) -> None:
         s.add(job)
 
 
-def get_job(job_id: str) -> Optional[Job]:
+def get_job(job_id: str) -> Job | None:
     with get_session() as s:
         stmt = select(Job).where(Job.id == job_id)
         return s.exec(stmt).first()
 
 
-def get_job_data(job_id: str) -> Optional[dict]:
+def get_job_data(job_id: str) -> dict | None:
     """Return job row as plain dict with session still open."""
     with get_session() as s:
         stmt = select(Job).where(Job.id == job_id)

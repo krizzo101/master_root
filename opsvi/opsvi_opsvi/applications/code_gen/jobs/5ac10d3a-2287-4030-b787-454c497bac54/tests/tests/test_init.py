@@ -1,17 +1,15 @@
-import pytest
-from flask import Flask
 from app import (
+    configure_logging,
     create_app,
     register_blueprints,
-    configure_logging,
     register_error_handlers,
 )
+from flask import Flask
 
 
 def test_create_app_returns_flask_app_instance():
     app = create_app()
     assert app is not None
-    from flask import Flask
 
     assert isinstance(app, Flask)
     # Check some expected config keys
@@ -33,8 +31,6 @@ class DummyBlueprint:
 
 
 def test_register_blueprints_adds_blueprints_to_app():
-    from flask import Flask
-
     app = Flask(__name__)
     # Assume register_blueprints registers a blueprint named 'main'
     register_blueprints(app)
@@ -62,8 +58,6 @@ def test_register_error_handlers_registers_handlers():
 
 
 def test_not_found_error_function_returns_correct_template():
-    from flask import Response
-
     class DummyError:
         pass
 

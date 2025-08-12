@@ -16,12 +16,11 @@ import sys
 import json
 import logging
 import argparse
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any
 
 from rules_engine.extractors import ExtractionManager
 from rules_engine.preprocessors import PreprocessorManager
 from rules_engine.utils.config_loader import load_config
-from rules_engine.validators import ValidationManager
 
 # Configure logging
 logging.basicConfig(

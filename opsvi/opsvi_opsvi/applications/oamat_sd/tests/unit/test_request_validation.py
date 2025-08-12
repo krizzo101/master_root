@@ -5,8 +5,8 @@ Tests the request schema validation, gap analysis, and information completion
 that ensure complete requirements before planning begins.
 """
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pytest
 

@@ -18,7 +18,6 @@ import os
 import shutil
 import re
 from pathlib import Path
-from typing import List, Dict, Any, Optional
 from datetime import datetime
 
 
@@ -538,7 +537,7 @@ All existing code continues to work without changes. The migration:
                 return False
 
         self._log("🎉 DRY Migration completed successfully!")
-        self._log(f"📝 See DRY_MIGRATION_SUMMARY.md for details")
+        self._log("📝 See DRY_MIGRATION_SUMMARY.md for details")
         self._log(f"💾 Original code backed up to: {self.backup_path}")
 
         return True

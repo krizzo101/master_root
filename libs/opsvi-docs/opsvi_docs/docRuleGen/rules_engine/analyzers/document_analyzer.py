@@ -28,11 +28,10 @@ Document Analyzer Module for Documentation Rule Generator.
 This module analyzes documentation files and extracts structured information.
 """
 
-import os
 import re
 import logging
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any
 
 from ..extractors.content_extractor import ContentExtractor
 from ..mappers.source_mapper import SourceMapper

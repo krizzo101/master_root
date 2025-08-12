@@ -1,11 +1,9 @@
 """Configuration validators for DSL and pipeline settings."""
 
 import logging
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
-from pydantic import BaseModel, Field, field_validator, ValidationError
+from typing import Any, Dict, List
+from pydantic import BaseModel
 
-from .models import Project, Run, TaskRecord
 from opsvi_auto_forge.application.orchestrator.dsl_processor import DSLProcessor
 
 logger = logging.getLogger(__name__)

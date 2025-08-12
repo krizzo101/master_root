@@ -6,7 +6,7 @@ and truly agentic behavior (no templates or rules).
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List
+from typing import Any
 
 from src.applications.oamat_sd.src.models.data_models import (
     ComplexityAnalysis,
@@ -33,7 +33,7 @@ class IRequestValidationAgent(ABC):
     @abstractmethod
     async def extract_information_dynamically(
         self, request: RequestInput
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Use AI to extract information from natural language
 
@@ -43,7 +43,7 @@ class IRequestValidationAgent(ABC):
         pass
 
     @abstractmethod
-    async def generate_validation_strategy(self, content: str) -> Dict[str, Any]:
+    async def generate_validation_strategy(self, content: str) -> dict[str, Any]:
         """
         Dynamically generate validation approach for this specific content
 
@@ -57,7 +57,7 @@ class IGapAnalysisAgent(ABC):
 
     @abstractmethod
     async def analyze_gaps_intelligently(
-        self, request: RequestInput, extracted_info: Dict[str, Any]
+        self, request: RequestInput, extracted_info: dict[str, Any]
     ) -> GapAnalysisResult:
         """
         Use AI reasoning to identify and prioritize information gaps
@@ -68,7 +68,7 @@ class IGapAnalysisAgent(ABC):
         pass
 
     @abstractmethod
-    async def generate_completion_strategy(self, gaps: List[Any]) -> Dict[str, Any]:
+    async def generate_completion_strategy(self, gaps: list[Any]) -> dict[str, Any]:
         """
         Dynamically generate strategy for filling information gaps
 
@@ -78,8 +78,8 @@ class IGapAnalysisAgent(ABC):
 
     @abstractmethod
     async def prioritize_gaps_contextually(
-        self, gaps: List[Any], context: Dict[str, Any]
-    ) -> List[Any]:
+        self, gaps: list[Any], context: dict[str, Any]
+    ) -> list[Any]:
         """
         Use contextual reasoning to prioritize gaps
 
@@ -93,7 +93,7 @@ class IInformationCompletionAgent(ABC):
 
     @abstractmethod
     async def complete_information_intelligently(
-        self, gaps: GapAnalysisResult, context: Dict[str, Any]
+        self, gaps: GapAnalysisResult, context: dict[str, Any]
     ) -> InformationCompletionResult:
         """
         Intelligently complete missing information using dynamic research
@@ -105,8 +105,8 @@ class IInformationCompletionAgent(ABC):
 
     @abstractmethod
     async def research_gap_dynamically(
-        self, gap: Any, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, gap: Any, context: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Dynamically research information to fill a specific gap
 
@@ -116,7 +116,7 @@ class IInformationCompletionAgent(ABC):
 
     @abstractmethod
     async def generate_intelligent_defaults(
-        self, gap: Any, research_results: Dict[str, Any]
+        self, gap: Any, research_results: dict[str, Any]
     ) -> Any:
         """
         Generate contextually appropriate defaults using AI reasoning
@@ -131,7 +131,7 @@ class IComplexityAnalysisModel(ABC):
 
     @abstractmethod
     async def analyze_complexity_dynamically(
-        self, request: RequestInput, context: Dict[str, Any]
+        self, request: RequestInput, context: dict[str, Any]
     ) -> ComplexityAnalysis:
         """
         Dynamically analyze complexity using AI reasoning
@@ -143,8 +143,8 @@ class IComplexityAnalysisModel(ABC):
 
     @abstractmethod
     async def generate_complexity_factors(
-        self, request_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, request_context: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Dynamically generate complexity factors specific to this request
 
@@ -154,7 +154,7 @@ class IComplexityAnalysisModel(ABC):
         pass
 
     @abstractmethod
-    async def reason_about_complexity(self, factors: Dict[str, Any]) -> Dict[str, Any]:
+    async def reason_about_complexity(self, factors: dict[str, Any]) -> dict[str, Any]:
         """
         Use AI reasoning to understand complexity implications
 
@@ -169,7 +169,7 @@ class IO3MasterAgent(ABC):
     @abstractmethod
     async def generate_execution_strategy(
         self, complexity_analysis: ComplexityAnalysis
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Use O3 reasoning to generate novel execution strategies
 
@@ -180,8 +180,8 @@ class IO3MasterAgent(ABC):
 
     @abstractmethod
     async def design_agent_roles_dynamically(
-        self, strategy: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, strategy: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """
         Dynamically design agent roles using O3 reasoning
 
@@ -192,8 +192,8 @@ class IO3MasterAgent(ABC):
 
     @abstractmethod
     async def create_coordination_plan(
-        self, agent_roles: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, agent_roles: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """
         Generate intelligent coordination plans using O3 reasoning
 
@@ -204,8 +204,8 @@ class IO3MasterAgent(ABC):
 
     @abstractmethod
     async def generate_workflow_structure(
-        self, strategy: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, strategy: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Dynamically generate workflow structures using O3 reasoning
 
@@ -219,7 +219,7 @@ class IDynamicAgentFactory(ABC):
     """Interface for truly dynamic agent creation without templates"""
 
     @abstractmethod
-    async def create_agent_from_specification(self, agent_spec: Dict[str, Any]) -> Any:
+    async def create_agent_from_specification(self, agent_spec: dict[str, Any]) -> Any:
         """
         Create agents from dynamically generated specifications
 
@@ -230,8 +230,8 @@ class IDynamicAgentFactory(ABC):
 
     @abstractmethod
     async def generate_agent_capabilities(
-        self, role_spec: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, role_spec: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Dynamically generate agent capabilities based on role requirements
 
@@ -242,8 +242,8 @@ class IDynamicAgentFactory(ABC):
 
     @abstractmethod
     async def design_agent_reasoning(
-        self, agent_spec: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, agent_spec: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Design agent-specific reasoning patterns
 
@@ -254,8 +254,8 @@ class IDynamicAgentFactory(ABC):
 
     @abstractmethod
     async def bind_tools_intelligently(
-        self, agent_spec: Dict[str, Any], available_tools: List[Any]
-    ) -> List[Any]:
+        self, agent_spec: dict[str, Any], available_tools: list[Any]
+    ) -> list[Any]:
         """
         Intelligently select and bind tools based on agent requirements
 

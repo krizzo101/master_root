@@ -15,10 +15,10 @@ import argparse
 import json
 import logging
 import os
-from pathlib import Path
 import shutil
 import sys
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
 
 try:
     from src.tools.code_generation.o3_code_generator.api_doc_generator import (
@@ -74,7 +74,7 @@ else:
 
 
 def run_analysis_phase(
-    target_path: str, filter_impact: Optional[str] = None, min_confidence: float = 0.0
+    target_path: str, filter_impact: str | None = None, min_confidence: float = 0.0
 ) -> dict[str, list[dict[str, Any]]]:
     """
     Phase 1: Analyze files and generate improvement suggestions.

@@ -1,11 +1,10 @@
 """
 Test suite for the FastAPI backend
 """
-import os
-import pytest
-from fastapi.testclient import TestClient
-from backend.app import app, issue_jwt, User
 from unittest.mock import patch
+
+from backend.app import User, app, issue_jwt
+from fastapi.testclient import TestClient
 
 client = TestClient(app)
 

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from src.applications.specstory_intelligence.agentic_review_schema import (
     AgenticAnnotation,
@@ -6,20 +6,20 @@ from src.applications.specstory_intelligence.agentic_review_schema import (
 )
 
 
-def add_annotation(log_object: Dict[str, Any], annotation: AgenticAnnotation):
+def add_annotation(log_object: dict[str, Any], annotation: AgenticAnnotation):
     """Attach an annotation to the log object (session, turn, tool, event)."""
     if "annotations" not in log_object:
         log_object["annotations"] = []
     log_object["annotations"].append(annotation.to_dict())
 
 
-def get_annotations(log_object: Dict[str, Any]) -> List[Dict[str, Any]]:
+def get_annotations(log_object: dict[str, Any]) -> list[dict[str, Any]]:
     return log_object.get("annotations", [])
 
 
 def aggregate_annotations(
-    log_object: Dict[str, Any], level: str = None
-) -> List[Dict[str, Any]]:
+    log_object: dict[str, Any], level: str = None
+) -> list[dict[str, Any]]:
     """Recursively collect all annotations at or below the given log object."""
     annotations = get_annotations(log_object)
     if level is None or (log_object.get("type") == level):
@@ -33,11 +33,11 @@ def aggregate_annotations(
 
 
 def flag_turn_for_review(
-    turn: Dict[str, Any],
+    turn: dict[str, Any],
     reviewer_id: str,
     summary: str,
     details: str,
-    categories: List[str] = None,
+    categories: list[str] = None,
 ):
     reviewer = Reviewer(type="human", id=reviewer_id)
     annotation = AgenticAnnotation.create(

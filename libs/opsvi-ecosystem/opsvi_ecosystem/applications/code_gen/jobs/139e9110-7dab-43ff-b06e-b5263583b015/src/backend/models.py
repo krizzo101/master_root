@@ -1,24 +1,24 @@
 """
 models.py: ORM / SQLAlchemy DB models for User, Project, Task, Comment, TimeEntry, File, AuditLog, Dependency
 """
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    Boolean,
-    ForeignKey,
-    Text,
-    DateTime,
-    Enum,
-    Table,
-    Float,
-    UniqueConstraint,
-)
-from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy.dialects.postgresql import UUID
-from datetime import datetime
 import enum
 import uuid
+from datetime import datetime
+
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 

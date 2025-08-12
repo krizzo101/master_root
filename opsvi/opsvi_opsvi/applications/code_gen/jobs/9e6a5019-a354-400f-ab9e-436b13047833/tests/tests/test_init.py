@@ -1,4 +1,3 @@
-import pytest
 from app import create_app, setup_error_handlers
 from flask import Flask
 

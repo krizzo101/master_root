@@ -9,7 +9,6 @@ from prometheus_client import Counter, Histogram
 
 from opsvi_auto_forge.config.models import (
     TaskRecord,
-    TaskResponse,
     Result,
     Critique,
     Artifact,

@@ -5,9 +5,9 @@ Defines the abstract base class that all tools must implement,
 providing a consistent interface for tool integration and execution.
 """
 
-from abc import ABC, abstractmethod
 import logging
-from typing import Any, Dict, Optional
+from abc import ABC, abstractmethod
+from typing import Any
 
 from ..common.types import ToolError, ToolSchema
 
@@ -32,12 +32,12 @@ class BaseTool(ABC):
         """
         self.name = name
         self.description = description
-        self._schema: Optional[ToolSchema] = None
+        self._schema: ToolSchema | None = None
 
         logger.debug(f"Tool {self.name} initialized")
 
     @abstractmethod
-    async def execute(self, parameters: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, parameters: dict[str, Any]) -> dict[str, Any]:
         """
         Execute the tool with given parameters.
 
@@ -62,7 +62,7 @@ class BaseTool(ABC):
         """
         pass
 
-    def validate_input(self, parameters: Dict[str, Any]) -> bool:
+    def validate_input(self, parameters: dict[str, Any]) -> bool:
         """
         Validate input parameters against the tool's schema.
 
@@ -92,7 +92,7 @@ class BaseTool(ABC):
             logger.error(f"Error validating input for tool {self.name}: {e}")
             return False
 
-    async def safe_execute(self, parameters: Dict[str, Any]) -> Dict[str, Any]:
+    async def safe_execute(self, parameters: dict[str, Any]) -> dict[str, Any]:
         """
         Safely execute the tool with comprehensive error handling.
 
@@ -137,7 +137,7 @@ class BaseTool(ABC):
                 "error": f"Unexpected error: {str(e)}",
             }
 
-    def get_capabilities(self) -> Dict[str, Any]:
+    def get_capabilities(self) -> dict[str, Any]:
         """
         Get information about the tool's capabilities.
 

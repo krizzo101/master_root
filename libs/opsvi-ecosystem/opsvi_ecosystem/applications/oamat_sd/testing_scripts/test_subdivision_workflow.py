@@ -13,9 +13,9 @@ Tests the complete subdivision workflow to ensure proper functionality.
 """
 
 import asyncio
+import sys
 from datetime import datetime
 from pathlib import Path
-import sys
 
 # Add the project root to Python path for imports
 project_root = Path(__file__).resolve().parents[4]

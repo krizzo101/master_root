@@ -4,10 +4,10 @@ Advanced parallel file generation with dependency management and context consoli
 """
 
 import asyncio
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime
-import logging
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 logger = logging.getLogger("OAMAT.FileOrchestrator")
 
@@ -19,18 +19,18 @@ class FileSpec:
     name: str
     path: str
     content_type: str  # "code", "documentation", "config", "data"
-    dependencies: List[str] = field(default_factory=list)  # Other files this depends on
+    dependencies: list[str] = field(default_factory=list)  # Other files this depends on
     estimated_complexity: int = 5  # 1-10 scale
     parallel_safe: bool = True
-    template_type: Optional[str] = None
-    context_requirements: List[str] = field(
+    template_type: str | None = None
+    context_requirements: list[str] = field(
         default_factory=list
     )  # What context this file needs
 
     # Generation metadata
     agent_role: str = "coder"
-    tools_needed: List[str] = field(default_factory=lambda: ["write_file"])
-    success_criteria: List[str] = field(default_factory=list)
+    tools_needed: list[str] = field(default_factory=lambda: ["write_file"])
+    success_criteria: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -39,12 +39,12 @@ class FileGenerationResult:
 
     file_spec: FileSpec
     success: bool
-    content: Optional[str] = None
-    file_path: Optional[str] = None
-    generation_time: Optional[float] = None
-    error: Optional[str] = None
-    context_used: Dict[str, Any] = field(default_factory=dict)
-    generated_artifacts: List[str] = field(default_factory=list)
+    content: str | None = None
+    file_path: str | None = None
+    generation_time: float | None = None
+    error: str | None = None
+    context_used: dict[str, Any] = field(default_factory=dict)
+    generated_artifacts: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -52,8 +52,8 @@ class FileGenerationBatch:
     """A batch of files that can be generated in parallel"""
 
     level: int
-    files: List[FileSpec]
-    dependencies_met: Set[str] = field(default_factory=set)
+    files: list[FileSpec]
+    dependencies_met: set[str] = field(default_factory=set)
 
 
 class FileDependencyAnalyzer:
@@ -106,7 +106,7 @@ class FileDependencyAnalyzer:
             },
         }
 
-    def analyze_dependencies(self, files: List[FileSpec]) -> List[FileGenerationBatch]:
+    def analyze_dependencies(self, files: list[FileSpec]) -> list[FileGenerationBatch]:
         """Analyze file dependencies and create execution batches"""
         self.logger.info(f"Analyzing dependencies for {len(files)} files")
 
@@ -142,7 +142,7 @@ class FileDependencyAnalyzer:
 
         return batches
 
-    def _get_pattern_dependencies(self, file_spec: FileSpec) -> Set[str]:
+    def _get_pattern_dependencies(self, file_spec: FileSpec) -> set[str]:
         """Get dependencies based on common patterns"""
         deps = set()
 
@@ -168,8 +168,8 @@ class FileDependencyAnalyzer:
         return deps
 
     def _create_execution_batches(
-        self, files: List[FileSpec], dependency_graph: Dict[str, Set[str]]
-    ) -> List[FileGenerationBatch]:
+        self, files: list[FileSpec], dependency_graph: dict[str, set[str]]
+    ) -> list[FileGenerationBatch]:
         """Create execution batches using topological sort"""
         batches = []
         file_map = {f.name: f for f in files}
@@ -226,9 +226,9 @@ class ContextConsolidator:
     def prepare_file_context(
         self,
         file_spec: FileSpec,
-        subtask_context: Dict[str, Any],
-        completed_files: Dict[str, FileGenerationResult],
-    ) -> Dict[str, Any]:
+        subtask_context: dict[str, Any],
+        completed_files: dict[str, FileGenerationResult],
+    ) -> dict[str, Any]:
         """Prepare context for a specific file generation"""
 
         file_context = {
@@ -268,8 +268,8 @@ class ContextConsolidator:
         return file_context
 
     def consolidate_file_results(
-        self, results: List[FileGenerationResult], subtask_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, results: list[FileGenerationResult], subtask_context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Consolidate file generation results back into subtask context"""
 
         consolidated = {
@@ -326,8 +326,8 @@ class FileGenerationOrchestrator:
         self.context_consolidator = ContextConsolidator()
 
     async def generate_files_parallel(
-        self, file_specs: List[FileSpec], subtask_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, file_specs: list[FileSpec], subtask_context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Generate multiple files in parallel with dependency management"""
 
         if not file_specs:
@@ -397,10 +397,10 @@ class FileGenerationOrchestrator:
 
     async def _execute_file_batch_parallel(
         self,
-        files: List[FileSpec],
-        subtask_context: Dict[str, Any],
-        completed_files: Dict[str, FileGenerationResult],
-    ) -> List[FileGenerationResult]:
+        files: list[FileSpec],
+        subtask_context: dict[str, Any],
+        completed_files: dict[str, FileGenerationResult],
+    ) -> list[FileGenerationResult]:
         """Execute a batch of files in parallel"""
 
         if len(files) == 1:
@@ -463,8 +463,8 @@ class FileGenerationOrchestrator:
     async def _create_file_generation_task(
         self,
         file_spec: FileSpec,
-        subtask_context: Dict[str, Any],
-        completed_files: Dict[str, FileGenerationResult],
+        subtask_context: dict[str, Any],
+        completed_files: dict[str, FileGenerationResult],
     ):
         """Create an async task for generating a single file"""
         return await self._generate_single_file(
@@ -474,8 +474,8 @@ class FileGenerationOrchestrator:
     async def _generate_single_file(
         self,
         file_spec: FileSpec,
-        subtask_context: Dict[str, Any],
-        completed_files: Dict[str, FileGenerationResult],
+        subtask_context: dict[str, Any],
+        completed_files: dict[str, FileGenerationResult],
     ) -> FileGenerationResult:
         """Generate a single file with proper context"""
         start_time = datetime.now()
@@ -530,7 +530,7 @@ class FileGenerationOrchestrator:
             )
 
     def _create_file_task_description(
-        self, file_spec: FileSpec, file_context: Dict[str, Any]
+        self, file_spec: FileSpec, file_context: dict[str, Any]
     ) -> str:
         """Create a detailed task description for file generation"""
 
@@ -579,8 +579,8 @@ Please generate this file now and save it using write_file.
         return task_description
 
     async def _execute_file_generation_agent(
-        self, agent_state: Dict[str, Any], file_spec: FileSpec
-    ) -> Dict[str, Any]:
+        self, agent_state: dict[str, Any], file_spec: FileSpec
+    ) -> dict[str, Any]:
         """Execute the agent to generate a specific file"""
 
         try:

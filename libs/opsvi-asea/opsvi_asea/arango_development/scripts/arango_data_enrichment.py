@@ -9,10 +9,9 @@ advanced analytics patterns for AI agent integration.
 
 import json
 import logging
-import time
 import random
-from typing import Dict, List, Any, Tuple
-from datetime import datetime, timedelta
+from typing import Dict, List, Any
+from datetime import datetime
 from arango import ArangoClient
 
 # Configure logging
@@ -936,7 +935,7 @@ def main():
 
         # Print summary
         summary = results.get("summary", {})
-        print(f"\nEnrichment Summary:")
+        print("\nEnrichment Summary:")
         print(f"- Phases completed: {summary.get('phases_completed', 0)}/5")
         print(f"- Entities added: {summary.get('total_entities_added', 0)}")
         print(f"- Relationships added: {summary.get('total_relationships_added', 0)}")

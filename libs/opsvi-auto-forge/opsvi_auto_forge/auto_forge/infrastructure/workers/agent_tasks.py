@@ -314,7 +314,6 @@ async def _execute_planner_agent_impl(
     node_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Core implementation for planner agent execution."""
-    import uuid
     from opsvi_auto_forge.infrastructure.workers.agent_tasks import logger
 
     task_id = f"planner_{project_id}_{run_id}_{node_id}_{uuid.uuid4().hex[:8]}"
@@ -369,7 +368,6 @@ async def _execute_specifier_agent_impl(
     node_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Core implementation for specifier agent execution."""
-    import uuid
     from opsvi_auto_forge.infrastructure.workers.agent_tasks import logger
 
     task_id = f"specifier_{project_id}_{run_id}_{node_id}_{uuid.uuid4().hex[:8]}"
@@ -424,7 +422,6 @@ async def _execute_architect_agent_impl(
     node_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Core implementation for architect agent execution."""
-    import uuid
     from opsvi_auto_forge.infrastructure.workers.agent_tasks import logger
 
     task_id = f"architect_{project_id}_{run_id}_{node_id}_{uuid.uuid4().hex[:8]}"
@@ -592,7 +589,6 @@ async def _execute_coder_agent_impl(
     node_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Core implementation for coder agent execution."""
-    import uuid
     from opsvi_auto_forge.infrastructure.workers.agent_tasks import logger
 
     task_id = f"coder_{project_id}_{run_id}_{node_id}_{uuid.uuid4().hex[:8]}"
@@ -683,7 +679,6 @@ async def _execute_tester_agent_impl(
     node_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Core implementation for tester agent execution."""
-    import uuid
     from opsvi_auto_forge.infrastructure.workers.agent_tasks import logger
 
     task_id = f"tester_{project_id}_{run_id}_{node_id}_{uuid.uuid4().hex[:8]}"
@@ -774,7 +769,6 @@ async def _execute_critic_agent_impl(
     node_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Core implementation for critic agent execution."""
-    import uuid
     from opsvi_auto_forge.infrastructure.workers.agent_tasks import logger
 
     task_id = f"critic_{project_id}_{run_id}_{node_id}_{uuid.uuid4().hex[:8]}"
@@ -866,7 +860,6 @@ async def _execute_agent_impl(
     node_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Core implementation for generic agent execution."""
-    import uuid
     from opsvi_auto_forge.infrastructure.workers.agent_tasks import logger
 
     task_id = f"{agent_type}_{project_id}_{run_id}_{node_id}_{uuid.uuid4().hex[:8]}"
@@ -1195,7 +1188,6 @@ async def _process_validation_failure(
     node_id: Optional[str] = None,
 ) -> Optional[Dict[str, Any]]:
     """Process validation failure by attempting repair with retry logic."""
-    import time
     from tenacity import retry, stop_after_attempt, wait_exponential
     from opsvi_auto_forge.agents.concrete_repair_agent import ConcreteRepairAgent
     from opsvi_auto_forge.agents.base_repair_agent import RepairRequest, Artifact

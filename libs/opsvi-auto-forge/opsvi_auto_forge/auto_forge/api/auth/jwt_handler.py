@@ -3,7 +3,6 @@
 import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
-from uuid import uuid4
 
 import jwt
 from fastapi import HTTPException, status

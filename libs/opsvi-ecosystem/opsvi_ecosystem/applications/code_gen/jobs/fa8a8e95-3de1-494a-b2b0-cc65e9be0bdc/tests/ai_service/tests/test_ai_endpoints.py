@@ -1,8 +1,7 @@
-import pytest
-from fastapi.testclient import TestClient
-from ai_service.main import app
-from ai_service.models import Task, TeamMember
 import random
+
+from ai_service.main import app
+from fastapi.testclient import TestClient
 
 client = TestClient(app)
 

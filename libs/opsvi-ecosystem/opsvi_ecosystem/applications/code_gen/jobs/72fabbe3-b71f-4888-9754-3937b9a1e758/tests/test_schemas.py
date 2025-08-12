@@ -1,13 +1,8 @@
 import pytest
 from backend.schemas import (
-    UserCreate,
-    UserRead,
-    MetricSampleRead,
-    ThresholdRead,
-    ThresholdUpdate,
-    AlertRead,
     MetricsHistoryQuery,
-    Token,
+    ThresholdUpdate,
+    UserCreate,
 )
 from pydantic import ValidationError
 

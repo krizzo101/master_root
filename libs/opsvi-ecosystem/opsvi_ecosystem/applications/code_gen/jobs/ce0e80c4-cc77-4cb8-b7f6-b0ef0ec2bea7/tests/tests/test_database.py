@@ -1,6 +1,7 @@
-import pytest
 import os
-from app.database import init_db, get_db
+
+import pytest
+from app.database import get_db, init_db
 from sqlalchemy import text
 
 

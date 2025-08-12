@@ -4,7 +4,6 @@ Debug script to identify why external reasoning service initialization fails.
 """
 
 import sys
-import os
 import asyncio
 import json
 from pathlib import Path

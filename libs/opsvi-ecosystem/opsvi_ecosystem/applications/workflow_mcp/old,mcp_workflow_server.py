@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 import traceback
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.applications.workflow_mcp.agent_runner import EmbeddedAgentRunner
 from src.applications.workflow_mcp.db import WorkflowDB
@@ -29,7 +29,7 @@ PROJECT_ROOT = "/home/opsvi/agent_world"
 
 
 # --- Helper: Load file from disk ---
-def load_file(path: str) -> Optional[str]:
+def load_file(path: str) -> str | None:
     try:
         with open(os.path.join(PROJECT_ROOT, path), encoding="utf-8") as f:
             return f.read()
@@ -39,7 +39,7 @@ def load_file(path: str) -> Optional[str]:
 
 
 # --- Helper: Load workflow and all supporting files ---
-def load_workflow_and_context(workflow_id: Optional[str] = None) -> Dict[str, Any]:
+def load_workflow_and_context(workflow_id: str | None = None) -> dict[str, Any]:
     context = {}
     if workflow_id:
         # Load workflow and files from ArangoDB
@@ -79,8 +79,8 @@ def load_workflow_and_context(workflow_id: Optional[str] = None) -> Dict[str, An
 
 # --- Main agentic workflow tool ---
 async def agentic_workflow_tool(
-    prompt: str, workflow_id: Optional[str] = None
-) -> Dict[str, Any]:
+    prompt: str, workflow_id: str | None = None
+) -> dict[str, Any]:
     context = load_workflow_and_context(workflow_id)
     if "error" in context:
         return {"success": False, "error": context["error"]}
@@ -173,12 +173,12 @@ TOOLS = [
 ]
 
 
-def list_tools() -> List[Dict[str, Any]]:
+def list_tools() -> list[dict[str, Any]]:
     logger.debug("list_tools called, returning %d tools", len(TOOLS))
     return TOOLS
 
 
-async def handle_tool_call(name: str, arguments: Dict[str, Any]) -> Any:
+async def handle_tool_call(name: str, arguments: dict[str, Any]) -> Any:
     logger.debug(f"handle_tool_call: {name} with arguments: {arguments}")
     try:
         if name == "agentic_workflow_tool":
@@ -203,7 +203,7 @@ async def handle_tool_call(name: str, arguments: Dict[str, Any]) -> Any:
         return {"success": False, "error": str(e), "trace": traceback.format_exc()}
 
 
-async def handle_request(request: Dict[str, Any]) -> Dict[str, Any]:
+async def handle_request(request: dict[str, Any]) -> dict[str, Any]:
     method = request.get("method")
     params = request.get("params", {})
     request_id = request.get("id")

@@ -6,22 +6,23 @@ Updated for July 2025 best practices with client.chat.completions.parse().
 """
 
 import logging
+import sys
+from pathlib import Path
 from typing import Optional
+
+from project_templates import ProjectType
 
 from config import get_config
 from schemas import (
-    ProjectTypeDetection,
-    SecurityAnalysis,
-    RequirementsSpec,
     ArchitectureSpec,
+    ProjectTypeDetection,
+    RequirementsSpec,
+    SecurityAnalysis,
 )
-from project_templates import ProjectType
-import sys
-from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from local_shared.openai_interfaces.responses_interface import get_openai_interface
 from audit_logger import log_prompt
+from local_shared.openai_interfaces.responses_interface import get_openai_interface
 
 # Model selector imported locally where needed
 
@@ -54,7 +55,7 @@ def detect_project_type_with_ai(user_request: str) -> ProjectType:
         prefer_cost_effective=True,
     )
 
-    system_prompt = f"""You are a project type classifier. Analyze the user's request and determine what type of Python project they want to build.
+    system_prompt = """You are a project type classifier. Analyze the user's request and determine what type of Python project they want to build.
 
 Valid project types are:
 - cli_tool: Command-line interface applications
@@ -146,7 +147,7 @@ Project Type: {project_type.value}
 5. Technology preferences mentioned by the user
 6. Any constraints or limitations
 
-{f'Use the technical insights above to inform technology choices and ensure requirements reflect current best practices.' if insights else ''}
+{'Use the technical insights above to inform technology choices and ensure requirements reflect current best practices.' if insights else ''}
 Be thorough but concise. Each requirement should be actionable and testable."""
 
     try:
@@ -216,7 +217,7 @@ def generate_architecture_with_ai(
 3. Deployment strategy (containerization, cloud deployment, etc.)
 4. Key architectural decisions with rationale
 
-{f'Use the technical insights above to select current technologies and follow modern architectural patterns.' if insights else ''}
+{'Use the technical insights above to select current technologies and follow modern architectural patterns.' if insights else ''}
 Provide detailed, implementable architecture that follows best practices."""
 
     try:

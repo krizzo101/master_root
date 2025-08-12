@@ -6,8 +6,8 @@ This module defines the Pydantic models for dependency analysis output data.
 
 from typing import Optional
 
-from pydantic import BaseModel, Field
-from typing import Dict, Any, List, Optional
+from pydantic import Field
+from typing import Dict, Any, List
 from .base_output_schema import BaseGeneratorOutput
 
 

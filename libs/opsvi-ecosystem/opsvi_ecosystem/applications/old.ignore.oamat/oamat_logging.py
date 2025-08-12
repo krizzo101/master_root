@@ -1,8 +1,8 @@
+import logging
 from dataclasses import dataclass
 from datetime import datetime
-import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 @dataclass
@@ -13,10 +13,10 @@ class WorkflowNode:
     name: str
     agent_role: str
     status: str  # pending, in_progress, completed, failed
-    subdivision_status: Optional[str] = None  # none, checking, subdivided, atomic
-    sub_nodes: List["WorkflowNode"] = None
+    subdivision_status: str | None = None  # none, checking, subdivided, atomic
+    sub_nodes: list["WorkflowNode"] = None
     depth: int = 0
-    parent_id: Optional[str] = None
+    parent_id: str | None = None
 
     def __post_init__(self):
         if self.sub_nodes is None:
@@ -31,7 +31,7 @@ class UserLogger:
 
     def __init__(self, debug_mode: bool = False):
         self.debug_mode = debug_mode
-        self.workflow_tree: Dict[str, WorkflowNode] = {}
+        self.workflow_tree: dict[str, WorkflowNode] = {}
         self.current_depth = 0
         self.indent_chars = "  "  # Two spaces per level
 

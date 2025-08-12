@@ -1,8 +1,10 @@
-import os
 import logging
+import os
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session, sessionmaker
+
 from app.models import Base
 
 DATABASE_URL = os.getenv("TODO_DB_URL", "sqlite:///./todo.sqlite3")

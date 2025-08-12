@@ -1,20 +1,20 @@
 """
 CRUD operations for Task Management API.
 """
+import logging
+
+from fastapi import HTTPException, status
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import update, delete
-from fastapi import HTTPException, status
+
 from app.models import Task
 from app.schemas import TaskCreate, TaskUpdate
-from typing import List, Optional
-import logging
 
 logger = logging.getLogger(__name__)
 
 
-async def get_tasks(session: AsyncSession) -> List[Task]:
+async def get_tasks(session: AsyncSession) -> list[Task]:
     """
     Retrieve all tasks.
     """
@@ -30,7 +30,7 @@ async def get_tasks(session: AsyncSession) -> List[Task]:
         )
 
 
-async def get_task_by_id(session: AsyncSession, task_id: int) -> Optional[Task]:
+async def get_task_by_id(session: AsyncSession, task_id: int) -> Task | None:
     """
     Retrieve a task by ID.
     """
@@ -74,7 +74,7 @@ async def create_task(session: AsyncSession, task_create: TaskCreate) -> Task:
 
 async def update_task(
     session: AsyncSession, task_id: int, task_update: TaskUpdate
-) -> Optional[Task]:
+) -> Task | None:
     """
     Update an existing task by ID.
     """

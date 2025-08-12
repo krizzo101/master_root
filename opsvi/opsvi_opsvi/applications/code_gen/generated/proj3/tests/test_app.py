@@ -6,9 +6,10 @@ CURRENT_DIR = os.path.dirname(__file__)
 SRC_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "src"))
 sys.path.insert(0, SRC_DIR)
 
+import json
+
 import pytest
 from app import app
-import json
 
 
 @pytest.fixture

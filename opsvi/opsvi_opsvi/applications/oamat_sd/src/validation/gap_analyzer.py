@@ -6,7 +6,6 @@ Extracted from request_validation.py for better modularity.
 """
 
 import logging
-from typing import List, Tuple
 
 from src.applications.oamat_sd.src.config.config_manager import ConfigManager
 from src.applications.oamat_sd.src.models.validation_models import (
@@ -29,8 +28,8 @@ class GapAnalyzer:
         self.schema_registry = schema_registry
 
     def prioritize_gaps(
-        self, missing_fields: List[str], request_type: RequestType
-    ) -> List[InformationGap]:
+        self, missing_fields: list[str], request_type: RequestType
+    ) -> list[InformationGap]:
         """Prioritize missing information gaps."""
         schema = self.schema_registry.get_schema(request_type)
         if not schema:
@@ -78,7 +77,7 @@ class GapAnalyzer:
 
         return gaps
 
-    def calculate_confidence(self, gaps: List[InformationGap]) -> float:
+    def calculate_confidence(self, gaps: list[InformationGap]) -> float:
         """Calculate confidence based on gaps."""
         if not gaps:
             return 1.0
@@ -94,8 +93,8 @@ class GapAnalyzer:
         return confidence
 
     def categorize_gaps(
-        self, gaps: List[InformationGap]
-    ) -> Tuple[List[InformationGap], List[InformationGap]]:
+        self, gaps: list[InformationGap]
+    ) -> tuple[list[InformationGap], list[InformationGap]]:
         """Categorize gaps into researchable and unresearchable."""
         researchable = [gap for gap in gaps if gap.researchable]
         unresearchable = [gap for gap in gaps if not gap.researchable]
@@ -137,11 +136,11 @@ class GapAnalyzer:
             unresearchable_gaps=unresearchable_gaps,
         )
 
-    def get_critical_gaps(self, gaps: List[InformationGap]) -> List[InformationGap]:
+    def get_critical_gaps(self, gaps: list[InformationGap]) -> list[InformationGap]:
         """Get only critical gaps from a list."""
         return [gap for gap in gaps if gap.priority == GapPriority.CRITICAL]
 
-    def get_researchable_gaps(self, gaps: List[InformationGap]) -> List[InformationGap]:
+    def get_researchable_gaps(self, gaps: list[InformationGap]) -> list[InformationGap]:
         """Get only researchable gaps from a list."""
         return [gap for gap in gaps if gap.researchable]
 

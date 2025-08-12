@@ -4,7 +4,6 @@ Autonomous Meta-Intelligence Emergence System
 Phase 7: Achieve meta-intelligence through systematic emergence orchestration
 """
 
-import json
 import sys
 from datetime import datetime
 from typing import Dict, List, Any
@@ -129,7 +128,7 @@ class AutonomousMetaIntelligenceEmergence:
                     result = collection_obj.insert(doc)
                     if result:
                         inserted_ids.append(result.get("_id", ""))
-                except Exception as e:
+                except Exception:
                     continue
 
             return inserted_ids
@@ -657,7 +656,7 @@ def main():
     )
 
     # Display results
-    print(f"\nMeta-intelligence emergence conditions analyzed")
+    print("\nMeta-intelligence emergence conditions analyzed")
     emergence_conditions = emergence_cycle["emergence_conditions_analysis"]
     readiness = emergence_conditions["emergence_readiness"]
 

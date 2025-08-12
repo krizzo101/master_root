@@ -5,7 +5,7 @@ This module defines the Pydantic models for architecture design input and output
 ensuring consistent and validated data handling across all architecture design components.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -48,10 +48,10 @@ class ArchitectureInput(BaseModel):
     )
     max_tokens: int = Field(default=6000, description="Maximum tokens for O3 model")
     temperature: float = Field(default=0.1, description="Temperature for O3 model")
-    context_files: Optional[list[str]] = Field(
+    context_files: list[str] | None = Field(
         default=None, description="List of context file paths"
     )
-    additional_constraints: Optional[str] = Field(
+    additional_constraints: str | None = Field(
         default=None,
         description="Additional architectural constraints or requirements",
     )
@@ -209,7 +209,7 @@ class ArchitectureOutput(BaseModel):
     )
     generation_time: float = Field(..., description="Time taken to generate design")
     model_used: str = Field(..., description="Model used for generation")
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Error message if generation failed"
     )
 
@@ -233,7 +233,7 @@ class ComponentOutput(BaseModel):
         ..., description="Time taken to generate specifications"
     )
     model_used: str = Field(..., description="Model used for generation")
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Error message if generation failed"
     )
 
@@ -257,7 +257,7 @@ class DataFlowOutput(BaseModel):
         ..., description="Time taken to generate specifications"
     )
     model_used: str = Field(..., description="Model used for generation")
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Error message if generation failed"
     )
 
@@ -281,7 +281,7 @@ class InterfaceOutput(BaseModel):
         ..., description="Time taken to generate specifications"
     )
     model_used: str = Field(..., description="Model used for generation")
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Error message if generation failed"
     )
 
@@ -298,6 +298,6 @@ class ValidationOutput(BaseModel):
     )
     validation_time: float = Field(..., description="Time taken to perform validation")
     model_used: str = Field(..., description="Model used for validation")
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Error message if validation failed"
     )

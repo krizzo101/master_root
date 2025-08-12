@@ -4,7 +4,6 @@ Autonomous Evolution Integration System
 Integrates all autonomous capabilities into unified self-evolution framework
 """
 
-import json
 import sys
 from datetime import datetime
 from typing import Dict, List, Any

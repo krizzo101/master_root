@@ -1,16 +1,14 @@
-import pytest
 from app.models import Todo
 from app.schemas import (
+    Config,
+    HealthCheckResponse,
     TodoBase,
     TodoCreate,
     TodoUpdate,
-    Todo as TodoSchema,
-    HealthCheckResponse,
-    Config,
 )
-
-
-from datetime import datetime
+from app.schemas import (
+    Todo as TodoSchema,
+)
 
 
 def test_todo_model_creates_with_default_values():

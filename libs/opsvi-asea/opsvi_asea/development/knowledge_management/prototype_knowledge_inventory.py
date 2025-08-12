@@ -15,11 +15,9 @@ Key Innovation: "Know what's available, load when needed" vs "Front-load everyth
 """
 
 import asyncio
-import json
 import time
 from datetime import datetime
 from typing import Dict, List, Any, Optional
-from dataclasses import dataclass
 
 
 # Note: This would integrate with mcp_cognitive_tools_arango_* in production
@@ -249,7 +247,7 @@ class KnowledgeInventorySystem:
         print("✅ Context Triggers Setup Complete")
         print(f"   🎯 {len(triggers['keyword_triggers'])} keyword trigger sets")
         print(f"   📋 {len(triggers['context_loading_strategies'])} loading strategies")
-        print(f"   ⚡ Dynamic loading ready")
+        print("   ⚡ Dynamic loading ready")
 
         return triggers
 
@@ -268,7 +266,7 @@ class KnowledgeInventorySystem:
 
         # Knowledge selection based on context
         knowledge_to_load = self._select_relevant_knowledge(detected_contexts)
-        print(f"📚 Knowledge Selected for Loading:")
+        print("📚 Knowledge Selected for Loading:")
 
         for context, knowledge in knowledge_to_load.items():
             print(f"   {context}:")

@@ -1,7 +1,6 @@
-import pytest
-import pandas as pd
 import csv_reporter.data_processor as dp
-from unittest import mock
+import pandas as pd
+import pytest
 
 
 @pytest.fixture

@@ -6,7 +6,7 @@ Coordinates specialized modules for validation, gap analysis, completion, and cl
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.applications.oamat_sd.src.config.config_manager import ConfigManager
 from src.applications.oamat_sd.src.interfaces.agent_interfaces import (
@@ -45,8 +45,8 @@ class RequestValidationAgent(IRequestValidationAgent):
 
     def __init__(
         self,
-        schema_registry: Optional[RequestSchemaRegistry] = None,
-        model_config: Optional[Dict[str, Any]] = None,
+        schema_registry: RequestSchemaRegistry | None = None,
+        model_config: dict[str, Any] | None = None,
     ):
         """Initialize the Request Validation Agent with all modular components"""
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
@@ -104,7 +104,7 @@ class RequestValidationAgent(IRequestValidationAgent):
 
     async def extract_information_dynamically(
         self, request: RequestInput
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Use AI to extract information from natural language
 
@@ -127,7 +127,7 @@ class RequestValidationAgent(IRequestValidationAgent):
             self.logger.error(f"❌ Information extraction failed: {e}")
             return {}
 
-    async def generate_validation_strategy(self, content: str) -> Dict[str, Any]:
+    async def generate_validation_strategy(self, content: str) -> dict[str, Any]:
         """
         Dynamically generate validation approach for this specific content
 
@@ -187,7 +187,7 @@ class RequestValidationAgent(IRequestValidationAgent):
 
     async def generate_clarification_questions(
         self, gap_analysis: GapAnalysisResult, original_request: str = ""
-    ) -> List[ClarificationQuestion]:
+    ) -> list[ClarificationQuestion]:
         """Generate user-friendly clarification questions"""
         self.logger.info("❓ Generating clarification questions")
 
@@ -208,8 +208,8 @@ class RequestValidationAgent(IRequestValidationAgent):
         )
 
     async def process_user_responses(
-        self, user_input: str, questions: List[ClarificationQuestion]
-    ) -> Dict[str, Any]:
+        self, user_input: str, questions: list[ClarificationQuestion]
+    ) -> dict[str, Any]:
         """Process user responses to clarification questions"""
         self.logger.info("📝 Processing user responses")
         return await self.clarification_interface.parse_user_responses(
@@ -218,7 +218,7 @@ class RequestValidationAgent(IRequestValidationAgent):
 
     async def complete_validation_workflow(
         self, request: RequestInput
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Complete end-to-end validation workflow with all steps
 
@@ -337,7 +337,7 @@ class RequestValidationAgent(IRequestValidationAgent):
         else:
             return "iterative_clarification"
 
-    def get_capabilities(self) -> Dict[str, Any]:
+    def get_capabilities(self) -> dict[str, Any]:
         """Return the capabilities of this validation agent"""
         return {
             "agent_name": "Request Validation Agent",

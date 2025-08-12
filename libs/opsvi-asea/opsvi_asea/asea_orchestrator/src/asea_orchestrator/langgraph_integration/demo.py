@@ -112,7 +112,7 @@ def demo_basic_integration():
         final_state = compiled_workflow.invoke(initial_state, config=config)
         execution_time = time.time() - start_time
 
-        print(f"\n=== Workflow Execution Results ===")
+        print("\n=== Workflow Execution Results ===")
         print(f"Execution time: {execution_time:.2f} seconds")
         print(f"Steps completed: {len(final_state.get('plugin_outputs', {}))}")
 
@@ -128,20 +128,20 @@ def demo_basic_integration():
         # Display final response
         final_response = final_state.get("workflow_state", {}).get("final_response")
         if final_response:
-            print(f"\n=== FINAL ENHANCED RESPONSE ===")
+            print("\n=== FINAL ENHANCED RESPONSE ===")
             print(final_response)
 
         # Display performance metrics
         step_timings = final_state.get("step_timings", {})
         if step_timings:
-            print(f"\n=== Performance Metrics ===")
+            print("\n=== Performance Metrics ===")
             for step, timing in step_timings.items():
                 print(f"{step}: {timing:.3f}s")
 
         # Display any errors
         errors = final_state.get("errors", [])
         if errors:
-            print(f"\n=== Errors ===")
+            print("\n=== Errors ===")
             for error in errors:
                 print(f"- {error}")
 
@@ -173,7 +173,7 @@ def demo_workflow_converter():
             "user_prompt": "What are the best practices for remote team collaboration?"
         }
 
-        print(f"\nTesting converted workflow...")
+        print("\nTesting converted workflow...")
         print(f"User prompt: {user_input['user_prompt']}")
 
         start_time = time.time()

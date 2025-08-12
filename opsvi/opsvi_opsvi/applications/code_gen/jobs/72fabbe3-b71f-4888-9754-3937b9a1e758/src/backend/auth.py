@@ -1,11 +1,12 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Optional
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlmodel import Session, select
+
 from backend.config import settings
 from backend.models import User
 
@@ -25,14 +26,14 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
+def authenticate_user(db: Session, username: str, password: str) -> User | None:
     user = db.exec(select(User).where(User.username == username)).first()
     if not user or not verify_password(password, user.hashed_password):
         return None
     return user
 
 
-def create_access_token(data: dict, expires_delta: Optional[int] = None):
+def create_access_token(data: dict, expires_delta: int | None = None):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(
         seconds=expires_delta or ACCESS_TOKEN_EXPIRE_MINUTES * 60

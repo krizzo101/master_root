@@ -3,6 +3,7 @@ Flask development server entrypoint.
 Use only for local development (not production).
 """
 import os
+
 from app import create_app
 
 if __name__ == "__main__":

@@ -4,12 +4,10 @@ Based on comprehensive research of OpenAI documentation and testing.
 """
 
 import json
-import asyncio
-from typing import Any, Dict, Optional, Type, TypeVar, Union
+from typing import Any, Dict, Optional, Type, TypeVar
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ValidationError
 from .simplified_schemas import (
-    get_simplified_schema,
     get_simplified_schema_for_operation,
 )
 
@@ -108,7 +106,7 @@ IMPORTANT: Respond with valid JSON that exactly matches the required schema. Pro
                     "api_method": "chat.responses.create (structured)",
                 }
 
-            except (json.JSONDecodeError, ValidationError) as e:
+            except (json.JSONDecodeError, ValidationError):
                 # Fallback to non-structured response
                 return await self.create_fallback_response(
                     model, instructions, user_input

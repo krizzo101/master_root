@@ -1,5 +1,4 @@
-import pytest
-from app.models import User, Project, File, Report
+from app.models import File, Project, Report, User
 
 
 def test_user_model_attributes_and_str_representation():

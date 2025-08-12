@@ -9,7 +9,7 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import json
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 
 
 class SessionContinuitySystem:
@@ -213,7 +213,7 @@ Ready for compound learning operations.
                 [
                     "python3",
                     "-c",
-                    f"""
+                    """
 import json
 from pathlib import Path
 import sys
@@ -292,6 +292,6 @@ if __name__ == "__main__":
     print(f"\nShell Command Validation: {json.dumps(result, indent=2)}")
 
     # Test context-specific knowledge
-    print(f"\nDatabase Context Knowledge:")
+    print("\nDatabase Context Knowledge:")
     db_knowledge = system.get_operational_knowledge_for_context("database operations")
     print(json.dumps(db_knowledge, indent=2))

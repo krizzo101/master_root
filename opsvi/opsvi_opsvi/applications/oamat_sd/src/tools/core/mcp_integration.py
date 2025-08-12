@@ -7,7 +7,7 @@ Replaces the previous approach of trying to import non-existent MCP server modul
 
 import json
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 
 class MCPIntegration:
@@ -38,7 +38,7 @@ class MCPIntegration:
             f"✅ MCP Integration initialized with {len(self.tool_interfaces)} tool interfaces"
         )
 
-    async def execute_tool(self, tool_name: str, query: str) -> Dict[str, Any]:
+    async def execute_tool(self, tool_name: str, query: str) -> dict[str, Any]:
         """
         Execute a tool by name with query parameters
 
@@ -78,7 +78,7 @@ class MCPIntegration:
 
     # Tool wrapper implementations using actual available functions
 
-    async def _codebase_search_wrapper(self, params: Dict[str, Any]) -> str:
+    async def _codebase_search_wrapper(self, params: dict[str, Any]) -> str:
         """Wrapper for codebase search functionality"""
         query = params.get("query", "")
         target_directories = params.get("target_directories", [])
@@ -93,7 +93,7 @@ Found 3 relevant code sections:
 
 Use read_file to examine specific files for detailed implementation."""
 
-    async def _read_file_wrapper(self, params: Dict[str, Any]) -> str:
+    async def _read_file_wrapper(self, params: dict[str, Any]) -> str:
         """Wrapper for file reading functionality - READS REAL FILES"""
         try:
             target_file = params.get("target_file", params.get("file_path", ""))
@@ -128,7 +128,7 @@ Use read_file to examine specific files for detailed implementation."""
         except Exception as e:
             return f"❌ File read failed: {e}"
 
-    async def _edit_file_wrapper(self, params: Dict[str, Any]) -> str:
+    async def _edit_file_wrapper(self, params: dict[str, Any]) -> str:
         """Wrapper for file editing functionality - CREATES REAL FILES"""
         try:
             target_file = params.get("target_file", params.get("file_path", ""))
@@ -163,7 +163,7 @@ Use read_file to examine specific files for detailed implementation."""
         except Exception as e:
             return f"❌ File creation failed: {e}"
 
-    async def _run_terminal_cmd_wrapper(self, params: Dict[str, Any]) -> str:
+    async def _run_terminal_cmd_wrapper(self, params: dict[str, Any]) -> str:
         """Wrapper for terminal command execution - EXECUTES REAL COMMANDS"""
         try:
             command = params.get("command", params.get("query", ""))
@@ -214,7 +214,7 @@ Use read_file to examine specific files for detailed implementation."""
         except Exception as e:
             return f"❌ Terminal command failed: {e}"
 
-    async def _grep_search_wrapper(self, params: Dict[str, Any]) -> str:
+    async def _grep_search_wrapper(self, params: dict[str, Any]) -> str:
         """Wrapper for grep search functionality"""
         try:
             from antml_function_calls import grep_search
@@ -235,7 +235,7 @@ Use read_file to examine specific files for detailed implementation."""
         except Exception as e:
             return f"Grep search failed: {e}"
 
-    async def _list_dir_wrapper(self, params: Dict[str, Any]) -> str:
+    async def _list_dir_wrapper(self, params: dict[str, Any]) -> str:
         """Wrapper for directory listing functionality - LISTS REAL DIRECTORIES"""
         try:
             relative_path = params.get(
@@ -286,7 +286,7 @@ Use read_file to examine specific files for detailed implementation."""
         except Exception as e:
             return f"❌ Directory listing failed: {e}"
 
-    async def _web_search_wrapper(self, params: Dict[str, Any]) -> str:
+    async def _web_search_wrapper(self, params: dict[str, Any]) -> str:
         """Wrapper for web search functionality"""
         try:
             from antml_function_calls import web_search
@@ -302,7 +302,7 @@ Use read_file to examine specific files for detailed implementation."""
         except Exception as e:
             return f"Web search failed: {e}"
 
-    async def _delete_file_wrapper(self, params: Dict[str, Any]) -> str:
+    async def _delete_file_wrapper(self, params: dict[str, Any]) -> str:
         """Wrapper for file deletion functionality"""
         try:
             from antml_function_calls import delete_file
@@ -318,7 +318,7 @@ Use read_file to examine specific files for detailed implementation."""
         except Exception as e:
             return f"File deletion failed: {e}"
 
-    async def _file_search_wrapper(self, params: Dict[str, Any]) -> str:
+    async def _file_search_wrapper(self, params: dict[str, Any]) -> str:
         """Wrapper for file search functionality"""
         try:
             from antml_function_calls import file_search
@@ -332,7 +332,7 @@ Use read_file to examine specific files for detailed implementation."""
         except Exception as e:
             return f"File search failed: {e}"
 
-    def get_available_tools(self) -> List[str]:
+    def get_available_tools(self) -> list[str]:
         """Return list of available tool names"""
         return list(self.tool_interfaces.keys())
 
@@ -342,7 +342,7 @@ Use read_file to examine specific files for detailed implementation."""
 
     async def execute_tool_method(
         self, tool_name: str, method: str, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute a specific method on a tool - bridge for the execution engine
 

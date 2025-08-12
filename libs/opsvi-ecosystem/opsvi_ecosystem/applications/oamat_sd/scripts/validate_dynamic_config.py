@@ -9,8 +9,8 @@ dynamic generation by the master agent.
 """
 
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import jsonschema
 import yaml

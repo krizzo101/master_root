@@ -9,8 +9,8 @@ Scans the codebase to identify files that need auto-alignment based on:
 """
 
 import ast
-from pathlib import Path
 import re
+from pathlib import Path
 from typing import Any
 
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import (

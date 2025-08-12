@@ -1,9 +1,9 @@
 """Test model validation and approved models enforcement."""
 
-import pytest
 from unittest.mock import Mock, patch
 
-from local_shared.openai_interfaces.model_selector import ModelSelector, APPROVED_MODELS
+import pytest
+from local_shared.openai_interfaces.model_selector import APPROVED_MODELS, ModelSelector
 from local_shared.openai_interfaces.responses_interface import OpenAIResponsesInterface
 
 

@@ -5,7 +5,7 @@ Implements proactive improvement identification, novel insights, and self-direct
 """
 
 import json
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any
 from autonomous_decision_system import AutonomousDecisionSystem
 
 

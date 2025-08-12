@@ -7,7 +7,7 @@ duplication found in 20+ plugin execute() methods.
 
 import asyncio
 import logging
-from typing import Dict, Any, Optional, Callable, Union, List
+from typing import Dict, Any, Optional, Callable, List
 from functools import wraps
 from datetime import datetime
 from abc import ABC, abstractmethod

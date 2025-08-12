@@ -278,7 +278,7 @@ async def create_run(
 
             # Create run with comprehensive error handling
             try:
-                logger.info(f"🔍 About to create run in database")
+                logger.info("🔍 About to create run in database")
                 run_id = await neo4j_client.create_run(run_data)
                 logger.info(f"🔍 Run created with ID: {run_id}")
             except Exception as run_error:
@@ -298,12 +298,12 @@ async def create_run(
                     execute_pipeline,
                 )
 
-                logger.info(f"🔍 Successfully imported execute_pipeline")
-                print(f"🔍 PRINT: Successfully imported execute_pipeline")
+                logger.info("🔍 Successfully imported execute_pipeline")
+                print("🔍 PRINT: Successfully imported execute_pipeline")
 
                 # Submit the pipeline execution task
-                logger.info(f"🔍 About to call execute_pipeline.delay()")
-                print(f"🔍 PRINT: About to call execute_pipeline.delay()")
+                logger.info("🔍 About to call execute_pipeline.delay()")
+                print("🔍 PRINT: About to call execute_pipeline.delay()")
                 task = execute_pipeline.delay(
                     run_id=run_id,
                     project_id=str(run_data["project_id"]),
@@ -710,10 +710,6 @@ async def cancel_run(
             await neo4j_client.update_run_status(str(run_id), "cancelled")
 
             # Cancel running tasks in Celery
-            from opsvi_auto_forge.infrastructure.workers.agent_tasks import (
-                submit_agent_task,
-            )
-            import json
 
             # Get all running tasks for this run
             query = """

@@ -1,5 +1,4 @@
 import logging
-from typing import Dict, List
 
 from shared.openai_interfaces.responses_interface import OpenAIResponsesInterface
 
@@ -14,7 +13,7 @@ class ExpertAssignerAgent:
         self.model = model
         self.openai_interface = OpenAIResponsesInterface()
 
-    def assign_experts(self, question: str, context: str = "") -> List[Dict]:
+    def assign_experts(self, question: str, context: str = "") -> list[dict]:
         """
         Decide which expert types to assign and generate system messages for each.
         Returns a list of dicts: {expert_type, system_message}

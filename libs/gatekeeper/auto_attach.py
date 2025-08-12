@@ -8,9 +8,7 @@ Can be used independently or as part of the gatekeeper agent.
 
 import json
 import os
-import sys
-from typing import List, Set, Dict, Any, Optional
-from pathlib import Path
+from typing import Any
 
 
 class AutoAttach:
@@ -24,26 +22,30 @@ class AutoAttach:
     def load_dependencies(self) -> bool:
         """Load the file dependencies data."""
         try:
-            with open(self.dependencies_file, 'r', encoding='utf-8') as f:
+            with open(self.dependencies_file, encoding="utf-8") as f:
                 self.data = json.load(f)
             self.loaded = True
             return True
         except FileNotFoundError:
             print(f"❌ Dependencies file not found: {self.dependencies_file}")
-            print("Run: python scripts/auto_attach_generator.py to generate dependencies")
+            print(
+                "Run: python scripts/auto_attach_generator.py to generate dependencies"
+            )
             return False
         except Exception as e:
             print(f"❌ Error loading dependencies: {e}")
             return False
 
-    def get_file_info(self, file_path: str) -> Dict[str, Any]:
+    def get_file_info(self, file_path: str) -> dict[str, Any]:
         """Get information about a specific file."""
         if not self.loaded:
             return {}
 
         return self.data["files"].get(file_path, {})
 
-    def find_related_files(self, user_files: List[str], verbose: bool = False) -> List[str]:
+    def find_related_files(
+        self, user_files: list[str], verbose: bool = False
+    ) -> list[str]:
         """
         Find all related files for the given user files.
 
@@ -83,7 +85,9 @@ class AutoAttach:
             imported_by = file_info.get("imported_by", [])
             if imported_by:
                 if verbose:
-                    print(f"  ➕ Adding files that import this: {len(imported_by)} files")
+                    print(
+                        f"  ➕ Adding files that import this: {len(imported_by)} files"
+                    )
                 related_files.update(imported_by)
 
             # Add files in the same directory
@@ -92,7 +96,9 @@ class AutoAttach:
                 same_dir_files = self.data["indexes"]["by_directory"].get(directory, [])
                 if same_dir_files:
                     if verbose:
-                        print(f"  ➕ Adding files in same directory: {len(same_dir_files)} files")
+                        print(
+                            f"  ➕ Adding files in same directory: {len(same_dir_files)} files"
+                        )
                     related_files.update(same_dir_files)
 
             # Add configuration files in the same directory
@@ -100,18 +106,22 @@ class AutoAttach:
             directory_configs = [f for f in config_files if f.startswith(directory)]
             if directory_configs:
                 if verbose:
-                    print(f"  ➕ Adding config files in directory: {len(directory_configs)} files")
+                    print(
+                        f"  ➕ Adding config files in directory: {len(directory_configs)} files"
+                    )
                 related_files.update(directory_configs)
 
             # Add test files for this file
             test_files = self.data["indexes"]["by_type"].get("test", [])
-            file_name = os.path.basename(user_file).replace('.py', '')
+            file_name = os.path.basename(user_file).replace(".py", "")
             related_tests = []
             for test_file in test_files:
                 test_name = os.path.basename(test_file)
-                if (file_name in test_name or
-                    test_name.startswith(f"test_{file_name}") or
-                    test_name.endswith(f"{file_name}_test.py")):
+                if (
+                    file_name in test_name
+                    or test_name.startswith(f"test_{file_name}")
+                    or test_name.endswith(f"{file_name}_test.py")
+                ):
                     related_tests.append(test_file)
 
             if related_tests:
@@ -121,10 +131,14 @@ class AutoAttach:
 
         result = list(related_files)
         if verbose:
-            print(f"📊 Total related files found: {len(result)} (original: {len(user_files)})")
+            print(
+                f"📊 Total related files found: {len(result)} (original: {len(user_files)})"
+            )
         return result
 
-    def filter_files_by_type(self, files: List[str], file_types: List[str]) -> List[str]:
+    def filter_files_by_type(
+        self, files: list[str], file_types: list[str]
+    ) -> list[str]:
         """Filter files by type."""
         if not self.loaded:
             return files
@@ -137,28 +151,28 @@ class AutoAttach:
 
         return filtered
 
-    def get_files_by_directory(self, directory: str) -> List[str]:
+    def get_files_by_directory(self, directory: str) -> list[str]:
         """Get all files in a specific directory."""
         if not self.loaded:
             return []
 
         return self.data["indexes"]["by_directory"].get(directory, [])
 
-    def get_files_by_type(self, file_type: str) -> List[str]:
+    def get_files_by_type(self, file_type: str) -> list[str]:
         """Get all files of a specific type."""
         if not self.loaded:
             return []
 
         return self.data["indexes"]["by_type"].get(file_type, [])
 
-    def get_importers(self, module: str) -> List[str]:
+    def get_importers(self, module: str) -> list[str]:
         """Get all files that import a specific module."""
         if not self.loaded:
             return []
 
         return self.data["indexes"]["by_import"].get(module, [])
 
-    def analyze_file_dependencies(self, file_path: str) -> Dict[str, Any]:
+    def analyze_file_dependencies(self, file_path: str) -> dict[str, Any]:
         """Analyze dependencies for a single file."""
         if not self.loaded:
             return {}
@@ -179,8 +193,8 @@ class AutoAttach:
                 "importing_files": [],
                 "same_directory": [],
                 "config_files": [],
-                "test_files": []
-            }
+                "test_files": [],
+            },
         }
 
         # Find imported files
@@ -194,26 +208,32 @@ class AutoAttach:
         # Find same directory files
         directory = file_info.get("directory", "")
         if directory:
-            analysis["related_files"]["same_directory"] = self.data["indexes"]["by_directory"].get(directory, [])
+            analysis["related_files"]["same_directory"] = self.data["indexes"][
+                "by_directory"
+            ].get(directory, [])
 
         # Find config files in same directory
         config_files = self.data["indexes"]["by_type"].get("config", [])
         if directory:
-            analysis["related_files"]["config_files"] = [f for f in config_files if f.startswith(directory)]
+            analysis["related_files"]["config_files"] = [
+                f for f in config_files if f.startswith(directory)
+            ]
 
         # Find related test files
         test_files = self.data["indexes"]["by_type"].get("test", [])
-        file_name = os.path.basename(file_path).replace('.py', '')
+        file_name = os.path.basename(file_path).replace(".py", "")
         for test_file in test_files:
             test_name = os.path.basename(test_file)
-            if (file_name in test_name or
-                test_name.startswith(f"test_{file_name}") or
-                test_name.endswith(f"{file_name}_test.py")):
+            if (
+                file_name in test_name
+                or test_name.startswith(f"test_{file_name}")
+                or test_name.endswith(f"{file_name}_test.py")
+            ):
                 analysis["related_files"]["test_files"].append(test_file)
 
         return analysis
 
-    def get_metadata(self) -> Dict[str, Any]:
+    def get_metadata(self) -> dict[str, Any]:
         """Get metadata about the loaded dependencies."""
         if not self.loaded:
             return {}

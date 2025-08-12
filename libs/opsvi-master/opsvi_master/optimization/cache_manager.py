@@ -7,15 +7,11 @@ and performance optimization for database and Knowledge Graph operations.
 
 from __future__ import annotations
 import asyncio
-import time
 from datetime import datetime, timedelta
-from typing import Any, Dict, Optional, Tuple, List
+from typing import Any, Dict, Optional
 from enum import Enum
 from dataclasses import dataclass
-import json
 import logging
-
-from .exceptions import CacheError, PerformanceError
 
 
 class CacheType(Enum):

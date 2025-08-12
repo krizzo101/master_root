@@ -3,7 +3,7 @@ AI Self-Assessment - Test AI instance quality before proceeding
 """
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 
 class AISelfAssessment:
@@ -13,7 +13,7 @@ class AISelfAssessment:
         self.test_results = {}
         self.pass_threshold = 0.75
 
-    def run_full_assessment(self) -> Dict[str, Any]:
+    def run_full_assessment(self) -> dict[str, Any]:
         """Run complete self-assessment battery"""
 
         results = {
@@ -46,7 +46,7 @@ class AISelfAssessment:
 
         return results
 
-    def _test_logical_reasoning(self) -> Dict[str, Any]:
+    def _test_logical_reasoning(self) -> dict[str, Any]:
         """Test basic logical reasoning ability"""
         try:
             # Simple logic test
@@ -61,7 +61,7 @@ class AISelfAssessment:
         except Exception as e:
             return {"score": 0.0, "status": "fail", "issue": f"Exception: {e}"}
 
-    def _test_working_memory(self) -> Dict[str, Any]:
+    def _test_working_memory(self) -> dict[str, Any]:
         """Test ability to maintain context"""
         try:
             # Track multiple variables
@@ -75,7 +75,7 @@ class AISelfAssessment:
         except Exception as e:
             return {"score": 0.0, "status": "fail", "issue": f"Exception: {e}"}
 
-    def _test_instruction_following(self) -> Dict[str, Any]:
+    def _test_instruction_following(self) -> dict[str, Any]:
         """Test ability to follow precise instructions"""
         try:
             # Multi-step instruction test
@@ -94,7 +94,7 @@ class AISelfAssessment:
         except Exception as e:
             return {"score": 0.0, "status": "fail", "issue": f"Exception: {e}"}
 
-    def _test_context_awareness(self) -> Dict[str, Any]:
+    def _test_context_awareness(self) -> dict[str, Any]:
         """Test awareness of current context"""
         try:
             # Check if aware of being in assessment
@@ -113,7 +113,7 @@ class AISelfAssessment:
         except Exception as e:
             return {"score": 0.0, "status": "fail", "issue": f"Exception: {e}"}
 
-    def _test_error_detection(self) -> Dict[str, Any]:
+    def _test_error_detection(self) -> dict[str, Any]:
         """Test ability to detect obvious errors"""
         try:
             # Intentional error detection
@@ -129,7 +129,7 @@ class AISelfAssessment:
         except Exception as e:
             return {"score": 0.0, "status": "fail", "issue": f"Exception: {e}"}
 
-    def _test_tool_competency(self) -> Dict[str, Any]:
+    def _test_tool_competency(self) -> dict[str, Any]:
         """Test basic tool usage understanding"""
         try:
             # Simulate tool understanding
@@ -144,7 +144,7 @@ class AISelfAssessment:
         except Exception as e:
             return {"score": 0.0, "status": "fail", "issue": f"Exception: {e}"}
 
-    def generate_assessment_report(self, results: Dict[str, Any]) -> str:
+    def generate_assessment_report(self, results: dict[str, Any]) -> str:
         """Generate human-readable assessment report"""
 
         status = "✅ PASS" if results["pass"] else "❌ FAIL"

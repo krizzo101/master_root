@@ -1,12 +1,11 @@
 """
 Configuration & Secrets management for Multi-Agent CLI Tool
 """
-import os
 from pathlib import Path
+
 from dotenv import load_dotenv
-from pydantic import BaseSettings, Field, ValidationError
-from typing import Optional
 from loguru import logger
+from pydantic import BaseSettings, Field, ValidationError
 
 
 class AppConfig(BaseSettings):
@@ -22,7 +21,7 @@ class AppConfig(BaseSettings):
     AGENT_RESULT_TIMEOUT: int = Field(
         default=600, env="AGENT_RESULT_TIMEOUT", gt=10, le=3600
     )
-    LANGGRAPH_CONFIG: Optional[str] = Field(
+    LANGGRAPH_CONFIG: str | None = Field(
         default=None, env="LANGGRAPH_CONFIG"
     )  # For advanced users
 
@@ -35,7 +34,7 @@ class AppConfig(BaseSettings):
 CONFIG_CACHE = None
 
 
-def load_dotenv_config(config_file: Optional[Path] = None):
+def load_dotenv_config(config_file: Path | None = None):
     """Loads .env files and updates os.environ accordingly."""
     # Most important: load this FIRST
     if config_file is not None and config_file.exists():

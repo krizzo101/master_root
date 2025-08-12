@@ -8,30 +8,29 @@ Designed for downstream atomic parsing and AI reasoning.
 
 import hashlib
 import re
-from typing import Dict, List
 
 import yaml
 
 
-def load_pattern_catalog(path: str) -> List[Dict]:
+def load_pattern_catalog(path: str) -> list[dict]:
     with open(path) as f:
         catalog = yaml.safe_load(f)
     return catalog["patterns"]
 
 
-def read_log_file(path: str) -> List[str]:
+def read_log_file(path: str) -> list[str]:
     with open(path) as f:
         return f.readlines()
 
 
-def write_file(path: str, lines: List[str]):
+def write_file(path: str, lines: list[str]):
     with open(path, "w") as f:
         f.writelines(lines)
 
 
 def clean_log(
-    lines: List[str], patterns: List[Dict], audit_log: List[str]
-) -> List[str]:
+    lines: list[str], patterns: list[dict], audit_log: list[str]
+) -> list[str]:
     cleaned = []
     seen_hashes = set()
     for line in lines:

@@ -10,8 +10,6 @@ Domain Knowledge Utility
 This module provides domain-specific knowledge for different types of rules.
 """
 
-from typing import Dict, Any
-
 
 def get_domain_knowledge(rule_id: str, rule_name: str, category: str) -> str:
     """

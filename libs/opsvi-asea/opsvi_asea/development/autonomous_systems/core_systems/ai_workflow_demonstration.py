@@ -6,7 +6,6 @@ Shows exactly how the AI decision system works under the hood.
 
 import asyncio
 import json
-from typing import Dict, Any
 from datetime import datetime
 from pathlib import Path
 
@@ -71,8 +70,8 @@ Provide detailed analysis with specific scores for each dimension."""
         print("🤖 STEP 3: AI AGENT INVOCATION")
         print("=" * 40)
         print(f"Agent: OpenAI {self.model}")
-        print(f"Max Tokens: 500")
-        print(f"Temperature: 0.1 (deterministic)")
+        print("Max Tokens: 500")
+        print("Temperature: 0.1 (deterministic)")
         print("Request Type: Chat Completion")
         print()
 
@@ -117,7 +116,7 @@ Provide detailed analysis with specific scores for each dimension."""
                 (evidence_score + feasibility_score + strategic_score) / 3
             )
 
-            print(f"Extracted Scores:")
+            print("Extracted Scores:")
             print(f"  Evidence: {evidence_score}/100")
             print(f"  Feasibility: {feasibility_score}/100")
             print(f"  Strategic: {strategic_score}/100")
@@ -218,7 +217,7 @@ Provide detailed analysis with specific scores for each dimension."""
                 print(f"  ✅ Found using pattern {i+1}: '{match.group(0)}' -> {score}")
                 return score
 
-        print(f"  ⚠️ No pattern matched, using default: 75")
+        print("  ⚠️ No pattern matched, using default: 75")
         return 75
 
     def _extract_strengths_with_demo(self, text: str) -> list:

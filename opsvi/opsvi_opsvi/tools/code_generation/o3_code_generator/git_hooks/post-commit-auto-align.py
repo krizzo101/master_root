@@ -12,13 +12,12 @@ Features:
 - Batch processing and separate commits
 """
 
-from dataclasses import asdict, dataclass
 import json
-from pathlib import Path
 import subprocess
 import sys
 import time
-from typing import Dict, List, Optional, Set
+from dataclasses import asdict, dataclass
+from pathlib import Path
 
 
 @dataclass
@@ -28,8 +27,8 @@ class AlignmentResult:
     file_path: str
     aligned: bool
     changes_made: bool
-    error: Optional[str] = None
-    performance_metrics: Optional[Dict] = None
+    error: str | None = None
+    performance_metrics: dict | None = None
 
 
 @dataclass
@@ -38,7 +37,7 @@ class AlignmentSession:
 
     session_id: str
     start_time: float
-    files_aligned: Set[str]
+    files_aligned: set[str]
     max_files: int = 50
     max_time: float = 300.0
     max_passes: int = 3
@@ -79,7 +78,7 @@ class SmartAutoAlignmentHook:
             pass
         raise FileNotFoundError("Could not find project root")
 
-    def _get_committed_files(self) -> List[str]:
+    def _get_committed_files(self) -> list[str]:
         """Get files that were committed in the last commit."""
         try:
             result = subprocess.run(
@@ -102,7 +101,7 @@ class SmartAutoAlignmentHook:
         finally:
             pass
 
-    def _get_related_files(self, committed_files: List[str]) -> Set[str]:
+    def _get_related_files(self, committed_files: list[str]) -> set[str]:
         """Get files that might be affected by the committed changes."""
         related_files = set()
         for file_path in committed_files:
@@ -139,7 +138,7 @@ class SmartAutoAlignmentHook:
             pass
         return related_files
 
-    def _load_alignment_cache(self) -> Dict[str, float]:
+    def _load_alignment_cache(self) -> dict[str, float]:
         """Load the alignment cache to avoid re-aligning recently aligned files."""
         if self.alignment_cache_file.exists():
             try:
@@ -155,7 +154,7 @@ class SmartAutoAlignmentHook:
             pass
         return {}
 
-    def _save_alignment_cache(self, cache: Dict[str, float]):
+    def _save_alignment_cache(self, cache: dict[str, float]):
         """Save the alignment cache."""
         try:
             with open(self.alignment_cache_file, "w") as f:
@@ -167,7 +166,7 @@ class SmartAutoAlignmentHook:
         finally:
             pass
 
-    def _load_alignment_session(self) -> Optional[AlignmentSession]:
+    def _load_alignment_session(self) -> AlignmentSession | None:
         """Load the current alignment session."""
         if self.session_file.exists():
             try:
@@ -313,7 +312,7 @@ class SmartAutoAlignmentHook:
         finally:
             pass
 
-    def _commit_alignment_changes(self, aligned_files: List[str]) -> bool:
+    def _commit_alignment_changes(self, aligned_files: list[str]) -> bool:
         """Commit alignment changes in a separate commit."""
         if not aligned_files:
             return True

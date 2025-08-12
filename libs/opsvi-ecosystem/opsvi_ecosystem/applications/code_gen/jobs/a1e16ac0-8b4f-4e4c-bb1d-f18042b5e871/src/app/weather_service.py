@@ -3,11 +3,11 @@ WeatherService provides an abstraction for fetching, caching, and parsing weathe
 from a remote API. It includes error handling and supports periodic cache refresh.
 """
 import logging
-from typing import Optional, Dict, Any
+from threading import Lock
+from typing import Any
+
 import requests
 from cachetools import TTLCache, cached
-from flask import current_app
-from threading import Lock
 
 
 class WeatherService:
@@ -18,7 +18,7 @@ class WeatherService:
     def __init__(self) -> None:
         self.cache = TTLCache(maxsize=1, ttl=900)  # 15 minutes by default
         self.cache_lock = Lock()
-        self.config: Optional[dict] = None
+        self.config: dict | None = None
 
     def init_app(self, app):
         self.config = {
@@ -34,7 +34,7 @@ class WeatherService:
             raise RuntimeError("WeatherService not configured")
         return self.config["API_URL"].format(api_key=self.config["API_KEY"])
 
-    def fetch_weather(self) -> Optional[Dict[str, Any]]:
+    def fetch_weather(self) -> dict[str, Any] | None:
         """Fetch latest weather data from the API."""
         url = self._build_api_url()
         try:
@@ -50,7 +50,7 @@ class WeatherService:
             logging.error(f"WeatherService unexpected error: {e}")
             return None
 
-    def parse_weather_data(self, data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    def parse_weather_data(self, data: dict[str, Any]) -> dict[str, Any] | None:
         """
         Parses external API response to our internal format.
         Expected fields: city, temp, description, icon, humidity, wind
@@ -75,7 +75,7 @@ class WeatherService:
             return None
 
     @cached(cache=lambda self: self.cache)
-    def get_weather(self) -> Optional[Dict[str, Any]]:
+    def get_weather(self) -> dict[str, Any] | None:
         """
         Returns the cached weather data or fetches new data if expired.
         Thread-safe access is enforced with self.cache_lock.
@@ -97,7 +97,7 @@ class WeatherService:
             else:
                 logging.warning("Could not refresh weather cache; using stale data.")
 
-    def get_cached_weather(self) -> Optional[Dict[str, Any]]:
+    def get_cached_weather(self) -> dict[str, Any] | None:
         """Returns cached weather if available, or fetches if missing."""
         with self.cache_lock:
             data = self.cache.get("weather")

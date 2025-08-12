@@ -4,12 +4,11 @@ Logging Configuration for Smart Decomposition Architecture
 Intelligent log decomposition with targeted investigation capabilities.
 """
 
+import re
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-import re
-from typing import Dict, Optional
 
 from pydantic import BaseModel
 
@@ -54,7 +53,7 @@ class LogConfig(BaseModel):
 
     # Base configuration - logs in app root, not project root
     log_dir: Path = Path(__file__).parent.parent.parent / "logs"
-    session_id: Optional[str] = None
+    session_id: str | None = None
 
     # Console configuration
     console_level: LogLevel = LogLevel.INFO
@@ -83,7 +82,7 @@ class LogConfig(BaseModel):
 
         # Note: log directory creation moved to LoggerFactory to allow config updates first
 
-    def get_log_files(self) -> Dict[LogCategory, LogFileConfig]:
+    def get_log_files(self) -> dict[LogCategory, LogFileConfig]:
         """Get configuration for all log files"""
         session_prefix = f"oamat_smart_{self.session_id}"
 

@@ -12,8 +12,7 @@ advanced reasoning methods to guide the LLM toward accurate results.
 """
 
 import json
-import os
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 from genfilemap.config import Config
 

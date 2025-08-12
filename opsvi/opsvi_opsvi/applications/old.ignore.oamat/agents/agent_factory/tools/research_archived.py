@@ -5,9 +5,9 @@ Research and knowledge gathering tools for LangGraph agents.
 Extracted from agent_factory.py for better modularity and maintainability.
 """
 
-from datetime import datetime
 import logging
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any
 
 from langchain_core.tools import tool
 from pydantic import BaseModel, Field
@@ -28,7 +28,7 @@ class ResearchRequest(BaseModel):
     depth: str = Field(
         "moderate", description="Research depth (basic, moderate, comprehensive)"
     )
-    sources: List[str] = Field(default_factory=list, description="Preferred sources")
+    sources: list[str] = Field(default_factory=list, description="Preferred sources")
 
 
 def create_knowledge_search_tool(neo4j_client=None):
@@ -36,8 +36,8 @@ def create_knowledge_search_tool(neo4j_client=None):
 
     @tool
     def knowledge_search(
-        query: str, knowledge_types: Optional[List[str]] = None, max_results: int = 10
-    ) -> Dict[str, Any]:
+        query: str, knowledge_types: list[str] | None = None, max_results: int = 10
+    ) -> dict[str, Any]:
         """
         Searches the Neo4j knowledge base for relevant information.
 

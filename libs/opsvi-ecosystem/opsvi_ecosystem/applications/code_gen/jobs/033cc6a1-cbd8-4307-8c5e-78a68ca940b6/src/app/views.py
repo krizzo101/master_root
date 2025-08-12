@@ -1,11 +1,12 @@
 """
 Flask view routes for the main application functions.
 """
-from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 import logging
-from .weather_client import get_weather_client, WeatherAPIError
+
+from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+
 from .config import Config
-from werkzeug.exceptions import abort
+from .weather_client import WeatherAPIError, get_weather_client
 
 main_bp = Blueprint("main", __name__)
 logger = logging.getLogger(__name__)
@@ -39,7 +40,7 @@ def index() -> str:
         error = str(exc)
         weather = None
         logger.error(f"Weather fetch failed: {exc}")
-    except Exception as exc:
+    except Exception:
         error = "Internal server error. Please try again later."
         weather = None
         logger.exception("Unexpected error in weather endpoint.")

@@ -7,10 +7,10 @@ subdivision while maintaining capability for genuinely complex problems.
 Core Principle: Market forces balance subdivision desire vs complexity management.
 """
 
+import logging
 from dataclasses import dataclass, field
 from enum import Enum
-import logging
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -37,7 +37,7 @@ class RewardParameters:
         9.0  # Override reward reduction if complexity extremely high
     )
     motivation_amplifier: float = 1.2  # How much reward affects effective complexity
-    domain_modifiers: Dict[IncentiveDomain, float] = field(
+    domain_modifiers: dict[IncentiveDomain, float] = field(
         default_factory=lambda: {
             IncentiveDomain.RESEARCH: 0.9,  # Slightly more conservative for research
             IncentiveDomain.SOFTWARE_DEVELOPMENT: 1.0,  # Baseline
@@ -71,7 +71,7 @@ class EconomicIncentiveCalculator:
     - Escape hatch allows genuine complexity to drive deep subdivision
     """
 
-    def __init__(self, parameters: Optional[RewardParameters] = None):
+    def __init__(self, parameters: RewardParameters | None = None):
         self.params = parameters or RewardParameters()
         self._subdivision_history: list[SubdivisionDecision] = []
 
@@ -136,7 +136,7 @@ class EconomicIncentiveCalculator:
         hierarchy_level: int,
         base_threshold: float = 4.0,
         domain: IncentiveDomain = IncentiveDomain.GENERAL,
-        context: Optional[Dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> SubdivisionDecision:
         """
         Make subdivision decision using economic incentive model.
@@ -194,7 +194,7 @@ class EconomicIncentiveCalculator:
 
         return decision
 
-    def get_subdivision_analytics(self) -> Dict[str, Any]:
+    def get_subdivision_analytics(self) -> dict[str, Any]:
         """Generate analytics on subdivision patterns and effectiveness"""
         if not self._subdivision_history:
             return {"message": "No subdivision decisions recorded"}
@@ -255,15 +255,15 @@ class WorkflowEconomicIntegration:
     Bridges the gap between economic calculations and practical workflow decisions.
     """
 
-    def __init__(self, calculator: Optional[EconomicIncentiveCalculator] = None):
+    def __init__(self, calculator: EconomicIncentiveCalculator | None = None):
         self.calculator = calculator or EconomicIncentiveCalculator()
 
     def evaluate_node_subdivision(
         self,
-        node_spec: Dict[str, Any],
+        node_spec: dict[str, Any],
         hierarchy_level: int,
-        context: Optional[Dict[str, Any]] = None,
-    ) -> Tuple[bool, Dict[str, Any]]:
+        context: dict[str, Any] | None = None,
+    ) -> tuple[bool, dict[str, Any]]:
         """
         Evaluate whether a workflow node should be subdivided.
 
@@ -299,7 +299,7 @@ class WorkflowEconomicIntegration:
         return decision.should_subdivide, metadata
 
     def recommend_subdivision_parameters(
-        self, historical_performance: Dict[str, Any]
+        self, historical_performance: dict[str, Any]
     ) -> RewardParameters:
         """
         Recommend economic parameters based on historical performance.

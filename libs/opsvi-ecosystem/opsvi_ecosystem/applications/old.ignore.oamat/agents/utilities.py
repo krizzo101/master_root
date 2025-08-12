@@ -7,7 +7,7 @@ that support the WorkflowManager's operations.
 
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .models import (
     EnhancedRequestAnalysis,
@@ -22,7 +22,7 @@ logger = logging.getLogger("OAMAT.Utilities")
 # JSON Processing Utilities
 
 
-def extract_structured_info(text_output: str, task_type: str = None) -> Dict[str, Any]:
+def extract_structured_info(text_output: str, task_type: str = None) -> dict[str, Any]:
     """Extract structured information from unstructured text output"""
     try:
         # Basic structured extraction for common patterns
@@ -128,7 +128,7 @@ def clean_json_response(response_text: str) -> str:
         return response_text
 
 
-def extract_json_from_response(response_text: str) -> Dict[str, Any]:
+def extract_json_from_response(response_text: str) -> dict[str, Any]:
     """Extract JSON from response text with multiple fallback strategies"""
     try:
         import re
@@ -191,7 +191,7 @@ def extract_json_from_response(response_text: str) -> Dict[str, Any]:
         return None
 
 
-def create_fallback_json_from_text(response_text: str) -> Optional[Dict[str, Any]]:
+def create_fallback_json_from_text(response_text: str) -> dict[str, Any] | None:
     """Create a fallback JSON structure by extracting key information from text"""
     try:
         import re
@@ -249,7 +249,7 @@ def create_fallback_json_from_text(response_text: str) -> Optional[Dict[str, Any
 
 
 def create_fallback_analysis(
-    user_request: str, context: Dict[str, Any] = None
+    user_request: str, context: dict[str, Any] = None
 ) -> EnhancedRequestAnalysis:
     """Create sophisticated fallback analysis when primary analysis fails."""
     return EnhancedRequestAnalysis(
@@ -308,8 +308,8 @@ def create_fallback_workflow(
 
 
 def create_fallback_decision(
-    available_options: List[str], error_reason: str
-) -> Dict[str, Any]:
+    available_options: list[str], error_reason: str
+) -> dict[str, Any]:
     """Create intelligent fallback decision when primary decision-making fails."""
     return {
         "selected_next_nodes": available_options[:1] if available_options else [],
@@ -331,7 +331,7 @@ def create_fallback_decision(
 
 def create_fallback_workflow_data(
     user_request: str, analysis: EnhancedRequestAnalysis
-) -> Dict:
+) -> dict:
     """Create fallback workflow data when structured generation fails."""
     return {
         "title": f"Fallback Workflow for: {user_request[:50]}...",
@@ -358,7 +358,7 @@ def create_fallback_workflow_data(
 # Serialization Utilities
 
 
-def serialize_analysis(analysis: EnhancedRequestAnalysis) -> Dict[str, Any]:
+def serialize_analysis(analysis: EnhancedRequestAnalysis) -> dict[str, Any]:
     """Serialize analysis object for JSON inclusion in prompts"""
     try:
         # Convert Pydantic model to dict

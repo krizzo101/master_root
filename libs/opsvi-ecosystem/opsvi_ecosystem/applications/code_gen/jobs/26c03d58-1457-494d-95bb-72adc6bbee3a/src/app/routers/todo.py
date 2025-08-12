@@ -1,16 +1,15 @@
 """
 Todo API router for CRUD operations.
 """
-from typing import List
-from fastapi import APIRouter, Depends, status, Path
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
+
+from fastapi import APIRouter, Depends, Path, status
+
 from app.models.todo import (
+    MessageResponse,
     TodoItemCreate,
-    TodoItemUpdate,
     TodoItemModel,
     TodoItemResponse,
-    MessageResponse,
+    TodoItemUpdate,
 )
 from app.services.todo_service import TodoService, get_todo_service
 
@@ -31,10 +30,10 @@ async def create_todo(
     return TodoItemResponse(data=todo)
 
 
-@router.get("", response_model=List[TodoItemModel], status_code=status.HTTP_200_OK)
+@router.get("", response_model=list[TodoItemModel], status_code=status.HTTP_200_OK)
 async def list_todos(
     service: TodoService = Depends(get_todo_service),
-) -> List[TodoItemModel]:
+) -> list[TodoItemModel]:
     """Retrieve all todo items."""
     return await service.list_items()
 

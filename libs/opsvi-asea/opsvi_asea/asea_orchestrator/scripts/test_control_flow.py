@@ -1,7 +1,6 @@
 import asyncio
 from asea_orchestrator.core import Orchestrator
 from asea_orchestrator.workflow import WorkflowManager
-from asea_orchestrator.plugins.types import PluginConfig
 
 
 # A simple plugin for testing state changes.

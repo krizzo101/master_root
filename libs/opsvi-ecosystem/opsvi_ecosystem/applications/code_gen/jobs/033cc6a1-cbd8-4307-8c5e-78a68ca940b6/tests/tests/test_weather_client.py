@@ -1,6 +1,7 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
-from app.weather_client import WeatherClient, WeatherAPIError
+from app.weather_client import WeatherAPIError, WeatherClient
 
 
 def test_weatherclient_initialization_sets_attributes_correctly():

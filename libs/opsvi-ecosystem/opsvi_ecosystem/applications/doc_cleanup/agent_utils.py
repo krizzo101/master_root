@@ -1,12 +1,11 @@
 import ast
 import os
 import subprocess
-from typing import List, Optional
 
 from src.shared.openai_interfaces.responses_interface import OpenAIResponsesInterface
 
 
-def get_changed_files(base_ref: str = "HEAD~1", target_ref: str = "HEAD") -> List[str]:
+def get_changed_files(base_ref: str = "HEAD~1", target_ref: str = "HEAD") -> list[str]:
     """
     Return a list of changed files between two git refs (default: last commit).
     """
@@ -46,7 +45,7 @@ def extract_code_summary(file_path: str) -> str:
 
 def extract_doc_section(
     code_file: str, docs_dir: str = "docs/applications/doc_cleanup/"
-) -> Optional[str]:
+) -> str | None:
     """
     Try to find and return the documentation section for a given code file.
     Looks for a .md file with a matching base name in docs_dir.

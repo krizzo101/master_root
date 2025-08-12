@@ -7,19 +7,18 @@ Uses OpenAI to understand project structure and generate meaningful documentatio
 
 from __future__ import annotations
 
-import logging
 import ast
-from typing import Dict, Any, List, Optional
-from pathlib import Path
+import logging
+from typing import Any
 
-from pydantic import BaseModel, Field
-
-from config import get_config
-from schemas import RequirementsSpec, ArchitectureSpec
 from local_shared.openai_interfaces.responses_interface import get_openai_interface
 
 # Model selector imported locally where needed
 from project_templates import ProjectType
+from pydantic import BaseModel, Field
+
+from config import get_config
+from schemas import ArchitectureSpec, RequirementsSpec
 
 logger = logging.getLogger(__name__)
 
@@ -38,8 +37,8 @@ class APIEndpoint(BaseModel):
     path: str = Field(..., description="Endpoint path")
     method: str = Field(..., description="HTTP method")
     description: str = Field(..., description="Endpoint description")
-    parameters: Optional[str] = Field(None, description="Parameters description")
-    response: Optional[str] = Field(None, description="Response description")
+    parameters: str | None = Field(None, description="Parameters description")
+    response: str | None = Field(None, description="Response description")
 
 
 class APISchema(BaseModel):
@@ -47,7 +46,7 @@ class APISchema(BaseModel):
 
     name: str = Field(..., description="Schema name")
     description: str = Field(..., description="Schema description")
-    properties: Optional[str] = Field(None, description="Schema properties")
+    properties: str | None = Field(None, description="Schema properties")
 
 
 class APIExample(BaseModel):
@@ -61,25 +60,25 @@ class APIExample(BaseModel):
 class APIDocumentation(BaseModel):
     """API-specific documentation."""
 
-    endpoints: List[APIEndpoint] = Field(
+    endpoints: list[APIEndpoint] = Field(
         default=[], description="API endpoint documentation"
     )
-    schemas: List[APISchema] = Field(
+    schemas: list[APISchema] = Field(
         default=[], description="Data schema documentation"
     )
-    examples: List[APIExample] = Field(default=[], description="Usage examples")
+    examples: list[APIExample] = Field(default=[], description="Usage examples")
 
 
 class DocumentationPackage(BaseModel):
     """Complete documentation package."""
 
     readme: str = Field(..., description="Main README.md content")
-    api_docs: Optional[APIDocumentation] = Field(None, description="API documentation")
+    api_docs: APIDocumentation | None = Field(None, description="API documentation")
     user_guide: str = Field(..., description="User guide content")
     developer_guide: str = Field(..., description="Developer/contributor guide")
     troubleshooting: str = Field(..., description="Common issues and solutions")
     changelog: str = Field(..., description="Version history and changes")
-    additional_sections: List[DocumentationSection] = Field(
+    additional_sections: list[DocumentationSection] = Field(
         default=[], description="Additional documentation sections"
     )
 
@@ -93,8 +92,8 @@ class AIDocumentationGenerator:
 
     def generate_documentation(
         self,
-        generated_files: List[Dict[str, str]],
-        test_files: List[Dict[str, str]],
+        generated_files: list[dict[str, str]],
+        test_files: list[dict[str, str]],
         requirements: RequirementsSpec,
         architecture: ArchitectureSpec,
         project_type: ProjectType,
@@ -164,8 +163,8 @@ class AIDocumentationGenerator:
             )
 
     def _analyze_code_for_docs(
-        self, generated_files: List[Dict[str, str]]
-    ) -> Dict[str, Any]:
+        self, generated_files: list[dict[str, str]]
+    ) -> dict[str, Any]:
         """Analyze code structure for documentation purposes."""
 
         analysis = {
@@ -379,9 +378,9 @@ SCRIPT DOCUMENTATION SPECIFIC REQUIREMENTS:
 
     def _build_docs_user_prompt(
         self,
-        generated_files: List[Dict[str, str]],
-        test_files: List[Dict[str, str]],
-        code_analysis: Dict[str, Any],
+        generated_files: list[dict[str, str]],
+        test_files: list[dict[str, str]],
+        code_analysis: dict[str, Any],
         requirements: RequirementsSpec,
         architecture: ArchitectureSpec,
         project_type: ProjectType,
@@ -467,7 +466,7 @@ Make the documentation professional, comprehensive, and user-friendly for both t
 
     def _fallback_documentation_generation(
         self,
-        generated_files: List[Dict[str, str]],
+        generated_files: list[dict[str, str]],
         requirements: RequirementsSpec,
         architecture: ArchitectureSpec,
         project_type: ProjectType,
@@ -685,8 +684,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 def generate_ai_documentation(
-    generated_files: List[Dict[str, str]],
-    test_files: List[Dict[str, str]],
+    generated_files: list[dict[str, str]],
+    test_files: list[dict[str, str]],
     requirements: RequirementsSpec,
     architecture: ArchitectureSpec,
     project_type: ProjectType,

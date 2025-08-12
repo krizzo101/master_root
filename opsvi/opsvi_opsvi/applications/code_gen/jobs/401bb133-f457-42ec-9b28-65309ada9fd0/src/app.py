@@ -5,8 +5,9 @@ A simple, production-ready Flask application that exposes a single GET route at 
 Returns 'Hello, World!' as the response.
 """
 
-from flask import Flask, Response, request
 import logging
+
+from flask import Flask, Response, request
 
 
 def create_app() -> Flask:

@@ -1,10 +1,11 @@
 import logging
-from typing import List
+
 from fastapi import FastAPI, HTTPException, Path, Request, status
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-from app.models import TaskCreate, TaskUpdate, Task, ErrorResponse
+
+from app.models import ErrorResponse, Task, TaskCreate, TaskUpdate
 from app.storage import TaskStorage
 
 logger = logging.getLogger("task_api")
@@ -67,12 +68,12 @@ async def create_task(task_data: TaskCreate) -> Task:
 
 @app.get(
     "/tasks",
-    response_model=List[Task],
+    response_model=list[Task],
     summary="List All Tasks",
     responses={200: {"description": "List of all tasks."}},
     tags=["Tasks"],
 )
-async def get_all_tasks() -> List[Task]:
+async def get_all_tasks() -> list[Task]:
     """Retrieve a list of all tasks in the system."""
     tasks = storage.list_tasks()
     logger.info(f"Retrieved {len(tasks)} tasks")

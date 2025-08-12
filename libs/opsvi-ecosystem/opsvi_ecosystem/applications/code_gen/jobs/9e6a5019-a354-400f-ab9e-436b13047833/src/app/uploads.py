@@ -1,7 +1,7 @@
 """
 Flask-Uploads configuration for image uploads.
 """
-from flask_uploads import UploadSet, IMAGES, configure_uploads
+from flask_uploads import IMAGES, UploadSet
 
 images = UploadSet("images", IMAGES)
 

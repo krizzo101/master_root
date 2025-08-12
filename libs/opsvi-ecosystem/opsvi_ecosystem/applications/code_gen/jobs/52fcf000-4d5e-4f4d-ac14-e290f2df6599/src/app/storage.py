@@ -2,14 +2,14 @@
 File upload/storage logic. Supports S3 or secure local filesystem.
 Handles uploads, secure filename, retention.
 """
-import os
-import shutil
-from pathlib import Path
-import uuid
-from typing import Optional
-from fastapi import UploadFile, HTTPException
-from app.config import settings
 import logging
+import os
+import uuid
+from pathlib import Path
+
+from fastapi import HTTPException, UploadFile
+
+from app.config import settings
 
 logger = logging.getLogger("storage")
 
@@ -24,7 +24,7 @@ def secure_filename(filename: str) -> str:
     return f"{uuid.uuid4().hex}_{fname}{ext}"
 
 
-def save_upload_file(upload_file: UploadFile, subdir: Optional[str] = None) -> str:
+def save_upload_file(upload_file: UploadFile, subdir: str | None = None) -> str:
     """Store upload to configured storage, return absolute file path. Only stores on local filesystem in this implementation."""
     upload_dir = Path(settings.UPLOAD_DIR)
     if subdir:

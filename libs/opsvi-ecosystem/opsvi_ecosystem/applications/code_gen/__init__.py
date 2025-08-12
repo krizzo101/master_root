@@ -1,7 +1,7 @@
 """Code generation utility package initializer."""
 
-from pathlib import Path
 import sys as _sys
+from pathlib import Path
 
 pkg_dir = Path(__file__).parent
 if str(pkg_dir) not in _sys.path:

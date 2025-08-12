@@ -1,7 +1,5 @@
-import os
-import pytest
-from fastapi.testclient import TestClient
 from app.main import app
+from fastapi.testclient import TestClient
 
 
 def get_token_and_project(client):

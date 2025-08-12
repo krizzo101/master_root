@@ -108,7 +108,6 @@ def create_configured_arango_enhancement():
 async def execute_configured_enhancement():
     """Execute the properly configured enhancement workflow."""
     import sys
-    import os
 
     # Add orchestrator to path
     sys.path.append("/home/opsvi/asea/asea_orchestrator/src")
@@ -172,8 +171,8 @@ async def execute_configured_enhancement():
 
         print("✅ Analysis completed successfully!")
         print(f"📊 Final state keys: {list(final_state.keys())}")
-        print(f"📁 Analysis document: /home/opsvi/asea/arango_graph_analysis.md")
-        print(f"💾 Results stored in collection: graph_enhancement_analysis")
+        print("📁 Analysis document: /home/opsvi/asea/arango_graph_analysis.md")
+        print("💾 Results stored in collection: graph_enhancement_analysis")
 
         # Display key findings
         if "collection_count" in final_state:

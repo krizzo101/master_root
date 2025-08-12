@@ -10,10 +10,10 @@ by constructing an in-memory enhancement request and running the self-improvemen
 
 import ast
 import difflib
-from pathlib import Path
 import re
 import sys
-from typing import Any, Dict, List, Tuple
+from pathlib import Path
+from typing import Any
 
 from src.tools.code_generation.o3_code_generator.import_fix_script import (
     analyze_with_rules,
@@ -25,14 +25,14 @@ from src.tools.code_generation.o3_code_generator.o3_logger.logger import (
 )
 
 
-def load_rules(logger: Any) -> Dict[str, str]:
+def load_rules(logger: Any) -> dict[str, str]:
     """Load project and universal rules as text."""
     base_dir = Path(__file__).parent / "docs"
     paths = {
         "project": base_dir / "project_rules.md",
         "universal": base_dir / "universal_rules.md",
     }
-    rules: Dict[str, str] = {}
+    rules: dict[str, str] = {}
     for key, path in paths.items():
         try:
             rules[key] = path.read_text(encoding="utf-8")
@@ -42,7 +42,7 @@ def load_rules(logger: Any) -> Dict[str, str]:
     return rules
 
 
-def parse_args(argv: List[str], logger: Any) -> Path:
+def parse_args(argv: list[str], logger: Any) -> Path:
     """Parse and validate command-line arguments."""
     if len(argv) != 2:
         logger.log_error(
@@ -59,8 +59,8 @@ def parse_args(argv: List[str], logger: Any) -> Path:
 
 
 def apply_fixes(
-    original_code: str, enhancement_requests: List[Dict[str, Any]], logger: Any
-) -> Tuple[str, bool]:
+    original_code: str, enhancement_requests: list[dict[str, Any]], logger: Any
+) -> tuple[str, bool]:
     """Apply enhancement requests to the original code and return modified code and flag."""
     lines = original_code.splitlines(keepends=True)
     changes_made = False

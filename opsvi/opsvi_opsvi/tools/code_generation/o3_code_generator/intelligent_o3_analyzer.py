@@ -16,8 +16,8 @@ from src.tools.code_generation.o3_code_generator.o3_logger.logger import (
 
 setup_logger(LogConfig())
 import argparse
-from pathlib import Path
 import time
+from pathlib import Path
 from typing import Any
 
 from src.tools.code_generation.o3_code_generator.auto_rules_generation.ast_analyzer import (

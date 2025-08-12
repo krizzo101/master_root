@@ -5,8 +5,8 @@ Tests the actual 6-factor complexity analysis engine using real implementations
 instead of mocks. This provides genuine TDD validation of working code.
 """
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pytest
 

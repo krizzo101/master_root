@@ -1,6 +1,4 @@
-import pytest
 from multiagent_cli import logs
-import os
 
 
 def test_get_log_file_path_returns_valid_path(tmp_path):

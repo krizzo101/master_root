@@ -12,7 +12,7 @@ and extract structured content from them.
 """
 
 import re
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any
 import os
 import logging
 

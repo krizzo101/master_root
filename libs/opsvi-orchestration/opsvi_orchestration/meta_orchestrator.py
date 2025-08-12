@@ -1,18 +1,14 @@
 """Meta-orchestrator for coordinating the software factory pipeline."""
 
-import asyncio
 import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional
-from uuid import UUID, uuid4
 
 from celery.result import AsyncResult
 
 from .dag_loader import dag_loader
-from .registry import registry
-from .task_models import Project, Run, TaskRecord, TaskStatus, Critique
+from .task_models import Project, Run
 from ..memory.graph.neo4j_client import get_neo4j_client
-from ..workers.celery_app import celery_app
 from ..workers.tasks import (
     execute_plan_task,
     execute_spec_task,

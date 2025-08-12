@@ -114,7 +114,7 @@ async def demonstrate_cognitive_enhancement():
             },
         )
 
-        print(f"\n✓ Cognitive enhancement workflow completed successfully!")
+        print("\n✓ Cognitive enhancement workflow completed successfully!")
         print("\nWorkflow Results:")
         for key, value in result.items():
             if key != "run_id":
@@ -188,7 +188,7 @@ async def demonstrate_simple_ai_workflow():
             "ai_coordination_demo", {"task": "Demonstrate AI plugin coordination"}
         )
 
-        print(f"✓ AI coordination workflow completed!")
+        print("✓ AI coordination workflow completed!")
         print(f"Budget Analysis: {result.get('budget_estimate', 'Not available')}")
         print(
             f"Workflow Intelligence: {result.get('workflow_analysis', 'Not available')}"

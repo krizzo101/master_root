@@ -5,7 +5,6 @@ Cognitive Migration Script: Transform all memories to semantic cognitive concept
 
 import json
 import sys
-import os
 
 sys.path.append("/home/opsvi/asea/development")
 
@@ -80,13 +79,13 @@ def main():
 
         print(f"   ✅ Generated {len(concepts)} concepts")
 
-    print(f"\n📈 Migration Summary:")
+    print("\n📈 Migration Summary:")
     print(f"   🧠 Total Concepts: {len(all_concepts)}")
     print(f"   🏷️  Knowledge Domains: {len(all_domains)}")
     print(f"   🌐 Domains: {', '.join(sorted(all_domains))}")
 
     # Output for MCP batch insertion
-    print(f"\n🔧 Concepts for batch insertion:")
+    print("\n🔧 Concepts for batch insertion:")
     print("=" * 50)
     print(json.dumps(all_concepts, indent=2))
 
@@ -105,7 +104,7 @@ def main():
             }
         )
 
-    print(f"\n🏷️  Domain records for batch insertion:")
+    print("\n🏷️  Domain records for batch insertion:")
     print("=" * 50)
     print(json.dumps(domain_records, indent=2))
 

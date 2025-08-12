@@ -25,10 +25,9 @@ File Scanner Module for Documentation Rule Generator.
 This module provides functionality to scan directories for documentation files.
 """
 
-import os
 import logging
 from pathlib import Path
-from typing import List, Set
+from typing import List
 
 # Configure logging
 logging.basicConfig(

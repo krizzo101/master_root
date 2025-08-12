@@ -3,7 +3,9 @@ Flask application factory module.
 Initializes Flask app and loads configurations.
 """
 import logging
+
 from flask import Flask
+
 from .config import Config
 
 

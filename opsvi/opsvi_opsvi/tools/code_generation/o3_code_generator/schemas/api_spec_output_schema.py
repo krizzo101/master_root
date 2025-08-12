@@ -5,7 +5,8 @@ Defines the structure for API specification generation outputs with
 validation framework integration.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 from pydantic import Field
 
 from .base_output_schema import BaseGeneratorOutput
@@ -19,20 +20,20 @@ class APISpecOutput(BaseGeneratorOutput):
     framework integration with success/error reporting.
     """
 
-    api_spec: Dict[str, Any] = Field(
+    api_spec: dict[str, Any] = Field(
         default_factory=dict,
         description="Generated API specification in OpenAPI format",
     )
 
-    endpoints: List[Dict[str, Any]] = Field(
+    endpoints: list[dict[str, Any]] = Field(
         default_factory=list, description="List of API endpoints with details"
     )
 
-    models: List[Dict[str, Any]] = Field(
+    models: list[dict[str, Any]] = Field(
         default_factory=list, description="Data models/schemas used in the API"
     )
 
-    authentication: Optional[Dict[str, Any]] = Field(
+    authentication: dict[str, Any] | None = Field(
         default=None, description="Authentication configuration"
     )
 
@@ -53,13 +54,13 @@ class APISpecOutput(BaseGeneratorOutput):
         self.endpoints.append(endpoint)
         self.add_metadata("endpoint_count", len(self.endpoints))
 
-    def add_model(self, name: str, properties: Dict[str, Any], **kwargs) -> None:
+    def add_model(self, name: str, properties: dict[str, Any], **kwargs) -> None:
         """Add a data model to the API specification."""
         model = {"name": name, "properties": properties, **kwargs}
         self.models.append(model)
         self.add_metadata("model_count", len(self.models))
 
-    def set_authentication(self, auth_type: str, config: Dict[str, Any]) -> None:
+    def set_authentication(self, auth_type: str, config: dict[str, Any]) -> None:
         """Set authentication configuration for the API."""
         self.authentication = {"type": auth_type, "config": config}
         self.add_metadata("auth_type", auth_type)

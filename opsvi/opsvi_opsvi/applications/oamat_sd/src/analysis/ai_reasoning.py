@@ -7,7 +7,7 @@ Extracted from complexity_model.py for better modularity.
 
 import logging
 import re
-from typing import Any, Dict, Optional
+from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
@@ -18,7 +18,7 @@ from src.applications.oamat_sd.src.config.config_manager import ConfigManager
 class AIReasoningEngine:
     """Handles AI reasoning for complexity analysis"""
 
-    def __init__(self, model_config: Optional[Dict[str, Any]] = None):
+    def __init__(self, model_config: dict[str, Any] | None = None):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
         # NO FALLBACKS RULE: Model configuration strictly required
@@ -39,8 +39,8 @@ class AIReasoningEngine:
         self.logger.info(f"✅ AI Reasoning Engine initialized with model: {model_name}")
 
     async def analyze_complexity_factors(
-        self, request, request_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, request, request_context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Use AI to analyze complexity factors for the request"""
 
         # Create comprehensive prompt for AI analysis
@@ -90,8 +90,8 @@ Provide complexity analysis for all 6 factors with scores 1-10 and reasoning."""
             )
 
     async def analyze_complexity_reasoning(
-        self, factors: Dict[str, Any], request_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, factors: dict[str, Any], request_context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Use AI to provide overall complexity reasoning and strategy"""
 
         # Create reasoning prompt
@@ -144,8 +144,8 @@ Provide overall complexity reasoning, execution strategy, and recommendations.""
             )
 
     async def _parse_factors_response(
-        self, ai_response: str, request_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, ai_response: str, request_context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Parse AI response into the 6 required complexity factors"""
         factors = {}
         response_lower = ai_response.lower()
@@ -246,8 +246,8 @@ Provide overall complexity reasoning, execution strategy, and recommendations.""
         return factors
 
     async def _parse_reasoning_response(
-        self, ai_response: str, factors: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, ai_response: str, factors: dict[str, Any]
+    ) -> dict[str, Any]:
         """Parse AI reasoning response into structured analysis"""
         response_lower = ai_response.lower()
 

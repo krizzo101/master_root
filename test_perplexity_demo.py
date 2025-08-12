@@ -8,7 +8,8 @@ with a mock API key for testing purposes.
 
 import asyncio
 import os
-from opsvi_llm import PerplexityProvider, PerplexityConfig, ChatRequest, Message
+
+from opsvi_llm import ChatRequest, Message, PerplexityConfig, PerplexityProvider
 
 
 async def test_perplexity_provider():

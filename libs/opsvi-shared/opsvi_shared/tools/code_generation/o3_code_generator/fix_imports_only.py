@@ -7,7 +7,6 @@ without the complexity of AST validation that was causing issues.
 import re
 import sys
 from pathlib import Path
-from typing import List, Dict, Any
 
 
 def fix_imports_in_file(file_path: str) -> bool:
@@ -59,7 +58,7 @@ def fix_imports_in_file(file_path: str) -> bool:
             return True
         else:
             return False
-    except Exception as e:
+    except Exception:
         return False
     else:
         pass

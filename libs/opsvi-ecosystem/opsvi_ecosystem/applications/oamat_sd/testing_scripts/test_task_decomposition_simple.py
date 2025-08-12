@@ -12,7 +12,6 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # Standalone implementation for testing without full OAMAT imports
 from dataclasses import dataclass
 from enum import Enum
-from typing import List
 
 
 class TaskComplexity(Enum):
@@ -30,8 +29,8 @@ class SubTask:
     description: str
     agent_role: str
     estimated_effort: int  # 1-10 scale
-    dependencies: List[str]
-    file_outputs: List[str]
+    dependencies: list[str]
+    file_outputs: list[str]
     parallel_safe: bool = True
 
 
@@ -84,7 +83,7 @@ class SimpleTaskDecomposer:
 
     def decompose_coding_task(
         self, task_description: str, user_request: str, complexity: TaskComplexity
-    ) -> List[SubTask]:
+    ) -> list[SubTask]:
         """Decompose coding tasks into parallel components"""
         subtasks = []
         task_lower = task_description.lower()

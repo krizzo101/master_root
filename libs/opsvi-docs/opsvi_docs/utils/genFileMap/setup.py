@@ -2,7 +2,6 @@
 Setup script for genfilemap package.
 """
 
-import os
 from setuptools import setup, find_packages
 
 # Read the content of README.md

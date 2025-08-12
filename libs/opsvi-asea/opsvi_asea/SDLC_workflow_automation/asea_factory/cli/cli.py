@@ -1,10 +1,8 @@
 import argparse
 import sys
-from asea_factory.agents.base import AgentBase
 
 from asea_factory.orchestrator import PipelineOrchestrator
 import yaml
-import os
 
 
 def main():

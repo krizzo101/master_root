@@ -36,7 +36,7 @@ import os
 import logging
 import re
 from pathlib import Path
-from typing import Dict, List, Any, Set
+from typing import Dict, List, Any
 
 # Configure logging
 logging.basicConfig(

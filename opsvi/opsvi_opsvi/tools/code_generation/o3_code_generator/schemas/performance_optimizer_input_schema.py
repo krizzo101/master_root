@@ -4,7 +4,6 @@ Input schema for Performance Optimizer.
 This module defines the Pydantic schema for performance optimizer input configuration.
 """
 
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -90,7 +89,7 @@ class PerformanceOptimizerInput(BaseModel):
     )
 
     # Output options
-    output_file: Optional[str] = Field(
+    output_file: str | None = Field(
         _default=None, description="Output file for results"
     )
     output_format: str = Field(

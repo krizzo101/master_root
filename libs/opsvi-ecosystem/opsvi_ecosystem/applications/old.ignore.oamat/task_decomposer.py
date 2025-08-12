@@ -3,10 +3,10 @@ OAMAT Task Decomposition Module
 Breaks large agent tasks into smaller parallel sub-workflows
 """
 
+import logging
 from dataclasses import dataclass
 from enum import Enum
-import logging
-from typing import Any, Dict, List
+from typing import Any
 
 # Import the new file generation orchestrator
 from src.applications.oamat.file_generation_orchestrator import (
@@ -30,13 +30,13 @@ class SubTask:
     description: str
     agent_role: str
     estimated_effort: int  # 1-10 scale
-    dependencies: List[str]
-    file_outputs: List[str]
-    tools_needed: List[str]
+    dependencies: list[str]
+    file_outputs: list[str]
+    tools_needed: list[str]
     parallel_safe: bool = True
 
     # NEW: File-level parallel generation specs
-    file_specs: List[FileSpec] = None
+    file_specs: list[FileSpec] = None
     enable_file_parallelization: bool = True
 
 
@@ -105,7 +105,7 @@ class TaskDecomposer:
 
     def decompose_task(
         self, task_description: str, agent_role: str, user_request: str
-    ) -> List[SubTask]:
+    ) -> list[SubTask]:
         """Main method to decompose a task into subtasks"""
         complexity = self.analyze_task_complexity(task_description, agent_role)
 
@@ -125,7 +125,7 @@ class TaskDecomposer:
 
     def _decompose_coding_task(
         self, task_description: str, user_request: str, complexity: TaskComplexity
-    ) -> List[SubTask]:
+    ) -> list[SubTask]:
         """Decompose coding tasks into parallel components"""
         subtasks = []
         task_lower = task_description.lower()
@@ -505,7 +505,7 @@ class TaskDecomposer:
 
     def _decompose_testing_task(
         self, task_description: str, user_request: str, complexity: TaskComplexity
-    ) -> List[SubTask]:
+    ) -> list[SubTask]:
         """Decompose testing tasks"""
         subtasks = []
 
@@ -665,7 +665,7 @@ class TaskDecomposer:
 
     def _decompose_documentation_task(
         self, task_description: str, user_request: str, complexity: TaskComplexity
-    ) -> List[SubTask]:
+    ) -> list[SubTask]:
         """Decompose documentation tasks"""
         subtasks = []
 
@@ -842,13 +842,13 @@ class TaskDecomposer:
 
     def _decompose_planning_task(
         self, task_description: str, user_request: str, complexity: TaskComplexity
-    ) -> List[SubTask]:
+    ) -> list[SubTask]:
         """Decompose planning tasks"""
         return []  # Planning typically shouldn't be decomposed
 
     def _decompose_review_task(
         self, task_description: str, user_request: str, complexity: TaskComplexity
-    ) -> List[SubTask]:
+    ) -> list[SubTask]:
         """Decompose review tasks"""
         subtasks = []
 
@@ -900,7 +900,7 @@ class SubWorkflowOrchestrator:
         # Initialize file generation orchestrator for file-level parallelization
         self.file_orchestrator = FileGenerationOrchestrator(main_oamat_instance)
 
-    async def execute_subtasks(self, subtasks: List[SubTask], base_state: Dict) -> Dict:
+    async def execute_subtasks(self, subtasks: list[SubTask], base_state: dict) -> dict:
         """Execute subtasks with dependency management"""
         if not subtasks:
             return {"success": False, "error": "No subtasks provided"}
@@ -945,8 +945,8 @@ class SubWorkflowOrchestrator:
         }
 
     def _organize_by_dependencies(
-        self, subtasks: List[SubTask]
-    ) -> Dict[int, List[SubTask]]:
+        self, subtasks: list[SubTask]
+    ) -> dict[int, list[SubTask]]:
         """Organize subtasks by dependency levels for parallel execution"""
         levels = {}
         subtask_map = {task.id: task for task in subtasks}
@@ -984,8 +984,8 @@ class SubWorkflowOrchestrator:
         return levels
 
     async def _execute_level_parallel(
-        self, tasks: List[SubTask], base_state: Dict
-    ) -> Dict:
+        self, tasks: list[SubTask], base_state: dict
+    ) -> dict:
         """Execute all tasks in a level in parallel"""
         import asyncio
 
@@ -1024,7 +1024,7 @@ class SubWorkflowOrchestrator:
             self.logger.error(f"Level parallel execution failed: {e}")
             return {task.id: {"success": False, "error": str(e)} for task in tasks}
 
-    async def _execute_single_subtask(self, subtask: SubTask, base_state: Dict) -> Dict:
+    async def _execute_single_subtask(self, subtask: SubTask, base_state: dict) -> dict:
         """Execute a single subtask, with file-level parallelization if enabled"""
 
         try:
@@ -1087,8 +1087,8 @@ class SubWorkflowOrchestrator:
             return {"success": False, "subtask_id": subtask.id, "error": str(e)}
 
     def _prepare_subtask_context(
-        self, subtask: SubTask, base_state: Dict
-    ) -> Dict[str, Any]:
+        self, subtask: SubTask, base_state: dict
+    ) -> dict[str, Any]:
         """Prepare context for subtask execution"""
 
         subtask_context = base_state.copy()
@@ -1116,8 +1116,8 @@ class SubWorkflowOrchestrator:
         return subtask_context
 
     def _get_dependency_context(
-        self, subtask: SubTask, base_state: Dict
-    ) -> Dict[str, Any]:
+        self, subtask: SubTask, base_state: dict
+    ) -> dict[str, Any]:
         """Get context from completed dependency subtasks"""
         dependency_context = {}
 
@@ -1139,8 +1139,8 @@ class SubWorkflowOrchestrator:
         return dependency_context
 
     async def _execute_traditional_subtask(
-        self, subtask: SubTask, subtask_context: Dict
-    ) -> Dict:
+        self, subtask: SubTask, subtask_context: dict
+    ) -> dict:
         """Execute subtask using traditional single-agent approach"""
 
         try:

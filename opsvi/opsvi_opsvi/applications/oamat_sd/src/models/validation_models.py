@@ -7,7 +7,7 @@ Extracted from request_validation.py for better modularity.
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class RequestType(str, Enum):
@@ -37,8 +37,8 @@ class RequestField:
     description: str
     field_type: type
     required: bool = True
-    default: Optional[Any] = None
-    validation_pattern: Optional[str] = None
+    default: Any | None = None
+    validation_pattern: str | None = None
 
 
 @dataclass
@@ -47,13 +47,13 @@ class RequestSchema:
 
     request_type: RequestType
     description: str
-    fields: List[RequestField]
+    fields: list[RequestField]
 
-    def get_required_fields(self) -> List[RequestField]:
+    def get_required_fields(self) -> list[RequestField]:
         """Get all required fields for this schema."""
         return [field for field in self.fields if field.required]
 
-    def get_optional_fields(self) -> List[RequestField]:
+    def get_optional_fields(self) -> list[RequestField]:
         """Get all optional fields for this schema."""
         return [field for field in self.fields if not field.required]
 
@@ -64,10 +64,10 @@ class ValidationResult:
 
     request_type: RequestType
     is_valid: bool
-    missing_fields: List[str]
-    extracted_info: Dict[str, Any]
+    missing_fields: list[str]
+    extracted_info: dict[str, Any]
     confidence: float
-    validation_errors: List[str] = field(default_factory=list)
+    validation_errors: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -78,32 +78,32 @@ class InformationGap:
     priority: GapPriority
     description: str
     researchable: bool
-    suggested_defaults: List[Any] = field(default_factory=list)
-    research_keywords: List[str] = field(default_factory=list)
+    suggested_defaults: list[Any] = field(default_factory=list)
+    research_keywords: list[str] = field(default_factory=list)
 
 
 @dataclass
 class GapAnalysisResult:
     """Result of gap analysis process."""
 
-    gaps: List[InformationGap]
+    gaps: list[InformationGap]
     confidence: float
     completeness_score: float
     critical_gaps_count: int
-    researchable_gaps: List[InformationGap] = field(default_factory=list)
-    unresearchable_gaps: List[InformationGap] = field(default_factory=list)
+    researchable_gaps: list[InformationGap] = field(default_factory=list)
+    unresearchable_gaps: list[InformationGap] = field(default_factory=list)
 
 
 @dataclass
 class CompletionResult:
     """Result of information completion process."""
 
-    filled_fields: Dict[str, Any]
-    applied_defaults: Dict[str, Any]
-    research_results: Dict[str, Any]
-    assumptions: List[str]
+    filled_fields: dict[str, Any]
+    applied_defaults: dict[str, Any]
+    research_results: dict[str, Any]
+    assumptions: list[str]
     escalation_required: bool
-    critical_gaps_remaining: List[str]
+    critical_gaps_remaining: list[str]
 
 
 @dataclass
@@ -113,5 +113,5 @@ class ClarificationQuestion:
     field_name: str
     question: str
     importance_explanation: str
-    options: List[str] = field(default_factory=list)
-    default_option: Optional[str] = None
+    options: list[str] = field(default_factory=list)
+    default_option: str | None = None

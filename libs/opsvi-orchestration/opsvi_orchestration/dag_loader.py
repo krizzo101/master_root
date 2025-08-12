@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Set
 import yaml
 from pydantic import BaseModel, Field
 
-from .task_models import TaskType, TaskPriority, TaskStatus
+from .task_models import TaskType, TaskPriority
 
 logger = logging.getLogger(__name__)
 

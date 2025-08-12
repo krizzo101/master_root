@@ -14,7 +14,6 @@ import os
 import sys
 from pathlib import Path
 from arango import ArangoClient
-from dotenv import load_dotenv
 
 # Add project root to the Python path
 project_root = Path(__file__).resolve().parents[2]
@@ -39,10 +38,10 @@ def setup_test_collection():
         client = ArangoClient(hosts=HOST)
         db = client.db(DB_NAME, username=USER, password=PASSWORD)
         if not db.has_collection("workflow_states"):
-            print(f"Creating test collection: 'workflow_states'...")
+            print("Creating test collection: 'workflow_states'...")
             db.create_collection("workflow_states")
         else:
-            print(f"Test collection 'workflow_states' already exists.")
+            print("Test collection 'workflow_states' already exists.")
     except Exception as e:
         print(f"!! Failed to set up ArangoDB collection: {e}")
         print("!! Please ensure ArangoDB is running and credentials are correct.")

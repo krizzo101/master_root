@@ -5,8 +5,8 @@ Tests the dynamic agent creation system that instantiates specialized agents
 based on complexity analysis and request requirements.
 """
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -21,6 +21,7 @@ from oamat_sd.src.agents.agent_factory import (
     AgentStatus,
     DynamicAgentFactory,
 )
+
 from tests.fixtures.test_data import (
     COMPLEX_REQUESTS,
     MEDIUM_REQUESTS,

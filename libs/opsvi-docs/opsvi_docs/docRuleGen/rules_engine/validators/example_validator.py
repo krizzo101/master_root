@@ -11,7 +11,7 @@ This module provides a validator for checking examples in rules.
 """
 
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 
 from .rule_validator import RuleValidator
 

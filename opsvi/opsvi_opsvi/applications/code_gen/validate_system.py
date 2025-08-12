@@ -6,13 +6,12 @@ Validates the entire code_gen system before deployment.
 Runs all tests, checks configurations, validates dependencies.
 """
 
-import sys
-import subprocess
 import logging
-from pathlib import Path
-from typing import List, Dict, Any
-import tempfile
 import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
 
 # Setup logging
 logging.basicConfig(
@@ -26,8 +25,8 @@ class SystemValidator:
 
     def __init__(self):
         self.app_dir = Path(__file__).parent
-        self.failures: List[str] = []
-        self.warnings: List[str] = []
+        self.failures: list[str] = []
+        self.warnings: list[str] = []
 
     def run_validation(self) -> bool:
         """Run complete system validation."""
@@ -63,8 +62,8 @@ class SystemValidator:
         logger.info("Validating approved models only...")
 
         from local_shared.openai_interfaces.model_selector import (
-            ModelSelector,
             APPROVED_MODELS,
+            ModelSelector,
         )
 
         # Check approved models list
@@ -196,8 +195,10 @@ class SystemValidator:
         logger.info("Validating AI modules...")
 
         from unittest.mock import Mock, patch
+
         from ai_agents import detect_project_type_with_ai
         from ai_code_generator import AICodeGenerator
+
         from schemas import ProjectType
 
         # Test project type detection with mock
@@ -224,7 +225,7 @@ class SystemValidator:
         """Validate pipeline construction and basic execution."""
         logger.info("Validating pipeline...")
 
-        from pipeline import build_pipeline, _SequentialPipeline
+        from pipeline import _SequentialPipeline, build_pipeline
 
         # Test pipeline construction
         pipeline = build_pipeline([])
@@ -254,8 +255,9 @@ class SystemValidator:
         """Validate API construction."""
         logger.info("Validating API...")
 
-        from api import app
         from fastapi.testclient import TestClient
+
+        from api import app
 
         # Test API construction
         if not app:

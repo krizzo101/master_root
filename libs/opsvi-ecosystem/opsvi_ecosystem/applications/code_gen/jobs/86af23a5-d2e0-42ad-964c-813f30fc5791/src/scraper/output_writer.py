@@ -5,14 +5,13 @@ Serializes headlines into structured UTF-8 encoded output files (CSV, JSON, or t
 """
 import csv
 import json
-from typing import List, Dict
 import logging
 
 logger = logging.getLogger("scraper.output_writer")
 
 
 def write_headlines(
-    headline_data: List[Dict[str, str]], filename: str, fmt: str = "csv"
+    headline_data: list[dict[str, str]], filename: str, fmt: str = "csv"
 ) -> None:
     """
     Write headlines to an output file in the specified format (csv, json, txt).

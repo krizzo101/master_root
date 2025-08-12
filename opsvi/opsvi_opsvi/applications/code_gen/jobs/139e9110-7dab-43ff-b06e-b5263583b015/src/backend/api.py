@@ -2,38 +2,29 @@
 API CRUD and business logic endpoints for projects, tasks, comments, users, time entries, dashboards, reporting.
 """
 import logging
+
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
-    status,
-    Request,
-    UploadFile,
-    File as FastAPIFile,
 )
 from sqlalchemy.orm import Session
-from backend.models import (
-    Project,
-    Task,
-    User,
-    Comment,
-    File as FileModel,
-    TimeEntry,
-    Dependency,
-    TaskStatus,
-)
-from backend.database import get_db
-from backend.auth import get_current_user, require_role
+
 from backend.ai import (
-    prioritize_tasks,
-    estimate_duration,
     detect_dependencies,
+    estimate_duration,
+    prioritize_tasks,
     suggest_schedule,
 )
 from backend.audit import log_audit
-from backend.utils import paginate
-from typing import List
-import uuid
+from backend.auth import get_current_user
+from backend.database import get_db
+from backend.models import (
+    Comment,
+    Project,
+    Task,
+    TaskStatus,
+    User,
+)
 
 logger = logging.getLogger("taskmgmt.api")
 api_router = APIRouter()

@@ -20,7 +20,6 @@ import os
 
 from rules_engine.utils.reasoning import apply_reasoning_method
 from rules_engine.validators.section_validator import (
-    validate_section,
     post_process_danger_section,
 )
 

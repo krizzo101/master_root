@@ -9,7 +9,7 @@ like Google Custom Search, Bing Search API, or similar services.
 import asyncio
 import logging
 import random
-from typing import Any, Dict, List
+from typing import Any
 
 from ..common.types import ToolError, ToolSchema
 from .base_tool import BaseTool
@@ -32,7 +32,7 @@ class WebSearchTool(BaseTool):
             description="Search the web for information on a given topic",
         )
 
-    async def execute(self, parameters: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, parameters: dict[str, Any]) -> dict[str, Any]:
         """
         Execute a web search with the given parameters.
 
@@ -120,7 +120,7 @@ class WebSearchTool(BaseTool):
 
     def _simulate_search_results(
         self, query: str, max_results: int
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Simulate web search results for demonstration.
 

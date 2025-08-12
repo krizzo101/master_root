@@ -6,7 +6,7 @@ across the fractal hierarchy levels.
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from langchain_core.prompts import (
     ChatPromptTemplate,
@@ -37,18 +37,18 @@ class PromptContext:
     agent_role: AgentRole
     parent_context: str
     focused_request: str
-    available_tools: List[str]
+    available_tools: list[str]
     complexity_score: int
     is_subdivision_candidate: bool
-    execution_constraints: Dict[str, Any]
+    execution_constraints: dict[str, Any]
 
 
 class FractalPromptTemplate(BaseModel):
     """Template for generating prompts at different fractal levels"""
 
     base_system_prompt: str
-    role_specific_additions: Dict[AgentRole, str]
-    level_specific_adaptations: Dict[AbstractionLevel, str]
+    role_specific_additions: dict[AgentRole, str]
+    level_specific_adaptations: dict[AbstractionLevel, str]
     autonomy_instructions: str
     tool_usage_patterns: str
     subdivision_logic: str
@@ -69,7 +69,7 @@ class FractalPromptEngineer:
         self,
         context: PromptContext,
         user_request: str,
-        parent_results: Optional[Dict] = None,
+        parent_results: dict | None = None,
     ) -> ChatPromptTemplate:
         """
         Generate a complete prompt for an agent at a specific fractal level
@@ -108,7 +108,7 @@ class FractalPromptEngineer:
 
     def _build_system_components(
         self, context: PromptContext, personality: PromptPersonality
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """Build the system prompt components for the specific context"""
 
         components = {}
@@ -339,7 +339,7 @@ TECHNICAL QUALITY STANDARDS:
         self,
         context: PromptContext,
         user_request: str,
-        parent_results: Optional[Dict] = None,
+        parent_results: dict | None = None,
     ) -> str:
         """Create the user message with appropriate context"""
 
@@ -409,7 +409,7 @@ TECHNICAL QUALITY STANDARDS:
 
     def _assemble_final_prompt(
         self,
-        system_components: Dict[str, str],
+        system_components: dict[str, str],
         user_message: str,
         tool_instructions: str,
         context: PromptContext,
@@ -437,7 +437,7 @@ TECHNICAL QUALITY STANDARDS:
         )
 
     def _filter_results_for_level(
-        self, parent_results: Dict, context: PromptContext
+        self, parent_results: dict, context: PromptContext
     ) -> str:
         """Filter parent results appropriate for current level"""
 
@@ -504,7 +504,7 @@ TECHNICAL QUALITY STANDARDS:
 
         return "\n".join([f"- {criterion}" for criterion in criteria])
 
-    def _categorize_tools(self, available_tools: List[str]) -> List[str]:
+    def _categorize_tools(self, available_tools: list[str]) -> list[str]:
         """Categorize available tools for instruction generation"""
         categories = []
 
@@ -524,7 +524,7 @@ TECHNICAL QUALITY STANDARDS:
 
         return categories
 
-    def _extract_strategic_info(self, results: Dict) -> str:
+    def _extract_strategic_info(self, results: dict) -> str:
         """Extract strategic information for executive level"""
         strategic_items = []
 
@@ -538,7 +538,7 @@ TECHNICAL QUALITY STANDARDS:
 
         return "\n".join([f"- {item}" for item in strategic_items])
 
-    def _extract_tactical_info(self, results: Dict) -> str:
+    def _extract_tactical_info(self, results: dict) -> str:
         """Extract tactical information for managerial level"""
         tactical_items = []
 
@@ -551,7 +551,7 @@ TECHNICAL QUALITY STANDARDS:
 
         return "\n".join([f"- {item}" for item in tactical_items])
 
-    def _extract_operational_info(self, results: Dict) -> str:
+    def _extract_operational_info(self, results: dict) -> str:
         """Extract operational information for operational level"""
         operational_items = []
 
@@ -564,7 +564,7 @@ TECHNICAL QUALITY STANDARDS:
 
         return "\n".join([f"- {item}" for item in operational_items])
 
-    def _extract_technical_info(self, results: Dict) -> str:
+    def _extract_technical_info(self, results: dict) -> str:
         """Extract technical information for technical level"""
         # Technical level gets full details
         technical_items = []
@@ -575,12 +575,12 @@ TECHNICAL QUALITY STANDARDS:
 
         return "\n".join([f"- {item}" for item in technical_items])
 
-    def _initialize_templates(self) -> Dict[str, FractalPromptTemplate]:
+    def _initialize_templates(self) -> dict[str, FractalPromptTemplate]:
         """Initialize prompt templates for different scenarios"""
         # This would contain pre-built templates for common patterns
         return {}
 
-    def _create_personality_mappings(self) -> Dict[AbstractionLevel, PromptPersonality]:
+    def _create_personality_mappings(self) -> dict[AbstractionLevel, PromptPersonality]:
         """Create mappings between abstraction levels and personalities"""
         return {
             AbstractionLevel.EXECUTIVE: PromptPersonality.STRATEGIC_EXECUTIVE,

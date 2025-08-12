@@ -1,13 +1,14 @@
+from unittest.mock import MagicMock
+
 import pytest
-from unittest.mock import MagicMock, patch
 from app.auth import (
-    verify_password,
-    get_password_hash,
-    create_access_token,
     authenticate_user,
-    signup,
-    login,
+    create_access_token,
     get_me,
+    get_password_hash,
+    login,
+    signup,
+    verify_password,
 )
 
 
@@ -27,8 +28,6 @@ def test_get_password_hash_is_non_empty_and_different_than_plain():
 
 
 def test_create_access_token_contains_subject_and_expiration():
-    import jwt  # Assuming JWT is used
-
     subject = "user@example.com"
     token = create_access_token(
         subject=subject, expires_delta=None

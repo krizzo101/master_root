@@ -5,13 +5,13 @@ This module provides sophisticated workflow pattern enforcement with configurabl
 phases, artifact management, and context injection for multi-agent workflows.
 """
 
+import json
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-import json
-import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import yaml
 
@@ -34,7 +34,7 @@ class PhaseArtifact:
 
     path: str
     description: str
-    template: Optional[str] = None
+    template: str | None = None
     type: str = "file"  # file or directory
     required: bool = True
 
@@ -44,10 +44,10 @@ class PhaseValidation:
     """Validation rule for phase completion"""
 
     rule: str
-    artifacts: Optional[List[str]] = None
-    min_chars: Optional[int] = None
-    path: Optional[str] = None
-    check: Optional[str] = None
+    artifacts: list[str] | None = None
+    min_chars: int | None = None
+    path: str | None = None
+    check: str | None = None
 
 
 @dataclass
@@ -58,17 +58,17 @@ class WorkflowPhase:
     description: str
     order: int
     required: bool
-    agents: List[str]
-    depends_on: List[str] = field(default_factory=list)
-    context_from: List[str] = field(default_factory=list)
-    required_artifacts: List[PhaseArtifact] = field(default_factory=list)
-    success_criteria: List[str] = field(default_factory=list)
-    validation: List[PhaseValidation] = field(default_factory=list)
-    estimated_duration: Optional[str] = None
+    agents: list[str]
+    depends_on: list[str] = field(default_factory=list)
+    context_from: list[str] = field(default_factory=list)
+    required_artifacts: list[PhaseArtifact] = field(default_factory=list)
+    success_criteria: list[str] = field(default_factory=list)
+    validation: list[PhaseValidation] = field(default_factory=list)
+    estimated_duration: str | None = None
     status: PhaseStatus = PhaseStatus.PENDING
-    start_time: Optional[datetime] = None
-    completion_time: Optional[datetime] = None
-    context_data: Dict[str, Any] = field(default_factory=dict)
+    start_time: datetime | None = None
+    completion_time: datetime | None = None
+    context_data: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -78,11 +78,11 @@ class WorkflowPattern:
     name: str
     description: str
     version: str
-    applies_to: List[str]
-    phases: Dict[str, WorkflowPhase]
-    settings: Dict[str, Any]
-    template_directory: Optional[str] = None
-    prompt_enhancements: Dict[str, bool] = field(default_factory=dict)
+    applies_to: list[str]
+    phases: dict[str, WorkflowPhase]
+    settings: dict[str, Any]
+    template_directory: str | None = None
+    prompt_enhancements: dict[str, bool] = field(default_factory=dict)
 
 
 class SDLCPhaseManager:
@@ -98,8 +98,8 @@ class SDLCPhaseManager:
             if config_dir
             else Path("src/applications/oamat/config/workflow_patterns")
         )
-        self.current_pattern: Optional[WorkflowPattern] = None
-        self.phase_execution_log: List[Dict[str, Any]] = []
+        self.current_pattern: WorkflowPattern | None = None
+        self.phase_execution_log: list[dict[str, Any]] = []
 
         # Ensure project phases directory exists
         self.phases_dir = self.project_path / "phases"
@@ -108,7 +108,7 @@ class SDLCPhaseManager:
         logger.info(f"SDLC Phase Manager initialized for project: {self.project_path}")
 
     async def initialize_project(
-        self, project_name: str, user_request: str, context: Dict[str, Any] = None
+        self, project_name: str, user_request: str, context: dict[str, Any] = None
     ):
         """
         Initializes a new project directory and sets up the workflow.
@@ -131,7 +131,7 @@ class SDLCPhaseManager:
         logger.info(f"Initialized project '{project_name}' for SDLC workflow.")
 
     def detect_workflow_type(
-        self, user_request: str, context: Dict[str, Any] = None
+        self, user_request: str, context: dict[str, Any] = None
     ) -> str:
         """
         Automatically detect workflow type based on user request and context.
@@ -162,7 +162,7 @@ class SDLCPhaseManager:
         logger.info("No specific workflow detected, defaulting to software_development")
         return "software_development"
 
-    def list_available_patterns(self) -> List[str]:
+    def list_available_patterns(self) -> list[str]:
         """List all available workflow pattern files"""
         if not self.config_dir.exists():
             logger.warning(f"Workflow patterns directory not found: {self.config_dir}")
@@ -174,7 +174,7 @@ class SDLCPhaseManager:
 
         return pattern_files
 
-    def load_workflow_pattern(self, pattern_name: str) -> Optional[WorkflowPattern]:
+    def load_workflow_pattern(self, pattern_name: str) -> WorkflowPattern | None:
         """
         Load a workflow pattern from configuration file.
 
@@ -254,7 +254,7 @@ class SDLCPhaseManager:
             return None
 
     def initialize_workflow(
-        self, user_request: str, context: Dict[str, Any] = None
+        self, user_request: str, context: dict[str, Any] = None
     ) -> bool:
         """
         Initialize workflow based on detected pattern.
@@ -297,7 +297,7 @@ class SDLCPhaseManager:
         logger.info(f"Workflow initialized with pattern: {pattern.name}")
         return True
 
-    def get_next_phase(self) -> Optional[str]:
+    def get_next_phase(self) -> str | None:
         """
         Get the next phase that should be executed based on dependencies and current status.
 
@@ -378,7 +378,7 @@ class SDLCPhaseManager:
         logger.info(f"Started phase: {phase.name} ({phase_id})")
         return True
 
-    def _build_phase_context(self, phase_id: str) -> Dict[str, Any]:
+    def _build_phase_context(self, phase_id: str) -> dict[str, Any]:
         """Build context data for a phase from previous phases"""
         if not self.current_pattern:
             return {}
@@ -426,7 +426,7 @@ class SDLCPhaseManager:
         return context
 
     async def complete_phase(
-        self, phase_id: str, result: Dict[str, Any] = None
+        self, phase_id: str, result: dict[str, Any] = None
     ) -> bool:
         """
         Mark a phase as completed after validating artifacts.
@@ -472,7 +472,7 @@ class SDLCPhaseManager:
         logger.info(f"Completed phase: {phase.name} ({phase_id})")
         return True
 
-    def validate_phase(self, phase_id: str) -> Dict[str, Any]:
+    def validate_phase(self, phase_id: str) -> dict[str, Any]:
         """
         Validate that a phase has been completed successfully.
 
@@ -552,7 +552,7 @@ class SDLCPhaseManager:
             "phase_name": phase.name,
         }
 
-    def get_phase_context(self, phase_id: str) -> Dict[str, Any]:
+    def get_phase_context(self, phase_id: str) -> dict[str, Any]:
         """Get context data for a specific phase"""
         if not self.current_pattern:
             return {}
@@ -563,7 +563,7 @@ class SDLCPhaseManager:
 
         return phase.context_data
 
-    def find_phase_for_agent(self, agent_role: str) -> Optional[str]:
+    def find_phase_for_agent(self, agent_role: str) -> str | None:
         """Finds the phase_id for a given agent_role."""
         if not self.current_pattern:
             return None
@@ -573,7 +573,7 @@ class SDLCPhaseManager:
         logger.warning(f"No phase found for agent role: {agent_role}")
         return None
 
-    def get_workflow_status(self) -> Dict[str, Any]:
+    def get_workflow_status(self) -> dict[str, Any]:
         """Get overall workflow status"""
         if not self.current_pattern:
             return {"status": "no_workflow", "message": "No workflow pattern loaded"}

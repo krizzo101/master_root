@@ -4,10 +4,10 @@ Comprehensive test suite for consolidated ArangoDB MCP tools
 Tests all 3 tools across 8 search types, 4 modify operations, and 6 manage actions
 """
 
-from datetime import datetime
 import json
 import os
 import sys
+from datetime import datetime
 
 # Add core directory to path
 sys.path.append(os.path.join(os.path.dirname(__file__), "core"))

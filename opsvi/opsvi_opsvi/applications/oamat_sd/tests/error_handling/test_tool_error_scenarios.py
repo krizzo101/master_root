@@ -8,8 +8,8 @@ error messages rather than generic exceptions.
 
 import asyncio
 import logging
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pytest
 

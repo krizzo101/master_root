@@ -5,16 +5,15 @@ These tests confirm that the demonstration functions output the expected results
 No user input or dynamic code evaluation is performed.
 """
 
+import contextlib
+import io
 import subprocess
 import sys
-from typing import Tuple
 
-import io
-import contextlib
 import eval_exec_demo
 
 
-def run_main_and_capture_output() -> Tuple[str, str]:
+def run_main_and_capture_output() -> tuple[str, str]:
     """
     Runs the main() function from eval_exec_demo and captures stdout and stderr.
     Returns:

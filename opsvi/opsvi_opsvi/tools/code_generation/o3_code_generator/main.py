@@ -2,11 +2,10 @@
 
 import argparse
 import glob
-import os
-from pathlib import Path
-import sys
 import json
-from typing import Optional
+import os
+import sys
+from pathlib import Path
 
 from src.tools.code_generation.o3_code_generator.api_doc_generator import (
     ApiDocGenerator,
@@ -71,15 +70,15 @@ from src.tools.code_generation.o3_code_generator.requirements_analyzer import (
 from src.tools.code_generation.o3_code_generator.research_script import (
     run_research,
 )
+from src.tools.code_generation.o3_code_generator.security_scanner import SecurityScanner
+from src.tools.code_generation.o3_code_generator.technical_spec_generator import (
+    TechnicalSpecGenerator,
+)
 from src.tools.code_generation.o3_code_generator.utils.input_loader import (
     UniversalInputLoader,
 )
 from src.tools.code_generation.o3_code_generator.validation_framework import (
     ValidationFramework,
-)
-from src.tools.code_generation.o3_code_generator.security_scanner import SecurityScanner
-from src.tools.code_generation.o3_code_generator.technical_spec_generator import (
-    TechnicalSpecGenerator,
 )
 
 # Setup logger once at the entry point
@@ -367,14 +366,15 @@ def run_architecture_validate(input_file):
 
 def run_auto_workflow(
     problem_statement: str,
-    steps: Optional[str] = None,
-    output_dir: Optional[str] = None,
-    resume: Optional[str] = None,
-    from_step: Optional[str] = None,
+    steps: str | None = None,
+    output_dir: str | None = None,
+    resume: str | None = None,
+    from_step: str | None = None,
 ):
     """Run autonomous workflow from problem statement to complete solution."""
-    from src.tools.code_generation.o3_code_generator.workflow import AutonomousWorkflow
     from pathlib import Path
+
+    from src.tools.code_generation.o3_code_generator.workflow import AutonomousWorkflow
 
     logger = get_logger()
 
@@ -393,7 +393,7 @@ def run_auto_workflow(
             # Resume workflow
             context = workflow.resume_workflow(context_file, from_step)
 
-            logger.log_info(f"Resumed workflow completed")
+            logger.log_info("Resumed workflow completed")
             logger.log_info(f"Final progress: {context.get_workflow_progress()}")
             return
 
@@ -417,7 +417,7 @@ def run_auto_workflow(
 
         # Report final results
         progress = context.get_workflow_progress()
-        logger.log_info(f"Autonomous workflow completed!")
+        logger.log_info("Autonomous workflow completed!")
         logger.log_info(
             f"Progress: {progress['completed_steps']}/{progress['total_steps']} steps ({progress['progress_percent']:.1f}%)"
         )
@@ -433,7 +433,7 @@ def run_auto_workflow(
         )
 
         # Print user-friendly completion message
-        print(f"\n🎉 Autonomous workflow completed successfully!")
+        print("\n🎉 Autonomous workflow completed successfully!")
         print(
             f"📊 Completed {progress['completed_steps']}/{progress['total_steps']} steps ({progress['progress_percent']:.1f}%)"
         )
@@ -448,7 +448,7 @@ def run_auto_workflow(
         print(f"🔄 Context: {context.output_directory}/workflow_context.json")
 
         if progress["completed_steps"] < progress["total_steps"]:
-            print(f"\n⚠️  Workflow partially completed. Use --resume to continue:")
+            print("\n⚠️  Workflow partially completed. Use --resume to continue:")
             print(
                 f"   python -m main.py auto-workflow --resume {context.output_directory}/workflow_context.json"
             )

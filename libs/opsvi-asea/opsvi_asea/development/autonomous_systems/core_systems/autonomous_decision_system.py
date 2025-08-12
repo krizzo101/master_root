@@ -11,7 +11,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import json
 import time
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any
 from session_continuity_system import SessionContinuitySystem
 
 
@@ -240,7 +240,7 @@ class AutonomousDecisionSystem:
         try:
             with open(self.log_file, "a") as f:
                 f.write(json.dumps(log_entry) + "\n")
-        except Exception as e:
+        except Exception:
             # Silent fail - don't break the main functionality
             pass
 
@@ -334,7 +334,7 @@ OPERATIONAL FOUNDATION → SESSION CONTINUITY → DECISION ENHANCEMENT → ADVAN
             if decision_info.get("problem") and decision_info.get("chosen_action"):
                 analysis_result[
                     "rationale"
-                ] = f"The chosen action directly addresses the stated problem. This is a sound, problem-first approach."
+                ] = "The chosen action directly addresses the stated problem. This is a sound, problem-first approach."
                 analysis_result[
                     "next_phase"
                 ] = "The logical next step is to execute the chosen action and validate the outcome against success criteria."
@@ -476,7 +476,7 @@ if __name__ == "__main__":
                 decision_context, decision_rationale
             )
 
-            print(f"Decision Assessment:")
+            print("Decision Assessment:")
             print(f"Context: {decision_context}")
             print(f"Rationale: {decision_rationale}")
             print(f"Assessment Score: {assessment['autonomous_score']}/100")
@@ -514,7 +514,7 @@ if __name__ == "__main__":
             test_rationale = "Holistic analysis shows I have extensive stored knowledge about operational problems but repeatedly fail to apply this knowledge. Mistake prevention addresses actual operational needs and builds foundation for compound learning."
 
             assessment = system.assess_decision_quality(test_decision, test_rationale)
-            print(f"\nDecision Assessment Example:")
+            print("\nDecision Assessment Example:")
             print(f"Decision: {test_decision}")
             print(f"Assessment Score: {assessment['autonomous_score']}/100")
             print(f"Strengths: {', '.join(assessment['strengths'])}")
@@ -526,7 +526,7 @@ if __name__ == "__main__":
                 "decision_enhancement",
             ]
             next_phase = system.plan_next_autonomous_phase(current_capabilities)
-            print(f"\nNext Phase Planning (Capabilities List):")
+            print("\nNext Phase Planning (Capabilities List):")
             print(f"Next Phase: {next_phase['next_phase']}")
             print(f"Rationale: {next_phase['rationale']}")
         else:

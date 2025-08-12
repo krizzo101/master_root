@@ -1,9 +1,8 @@
 """
 Output handler for printing and saving headlines.
 """
-import os
-from typing import List
 import logging
+import os
 
 
 class OutputHandler:
@@ -12,7 +11,7 @@ class OutputHandler:
     """
 
     @staticmethod
-    def print_headlines(headlines: List[str]) -> None:
+    def print_headlines(headlines: list[str]) -> None:
         """
         Print headlines to the console in a formatted way.
         """
@@ -22,7 +21,7 @@ class OutputHandler:
         print(f"\nTotal headlines: {len(headlines)}\n")
 
     @staticmethod
-    def save_headlines(headlines: List[str], filepath: str) -> None:
+    def save_headlines(headlines: list[str], filepath: str) -> None:
         """
         Save headlines to a plain text file, one per line.
         """

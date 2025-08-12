@@ -7,12 +7,12 @@ collaboration scenarios.
 """
 
 import asyncio
-from datetime import datetime
 import json
 import logging
-from pathlib import Path
 import sys
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 from ..agents.research_agent import ResearchAgent
 from ..agents.task_agent import TaskAgent
@@ -62,12 +62,12 @@ class DemoApplication:
         )
 
         # Agent instances
-        self.research_agent: Optional[ResearchAgent] = None
-        self.task_agent: Optional[TaskAgent] = None
+        self.research_agent: ResearchAgent | None = None
+        self.task_agent: TaskAgent | None = None
 
         # Demo state
-        self.demo_results: Dict[str, Any] = {}
-        self.execution_history: List[Dict[str, Any]] = []
+        self.demo_results: dict[str, Any] = {}
+        self.execution_history: list[dict[str, Any]] = []
 
         self.logger.info("Demo application initialized")
 
@@ -191,7 +191,7 @@ class DemoApplication:
 
         self.logger.info("Sample data files created")
 
-    async def run_workflow_demo(self, workflow_type: str) -> Dict[str, Any]:
+    async def run_workflow_demo(self, workflow_type: str) -> dict[str, Any]:
         """
         Run a specific workflow demonstration.
 
@@ -255,7 +255,7 @@ class DemoApplication:
                 "timestamp": datetime.now().isoformat(),
             }
 
-    async def run_all_demos(self) -> Dict[str, Any]:
+    async def run_all_demos(self) -> dict[str, Any]:
         """
         Run all available workflow demonstrations.
 
@@ -295,7 +295,7 @@ class DemoApplication:
             "execution_history": self.orchestrator.get_execution_history(),
         }
 
-    def _generate_demo_summary(self, results: Dict[str, Any]) -> Dict[str, Any]:
+    def _generate_demo_summary(self, results: dict[str, Any]) -> dict[str, Any]:
         """Generate a summary of demo results."""
         successful = [k for k, v in results.items() if "error" not in v]
         failed = [k for k, v in results.items() if "error" in v]
@@ -457,7 +457,7 @@ class DemoApplication:
             for key, value in capabilities.items():
                 print(f"  {key}: {value}")
 
-    def _display_workflow_result(self, result: Dict[str, Any]) -> None:
+    def _display_workflow_result(self, result: dict[str, Any]) -> None:
         """Display workflow execution result."""
         print("\n" + "=" * 50)
         print("WORKFLOW EXECUTION RESULT")

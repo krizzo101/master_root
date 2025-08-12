@@ -1,12 +1,13 @@
 """
 Integration tests for Task Management API endpoints.
 """
-import pytest
-from httpx import AsyncClient
-from app.main import app
-from app.database import init_db
 import asyncio
 import os
+
+import pytest
+from app.database import init_db
+from app.main import app
+from httpx import AsyncClient
 
 
 @pytest.fixture(scope="session", autouse=True)

@@ -2,7 +2,8 @@
 App global error handler setup.
 """
 import logging
-from flask import render_template, Flask
+
+from flask import Flask, render_template
 
 
 def register_error_handlers(app: Flask) -> None:

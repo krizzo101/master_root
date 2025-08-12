@@ -1,11 +1,12 @@
 """
 OpenAI Reasoning Interface: Handles communication with OpenAI models, retries, structured outputs.
 """
-from typing import Any, Dict
-from loguru import logger
-from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
-import openai
 import json
+from typing import Any
+
+import openai
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
+
 from multiagent_cli.config import AppConfig
 
 
@@ -32,7 +33,6 @@ class OpenAIReasoningInterface:
         """
         self.logger.debug(f"Calling OpenAI: model={self.model}, prompt={prompt}")
         try:
-            import asyncio
             from openai import AsyncOpenAI
 
             openai_async = AsyncOpenAI(api_key=self.config.OPENAI_API_KEY)

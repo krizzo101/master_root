@@ -15,8 +15,8 @@ import json
 import logging
 import time
 import random
-from typing import Dict, List, Any, Optional
-from arango import ArangoClient, ArangoServerError
+from typing import Dict, List, Any
+from arango import ArangoClient
 
 # Configure logging
 logging.basicConfig(
@@ -795,11 +795,11 @@ def main():
             json.dump(results, f, indent=2, default=str)
 
         print("ArangoDB Comprehensive Testing Complete!")
-        print(f"Results saved to: arango_comprehensive_testing_results.json")
+        print("Results saved to: arango_comprehensive_testing_results.json")
 
         # Print summary
         summary = results.get("summary", {})
-        print(f"\nTest Summary:")
+        print("\nTest Summary:")
         print(f"- Total tests run: {summary.get('total_tests_run', 0)}")
         print(f"- Successful tests: {summary.get('successful_tests', 0)}")
         print(f"- Failed tests: {summary.get('failed_tests', 0)}")
@@ -808,7 +808,7 @@ def main():
         )
         print(f"- Data population: {summary.get('data_population_status', 'unknown')}")
 
-        print(f"\nRecommendations:")
+        print("\nRecommendations:")
         for rec in summary.get("recommendations", []):
             print(f"- {rec}")
 

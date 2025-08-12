@@ -5,10 +5,8 @@ Simple interface to cognitive database without AQL complexity
 """
 
 import sys
-import os
 import json
 import argparse
-from typing import Dict, List, Any
 
 # Add the core module to path
 sys.path.append("/home/opsvi/asea/development/cognitive_interface/core")

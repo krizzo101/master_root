@@ -13,17 +13,17 @@ Usage:
 import argparse
 import ast
 import os
-from pathlib import Path
 import re
 import sys
-from typing import Any, Dict, List, Tuple, Union
+from pathlib import Path
+from typing import Any
 
 
 class ComplianceTransformer(ast.NodeTransformer):
     """AST transformer that eliminates hardcoded values and fallback patterns."""
 
     def __init__(self):
-        self.changes: List[Dict[str, Any]] = []
+        self.changes: list[dict[str, Any]] = []
         self.current_file = ""
 
         # Config path mappings for common patterns
@@ -275,7 +275,7 @@ class ComplianceTransformer(ast.NodeTransformer):
         return None
 
     def _get_config_reference_for_number(
-        self, value: Union[int, float], node: ast.Constant
+        self, value: int | float, node: ast.Constant
     ) -> str:
         """Get config reference for numeric constants."""
 
@@ -320,7 +320,7 @@ class ComplianceTransformer(ast.NodeTransformer):
         return string_mappings.get(value)
 
     def _get_scoring_config_reference(
-        self, value: Union[int, float], op: ast.operator
+        self, value: int | float, op: ast.operator
     ) -> str:
         """Get config reference for scoring adjustments."""
 
@@ -342,7 +342,7 @@ class ComplianceTransformer(ast.NodeTransformer):
         return None
 
 
-def find_python_files(root_dir: str) -> List[Path]:
+def find_python_files(root_dir: str) -> list[Path]:
     """Find all Python files in the oamat_sd application."""
     root = Path(root_dir)
     python_files = []
@@ -369,7 +369,7 @@ def find_python_files(root_dir: str) -> List[Path]:
 
 def process_file(
     file_path: Path, transformer: ComplianceTransformer, dry_run: bool = True
-) -> Tuple[str, bool]:
+) -> tuple[str, bool]:
     """Process a single Python file."""
     try:
         with open(file_path, encoding="utf-8") as f:

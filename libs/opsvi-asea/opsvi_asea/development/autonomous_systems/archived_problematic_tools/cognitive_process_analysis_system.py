@@ -21,7 +21,7 @@ import json
 import sys
 import time
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any
 import re
 from collections import defaultdict, Counter
 import os
@@ -511,7 +511,7 @@ class CognitiveProcessAnalysisSystem:
         try:
             with open(self.log_file, "a") as f:
                 f.write(json.dumps(log_entry) + "\n")
-        except Exception as e:
+        except Exception:
             # Silent fail - don't break the main functionality
             pass
 

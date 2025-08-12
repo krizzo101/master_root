@@ -7,7 +7,7 @@ Extracted from manager.py for better modularity and maintainability.
 
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
@@ -25,8 +25,8 @@ logger = logging.getLogger("OAMAT.RequestAnalyzer")
 class UserContext(BaseModel):
     scope: str = Field(..., description="personal, team, or enterprise level")
     experience_level: str = Field(..., description="beginner, intermediate, or expert")
-    time_constraints: Optional[str] = Field(None, description="Any urgency indicators")
-    specific_constraints: List[str] = Field(
+    time_constraints: str | None = Field(None, description="Any urgency indicators")
+    specific_constraints: list[str] = Field(
         default_factory=list, description="Budget, technology, or other limitations"
     )
 
@@ -42,8 +42,8 @@ class ContextAnalysis(BaseModel):
         ..., description="development, analysis, design, optimization, or consultation"
     )
     user_context: UserContext
-    specialized_requirements: List[str] = Field(default_factory=list)
-    inferred_technologies: List[str] = Field(default_factory=list)
+    specialized_requirements: list[str] = Field(default_factory=list)
+    inferred_technologies: list[str] = Field(default_factory=list)
     suggested_approach: str = Field(
         ..., description="Brief description of recommended approach"
     )
@@ -60,8 +60,8 @@ class RequestAnalyzer:
         self.logger = logger
 
     def analyze_task_context(
-        self, user_request: str, context: Dict[str, Any] = None
-    ) -> Dict[str, Any]:
+        self, user_request: str, context: dict[str, Any] = None
+    ) -> dict[str, Any]:
         """
         Analyze the user request using LLM to determine actual requirements rather than keyword matching.
         This replaces the hardcoded domain detection with intelligent analysis.
@@ -126,7 +126,7 @@ Respond with a JSON object containing your analysis that adheres to the `Context
     def analyze_request(
         self,
         user_request: str,
-        context: Dict[str, Any] = None,
+        context: dict[str, Any] = None,
         dynamic_identity: str = None,
     ) -> EnhancedRequestAnalysis:
         """
@@ -241,7 +241,7 @@ Generate a comprehensive analysis following the EnhancedRequestAnalysis schema.
     def analyze_user_request(
         self,
         user_request: str,
-        context: Dict[str, Any] = None,
+        context: dict[str, Any] = None,
         dynamic_identity: str = None,
     ) -> ExpandedPrompt:
         """

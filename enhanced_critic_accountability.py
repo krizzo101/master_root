@@ -6,10 +6,10 @@ The critic is now "on the hook" for providing specific fixes and guidance.
 No more vague suggestions - concrete, actionable fixes required.
 """
 
-from typing import Dict, List, Any
+import re  # Added missing import for regex
 from dataclasses import dataclass
 from enum import Enum
-import re  # Added missing import for regex
+from typing import Any
 
 
 class IssueSeverity(Enum):
@@ -72,7 +72,7 @@ class EnhancedCriticAgent:
 
     def analyze_code_with_accountability(
         self, code: str, session_id: str, iteration: int = 1
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Analyze code with full accountability for finding and fixing issues.
 
@@ -133,7 +133,7 @@ class EnhancedCriticAgent:
             ),
         }
 
-    def _find_all_issues(self, code: str) -> List[Dict[str, Any]]:
+    def _find_all_issues(self, code: str) -> list[dict[str, Any]]:
         """
         Find ALL issues in the code. The critic is accountable for missing nothing.
 
@@ -185,8 +185,8 @@ class EnhancedCriticAgent:
         return issues
 
     def _provide_concrete_fixes(
-        self, issues: List[Dict], code: str
-    ) -> List[ConcreteFix]:
+        self, issues: list[dict], code: str
+    ) -> list[ConcreteFix]:
         """
         Provide concrete, actionable fixes for each issue.
 
@@ -206,7 +206,7 @@ class EnhancedCriticAgent:
 
         return fixes
 
-    def _create_critical_fix(self, issue: Dict, code: str) -> ConcreteFix:
+    def _create_critical_fix(self, issue: dict, code: str) -> ConcreteFix:
         """Create a critical fix with specific code changes."""
 
         if "Global JWT reference" in issue["description"]:
@@ -235,7 +235,7 @@ class EnhancedCriticAgent:
             atomic_fix=f"Fix {issue['description']}",
         )
 
-    def _create_high_priority_fix(self, issue: Dict, code: str) -> ConcreteFix:
+    def _create_high_priority_fix(self, issue: dict, code: str) -> ConcreteFix:
         """Create a high priority fix with specific guidance."""
 
         if "Silent exception handling" in issue["description"]:
@@ -264,8 +264,8 @@ class EnhancedCriticAgent:
         )
 
     def _validate_fixes(
-        self, fixes: List[ConcreteFix], original_code: str
-    ) -> Dict[str, Any]:
+        self, fixes: list[ConcreteFix], original_code: str
+    ) -> dict[str, Any]:
         """
         Validate that the provided fixes actually work.
 
@@ -316,8 +316,8 @@ class EnhancedCriticAgent:
             return "GOOD PERFORMANCE - Providing effective fixes"
 
     def _generate_next_actions(
-        self, fixes: List[ConcreteFix], validation: Dict
-    ) -> List[str]:
+        self, fixes: list[ConcreteFix], validation: dict
+    ) -> list[str]:
         """Generate specific next actions for the nano model."""
         actions = []
 
@@ -337,7 +337,7 @@ class EnhancedCriticAgent:
 
         return actions
 
-    def _issue_to_dict(self, issue: Dict) -> Dict[str, Any]:
+    def _issue_to_dict(self, issue: dict) -> dict[str, Any]:
         """Convert issue to dictionary format."""
         return {
             "severity": issue["severity"].value,
@@ -346,7 +346,7 @@ class EnhancedCriticAgent:
             "pattern": issue.get("pattern", ""),
         }
 
-    def _fix_to_dict(self, fix: ConcreteFix) -> Dict[str, Any]:
+    def _fix_to_dict(self, fix: ConcreteFix) -> dict[str, Any]:
         """Convert fix to dictionary format."""
         return {
             "issue_description": fix.issue_description,

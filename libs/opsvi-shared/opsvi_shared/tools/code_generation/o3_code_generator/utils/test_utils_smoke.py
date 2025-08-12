@@ -29,7 +29,7 @@ try:
     from src.tools.code_generation.o3_code_generator.utils.input_loader import (
         UniversalInputLoader,
     )
-except ImportError as e:
+except ImportError:
     exit(1)
 else:
     pass
@@ -45,7 +45,7 @@ def main():
     try:
         dm = DirectoryManager()
         dm.ensure_directory_exists("test_dir")
-    except Exception as e:
+    except Exception:
         pass
     else:
         pass
@@ -54,7 +54,7 @@ def main():
     try:
         of = OutputFormatter()
         _ = of.to_json({"test": 123})
-    except Exception as e:
+    except Exception:
         pass
     else:
         pass
@@ -63,7 +63,7 @@ def main():
     try:
         fg = FileGenerator()
         fg.save_file("test content", Path("test_file.txt"))
-    except Exception as e:
+    except Exception:
         pass
     else:
         pass
@@ -74,7 +74,7 @@ def main():
         prompt = pb.build_generation_prompt(
             input_data={"foo": "bar"}, system_prompt="Test system prompt"
         )
-    except Exception as e:
+    except Exception:
         pass
     else:
         pass
@@ -82,7 +82,7 @@ def main():
         pass
     try:
         uil = UniversalInputLoader()
-    except Exception as e:
+    except Exception:
         pass
     else:
         pass

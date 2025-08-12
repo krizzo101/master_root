@@ -5,13 +5,13 @@ This module provides common fixtures and test configuration for the entire test 
 """
 
 import asyncio
-from collections.abc import Generator
-from pathlib import Path
 
 # Add project root to path for imports
 import sys
 import tempfile
-from typing import Any, Dict
+from collections.abc import Generator
+from pathlib import Path
+from typing import Any
 from unittest.mock import AsyncMock
 
 import pytest
@@ -40,7 +40,7 @@ def temp_dir() -> Generator[Path, None, None]:
 
 
 @pytest.fixture
-def sample_test_requests() -> Dict[str, str]:
+def sample_test_requests() -> dict[str, str]:
     """Provide sample test requests for various complexity levels"""
     return {
         "simple": "What is Python?",
@@ -64,7 +64,7 @@ def mock_openai_client():
 
 
 @pytest.fixture
-def mock_complexity_analysis() -> Dict[str, Any]:
+def mock_complexity_analysis() -> dict[str, Any]:
     """Provide mock complexity analysis for testing"""
     return {
         "complexity_score": 5.5,
@@ -82,7 +82,7 @@ def mock_complexity_analysis() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def mock_agent_output() -> Dict[str, Any]:
+def mock_agent_output() -> dict[str, Any]:
     """Provide mock agent output for testing"""
     return {
         "success": True,
@@ -97,7 +97,7 @@ def mock_agent_output() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def mock_solution_artifact() -> Dict[str, Any]:
+def mock_solution_artifact() -> dict[str, Any]:
     """Provide mock solution artifact for testing"""
     return {
         "artifact_type": "research_report",

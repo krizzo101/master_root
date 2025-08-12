@@ -2,16 +2,16 @@
 WebSocket real-time collaboration handler based on Y.js/CRDT simulation (mock for demo).
 Implements: doc state broadcast, user presence, basic sync.
 """
-from fastapi import WebSocket
-from .models import User
-from typing import Dict, Any, Set
-import asyncio
-import json
 import logging
+from typing import Any
+
+from fastapi import WebSocket
+
+from .models import User
 
 # Simple in-memory room and state:
-_DOC_ROOMS: Dict[str, Set[WebSocket]] = {}
-_DOC_STATE: Dict[str, str] = {}  # doc_id -> text
+_DOC_ROOMS: dict[str, set[WebSocket]] = {}
+_DOC_STATE: dict[str, str] = {}  # doc_id -> text
 
 
 async def join_collab_room(doc_id: str, socket: WebSocket, user: User) -> None:

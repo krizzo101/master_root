@@ -1,20 +1,20 @@
 """
 Task management API routes.
 """
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
 import logging
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app import crud
+from app.database import get_session
 from app.schemas import (
+    MessageResponse,
     TaskCreate,
+    TaskListResponse,
     TaskResponse,
     TaskUpdate,
-    TaskListResponse,
-    MessageResponse,
 )
-from app.database import get_session
-from app import crud
 
 logger = logging.getLogger(__name__)
 

@@ -6,13 +6,13 @@ Extracted from mcp_tool_registry.py for better modularity.
 """
 
 import asyncio
-from typing import Any, Dict, List
+from typing import Any
 
 
 class MockBraveSearch:
     """Mock Brave Search interface."""
 
-    async def web_search(self, query: str, **kwargs) -> Dict[str, Any]:
+    async def web_search(self, query: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.1)  # Simulate network delay
         return {
             "query": query,
@@ -31,21 +31,21 @@ class MockBraveSearch:
             "total": 2,
         }
 
-    async def news_search(self, query: str, **kwargs) -> Dict[str, Any]:
+    async def news_search(self, query: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.1)
         return {
             "query": query,
             "news": [{"title": "Mock News", "source": "Mock Source"}],
         }
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         return {"status": "healthy", "service": "brave_search"}
 
 
 class MockArxivResearch:
     """Mock ArXiv Research interface."""
 
-    async def search_papers(self, query: str, **kwargs) -> Dict[str, Any]:
+    async def search_papers(self, query: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.2)
         return {
             "query": query,
@@ -55,40 +55,40 @@ class MockArxivResearch:
             ],
         }
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         return {"status": "healthy", "service": "arxiv_research"}
 
 
 class MockFirecrawl:
     """Mock Firecrawl interface."""
 
-    async def scrape(self, url: str, **kwargs) -> Dict[str, Any]:
+    async def scrape(self, url: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.3)
         return {"url": url, "content": "Mock scraped content", "success": True}
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         return {"status": "healthy", "service": "firecrawl"}
 
 
 class MockContext7Docs:
     """Mock Context7 Docs interface."""
 
-    async def resolve_library_id(self, library_name: str, **kwargs) -> Dict[str, Any]:
+    async def resolve_library_id(self, library_name: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.1)
         return {"library_name": library_name, "library_id": f"/{library_name}/docs"}
 
-    async def get_library_docs(self, library_id: str, **kwargs) -> Dict[str, Any]:
+    async def get_library_docs(self, library_id: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.2)
         return {"library_id": library_id, "docs": "Mock documentation content"}
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         return {"status": "healthy", "service": "context7_docs"}
 
 
 class MockSequentialThinking:
     """Mock Sequential Thinking interface."""
 
-    async def think(self, problem: str, **kwargs) -> Dict[str, Any]:
+    async def think(self, problem: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.5)  # Thinking takes time
         return {
             "problem": problem,
@@ -96,36 +96,36 @@ class MockSequentialThinking:
             "conclusion": "Mock conclusion",
         }
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         return {"status": "healthy", "service": "sequential_thinking"}
 
 
 class MockNeo4j:
     """Mock Neo4j interface."""
 
-    async def get_schema(self, **kwargs) -> Dict[str, Any]:
+    async def get_schema(self, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.1)
         return {"nodes": ["Node1", "Node2"], "relationships": ["REL1", "REL2"]}
 
-    async def read_cypher(self, query: str, **kwargs) -> Dict[str, Any]:
+    async def read_cypher(self, query: str, **kwargs) -> dict[str, Any]:
         await asyncio.sleep(0.1)
         return {"query": query, "results": [{"mock": "data"}]}
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         return {"status": "healthy", "service": "neo4j"}
 
 
 class MockResearchWorkflow:
     """Mock Research Workflow interface."""
 
-    async def search_and_present(self, query: str, max_results: int) -> List[Any]:
+    async def search_and_present(self, query: str, max_results: int) -> list[Any]:
         await asyncio.sleep(0.4)
         return [
             MockResearchUrl("https://example.com/1", "Example 1", 0.9),
             MockResearchUrl("https://example.com/2", "Example 2", 0.8),
         ]
 
-    async def search_and_extract_urls(self, query: str, max_results: int) -> List[Any]:
+    async def search_and_extract_urls(self, query: str, max_results: int) -> list[Any]:
         """Extract URLs for agent selection."""
         await asyncio.sleep(0.3)
         return [
@@ -133,7 +133,7 @@ class MockResearchWorkflow:
             MockResearchUrl("https://example.com/2", "Mock URL 2", 0.8),
         ]
 
-    def present_urls_for_selection(self, urls: List[Any], max_results: int) -> str:
+    def present_urls_for_selection(self, urls: list[Any], max_results: int) -> str:
         """Present URLs for agent selection."""
         presentation = "## URLs Found for Selection:\n\n"
         for i, url in enumerate(urls[:max_results], 1):
@@ -142,8 +142,8 @@ class MockResearchWorkflow:
         return presentation
 
     async def scrape_selected_urls(
-        self, urls: List[Any], selected_indices: List[int]
-    ) -> List[Any]:
+        self, urls: list[Any], selected_indices: list[int]
+    ) -> list[Any]:
         await asyncio.sleep(0.5)
         return [
             MockResearchResult(True, "Scraped content 1"),
@@ -153,10 +153,10 @@ class MockResearchWorkflow:
     def compile_research_report(
         self,
         query: str,
-        urls: List[Any],
-        selected_indices: List[int],
-        results: List[Any],
-    ) -> Dict[str, Any]:
+        urls: list[Any],
+        selected_indices: list[int],
+        results: list[Any],
+    ) -> dict[str, Any]:
         """Compile research report from scraped results."""
         return {
             "query": query,
@@ -165,11 +165,11 @@ class MockResearchWorkflow:
             "results": results,
         }
 
-    def format_research_report(self, report: Dict[str, Any]) -> str:
+    def format_research_report(self, report: dict[str, Any]) -> str:
         """Format the research report."""
         return f"# Research Report for: {report['query']}\n\nMock research content..."
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         return {"status": "healthy", "service": "research_workflow"}
 
 

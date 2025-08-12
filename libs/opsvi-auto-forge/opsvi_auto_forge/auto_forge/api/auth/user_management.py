@@ -1,8 +1,7 @@
 """User management for authentication."""
 
 import logging
-from datetime import datetime, timezone
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict
 from uuid import uuid4
 
 import bcrypt

@@ -7,7 +7,6 @@ Tests all approved models and compares their performance and quality.
 import sys
 import time
 import json
-import os
 from pathlib import Path
 
 # Add the project root to the path

@@ -5,8 +5,8 @@ Image-specific utility functions and helpers.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
 from datetime import datetime
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ class ImageUtils:
     """
 
     @staticmethod
-    def analyze_image_layers(image_info: Dict[str, Any]) -> Dict[str, Any]:
+    def analyze_image_layers(image_info: dict[str, Any]) -> dict[str, Any]:
         """Analyze Docker image layers for optimization opportunities."""
         analysis = {
             "total_layers": 0,
@@ -76,7 +76,7 @@ class ImageUtils:
         return analysis
 
     @staticmethod
-    def calculate_image_size(image_info: Dict[str, Any]) -> Dict[str, Any]:
+    def calculate_image_size(image_info: dict[str, Any]) -> dict[str, Any]:
         """Calculate detailed image size information."""
         size_info = {
             "virtual_size": 0,
@@ -121,7 +121,7 @@ class ImageUtils:
         return f"{size_bytes:.1f} PB"
 
     @staticmethod
-    def analyze_image_security(image_info: Dict[str, Any]) -> Dict[str, Any]:
+    def analyze_image_security(image_info: dict[str, Any]) -> dict[str, Any]:
         """Analyze image for security considerations."""
         security_analysis = {
             "base_image": None,
@@ -173,7 +173,7 @@ class ImageUtils:
         return security_analysis
 
     @staticmethod
-    def get_image_metadata(image_info: Dict[str, Any]) -> Dict[str, Any]:
+    def get_image_metadata(image_info: dict[str, Any]) -> dict[str, Any]:
         """Extract and format image metadata."""
         metadata = {
             "id": image_info.get("Id", ""),
@@ -209,7 +209,7 @@ class ImageUtils:
         return metadata
 
     @staticmethod
-    def optimize_image_config(image_config: Dict[str, Any]) -> Dict[str, Any]:
+    def optimize_image_config(image_config: dict[str, Any]) -> dict[str, Any]:
         """Suggest optimizations for image configuration."""
         optimizations = {
             "size_optimizations": [],
@@ -256,8 +256,8 @@ class ImageUtils:
 
     @staticmethod
     def compare_images(
-        image1_info: Dict[str, Any], image2_info: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        image1_info: dict[str, Any], image2_info: dict[str, Any]
+    ) -> dict[str, Any]:
         """Compare two Docker images."""
         comparison = {
             "size_difference": 0,

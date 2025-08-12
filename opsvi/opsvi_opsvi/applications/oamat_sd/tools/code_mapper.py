@@ -14,13 +14,13 @@ Usage:
 
 import argparse
 import ast
-from dataclasses import asdict, dataclass
-from datetime import datetime
 import json
 import os
-from pathlib import Path
 import sys
-from typing import Any, Dict, List, Optional
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 
 @dataclass
@@ -30,14 +30,14 @@ class FunctionInfo:
     name: str
     file_path: str
     line_number: int
-    parameters: List[str]
-    default_values: Dict[str, Any]
-    return_type: Optional[str]
-    docstring: Optional[str]
-    decorators: List[str]
+    parameters: list[str]
+    default_values: dict[str, Any]
+    return_type: str | None
+    docstring: str | None
+    decorators: list[str]
     is_async: bool
     is_method: bool
-    class_name: Optional[str]
+    class_name: str | None
 
 
 @dataclass
@@ -47,11 +47,11 @@ class ClassInfo:
     name: str
     file_path: str
     line_number: int
-    bases: List[str]
-    methods: List[str]
-    attributes: List[str]
-    docstring: Optional[str]
-    decorators: List[str]
+    bases: list[str]
+    methods: list[str]
+    attributes: list[str]
+    docstring: str | None
+    decorators: list[str]
 
 
 @dataclass
@@ -62,7 +62,7 @@ class VariableInfo:
     file_path: str
     line_number: int
     scope: str  # 'module', 'class', 'function'
-    type_hint: Optional[str]
+    type_hint: str | None
     is_constant: bool
 
 
@@ -73,19 +73,19 @@ class ImportInfo:
     module: str
     file_path: str
     line_number: int
-    imports: List[str]  # What's being imported
-    alias: Optional[str]  # If imported with 'as'
+    imports: list[str]  # What's being imported
+    alias: str | None  # If imported with 'as'
 
 
 @dataclass
 class CodeMap:
     """Complete code map of the project"""
 
-    functions: List[FunctionInfo]
-    classes: List[ClassInfo]
-    variables: List[VariableInfo]
-    imports: List[ImportInfo]
-    modules: List[str]
+    functions: list[FunctionInfo]
+    classes: list[ClassInfo]
+    variables: list[VariableInfo]
+    imports: list[ImportInfo]
+    modules: list[str]
     generated_at: str
 
 
@@ -94,11 +94,11 @@ class CodeAnalyzer:
 
     def __init__(self, project_root: str):
         self.project_root = Path(project_root)
-        self.functions: List[FunctionInfo] = []
-        self.classes: List[ClassInfo] = []
-        self.variables: List[VariableInfo] = []
-        self.imports: List[ImportInfo] = []
-        self.modules: List[str] = []
+        self.functions: list[FunctionInfo] = []
+        self.classes: list[ClassInfo] = []
+        self.variables: list[VariableInfo] = []
+        self.imports: list[ImportInfo] = []
+        self.modules: list[str] = []
 
     def analyze_project(self) -> CodeMap:
         """Analyze the entire project"""
@@ -170,12 +170,12 @@ class FileAnalyzer(ast.NodeVisitor):
 
     def __init__(self, file_path: str):
         self.file_path = file_path
-        self.functions: List[FunctionInfo] = []
-        self.classes: List[ClassInfo] = []
-        self.variables: List[VariableInfo] = []
-        self.imports: List[ImportInfo] = []
-        self.current_class: Optional[str] = None
-        self.current_function: Optional[str] = None
+        self.functions: list[FunctionInfo] = []
+        self.classes: list[ClassInfo] = []
+        self.variables: list[VariableInfo] = []
+        self.imports: list[ImportInfo] = []
+        self.current_class: str | None = None
+        self.current_function: str | None = None
 
     def visit_FunctionDef(self, node: ast.FunctionDef):
         """Visit function definitions"""
@@ -367,7 +367,7 @@ class CodeMapManager:
 
     def __init__(self, map_file: str = "code_map.json"):
         self.map_file = map_file
-        self.code_map: Optional[CodeMap] = None
+        self.code_map: CodeMap | None = None
 
     def generate_map(self, project_root: str):
         """Generate code map for project"""
@@ -411,7 +411,7 @@ class CodeMapManager:
             json.dump(asdict(self.code_map), f, indent=2, default=str)
         print(f"💾 Code map saved to {self.map_file}")
 
-    def search_functions(self, query: str) -> List[FunctionInfo]:
+    def search_functions(self, query: str) -> list[FunctionInfo]:
         """Search for functions by name"""
         if not self.code_map:
             self.load_map()
@@ -425,7 +425,7 @@ class CodeMapManager:
 
         return results
 
-    def search_classes(self, query: str) -> List[ClassInfo]:
+    def search_classes(self, query: str) -> list[ClassInfo]:
         """Search for classes by name"""
         if not self.code_map:
             self.load_map()
@@ -440,8 +440,8 @@ class CodeMapManager:
         return results
 
     def get_function_signature(
-        self, function_name: str, file_path: Optional[str] = None
-    ) -> Optional[FunctionInfo]:
+        self, function_name: str, file_path: str | None = None
+    ) -> FunctionInfo | None:
         """Get function signature by name"""
         if not self.code_map:
             self.load_map()
@@ -454,8 +454,8 @@ class CodeMapManager:
         return None
 
     def validate_function_call(
-        self, function_name: str, parameters: List[str], file_path: Optional[str] = None
-    ) -> Dict[str, Any]:
+        self, function_name: str, parameters: list[str], file_path: str | None = None
+    ) -> dict[str, Any]:
         """Validate a function call against actual signature"""
         func = self.get_function_signature(function_name, file_path)
 
@@ -483,7 +483,7 @@ class CodeMapManager:
             "line": func.line_number,
         }
 
-    def _get_similar_functions(self, function_name: str) -> List[str]:
+    def _get_similar_functions(self, function_name: str) -> list[str]:
         """Get similar function names for suggestions"""
         if not self.code_map:
             return []

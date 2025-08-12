@@ -1,16 +1,16 @@
 """
 Pydantic models for todo items and API messages.
 """
-from typing import Optional, Union
-from pydantic import BaseModel, Field, validator
 from datetime import datetime
+
+from pydantic import BaseModel, Field, validator
 
 
 class TodoItemBase(BaseModel):
     title: str = Field(
         ..., min_length=2, max_length=200, description="Title of the todo item."
     )
-    description: Optional[str] = Field(
+    description: str | None = Field(
         None, max_length=1000, description="Description of the todo item."
     )
     completed: bool = Field(default=False, description="Completion status.")
@@ -27,12 +27,12 @@ class TodoItemCreate(TodoItemBase):
 
 
 class TodoItemUpdate(BaseModel):
-    title: Optional[str] = Field(None, min_length=2, max_length=200)
-    description: Optional[str] = Field(None, max_length=1000)
-    completed: Optional[bool] = Field(None)
+    title: str | None = Field(None, min_length=2, max_length=200)
+    description: str | None = Field(None, max_length=1000)
+    completed: bool | None = Field(None)
 
     @validator("title")
-    def title_must_not_be_blank(cls, v: Optional[str]) -> Optional[str]:
+    def title_must_not_be_blank(cls, v: str | None) -> str | None:
         if v is not None and not v.strip():
             raise ValueError("Title cannot be blank.")
         return v

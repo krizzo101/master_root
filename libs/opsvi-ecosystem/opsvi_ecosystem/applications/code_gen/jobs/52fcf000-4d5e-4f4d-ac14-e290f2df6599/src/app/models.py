@@ -2,17 +2,19 @@
 SQLAlchemy ORM models: User, Project, Report, File, etc.
 """
 from datetime import datetime
+
 from sqlalchemy import (
+    JSON,
+    Boolean,
     Column,
-    Integer,
-    String,
     DateTime,
     ForeignKey,
+    Integer,
+    String,
     Text,
-    Boolean,
-    JSON,
 )
 from sqlalchemy.orm import relationship
+
 from app.db import Base
 
 

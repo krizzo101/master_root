@@ -4,13 +4,11 @@ Tests for opsvi-rag components
 """
 
 import pytest
-import asyncio
-from unittest.mock import Mock, patch, AsyncMock
-from typing import Any, Dict, List
 
 from opsvi_rag import OpsviRagManager
 from opsvi_rag.config.settings import OpsviRagConfig
 from opsvi_rag.exceptions.base import OpsviRagError
+
 
 class TestOpsviRag:
     """Test cases for opsvi-rag."""
@@ -36,7 +34,7 @@ class TestOpsviRag:
         """Test component start and stop."""
         await component.start()
         assert component.is_active()
-        
+
         await component.stop()
         assert not component.is_active()
 
@@ -54,4 +52,3 @@ class TestOpsviRag:
             pass
 
     # Component-specific tests
-    

@@ -4,7 +4,8 @@ HTML Parser and Headline Extractor:
 Parses retrieved HTML using CSS selectors or XPath (BeautifulSoup/lxml) to extract news headlines.
 """
 import logging
-from typing import List, Dict, Any
+from typing import Any
+
 from bs4 import BeautifulSoup
 
 logger = logging.getLogger("scraper.parser")
@@ -15,10 +16,10 @@ class HeadlineExtractor:
     Extracts headlines according to per-site parsing rules.
     """
 
-    def __init__(self, parsing_rules: Dict[str, Any]):
+    def __init__(self, parsing_rules: dict[str, Any]):
         self.parsing_rules = parsing_rules
 
-    def extract_headlines(self, html: str) -> List[str]:
+    def extract_headlines(self, html: str) -> list[str]:
         """
         Extract headlines using configured CSS selectors or XPaths.
         Args:

@@ -7,8 +7,8 @@ proper environment variable handling and path resolution.
 
 import logging
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pytest
 

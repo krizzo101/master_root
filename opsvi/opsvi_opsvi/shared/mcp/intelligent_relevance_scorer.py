@@ -15,12 +15,12 @@ This agent is embedded within the research workflow to provide
 intelligent URL ranking for better research outcomes.
 """
 
-from dataclasses import dataclass
 import json
 import logging
-from pathlib import Path
 import sys
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
 # Add src to path if needed
 if "src" not in sys.path:
@@ -36,8 +36,8 @@ class RelevanceEvaluation:
     score: float  # 0.0 - 5.0 scale
     reasoning: str
     confidence: float  # 0.0 - 1.0
-    key_factors: List[str]
-    quality_indicators: List[str]
+    key_factors: list[str]
+    quality_indicators: list[str]
 
 
 class IntelligentRelevanceScorer:
@@ -74,7 +74,7 @@ class IntelligentRelevanceScorer:
         url: str,
         title: str,
         description: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> RelevanceEvaluation:
         """
         Evaluate the relevance of a URL using intelligent LLM analysis
@@ -111,7 +111,7 @@ class IntelligentRelevanceScorer:
         url: str,
         title: str,
         description: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> str:
         """Create specialized prompt for relevance evaluation"""
 
@@ -273,9 +273,9 @@ Now evaluate the given search result:"""
     async def batch_evaluate_urls(
         self,
         query: str,
-        urls_data: List[Dict[str, str]],
-        context: Optional[Dict[str, Any]] = None,
-    ) -> List[Tuple[Dict[str, str], RelevanceEvaluation]]:
+        urls_data: list[dict[str, str]],
+        context: dict[str, Any] | None = None,
+    ) -> list[tuple[dict[str, str], RelevanceEvaluation]]:
         """
         Evaluate multiple URLs for relevance in batch
 
@@ -311,7 +311,7 @@ async def intelligent_relevance_score(
     url: str,
     title: str,
     description: str,
-    context: Optional[Dict[str, Any]] = None,
+    context: dict[str, Any] | None = None,
 ) -> float:
     """
     Convenience function to get intelligent relevance score

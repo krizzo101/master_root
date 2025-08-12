@@ -1,9 +1,6 @@
+import csv
 import subprocess
 import sys
-import tempfile
-from pathlib import Path
-import csv
-import os
 
 
 def test_cli_text_report(tmp_path):

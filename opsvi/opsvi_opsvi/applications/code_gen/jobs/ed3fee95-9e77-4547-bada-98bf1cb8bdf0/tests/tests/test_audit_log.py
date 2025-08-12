@@ -1,4 +1,3 @@
-import pytest
 from ai_collab_task_manager.audit_log import audit_log_event
 from ai_collab_task_manager.models import AuditLog
 

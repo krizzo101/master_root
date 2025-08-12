@@ -27,11 +27,9 @@ Taxonomy Mapper Module for Documentation Rule Generator.
 This module maps content to taxonomy categories.
 """
 
-import os
 import re
 import logging
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Set
+from typing import Dict, List, Any
 
 # Configure logging
 logging.basicConfig(

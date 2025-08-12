@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import BaseModel, Field
 
 
@@ -10,7 +8,7 @@ class AgentSpecificationOutput(BaseModel):
     DO NOT return just the array directly - wrap it in this object structure.
     """
 
-    agent_specifications: List["AgentSpecification"] = Field(
+    agent_specifications: list["AgentSpecification"] = Field(
         description="Array of agent specifications for the subdivided workflow. This must be wrapped in a JSON object with key 'agent_specifications'",
         min_items=1,
         max_items=10,
@@ -43,19 +41,19 @@ class AgentSpecification(BaseModel):
         max_length=2000,
     )
 
-    tools: List[str] = Field(
+    tools: list[str] = Field(
         description="List of tool names this agent needs", default_factory=list
     )
 
-    deliverables: List[str] = Field(
+    deliverables: list[str] = Field(
         description="Specific outputs this agent will produce", default_factory=list
     )
 
-    handoff_targets: List[str] = Field(
+    handoff_targets: list[str] = Field(
         description="Other agents this agent can hand off to", default_factory=list
     )
 
-    integration_requirements: List[str] = Field(
+    integration_requirements: list[str] = Field(
         description="How this agent's output integrates with others",
         default_factory=list,
     )

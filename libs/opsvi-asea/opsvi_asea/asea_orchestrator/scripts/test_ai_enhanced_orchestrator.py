@@ -5,7 +5,6 @@ Validates budget management, AI reasoning, and workflow intelligence.
 """
 
 import asyncio
-import json
 import os
 import sys
 from pathlib import Path
@@ -13,7 +12,6 @@ from pathlib import Path
 # Add the src directory to the path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from asea_orchestrator.plugins.plugin_manager import PluginManager
 from asea_orchestrator.plugins.types import PluginConfig, ExecutionContext
 from asea_orchestrator.plugins.available.budget_manager_plugin import (
     BudgetManagerPlugin,

@@ -5,13 +5,12 @@ Utility functions for Docker operations, health checks, monitoring, and security
 Provides helper functions and common operations for Docker management.
 """
 
-import logging
-import os
 import hashlib
 import json
+import logging
 import subprocess
-from typing import Any, Dict, List, Optional, Union
-from datetime import datetime, timedelta
+from datetime import datetime
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +73,7 @@ class DockerUtils:
             return False
 
     @staticmethod
-    def get_docker_info() -> Dict[str, Any]:
+    def get_docker_info() -> dict[str, Any]:
         """Get Docker system information.
 
         Returns:
@@ -115,7 +114,7 @@ class DockerUtils:
             return 0
 
     @staticmethod
-    def get_container_ip(container_id: str) -> Optional[str]:
+    def get_container_ip(container_id: str) -> str | None:
         """Get container IP address.
 
         Args:
@@ -144,7 +143,7 @@ class DockerUtils:
             return None
 
     @staticmethod
-    def get_container_ports(container_id: str) -> Dict[str, List[Dict[str, str]]]:
+    def get_container_ports(container_id: str) -> dict[str, list[dict[str, str]]]:
         """Get container port mappings.
 
         Args:
@@ -177,7 +176,7 @@ class ContainerUtils:
 
     @staticmethod
     def generate_container_name(
-        prefix: str = "opsvi", suffix: Optional[str] = None
+        prefix: str = "opsvi", suffix: str | None = None
     ) -> str:
         """Generate a unique container name.
 
@@ -299,7 +298,7 @@ class ImageUtils:
         return not any(char in name for char in invalid_chars)
 
     @staticmethod
-    def parse_image_reference(image_ref: str) -> Dict[str, str]:
+    def parse_image_reference(image_ref: str) -> dict[str, str]:
         """Parse image reference into components.
 
         Args:
@@ -557,7 +556,7 @@ class HealthUtils:
     """Utility functions for health checks."""
 
     @staticmethod
-    def check_container_health(container_id: str) -> Dict[str, Any]:
+    def check_container_health(container_id: str) -> dict[str, Any]:
         """Check container health status.
 
         Args:
@@ -615,7 +614,7 @@ class HealthUtils:
             return False
 
     @staticmethod
-    def check_docker_daemon_health() -> Dict[str, Any]:
+    def check_docker_daemon_health() -> dict[str, Any]:
         """Check Docker daemon health.
 
         Returns:
@@ -673,7 +672,7 @@ class MonitoringUtils:
         return f"{value:.1f}%"
 
     @staticmethod
-    def calculate_average(values: List[float]) -> float:
+    def calculate_average(values: list[float]) -> float:
         """Calculate average of values.
 
         Args:
@@ -687,7 +686,7 @@ class MonitoringUtils:
         return sum(values) / len(values)
 
     @staticmethod
-    def calculate_percentile(values: List[float], percentile: float) -> float:
+    def calculate_percentile(values: list[float], percentile: float) -> float:
         """Calculate percentile of values.
 
         Args:
@@ -715,7 +714,7 @@ class SecurityUtils:
     """Utility functions for security operations."""
 
     @staticmethod
-    def scan_image_vulnerabilities(image_name: str) -> Dict[str, Any]:
+    def scan_image_vulnerabilities(image_name: str) -> dict[str, Any]:
         """Scan image for vulnerabilities.
 
         Args:
@@ -740,7 +739,7 @@ class SecurityUtils:
             return {"scanned": False, "error": str(e), "timestamp": datetime.now()}
 
     @staticmethod
-    def validate_security_policy(container_config: Dict[str, Any]) -> Dict[str, Any]:
+    def validate_security_policy(container_config: dict[str, Any]) -> dict[str, Any]:
         """Validate container security policy.
 
         Args:
@@ -776,7 +775,7 @@ class SecurityUtils:
         }
 
     @staticmethod
-    def generate_security_report(container_id: str) -> Dict[str, Any]:
+    def generate_security_report(container_id: str) -> dict[str, Any]:
         """Generate security report for container.
 
         Args:
@@ -819,8 +818,8 @@ class SecurityUtils:
 
     @staticmethod
     def _generate_security_recommendations(
-        security_analysis: Dict[str, Any]
-    ) -> List[str]:
+        security_analysis: dict[str, Any]
+    ) -> list[str]:
         """Generate security recommendations.
 
         Args:
@@ -871,7 +870,7 @@ class VulnerabilityScanner:
         except Exception:
             return False
 
-    def scan_image(self, image_name: str) -> Dict[str, Any]:
+    def scan_image(self, image_name: str) -> dict[str, Any]:
         """Scan image for vulnerabilities.
 
         Args:

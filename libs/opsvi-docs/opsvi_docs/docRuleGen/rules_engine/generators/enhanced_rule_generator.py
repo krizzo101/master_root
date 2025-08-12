@@ -13,9 +13,8 @@ It extends the basic rule generator with validation, verification, and automatic
 
 import os
 import json
-import time
 import re
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional
 from pathlib import Path
 
 from openai import OpenAI
@@ -31,9 +30,7 @@ from rules_engine.utils.file_utils import (
     ensure_rules_dir,
     rule_file_exists,
     get_rule_file_path,
-    read_rule_file,
 )
-from rules_engine.utils.reasoning import apply_reasoning_method
 from rules_engine.generators.rule_generator import analyze_dependencies
 
 # Initialize the OpenAI client
@@ -807,7 +804,7 @@ def create_rule_with_feedback(
             with open(standalone_rules_generation_path, "r", encoding="utf-8") as f:
                 standalone_rules_generation_content = f.read()
             print(
-                f"Successfully loaded rule 012 for standalone rule generation standards"
+                "Successfully loaded rule 012 for standalone rule generation standards"
             )
         except Exception as e:
             print(f"Could not load rule 012: {str(e)}")
@@ -821,7 +818,7 @@ def create_rule_with_feedback(
         try:
             with open(ai_interpretability_path, "r", encoding="utf-8") as f:
                 ai_interpretability_content = f.read()
-            print(f"Successfully loaded rule 015 for AI interpretability standards")
+            print("Successfully loaded rule 015 for AI interpretability standards")
         except Exception as e:
             print(f"Could not load rule 015: {str(e)}")
 

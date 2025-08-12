@@ -1,6 +1,5 @@
 from celery import Celery
 from celery.signals import worker_process_init
-import os
 
 # It's a common practice to define the Celery app instance in a separate file.
 # This prevents circular import issues.

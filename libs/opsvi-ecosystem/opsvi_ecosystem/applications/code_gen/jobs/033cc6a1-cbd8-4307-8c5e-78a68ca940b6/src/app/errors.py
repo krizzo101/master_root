@@ -1,10 +1,10 @@
 """
 Centralized error handler registrations for the Flask app.
 """
-from flask import render_template
-from werkzeug.exceptions import HTTPException
-from flask import Flask
 import logging
+
+from flask import Flask, render_template
+from werkzeug.exceptions import HTTPException
 
 
 def register_error_handlers(app: Flask) -> None:

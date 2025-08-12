@@ -1,16 +1,14 @@
-import pytest
 from ai_collab_task_manager.models import (
-    User,
-    Team,
-    TeamMembers,
+    AuditLog,
+    Comment,
+    Notification,
     Task,
     TaskAssignment,
-    Comment,
+    Team,
+    TeamMembers,
     TimeEntry,
-    Notification,
-    AuditLog,
+    User,
 )
-from datetime import datetime, timedelta
 
 
 def test_user_model_creation():

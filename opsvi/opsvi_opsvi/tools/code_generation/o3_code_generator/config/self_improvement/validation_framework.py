@@ -14,10 +14,11 @@ Usage as a script:
 
 import ast
 import difflib
-from pathlib import Path
 import sys
 import traceback
-from typing import Any, Callable
+from collections.abc import Callable
+from pathlib import Path
+from typing import Any
 
 # Add the parent directory to the path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent))

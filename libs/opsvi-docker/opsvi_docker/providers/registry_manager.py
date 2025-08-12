@@ -6,15 +6,10 @@ Provides comprehensive registry operations and authentication.
 """
 
 import logging
-import base64
-import json
-from typing import Any, Dict, List, Optional, Union
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import dataclass
+from typing import Any
 
 from docker import DockerClient
-from docker.errors import DockerException, APIError
-
 from opsvi_foundation import BaseComponent, ComponentError
 
 logger = logging.getLogger(__name__)
@@ -32,26 +27,26 @@ class RegistryConfig:
 
     # Registry settings
     url: str = ""
-    username: Optional[str] = None
-    password: Optional[str] = None
+    username: str | None = None
+    password: str | None = None
 
     # Authentication settings
-    auth_token: Optional[str] = None
-    auth_config: Optional[Dict[str, Any]] = None
+    auth_token: str | None = None
+    auth_config: dict[str, Any] | None = None
 
     # Security settings
     insecure_registry: bool = False
     verify_tls: bool = True
-    ca_cert: Optional[str] = None
-    client_cert: Optional[str] = None
-    client_key: Optional[str] = None
+    ca_cert: str | None = None
+    client_cert: str | None = None
+    client_key: str | None = None
 
     # Connection settings
     timeout: int = 60
     max_retries: int = 3
 
     # Default settings
-    default_namespace: Optional[str] = None
+    default_namespace: str | None = None
     default_tag: str = "latest"
 
 
@@ -71,11 +66,11 @@ class RegistryInfo:
 
     # Authentication info
     authenticated: bool
-    username: Optional[str] = None
+    username: str | None = None
 
     # Additional metadata
-    description: Optional[str] = None
-    documentation: Optional[str] = None
+    description: str | None = None
+    documentation: str | None = None
 
 
 class RegistryManager(BaseComponent):
@@ -102,7 +97,7 @@ class RegistryManager(BaseComponent):
 
         self.client = client
         self.config = config
-        self._registries: Dict[str, RegistryConfig] = {}
+        self._registries: dict[str, RegistryConfig] = {}
 
         logger.debug("RegistryManager initialized")
 
@@ -206,7 +201,7 @@ class RegistryManager(BaseComponent):
 
     async def search_registry(
         self, registry_url: str, query: str, limit: int = 25
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Search for images in a registry.
 
         Args:
@@ -243,8 +238,8 @@ class RegistryManager(BaseComponent):
             raise RegistryError(f"Registry search failed: {e}")
 
     async def list_repositories(
-        self, registry_url: str, namespace: Optional[str] = None
-    ) -> List[str]:
+        self, registry_url: str, namespace: str | None = None
+    ) -> list[str]:
         """List repositories in a registry.
 
         Args:
@@ -279,7 +274,7 @@ class RegistryManager(BaseComponent):
             )
             raise RegistryError(f"Failed to list repositories: {e}")
 
-    async def list_tags(self, registry_url: str, repository: str) -> List[str]:
+    async def list_tags(self, registry_url: str, repository: str) -> list[str]:
         """List tags for a repository.
 
         Args:
@@ -447,7 +442,7 @@ class RegistryManager(BaseComponent):
             logger.error(f"Failed to delete image from registry {registry_url}: {e}")
             raise RegistryError(f"Image deletion failed: {e}")
 
-    async def list_registries(self) -> List[str]:
+    async def list_registries(self) -> list[str]:
         """List configured registries.
 
         Returns:

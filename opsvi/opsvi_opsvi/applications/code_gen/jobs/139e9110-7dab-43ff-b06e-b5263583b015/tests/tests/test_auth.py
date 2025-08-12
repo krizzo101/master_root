@@ -1,18 +1,18 @@
+from datetime import timedelta
+from unittest.mock import MagicMock
+
 import pytest
 from backend.auth import (
-    verify_password,
-    hash_password,
-    get_user,
     authenticate,
     create_access_token,
     decode_access_token,
-    require_role,
-    register_user,
+    get_user,
+    hash_password,
     login,
-    TokenData,
+    register_user,
+    require_role,
+    verify_password,
 )
-from unittest.mock import MagicMock
-from datetime import timedelta
 
 
 @pytest.fixture

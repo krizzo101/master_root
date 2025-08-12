@@ -1,5 +1,4 @@
-import pytest
-from app.errors import not_found_error, internal_error, unhandled_exception
+from app.errors import internal_error, not_found_error, unhandled_exception
 
 
 def test_not_found_error_returns_404_response():

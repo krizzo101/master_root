@@ -1,13 +1,12 @@
 import pytest
-from flask import Flask, Response, json
 from app import (
     create_app,
-    log_request,
-    hello_world,
-    not_found,
-    method_not_allowed,
     handle_exception,
+    log_request,
+    method_not_allowed,
+    not_found,
 )
+from flask import Flask, json
 
 
 @pytest.fixture(scope="module")
@@ -46,9 +45,7 @@ def test_hello_world_returns_expected_response(test_client):
     assert "text" in response.content_type, "Content-Type should be a type of text"
 
 
-import logging
 from unittest.mock import patch
-from flask import Request
 
 
 def test_log_request_logs_info_and_returns_none(test_client):
@@ -56,7 +53,6 @@ def test_log_request_logs_info_and_returns_none(test_client):
         response = test_client.get("/")
         # call log_request with current request context
         # We need to simulate a call context
-        from flask import request
 
         # Invoke log_request explicitly to test
         result = log_request()
@@ -82,8 +78,6 @@ def test_not_found_handler_returns_404_json_response():
 
 
 def test_method_not_allowed_handler_returns_405_json_response():
-    from werkzeug.exceptions import MethodNotAllowed
-
     error = MethodNotAllowed(description="Method Not Allowed")
     response = method_not_allowed(error)
     assert response.status_code == 405
@@ -174,7 +168,7 @@ def test_root_route_response_content_type_and_headers(test_client):
     assert int(response.headers["Content-Length"]) == len("Hello, World!")
 
 
-from werkzeug.exceptions import NotFound, MethodNotAllowed
+from werkzeug.exceptions import MethodNotAllowed, NotFound
 
 
 def test_error_handlers_return_json_and_expected_status_codes(test_client):
@@ -208,9 +202,8 @@ def test_logging_does_not_raise_under_normal_operation(test_client):
     assert response.status_code == 200
 
 
-from werkzeug.exceptions import BadRequest, Unauthorized, Forbidden, NotFound
-
 import pytest
+from werkzeug.exceptions import Forbidden, Unauthorized
 
 
 @pytest.mark.parametrize(

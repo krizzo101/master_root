@@ -12,12 +12,8 @@ This module contains utilities for generating complete rule files.
 
 import os
 import json
-import time
-import re
 import yaml
-from typing import Dict, Any, List, Optional, Tuple
-from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Dict, Any, List
 
 from openai import OpenAI
 
@@ -29,7 +25,6 @@ from rules_engine.utils.file_utils import (
     rule_file_exists,
     get_rule_file_path,
 )
-from rules_engine.utils.reasoning import apply_reasoning_method
 
 # Initialize the OpenAI client
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -117,7 +112,7 @@ def generate_rule_sections_parallel(
 
     # Initial sections that don't have dependencies
     frontmatter = generate_rule_section(rule_id, rule_name, "frontmatter", category)
-    print(f"  ✓ Generated frontmatter")
+    print("  ✓ Generated frontmatter")
 
     # Get rule dependencies for metadata
     dependencies = analyze_dependencies(rule_id, rule_name, category)
@@ -125,11 +120,11 @@ def generate_rule_sections_parallel(
     # Generate metadata with dependencies
     metadata = generate_rule_section(rule_id, rule_name, "metadata", category)
     metadata["inherits"] = dependencies
-    print(f"  ✓ Generated metadata")
+    print("  ✓ Generated metadata")
 
     # Generate overview
     overview = generate_rule_section(rule_id, rule_name, "overview", category)
-    print(f"  ✓ Generated overview")
+    print("  ✓ Generated overview")
 
     # Create initial section results
     rule_content = {
@@ -142,17 +137,17 @@ def generate_rule_sections_parallel(
     main_sections = generate_rule_section(
         rule_id, rule_name, "main_sections", category, rule_content
     )
-    print(f"  ✓ Generated main sections")
+    print("  ✓ Generated main sections")
     rule_content["main_sections"] = main_sections
 
     # Generate examples using detailed example generator
     examples = generate_detailed_example(rule_id, rule_name, category, rule_content)
-    print(f"  ✓ Generated examples")
+    print("  ✓ Generated examples")
     rule_content["examples"] = examples
 
     # Generate danger section
     danger = generate_rule_section(rule_id, rule_name, "danger", category, rule_content)
-    print(f"  ✓ Generated danger section")
+    print("  ✓ Generated danger section")
     rule_content["danger"] = danger
 
     return rule_content

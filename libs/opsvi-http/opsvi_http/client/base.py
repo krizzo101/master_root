@@ -3,16 +3,14 @@
 Comprehensive HTTP client abstraction for the OPSVI ecosystem
 """
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Union
+from abc import abstractmethod
+from typing import Any, Dict, Optional, Union
 import asyncio
 import logging
 from enum import Enum
-from datetime import datetime, timedelta
-from urllib.parse import urljoin, urlparse
+from datetime import datetime
+from urllib.parse import urljoin
 
-import aiohttp
-import httpx
 from pydantic import BaseModel, Field, ConfigDict
 
 from opsvi_foundation import BaseComponent, ComponentError, BaseSettings

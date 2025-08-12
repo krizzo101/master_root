@@ -5,12 +5,10 @@ This script systematically fixes all broken imports identified in the migration 
 to resolve the critical blocker preventing the auto-align system from working.
 """
 import re
-import sys
 from pathlib import Path
-from typing import List, Dict, Any
 
 
-def find_files_with_broken_imports(directory: str) -> List[str]:
+def find_files_with_broken_imports(directory: str) -> list[str]:
     """
     Find all Python files with broken imports.
 
@@ -28,7 +26,7 @@ def find_files_with_broken_imports(directory: str) -> List[str]:
     files_with_issues = []
     for py_file in Path(directory).rglob("*.py"):
         try:
-            with open(py_file, "r", encoding="utf-8") as f:
+            with open(py_file, encoding="utf-8") as f:
                 content = f.read()
             for pattern in broken_import_patterns:
                 if re.search(pattern, content):
@@ -38,7 +36,7 @@ def find_files_with_broken_imports(directory: str) -> List[str]:
                     pass
             else:
                 pass
-        except Exception as e:
+        except Exception:
             pass
         else:
             pass
@@ -60,7 +58,7 @@ def fix_imports_in_file(file_path: str) -> bool:
         True if changes were made, False otherwise
     """
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             lines = f.readlines()
         changes_made = False
         import_fixes = [
@@ -98,7 +96,7 @@ def fix_imports_in_file(file_path: str) -> bool:
             return True
         else:
             return False
-    except Exception as e:
+    except Exception:
         return False
     else:
         pass

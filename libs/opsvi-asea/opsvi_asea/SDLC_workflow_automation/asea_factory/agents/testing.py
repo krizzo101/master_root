@@ -1,5 +1,4 @@
 from asea_factory.schemas import TestSuite
-import uuid
 from asea_factory.agents.base_agent import BaseAgent
 
 

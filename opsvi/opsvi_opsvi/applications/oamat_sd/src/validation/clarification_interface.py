@@ -6,7 +6,7 @@ Extracted from request_validation.py for better modularity.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
@@ -22,7 +22,7 @@ from src.applications.oamat_sd.src.models.validation_models import (
 class ClarificationInterface:
     """Handles user interaction and clarification processing"""
 
-    def __init__(self, model_config: Optional[Dict[str, Any]] = None):
+    def __init__(self, model_config: dict[str, Any] | None = None):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
         # AI model for intelligent clarification generation
@@ -46,10 +46,10 @@ class ClarificationInterface:
 
     async def generate_clarification_questions(
         self,
-        gaps: List[InformationGap],
+        gaps: list[InformationGap],
         request_type: RequestType,
         original_request: str = "",
-    ) -> List[ClarificationQuestion]:
+    ) -> list[ClarificationQuestion]:
         """Generate focused clarification questions for information gaps"""
 
         if self.ai_enabled:
@@ -61,10 +61,10 @@ class ClarificationInterface:
 
     async def _ai_generate_questions(
         self,
-        gaps: List[InformationGap],
+        gaps: list[InformationGap],
         request_type: RequestType,
         original_request: str,
-    ) -> List[ClarificationQuestion]:
+    ) -> list[ClarificationQuestion]:
         """AI-powered clarification question generation"""
 
         if not gaps:
@@ -99,7 +99,7 @@ class ClarificationInterface:
 
     async def _ai_generate_single_question(
         self, gap: InformationGap, request_type: RequestType, original_request: str
-    ) -> Optional[ClarificationQuestion]:
+    ) -> ClarificationQuestion | None:
         """Generate a single clarification question using AI"""
 
         system_prompt = f"""You are a helpful project consultant. Generate a clear, specific question to clarify missing information for a {request_type.value} project.
@@ -161,8 +161,8 @@ Generate a clarification question for the missing field: {gap.field_name}"""
         return None
 
     def _standard_generate_questions(
-        self, gaps: List[InformationGap], request_type: RequestType
-    ) -> List[ClarificationQuestion]:
+        self, gaps: list[InformationGap], request_type: RequestType
+    ) -> list[ClarificationQuestion]:
         """Standard template-based clarification question generation"""
 
         questions = []
@@ -181,7 +181,7 @@ Generate a clarification question for the missing field: {gap.field_name}"""
 
     def _standard_generate_single_question(
         self, gap: InformationGap, request_type: RequestType
-    ) -> Optional[ClarificationQuestion]:
+    ) -> ClarificationQuestion | None:
         """Generate a single clarification question using templates"""
 
         # Standard question templates by field
@@ -262,7 +262,7 @@ Generate a clarification question for the missing field: {gap.field_name}"""
             default_option=template.get("default") if "default" in template else None,
         )
 
-    def format_questions_for_user(self, questions: List[ClarificationQuestion]) -> str:
+    def format_questions_for_user(self, questions: list[ClarificationQuestion]) -> str:
         """Format clarification questions for user presentation"""
 
         if not questions:
@@ -289,8 +289,8 @@ Generate a clarification question for the missing field: {gap.field_name}"""
         return "\n".join(formatted_lines)
 
     async def parse_user_responses(
-        self, user_input: str, questions: List[ClarificationQuestion]
-    ) -> Dict[str, Any]:
+        self, user_input: str, questions: list[ClarificationQuestion]
+    ) -> dict[str, Any]:
         """Parse user responses to clarification questions"""
 
         if self.ai_enabled:
@@ -299,8 +299,8 @@ Generate a clarification question for the missing field: {gap.field_name}"""
             return self._standard_parse_responses(user_input, questions)
 
     async def _ai_parse_responses(
-        self, user_input: str, questions: List[ClarificationQuestion]
-    ) -> Dict[str, Any]:
+        self, user_input: str, questions: list[ClarificationQuestion]
+    ) -> dict[str, Any]:
         """AI-powered response parsing"""
 
         question_context = "\n".join(
@@ -333,8 +333,8 @@ Example: {{"framework": "React", "database": "PostgreSQL", "authentication": "JW
             return self._standard_parse_responses(user_input, questions)
 
     def _standard_parse_responses(
-        self, user_input: str, questions: List[ClarificationQuestion]
-    ) -> Dict[str, Any]:
+        self, user_input: str, questions: list[ClarificationQuestion]
+    ) -> dict[str, Any]:
         """Standard pattern-based response parsing"""
 
         responses = {}
@@ -380,7 +380,7 @@ Example: {{"framework": "React", "database": "PostgreSQL", "authentication": "JW
 
         return responses
 
-    def _parse_question_response(self, ai_response: str) -> Optional[Dict[str, Any]]:
+    def _parse_question_response(self, ai_response: str) -> dict[str, Any] | None:
         """Parse AI-generated question response"""
         try:
             import json
@@ -405,7 +405,7 @@ Example: {{"framework": "React", "database": "PostgreSQL", "authentication": "JW
 
         return question_data if question_data else None
 
-    def _parse_response_extraction(self, ai_response: str) -> Dict[str, Any]:
+    def _parse_response_extraction(self, ai_response: str) -> dict[str, Any]:
         """Parse AI response extraction"""
         try:
             import json

@@ -1,5 +1,5 @@
 import pytest
-from app.main import health_check, startup_event, shutdown_event
+from app.main import health_check, shutdown_event, startup_event
 
 
 def test_health_check_returns_ok_status():

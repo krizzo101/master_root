@@ -6,7 +6,6 @@ Extracted from complexity_model.py for better modularity.
 """
 
 import logging
-from typing import Dict, List
 
 from src.applications.oamat_sd.src.config.config_manager import ConfigManager
 from src.applications.oamat_sd.src.models.complexity_models import ComplexityFactor
@@ -15,12 +14,12 @@ from src.applications.oamat_sd.src.models.complexity_models import ComplexityFac
 class FactorAnalyzer:
     """Analyzes individual complexity factors using pattern recognition"""
 
-    def __init__(self, factor_weights: Dict[str, float]):
+    def __init__(self, factor_weights: dict[str, float]):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.factor_weights = factor_weights
         self.complexity_indicators = self._initialize_indicators()
 
-    def _initialize_indicators(self) -> Dict[str, Dict[str, List[str]]]:
+    def _initialize_indicators(self) -> dict[str, dict[str, list[str]]]:
         """Initialize complexity indicators for automated detection."""
         return {
             "scope": {

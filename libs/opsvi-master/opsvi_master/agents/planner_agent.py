@@ -8,15 +8,14 @@ Optimized for autonomous workflow execution with human oversight points.
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set
 
 from .base_agent import BaseAgent, AgentCapability, AgentMessage, MessageType
-from .error_handling import with_retry, with_circuit_breaker, RetryConfig, ErrorSeverity
+from .error_handling import with_retry, RetryConfig
 
 logger = logging.getLogger(__name__)
 

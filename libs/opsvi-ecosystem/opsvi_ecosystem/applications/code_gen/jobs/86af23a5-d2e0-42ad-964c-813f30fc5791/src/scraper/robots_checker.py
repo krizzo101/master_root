@@ -3,11 +3,11 @@
 Robots.txt Compliance Checker:
 Fetches and parses robots.txt for each domain. Ensures URLs to scrape are permitted.
 """
+import logging
 from urllib import robotparser
 from urllib.parse import urlparse
-from typing import Dict
+
 import requests
-import logging
 
 USER_AGENT = "PythonNewsScraperBot/1.0"
 logger = logging.getLogger("scraper.robots_checker")
@@ -20,7 +20,7 @@ class RobotsChecker:
 
     def __init__(self, user_agent: str = USER_AGENT):
         self.user_agent = user_agent
-        self.parsers: Dict[str, robotparser.RobotFileParser] = {}
+        self.parsers: dict[str, robotparser.RobotFileParser] = {}
 
     def is_allowed(self, url: str) -> bool:
         """

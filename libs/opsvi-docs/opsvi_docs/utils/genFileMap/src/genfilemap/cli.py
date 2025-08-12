@@ -14,11 +14,10 @@ import os
 import sys
 import argparse
 import asyncio
-from pathlib import Path
 
 from genfilemap.config import Config, DEFAULT_CONFIG_PATH
 from genfilemap.core import process_files_async, generate_project_map
-from genfilemap.models.schemas import load_schema, FILE_MAP_SCHEMA
+from genfilemap.models.schemas import load_schema
 
 
 def main():

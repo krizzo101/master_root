@@ -4,10 +4,10 @@ OAMAT Agent Models
 Contains all Pydantic models, enums, and data structures for the OAMAT system.
 """
 
+import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Literal, Optional
-import uuid
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -49,7 +49,7 @@ class NodeResourceRequirements(BaseModel):
     """Resource requirements for individual workflow nodes"""
 
     model_config = ConfigDict(extra="forbid")
-    estimated_duration_minutes: Optional[int] = None
+    estimated_duration_minutes: int | None = None
     cpu_intensity: str = Field(default="medium", description="low, medium, high")
     memory_requirements: str = Field(
         default="standard", description="minimal, standard, high"
@@ -60,7 +60,7 @@ class NodeResourceRequirements(BaseModel):
     storage_needs: str = Field(
         default="temporary", description="none, temporary, persistent"
     )
-    dependencies: List[str] = Field(default_factory=list)
+    dependencies: list[str] = Field(default_factory=list)
 
 
 class NodeMetadata(BaseModel):
@@ -68,21 +68,21 @@ class NodeMetadata(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
     created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
-    estimated_duration: Optional[int] = None
+    estimated_duration: int | None = None
     priority: str = Field(default="normal", description="low, normal, high, critical")
-    retry_policy: Dict[str, Any] = Field(default_factory=dict)
-    timeout_seconds: Optional[int] = None
-    tags: List[str] = Field(default_factory=list)
+    retry_policy: dict[str, Any] = Field(default_factory=dict)
+    timeout_seconds: int | None = None
+    tags: list[str] = Field(default_factory=list)
 
 
 class PlanResourceRequirements(BaseModel):
     """Overall resource requirements for workflow plans"""
 
     model_config = ConfigDict(extra="forbid")
-    total_estimated_duration: Optional[int] = None
+    total_estimated_duration: int | None = None
     peak_agents_required: int = Field(default=1)
-    required_tools: List[str] = Field(default_factory=list)
-    external_dependencies: List[str] = Field(default_factory=list)
+    required_tools: list[str] = Field(default_factory=list)
+    external_dependencies: list[str] = Field(default_factory=list)
     computational_complexity: str = Field(default="medium")
 
 
@@ -109,50 +109,50 @@ class EnhancedRequestAnalysis(BaseModel):
     primary_intent: str = Field(
         default="", description="Main intent of the user request"
     )
-    secondary_intents: List[str] = Field(default_factory=list)
+    secondary_intents: list[str] = Field(default_factory=list)
     domain_category: str = Field(
         default="general", description="Technical domain category"
     )
-    context_understanding: Dict[str, Any] = Field(default_factory=dict)
+    context_understanding: dict[str, Any] = Field(default_factory=dict)
 
     # Complexity and Requirements Analysis
     complexity: TaskComplexity = Field(default=TaskComplexity.MODERATE)
-    estimated_effort_hours: Optional[float] = None
-    required_expertise: List[str] = Field(default_factory=list)
-    required_capabilities: List[str] = Field(default_factory=list)
-    required_tools: List[str] = Field(default_factory=list)
-    estimated_phases: Optional[int] = None
+    estimated_effort_hours: float | None = None
+    required_expertise: list[str] = Field(default_factory=list)
+    required_capabilities: list[str] = Field(default_factory=list)
+    required_tools: list[str] = Field(default_factory=list)
+    estimated_phases: int | None = None
 
     # Agent and Tool Recommendations
-    recommended_agents: List[str] = Field(default_factory=list)
+    recommended_agents: list[str] = Field(default_factory=list)
     suggested_workflow_pattern: str = Field(
         default="research_and_analyze", description="Suggested workflow pattern"
     )
-    alternative_approaches: List[str] = Field(default_factory=list)
+    alternative_approaches: list[str] = Field(default_factory=list)
 
     # Quality and Success Criteria
-    success_criteria: List[str] = Field(default_factory=list)
-    quality_requirements: List[str] = Field(default_factory=list)
-    deliverable_expectations: List[str] = Field(default_factory=list)
+    success_criteria: list[str] = Field(default_factory=list)
+    quality_requirements: list[str] = Field(default_factory=list)
+    deliverable_expectations: list[str] = Field(default_factory=list)
 
     # Risk and Constraint Analysis
-    identified_risks: List[str] = Field(default_factory=list)
-    risk_factors: List[str] = Field(default_factory=list)
-    uncertainty_factors: List[str] = Field(default_factory=list)
-    constraints: List[str] = Field(default_factory=list)
-    dependencies: List[str] = Field(default_factory=list)
+    identified_risks: list[str] = Field(default_factory=list)
+    risk_factors: list[str] = Field(default_factory=list)
+    uncertainty_factors: list[str] = Field(default_factory=list)
+    constraints: list[str] = Field(default_factory=list)
+    dependencies: list[str] = Field(default_factory=list)
 
     # Strategic Recommendations
     workflow_strategy: WorkflowStrategy = Field(default=WorkflowStrategy.ADAPTIVE)
-    optimization_opportunities: List[str] = Field(default_factory=list)
-    escalation_conditions: List[str] = Field(default_factory=list)
-    clarification_questions: List[str] = Field(default_factory=list)
+    optimization_opportunities: list[str] = Field(default_factory=list)
+    escalation_conditions: list[str] = Field(default_factory=list)
+    clarification_questions: list[str] = Field(default_factory=list)
 
     # Confidence and Validation
     confidence_score: float = Field(default=0.8, ge=0.0, le=1.0)
-    success_probability: Optional[float] = None
+    success_probability: float | None = None
     analysis_timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
-    validation_notes: List[str] = Field(default_factory=list)
+    validation_notes: list[str] = Field(default_factory=list)
 
 
 # Enhanced Workflow Node Model
@@ -173,41 +173,41 @@ class EnhancedWorkflowNode(BaseModel):
     critical: bool = Field(
         default=False, description="If True, workflow stops if this task fails"
     )
-    critical_reason: Optional[str] = Field(
+    critical_reason: str | None = Field(
         default=None, description="Why this task is critical"
     )
 
     # Input and Output Management
     parameters: str = Field(default="{}", description="JSON string of parameters")
-    expected_outputs: List[str] = Field(default_factory=list)
+    expected_outputs: list[str] = Field(default_factory=list)
 
     # Orchestration and Flow Control
-    next_nodes: List[str] = Field(default_factory=list)
-    dependencies: List[str] = Field(
+    next_nodes: list[str] = Field(default_factory=list)
+    dependencies: list[str] = Field(
         default_factory=list,
         description="Node IDs that must complete before this node can execute",
     )
     parallel_eligible: bool = Field(default=True)
 
     # Quality and Success Management
-    success_criteria: List[str] = Field(default_factory=list)
-    quality_gates: List[str] = Field(default_factory=list)
+    success_criteria: list[str] = Field(default_factory=list)
+    quality_gates: list[str] = Field(default_factory=list)
 
     # Integration and Tool Management
-    tools_required: List[str] = Field(default_factory=list)
+    tools_required: list[str] = Field(default_factory=list)
 
     # INTELLIGENT SUBDIVISION - Manager-Driven (NEW)
     requires_subdivision: bool = Field(
         default=False,
         description="If True, this node should be automatically subdivided by WorkflowManager",
     )
-    subdivision_reasoning: Optional[str] = Field(
+    subdivision_reasoning: str | None = Field(
         default=None, description="Why this node was marked for subdivision"
     )
     estimated_sub_nodes: int = Field(
         default=0, description="Estimated number of sub-nodes this will create"
     )
-    suggested_sub_roles: List[str] = Field(
+    suggested_sub_roles: list[str] = Field(
         default_factory=list, description="Suggested agent roles for subdivision"
     )
     complexity_score: float = Field(
@@ -235,20 +235,20 @@ class EnhancedWorkflowPlan(BaseModel):
     complexity: TaskComplexity = Field(default=TaskComplexity.MODERATE)
 
     # Node and Flow Management
-    nodes: List[EnhancedWorkflowNode] = Field(default_factory=list)
+    nodes: list[EnhancedWorkflowNode] = Field(default_factory=list)
 
     # Output and Deliverable Management
-    expected_outputs: List[str] = Field(default_factory=list)
+    expected_outputs: list[str] = Field(default_factory=list)
 
     # Quality and Success Management
-    success_criteria: List[str] = Field(default_factory=list)
-    quality_requirements: List[str] = Field(default_factory=list)
+    success_criteria: list[str] = Field(default_factory=list)
+    quality_requirements: list[str] = Field(default_factory=list)
 
     # Risk and Resilience Management
-    escalation_triggers: List[str] = Field(default_factory=list)
+    escalation_triggers: list[str] = Field(default_factory=list)
 
     # Resource and Performance Management
-    estimated_duration_minutes: Optional[int] = None
+    estimated_duration_minutes: int | None = None
 
 
 # Request Processing Models
@@ -257,9 +257,9 @@ class ProcessingRequest(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
     user_request: str = Field(default="", description="The user's request")
-    context: Dict[str, Any] = Field(default_factory=dict)
-    preferences: Dict[str, Any] = Field(default_factory=dict)
-    constraints: Dict[str, Any] = Field(default_factory=dict)
+    context: dict[str, Any] = Field(default_factory=dict)
+    preferences: dict[str, Any] = Field(default_factory=dict)
+    constraints: dict[str, Any] = Field(default_factory=dict)
 
 
 class ProcessingResponse(BaseModel):
@@ -269,14 +269,14 @@ class ProcessingResponse(BaseModel):
     success: bool = Field(
         default=False, description="Whether the request was processed successfully"
     )
-    analysis: Optional[EnhancedRequestAnalysis] = None
-    workflow: Optional[EnhancedWorkflowPlan] = None
-    error: Optional[str] = None
-    fallback_analysis: Optional[EnhancedRequestAnalysis] = None
-    fallback_workflow: Optional[EnhancedWorkflowPlan] = None
+    analysis: EnhancedRequestAnalysis | None = None
+    workflow: EnhancedWorkflowPlan | None = None
+    error: str | None = None
+    fallback_analysis: EnhancedRequestAnalysis | None = None
+    fallback_workflow: EnhancedWorkflowPlan | None = None
     agent: str = "workflow_manager"
     timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
-    processing_metadata: Dict[str, Any] = Field(default_factory=dict)
+    processing_metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class ClarificationQuestion(BaseModel):
@@ -289,10 +289,10 @@ class ClarificationQuestion(BaseModel):
     question_type: Literal["text", "choice", "yes_no", "optional"] = Field(
         default="text", description="Type of question"
     )
-    options: Optional[List[str]] = Field(
+    options: list[str] | None = Field(
         default=None, description="Available options for choice questions"
     )
-    default_value: Optional[str] = Field(
+    default_value: str | None = Field(
         default=None, description="Default/recommended value"
     )
     priority: Literal["high", "medium", "low"] = Field(
@@ -302,7 +302,7 @@ class ClarificationQuestion(BaseModel):
         default=QuestionCategory.GENERAL,
         description="Question category to guide specification refinement.",
     )
-    explanation: Optional[str] = Field(
+    explanation: str | None = Field(
         default=None, description="Why this question is important"
     )
     skip_if_obvious: bool = Field(
@@ -316,55 +316,55 @@ class ExpandedPrompt(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     # Original request tracking
-    original_request: Optional[str] = Field(
+    original_request: str | None = Field(
         default="", description="The original user request"
     )
 
     # Expanded specification
-    objective: Optional[str] = Field(
+    objective: str | None = Field(
         default="", description="Clear, comprehensive objective statement"
     )
-    scope_and_deliverables: Optional[List[str]] = Field(
+    scope_and_deliverables: list[str] | None = Field(
         default_factory=list, description="Detailed scope and expected deliverables"
     )
-    technical_architecture: Optional[Dict[str, str]] = Field(
+    technical_architecture: dict[str, str] | None = Field(
         default_factory=dict, description="Inferred technical components and approaches"
     )
-    execution_approach: Optional[List[str]] = Field(
+    execution_approach: list[str] | None = Field(
         default_factory=list, description="High-level execution steps"
     )
-    success_criteria: Optional[List[str]] = Field(
+    success_criteria: list[str] | None = Field(
         default_factory=list, description="Measurable success criteria"
     )
 
     # Inferred assumptions
-    inferred_assumptions: Optional[List[str]] = Field(
+    inferred_assumptions: list[str] | None = Field(
         default_factory=list, description="Assumptions made during expansion"
     )
-    domain_category: Optional[str] = Field(
+    domain_category: str | None = Field(
         default="general",
         description="Project domain (e.g., 'web_development', 'data_analysis')",
     )
 
     # Clarification needs
-    clarification_questions: Optional[List[ClarificationQuestion]] = Field(
+    clarification_questions: list[ClarificationQuestion] | None = Field(
         default_factory=list, description="Questions to ask user"
     )
-    high_priority_questions: Optional[List[str]] = Field(
+    high_priority_questions: list[str] | None = Field(
         default_factory=list,
         description="Most critical questions that must be answered",
     )
 
     # Risk and complexity assessment
-    complexity_factors: Optional[List[str]] = Field(
+    complexity_factors: list[str] | None = Field(
         default_factory=list, description="Factors that add complexity"
     )
-    potential_risks: Optional[List[str]] = Field(
+    potential_risks: list[str] | None = Field(
         default_factory=list, description="Identified risks and challenges"
     )
 
     # Recommendations
-    recommended_approaches: Optional[Dict[str, str]] = Field(
+    recommended_approaches: dict[str, str] | None = Field(
         default_factory=dict,
         description="Recommended technical approaches with rationale",
     )
@@ -383,10 +383,10 @@ class UserClarificationResponse(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    responses: List[QuestionAnswer] = Field(
+    responses: list[QuestionAnswer] = Field(
         description="A list of question IDs and their corresponding answers"
     )
-    additional_context: Optional[str] = Field(
+    additional_context: str | None = Field(
         default=None, description="Additional context provided by user"
     )
     skip_remaining: bool = Field(
@@ -400,37 +400,37 @@ class RefinedSpecification(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     # Core specification
-    refined_objective: Optional[str] = Field(
+    refined_objective: str | None = Field(
         default="", description="Refined objective incorporating user feedback"
     )
-    detailed_requirements: Optional[List[str]] = Field(
+    detailed_requirements: list[str] | None = Field(
         default_factory=list, description="Detailed functional requirements"
     )
-    technical_specifications: Optional[Dict[str, str]] = Field(
+    technical_specifications: dict[str, str] | None = Field(
         default_factory=dict, description="Specific technical choices"
     )
 
     # Implementation details
-    implementation_phases: Optional[List[str]] = Field(
+    implementation_phases: list[str] | None = Field(
         default_factory=list, description="Detailed implementation phases"
     )
-    critical_path_items: Optional[List[str]] = Field(
+    critical_path_items: list[str] | None = Field(
         default_factory=list, description="Items that must succeed for project success"
     )
 
     # Quality and success
-    acceptance_criteria: Optional[List[str]] = Field(
+    acceptance_criteria: list[str] | None = Field(
         default_factory=list, description="Specific acceptance criteria"
     )
-    testing_strategy: Optional[List[str]] = Field(
+    testing_strategy: list[str] | None = Field(
         default_factory=list, description="Testing approach and coverage"
     )
 
     # Constraints and considerations
-    constraints: Optional[List[str]] = Field(
+    constraints: list[str] | None = Field(
         default_factory=list, description="Project constraints and limitations"
     )
-    assumptions: Optional[List[str]] = Field(
+    assumptions: list[str] | None = Field(
         default_factory=list, description="Final assumptions being made"
     )
 
@@ -441,10 +441,10 @@ class RefinedSpecification(BaseModel):
         le=1.0,
         description="Agent's confidence in the spec's completeness (0.0-1.0)",
     )
-    estimated_complexity: Optional[TaskComplexity] = Field(
+    estimated_complexity: TaskComplexity | None = Field(
         default=TaskComplexity.MODERATE, description="Estimated project complexity"
     )
-    recommended_timeline: Optional[str] = Field(
+    recommended_timeline: str | None = Field(
         default=None, description="Recommended timeline"
     )
 
@@ -465,7 +465,7 @@ class DynamicQuestionUpdate(BaseModel):
     """Schema for dynamically updating the list of clarification questions."""
 
     model_config = ConfigDict(extra="forbid")
-    updated_questions: List[ClarificationQuestion] = Field(
+    updated_questions: list[ClarificationQuestion] = Field(
         description="The new, updated list of questions to ask."
     )
     reasoning: str = Field(description="Explanation of why the questions were updated.")

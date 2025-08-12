@@ -7,10 +7,8 @@ This system provides a structured approach to autonomous capability development
 with research validation, compound learning optimization, and systematic progression.
 """
 
-import json
-import os
 from datetime import datetime
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Any
 
 
 class SystematicCapabilityDevelopment:

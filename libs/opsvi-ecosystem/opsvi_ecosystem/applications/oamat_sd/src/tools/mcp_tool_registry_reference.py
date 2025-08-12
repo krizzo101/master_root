@@ -15,15 +15,15 @@ Features:
 """
 
 import asyncio
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from enum import Enum
 import logging
-from pathlib import Path
 
 # MCP client imports with path resolution
 import sys
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from pathlib import Path
+from typing import Any
 
 # Ensure project root is in sys.path for MCP client imports
 current_file = Path(__file__).resolve()
@@ -142,12 +142,12 @@ class ToolMetadata:
 
     name: str
     category: ToolCategory
-    capabilities: List[ToolCapability]
+    capabilities: list[ToolCapability]
     description: str
     client_class: str
-    available_methods: List[str] = field(default_factory=list)
-    rate_limits: Dict[str, int] = field(default_factory=dict)
-    dependencies: List[str] = field(default_factory=list)
+    available_methods: list[str] = field(default_factory=list)
+    rate_limits: dict[str, int] = field(default_factory=dict)
+    dependencies: list[str] = field(default_factory=list)
     cost_per_call: float = field(
         default_factory=lambda: _get_default_config().tools.defaults["cost_per_call"]
     )
@@ -159,7 +159,7 @@ class ToolMetadata:
     success_rate: float = field(
         default_factory=lambda: _get_default_config().tools.defaults["success_rate"]
     )
-    last_health_check: Optional[datetime] = None
+    last_health_check: datetime | None = None
     health_status: str = field(
         default_factory=lambda: _get_default_config().tools.defaults["health_status"]
     )
@@ -181,8 +181,8 @@ class ToolExecutionResult:
     method_name: str
     execution_time: float
     timestamp: datetime
-    error_message: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    error_message: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
     cost_incurred: float = field(
         default_factory=lambda: _get_default_config().tools.defaults["cost_incurred"]
     )
@@ -199,8 +199,8 @@ class MCPToolRegistry:
     def __init__(
         self, config_path: str = "src/applications/oamat/config/mcp_config.yaml"
     ):
-        from datetime import datetime
         import sys
+        from datetime import datetime
 
         timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
         print(
@@ -212,13 +212,13 @@ class MCPToolRegistry:
         self.config_path = config_path
 
         # Registry storage
-        self.registered_tools: Dict[str, ToolMetadata] = {}
-        self.tool_instances: Dict[str, Any] = {}
-        self.tool_chains: Dict[str, List[str]] = {}
+        self.registered_tools: dict[str, ToolMetadata] = {}
+        self.tool_instances: dict[str, Any] = {}
+        self.tool_chains: dict[str, list[str]] = {}
 
         # Performance tracking
-        self.execution_history: List[ToolExecutionResult] = []
-        self.performance_metrics: Dict[str, Dict] = {}
+        self.execution_history: list[ToolExecutionResult] = []
+        self.performance_metrics: dict[str, dict] = {}
 
         timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
         print(
@@ -251,7 +251,7 @@ class MCPToolRegistry:
         )
         sys.stdout.flush()
 
-    def _load_config(self) -> Dict:
+    def _load_config(self) -> dict:
         """Load MCP configuration"""
         try:
             import yaml
@@ -265,8 +265,8 @@ class MCPToolRegistry:
 
     def _initialize_registry(self):
         """Initialize the tool registry with automatic discovery"""
-        from datetime import datetime
         import sys
+        from datetime import datetime
 
         timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
         print(f"[{timestamp}] 🔍 DEBUG: _initialize_registry() starting...")
@@ -310,8 +310,8 @@ class MCPToolRegistry:
 
     def _discover_and_register_tools(self):
         """Automatically discover and register available MCP tools"""
-        from datetime import datetime
         import sys
+        from datetime import datetime
 
         timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
         print(f"[{timestamp}] 🔍 DEBUG: _discover_and_register_tools() starting...")
@@ -445,10 +445,10 @@ class MCPToolRegistry:
         self,
         name: str,
         category: ToolCategory,
-        capabilities: List[ToolCapability],
+        capabilities: list[ToolCapability],
         description: str,
         client_class: str,
-        available_methods: List[str],
+        available_methods: list[str],
         **kwargs,
     ):
         """Register a tool in the registry"""
@@ -505,7 +505,7 @@ class MCPToolRegistry:
                 f"Loaded tool chain: {chain_name} with {len(tool_names)} tools"
             )
 
-    async def get_tool_instance(self, tool_name: str) -> Optional[Any]:
+    async def get_tool_instance(self, tool_name: str) -> Any | None:
         """Get or create tool instance"""
         if tool_name not in self.registered_tools:
             self.logger.error(f"Tool {tool_name} not registered")
@@ -545,7 +545,7 @@ class MCPToolRegistry:
             return None
 
     def execute_tool(
-        self, tool_name: str, method_name: str, arguments: Dict[str, Any]
+        self, tool_name: str, method_name: str, arguments: dict[str, Any]
     ) -> ToolExecutionResult:
         """Synchronous wrapper for executing a tool method."""
         try:
@@ -591,7 +591,7 @@ class MCPToolRegistry:
             )
 
     async def _execute_tool_async(
-        self, tool_name: str, method_name: str, arguments: Dict[str, Any]
+        self, tool_name: str, method_name: str, arguments: dict[str, Any]
     ) -> ToolExecutionResult:
         """Execute a tool method with comprehensive tracking"""
         start_time = datetime.now()
@@ -699,8 +699,8 @@ class MCPToolRegistry:
         ) / tool_metadata.usage_count
 
     async def intelligent_tool_selection(
-        self, query: str, task_type: str = "general", max_tools: Optional[int] = None
-    ) -> List[Tuple[str, str, float]]:
+        self, query: str, task_type: str = "general", max_tools: int | None = None
+    ) -> list[tuple[str, str, float]]:
         """
         Intelligently select tools based on query analysis
 
@@ -820,8 +820,8 @@ class MCPToolRegistry:
         return recommendations[:max_tools]
 
     async def execute_tool_chain(
-        self, chain_name: str, initial_data: Dict[str, Any]
-    ) -> List[ToolExecutionResult]:
+        self, chain_name: str, initial_data: dict[str, Any]
+    ) -> list[ToolExecutionResult]:
         """Execute a predefined tool chain"""
         if chain_name not in self.tool_chains:
             self.logger.error(f"Tool chain {chain_name} not found")
@@ -849,7 +849,7 @@ class MCPToolRegistry:
 
         return results
 
-    def _infer_method_for_tool(self, tool_name: str, data: Dict[str, Any]) -> str:
+    def _infer_method_for_tool(self, tool_name: str, data: dict[str, Any]) -> str:
         """Infer the best method to use for a tool based on available data"""
         if tool_name not in self.registered_tools:
             return "unknown"
@@ -869,7 +869,7 @@ class MCPToolRegistry:
         # Return first available method as fallback
         return available_methods[0] if available_methods else "unknown"
 
-    async def health_check_tools(self) -> Dict[str, bool]:
+    async def health_check_tools(self) -> dict[str, bool]:
         """Perform health checks on all registered tools"""
         health_status = {}
 
@@ -900,7 +900,7 @@ class MCPToolRegistry:
 
         return health_status
 
-    def get_tool_analytics(self) -> Dict[str, Any]:
+    def get_tool_analytics(self) -> dict[str, Any]:
         """Get comprehensive analytics about tool usage and performance"""
         analytics = {
             "total_tools": len(self.registered_tools),
@@ -958,7 +958,7 @@ class MCPToolRegistry:
 
         return analytics
 
-    def list_available_tools(self) -> Dict[str, Dict[str, Any]]:
+    def list_available_tools(self) -> dict[str, dict[str, Any]]:
         """List all available tools with their metadata"""
         return {
             name: {
@@ -973,7 +973,7 @@ class MCPToolRegistry:
             for name, metadata in self.registered_tools.items()
         }
 
-    def get_tools_by_capability(self, capability: ToolCapability) -> List[str]:
+    def get_tools_by_capability(self, capability: ToolCapability) -> list[str]:
         """Get tools that have a specific capability"""
         return [
             name
@@ -1008,8 +1008,8 @@ def create_mcp_tool_registry(config_path: str = None) -> MCPToolRegistry:
     Returns:
         MCPToolRegistry instance
     """
-    from datetime import datetime
     import sys
+    from datetime import datetime
 
     timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
     print(f"[{timestamp}] 🔍 DEBUG: create_mcp_tool_registry() called")
@@ -1040,11 +1040,11 @@ def create_mcp_tool_registry(config_path: str = None) -> MCPToolRegistry:
 
 
 # Utility functions
-def get_available_tool_categories() -> List[str]:
+def get_available_tool_categories() -> list[str]:
     """Get list of available tool categories"""
     return [category.value for category in ToolCategory]
 
 
-def get_available_capabilities() -> List[str]:
+def get_available_capabilities() -> list[str]:
     """Get list of available tool capabilities"""
     return [capability.value for capability in ToolCapability]

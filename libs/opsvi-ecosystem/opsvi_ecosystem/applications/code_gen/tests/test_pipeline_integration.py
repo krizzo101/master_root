@@ -1,14 +1,15 @@
 """Test complete pipeline integration."""
 
-import pytest
-import tempfile
 import shutil
+import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from pipeline import build_pipeline, _SequentialPipeline
+import pytest
+from database import create_job, init_db
+from pipeline import _SequentialPipeline, build_pipeline
+
 from schemas import ProjectType
-from database import init_db, create_job, get_job
 
 
 class TestPipelineIntegration:

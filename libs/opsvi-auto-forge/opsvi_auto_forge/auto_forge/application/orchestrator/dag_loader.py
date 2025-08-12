@@ -8,7 +8,6 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 
-from opsvi_auto_forge.config.models import Project, Run, TaskRecord, TaskStatus
 from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
 
 logger = logging.getLogger(__name__)

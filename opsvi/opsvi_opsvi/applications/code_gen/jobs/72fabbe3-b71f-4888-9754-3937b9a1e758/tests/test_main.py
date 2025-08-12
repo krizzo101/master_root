@@ -1,20 +1,20 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from fastapi.testclient import TestClient
 from backend.main import (
-    app,
-    setup_logging,
-    startup_event,
-    login,
-    register,
-    api_get_realtime_metrics,
+    api_get_active_alerts,
     api_get_historical_metrics,
+    api_get_realtime_metrics,
     api_get_thresholds,
     api_update_thresholds,
-    api_get_active_alerts,
+    app,
+    login,
+    register,
+    setup_logging,
+    startup_event,
 )
-from unittest.mock import MagicMock, patch
 from backend.models import User
-from backend.db import get_session
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture(scope="module")

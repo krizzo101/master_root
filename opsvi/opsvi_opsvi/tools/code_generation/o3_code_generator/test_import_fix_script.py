@@ -1,13 +1,7 @@
-from src.tools.code_generation.o3_code_generator.generated.generated_files.something import (
-    foo,
-)
-
 "\nImport Fix Script for O3 Code Generator\n\nAutomatically fixes common broken import patterns identified in the alignment scanner.\nThis script runs before auto-align to resolve critical import issues that prevent\nsuccessful code generation.\n"
 import re
-from pathlib import Path
 import sys
-from typing import Dict, List, Tuple
-import json
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent))
 try:
@@ -59,7 +53,7 @@ class ImportFixer:
         }
         self.logger.log_info("Initialized ImportFixer with common import patterns")
 
-    def fix_file_imports(self, file_path: str) -> Dict[str, any]:
+    def fix_file_imports(self, file_path: str) -> dict[str, any]:
         """
         Fix imports in a single file.
 
@@ -80,7 +74,7 @@ class ImportFixer:
                 }
             else:
                 pass
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read()
             original_content = content
             fixes_applied = 0
@@ -129,7 +123,7 @@ class ImportFixer:
         finally:
             pass
 
-    def fix_directory_imports(self, directory_path: str) -> Dict[str, any]:
+    def fix_directory_imports(self, directory_path: str) -> dict[str, any]:
         """
         Fix imports in all Python files in a directory.
 
@@ -176,7 +170,7 @@ class ImportFixer:
         )
         return results
 
-    def get_import_issues(self, file_path: str) -> List[str]:
+    def get_import_issues(self, file_path: str) -> list[str]:
         """
         Get list of import issues in a file without fixing them.
 
@@ -192,7 +186,7 @@ class ImportFixer:
                 return [f"File does not exist: {file_path}"]
             else:
                 pass
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read()
             issues = []
             for pattern in self.import_fixes.keys():
@@ -239,7 +233,7 @@ def generate_import_enhancement_requests(file_path: str):
         return
     else:
         pass
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         lines = f.readlines()
     enhancement_requests = []
     for i, line in enumerate(lines, 1):

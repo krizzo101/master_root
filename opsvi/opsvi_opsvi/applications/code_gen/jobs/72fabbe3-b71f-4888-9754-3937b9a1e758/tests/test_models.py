@@ -1,5 +1,4 @@
-import pytest
-from backend.models import MetricType, User, Threshold, MetricSample, AlertEvent
+from backend.models import AlertEvent, MetricSample, MetricType, Threshold, User
 
 
 def test_metrictype_enum_values():

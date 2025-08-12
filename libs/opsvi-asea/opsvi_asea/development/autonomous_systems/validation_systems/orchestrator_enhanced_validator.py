@@ -18,15 +18,13 @@ import json
 import os
 import sys
 import asyncio
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
-from pathlib import Path
+from datetime import datetime
+from typing import Dict, List, Any
 
 # Add orchestrator to path
 sys.path.append("/home/opsvi/asea/asea_orchestrator/src")
 
 from asea_orchestrator.core import Orchestrator
-from asea_orchestrator.plugins.plugin_manager import PluginManager
 from asea_orchestrator.workflow import WorkflowManager
 
 
@@ -352,7 +350,7 @@ class OrchestratorEnhancedValidator:
     ) -> Dict[str, Any]:
         """Synthesize evidence and generate final scoring"""
 
-        synthesis_prompt = f"""
+        synthesis_prompt = """
         Synthesize all available evidence to generate a comprehensive validation assessment:
         
         SYNTHESIS REQUIREMENTS:
@@ -481,7 +479,7 @@ class OrchestratorEnhancedValidator:
         score = results["final_validation_score"]
 
         summary_parts = [
-            f"🤖 ORCHESTRATOR-ENHANCED VALIDATION RESULTS",
+            "🤖 ORCHESTRATOR-ENHANCED VALIDATION RESULTS",
             f"Final Validation Score: {score:.1f}/100",
             "",
         ]

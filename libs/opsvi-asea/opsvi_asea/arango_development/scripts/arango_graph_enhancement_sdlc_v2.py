@@ -16,9 +16,7 @@ Uses ASEA Orchestrator with available plugins:
 
 import asyncio
 import uuid
-import json
 from datetime import datetime
-from pathlib import Path
 
 
 def create_arango_graph_enhancement_sdlc():
@@ -332,7 +330,6 @@ async def execute_arango_enhancement_sdlc():
     Execute the comprehensive ArangoDB graph enhancement SDLC workflow.
     """
     import sys
-    import os
 
     # Add orchestrator to path
     sys.path.append("/home/opsvi/asea/asea_orchestrator/src")
@@ -383,14 +380,14 @@ async def execute_arango_enhancement_sdlc():
 
         print("✅ SDLC Workflow completed successfully!")
         print(f"📊 Final state keys: {list(final_state.keys())}")
-        print(f"📁 Files created:")
-        print(f"   - Architecture: /home/opsvi/asea/arango_graph_architecture.md")
-        print(f"   - Implementation: /home/opsvi/asea/arango_graph_implementation.py")
-        print(f"   - Tests: /home/opsvi/asea/test_arango_graph.py")
+        print("📁 Files created:")
+        print("   - Architecture: /home/opsvi/asea/arango_graph_architecture.md")
+        print("   - Implementation: /home/opsvi/asea/arango_graph_implementation.py")
+        print("   - Tests: /home/opsvi/asea/test_arango_graph.py")
         print(
-            f"   - Deployment Guide: /home/opsvi/asea/arango_graph_deployment_guide.md"
+            "   - Deployment Guide: /home/opsvi/asea/arango_graph_deployment_guide.md"
         )
-        print(f"📈 Artifacts stored in ArangoDB collection: sdlc_artifacts")
+        print("📈 Artifacts stored in ArangoDB collection: sdlc_artifacts")
 
         return final_state
 

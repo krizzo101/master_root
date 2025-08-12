@@ -16,7 +16,7 @@ import json
 import hashlib
 from pathlib import Path
 from fnmatch import fnmatch
-from typing import Dict, Tuple, List, Optional, Set, Any
+from typing import List
 
 # File comment styles for different file types
 COMMENT_STYLES = {
@@ -103,7 +103,7 @@ def extract_existing_file_map(content, comment_style):
             try:
                 file_map_json = match.group(1).strip()
                 json_obj = json.loads(file_map_json)
-                print(f"DEBUG: Found Python-compatible file map format with # markers")
+                print("DEBUG: Found Python-compatible file map format with # markers")
                 return match.group(0), content[match.end() :].lstrip()
             except (json.JSONDecodeError, NameError) as e:
                 print(f"Failed to parse JSON in Python-compatible file map: {str(e)}")
@@ -117,7 +117,7 @@ def extract_existing_file_map(content, comment_style):
                 file_map_json = match.group(1).strip()
                 json_obj = json.loads(file_map_json)
                 print(
-                    f"DEBUG: Found old Python triple-quoted file map format. This will be updated to the new format."
+                    "DEBUG: Found old Python triple-quoted file map format. This will be updated to the new format."
                 )
                 return match.group(0), content[match.end() :].lstrip()
             except (json.JSONDecodeError, NameError) as e:

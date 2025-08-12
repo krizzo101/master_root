@@ -1,9 +1,10 @@
 """Tests for DirectoryManager."""
 
-import pytest
-from pathlib import Path
-import tempfile
 import shutil
+import tempfile
+from pathlib import Path
+
+import pytest
 
 from src.tools.code_generation.o3_code_generator.utils.directory_manager import (
     DirectoryManager,

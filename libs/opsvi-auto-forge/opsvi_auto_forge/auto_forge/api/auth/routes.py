@@ -3,7 +3,6 @@
 import logging
 from typing import List
 from fastapi import APIRouter, HTTPException, status, Depends
-from fastapi.security import HTTPBearer
 
 from .jwt_handler import jwt_manager, Token, User
 from .user_management import (

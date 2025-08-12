@@ -38,10 +38,8 @@ content for conversion to rule format.
 """
 
 import re
-import json
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any
 import logging
-import os
 from .markdown_parser import parse_markdown_file
 
 # Configure logging

@@ -12,9 +12,9 @@ Usage:
 """
 
 import argparse
-from pathlib import Path
 import sys
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import Any
 
 # Add the tools directory to the path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -38,9 +38,9 @@ class DevAgentValidator:
     def check_before_change(
         self,
         function_name: str,
-        parameters: List[str] = None,
-        file_path: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        parameters: list[str] = None,
+        file_path: str | None = None,
+    ) -> dict[str, Any]:
         """
         MANDATORY: Check function signature before making changes
 
@@ -73,7 +73,7 @@ class DevAgentValidator:
                 print(f"💡 Suggestions: {', '.join(result['suggestions'])}")
             return result
 
-    def search_function(self, query: str) -> List[Dict[str, Any]]:
+    def search_function(self, query: str) -> list[dict[str, Any]]:
         """Search for functions in the codebase"""
         print(f"🔍 Searching for functions: {query}")
 
@@ -101,7 +101,7 @@ class DevAgentValidator:
 
         return results
 
-    def search_class(self, query: str) -> List[Dict[str, Any]]:
+    def search_class(self, query: str) -> list[dict[str, Any]]:
         """Search for classes in the codebase"""
         print(f"🔍 Searching for classes: {query}")
 
@@ -132,7 +132,7 @@ class DevAgentValidator:
 
         return results
 
-    def validate_import(self, module_name: str) -> Dict[str, Any]:
+    def validate_import(self, module_name: str) -> dict[str, Any]:
         """Validate if a module is imported in the codebase"""
         print(f"🔍 Validating import: {module_name}")
 
@@ -159,8 +159,8 @@ class DevAgentValidator:
             return {"valid": False, "error": f"Module '{module_name}' not found"}
 
     def get_function_signature(
-        self, function_name: str, file_path: Optional[str] = None
-    ) -> Optional[Dict[str, Any]]:
+        self, function_name: str, file_path: str | None = None
+    ) -> dict[str, Any] | None:
         """Get complete function signature and information"""
         try:
             self.code_manager.load_map()

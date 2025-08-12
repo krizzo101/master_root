@@ -8,8 +8,6 @@ Run this to show the difference between standard vs enhanced approaches.
 
 from cognitive_enhancement_orchestrator import (
     enhance_decision_making,
-    enhance_analysis,
-    validate_cognitive_enhancement,
 )
 
 
@@ -100,7 +98,7 @@ def test_scenario_for_fresh_agent():
         # Show what each cognitive plugin provides
         pre_analysis = enhanced_result.get("pre_analysis", {})
         if pre_analysis:
-            print(f"\n🔍 PRE-ANALYSIS INSIGHTS:")
+            print("\n🔍 PRE-ANALYSIS INSIGHTS:")
             print(f"   Core Intent: {pre_analysis.get('core_intent', 'N/A')}")
             print(f"   Complexity: {pre_analysis.get('complexity_level', 'N/A')}")
             print(
@@ -109,7 +107,7 @@ def test_scenario_for_fresh_agent():
 
         ai_reasoning = enhanced_result.get("ai_reasoning", {})
         if ai_reasoning:
-            print(f"\n🤖 AI REASONING:")
+            print("\n🤖 AI REASONING:")
             reasoning_text = ai_reasoning.get("reasoning", "N/A")
             print(
                 f"   {reasoning_text[:200]}..."
@@ -119,7 +117,7 @@ def test_scenario_for_fresh_agent():
 
         quality_critique = enhanced_result.get("quality_critique", {})
         if quality_critique:
-            print(f"\n🎯 QUALITY CRITIQUE:")
+            print("\n🎯 QUALITY CRITIQUE:")
             print(
                 f"   Quality Score: {quality_critique.get('quality_score', 'N/A')}/10"
             )
@@ -129,11 +127,11 @@ def test_scenario_for_fresh_agent():
                 print(f"   Improvements: {improvements[:2]}")
 
         recommendations = enhanced_result.get("enhanced_recommendations", [])
-        print(f"\n📋 ENHANCED RECOMMENDATIONS:")
+        print("\n📋 ENHANCED RECOMMENDATIONS:")
         for i, rec in enumerate(recommendations[:5], 1):
             print(f"   {i}. {rec}")
 
-        print(f"\n📊 COGNITIVE ENHANCEMENT METRICS:")
+        print("\n📊 COGNITIVE ENHANCEMENT METRICS:")
         print(
             f"   Plugins Used: {len(enhanced_result.get('cognitive_pipeline_used', []))}"
         )
@@ -175,7 +173,7 @@ def compare_standard_vs_enhanced():
     enhanced_result = test_scenario_for_fresh_agent()
 
     # Show the difference
-    print(f"\n📈 ENHANCEMENT VALUE:")
+    print("\n📈 ENHANCEMENT VALUE:")
     if enhanced_result.get("cognitive_enhancement_applied"):
         print("✅ 4-plugin cognitive coordination")
         print("✅ Structured problem pre-analysis")

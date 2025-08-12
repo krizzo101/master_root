@@ -1,12 +1,13 @@
 """
 Input Parser & Validator for workloads JSON schema
 """
-from pathlib import Path
 import json
+from pathlib import Path
+from typing import Any
+
 import jsonschema
-from typing import Dict, Any
-from pydantic import BaseModel, ValidationError, Field, constr, validator
 from loguru import logger
+from pydantic import BaseModel, Field, ValidationError, constr, validator
 
 WORKLOAD_JSON_SCHEMA = {
     "type": "object",
@@ -52,7 +53,7 @@ WORKLOAD_JSON_SCHEMA = {
 class TaskModel(BaseModel):
     agent: str = Field(..., min_length=1)
     type: str = Field(..., min_length=1)
-    input: Dict[str, Any]
+    input: dict[str, Any]
     depends_on: list[str] = Field(default_factory=list)
 
 
@@ -81,7 +82,7 @@ def parse_and_validate_input(input_file: Path) -> InputModel:
     Raises ValueError on schema or validation errors.
     """
     try:
-        with open(input_file, "r", encoding="utf-8") as f:
+        with open(input_file, encoding="utf-8") as f:
             input_data = json.load(f)
         jsonschema.validate(instance=input_data, schema=WORKLOAD_JSON_SCHEMA)
         validated = InputModel.parse_obj(input_data)

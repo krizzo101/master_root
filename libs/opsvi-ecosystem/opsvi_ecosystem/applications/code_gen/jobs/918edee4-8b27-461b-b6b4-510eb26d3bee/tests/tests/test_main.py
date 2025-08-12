@@ -1,6 +1,6 @@
-import pytest
 import sys
-from unittest import mock
+
+import pytest
 from simple_news_scraper import __main__
 
 

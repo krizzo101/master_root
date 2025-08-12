@@ -9,7 +9,6 @@ Based on the proven pattern from old OAMAT application.
 
 import logging
 import threading
-from typing import Optional
 
 # Import enhanced logging system
 from src.applications.oamat_sd.src.sd_logging import LogConfig, LoggerFactory
@@ -57,7 +56,7 @@ class ProjectContextManager:
             logger.info(f"✅ Project context set: {project_name} at {project_path}")
 
     @classmethod
-    def get_project_path(cls) -> Optional[str]:
+    def get_project_path(cls) -> str | None:
         """Get the project path from global context."""
         with cls._lock:
             return (
@@ -65,7 +64,7 @@ class ProjectContextManager:
             )
 
     @classmethod
-    def get_project_name(cls) -> Optional[str]:
+    def get_project_name(cls) -> str | None:
         """Get the project name from global context."""
         with cls._lock:
             return (
@@ -97,7 +96,7 @@ class ProjectContextManager:
             logger.info("🧹 Project context cleared")
 
     @classmethod
-    def get_context(cls) -> Optional[dict]:
+    def get_context(cls) -> dict | None:
         """Get the full global context."""
         with cls._lock:
             context_available = cls._global_context is not None

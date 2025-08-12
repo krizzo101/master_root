@@ -11,7 +11,6 @@ This module extends the planner agent with:
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
@@ -21,7 +20,6 @@ from .enhanced_base_agent import EnhancedBaseAgent
 from .planner_agent import Plan, Task, PlanningPhase, TaskStatus, Priority
 from .error_handling import ErrorSeverity, RetryConfig, with_retry
 from .monitoring import AlertLevel
-from ..coordination.enhanced_message_bus import MessagePriority, DeliveryMode
 
 
 logger = logging.getLogger(__name__)
@@ -201,7 +199,7 @@ class EnhancedPlannerAgent(EnhancedBaseAgent):
                 },
             }
 
-        except Exception as e:
+        except Exception:
             self.monitor.end_task_timer(start_time, success=False)
             self.monitor.collector.record_counter("plan_creation_failures")
             raise

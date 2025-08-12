@@ -10,15 +10,15 @@ Implements N-best with critic selection pattern:
 5. Improve winner with synthesizer
 """
 
-import asyncio
-import json
 import ast
-from typing import Dict, List, Any, Optional, Tuple
-from dataclasses import dataclass, field
-from collections import defaultdict
-from enum import Enum
-from openai import OpenAI
+import asyncio
 import os
+from collections import defaultdict
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any
+
+from openai import OpenAI
 
 
 class CandidateStatus(Enum):
@@ -34,15 +34,15 @@ class Candidate:
     """Represents a single candidate solution."""
 
     candidate_id: str
-    files: List[Dict[str, str]]  # [{"path": "...", "content": "..."}]
-    tests: List[Dict[str, str]] = field(default_factory=list)
+    files: list[dict[str, str]]  # [{"path": "...", "content": "..."}]
+    tests: list[dict[str, str]] = field(default_factory=list)
     notes: str = ""
     status: CandidateStatus = CandidateStatus.GENERATED
-    scores: Dict[str, float] = field(default_factory=dict)
-    failures: List[Dict[str, str]] = field(default_factory=list)
-    next_actions: List[str] = field(default_factory=list)
+    scores: dict[str, float] = field(default_factory=dict)
+    failures: list[dict[str, str]] = field(default_factory=list)
+    next_actions: list[str] = field(default_factory=list)
     weighted_score: float = 0.0
-    blocking_failures: List[Dict[str, str]] = field(default_factory=list)
+    blocking_failures: list[dict[str, str]] = field(default_factory=list)
 
 
 @dataclass
@@ -51,7 +51,7 @@ class TournamentConfig:
 
     num_candidates: int = 3
     max_file_lines: int = 200
-    temperature_range: Tuple[float, float] = (0.1, 0.2)
+    temperature_range: tuple[float, float] = (0.1, 0.2)
     enable_pre_gating: bool = True
     enable_synthesis: bool = True
     max_iterations: int = 3
@@ -72,7 +72,7 @@ class MultiCandidateTournament:
         self.critic_schema = self._get_critic_schema()
         self.synthesis_schema = self._get_synthesis_schema()
 
-    def _get_candidate_schema(self) -> Dict[str, Any]:
+    def _get_candidate_schema(self) -> dict[str, Any]:
         """Schema for candidate generation output."""
         return {
             "name": "candidate_result",
@@ -110,7 +110,7 @@ class MultiCandidateTournament:
             "strict": True,
         }
 
-    def _get_critic_schema(self) -> Dict[str, Any]:
+    def _get_critic_schema(self) -> dict[str, Any]:
         """Schema for critic evaluation output."""
         return {
             "name": "critic_result",
@@ -180,7 +180,7 @@ class MultiCandidateTournament:
             "strict": True,
         }
 
-    def _get_synthesis_schema(self) -> Dict[str, Any]:
+    def _get_synthesis_schema(self) -> dict[str, Any]:
         """Schema for synthesis output."""
         return {
             "name": "synthesis_result",
@@ -229,7 +229,7 @@ class MultiCandidateTournament:
 
     async def run_tournament(
         self, task: str, spec: str, session_id: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Run complete tournament workflow.
 
@@ -282,7 +282,7 @@ class MultiCandidateTournament:
 
     async def _generate_candidates(
         self, task: str, spec: str, session_id: str
-    ) -> List[Candidate]:
+    ) -> list[Candidate]:
         """Generate K diverse candidates using GPT-5."""
 
         candidates = []
@@ -383,8 +383,8 @@ OUTPUT FORMAT:
 IMPORTANT: Return ONLY valid JSON. No explanations or markdown."""
 
     async def _pre_gate_candidates(
-        self, candidates: List[Candidate]
-    ) -> List[Candidate]:
+        self, candidates: list[Candidate]
+    ) -> list[Candidate]:
         """Pre-gate candidates with cheap mechanical checks."""
 
         viable_candidates = []
@@ -423,8 +423,8 @@ IMPORTANT: Return ONLY valid JSON. No explanations or markdown."""
         return viable_candidates
 
     async def _run_critics_parallel(
-        self, candidates: List[Candidate], spec: str, session_id: str
-    ) -> Dict[str, List[Dict]]:
+        self, candidates: list[Candidate], spec: str, session_id: str
+    ) -> dict[str, list[dict]]:
         """Run critics in parallel for all candidates."""
 
         critic_types = [
@@ -471,7 +471,7 @@ IMPORTANT: Return ONLY valid JSON. No explanations or markdown."""
 
     async def _run_single_critic(
         self, critic_type: str, candidate: Candidate, spec: str, session_id: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Run a single critic on a single candidate."""
 
         # Build critic-specific prompt
@@ -574,8 +574,8 @@ OUTPUT: Return structured JSON with candidate_id, verdict, scores, failures, and
         return base_prompt
 
     def _consolidate_and_select(
-        self, candidates: List[Candidate], critic_results: Dict[str, List[Dict]]
-    ) -> Dict[str, Any]:
+        self, candidates: list[Candidate], critic_results: dict[str, list[dict]]
+    ) -> dict[str, Any]:
         """Consolidate critic results and select winner."""
 
         blocking_categories = {"syntax", "test", "contract", "security"}
@@ -696,11 +696,11 @@ OUTPUT: Return structured JSON with candidate_id, verdict, scores, failures, and
 
     async def _synthesize_improvements(
         self,
-        winner: Dict,
-        runner_up: Optional[Dict],
-        all_actions: List[str],
+        winner: dict,
+        runner_up: dict | None,
+        all_actions: list[str],
         session_id: str,
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """Synthesize improvements using o3."""
 
         if not winner:
@@ -756,7 +756,7 @@ OUTPUT: Return structured JSON with candidate_id, verdict, scores, failures, and
             return None
 
     def _build_synthesis_prompt(
-        self, winner: Candidate, runner_up: Optional[Candidate], all_actions: List[str]
+        self, winner: Candidate, runner_up: Candidate | None, all_actions: list[str]
     ) -> str:
         """Build prompt for synthesis."""
 
@@ -850,7 +850,7 @@ async def main():
                 f"🔧 Improved winner synthesized with {result['improved_winner']['changes_made']}"
             )
 
-    print(f"\nAll Candidates:")
+    print("\nAll Candidates:")
     for summary in result["all_summaries"]:
         status = "✅" if len(summary["blocking_failures"]) == 0 else "⚠️"
         print(

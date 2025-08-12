@@ -15,7 +15,7 @@ import logging
 import time
 import hashlib
 from typing import Dict, List, Any, Optional
-from datetime import datetime, timedelta
+from datetime import datetime
 from arango import ArangoClient
 
 # Configure logging
@@ -725,7 +725,7 @@ def main():
 
         # Print summary
         summary = results.get("summary", {})
-        print(f"\nOptimization Summary:")
+        print("\nOptimization Summary:")
         print(f"- Phases completed: {summary.get('phases_completed', 0)}/7")
         print(f"- Collections analyzed: {summary.get('indexes_analyzed', 0)}")
         print(f"- Indexes created: {summary.get('indexes_created', 0)}")
@@ -738,7 +738,7 @@ def main():
         # Print key recommendations
         recommendations = results.get("recommendations", [])
         if recommendations:
-            print(f"\nKey Recommendations:")
+            print("\nKey Recommendations:")
             for i, rec in enumerate(recommendations[:5], 1):
                 print(f"{i}. {rec}")
 

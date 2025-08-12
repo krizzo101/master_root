@@ -2,7 +2,9 @@
 Main application routes.
 """
 import logging
-from flask import Blueprint, render_template, request, current_app, flash
+
+from flask import Blueprint, current_app, render_template, request
+
 from .forms import CitySearchForm
 from .weather_client import WeatherAPIClient, WeatherAPIError
 

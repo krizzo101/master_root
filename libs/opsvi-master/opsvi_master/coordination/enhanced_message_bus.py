@@ -21,7 +21,7 @@ from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Set, Union
+from typing import Any, Callable, Dict, List, Optional, Set
 from statistics import mean
 
 from src.agents.base_agent import AgentMessage, MessageType
@@ -296,7 +296,6 @@ class MessageCompression:
             message_dict = json.loads(data.decode("utf-8"))
 
         # Reconstruct AgentMessage object
-        from datetime import datetime
 
         return AgentMessage(
             type=MessageType(message_dict["type"]),

@@ -6,7 +6,7 @@ Agent creation and execution wrapper for dynamic workflow orchestration.
 
 import logging
 import traceback
-from typing import Callable, Dict
+from collections.abc import Callable
 
 from src.applications.oamat.agents.agent_factory import AgentFactory
 from src.applications.oamat.agents.registry import AGENT_REGISTRY
@@ -215,6 +215,6 @@ Please complete the assigned task following all applicable development standards
 
         return agent_wrapper
 
-    def create_agent_creators_dict(self, roles: list) -> Dict[str, Callable]:
+    def create_agent_creators_dict(self, roles: list) -> dict[str, Callable]:
         """Create a dictionary of agent creators for all specified roles"""
         return {role: self.create_specialized_agent(role) for role in roles}

@@ -9,7 +9,7 @@ CRITICAL: These tests ensure 75%+ sophistication compliance required for system 
 
 import importlib.util
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 
@@ -73,7 +73,7 @@ class SophisticationEnforcer:
     ]
 
     @classmethod
-    def scan_file_content(cls, file_path: Path) -> Dict[str, Any]:
+    def scan_file_content(cls, file_path: Path) -> dict[str, Any]:
         """Enhanced scanning of file content for sophisticated patterns"""
         if not file_path.exists():
             return {"error": f"File not found: {file_path}"}

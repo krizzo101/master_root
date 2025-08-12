@@ -3,10 +3,8 @@ Knowledge Context Gatherer for External Reasoning Service.
 Gathers relevant context from ArangoDB knowledge graph for decision analysis.
 """
 
-import json
 import logging
-from typing import Dict, List, Any, Optional
-from datetime import datetime, timedelta
+from typing import Dict, List, Any
 
 # Try to import arango, but handle gracefully if not available
 try:

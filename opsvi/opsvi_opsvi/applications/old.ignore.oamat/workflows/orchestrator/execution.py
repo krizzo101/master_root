@@ -4,10 +4,10 @@ OAMAT Workflow Orchestrator - Execution
 Main workflow execution logic and coordination.
 """
 
-from datetime import datetime
 import logging
-from typing import Any, Dict
 import uuid
+from datetime import datetime
+from typing import Any
 
 from src.applications.oamat.agents.models import (
     EnhancedWorkflowPlan,
@@ -35,10 +35,10 @@ class WorkflowExecutor:
         user_request: str,
         workflow_plan: EnhancedWorkflowPlan,
         workflow_graph,
-        context: Dict[str, Any] = None,
+        context: dict[str, Any] = None,
         interactive: bool = True,
         initial_state: AgenticWorkflowState = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute a complete agentic workflow using LangGraph orchestration.
 
@@ -115,10 +115,10 @@ class WorkflowExecutor:
         workflow_plan: EnhancedWorkflowPlan,
         workflow_id: str,
         user_request: str,
-        context: Dict[str, Any] = None,
+        context: dict[str, Any] = None,
         workflow_graph=None,
         initial_state: AgenticWorkflowState = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Execute workflow using standard LangGraph orchestration"""
         start_time = datetime.now()  # FIXED: Moved to very beginning of method
 

@@ -9,7 +9,7 @@ for better quality and compliance in generated code.
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger("OAMAT.RuleLoader")
 
@@ -65,7 +65,7 @@ class RuleLoader:
         except Exception as e:
             logger.error(f"Error loading rules: {e}")
 
-    def _load_rule_file(self, rule_file: Path) -> Optional[Dict[str, Any]]:
+    def _load_rule_file(self, rule_file: Path) -> dict[str, Any] | None:
         """Load and parse a single rule file"""
         try:
             with open(rule_file, encoding="utf-8") as f:
@@ -87,7 +87,7 @@ class RuleLoader:
             logger.error(f"Failed to load rule file {rule_file}: {e}")
             return None
 
-    def _extract_categories(self, content: str) -> List[str]:
+    def _extract_categories(self, content: str) -> list[str]:
         """Extract rule categories from content"""
         categories = []
 
@@ -129,7 +129,7 @@ class RuleLoader:
         else:
             return 5  # Default priority
 
-    def _extract_applicable_agents(self, content: str) -> List[str]:
+    def _extract_applicable_agents(self, content: str) -> list[str]:
         """Extract which agent roles this rule applies to"""
         applicable = []
         content_lower = content.lower()
@@ -163,8 +163,8 @@ class RuleLoader:
         return applicable
 
     def get_rules_for_agent(
-        self, agent_role: str, categories: List[str] = None
-    ) -> List[Dict[str, Any]]:
+        self, agent_role: str, categories: list[str] = None
+    ) -> list[dict[str, Any]]:
         """
         Get applicable rules for a specific agent role
 
@@ -198,7 +198,7 @@ class RuleLoader:
     def format_rules_for_prompt(
         self,
         agent_role: str,
-        categories: List[str] = None,
+        categories: list[str] = None,
         max_rules: int = 5,
         max_chars: int = 2000,
     ) -> str:
@@ -278,14 +278,14 @@ class RuleLoader:
 
         return summary
 
-    def get_rule_categories(self) -> List[str]:
+    def get_rule_categories(self) -> list[str]:
         """Get all available rule categories"""
         categories = set()
         for rule_data in self.loaded_rules.values():
             categories.update(rule_data["categories"])
         return sorted(list(categories))
 
-    def get_available_rules(self) -> List[str]:
+    def get_available_rules(self) -> list[str]:
         """Get list of all available rule names"""
         return list(self.loaded_rules.keys())
 
@@ -300,7 +300,7 @@ class RuleLoader:
 rule_loader = RuleLoader()
 
 
-def get_rules_for_agent(agent_role: str, categories: List[str] = None) -> str:
+def get_rules_for_agent(agent_role: str, categories: list[str] = None) -> str:
     """
     Convenience function to get formatted rules for an agent
 

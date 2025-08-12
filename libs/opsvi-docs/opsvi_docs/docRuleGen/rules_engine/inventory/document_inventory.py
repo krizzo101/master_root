@@ -31,10 +31,9 @@ Document Inventory Module for Documentation Rule Generator.
 This module maintains an inventory of documents and their metadata.
 """
 
-import os
 import logging
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Set
+from typing import Dict, List, Any
 
 # Configure logging
 logging.basicConfig(

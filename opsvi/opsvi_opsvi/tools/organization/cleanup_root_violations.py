@@ -9,9 +9,9 @@ Usage:
 """
 
 import argparse
+import shutil
 from datetime import datetime
 from pathlib import Path
-import shutil
 
 
 def cleanup_root_directory(dry_run=True):

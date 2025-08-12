@@ -5,9 +5,9 @@ This module provides the RuleEngine class that can execute different types of ru
 """
 
 import ast
-from pathlib import Path
 import re
-from typing import Any, Dict, List, Tuple
+from pathlib import Path
+from typing import Any
 
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import (
     LogConfig,
@@ -34,7 +34,7 @@ class RuleEngine:
 
         self.logger.log_info("Initialized RuleEngine")
 
-    def check_regex_rule(self, rule: Rule, content: str) -> List[Tuple[int, str]]:
+    def check_regex_rule(self, rule: Rule, content: str) -> list[tuple[int, str]]:
         """Check a regex-based rule against file content.
 
         Args:
@@ -75,7 +75,7 @@ class RuleEngine:
 
     def check_ast_rule(
         self, rule: Rule, content: str, file_path: Path
-    ) -> List[Tuple[int, str]]:
+    ) -> list[tuple[int, str]]:
         """Check an AST-based rule against file content.
 
         Args:
@@ -105,8 +105,8 @@ class RuleEngine:
         return check_method(tree, content, file_path)
 
     def check_broken_imports(
-        self, broken_imports: List[BrokenImport], content: str
-    ) -> List[Tuple[int, str, str]]:
+        self, broken_imports: list[BrokenImport], content: str
+    ) -> list[tuple[int, str, str]]:
         """Check for broken import patterns.
 
         Args:
@@ -170,7 +170,7 @@ class RuleEngine:
     # AST check methods
     def _check_has_module_docstring(
         self, tree: ast.AST, content: str, file_path: Path
-    ) -> List[Tuple[int, str]]:
+    ) -> list[tuple[int, str]]:
         """Check if module has a docstring."""
         if not tree.body:
             return [(1, "missing_module_docstring")]
@@ -188,7 +188,7 @@ class RuleEngine:
 
     def _check_class_has_logger_init(
         self, tree: ast.AST, content: str, file_path: Path
-    ) -> List[Tuple[int, str]]:
+    ) -> list[tuple[int, str]]:
         """Check if classes initialize logger in __init__."""
         violations = []
 
@@ -201,7 +201,7 @@ class RuleEngine:
 
     def _check_has_logger_setup(
         self, tree: ast.AST, content: str, file_path: Path
-    ) -> List[Tuple[int, str]]:
+    ) -> list[tuple[int, str]]:
         """Check if main script has logger setup.
 
         Only applies to actual main scripts, identified by:
@@ -250,7 +250,7 @@ class RuleEngine:
 
     def _check_no_syntax_errors(
         self, tree: ast.AST, content: str, file_path: Path
-    ) -> List[Tuple[int, str]]:
+    ) -> list[tuple[int, str]]:
         """Check for syntax errors (already handled in check_ast_rule)."""
         return []  # If we got here, syntax is valid
 
@@ -292,7 +292,7 @@ class RuleExecutor:
             f"Initialized RuleExecutor with {len(rule_config.rules)} rules"
         )
 
-    def check_file(self, file_path: Path) -> Dict[str, Any]:
+    def check_file(self, file_path: Path) -> dict[str, Any]:
         """Check a file against all rules.
 
         Args:

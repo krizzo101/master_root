@@ -2,36 +2,32 @@
 
 from __future__ import annotations
 
-import uuid
-from pathlib import Path
-from typing import Dict, Any
-
 import logging
-from fastapi import FastAPI, HTTPException, Body, Request, Response
-from starlette.middleware.base import BaseHTTPMiddleware
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
-
 import time
-from config import config
-from logging_config import setup_logging
-from rate_limiting import rate_limit_middleware, rate_limiter
-from validation import validator, validate_job_id, ValidationError
-from schemas import RequirementsSpec
-from pipeline import build_pipeline
-from database import create_job, update_job, get_job_data, init_db
-from task_queue import run_pipeline
-
-from local_shared.openai_interfaces.responses_interface import OpenAIResponsesInterface  # type: ignore
-from threading import Thread
-import os
-from ws_router import ws_router
-from fastapi.responses import JSONResponse
+import uuid
 from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+from database import create_job, get_job_data, init_db
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from local_shared.openai_interfaces.responses_interface import (
+    OpenAIResponsesInterface,  # type: ignore
+)
+from logging_config import setup_logging
+from pipeline import build_pipeline
+from rate_limiting import rate_limit_middleware, rate_limiter
+from starlette.middleware.base import BaseHTTPMiddleware
+from task_queue import run_pipeline
+from validation import validate_job_id
+from ws_router import ws_router
+
+from config import config
 
 # Application start time for uptime tracking
 _start_time = datetime.now()
-from ai_agents import analyze_request_security_with_ai
 
 # Initialize interfaces
 _openai_interface = OpenAIResponsesInterface()
@@ -47,7 +43,7 @@ logger = logging.getLogger(__name__)
 init_db()
 
 # In-memory job store placeholder; replace with persistent DB in production
-_jobs: Dict[str, Path] = {}
+_jobs: dict[str, Path] = {}
 
 # Application metrics
 _metrics = {

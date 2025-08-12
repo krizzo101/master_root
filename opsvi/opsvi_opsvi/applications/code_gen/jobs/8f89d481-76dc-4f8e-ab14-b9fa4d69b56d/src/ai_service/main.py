@@ -3,15 +3,15 @@ AI Service for Summarization and Suggestions (FastAPI).
 Implements /summarize and /suggest endpoints for document processing, with JWT authentication and input validation.
 """
 import logging
-from typing import Any, Dict
 import os
+from typing import Any
 
-from fastapi import FastAPI, Depends, HTTPException, status, Security
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, constr
-from transformers import pipeline, Pipeline
 import jwt
+from fastapi import Depends, FastAPI, HTTPException, Security, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from pydantic import BaseModel, constr
+from transformers import Pipeline, pipeline
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -66,7 +66,7 @@ class SuggestionResponse(BaseModel):
 
 def verify_jwt(
     credentials: HTTPAuthorizationCredentials = Security(security),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     token = credentials.credentials
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])

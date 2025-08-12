@@ -1,11 +1,12 @@
 """
 Logging & Audit module – loguru + Rich integration
 """
-from loguru import logger
-import sys
-from rich.logging import RichHandler
-from pathlib import Path
 import os
+import sys
+from pathlib import Path
+
+from loguru import logger
+from rich.logging import RichHandler
 
 
 def get_log_file_path() -> str:

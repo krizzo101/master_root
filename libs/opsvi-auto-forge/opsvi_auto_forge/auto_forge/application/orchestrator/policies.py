@@ -6,7 +6,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 
-from opsvi_auto_forge.config.models import Artifact, Result, Critique
+from opsvi_auto_forge.config.models import Artifact, Result
 from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
 from opsvi_auto_forge.infrastructure.monitoring.metrics.decision_metrics import (
     cost_per_pass_gate,

@@ -4,10 +4,9 @@ Handles storing parsed atomic components and relationships in ArangoDB
 """
 
 import asyncio
-from datetime import datetime
 import logging
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 
 from .atomic_parser import (
     AtomicComponent,
@@ -167,10 +166,10 @@ class SpecStoryDatabaseStorage:
     async def store_parsed_file(
         self,
         file_path: str,
-        components: List[AtomicComponent],
-        relationships: List[AtomicRelationship],
-        metadata: Dict = None,
-    ) -> Dict:
+        components: list[AtomicComponent],
+        relationships: list[AtomicRelationship],
+        metadata: dict = None,
+    ) -> dict:
         """Store complete parsed file with all components and relationships"""
         try:
             start_time = datetime.utcnow()
@@ -225,10 +224,10 @@ class SpecStoryDatabaseStorage:
     async def _store_file_metadata(
         self,
         file_path: str,
-        components: List[AtomicComponent],
-        relationships: List[AtomicRelationship],
-        metadata: Dict = None,
-    ) -> Dict:
+        components: list[AtomicComponent],
+        relationships: list[AtomicRelationship],
+        metadata: dict = None,
+    ) -> dict:
         """Store file-level metadata"""
         try:
             from src.shared.database.core.cognitive_database import (
@@ -287,8 +286,8 @@ class SpecStoryDatabaseStorage:
         return result.get("document", {})
 
     async def _store_components_batch(
-        self, components: List[AtomicComponent], file_path: str
-    ) -> Dict:
+        self, components: list[AtomicComponent], file_path: str
+    ) -> dict:
         """Store components in optimized batches"""
         from src.shared.database.core.cognitive_database import (
             mcp_cognitive_tools_arango_modify,
@@ -324,8 +323,8 @@ class SpecStoryDatabaseStorage:
         return {"stored": stored_components}
 
     async def _store_relationships_batch(
-        self, relationships: List[AtomicRelationship]
-    ) -> Dict:
+        self, relationships: list[AtomicRelationship]
+    ) -> dict:
         """Store relationships in optimized batches"""
         from src.shared.database.core.cognitive_database import (
             mcp_cognitive_tools_arango_modify,
@@ -357,8 +356,8 @@ class SpecStoryDatabaseStorage:
         return {"stored": stored_relationships}
 
     async def _store_specialized_collections(
-        self, components: List[AtomicComponent], relationships: List[AtomicRelationship]
-    ) -> Dict:
+        self, components: list[AtomicComponent], relationships: list[AtomicRelationship]
+    ) -> dict:
         """Store components in specialized collections for optimized queries"""
         try:
             results = {
@@ -430,7 +429,7 @@ class SpecStoryDatabaseStorage:
             self.logger.error(f"❌ Failed to store specialized collections: {e}")
             return {"success": False, "error": str(e)}
 
-    def _create_code_block_document(self, component: AtomicComponent) -> Dict:
+    def _create_code_block_document(self, component: AtomicComponent) -> dict:
         """Create optimized code block document"""
         base_doc = component.to_arango_document()
 
@@ -456,7 +455,7 @@ class SpecStoryDatabaseStorage:
 
         return base_doc
 
-    def _create_tool_interaction_document(self, component: AtomicComponent) -> Dict:
+    def _create_tool_interaction_document(self, component: AtomicComponent) -> dict:
         """Create optimized tool interaction document"""
         base_doc = component.to_arango_document()
 
@@ -495,7 +494,7 @@ class SpecStoryDatabaseStorage:
 
         return base_doc
 
-    def _create_text_content_document(self, component: AtomicComponent) -> Dict:
+    def _create_text_content_document(self, component: AtomicComponent) -> dict:
         """Create optimized text content document for NLP"""
         base_doc = component.to_arango_document()
 
@@ -516,7 +515,7 @@ class SpecStoryDatabaseStorage:
 
         return base_doc
 
-    def _create_token_document(self, component: AtomicComponent) -> Dict:
+    def _create_token_document(self, component: AtomicComponent) -> dict:
         """Create optimized token document for linguistic analysis"""
         base_doc = component.to_arango_document()
 
@@ -543,7 +542,7 @@ class SpecStoryDatabaseStorage:
 
         return base_doc
 
-    def _create_character_document(self, component: AtomicComponent) -> Dict:
+    def _create_character_document(self, component: AtomicComponent) -> dict:
         """Create optimized character document for character-level analysis"""
         base_doc = component.to_arango_document()
 
@@ -575,8 +574,8 @@ class SpecStoryDatabaseStorage:
         return base_doc
 
     def _create_temporal_sequence_documents(
-        self, relationships: List[AtomicRelationship]
-    ) -> List[Dict]:
+        self, relationships: list[AtomicRelationship]
+    ) -> list[dict]:
         """Create temporal sequence documents for time-series analysis"""
         temporal_docs = []
 
@@ -610,8 +609,8 @@ class SpecStoryDatabaseStorage:
         return temporal_docs
 
     async def _batch_store_documents(
-        self, collection_name: str, documents: List[Dict]
-    ) -> Dict:
+        self, collection_name: str, documents: list[dict]
+    ) -> dict:
         """Store documents in batches to specified collection"""
         try:
             from src.shared.database.core.cognitive_database import (
@@ -645,7 +644,7 @@ class SpecStoryDatabaseStorage:
         return {"success": len(errors) == 0, "stored": stored_docs, "errors": errors}
 
     # Helper methods for enhanced analysis
-    def _analyze_code_complexity(self, content: str, language: str) -> Dict:
+    def _analyze_code_complexity(self, content: str, language: str) -> dict:
         """Analyze code complexity indicators"""
         return {
             "cyclomatic_complexity": content.count("if")
@@ -667,7 +666,7 @@ class SpecStoryDatabaseStorage:
             / max(len(content.split("\n")), 1),
         }
 
-    def _extract_syntax_elements(self, content: str, language: str) -> List[str]:
+    def _extract_syntax_elements(self, content: str, language: str) -> list[str]:
         """Extract syntax elements from code"""
         elements = []
         if language == "python":
@@ -701,7 +700,7 @@ class SpecStoryDatabaseStorage:
 
         return [elem for elem in elements if elem in content]
 
-    def _extract_imports_exports(self, content: str, language: str) -> List[str]:
+    def _extract_imports_exports(self, content: str, language: str) -> list[str]:
         """Extract import/export statements"""
         imports = []
         lines = content.split("\n")
@@ -758,7 +757,7 @@ class SpecStoryDatabaseStorage:
         # Simple readability metric (lower is more readable)
         return min(avg_words_per_sentence / 20.0 + avg_chars_per_word / 10.0, 1.0)
 
-    def _extract_sentiment_indicators(self, content: str) -> Dict:
+    def _extract_sentiment_indicators(self, content: str) -> dict:
         """Extract basic sentiment indicators"""
         positive_words = ["good", "great", "excellent", "success", "working", "correct"]
         negative_words = ["error", "failed", "wrong", "issue", "problem", "broken"]
@@ -775,7 +774,7 @@ class SpecStoryDatabaseStorage:
             "overall_sentiment": "neutral",  # Could be enhanced with ML
         }
 
-    def _extract_topic_keywords(self, content: str) -> List[str]:
+    def _extract_topic_keywords(self, content: str) -> list[str]:
         """Extract topic keywords (simple implementation)"""
         # Remove common words and extract meaningful terms
         common_words = {
@@ -814,8 +813,8 @@ class SpecStoryDatabaseStorage:
             return "Unknown"
 
     async def _update_session_aggregates(
-        self, session_id: str, components: List[AtomicComponent]
-    ) -> Dict:
+        self, session_id: str, components: list[AtomicComponent]
+    ) -> dict:
         """Update session-level aggregated data"""
         from src.shared.database.core.cognitive_database import (
             mcp_cognitive_tools_arango_modify,
@@ -895,12 +894,12 @@ class SpecStoryDatabaseStorage:
 
     async def query_components(
         self,
-        component_type: Optional[ComponentType] = None,
-        session_id: Optional[str] = None,
-        file_path: Optional[str] = None,
-        content_search: Optional[str] = None,
+        component_type: ComponentType | None = None,
+        session_id: str | None = None,
+        file_path: str | None = None,
+        content_search: str | None = None,
         limit: int = 100,
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """Query components with flexible filters"""
         from src.shared.database.core.cognitive_database import (
             mcp_cognitive_tools_arango_search,
@@ -933,11 +932,11 @@ class SpecStoryDatabaseStorage:
 
     async def query_relationships(
         self,
-        relationship_type: Optional[RelationshipType] = None,
-        source_component_id: Optional[str] = None,
+        relationship_type: RelationshipType | None = None,
+        source_component_id: str | None = None,
         min_confidence: float = 0.0,
         limit: int = 100,
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """Query relationships with filters"""
         from src.shared.database.core.cognitive_database import (
             mcp_cognitive_tools_arango_search,
@@ -970,7 +969,7 @@ class SpecStoryDatabaseStorage:
 
         return documents
 
-    async def get_session_overview(self, session_id: str) -> Dict:
+    async def get_session_overview(self, session_id: str) -> dict:
         """Get comprehensive session overview"""
         from src.shared.database.core.cognitive_database import (
             mcp_cognitive_tools_arango_search,
@@ -1004,7 +1003,7 @@ class SpecStoryDatabaseStorage:
             "insights": self._generate_session_insights(components),
         }
 
-    def _analyze_component_breakdown(self, components: List[Dict]) -> Dict:
+    def _analyze_component_breakdown(self, components: list[dict]) -> dict:
         """Analyze breakdown of component types"""
         breakdown = {}
         for component in components:
@@ -1012,7 +1011,7 @@ class SpecStoryDatabaseStorage:
             breakdown[comp_type] = breakdown.get(comp_type, 0) + 1
         return breakdown
 
-    def _build_session_timeline(self, components: List[Dict]) -> List[Dict]:
+    def _build_session_timeline(self, components: list[dict]) -> list[dict]:
         """Build chronological timeline of session"""
         # Sort by component sequence
         sorted_components = sorted(
@@ -1040,7 +1039,7 @@ class SpecStoryDatabaseStorage:
 
         return timeline
 
-    def _generate_session_insights(self, components: List[Dict]) -> Dict:
+    def _generate_session_insights(self, components: list[dict]) -> dict:
         """Generate analytical insights about session"""
         total_words = sum(
             len(comp.get("content", {}).get("raw_content", "").split())
@@ -1058,7 +1057,7 @@ class SpecStoryDatabaseStorage:
             "complexity_assessment": self._assess_session_complexity(components),
         }
 
-    def _identify_primary_activities(self, components: List[Dict]) -> List[str]:
+    def _identify_primary_activities(self, components: list[dict]) -> list[str]:
         """Identify primary activities in session"""
         activities = []
 
@@ -1073,7 +1072,7 @@ class SpecStoryDatabaseStorage:
 
         return activities
 
-    def _analyze_tool_usage(self, tool_calls: List[Dict]) -> Dict:
+    def _analyze_tool_usage(self, tool_calls: list[dict]) -> dict:
         """Analyze patterns in tool usage"""
         tools_used = {}
         for call in tool_calls:
@@ -1093,7 +1092,7 @@ class SpecStoryDatabaseStorage:
             "tool_distribution": tools_used,
         }
 
-    def _assess_session_complexity(self, components: List[Dict]) -> str:
+    def _assess_session_complexity(self, components: list[dict]) -> str:
         """Assess overall session complexity"""
         component_count = len(components)
 

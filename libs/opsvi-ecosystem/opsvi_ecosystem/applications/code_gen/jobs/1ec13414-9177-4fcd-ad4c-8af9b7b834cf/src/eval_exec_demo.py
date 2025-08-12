@@ -9,7 +9,6 @@ Date: 2024-06-09
 """
 
 import logging
-from typing import Any
 
 # Configure logging for debug and information output
 logging.basicConfig(
@@ -66,7 +65,7 @@ def demonstrate_exec() -> None:
             print(f"[exec()] After executing code, z = {environment['z']}")
             logging.debug(f"Exec assigned z = {environment['z']}")
         else:
-            print(f"[exec()] Variable 'z' was not assigned in the environment.")
+            print("[exec()] Variable 'z' was not assigned in the environment.")
     except Exception as e:
         logging.error(f"Error executing code block: {e}")
 

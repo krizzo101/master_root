@@ -6,7 +6,7 @@ and error handling with adaptive capabilities.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List
+from typing import Any
 
 from src.applications.oamat_sd.src.models.data_models import SystemError
 
@@ -16,8 +16,8 @@ class ISystemConfigurationManager(ABC):
 
     @abstractmethod
     async def load_configuration_adaptively(
-        self, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, context: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Load configuration adapted to current execution context
 
@@ -28,8 +28,8 @@ class ISystemConfigurationManager(ABC):
 
     @abstractmethod
     async def validate_configuration_intelligently(
-        self, config: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, config: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Intelligently validate configuration completeness and correctness
 
@@ -40,8 +40,8 @@ class ISystemConfigurationManager(ABC):
 
     @abstractmethod
     async def optimize_configuration_dynamically(
-        self, config: Dict[str, Any], performance_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, config: dict[str, Any], performance_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Dynamically optimize configuration based on performance data
 
@@ -56,8 +56,8 @@ class IErrorHandlingManager(ABC):
 
     @abstractmethod
     async def analyze_error_intelligently(
-        self, error: SystemError, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, error: SystemError, context: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Intelligently analyze errors using contextual information
 
@@ -68,8 +68,8 @@ class IErrorHandlingManager(ABC):
 
     @abstractmethod
     async def generate_recovery_strategy(
-        self, error_analysis: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, error_analysis: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Generate intelligent recovery strategies based on error analysis
 
@@ -80,8 +80,8 @@ class IErrorHandlingManager(ABC):
 
     @abstractmethod
     async def implement_adaptive_circuit_breaker(
-        self, component: str, error_patterns: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, component: str, error_patterns: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Implement adaptive circuit breaker patterns
 
@@ -92,8 +92,8 @@ class IErrorHandlingManager(ABC):
 
     @abstractmethod
     async def learn_from_errors(
-        self, error_history: List[SystemError]
-    ) -> Dict[str, Any]:
+        self, error_history: list[SystemError]
+    ) -> dict[str, Any]:
         """
         Learn from error patterns to improve future error handling
 

@@ -10,13 +10,10 @@ Directive Identifier Module.
 This module identifies potential directives in content for rule generation.
 """
 
-import re
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 
 from .base_preprocessor import BasePreprocessor
-from ..utils.config_loader import load_prompt_config
-from ..connectors.llm_client import get_completion
 
 logger = logging.getLogger(__name__)
 

@@ -5,7 +5,7 @@ Now supports semantic search using OpenAI embeddings (requires numpy).
 """
 
 import os
-from typing import Any, List, Tuple
+from typing import Any
 
 import networkx as nx
 import numpy as np
@@ -19,24 +19,24 @@ from src.shared.interfaces.database.arango_interface import (
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
-def shortest_path(G: nx.Graph, source: Any, target: Any) -> List[Any]:
+def shortest_path(G: nx.Graph, source: Any, target: Any) -> list[Any]:
     """Return the shortest path between source and target nodes."""
     return nx.shortest_path(G, source=source, target=target)
 
 
-def neighbors(G: nx.Graph, node: Any) -> List[Any]:
+def neighbors(G: nx.Graph, node: Any) -> list[Any]:
     """Return the neighbors of a node."""
     return list(G.neighbors(node))
 
 
-def extract_subgraph(G: nx.Graph, nodes: List[Any]) -> nx.Graph:
+def extract_subgraph(G: nx.Graph, nodes: list[Any]) -> nx.Graph:
     """Return the subgraph induced by the given nodes."""
     return G.subgraph(nodes).copy()
 
 
 def embed_query_openai(
     query: str, model: str = "text-embedding-3-large", dimensions: int = 1536
-) -> List[float]:
+) -> list[float]:
     """Embed a query using OpenAI's embedding API (configurable model/dimensions)."""
     if not os.getenv("OPENAI_API_KEY"):
         raise RuntimeError("OPENAI_API_KEY not set")
@@ -48,7 +48,7 @@ def embed_query_openai(
 
 def semantic_search(
     G: nx.Graph, query: str, top_k: int = 5, model: str = "text-embedding-ada-002"
-) -> List[Tuple[str, float]]:
+) -> list[tuple[str, float]]:
     """Return top-k node IDs most semantically similar to the query. Shows progress bar if >100 nodes."""
     query_emb = np.array(embed_query_openai(query, model))
     results = []

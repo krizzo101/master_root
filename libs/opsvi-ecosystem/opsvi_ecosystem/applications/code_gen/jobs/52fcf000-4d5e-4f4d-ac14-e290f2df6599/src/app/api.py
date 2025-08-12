@@ -1,24 +1,24 @@
 """
 FastAPI API routers: project CRUD, file upload, report fetch, etc.
 """
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
+import logging
+
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
-from typing import List
+
 from app.auth import get_current_active_user
 from app.db import get_db
-from app.models import User, Project, File as FileModel, Report
+from app.models import File as FileModel
+from app.models import Project, Report, User
 from app.schemas import (
-    ProjectCreate,
-    ProjectUpdate,
-    ProjectRead,
-    FileRead,
-    ReportRead,
     Msg,
+    ProjectCreate,
+    ProjectRead,
+    ProjectUpdate,
+    ReportRead,
 )
-from app.storage import save_upload_file, delete_file
+from app.storage import save_upload_file
 from app.tasks import analyze_code_task
-
-import logging
 
 logger = logging.getLogger("api")
 
@@ -45,7 +45,7 @@ def create_project(
     return project
 
 
-@router.get("/projects", response_model=List[ProjectRead])
+@router.get("/projects", response_model=list[ProjectRead])
 def list_projects(
     db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)
 ):
@@ -130,7 +130,7 @@ def upload_python_code(
 
 
 # --- Reports ---
-@router.get("/projects/{project_id}/reports", response_model=List[ReportRead])
+@router.get("/projects/{project_id}/reports", response_model=list[ReportRead])
 def list_project_reports(
     project_id: int,
     db: Session = Depends(get_db),

@@ -4,11 +4,9 @@ Process Real Foundational Memories into Cognitive Concepts
 Autonomous Intelligence Evolution Phase 1
 """
 
-import json
 import sys
-import os
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Dict, List
 
 # Add the development directory to Python path
 sys.path.append("/home/opsvi/asea")
@@ -199,7 +197,7 @@ def main():
 
     completion_ids = insert_arango_documents("cognitive_patterns", [completion_status])
 
-    print(f"\nCognitive enhancement phase 1 completed successfully!")
+    print("\nCognitive enhancement phase 1 completed successfully!")
     print(f"Status stored: {completion_ids}")
     print(f"Enhanced concepts file: {concepts_file}")
 

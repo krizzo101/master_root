@@ -5,12 +5,12 @@ This module handles writing research results to the database.
 """
 
 import logging
-from typing import Dict, Any
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-async def write_research_to_db(summary: Dict[str, Any]) -> Dict[str, Any]:
+async def write_research_to_db(summary: dict[str, Any]) -> dict[str, Any]:
     """
     Write research summary to database.
 

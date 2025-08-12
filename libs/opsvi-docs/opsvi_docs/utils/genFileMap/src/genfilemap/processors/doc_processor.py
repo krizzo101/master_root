@@ -13,10 +13,9 @@ This module provides specialized processing for documentation files like markdow
 import re
 import json
 import asyncio
-import hashlib
 import os
 from datetime import datetime
-from typing import Dict, Any, Optional, Tuple, List
+from typing import Dict, Any, Optional, Tuple
 
 from genfilemap.processors.base import FileProcessor
 from genfilemap.prompting.prompts import (
@@ -99,15 +98,15 @@ class DocumentationFileProcessor(FileProcessor):
                         )
                         if valid:
                             print(
-                                f"DEBUG-DOC: Existing map is valid, returning None to skip update"
+                                "DEBUG-DOC: Existing map is valid, returning None to skip update"
                             )
                             return None  # Valid file map, no need to update
                     except json.JSONDecodeError:
-                        print(f"DEBUG-DOC: Invalid JSON in existing map")
+                        print("DEBUG-DOC: Invalid JSON in existing map")
                 else:
-                    print(f"DEBUG-DOC: No JSON found in existing map")
+                    print("DEBUG-DOC: No JSON found in existing map")
         else:
-            print(f"DEBUG-DOC: No hash file found, will generate new map")
+            print("DEBUG-DOC: No hash file found, will generate new map")
 
         # Get the current date
         current_date = datetime.now().strftime("%Y-%m-%d")
@@ -120,13 +119,13 @@ class DocumentationFileProcessor(FileProcessor):
             # Add 6 blank lines for HTML comments (5 for file map + 1 blank line)
             content_with_blanks = "\n\n\n\n\n\n" + remaining_content
             print(
-                f"DEBUG-DOC: Added six blank lines to beginning of content for HTML comment format"
+                "DEBUG-DOC: Added six blank lines to beginning of content for HTML comment format"
             )
         else:
             # Add 2 blank lines for other file types (1 for file map + 1 blank line)
             content_with_blanks = "\n\n" + remaining_content
             print(
-                f"DEBUG-DOC: Added two blank lines to beginning of content for standard format"
+                "DEBUG-DOC: Added two blank lines to beginning of content for standard format"
             )
 
         # Perform structure analysis on the original content
@@ -172,7 +171,7 @@ class DocumentationFileProcessor(FileProcessor):
                     print(f"DEBUG-DOC: Map validation result: {valid}")
 
                     if valid:
-                        print(f"DEBUG-DOC: Valid file map generated")
+                        print("DEBUG-DOC: Valid file map generated")
                         # Single-line JSON formatting - most compact representation
                         file_map_json = json.dumps(file_map_obj, separators=(",", ":"))
                         break
@@ -221,6 +220,6 @@ class DocumentationFileProcessor(FileProcessor):
         # Save the current hash
         with open(hash_file, "w") as f:
             f.write(content_hash)
-        print(f"DEBUG-DOC: Saved hash file")
+        print("DEBUG-DOC: Saved hash file")
 
         return formatted_map

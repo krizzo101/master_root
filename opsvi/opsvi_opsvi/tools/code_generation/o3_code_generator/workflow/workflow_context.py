@@ -8,7 +8,7 @@ import json
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 
 class WorkflowContext:
@@ -64,7 +64,7 @@ class WorkflowContext:
     # Define SDLC step dependencies - pure software development workflow
     STEP_DEPENDENCIES = STEP_DEPENDENCIES
 
-    def __init__(self, initial_problem: str, workflow_id: Optional[str] = None):
+    def __init__(self, initial_problem: str, workflow_id: str | None = None):
         """
         Initialize workflow context.
 
@@ -78,25 +78,25 @@ class WorkflowContext:
         self.updated_at = datetime.now()
 
         # Workflow state
-        self.steps_completed: List[str] = []
-        self.current_step: Optional[str] = None
-        self.step_outputs: Dict[str, Any] = {}
-        self.step_metadata: Dict[str, Dict[str, Any]] = {}
+        self.steps_completed: list[str] = []
+        self.current_step: str | None = None
+        self.step_outputs: dict[str, Any] = {}
+        self.step_metadata: dict[str, dict[str, Any]] = {}
 
         # Key selections and derived data
-        self.selected_idea: Optional[Dict[str, Any]] = None
-        self.idea_selection_rationale: Optional[str] = None
+        self.selected_idea: dict[str, Any] | None = None
+        self.idea_selection_rationale: str | None = None
 
         # File tracking
-        self.output_directory: Optional[Path] = None
-        self.step_files: Dict[str, List[str]] = {}
+        self.output_directory: Path | None = None
+        self.step_files: dict[str, list[str]] = {}
 
         # Workflow configuration
-        self.enabled_steps: List[str] = list(self.STEP_DEPENDENCIES.keys())
-        self.step_config: Dict[str, Dict[str, Any]] = {}
+        self.enabled_steps: list[str] = list(self.STEP_DEPENDENCIES.keys())
+        self.step_config: dict[str, dict[str, Any]] = {}
 
     def add_step_output(
-        self, step_name: str, output: Any, metadata: Optional[Dict[str, Any]] = None
+        self, step_name: str, output: Any, metadata: dict[str, Any] | None = None
     ) -> None:
         """
         Add output from a completed workflow step.
@@ -119,11 +119,11 @@ class WorkflowContext:
             self.selected_idea = output["selected_idea"]
             self.idea_selection_rationale = output.get("selection_rationale", "")
 
-    def get_step_output(self, step_name: str) -> Optional[Any]:
+    def get_step_output(self, step_name: str) -> Any | None:
         """Get output from a specific step."""
         return self.step_outputs.get(step_name)
 
-    def get_relevant_context_for_step(self, step_name: str) -> Dict[str, Any]:
+    def get_relevant_context_for_step(self, step_name: str) -> dict[str, Any]:
         """
         Get relevant context for a specific workflow step.
 
@@ -150,7 +150,7 @@ class WorkflowContext:
 
         return context
 
-    def _get_enhanced_context_for_step(self, step_name: str) -> Dict[str, Any]:
+    def _get_enhanced_context_for_step(self, step_name: str) -> dict[str, Any]:
         """
         Get enhanced context specific to each step type.
 
@@ -191,7 +191,7 @@ class WorkflowContext:
 
         return enhanced_context
 
-    def _synthesize_problem_analysis(self) -> Dict[str, Any]:
+    def _synthesize_problem_analysis(self) -> dict[str, Any]:
         """Synthesize problem analysis from completed steps."""
         analysis = {"core_problem": self.initial_problem}
 
@@ -212,7 +212,7 @@ class WorkflowContext:
 
         return analysis
 
-    def _extract_market_insights(self) -> Dict[str, Any]:
+    def _extract_market_insights(self) -> dict[str, Any]:
         """Extract key market insights for requirements analysis."""
         if "market-research" not in self.step_outputs:
             return {}
@@ -225,7 +225,7 @@ class WorkflowContext:
             "success_factors": market_data.get("success_factors", []),
         }
 
-    def _extract_feasibility_constraints(self) -> Dict[str, Any]:
+    def _extract_feasibility_constraints(self) -> dict[str, Any]:
         """Extract feasibility constraints and considerations."""
         if "feasibility-assess" not in self.step_outputs:
             return {}
@@ -240,7 +240,7 @@ class WorkflowContext:
             ),
         }
 
-    def _extract_technical_requirements(self) -> Dict[str, Any]:
+    def _extract_technical_requirements(self) -> dict[str, Any]:
         """Extract technical requirements for API and database design."""
         if "requirements-analyze" not in self.step_outputs:
             return {}
@@ -253,7 +253,7 @@ class WorkflowContext:
             "scalability_requirements": req_data.get("scalability_requirements", []),
         }
 
-    def _extract_functional_requirements(self) -> Dict[str, Any]:
+    def _extract_functional_requirements(self) -> dict[str, Any]:
         """Extract functional requirements."""
         if "requirements-analyze" not in self.step_outputs:
             return {}
@@ -265,7 +265,7 @@ class WorkflowContext:
             "use_cases": req_data.get("use_cases", []),
         }
 
-    def _extract_non_functional_requirements(self) -> Dict[str, Any]:
+    def _extract_non_functional_requirements(self) -> dict[str, Any]:
         """Extract non-functional requirements."""
         if "requirements-analyze" not in self.step_outputs:
             return {}
@@ -278,7 +278,7 @@ class WorkflowContext:
             "reliability": req_data.get("reliability_requirements", []),
         }
 
-    def _extract_api_overview(self) -> Dict[str, Any]:
+    def _extract_api_overview(self) -> dict[str, Any]:
         """Extract API overview for architecture design."""
         if "api-spec-generate" not in self.step_outputs:
             return {}
@@ -290,7 +290,7 @@ class WorkflowContext:
             "data_models": api_data.get("models", []),
         }
 
-    def _extract_data_model(self) -> Dict[str, Any]:
+    def _extract_data_model(self) -> dict[str, Any]:
         """Extract data model for architecture design."""
         if "database-generate" not in self.step_outputs:
             return {}
@@ -302,7 +302,7 @@ class WorkflowContext:
             "indexes": db_data.get("indexes", []),
         }
 
-    def _extract_integration_requirements(self) -> Dict[str, Any]:
+    def _extract_integration_requirements(self) -> dict[str, Any]:
         """Extract integration requirements."""
         if "integration-spec-generate" not in self.step_outputs:
             return {}
@@ -329,7 +329,7 @@ class WorkflowContext:
         dependencies = self.STEP_DEPENDENCIES.get(step_name, [])
         return all(dep in self.steps_completed for dep in dependencies)
 
-    def get_next_ready_steps(self) -> List[str]:
+    def get_next_ready_steps(self) -> list[str]:
         """Get list of steps that are ready to execute."""
         ready_steps = []
         for step in self.enabled_steps:
@@ -337,7 +337,7 @@ class WorkflowContext:
                 ready_steps.append(step)
         return ready_steps
 
-    def get_workflow_progress(self) -> Dict[str, Any]:
+    def get_workflow_progress(self) -> dict[str, Any]:
         """Get workflow progress summary."""
         total_steps = len(self.enabled_steps)
         completed_steps = len(self.steps_completed)
@@ -408,7 +408,7 @@ class WorkflowContext:
     @classmethod
     def load_context(cls, context_file: Path) -> "WorkflowContext":
         """Load workflow context from file."""
-        with open(context_file, "r") as f:
+        with open(context_file) as f:
             data = json.load(f)
 
         context = cls(

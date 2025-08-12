@@ -4,10 +4,10 @@ Prevents information overload by intelligently filtering and summarizing
 child workflow results appropriate for each hierarchical level.
 """
 
+import json
 from dataclasses import dataclass
 from enum import Enum
-import json
-from typing import Any, Dict, List
+from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
@@ -41,7 +41,7 @@ class ContextFilter:
     """Defines what information should be passed up to specific abstraction levels"""
 
     abstraction_level: AbstractionLevel
-    included_types: List[InformationType]
+    included_types: list[InformationType]
     max_detail_length: int
     summary_style: str
 
@@ -53,25 +53,25 @@ class ChildWorkflowResult(BaseModel):
     agent_role: str
     task_description: str
     completion_status: str
-    key_decisions: List[str] = Field(default_factory=list)
-    technical_details: Dict[str, Any] = Field(default_factory=dict)
-    dependencies_created: List[str] = Field(default_factory=list)
-    risks_identified: List[str] = Field(default_factory=list)
-    resource_usage: Dict[str, Any] = Field(default_factory=dict)
-    deliverables: List[str] = Field(default_factory=list)
+    key_decisions: list[str] = Field(default_factory=list)
+    technical_details: dict[str, Any] = Field(default_factory=dict)
+    dependencies_created: list[str] = Field(default_factory=list)
+    risks_identified: list[str] = Field(default_factory=list)
+    resource_usage: dict[str, Any] = Field(default_factory=dict)
+    deliverables: list[str] = Field(default_factory=list)
     raw_output: str = ""
 
 
 class AbstractedSummary(BaseModel):
     """Filtered and summarized information appropriate for parent level"""
 
-    source_workflows: List[str]
+    source_workflows: list[str]
     executive_summary: str
-    key_outcomes: List[str]
-    critical_dependencies: List[str]
-    escalated_risks: List[str]
+    key_outcomes: list[str]
+    critical_dependencies: list[str]
+    escalated_risks: list[str]
     resource_impact: str
-    next_actions_required: List[str]
+    next_actions_required: list[str]
     confidence_level: float
 
 
@@ -85,7 +85,7 @@ class ContextAbstractionEngine:
         self.llm = ChatOpenAI(model=llm_model, temperature=0.1)
         self.abstraction_filters = self._initialize_filters()
 
-    def _initialize_filters(self) -> Dict[AbstractionLevel, ContextFilter]:
+    def _initialize_filters(self) -> dict[AbstractionLevel, ContextFilter]:
         """Initialize abstraction filters for different hierarchical levels"""
         return {
             AbstractionLevel.EXECUTIVE: ContextFilter(
@@ -133,7 +133,7 @@ class ContextAbstractionEngine:
 
     async def abstract_child_results(
         self,
-        child_results: List[ChildWorkflowResult],
+        child_results: list[ChildWorkflowResult],
         parent_abstraction_level: AbstractionLevel,
         parent_context: str,
     ) -> AbstractedSummary:
@@ -158,8 +158,8 @@ class ContextAbstractionEngine:
         return abstracted_summary
 
     def _filter_by_abstraction_level(
-        self, results: List[ChildWorkflowResult], level: AbstractionLevel
-    ) -> List[Dict[str, Any]]:
+        self, results: list[ChildWorkflowResult], level: AbstractionLevel
+    ) -> list[dict[str, Any]]:
         """Filter results based on abstraction level requirements"""
 
         filter_config = self.abstraction_filters[level]
@@ -207,8 +207,8 @@ class ContextAbstractionEngine:
         return filtered_results
 
     def _extract_critical_information(
-        self, filtered_results: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, filtered_results: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Extract information that MUST bubble up regardless of abstraction level"""
 
         critical_info = {
@@ -247,8 +247,8 @@ class ContextAbstractionEngine:
 
     async def _generate_intelligent_summary(
         self,
-        filtered_results: List[Dict[str, Any]],
-        critical_info: Dict[str, Any],
+        filtered_results: list[dict[str, Any]],
+        critical_info: dict[str, Any],
         abstraction_level: AbstractionLevel,
         parent_context: str,
     ) -> AbstractedSummary:
@@ -302,8 +302,8 @@ class ContextAbstractionEngine:
     def _parse_llm_response_to_summary(
         self,
         llm_response: str,
-        filtered_results: List[Dict[str, Any]],
-        critical_info: Dict[str, Any],
+        filtered_results: list[dict[str, Any]],
+        critical_info: dict[str, Any],
     ) -> AbstractedSummary:
         """Parse LLM response into structured AbstractedSummary"""
 
@@ -328,7 +328,7 @@ class ContextAbstractionEngine:
         )
 
     def _summarize_technical_details(
-        self, technical_details: Dict[str, Any], max_length: int
+        self, technical_details: dict[str, Any], max_length: int
     ) -> str:
         """Summarize technical details to appropriate length"""
         if not technical_details:
@@ -347,7 +347,7 @@ class ContextAbstractionEngine:
             else full_summary
         )
 
-    def _summarize_resource_usage(self, resource_usage: Dict[str, Any]) -> str:
+    def _summarize_resource_usage(self, resource_usage: dict[str, Any]) -> str:
         """Summarize resource usage for parent-level consumption"""
         if not resource_usage:
             return "No resource impact"
@@ -370,7 +370,7 @@ class ContextAbstractionEngine:
                 return lines[i + 1] if i + 1 < len(lines) else ""
         return "Summary not available"
 
-    def _extract_list_section(self, text: str, section: str) -> List[str]:
+    def _extract_list_section(self, text: str, section: str) -> list[str]:
         """Extract list section from LLM response"""
         # Simplified extraction - production would use more robust parsing
         items = []
@@ -389,7 +389,7 @@ class ContextAbstractionEngine:
         return items
 
     def _calculate_confidence_level(
-        self, filtered_results: List[Dict[str, Any]]
+        self, filtered_results: list[dict[str, Any]]
     ) -> float:
         """Calculate confidence level based on completion status of child workflows"""
         if not filtered_results:
@@ -415,7 +415,7 @@ class ParentNodeContextManager:
         self.abstraction_engine = ContextAbstractionEngine()
 
     async def process_child_results(
-        self, child_results: List[ChildWorkflowResult]
+        self, child_results: list[ChildWorkflowResult]
     ) -> AbstractedSummary:
         """Main method for parent nodes to get filtered child results"""
 

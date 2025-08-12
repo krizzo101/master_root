@@ -1,12 +1,11 @@
 import os
 import subprocess
 import time
-from typing import Dict, List
 
 from src.shared.openai_interfaces.responses_interface import OpenAIResponsesInterface
 
 
-def orchestrate_update(correction_tasks: List[Dict]) -> List[Dict]:
+def orchestrate_update(correction_tasks: list[dict]) -> list[dict]:
     """
     Aggregate correction tasks, assign to agents (simulate), manage state.
     """
@@ -16,7 +15,7 @@ def orchestrate_update(correction_tasks: List[Dict]) -> List[Dict]:
     return doc_update_plan
 
 
-def multi_agent_review(doc_update_plan: List[Dict]) -> List[Dict]:
+def multi_agent_review(doc_update_plan: list[dict]) -> list[dict]:
     """
     Use OpenAI to review proposed doc updates for accuracy and compliance.
     """
@@ -41,7 +40,7 @@ def multi_agent_review(doc_update_plan: List[Dict]) -> List[Dict]:
     return reviewed
 
 
-def generate_commit_message(reviewed_updates: List[Dict]) -> str:
+def generate_commit_message(reviewed_updates: list[dict]) -> str:
     """
     Generate a descriptive commit message based on agent review and file changes.
     """
@@ -57,7 +56,7 @@ def generate_commit_message(reviewed_updates: List[Dict]) -> str:
 
 
 def finalize_update(
-    reviewed_updates: List[Dict],
+    reviewed_updates: list[dict],
     docs_dir: str = "docs/applications/agentic_doc_manager/",
 ) -> None:
     """

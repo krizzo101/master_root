@@ -1,5 +1,4 @@
 import logging
-from typing import Dict, Optional
 
 from shared.openai_interfaces.responses_interface import OpenAIResponsesInterface
 
@@ -16,8 +15,8 @@ class SystemMessageGeneratorAgent:
         self.openai_interface = OpenAIResponsesInterface()
 
     def generate_system_message(
-        self, expert_name: str, context: Optional[str] = None
-    ) -> Dict:
+        self, expert_name: str, context: str | None = None
+    ) -> dict:
         """
         Generate a system message for a new expert type using the allowed OpenAI model.
         Returns a structured dict with expert_name, system_message, model_used, and raw_response.

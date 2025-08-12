@@ -7,7 +7,8 @@ environment variable overrides and YAML file configuration.
 
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
+
 import yaml
 
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import get_logger
@@ -23,20 +24,20 @@ class ConfigManager:
     3. Hardcoded defaults
     """
 
-    def __init__(self, config_path: Optional[str] = None) -> None:
+    def __init__(self, config_path: str | None = None) -> None:
         """Initialize configuration manager."""
         self.logger = get_logger()
         self.config_path = (
             Path(config_path) if config_path else Path(__file__).parent / "config.yaml"
         )
-        self._config_data: Dict[str, Any] = {}
+        self._config_data: dict[str, Any] = {}
         self._load_config()
 
     def _load_config(self) -> None:
         """Load configuration from YAML file."""
         try:
             if self.config_path.exists():
-                with open(self.config_path, "r", encoding="utf-8") as f:
+                with open(self.config_path, encoding="utf-8") as f:
                     self._config_data = yaml.safe_load(f) or {}
                 self.logger.log_debug(f"Loaded config from {self.config_path}")
             else:
@@ -82,11 +83,11 @@ class ConfigManager:
             raise ValueError("OpenAI API key not found in environment or config")
         return api_key
 
-    def get_api_base_url(self) -> Optional[str]:
+    def get_api_base_url(self) -> str | None:
         """Get OpenAI API base URL."""
         return self.get("openai.base_url") or self.get("OPENAI_BASE_URL")
 
-    def get_logging_config(self) -> Dict[str, Any]:
+    def get_logging_config(self) -> dict[str, Any]:
         """Get logging configuration with defaults."""
         return {
             "level": self.get("logging.level", "INFO"),
@@ -96,7 +97,7 @@ class ConfigManager:
             "enable_debug_log": self.get("logging.enable_debug_log", False),
         }
 
-    def get_model_config(self) -> Dict[str, Any]:
+    def get_model_config(self) -> dict[str, Any]:
         """Get model configuration with defaults."""
         return {
             "default_model": self.get("model.default", "gpt-4o-mini"),

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Simple web application with HTML frontend."""
-from flask import Flask, render_template, request, jsonify, redirect, url_for
-from pathlib import Path
 import os
+from pathlib import Path
 
+from flask import Flask, jsonify, redirect, render_template, request, url_for
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")

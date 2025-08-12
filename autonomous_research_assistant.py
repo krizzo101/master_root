@@ -20,11 +20,10 @@ research tool for the project.
 
 import asyncio
 import json
-import sys
 import os
+import sys
 from datetime import datetime
-from typing import List, Dict, Any, Optional
-from pathlib import Path
+from typing import Any
 
 # Add libs to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "libs"))
@@ -33,7 +32,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "libs"))
 class ResearchTopic:
     """Represents a research topic with metadata."""
 
-    def __init__(self, title: str, description: str, keywords: List[str]):
+    def __init__(self, title: str, description: str, keywords: list[str]):
         self.title = title
         self.description = description
         self.keywords = keywords
@@ -47,7 +46,7 @@ class ResearchTopic:
 class ResearchFinding:
     """Represents a research finding."""
 
-    def __init__(self, source: str, content: str, summary: str, insights: List[str]):
+    def __init__(self, source: str, content: str, summary: str, insights: list[str]):
         self.source = source
         self.content = content
         self.summary = summary
@@ -73,7 +72,6 @@ class AutonomousResearchAssistant:
 
         try:
             # Initialize Foundation components
-            from opsvi_foundation import BaseComponent, ComponentError
 
             # Initialize simple state management
             self.state_manager = {}
@@ -96,7 +94,7 @@ class AutonomousResearchAssistant:
             print(f"❌ Shutdown error: {e}")
 
     async def add_research_topic(
-        self, title: str, description: str, keywords: List[str]
+        self, title: str, description: str, keywords: list[str]
     ) -> ResearchTopic:
         """Add a new research topic."""
         topic = ResearchTopic(title, description, keywords)
@@ -115,7 +113,7 @@ class AutonomousResearchAssistant:
         print(f"📝 Added research topic: {title}")
         return topic
 
-    async def fetch_research_data(self, topic: ResearchTopic) -> List[Dict[str, Any]]:
+    async def fetch_research_data(self, topic: ResearchTopic) -> list[dict[str, Any]]:
         """Fetch research data using HTTP services."""
         print(f"🔍 Fetching research data for: {topic.title}")
 
@@ -161,7 +159,7 @@ class AutonomousResearchAssistant:
 
     async def analyze_content(
         self, content: str, topic: ResearchTopic
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Analyze content using LLM services."""
         print(f"🧠 Analyzing content for: {topic.title}")
 
@@ -179,7 +177,7 @@ class AutonomousResearchAssistant:
                 "recommendations": [
                     f"Further research needed on {topic.keywords[0]}",
                     f"Consider implications for {topic.title}",
-                    f"Explore connections with related topics",
+                    "Explore connections with related topics",
                 ],
             }
 
@@ -190,7 +188,7 @@ class AutonomousResearchAssistant:
             return {}
 
     async def store_findings(
-        self, topic: ResearchTopic, findings: List[ResearchFinding]
+        self, topic: ResearchTopic, findings: list[ResearchFinding]
     ):
         """Store research findings using data services."""
         print(f"💾 Storing findings for: {topic.title}")
@@ -220,7 +218,7 @@ class AutonomousResearchAssistant:
         except Exception as e:
             print(f"❌ Error storing findings: {e}")
 
-    async def generate_research_report(self, topic: ResearchTopic) -> Dict[str, Any]:
+    async def generate_research_report(self, topic: ResearchTopic) -> dict[str, Any]:
         """Generate a comprehensive research report."""
         print(f"📊 Generating research report for: {topic.title}")
 
@@ -253,8 +251,8 @@ class AutonomousResearchAssistant:
                 "sources": topic.sources,
                 "recommendations": [
                     f"Continue research on {topic.keywords[0]}",
-                    f"Explore interdisciplinary connections",
-                    f"Consider practical applications",
+                    "Explore interdisciplinary connections",
+                    "Consider practical applications",
                 ],
                 "generated_at": datetime.now().isoformat(),
                 "session_id": self.session_id,
@@ -271,8 +269,8 @@ class AutonomousResearchAssistant:
             return {}
 
     async def conduct_research(
-        self, title: str, description: str, keywords: List[str]
-    ) -> Dict[str, Any]:
+        self, title: str, description: str, keywords: list[str]
+    ) -> dict[str, Any]:
         """Conduct comprehensive research on a topic."""
         print(f"\n🚀 Starting research on: {title}")
         print("=" * 60)
@@ -315,7 +313,7 @@ class AutonomousResearchAssistant:
             print(f"❌ Research failed: {e}")
             return {}
 
-    async def get_research_status(self) -> Dict[str, Any]:
+    async def get_research_status(self) -> dict[str, Any]:
         """Get overall research status."""
         try:
             topics_data = []

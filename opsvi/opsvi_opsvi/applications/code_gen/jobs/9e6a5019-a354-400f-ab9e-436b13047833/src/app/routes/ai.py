@@ -1,15 +1,16 @@
 """
 Blueprint: AI endpoints for content, tag, category, and alt text generation (AJAX/RESTful).
 """
-from flask import Blueprint, jsonify, request, current_app
-from flask_login import login_required, current_user
+from flask import Blueprint, jsonify, request
+from flask_login import login_required
+
+from app.models import Image
 from app.tasks import (
     ai_generate_post_content,
-    ai_suggest_tags,
     ai_suggest_categories,
+    ai_suggest_tags,
     generate_alt_text,
 )
-from app.models import Image
 
 ai_bp = Blueprint("ai", __name__)
 

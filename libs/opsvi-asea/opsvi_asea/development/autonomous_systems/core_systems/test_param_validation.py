@@ -1,4 +1,3 @@
-import pytest
 from mistake_prevention_system import require_params, MistakePreventionSystem
 
 

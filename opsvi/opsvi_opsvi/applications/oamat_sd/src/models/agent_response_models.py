@@ -5,11 +5,10 @@ Defines the exact schema that ALL agents must use for their responses.
 This eliminates format detection and ensures predictable parsing.
 """
 
-from pathlib import Path
-
 # Import StrictBaseModel for OpenAI compatibility
 import sys
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import Any
 
 from pydantic import Field
 
@@ -39,7 +38,7 @@ class ToolExecution(StrictBaseModel):
     """Tool execution performed by agent"""
 
     tool_name: str = Field(..., description="Name of the tool used")
-    parameters: Dict[str, Any] = Field(..., description="Parameters passed to tool")
+    parameters: dict[str, Any] = Field(..., description="Parameters passed to tool")
     result_summary: str = Field(..., description="Summary of tool execution result")
     success: bool = Field(..., description="Whether tool execution succeeded")
 
@@ -48,7 +47,7 @@ class AgentDeliverables(StrictBaseModel):
     """MANDATORY structured response format for ALL agents"""
 
     # Core deliverables
-    generated_files: List[GeneratedFile] = Field(
+    generated_files: list[GeneratedFile] = Field(
         ...,
         description="All files created by this agent (MUST be non-empty for successful completion)",
     )
@@ -63,19 +62,19 @@ class AgentDeliverables(StrictBaseModel):
     )
 
     # Optional additional information
-    tools_used: List[ToolExecution] = Field(
+    tools_used: list[ToolExecution] = Field(
         default_factory=list, description="Tools executed during task completion"
     )
 
-    reasoning_chain: List[str] = Field(
+    reasoning_chain: list[str] = Field(
         default_factory=list, description="Step-by-step reasoning for task completion"
     )
 
-    validation_results: List[str] = Field(
+    validation_results: list[str] = Field(
         default_factory=list, description="Self-validation checks performed"
     )
 
-    additional_notes: Optional[str] = Field(
+    additional_notes: str | None = Field(
         None, description="Any additional notes or recommendations"
     )
 
@@ -93,7 +92,7 @@ class AgentResponse(StrictBaseModel):
     )
 
     # Metadata
-    execution_time_seconds: Optional[float] = Field(
+    execution_time_seconds: float | None = Field(
         None, description="Time taken to complete task"
     )
 

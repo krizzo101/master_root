@@ -20,9 +20,7 @@ Original implementation preserved below for backwards compatibility.
 # self.logger = get_plugin_logger(self.get_name())
 
 # /home/opsvi/asea/asea_orchestrator/src/asea_orchestrator/plugins/available/qa_plugin.py
-import os
 import requests
-import logging
 from typing import Dict, Any
 
 from asea_orchestrator.plugins.base_plugin import BasePlugin

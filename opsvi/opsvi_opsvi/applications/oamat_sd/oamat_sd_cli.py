@@ -10,9 +10,9 @@ import argparse
 import asyncio
 import json
 import os
-from pathlib import Path
 import sys
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any
 
 # Add project root to path for imports
 project_root = Path(__file__).parents[3]
@@ -22,7 +22,7 @@ sys.path.insert(0, str(project_root))
 from src.applications.oamat_sd.smart_decomposition_agent import SmartDecompositionAgent
 
 
-async def run_project_generation(request: str, verbose: bool = False) -> Dict[str, Any]:
+async def run_project_generation(request: str, verbose: bool = False) -> dict[str, Any]:
     """Run the Smart Decomposition Agent to generate a project"""
 
     if verbose:
@@ -41,7 +41,7 @@ async def run_project_generation(request: str, verbose: bool = False) -> Dict[st
     return result
 
 
-def print_results(result: Dict[str, Any], verbose: bool = False):
+def print_results(result: dict[str, Any], verbose: bool = False):
     """Print the results in a user-friendly format"""
 
     print("\n" + "🎯 SMART DECOMPOSITION RESULTS")

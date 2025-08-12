@@ -1,5 +1,4 @@
-import pytest
-from app.config import Settings, Config
+from app.config import Config, Settings
 
 
 def test_settings_properties_and_defaults():

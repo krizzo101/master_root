@@ -5,10 +5,9 @@ Provides continuous reflection, insight capture, and background analysis capabil
 Addresses the fundamental AI limitation of task-focused processing vs human background thinking.
 """
 
+import time
 from dataclasses import dataclass, field
 from datetime import datetime
-import time
-from typing import Dict, List, Optional
 
 
 @dataclass
@@ -19,11 +18,11 @@ class Insight:
     content: str
     category: str  # strategic, technical, methodological, philosophical, aesthetic
     confidence: float
-    context: Dict
+    context: dict
     timestamp: datetime = field(default_factory=datetime.utcnow)
-    tags: List[str] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {
             "insight_id": self.insight_id,
             "content": self.content,
@@ -42,9 +41,9 @@ class ThinkingSession:
     session_id: str
     topic: str
     start_time: datetime
-    end_time: Optional[datetime] = None
-    insights: List[Insight] = field(default_factory=list)
-    meta_insights: List[str] = field(default_factory=list)
+    end_time: datetime | None = None
+    insights: list[Insight] = field(default_factory=list)
+    meta_insights: list[str] = field(default_factory=list)
 
 
 class MetaThinkingEngine:
@@ -55,9 +54,9 @@ class MetaThinkingEngine:
 
     def __init__(self):
         self.is_thinking = False
-        self.insights: List[Insight] = []
-        self.thinking_sessions: List[ThinkingSession] = []
-        self.background_reflections: List[str] = []
+        self.insights: list[Insight] = []
+        self.thinking_sessions: list[ThinkingSession] = []
+        self.background_reflections: list[str] = []
 
         # Thinking triggers
         self.reflection_triggers = [
@@ -83,7 +82,7 @@ class MetaThinkingEngine:
             "aesthetic": ["beauty", "elegance", "preference", "artistic"],
         }
 
-    async def start_thinking_session(self, topic: str, context: Dict = None) -> str:
+    async def start_thinking_session(self, topic: str, context: dict = None) -> str:
         """Start a focused thinking session"""
         session_id = f"thinking_{int(time.time())}"
         session = ThinkingSession(
@@ -97,8 +96,8 @@ class MetaThinkingEngine:
         return session_id
 
     async def think_about(
-        self, topic: str, current_context: Dict = None
-    ) -> List[Insight]:
+        self, topic: str, current_context: dict = None
+    ) -> list[Insight]:
         """Engage in focused thinking about a specific topic"""
         session_id = await self.start_thinking_session(topic, current_context)
         insights = []
@@ -116,7 +115,7 @@ class MetaThinkingEngine:
         await self.end_thinking_session(session_id)
         return insights
 
-    async def _think_recursively(self, topic: str, context: Dict) -> List[Insight]:
+    async def _think_recursively(self, topic: str, context: dict) -> list[Insight]:
         """Recursive thinking - systems that analyze themselves"""
         insights = []
 
@@ -147,7 +146,7 @@ class MetaThinkingEngine:
 
         return insights
 
-    async def _think_systemically(self, topic: str, context: Dict) -> List[Insight]:
+    async def _think_systemically(self, topic: str, context: dict) -> list[Insight]:
         """Systems thinking - interconnections and emergent properties"""
         insights = []
 
@@ -164,7 +163,7 @@ class MetaThinkingEngine:
 
         return insights
 
-    async def _think_analytically(self, topic: str, context: Dict) -> List[Insight]:
+    async def _think_analytically(self, topic: str, context: dict) -> list[Insight]:
         """Analytical thinking - breaking down and solving"""
         insights = []
 
@@ -181,7 +180,7 @@ class MetaThinkingEngine:
 
         return insights
 
-    async def _think_exploratively(self, topic: str, context: Dict) -> List[Insight]:
+    async def _think_exploratively(self, topic: str, context: dict) -> list[Insight]:
         """Exploratory thinking - open-ended investigation"""
         insights = []
 
@@ -203,7 +202,7 @@ class MetaThinkingEngine:
         content: str,
         category: str = "general",
         confidence: float = 0.8,
-        context: Dict = None,
+        context: dict = None,
     ) -> Insight:
         """Capture an insight immediately when it occurs"""
         insight = Insight(
@@ -220,8 +219,8 @@ class MetaThinkingEngine:
         return insight
 
     async def reflect_on_work_session(
-        self, work_description: str, outcomes: Dict
-    ) -> List[Insight]:
+        self, work_description: str, outcomes: dict
+    ) -> list[Insight]:
         """Reflect on a completed work session to extract learnings"""
         reflections = []
 
@@ -257,7 +256,7 @@ class MetaThinkingEngine:
 
         return reflections
 
-    async def background_reflection(self, current_activity: str) -> Optional[Insight]:
+    async def background_reflection(self, current_activity: str) -> Insight | None:
         """Continuous background reflection while working"""
         # Simulate the human ability to have insights while doing other things
         reflection_prompts = [
@@ -304,11 +303,11 @@ class MetaThinkingEngine:
         self.is_thinking = False
         print(f"🧠 Ended thinking session: {session.topic if session else session_id}")
 
-    def get_insights_by_category(self, category: str) -> List[Insight]:
+    def get_insights_by_category(self, category: str) -> list[Insight]:
         """Get all insights of a specific category"""
         return [insight for insight in self.insights if insight.category == category]
 
-    def get_recent_insights(self, hours: int = 24) -> List[Insight]:
+    def get_recent_insights(self, hours: int = 24) -> list[Insight]:
         """Get insights from the last N hours"""
         cutoff = datetime.utcnow().timestamp() - (hours * 3600)
         return [
@@ -317,7 +316,7 @@ class MetaThinkingEngine:
             if insight.timestamp.timestamp() > cutoff
         ]
 
-    async def generate_thinking_summary(self) -> Dict:
+    async def generate_thinking_summary(self) -> dict:
         """Generate a summary of thinking activities and insights"""
         return {
             "total_insights": len(self.insights),
@@ -341,7 +340,7 @@ class MetaThinkingEngine:
 meta_thinking_engine = MetaThinkingEngine()
 
 
-async def think_about(topic: str, context: Dict = None) -> List[Insight]:
+async def think_about(topic: str, context: dict = None) -> list[Insight]:
     """Convenient function to start thinking about something"""
     return await meta_thinking_engine.think_about(topic, context)
 

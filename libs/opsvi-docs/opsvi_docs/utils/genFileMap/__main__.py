@@ -22,7 +22,6 @@ if __name__ == "__main__":
                 os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             ),
         )
-        from utils.genFileMap import genFileMap
         from utils.genFileMap.genFileMap import main
 
     main()

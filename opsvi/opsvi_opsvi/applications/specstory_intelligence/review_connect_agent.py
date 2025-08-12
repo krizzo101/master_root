@@ -8,9 +8,9 @@ Review & Connect Agent
 """
 
 import argparse
-from datetime import datetime
 import logging
 import os
+from datetime import datetime
 
 from arango import ArangoClient
 

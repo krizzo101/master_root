@@ -10,7 +10,7 @@ import logging
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +24,9 @@ class AuditLogger:
         self.audit_dir.mkdir(exist_ok=True)
 
         # Initialize audit data
-        self.execution_log: List[Dict[str, Any]] = []
-        self.prompts_used: List[Dict[str, Any]] = []
-        self.research_results: Optional[Dict[str, Any]] = None
+        self.execution_log: list[dict[str, Any]] = []
+        self.prompts_used: list[dict[str, Any]] = []
+        self.research_results: dict[str, Any] | None = None
         self.start_time = time.time()
 
     def log_execution_step(
@@ -34,8 +34,8 @@ class AuditLogger:
         step_name: str,
         status: str,
         message: str = "",
-        error: Optional[str] = None,
-        duration: Optional[float] = None,
+        error: str | None = None,
+        duration: float | None = None,
     ):
         """Log an execution step with timing and status."""
         timestamp = datetime.now().isoformat()
@@ -58,8 +58,8 @@ class AuditLogger:
         agent_name: str,
         prompt_type: str,
         prompt: str,
-        response: Optional[str] = None,
-        model: Optional[str] = None,
+        response: str | None = None,
+        model: str | None = None,
     ):
         """Log a prompt used by an AI agent."""
         timestamp = datetime.now().isoformat()
@@ -99,7 +99,7 @@ class AuditLogger:
             "insights": research_insights,
         }
 
-    def save_audit_files(self) -> List[str]:
+    def save_audit_files(self) -> list[str]:
         """Save all audit information to files and return list of created files."""
         files_created = []
 
@@ -248,10 +248,10 @@ class AuditLogger:
 
 
 # Global audit logger instance
-_audit_logger: Optional[AuditLogger] = None
+_audit_logger: AuditLogger | None = None
 
 
-def get_audit_logger() -> Optional[AuditLogger]:
+def get_audit_logger() -> AuditLogger | None:
     """Get the current audit logger instance."""
     return _audit_logger
 
@@ -267,8 +267,8 @@ def log_execution_step(
     step_name: str,
     status: str,
     message: str = "",
-    error: Optional[str] = None,
-    duration: Optional[float] = None,
+    error: str | None = None,
+    duration: float | None = None,
 ):
     """Log an execution step using the global audit logger."""
     if _audit_logger:
@@ -279,8 +279,8 @@ def log_prompt(
     agent_name: str,
     prompt_type: str,
     prompt: str,
-    response: Optional[str] = None,
-    model: Optional[str] = None,
+    response: str | None = None,
+    model: str | None = None,
 ):
     """Log a prompt using the global audit logger."""
     if _audit_logger:

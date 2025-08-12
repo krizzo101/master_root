@@ -5,13 +5,12 @@ Uses the atomic parser engine for complete decomposition and database storage
 """
 
 import asyncio
-from datetime import datetime, timezone
 import hashlib
 import json
 import os
-from pathlib import Path
 import sys
-from typing import Dict
+from datetime import datetime, timezone
+from pathlib import Path
 
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
@@ -90,7 +89,7 @@ class SpecStoryAutoLoaderServer:
         )
 
         # Track file states to detect changes
-        self.file_states: Dict[str, Dict] = {}
+        self.file_states: dict[str, dict] = {}
         self.state_file = Path(".specstory_loader_state.json")
 
         # Load previous state if exists
@@ -133,7 +132,7 @@ class SpecStoryAutoLoaderServer:
         except Exception as e:
             print(f"⚠️  Could not save state: {e}")
 
-    def get_file_stats(self, filepath: str) -> Dict:
+    def get_file_stats(self, filepath: str) -> dict:
         """Get file statistics for tracking"""
         try:
             stat = os.stat(filepath)

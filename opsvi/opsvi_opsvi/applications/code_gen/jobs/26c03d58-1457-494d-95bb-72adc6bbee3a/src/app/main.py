@@ -3,13 +3,13 @@ Main FastAPI application for Todo List REST API.
 Handles all routing, dependency injection, and startup configuration.
 """
 import logging
-from fastapi import FastAPI, Request, status
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 
-from app.routers import todo
-from app.middleware.error_handling import add_exception_handlers
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.config import get_api_settings
+from app.middleware.error_handling import add_exception_handlers
+from app.routers import todo
 
 # Initialize logging
 logging.basicConfig(

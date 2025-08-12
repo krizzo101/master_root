@@ -6,7 +6,7 @@ Extracted from request_validation.py for better modularity.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.applications.oamat_sd.src.config.config_manager import ConfigManager
 from src.applications.oamat_sd.src.models.validation_models import (
@@ -55,7 +55,7 @@ class CompletionEngine:
 
     async def research_gap(
         self, gap: InformationGap, request_type: str = "default"
-    ) -> Optional[Any]:
+    ) -> Any | None:
         """Research information for a specific gap."""
         if not gap.researchable:
             return None
@@ -81,7 +81,7 @@ class CompletionEngine:
 
         return result
 
-    def apply_defaults(self, gaps: List[InformationGap]) -> Dict[str, Any]:
+    def apply_defaults(self, gaps: list[InformationGap]) -> dict[str, Any]:
         """Apply reasonable defaults for gaps that have them."""
         defaults = {}
 
@@ -95,8 +95,8 @@ class CompletionEngine:
         return defaults
 
     def document_assumptions(
-        self, filled_fields: Dict[str, Any], applied_defaults: Dict[str, Any]
-    ) -> List[str]:
+        self, filled_fields: dict[str, Any], applied_defaults: dict[str, Any]
+    ) -> list[str]:
         """Document assumptions made during completion."""
         assumptions = []
 
@@ -112,7 +112,7 @@ class CompletionEngine:
         return assumptions
 
     def identify_escalation_needs(
-        self, critical_gaps_remaining: List[str], gap_analysis: GapAnalysisResult
+        self, critical_gaps_remaining: list[str], gap_analysis: GapAnalysisResult
     ) -> bool:
         """Determine if escalation to user is required."""
         # Escalate if there are unresolved critical gaps that can't be researched

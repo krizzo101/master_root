@@ -6,7 +6,6 @@ when it's not available through LangGraph's state management.
 """
 
 import threading
-from typing import Optional
 
 
 class ProjectContextManager:
@@ -25,7 +24,7 @@ class ProjectContextManager:
             }
 
     @classmethod
-    def get_project_path(cls) -> Optional[str]:
+    def get_project_path(cls) -> str | None:
         """Get the project path from global context."""
         with cls._lock:
             return (
@@ -33,7 +32,7 @@ class ProjectContextManager:
             )
 
     @classmethod
-    def get_project_name(cls) -> Optional[str]:
+    def get_project_name(cls) -> str | None:
         """Get the project name from global context."""
         with cls._lock:
             return (
@@ -47,7 +46,7 @@ class ProjectContextManager:
             cls._global_context = None
 
     @classmethod
-    def get_context(cls) -> Optional[dict]:
+    def get_context(cls) -> dict | None:
         """Get the full global context."""
         with cls._lock:
             return cls._global_context

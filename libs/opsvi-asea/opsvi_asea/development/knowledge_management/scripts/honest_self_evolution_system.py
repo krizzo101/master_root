@@ -21,10 +21,9 @@ NOT Claiming:
 
 import json
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from datetime import datetime
+from typing import Dict, List
 from dataclasses import dataclass
-import statistics
 
 # Configure logging
 logging.basicConfig(

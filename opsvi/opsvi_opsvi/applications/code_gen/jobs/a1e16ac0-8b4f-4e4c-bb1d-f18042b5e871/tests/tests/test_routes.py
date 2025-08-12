@@ -1,7 +1,6 @@
-import pytest
-from flask import url_for
-from app.weather_service import WeatherService
 from unittest.mock import patch
+
+import pytest
 
 
 @pytest.fixture

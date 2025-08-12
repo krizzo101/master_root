@@ -7,13 +7,13 @@ with macro application intent while preventing development of mismatched compone
 Core Principle: Context coherence and alignment validation at every level.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
 import hashlib
 import json
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -48,21 +48,21 @@ class MacroIntent:
     domain: IntentDomain
     description: str
     priority: int = Field(ge=1, le=10)  # 1=lowest, 10=highest
-    success_criteria: List[str] = field(default_factory=list)
-    constraints: List[str] = field(default_factory=list)
-    acceptance_criteria: List[str] = field(default_factory=list)
-    non_negotiable_requirements: List[str] = field(default_factory=list)
+    success_criteria: list[str] = field(default_factory=list)
+    constraints: list[str] = field(default_factory=list)
+    acceptance_criteria: list[str] = field(default_factory=list)
+    non_negotiable_requirements: list[str] = field(default_factory=list)
 
 
 class ContextTrace(BaseModel):
     """Tracks context flow and transformations through hierarchy"""
 
     level: int
-    parent_context_hash: Optional[str] = None
+    parent_context_hash: str | None = None
     current_context_hash: str
     transformation_summary: str
-    information_lost: List[str] = Field(default_factory=list)
-    information_added: List[str] = Field(default_factory=list)
+    information_lost: list[str] = Field(default_factory=list)
+    information_added: list[str] = Field(default_factory=list)
     alignment_score: float = Field(ge=0.0, le=1.0)
     timestamp: datetime = Field(default_factory=datetime.now)
 
@@ -76,8 +76,8 @@ class AlignmentViolation(BaseModel):
     affected_intent: MacroIntent
     current_level: int
     parent_level: int
-    evidence: Dict[str, Any] = Field(default_factory=dict)
-    suggested_correction: Optional[str] = None
+    evidence: dict[str, Any] = Field(default_factory=dict)
+    suggested_correction: str | None = None
     auto_correctable: bool = False
 
 
@@ -85,12 +85,12 @@ class IntegrationContract(BaseModel):
     """Contract defining how components must integrate"""
 
     component_name: str
-    required_interfaces: List[str]
-    provided_interfaces: List[str]
-    data_dependencies: List[str]
-    performance_requirements: Dict[str, Any] = Field(default_factory=dict)
-    integration_points: List[str] = Field(default_factory=list)
-    compatibility_constraints: List[str] = Field(default_factory=list)
+    required_interfaces: list[str]
+    provided_interfaces: list[str]
+    data_dependencies: list[str]
+    performance_requirements: dict[str, Any] = Field(default_factory=dict)
+    integration_points: list[str] = Field(default_factory=list)
+    compatibility_constraints: list[str] = Field(default_factory=list)
 
 
 class MacroIntentRepository:
@@ -101,15 +101,15 @@ class MacroIntentRepository:
     """
 
     def __init__(self):
-        self.intents: Dict[str, MacroIntent] = {}
-        self.intent_hierarchy: Dict[str, List[str]] = {}  # parent -> children
-        self._change_log: List[Tuple[datetime, str, str]] = []
+        self.intents: dict[str, MacroIntent] = {}
+        self.intent_hierarchy: dict[str, list[str]] = {}  # parent -> children
+        self._change_log: list[tuple[datetime, str, str]] = []
 
     def register_macro_intent(
         self,
         intent_id: str,
         intent: MacroIntent,
-        parent_intent_id: Optional[str] = None,
+        parent_intent_id: str | None = None,
     ) -> None:
         """Register a new macro intent"""
         self.intents[intent_id] = intent
@@ -124,7 +124,7 @@ class MacroIntentRepository:
             f"Registered macro intent: {intent_id} (domain: {intent.domain.value})"
         )
 
-    def get_intent_chain(self, intent_id: str) -> List[MacroIntent]:
+    def get_intent_chain(self, intent_id: str) -> list[MacroIntent]:
         """Get full chain of intent from root to specified intent"""
         chain = []
         current_id = intent_id
@@ -144,7 +144,7 @@ class MacroIntentRepository:
 
     def validate_intent_compatibility(
         self, parent_intent_id: str, child_intent_id: str
-    ) -> Tuple[bool, List[str]]:
+    ) -> tuple[bool, list[str]]:
         """Validate that child intent is compatible with parent"""
         parent = self.intents.get(parent_intent_id)
         child = self.intents.get(child_intent_id)
@@ -180,8 +180,8 @@ class ContextAlignmentValidator:
 
     def __init__(self, intent_repository: MacroIntentRepository):
         self.intent_repo = intent_repository
-        self.context_traces: List[ContextTrace] = []
-        self.violations: List[AlignmentViolation] = []
+        self.context_traces: list[ContextTrace] = []
+        self.violations: list[AlignmentViolation] = []
         self._alignment_thresholds = {
             AlignmentRisk.LOW: 0.9,
             AlignmentRisk.MEDIUM: 0.7,
@@ -189,16 +189,16 @@ class ContextAlignmentValidator:
             AlignmentRisk.CRITICAL: 0.3,
         }
 
-    def _calculate_context_hash(self, context: Dict[str, Any]) -> str:
+    def _calculate_context_hash(self, context: dict[str, Any]) -> str:
         """Generate deterministic hash of context for tracking changes"""
         context_str = json.dumps(context, sort_keys=True, default=str)
         return hashlib.sha256(context_str.encode()).hexdigest()[:16]
 
     def _calculate_alignment_score(
         self,
-        parent_context: Dict[str, Any],
-        child_context: Dict[str, Any],
-        applicable_intents: List[MacroIntent],
+        parent_context: dict[str, Any],
+        child_context: dict[str, Any],
+        applicable_intents: list[MacroIntent],
     ) -> float:
         """Calculate alignment score between parent and child contexts"""
         # Simplified alignment calculation (would be more sophisticated in practice)
@@ -236,11 +236,11 @@ class ContextAlignmentValidator:
 
     def validate_context_transition(
         self,
-        parent_context: Dict[str, Any],
-        child_context: Dict[str, Any],
+        parent_context: dict[str, Any],
+        child_context: dict[str, Any],
         hierarchy_level: int,
-        applicable_intent_ids: List[str],
-    ) -> Tuple[bool, List[AlignmentViolation], ContextTrace]:
+        applicable_intent_ids: list[str],
+    ) -> tuple[bool, list[AlignmentViolation], ContextTrace]:
         """
         Validate context transition from parent to child level.
 
@@ -355,7 +355,7 @@ class ContextAlignmentValidator:
 
         return is_valid, violations, trace
 
-    def get_alignment_report(self) -> Dict[str, Any]:
+    def get_alignment_report(self) -> dict[str, Any]:
         """Generate comprehensive alignment report"""
         if not self.context_traces:
             return {"message": "No context traces recorded"}
@@ -406,8 +406,8 @@ class IntegrationValidator:
     """
 
     def __init__(self):
-        self.contracts: Dict[str, IntegrationContract] = {}
-        self.compatibility_matrix: Dict[Tuple[str, str], bool] = {}
+        self.contracts: dict[str, IntegrationContract] = {}
+        self.compatibility_matrix: dict[tuple[str, str], bool] = {}
 
     def register_component_contract(
         self, component_id: str, contract: IntegrationContract
@@ -418,7 +418,7 @@ class IntegrationValidator:
 
     def validate_component_compatibility(
         self, parent_component_id: str, child_component_id: str
-    ) -> Tuple[bool, List[str]]:
+    ) -> tuple[bool, list[str]]:
         """Validate that child component can integrate with parent"""
         parent_contract = self.contracts.get(parent_component_id)
         child_contract = self.contracts.get(child_component_id)
@@ -468,15 +468,15 @@ class DriftCorrectionEngine:
     ):
         self.intent_repo = intent_repository
         self.alignment_validator = alignment_validator
-        self._correction_strategies: Dict[str, callable] = {
+        self._correction_strategies: dict[str, callable] = {
             "LOST_NON_NEGOTIABLE_REQUIREMENT": self._restore_lost_requirement,
             "LOW_ALIGNMENT_SCORE": self._boost_alignment_score,
             "INTERFACE_MISMATCH": self._resolve_interface_mismatch,
         }
 
     def _restore_lost_requirement(
-        self, violation: AlignmentViolation, current_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, violation: AlignmentViolation, current_context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Restore a lost non-negotiable requirement"""
         requirement = violation.evidence.get("lost_requirement", "")
         req_key = requirement.lower().replace(" ", "_")
@@ -496,8 +496,8 @@ class DriftCorrectionEngine:
         return corrected_context
 
     def _boost_alignment_score(
-        self, violation: AlignmentViolation, current_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, violation: AlignmentViolation, current_context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Attempt to boost alignment score by reinforcing key elements"""
         corrected_context = current_context.copy()
 
@@ -512,8 +512,8 @@ class DriftCorrectionEngine:
         return corrected_context
 
     def _resolve_interface_mismatch(
-        self, violation: AlignmentViolation, current_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, violation: AlignmentViolation, current_context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Resolve interface compatibility issues"""
         corrected_context = current_context.copy()
 
@@ -527,8 +527,8 @@ class DriftCorrectionEngine:
         return corrected_context
 
     def apply_corrections(
-        self, violations: List[AlignmentViolation], current_context: Dict[str, Any]
-    ) -> Tuple[Dict[str, Any], List[str]]:
+        self, violations: list[AlignmentViolation], current_context: dict[str, Any]
+    ) -> tuple[dict[str, Any], list[str]]:
         """Apply automatic corrections for detected violations"""
         corrected_context = current_context.copy()
         applied_corrections = []
@@ -562,8 +562,8 @@ class ContextAlignmentIntegration:
         )
 
     def setup_macro_intents_for_workflow(
-        self, workflow_spec: Dict[str, Any]
-    ) -> List[str]:
+        self, workflow_spec: dict[str, Any]
+    ) -> list[str]:
         """Setup macro intents from workflow specification"""
         intent_ids = []
 
@@ -584,11 +584,11 @@ class ContextAlignmentIntegration:
 
     def validate_workflow_step(
         self,
-        parent_context: Dict[str, Any],
-        child_context: Dict[str, Any],
+        parent_context: dict[str, Any],
+        child_context: dict[str, Any],
         hierarchy_level: int,
-        component_spec: Optional[Dict[str, Any]] = None,
-    ) -> Tuple[bool, Dict[str, Any]]:
+        component_spec: dict[str, Any] | None = None,
+    ) -> tuple[bool, dict[str, Any]]:
         """
         Validate a workflow step for context alignment and integration.
 

@@ -11,9 +11,8 @@ This module provides functionality for using LLM to generate taxonomies from doc
 extracting concepts, hierarchies, and relationships through AI-powered analysis.
 """
 
-import json
 import logging
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List
 
 from ..connectors.llm_orchestrator import LLMOrchestrator
 from .content_extractor import ContentExtractor

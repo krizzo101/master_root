@@ -8,11 +8,11 @@ including project scaffolding, dependency management, configuration setup, and d
 import argparse
 import json
 import os
-from pathlib import Path
 import subprocess
 import sys
 import time
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
 
 from openai import OpenAI
 
@@ -834,7 +834,7 @@ class VirtualEnvironmentManager:
 class ProjectInitializer:
     """Main project initializer class."""
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: str | None = None):
         """Initialize the project initializer.
 
         Args:

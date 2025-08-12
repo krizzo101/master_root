@@ -1,9 +1,8 @@
 """Input validation and sanitization for code generation requests."""
 
-import re
-from typing import List, Optional
 import html
 import logging
+import re
 
 from ai_agents import analyze_request_security_with_ai
 
@@ -136,7 +135,7 @@ class InputValidator:
 
         return text
 
-    def extract_keywords(self, request: str) -> List[str]:
+    def extract_keywords(self, request: str) -> list[str]:
         """Extract safe keywords from request - now just delegates to AI analysis."""
         logger.info("Keyword extraction now handled by AI project type detection")
         # This method is kept for backward compatibility but AI agents handle semantic analysis

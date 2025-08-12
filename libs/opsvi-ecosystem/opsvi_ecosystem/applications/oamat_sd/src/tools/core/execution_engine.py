@@ -9,7 +9,7 @@ import asyncio
 import concurrent.futures
 import logging
 import time
-from typing import Any, Dict, List
+from typing import Any
 
 from src.applications.oamat_sd.src.config.config_manager import ConfigManager
 from src.applications.oamat_sd.src.models.tool_models import (
@@ -180,7 +180,7 @@ class ToolExecutionEngine:
             return result
 
     async def execute_tools_parallel(
-        self, tool_requests: List[Dict[str, Any]]
+        self, tool_requests: list[dict[str, Any]]
     ) -> ParallelExecutionResult:
         """Execute multiple tool methods in parallel"""
         start_time = time.time()
@@ -247,7 +247,7 @@ class ToolExecutionEngine:
     # Tool-specific execution methods
     async def _execute_brave_search(
         self, interface, method: str, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Execute Brave Search operations"""
         if method == "search":
             return await interface.web_search(
@@ -289,7 +289,7 @@ class ToolExecutionEngine:
 
     async def _execute_arxiv_research(
         self, interface, method: str, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Execute ArXiv Research operations"""
         if method == "search_papers":
             return await interface.search_papers(
@@ -311,7 +311,7 @@ class ToolExecutionEngine:
 
     async def _execute_firecrawl(
         self, interface, method: str, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Execute Firecrawl operations"""
         if method == "scrape":
             return await interface.scrape(kwargs.get("url", ""), **kwargs)
@@ -335,7 +335,7 @@ class ToolExecutionEngine:
 
     async def _execute_context7_docs(
         self, interface, method: str, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Execute Context7 Docs operations"""
         if method == "resolve_library_id":
             return await interface.resolve_library_id(
@@ -350,7 +350,7 @@ class ToolExecutionEngine:
 
     async def _execute_sequential_thinking(
         self, interface, method: str, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Execute Sequential Thinking operations"""
         if method == "think_step" or method == "solve_problem":
             return await interface.think(kwargs.get("problem", ""), **kwargs)
@@ -359,7 +359,7 @@ class ToolExecutionEngine:
         else:
             raise ValueError(f"Unknown Sequential Thinking method: {method}")
 
-    async def _execute_neo4j(self, interface, method: str, **kwargs) -> Dict[str, Any]:
+    async def _execute_neo4j(self, interface, method: str, **kwargs) -> dict[str, Any]:
         """Execute Neo4j operations"""
         if method == "get_schema":
             return await interface.get_schema(**kwargs)
@@ -382,7 +382,7 @@ class ToolExecutionEngine:
 
     async def _execute_research_workflow(
         self, interface, method: str, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Execute Research Workflow operations"""
         if method == "search_and_present":
             return await self._research_search_and_present(interface, **kwargs)
@@ -414,7 +414,7 @@ class ToolExecutionEngine:
             raise ValueError(f"Unknown Research Workflow method: {method}")
 
     # Helper methods for complex operations
-    async def _arxiv_search_and_ingest(self, interface, **kwargs) -> Dict[str, Any]:
+    async def _arxiv_search_and_ingest(self, interface, **kwargs) -> dict[str, Any]:
         """Search ArXiv papers and ingest them for context"""
         query = (
             kwargs["query"]
@@ -482,7 +482,7 @@ class ToolExecutionEngine:
             "ingestion_summary": f"Found {len(papers_info)} papers for context",
         }
 
-    async def _research_search_and_present(self, interface, **kwargs) -> Dict[str, Any]:
+    async def _research_search_and_present(self, interface, **kwargs) -> dict[str, Any]:
         """Search multiple sources and present URLs for agent selection"""
         query = (
             kwargs["query"]
@@ -525,7 +525,7 @@ class ToolExecutionEngine:
         except Exception as e:
             return {"success": False, "error": str(e), "query": query, "urls_found": 0}
 
-    async def _research_scrape_selected(self, interface, **kwargs) -> Dict[str, Any]:
+    async def _research_scrape_selected(self, interface, **kwargs) -> dict[str, Any]:
         """Scrape agent-selected URLs and compile research report"""
         query = (
             kwargs["query"]
@@ -573,7 +573,7 @@ class ToolExecutionEngine:
         except Exception as e:
             return {"success": False, "error": str(e), "query": query}
 
-    async def _research_complete_workflow(self, interface, **kwargs) -> Dict[str, Any]:
+    async def _research_complete_workflow(self, interface, **kwargs) -> dict[str, Any]:
         """Complete auto-workflow with intelligent URL selection and scraping"""
         query = (
             kwargs["query"]

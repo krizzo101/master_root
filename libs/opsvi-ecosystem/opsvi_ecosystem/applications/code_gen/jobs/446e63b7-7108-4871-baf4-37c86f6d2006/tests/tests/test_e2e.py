@@ -1,8 +1,8 @@
 import pytest
+from app import create_app
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from app import create_app
 
 
 @pytest.fixture(scope="module")
@@ -14,8 +14,8 @@ def test_app():
 
 @pytest.fixture(scope="module")
 def live_server(test_app):
-    from multiprocessing import Process
     import time
+    from multiprocessing import Process
 
     def run():
         test_app.run(port=5001, debug=False, use_reloader=False)

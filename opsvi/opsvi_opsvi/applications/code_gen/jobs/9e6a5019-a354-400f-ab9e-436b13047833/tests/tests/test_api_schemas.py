@@ -1,5 +1,4 @@
-import pytest
-from app.api_schemas import TagSchema, CategorySchema, ImageSchema, PostSchema
+from app.api_schemas import CategorySchema, ImageSchema, PostSchema, TagSchema
 
 
 def test_tag_schema_serialization():

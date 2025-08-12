@@ -5,10 +5,10 @@ Enables tracking of operations across the entire DAG workflow with unique identi
 """
 
 import contextvars
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, Optional
-import uuid
+from typing import Any
 
 
 @dataclass
@@ -20,24 +20,24 @@ class CorrelationContext:
     session_id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
     # Workflow context
-    workflow_id: Optional[str] = None
-    task_id: Optional[str] = None
-    agent_id: Optional[str] = None
+    workflow_id: str | None = None
+    task_id: str | None = None
+    agent_id: str | None = None
 
     # Execution context
-    user_request: Optional[str] = None
-    complexity_score: Optional[float] = None
-    execution_mode: Optional[str] = None  # "linear" or "dag"
+    user_request: str | None = None
+    complexity_score: float | None = None
+    execution_mode: str | None = None  # "linear" or "dag"
 
     # Timing context
     started_at: datetime = field(default_factory=datetime.now)
-    parent_correlation_id: Optional[str] = None
+    parent_correlation_id: str | None = None
 
     # Additional metadata
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def create_child_context(
-        self, task_id: Optional[str] = None, agent_id: Optional[str] = None, **metadata
+        self, task_id: str | None = None, agent_id: str | None = None, **metadata
     ) -> "CorrelationContext":
         """Create a child context for sub-operations"""
         return CorrelationContext(
@@ -53,7 +53,7 @@ class CorrelationContext:
             metadata={**self.metadata, **metadata},
         )
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert context to dictionary for logging"""
         return {
             "correlation_id": self.correlation_id,
@@ -72,11 +72,11 @@ class CorrelationContext:
 
 # Context variable for correlation tracking
 _correlation_context: contextvars.ContextVar[
-    Optional[CorrelationContext]
+    CorrelationContext | None
 ] = contextvars.ContextVar("correlation_context", default=None)
 
 
-def get_correlation_context() -> Optional[CorrelationContext]:
+def get_correlation_context() -> CorrelationContext | None:
     """Get the current correlation context"""
     return _correlation_context.get()
 
@@ -88,8 +88,8 @@ def set_correlation_context(context: CorrelationContext) -> None:
 
 def create_correlation_context(
     user_request: str,
-    complexity_score: Optional[float] = None,
-    execution_mode: Optional[str] = None,
+    complexity_score: float | None = None,
+    execution_mode: str | None = None,
     **metadata,
 ) -> CorrelationContext:
     """Create and set a new correlation context for a workflow"""

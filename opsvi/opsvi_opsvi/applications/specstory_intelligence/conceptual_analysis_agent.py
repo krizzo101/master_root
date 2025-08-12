@@ -1,10 +1,10 @@
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import logging
 import os
-from pathlib import Path
 import re
 import time
-from typing import Any, Dict, List
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+from typing import Any
 
 from shared.interfaces.database.arango_interface import DirectArangoDB
 
@@ -26,7 +26,7 @@ class ConceptualAnalysisAgent:
     def __init__(
         self,
         logs_dir: str,
-        arango_config: Dict[str, Any],
+        arango_config: dict[str, Any],
         collection_prefix: str = "specstory",
     ):
         self.logs_dir = Path(logs_dir)
@@ -118,7 +118,7 @@ class ConceptualAnalysisAgent:
             self.logger.error(f"Failed to read log text: {e}")
             return ""
 
-    def _extract_decisions(self, text: str, log_path: Path) -> List[Dict]:
+    def _extract_decisions(self, text: str, log_path: Path) -> list[dict]:
         pattern = re.compile(
             r"(?:decided to|decision is|we chose|will proceed with|selected|opted to)[:\s]+(.+?)(?:\.|\n)",
             re.IGNORECASE,
@@ -134,7 +134,7 @@ class ConceptualAnalysisAgent:
             for m in pattern.finditer(text)
         ]
 
-    def _extract_qa(self, text: str, log_path: Path) -> List[Dict]:
+    def _extract_qa(self, text: str, log_path: Path) -> list[dict]:
         q_pattern = re.compile(r"Q[:\s]+(.+?)(?:\?|\n)", re.IGNORECASE)
         a_pattern = re.compile(r"A[:\s]+(.+?)(?:\.|\n)", re.IGNORECASE)
         questions = q_pattern.findall(text)
@@ -162,7 +162,7 @@ class ConceptualAnalysisAgent:
                 )
         return nodes
 
-    def _extract_blockers(self, text: str, log_path: Path) -> List[Dict]:
+    def _extract_blockers(self, text: str, log_path: Path) -> list[dict]:
         pattern = re.compile(
             r"(?:blocked by|unable to|issue with|blocker|obstacle)[:\s]+(.+?)(?:\.|\n)",
             re.IGNORECASE,
@@ -178,7 +178,7 @@ class ConceptualAnalysisAgent:
             for m in pattern.finditer(text)
         ]
 
-    def _extract_named_entities(self, text: str, log_path: Path) -> List[Dict]:
+    def _extract_named_entities(self, text: str, log_path: Path) -> list[dict]:
         # Simple regex for file/module/person/tool names (expand as needed)
         file_pattern = re.compile(r"\b([\w\-/]+\.(py|md|yml|yaml|json|txt))\b")
         tool_pattern = re.compile(r"tool: ([\w_\-]+)", re.IGNORECASE)
@@ -216,7 +216,7 @@ class ConceptualAnalysisAgent:
             )
         return nodes
 
-    def _extract_pivots(self, text: str, log_path: Path) -> List[Dict]:
+    def _extract_pivots(self, text: str, log_path: Path) -> list[dict]:
         pattern = re.compile(
             r"(?:pivot|changed approach|switched to|major change)[:\s]+(.+?)(?:\.|\n)",
             re.IGNORECASE,
@@ -232,7 +232,7 @@ class ConceptualAnalysisAgent:
             for m in pattern.finditer(text)
         ]
 
-    def _insight_to_conceptual_node(self, insight: Insight, log_path: Path) -> Dict:
+    def _insight_to_conceptual_node(self, insight: Insight, log_path: Path) -> dict:
         return {
             "_key": insight.insight_id,
             "component_type": "conceptual_insight",
@@ -245,7 +245,7 @@ class ConceptualAnalysisAgent:
             "timestamp": insight.timestamp.isoformat(),
         }
 
-    def _theme_to_conceptual_node(self, theme: str, log_path: Path) -> Dict:
+    def _theme_to_conceptual_node(self, theme: str, log_path: Path) -> dict:
         return {
             "_key": f"theme_{int(time.time())}",
             "component_type": "improvement_theme",
@@ -255,8 +255,8 @@ class ConceptualAnalysisAgent:
         }
 
     def _link_concept_to_atomic(
-        self, concept_node: Dict, atomic_component: AtomicComponent
-    ) -> Dict:
+        self, concept_node: dict, atomic_component: AtomicComponent
+    ) -> dict:
         return {
             "_from": f"specstory_components/{concept_node['_key']}",
             "_to": f"specstory_components/{atomic_component.component_id}",
@@ -265,7 +265,7 @@ class ConceptualAnalysisAgent:
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         }
 
-    def _store_conceptual_nodes(self, nodes: List[Dict]):
+    def _store_conceptual_nodes(self, nodes: list[dict]):
         if not nodes:
             return
         try:
@@ -281,7 +281,7 @@ class ConceptualAnalysisAgent:
         except Exception as e:
             self.logger.error(f"Error storing conceptual nodes: {e}")
 
-    def _store_conceptual_edges(self, edges: List[Dict]):
+    def _store_conceptual_edges(self, edges: list[dict]):
         if not edges:
             return
         try:
@@ -297,7 +297,7 @@ class ConceptualAnalysisAgent:
         except Exception as e:
             self.logger.error(f"Error storing conceptual edges: {e}")
 
-    def _log_evidence(self, log_path: Path, nodes: List[Dict], edges: List[Dict]):
+    def _log_evidence(self, log_path: Path, nodes: list[dict], edges: list[dict]):
         evidence_path = log_path.parent / f"{log_path.stem}_conceptual_evidence.log"
         try:
             with open(evidence_path, "w") as f:
@@ -310,7 +310,7 @@ class ConceptualAnalysisAgent:
         except Exception as e:
             self.logger.error(f"Failed to log evidence: {e}")
 
-    def self_improve(self, files: List[Path]):
+    def self_improve(self, files: list[Path]):
         # Use meta_thinking_engine to reflect and log improvement suggestions
         try:
             summary = self.meta_engine.generate_thinking_summary()
@@ -335,11 +335,11 @@ class ConceptualAnalysisAgent:
         except Exception as e:
             self.logger.error(f"Failed to update documentation/diagrams: {e}")
 
-    def _link_qa_pairs(self, qas: List[Dict]) -> List[Dict]:
+    def _link_qa_pairs(self, qas: list[dict]) -> list[dict]:
         edges = []
         questions = [n for n in qas if n["component_type"] == "question"]
         answers = [n for n in qas if n["component_type"] == "answer"]
-        for q, a in zip(questions, answers):
+        for q, a in zip(questions, answers, strict=False):
             edges.append(
                 {
                     "_from": f"specstory_components/{q['_key']}",
@@ -352,8 +352,8 @@ class ConceptualAnalysisAgent:
         return edges
 
     def _link_decisions_to_blockers(
-        self, decisions: List[Dict], blockers: List[Dict]
-    ) -> List[Dict]:
+        self, decisions: list[dict], blockers: list[dict]
+    ) -> list[dict]:
         edges = []
         for d in decisions:
             for b in blockers:
@@ -372,8 +372,8 @@ class ConceptualAnalysisAgent:
         return edges
 
     def _link_pivots_to_entities(
-        self, pivots: List[Dict], entities: List[Dict]
-    ) -> List[Dict]:
+        self, pivots: list[dict], entities: list[dict]
+    ) -> list[dict]:
         edges = []
         for p in pivots:
             for e in entities:
@@ -392,8 +392,8 @@ class ConceptualAnalysisAgent:
         return edges
 
     def _contextual_linking(
-        self, conceptual_nodes: List[Dict], atomic_components: List[AtomicComponent]
-    ) -> List[Dict]:
+        self, conceptual_nodes: list[dict], atomic_components: list[AtomicComponent]
+    ) -> list[dict]:
         edges = []
         for node in conceptual_nodes:
             for comp in atomic_components:
@@ -414,7 +414,7 @@ class ConceptualAnalysisAgent:
         return edges
 
     def _automated_test_and_validation(
-        self, log_path: Path, nodes: List[Dict], edges: List[Dict]
+        self, log_path: Path, nodes: list[dict], edges: list[dict]
     ):
         # Placeholder: Implement automated tests for extraction/DB insertion
         test_log = log_path.parent / f"{log_path.stem}_conceptual_test.log"
@@ -426,7 +426,7 @@ class ConceptualAnalysisAgent:
         except Exception as e:
             self.logger.error(f"Failed to log automated test/validation: {e}")
 
-    def _collab_tools_review(self, nodes: List[Dict], edges: List[Dict]):
+    def _collab_tools_review(self, nodes: list[dict], edges: list[dict]):
         # Placeholder: Integrate with collab_tools/agents for distributed review/validation
         review_log = self.logs_dir / "conceptual_agent_collab_review.log"
         try:

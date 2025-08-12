@@ -4,8 +4,8 @@ Tests for Smart Decomposition Logging System
 Validates logging functionality, correlation context, and console interface.
 """
 
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 import pytest
 

@@ -16,7 +16,6 @@ Usage:
     python memory_to_concepts_processor.py --batch-size 10 --quality-threshold 0.7
 """
 
-import json
 import logging
 from datetime import datetime
 from typing import Dict, List, Optional

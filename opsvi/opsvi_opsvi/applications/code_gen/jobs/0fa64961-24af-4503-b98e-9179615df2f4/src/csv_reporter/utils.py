@@ -2,9 +2,7 @@
 Utility helpers for CLI (progress bar, etc).
 """
 import sys
-from typing import Optional, Iterator
 import threading
-import time
 
 
 class print_progress_bar:

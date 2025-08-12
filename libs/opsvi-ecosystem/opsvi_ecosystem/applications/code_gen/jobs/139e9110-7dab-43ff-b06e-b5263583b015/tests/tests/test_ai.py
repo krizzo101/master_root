@@ -1,11 +1,12 @@
+from unittest.mock import MagicMock
+
 import pytest
 from backend.ai import (
-    prioritize_tasks,
-    estimate_duration,
     detect_dependencies,
+    estimate_duration,
+    prioritize_tasks,
     suggest_schedule,
 )
-from unittest.mock import AsyncMock, MagicMock
 
 
 @pytest.mark.asyncio

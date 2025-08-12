@@ -1,6 +1,6 @@
 import pytest
+from app.schemas.todo import TodoBase, TodoCreate, TodoInDB, TodoResponse, TodoUpdate
 from pydantic import ValidationError
-from app.schemas.todo import TodoBase, TodoCreate, TodoUpdate, TodoInDB, TodoResponse
 
 
 def test_todobase_and_todocreate_schema_validation():

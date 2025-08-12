@@ -51,7 +51,7 @@ async def test_orchestrator_manager():
         print("-" * 30)
 
         status = await manager.get_status()
-        print(f"📊 Status Report:")
+        print("📊 Status Report:")
         for key, value in status.items():
             print(f"   {key}: {value}")
 

@@ -2,9 +2,10 @@
 Weather API Service Client: Handles external weather API communications.
 """
 import logging
+from typing import Any
+
 import requests
 
-from typing import Dict, Any, Optional
 from .config import Config
 
 
@@ -36,7 +37,7 @@ class WeatherClient:
         self.units = units
         self.timeout = timeout
 
-    def get_weather(self, city: Optional[str] = None) -> Dict[str, Any]:
+    def get_weather(self, city: str | None = None) -> dict[str, Any]:
         """
         Fetch current weather data for the specified city.
         :param city: City name (string).

@@ -4,10 +4,10 @@ OAMAT Workflow Orchestrator - Utilities
 Helper functions and utilities for workflow orchestration.
 """
 
-from datetime import datetime
 import json
 import logging
-from typing import Any, Dict, List, Tuple
+from datetime import datetime
+from typing import Any
 
 from src.applications.oamat.workflows.orchestrator.state import AgenticWorkflowState
 
@@ -18,7 +18,7 @@ class WorkflowVisualizer:
     """Utilities for visualizing workflow execution"""
 
     @staticmethod
-    def generate_execution_summary(state: AgenticWorkflowState) -> Dict[str, Any]:
+    def generate_execution_summary(state: AgenticWorkflowState) -> dict[str, Any]:
         """Generate a comprehensive execution summary"""
         planned_nodes = state.get("planned_nodes", [])
         completed_nodes = state.get("completed_nodes", [])
@@ -110,7 +110,7 @@ class WorkflowMetrics:
     """Utilities for tracking and analyzing workflow metrics"""
 
     @staticmethod
-    def calculate_execution_metrics(state: AgenticWorkflowState) -> Dict[str, Any]:
+    def calculate_execution_metrics(state: AgenticWorkflowState) -> dict[str, Any]:
         """Calculate detailed execution metrics"""
         planned_nodes = state.get("planned_nodes", [])
         completed_nodes = state.get("completed_nodes", [])
@@ -154,7 +154,7 @@ class WorkflowMetrics:
     @staticmethod
     def track_performance_metrics(
         state: AgenticWorkflowState, execution_time: float
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Track performance metrics for the workflow execution"""
         completed_nodes = state.get("completed_nodes", [])
         total_nodes = len(state.get("planned_nodes", []))
@@ -183,7 +183,7 @@ class WorkflowValidator:
     """Utilities for validating workflow state and configuration"""
 
     @staticmethod
-    def validate_workflow_state(state: AgenticWorkflowState) -> Tuple[bool, List[str]]:
+    def validate_workflow_state(state: AgenticWorkflowState) -> tuple[bool, list[str]]:
         """Validate the current workflow state for consistency"""
         errors = []
 
@@ -230,8 +230,8 @@ class WorkflowValidator:
 
     @staticmethod
     def validate_node_dependencies(
-        planned_nodes: List[Dict[str, Any]],
-    ) -> Tuple[bool, List[str]]:
+        planned_nodes: list[dict[str, Any]],
+    ) -> tuple[bool, list[str]]:
         """Validate node dependencies for circular references and missing nodes"""
         errors = []
         node_names = {node.get("agent_role") for node in planned_nodes}
@@ -329,7 +329,7 @@ class WorkflowStateManager:
         return state
 
     @staticmethod
-    def get_next_executable_nodes(state: AgenticWorkflowState) -> List[Dict[str, Any]]:
+    def get_next_executable_nodes(state: AgenticWorkflowState) -> list[dict[str, Any]]:
         """Get list of nodes that can be executed next based on dependencies"""
         planned_nodes = state.get("planned_nodes", [])
         completed_nodes = set(state.get("completed_nodes", []))

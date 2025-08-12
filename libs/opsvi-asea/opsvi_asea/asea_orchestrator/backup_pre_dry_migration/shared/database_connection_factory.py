@@ -108,7 +108,7 @@ class ArangoConnectionManager:
             )
 
             if self._connection_attempts < self._max_retries:
-                logger.info(f"Retrying connection in 2 seconds...")
+                logger.info("Retrying connection in 2 seconds...")
                 await asyncio.sleep(2)
                 return await self.connect(ensure_database, required_collections)
             else:

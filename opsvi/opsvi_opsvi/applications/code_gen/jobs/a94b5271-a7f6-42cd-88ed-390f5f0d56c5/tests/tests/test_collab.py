@@ -1,7 +1,6 @@
 import pytest
 from app import collab
 from app.models import User
-import asyncio
 
 
 class MockWebSocket:

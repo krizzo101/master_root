@@ -8,17 +8,15 @@ Uses OpenAI structured outputs for reliable code generation.
 from __future__ import annotations
 
 import logging
-from typing import Dict, Any, List, Optional
-from pathlib import Path
 
-from pydantic import BaseModel, Field
-
-from config import get_config
-from schemas import RequirementsSpec, ArchitectureSpec, ArchitectureComponent
 from local_shared.openai_interfaces.responses_interface import get_openai_interface
 
 # Model selector imported locally where needed
 from project_templates import ProjectType
+from pydantic import BaseModel, Field
+
+from config import get_config
+from schemas import ArchitectureSpec, RequirementsSpec
 
 logger = logging.getLogger(__name__)
 
@@ -34,10 +32,10 @@ class GeneratedFile(BaseModel):
 class CodeGeneration(BaseModel):
     """Complete code generation output."""
 
-    main_files: List[GeneratedFile] = Field(..., description="Main application files")
-    test_files: List[GeneratedFile] = Field(..., description="Test files")
-    config_files: List[GeneratedFile] = Field(..., description="Configuration files")
-    dependencies: List[str] = Field(..., description="Required Python packages")
+    main_files: list[GeneratedFile] = Field(..., description="Main application files")
+    test_files: list[GeneratedFile] = Field(..., description="Test files")
+    config_files: list[GeneratedFile] = Field(..., description="Configuration files")
+    dependencies: list[str] = Field(..., description="Required Python packages")
     setup_instructions: str = Field(..., description="Setup and usage instructions")
 
 

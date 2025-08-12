@@ -3,7 +3,6 @@
 Bulk Cognitive Migration: Transform ALL memories efficiently
 """
 
-import json
 import sys
 
 sys.path.append("/home/opsvi/asea/development")
@@ -42,7 +41,7 @@ def process_all_memories(memories_data):
             }
         )
 
-    print(f"✅ BULK RESULTS:")
+    print("✅ BULK RESULTS:")
     print(f"   🧠 Concepts: {len(all_concepts)}")
     print(f"   🏷️  Domains: {len(all_domains)}")
 

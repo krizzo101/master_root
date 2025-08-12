@@ -5,9 +5,9 @@ Provides comprehensive mocks for all MCP tools used in Smart Decomposition syste
 These mocks simulate real tool behavior for reliable testing without external dependencies.
 """
 
-from dataclasses import dataclass
 import time
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from typing import Any
 from unittest.mock import MagicMock
 
 
@@ -17,20 +17,20 @@ class ToolExecution:
 
     timestamp: float
     method: str
-    params: Dict[str, Any]
-    response: Dict[str, Any]
+    params: dict[str, Any]
+    response: dict[str, Any]
 
 
 class MCPToolMock:
     """Base class for MCP tool mocks with execution tracking"""
 
-    def __init__(self, tool_name: str, responses: Dict[str, Any]):
+    def __init__(self, tool_name: str, responses: dict[str, Any]):
         self.tool_name = tool_name
         self.responses = responses
-        self.call_history: List[ToolExecution] = []
+        self.call_history: list[ToolExecution] = []
         self.failure_rate = 0.0  # For simulating failures
 
-    async def execute(self, method: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, method: str, params: dict[str, Any]) -> dict[str, Any]:
         """Mock tool execution with predefined responses"""
         timestamp = time.time()
 
@@ -58,7 +58,7 @@ class MCPToolMock:
         """Reset call history for clean testing"""
         self.call_history.clear()
 
-    def get_call_count(self, method: Optional[str] = None) -> int:
+    def get_call_count(self, method: str | None = None) -> int:
         """Get number of calls for specific method or all methods"""
         if method is None:
             return len(self.call_history)
@@ -330,13 +330,13 @@ class MCPRegistryMock:
         """Get specific tool mock"""
         return self.tools.get(tool_name)
 
-    def list_tools(self) -> List[str]:
+    def list_tools(self) -> list[str]:
         """List all available tool names"""
         return list(self.tools.keys())
 
     async def execute_tool(
-        self, tool_name: str, method: str, params: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, tool_name: str, method: str, params: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute tool method with parameters"""
         if tool_name not in self.tools:
             return {"success": False, "error": f"Tool {tool_name} not found"}

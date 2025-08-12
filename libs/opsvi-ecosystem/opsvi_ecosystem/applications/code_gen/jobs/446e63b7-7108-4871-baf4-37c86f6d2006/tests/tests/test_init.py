@@ -1,6 +1,6 @@
 import pytest
+from app import create_app, register_error_handlers
 from flask import Flask
-from app import create_app, register_error_handlers, not_found, server_error
 
 
 @pytest.fixture

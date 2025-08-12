@@ -14,7 +14,6 @@ See crashable_plugin_refactored.py for DRY implementation example.
 Original implementation preserved below for backwards compatibility.
 """
 
-import sys
 import os
 from typing import Any
 

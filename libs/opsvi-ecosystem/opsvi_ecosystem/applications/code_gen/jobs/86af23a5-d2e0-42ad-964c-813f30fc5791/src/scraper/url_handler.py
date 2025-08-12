@@ -5,10 +5,10 @@ Accepts and validates a single URL or list of URLs for scraping.
 Normalizes and prepares the list for processing.
 """
 import argparse
-import validators
-from typing import List
-import sys
 import logging
+import sys
+
+import validators
 
 logger = logging.getLogger("scraper.url_handler")
 
@@ -48,7 +48,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def normalize_and_validate_urls(urls: List[str]) -> List[str]:
+def normalize_and_validate_urls(urls: list[str]) -> list[str]:
     """
     Validates and normalizes input URLs.
     Args:

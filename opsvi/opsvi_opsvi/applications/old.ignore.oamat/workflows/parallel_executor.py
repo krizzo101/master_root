@@ -6,17 +6,18 @@ resource coordination, and advanced error handling for OAMAT workflows.
 """
 
 import asyncio
+import logging
+import os
+import time
+import uuid
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from functools import wraps
 from graphlib import TopologicalSorter
-import logging
-import os
-import time
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
-import uuid
+from typing import Any
 
 logger = logging.getLogger("ParallelExecutor")
 
@@ -71,7 +72,7 @@ class TaskRetryConfig:
     initial_delay: float = 1.0
     exponential_backoff: bool = True
     max_delay: float = 60.0
-    retry_on_exceptions: List[type] = field(default_factory=lambda: [Exception])
+    retry_on_exceptions: list[type] = field(default_factory=lambda: [Exception])
 
 
 @dataclass
@@ -82,19 +83,19 @@ class ParallelTask:
     name: str
     description: str
     function: Callable
-    args: List[Any] = field(default_factory=list)
-    kwargs: Dict[str, Any] = field(default_factory=dict)
+    args: list[Any] = field(default_factory=list)
+    kwargs: dict[str, Any] = field(default_factory=dict)
 
     # Dependencies
-    depends_on: List[str] = field(default_factory=list)
-    dependent_tasks: Set[str] = field(default_factory=set)
+    depends_on: list[str] = field(default_factory=list)
+    dependent_tasks: set[str] = field(default_factory=set)
 
     # Resource management
-    required_resources: List[TaskResource] = field(default_factory=list)
+    required_resources: list[TaskResource] = field(default_factory=list)
 
     # Execution control
     priority: TaskPriority = TaskPriority.NORMAL
-    estimated_duration: Optional[float] = None
+    estimated_duration: float | None = None
     max_parallel_instances: int = 1
 
     # Error handling
@@ -102,16 +103,16 @@ class ParallelTask:
 
     # Status tracking
     status: TaskStatus = TaskStatus.PENDING
-    start_time: Optional[datetime] = None
-    completion_time: Optional[datetime] = None
-    duration: Optional[float] = None
+    start_time: datetime | None = None
+    completion_time: datetime | None = None
+    duration: float | None = None
     attempts: int = 0
-    last_error: Optional[str] = None
+    last_error: str | None = None
     result: Any = None
 
     # Context data
-    context: Dict[str, Any] = field(default_factory=dict)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    context: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -119,9 +120,9 @@ class ExecutionBatch:
     """Represents a batch of tasks that can run in parallel"""
 
     id: str
-    tasks: List[ParallelTask]
-    max_concurrent: Optional[int] = None
-    estimated_duration: Optional[float] = None
+    tasks: list[ParallelTask]
+    max_concurrent: int | None = None
+    estimated_duration: float | None = None
     priority: TaskPriority = TaskPriority.NORMAL
 
 
@@ -129,10 +130,10 @@ class ResourceManager:
     """Manages shared resources and prevents conflicts"""
 
     def __init__(self):
-        self._resource_locks: Dict[str, asyncio.Lock] = {}
-        self._resource_queue: Dict[str, asyncio.Queue] = {}
-        self._exclusive_resources: Set[str] = set()
-        self._resource_usage: Dict[str, Set[str]] = {}  # resource_id -> set of task_ids
+        self._resource_locks: dict[str, asyncio.Lock] = {}
+        self._resource_queue: dict[str, asyncio.Queue] = {}
+        self._exclusive_resources: set[str] = set()
+        self._resource_usage: dict[str, set[str]] = {}  # resource_id -> set of task_ids
 
     async def acquire_resources(self, task: ParallelTask) -> bool:
         """Acquire all required resources for a task"""
@@ -190,7 +191,7 @@ class ResourceManager:
 
         await self._release_resources(resources_to_release, task.id)
 
-    async def _release_resources(self, resource_keys: List[str], task_id: str):
+    async def _release_resources(self, resource_keys: list[str], task_id: str):
         """Internal method to release specific resources"""
         for resource_key in resource_keys:
             if resource_key in self._resource_locks:
@@ -214,8 +215,8 @@ class TaskDependencyManager:
     """Manages task dependencies using DAG topology"""
 
     def __init__(self):
-        self.dependency_graph: Dict[str, List[str]] = {}
-        self.reverse_dependencies: Dict[str, Set[str]] = {}
+        self.dependency_graph: dict[str, list[str]] = {}
+        self.reverse_dependencies: dict[str, set[str]] = {}
 
     def add_task(self, task: ParallelTask):
         """Add a task to the dependency graph"""
@@ -227,7 +228,7 @@ class TaskDependencyManager:
                 self.reverse_dependencies[dep_id] = set()
             self.reverse_dependencies[dep_id].add(task.id)
 
-    def validate_dependencies(self, tasks: List[ParallelTask]) -> bool:
+    def validate_dependencies(self, tasks: list[ParallelTask]) -> bool:
         """Validate that the dependency graph is acyclic"""
         try:
             # Build dependency graph for validation
@@ -244,8 +245,8 @@ class TaskDependencyManager:
             return False
 
     def get_ready_tasks(
-        self, all_tasks: Dict[str, ParallelTask], completed_tasks: Set[str]
-    ) -> List[str]:
+        self, all_tasks: dict[str, ParallelTask], completed_tasks: set[str]
+    ) -> list[str]:
         """Get tasks that are ready to execute (all dependencies satisfied)"""
         ready_tasks = []
 
@@ -257,7 +258,7 @@ class TaskDependencyManager:
 
         return ready_tasks
 
-    def get_dependent_tasks(self, completed_task_id: str) -> Set[str]:
+    def get_dependent_tasks(self, completed_task_id: str) -> set[str]:
         """Get tasks that depend on the completed task"""
         return self.reverse_dependencies.get(completed_task_id, set())
 
@@ -323,14 +324,14 @@ class ParallelTaskExecutor:
         self.thread_executor = ThreadPoolExecutor(max_workers=self.max_workers)
 
         # Task tracking
-        self.tasks: Dict[str, ParallelTask] = {}
-        self.execution_batches: List[ExecutionBatch] = []
-        self.completed_tasks: Set[str] = set()
-        self.failed_tasks: Set[str] = set()
-        self.running_tasks: Set[str] = set()
+        self.tasks: dict[str, ParallelTask] = {}
+        self.execution_batches: list[ExecutionBatch] = []
+        self.completed_tasks: set[str] = set()
+        self.failed_tasks: set[str] = set()
+        self.running_tasks: set[str] = set()
 
         # Event system for coordination
-        self.task_completion_events: Dict[str, asyncio.Event] = {}
+        self.task_completion_events: dict[str, asyncio.Event] = {}
         self.execution_stats = {
             "total_tasks": 0,
             "completed_tasks": 0,
@@ -363,9 +364,9 @@ class ParallelTaskExecutor:
         name: str,
         function: Callable,
         *args,
-        depends_on: List[str] = None,
+        depends_on: list[str] = None,
         priority: TaskPriority = TaskPriority.NORMAL,
-        required_resources: List[TaskResource] = None,
+        required_resources: list[TaskResource] = None,
         **kwargs,
     ) -> str:
         """Convenience method to create and add a task"""
@@ -385,7 +386,7 @@ class ParallelTaskExecutor:
 
         return self.add_task(task)
 
-    def validate_execution_plan(self) -> Tuple[bool, List[str]]:
+    def validate_execution_plan(self) -> tuple[bool, list[str]]:
         """Validate the execution plan for correctness"""
         errors = []
 
@@ -407,7 +408,7 @@ class ParallelTaskExecutor:
 
         return len(errors) == 0, errors
 
-    def _check_resource_conflicts(self) -> List[str]:
+    def _check_resource_conflicts(self) -> list[str]:
         """Check for potential resource conflicts"""
         conflicts = []
         exclusive_resources = {}
@@ -426,7 +427,7 @@ class ParallelTaskExecutor:
 
         return conflicts
 
-    async def execute_all(self, timeout: float = None) -> Dict[str, Any]:
+    async def execute_all(self, timeout: float = None) -> dict[str, Any]:
         """Execute all tasks with parallel coordination"""
         async with self._execution_lock:
             if self._stop_execution:
@@ -478,7 +479,7 @@ class ParallelTaskExecutor:
             self.tasks[task_id].status = TaskStatus.READY
 
         # Track running tasks
-        running_task_futures: Dict[str, asyncio.Task] = {}
+        running_task_futures: dict[str, asyncio.Task] = {}
 
         while (
             not execution_queue.empty()
@@ -639,7 +640,7 @@ class ParallelTaskExecutor:
         for task_id in self.running_tasks.copy():
             self.tasks[task_id].status = TaskStatus.CANCELLED
 
-    def _generate_execution_report(self) -> Dict[str, Any]:
+    def _generate_execution_report(self) -> dict[str, Any]:
         """Generate comprehensive execution report"""
         total_duration = (
             self.execution_stats["end_time"] - self.execution_stats["start_time"]
@@ -693,7 +694,7 @@ class ParallelTaskExecutor:
         except asyncio.TimeoutError:
             raise TimeoutError(f"Task {task_id} did not complete within {timeout}s")
 
-    def get_task_status(self, task_id: str) -> Dict[str, Any]:
+    def get_task_status(self, task_id: str) -> dict[str, Any]:
         """Get detailed status of a specific task"""
         if task_id not in self.tasks:
             raise ValueError(f"Task {task_id} not found")
@@ -726,7 +727,7 @@ class ParallelTaskExecutor:
 
         return 0.0
 
-    def get_execution_visualization(self) -> Dict[str, Any]:
+    def get_execution_visualization(self) -> dict[str, Any]:
         """Generate data for visualizing the execution graph"""
         nodes = []
         edges = []

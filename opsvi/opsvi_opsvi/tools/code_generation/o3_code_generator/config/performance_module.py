@@ -5,9 +5,9 @@ Module PerformanceManager provides performance optimizations for the O3 code gen
 including response caching, parallel request handling, streaming support, and performance monitoring.
 """
 
+import time
 from concurrent.futures import Future, ThreadPoolExecutor
 from threading import Lock
-import time
 
 from src.tools.code_generation.o3_code_generator.utils.logger import O3Logger
 

@@ -37,7 +37,7 @@ This module provides functionality to extract key concepts from content.
 
 import re
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from collections import Counter
 
 from .base_preprocessor import BasePreprocessor

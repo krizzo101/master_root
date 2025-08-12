@@ -8,7 +8,7 @@ and plugin implementations.
 import asyncio
 import logging
 import traceback
-from typing import Dict, Any, Optional, Callable, Type, Union, List
+from typing import Dict, Any, Optional, Callable, Type, Union
 from functools import wraps
 from datetime import datetime
 from enum import Enum

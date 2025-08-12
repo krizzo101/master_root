@@ -1,12 +1,11 @@
-import pytest
-from fastapi.testclient import TestClient
-from app.main import create_app
-from app.db.session import get_session
-from app.db.init_db import init_db
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 import os
 import tempfile
+
+import pytest
+from app.db.init_db import init_db
+from app.db.session import get_session
+from app.main import create_app
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture(scope="module")
@@ -151,11 +150,11 @@ def test_delete_todo_not_found(client):
     assert response.status_code == 404
 
 
-from app.main import LoggingMiddleware
-from starlette.requests import Request
-from starlette.responses import Response
 import asyncio
+
 import pytest
+from app.main import LoggingMiddleware
+from starlette.responses import Response
 
 
 class DummyApp:
@@ -197,7 +196,6 @@ def test_todo_model_attributes():
     """
     Test Todo SQLAlchemy model creates with attributes correctly set
     """
-    from app.models.todo import Todo
 
     todo = Todo(description="Test model", completed=False)
     assert todo.description == "Test model"
@@ -207,8 +205,8 @@ def test_todo_model_attributes():
 
 
 import pytest
-from pydantic import ValidationError
 from app.schemas.todo import TodoBase, TodoCreate, TodoUpdate
+from pydantic import ValidationError
 
 
 def test_todobase_valid_and_invalid():
@@ -248,9 +246,7 @@ def test_todoupdate_validation():
         TodoUpdate(description="")
 
 
-from app.schemas.todo import TodoUpdate
 import pytest
-from pydantic import ValidationError
 
 
 def test_validate_description_accepts_none():
@@ -270,7 +266,6 @@ def test_validate_description_accepts_none():
         TodoUpdate.validate_description("")
 
 
-from app.db.session import get_session
 import pytest
 
 
@@ -283,9 +278,10 @@ def test_get_session_context_manager():
         assert result.scalar() == 1
 
 
-from app.crud.todo import TodoDAL
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
+from app.crud.todo import TodoDAL
 
 
 def test_tododal_init_with_mock_session():
@@ -297,8 +293,8 @@ def test_tododal_init_with_mock_session():
     assert dal.db_session == mock_session
 
 
-from app.core.config import get_settings
 import pytest
+from app.core.config import get_settings
 
 
 def test_get_settings_instance():
@@ -315,8 +311,8 @@ def test_config_classes_presence_and_defaults():
     """
     Verify Config classes in schemas.todo.py and core.config.py have key attributes
     """
-    from app.schemas.todo import Config as SchemaConfig
     from app.core.config import Config as CoreConfig
+    from app.schemas.todo import Config as SchemaConfig
 
     schema_cfg = SchemaConfig()
     core_cfg = CoreConfig()
@@ -327,9 +323,6 @@ def test_config_classes_presence_and_defaults():
 
 
 import pytest
-from app.crud.todo import TodoDAL
-from app.db.session import get_session
-from app.models.todo import Todo
 from sqlalchemy.orm import Session
 
 

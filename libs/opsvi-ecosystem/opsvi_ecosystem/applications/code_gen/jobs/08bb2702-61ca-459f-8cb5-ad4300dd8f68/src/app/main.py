@@ -3,18 +3,18 @@ Main entrypoint for the Task Management API.
 """
 import logging
 import sys
+
 import uvicorn
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
 from fastapi.exception_handlers import RequestValidationError
 from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from starlette.requests import Request
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
-from starlette.responses import PlainTextResponse
 
-from app.routers import tasks, health
-from app.middleware import setup_middleware
 from app.database import init_db
+from app.middleware import setup_middleware
+from app.routers import health, tasks
 
 # Logging configuration
 logging.basicConfig(

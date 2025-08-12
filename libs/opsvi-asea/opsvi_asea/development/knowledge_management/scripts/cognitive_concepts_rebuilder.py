@@ -13,7 +13,7 @@ import json
 import re
 import hashlib
 from datetime import datetime, timezone
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from arango import ArangoClient
 import logging
 
@@ -226,7 +226,7 @@ class CognitiveConceptRebuilder:
             return f"Apply the successful approach described in: {title}"
         else:
             return (
-                f"Implement the methods and techniques described in this knowledge area"
+                "Implement the methods and techniques described in this knowledge area"
             )
 
     def _extract_prevention_from_structure(self, content: str, title: str) -> str:
@@ -251,7 +251,7 @@ class CognitiveConceptRebuilder:
             return f"Maintain the conditions that enabled: {title}"
         else:
             return (
-                f"Apply the standards and requirements described in this knowledge area"
+                "Apply the standards and requirements described in this knowledge area"
             )
 
     def _extract_insights_from_structure(self, content: str, title: str) -> List[str]:

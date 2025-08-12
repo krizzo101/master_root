@@ -1,10 +1,11 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List, Optional
-from sqlalchemy.future import select
-from sqlalchemy.exc import SQLAlchemyError
-from app.db.models import Task
-from app.schemas.task import TaskCreate, TaskUpdate, TaskResponse
 import logging
+
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+
+from app.db.models import Task
+from app.schemas.task import TaskCreate, TaskResponse, TaskUpdate
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -29,14 +30,14 @@ class TaskService:
             logger.error(f"Error creating task: {exc}")
             raise
 
-    async def list_tasks(self) -> List[TaskResponse]:
+    async def list_tasks(self) -> list[TaskResponse]:
         """Return a list of all tasks."""
         stmt = select(Task)
         tasks = (await self.session.execute(stmt)).scalars().all()
         logger.info(f"Listed {len(tasks)} tasks")
         return [TaskResponse.from_orm(task) for task in tasks]
 
-    async def get_task(self, task_id: int) -> Optional[TaskResponse]:
+    async def get_task(self, task_id: int) -> TaskResponse | None:
         """Get a task by its ID."""
         task = await self.session.get(Task, task_id)
         if not task:
@@ -46,7 +47,7 @@ class TaskService:
 
     async def update_task(
         self, task_id: int, task_update: TaskUpdate
-    ) -> Optional[TaskResponse]:
+    ) -> TaskResponse | None:
         """Update an existing task by ID."""
         task = await self.session.get(Task, task_id)
         if not task:

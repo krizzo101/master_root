@@ -1,9 +1,8 @@
-import pytest
 from multiagent_cli.input_parser import (
-    parse_and_validate_input,
     InputModel,
     TaskModel,
     WorkloadModel,
+    parse_and_validate_input,
 )
 
 

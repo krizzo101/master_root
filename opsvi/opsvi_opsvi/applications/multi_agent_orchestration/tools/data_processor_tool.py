@@ -6,11 +6,11 @@ data transformation, and basic analytics operations.
 """
 
 import asyncio
-from collections import Counter
 import json
 import logging
 import re
-from typing import Any, Dict, List, Union
+from collections import Counter
+from typing import Any
 
 from ..common.types import ToolError, ToolSchema
 from .base_tool import BaseTool
@@ -33,7 +33,7 @@ class DataProcessorTool(BaseTool):
             description="Process and analyze data including text analysis, format conversion, and statistics",
         )
 
-    async def execute(self, parameters: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, parameters: dict[str, Any]) -> dict[str, Any]:
         """
         Execute data processing with the given parameters.
 
@@ -135,8 +135,8 @@ class DataProcessorTool(BaseTool):
         )
 
     async def _analyze_text(
-        self, text: str, parameters: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, text: str, parameters: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Analyze text for various metrics and insights.
 
@@ -260,8 +260,8 @@ class DataProcessorTool(BaseTool):
         return result
 
     async def _convert_format(
-        self, data: Any, parameters: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, data: Any, parameters: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Convert data between different formats.
 
@@ -324,8 +324,8 @@ class DataProcessorTool(BaseTool):
             raise ToolError(f"Format conversion failed: {str(e)}")
 
     async def _calculate_statistics(
-        self, data: Union[List, Dict], parameters: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, data: list | dict, parameters: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Calculate basic statistics on numerical data.
 
@@ -380,8 +380,8 @@ class DataProcessorTool(BaseTool):
             raise ToolError(f"Statistics calculation failed: {str(e)}")
 
     async def _filter_data(
-        self, data: Union[List, Dict], parameters: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, data: list | dict, parameters: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Filter data based on specified criteria.
 
@@ -424,8 +424,8 @@ class DataProcessorTool(BaseTool):
             raise ToolError(f"Data filtering failed: {str(e)}")
 
     async def _aggregate_data(
-        self, data: List[Dict], parameters: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, data: list[dict], parameters: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Aggregate data by specified key.
 
@@ -489,7 +489,7 @@ class DataProcessorTool(BaseTool):
         except Exception as e:
             raise ToolError(f"Data aggregation failed: {str(e)}")
 
-    def _matches_criteria(self, item: Any, criteria: Dict[str, Any]) -> bool:
+    def _matches_criteria(self, item: Any, criteria: dict[str, Any]) -> bool:
         """
         Check if an item matches the filter criteria.
 

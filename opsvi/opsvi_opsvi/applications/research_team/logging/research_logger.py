@@ -3,8 +3,8 @@ try:
     from shared.logging.shared_logger import SharedLogger
 except ImportError:
     # Fallback to relative import with path manipulation
-    import sys
     import os
+    import sys
 
     # Add the src directory to the path
     current_dir = os.path.dirname(os.path.abspath(__file__))

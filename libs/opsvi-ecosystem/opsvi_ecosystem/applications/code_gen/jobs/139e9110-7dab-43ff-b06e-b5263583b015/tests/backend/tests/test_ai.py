@@ -1,9 +1,9 @@
 """
 Mocked AI tests for prioritization and estimation.
 """
-import pytest
 from unittest.mock import patch
-from backend.ai import prioritize_tasks, estimate_duration
+
+from backend.ai import estimate_duration, prioritize_tasks
 
 
 @patch("backend.ai.openai.ChatCompletion.create")

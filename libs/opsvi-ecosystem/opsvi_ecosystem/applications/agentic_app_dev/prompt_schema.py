@@ -1,6 +1,5 @@
-from dataclasses import dataclass, field
 import json
-from typing import Dict, List, Optional
+from dataclasses import dataclass, field
 
 import yaml
 
@@ -11,25 +10,25 @@ class ReferencedFile:
     role: (
         str  # e.g., 'requirements', 'design', 'code', 'config', 'doc', 'example', etc.
     )
-    description: Optional[str] = None
+    description: str | None = None
 
 
 @dataclass
 class AgentPromptSchema:
     title: str
     description: str
-    objectives: List[str]
-    requirements: List[str]
-    constraints: List[str] = field(default_factory=list)
-    context_files: List[str] = field(default_factory=list)
-    referenced_files: List[ReferencedFile] = field(default_factory=list)
-    standards: List[str] = field(default_factory=list)
-    onboarding: Optional[str] = None
-    artifact_types: List[str] = field(default_factory=list)
-    output_preferences: Dict[str, str] = field(default_factory=dict)
-    extra: Dict[str, str] = field(default_factory=dict)  # extensibility
-    manifest_schema: Optional[str] = None
-    config_schema: Optional[str] = None
+    objectives: list[str]
+    requirements: list[str]
+    constraints: list[str] = field(default_factory=list)
+    context_files: list[str] = field(default_factory=list)
+    referenced_files: list[ReferencedFile] = field(default_factory=list)
+    standards: list[str] = field(default_factory=list)
+    onboarding: str | None = None
+    artifact_types: list[str] = field(default_factory=list)
+    output_preferences: dict[str, str] = field(default_factory=dict)
+    extra: dict[str, str] = field(default_factory=dict)  # extensibility
+    manifest_schema: str | None = None
+    config_schema: str | None = None
 
     @staticmethod
     def from_yaml(yaml_str: str) -> "AgentPromptSchema":
@@ -47,7 +46,7 @@ class AgentPromptSchema:
         ]
         return AgentPromptSchema(**data)
 
-    def validate(self) -> List[str]:
+    def validate(self) -> list[str]:
         errors = []
         if not self.title:
             errors.append("Missing title")

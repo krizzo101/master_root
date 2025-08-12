@@ -3,23 +3,20 @@ Routes for blog post CRUD, image upload, AI-assist, editor UI.
 """
 from flask import (
     Blueprint,
-    render_template,
-    redirect,
-    url_for,
-    flash,
-    request,
     abort,
-    current_app,
-    jsonify,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
 )
-from flask_login import login_required, current_user
+from flask_login import current_user, login_required
 from sqlalchemy.exc import SQLAlchemyError
-from app.forms import PostForm, ImageUploadForm
-from app.models import Post, Tag, Category, Image, db
-from app.uploads import images
-from werkzeug.utils import secure_filename
+
+from app.forms import ImageUploadForm, PostForm
+from app.models import Category, Image, Post, Tag, db
 from app.tasks import ai_generate_post_content, generate_alt_text
-import os
+from app.uploads import images
 
 posts_bp = Blueprint("posts", __name__, url_prefix="/posts")
 
@@ -38,7 +35,7 @@ def create_post():
                 form.title.data, form.content.data
             )
             flash("AI is generating the post content. Check back later.", "info")
-            content = f"<p><em>AI is generating your content. Refresh soon.</em></p>"
+            content = "<p><em>AI is generating your content. Refresh soon.</em></p>"
         post = Post(title=form.title.data, content=content, user_id=current_user.id)
         # Categories and tags
         post.categories = Category.query.filter(

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
 
 from ..config.settings import LibrarySettings
 from ..providers.local_adapter import LocalStorageProvider
@@ -12,7 +11,7 @@ from ..schemas.models import FileLocation
 
 def main() -> int:
     ap = argparse.ArgumentParser(prog="opsvi-fs")
-    ap.add_argument("command", choices=["health", "stat", "ls"]) 
+    ap.add_argument("command", choices=["health", "stat", "ls"])
     ap.add_argument("path", nargs="?", default=".")
     args = ap.parse_args()
 

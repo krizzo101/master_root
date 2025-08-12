@@ -8,9 +8,9 @@ This example shows the complete decision-making process for subdivision
 with both economic factors and alignment validation.
 """
 
-from dataclasses import dataclass
 import logging
-from typing import Any, Dict, List
+from dataclasses import dataclass
+from typing import Any
 
 from context_alignment_system import (
     ContextAlignmentIntegration,
@@ -31,8 +31,8 @@ class FractalDecisionResult:
     should_subdivide: bool
     economic_reward: float
     alignment_score: float
-    risk_factors: List[str]
-    corrective_actions: List[str]
+    risk_factors: list[str]
+    corrective_actions: list[str]
     justification: str
     confidence: float
 
@@ -58,9 +58,9 @@ class FractalDecisionEngine:
 
     def make_subdivision_decision(
         self,
-        parent_context: Dict[str, Any],
-        proposed_child_context: Dict[str, Any],
-        node_spec: Dict[str, Any],
+        parent_context: dict[str, Any],
+        proposed_child_context: dict[str, Any],
+        node_spec: dict[str, Any],
         hierarchy_level: int,
     ) -> FractalDecisionResult:
         """

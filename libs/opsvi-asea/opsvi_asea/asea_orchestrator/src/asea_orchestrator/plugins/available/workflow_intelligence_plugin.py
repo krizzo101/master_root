@@ -20,7 +20,6 @@ Original implementation preserved below for backwards compatibility.
 # @execution_wrapper(validate_input=True, log_execution=True)
 
 from typing import List, Any, Optional, Dict
-import json
 from datetime import datetime, timedelta
 from dataclasses import dataclass, asdict
 from statistics import mean, median

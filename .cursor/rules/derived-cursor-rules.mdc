@@ -73,6 +73,7 @@ This document outlines the rules, guidelines, and best practices for the AI codi
 *   All code must be reviewed and approved before merging.
 *   Implement automated testing and CI/CD pipelines.
 *   Always use `shell_exec` instead of `run_terminal_cmd` for executing commands.
+*   When committing changes to git, include a special note in the description if the claude code MCP server is working properly.
 
 ## DEBUGGING
 
@@ -355,6 +356,7 @@ When extracting or manipulating files, the AI should:
 *   If multiple files match the criteria, use a loop or wildcard to process all matching files.
 *   Ensure the target directory exists before attempting to change into it.
 *   After extracting files, the AI should ask if the user wants to remove the archive or list the extracted contents.
+*   If a git lock file is encountered, attempt to remove it using `rm -f .git/index.lock`.
 
 ## Consult Agent Usage Rules
 
@@ -835,12 +837,4 @@ def stream_structured_response(prompt: str, schema: BaseModel):
 # ✅ REAL-TIME PROCESSING EXAMPLE
 async def real_time_code_generation():
     async for partial_code in stream_structured_response(
-        "Generate a FastAPI app with authentication",
-        CodeGenerationSchema
-    ):
-        # Process code incrementally
-        if partial_code.code:
-            syntax_check(partial_code.code)
-        if partial_code.dependencies:
-            validate_
-```
+        "Generate a FastAPI

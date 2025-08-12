@@ -1,5 +1,4 @@
 import pytest
-from unittest.mock import patch, MagicMock
 from ai_collab_task_manager.ai_service import AIService
 from ai_collab_task_manager.models import Task
 

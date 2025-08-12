@@ -4,8 +4,8 @@ Uses python-arango library with validated query templates.
 """
 
 import logging
-from typing import Dict, List, Any, Optional
-from datetime import datetime, timedelta
+from typing import Dict, List, Any
+from datetime import datetime
 from arango import ArangoClient
 
 # Configure logging

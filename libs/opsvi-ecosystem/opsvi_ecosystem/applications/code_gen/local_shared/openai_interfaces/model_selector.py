@@ -5,14 +5,13 @@ This module validates and selects OpenAI models according to organizational rule
 Updated for July 2025 with structured outputs support.
 """
 
-from typing import Set, Optional
 import logging
 
 logger = logging.getLogger(__name__)
 
 # Approved OpenAI models (Rule 953 compliant) - STRICT ENFORCEMENT
 # ONLY APPROVED MODELS - NO GPT-4O VARIANTS ALLOWED
-APPROVED_MODELS: Set[str] = {
+APPROVED_MODELS: set[str] = {
     # Approved reasoning models
     "o4-mini",
     "o3",
@@ -23,7 +22,7 @@ APPROVED_MODELS: Set[str] = {
 }
 
 # Models specifically supporting structured outputs (subset of approved)
-STRUCTURED_OUTPUTS_MODELS: Set[str] = {
+STRUCTURED_OUTPUTS_MODELS: set[str] = {
     "gpt-4.1",
     "gpt-4.1-mini",
 }

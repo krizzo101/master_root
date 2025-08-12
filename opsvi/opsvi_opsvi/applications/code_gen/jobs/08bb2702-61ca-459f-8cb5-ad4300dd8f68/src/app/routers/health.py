@@ -1,9 +1,10 @@
 """
 Health check endpoint for the Task Management API.
 """
+
 from fastapi import APIRouter, status
+
 from app.database import engine
-import asyncio
 
 router = APIRouter(tags=["health"])
 

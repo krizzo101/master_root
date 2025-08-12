@@ -1,8 +1,7 @@
 """Neo4j client for graph logging and lineage tracking."""
 
 import logging
-from typing import Any, Dict, List, Optional, Union
-from uuid import UUID
+from typing import Any, Dict, List, Optional
 
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable

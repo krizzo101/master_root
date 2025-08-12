@@ -7,8 +7,9 @@ Raises exceptions if forbidden patterns are detected during execution.
 
 import functools
 import inspect
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable, Dict, List
+from typing import Any
 
 # Module-level export for testing
 FORBIDDEN_PATTERNS = None  # Will be set after class definition
@@ -281,7 +282,7 @@ def enforce_send_api_usage(func: Callable) -> Callable:
     return wrapper
 
 
-def validate_codebase_sophistication() -> Dict[str, Any]:
+def validate_codebase_sophistication() -> dict[str, Any]:
     """Validate entire codebase for sophistication compliance"""
 
     src_path = Path("src/applications/oamat_sd/src")
@@ -367,7 +368,7 @@ class ImplementationGuard:
         ],
     }
 
-    def check_forbidden_patterns(self, code: str) -> List[str]:
+    def check_forbidden_patterns(self, code: str) -> list[str]:
         """Check for forbidden simplification patterns"""
         violations = []
 
@@ -378,7 +379,7 @@ class ImplementationGuard:
 
         return violations
 
-    def check_required_patterns(self, code: str) -> List[str]:
+    def check_required_patterns(self, code: str) -> list[str]:
         """Check for required sophisticated patterns"""
         validations = []
 

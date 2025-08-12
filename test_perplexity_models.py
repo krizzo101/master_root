@@ -2,8 +2,8 @@
 """Test Perplexity API to get available models."""
 
 import asyncio
+
 import aiohttp
-import os
 
 
 async def test_perplexity_models():

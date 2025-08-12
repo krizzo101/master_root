@@ -19,14 +19,6 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from ..orchestrator.meta_orchestrator import execute_software_factory_pipeline
-from ..orchestrator.task_models import (
-    Project,
-    Run,
-    TaskRecord,
-    Artifact,
-    Result,
-    Critique,
-)
 from ..memory.graph.neo4j_client import get_neo4j_client
 from ..workers.celery_app import get_queue_stats, get_worker_status
 

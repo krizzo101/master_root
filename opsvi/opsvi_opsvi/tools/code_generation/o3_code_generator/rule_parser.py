@@ -4,10 +4,9 @@ This module provides functionality to parse machine-readable rule definitions
 from project_rules.md and convert them into structured data for the AlignmentScanner.
 """
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
-import re
-from typing import List, Optional
 
 import yaml
 
@@ -24,8 +23,8 @@ class Rule:
 
     id: str
     type: str  # 'regex', 'ast', 'import', 'structure'
-    pattern: Optional[str] = None  # For regex rules
-    check: Optional[str] = None  # For AST rules
+    pattern: str | None = None  # For regex rules
+    check: str | None = None  # For AST rules
     message: str = ""
     severity: str = "error"  # 'error', 'warning', 'info'
     category: str = "general"
@@ -44,15 +43,15 @@ class BrokenImport:
 class RuleConfig:
     """Complete rule configuration parsed from project_rules.md."""
 
-    rules: List[Rule]
-    broken_imports: List[BrokenImport]
-    ignore_dirs: List[str]
+    rules: list[Rule]
+    broken_imports: list[BrokenImport]
+    ignore_dirs: list[str]
 
 
 class RuleParser:
     """Parses dynamic rules from project_rules.md with YAML frontmatter."""
 
-    def __init__(self, rules_file: Optional[Path] = None) -> None:
+    def __init__(self, rules_file: Path | None = None) -> None:
         """Initialize the rule parser.
 
         Args:
@@ -134,7 +133,7 @@ class RuleParser:
         )
         return rule_config
 
-    def get_rules_by_type(self, rule_config: RuleConfig, rule_type: str) -> List[Rule]:
+    def get_rules_by_type(self, rule_config: RuleConfig, rule_type: str) -> list[Rule]:
         """Get all rules of a specific type.
 
         Args:
@@ -148,7 +147,7 @@ class RuleParser:
 
     def get_rules_by_category(
         self, rule_config: RuleConfig, category: str
-    ) -> List[Rule]:
+    ) -> list[Rule]:
         """Get all rules of a specific category.
 
         Args:
@@ -160,7 +159,7 @@ class RuleParser:
         """
         return [rule for rule in rule_config.rules if rule.category == category]
 
-    def validate_rule_config(self, rule_config: RuleConfig) -> List[str]:
+    def validate_rule_config(self, rule_config: RuleConfig) -> list[str]:
         """Validate the parsed rule configuration.
 
         Args:

@@ -6,7 +6,7 @@ contextual reasoning rather than static defaults or templates.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
@@ -33,7 +33,7 @@ class InformationCompletionAgent(IInformationCompletionAgent):
     NO STATIC DEFAULTS - uses AI to research and generate appropriate completions
     """
 
-    def __init__(self, model_config: Optional[Dict[str, Any]] = None):
+    def __init__(self, model_config: dict[str, Any] | None = None):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
         # Use AI model for intelligent completion
@@ -55,7 +55,7 @@ class InformationCompletionAgent(IInformationCompletionAgent):
         self.ai_model = ChatOpenAI(**model_kwargs)
 
     async def complete_information_intelligently(
-        self, gaps: GapAnalysisResult, context: Dict[str, Any]
+        self, gaps: GapAnalysisResult, context: dict[str, Any]
     ) -> InformationCompletionResult:
         """
         Intelligently complete missing information using dynamic research
@@ -146,8 +146,8 @@ class InformationCompletionAgent(IInformationCompletionAgent):
         )
 
     async def research_gap_dynamically(
-        self, gap: InformationGap, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, gap: InformationGap, context: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Dynamically research information to fill a specific gap
         """
@@ -198,7 +198,7 @@ class InformationCompletionAgent(IInformationCompletionAgent):
             }
 
     async def generate_intelligent_defaults(
-        self, gap: InformationGap, research_results: Dict[str, Any]
+        self, gap: InformationGap, research_results: dict[str, Any]
     ) -> Any:
         """
         Generate contextually appropriate defaults using AI reasoning
@@ -250,7 +250,7 @@ class InformationCompletionAgent(IInformationCompletionAgent):
         else:
             return ConfigManager().analysis.confidence.default_confidence
 
-    def _extract_assumptions_from_response(self, response: str) -> List[str]:
+    def _extract_assumptions_from_response(self, response: str) -> list[str]:
         """Extract assumptions from AI response"""
         # Simple extraction - would parse more sophisticatedly in full implementation
         assumptions = []

@@ -1,6 +1,6 @@
-from typing import List
-from pydantic import BaseSettings
 import os
+
+from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     METRICS_COLLECTION_INTERVAL_SEC: int = int(
         os.getenv("METRICS_COLLECTION_INTERVAL_SEC", "1")
     )
-    CORS_ALLOW_ORIGINS: List[str] = [os.getenv("FRONTEND_URL", "http://localhost:3000")]
+    CORS_ALLOW_ORIGINS: list[str] = [os.getenv("FRONTEND_URL", "http://localhost:3000")]
 
 
 settings = Settings()

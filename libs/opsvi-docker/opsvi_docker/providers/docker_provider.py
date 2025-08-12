@@ -5,14 +5,14 @@ Main Docker provider for the OPSVI ecosystem.
 Provides comprehensive Docker management capabilities.
 """
 
-import os
 import logging
-from typing import Any, Dict, List, Optional, Union
-from dataclasses import dataclass, field
+import os
+from dataclasses import dataclass
+from typing import Any
 
 try:
     import docker
-    from docker.errors import DockerException, APIError, ImageNotFound, ContainerError
+    from docker.errors import APIError, ContainerError, DockerException, ImageNotFound
 except ImportError:
     raise ImportError("docker-py is required. Install with `pip install docker`.")
 
@@ -32,18 +32,18 @@ class DockerConfig:
     """Configuration for Docker provider."""
 
     # Connection settings
-    base_url: Optional[str] = None
+    base_url: str | None = None
     timeout: int = 60
     tls: bool = False
     tls_verify: bool = True
-    tls_ca_cert: Optional[str] = None
-    tls_client_cert: Optional[str] = None
-    tls_client_key: Optional[str] = None
+    tls_ca_cert: str | None = None
+    tls_client_cert: str | None = None
+    tls_client_key: str | None = None
 
     # Registry settings
-    registry_url: Optional[str] = None
-    registry_username: Optional[str] = None
-    registry_password: Optional[str] = None
+    registry_url: str | None = None
+    registry_username: str | None = None
+    registry_password: str | None = None
 
     # Default settings
     default_network: str = "bridge"
@@ -106,7 +106,7 @@ class DockerProvider(BaseComponent):
 
         self.config = config
         self.client = None
-        self._managers: Dict[str, Any] = {}
+        self._managers: dict[str, Any] = {}
 
         logger.debug(f"DockerProvider initialized with base_url: {config.base_url}")
 
@@ -145,13 +145,13 @@ class DockerProvider(BaseComponent):
 
     async def _initialize_managers(self) -> None:
         """Initialize all Docker managers."""
+        from .compose_manager import ComposeManager
         from .container_manager import ContainerManager
         from .image_manager import ImageManager
-        from .network_manager import NetworkManager
-        from .volume_manager import VolumeManager
-        from .compose_manager import ComposeManager
-        from .registry_manager import RegistryManager
         from .monitoring import DockerMonitor
+        from .network_manager import NetworkManager
+        from .registry_manager import RegistryManager
+        from .volume_manager import VolumeManager
 
         # Initialize managers
         self._managers["container"] = ContainerManager(self.client, self.config)
@@ -221,7 +221,7 @@ class DockerProvider(BaseComponent):
         """Get Docker monitor."""
         return self._managers["monitor"]
 
-    async def _health_check_impl(self) -> Dict[str, Any]:
+    async def _health_check_impl(self) -> dict[str, Any]:
         """Implement health check for Docker provider."""
         try:
             if not self.client:
@@ -257,7 +257,7 @@ class DockerProvider(BaseComponent):
             logger.error(f"Docker health check failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def get_docker_info(self) -> Dict[str, Any]:
+    def get_docker_info(self) -> dict[str, Any]:
         """Get comprehensive Docker system information."""
         try:
             if not self.client:
@@ -289,13 +289,13 @@ class DockerProvider(BaseComponent):
 
         return self._managers[manager_type]
 
-    def list_managers(self) -> List[str]:
+    def list_managers(self) -> list[str]:
         """List all available managers."""
         return list(self._managers.keys())
 
     async def execute_docker_command(
         self, command: str, **kwargs: Any
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Execute a Docker command and return results."""
         try:
             if not self.client:

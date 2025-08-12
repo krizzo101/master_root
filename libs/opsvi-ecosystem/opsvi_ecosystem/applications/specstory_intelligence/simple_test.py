@@ -2,9 +2,9 @@
 """Simple test for SpecStory Intelligence system"""
 
 import asyncio
-from pathlib import Path
 import sys
 import tempfile
+from pathlib import Path
 
 sys.path.append(".")
 

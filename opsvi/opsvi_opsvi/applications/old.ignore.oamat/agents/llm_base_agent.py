@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
@@ -24,24 +24,24 @@ class AnalysisSchema(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
     primary_intent: str = Field(description="Main goal or objective")
-    secondary_intents: List[str] = Field(description="Additional goals or benefits")
+    secondary_intents: list[str] = Field(description="Additional goals or benefits")
     complexity: str = Field(
         description="Complexity level: simple|moderate|complex|enterprise"
     )
-    required_capabilities: List[str] = Field(description="Specific capabilities needed")
+    required_capabilities: list[str] = Field(description="Specific capabilities needed")
     workflow_strategy: str = Field(
         description="Workflow execution strategy: linear|parallel|adaptive|iterative|hybrid|sdlc"
     )
-    recommended_agents: List[str] = Field(description="Optimal agent sequence")
-    required_tools: List[str] = Field(description="Essential tools for success")
+    recommended_agents: list[str] = Field(description="Optimal agent sequence")
+    required_tools: list[str] = Field(description="Essential tools for success")
     estimated_phases: int = Field(description="Number of workflow phases")
-    uncertainty_factors: List[str] = Field(
+    uncertainty_factors: list[str] = Field(
         description="Factors that could change approach"
     )
-    clarification_questions: List[str] = Field(
+    clarification_questions: list[str] = Field(
         description="Questions to reduce uncertainty"
     )
-    risk_factors: List[str] = Field(description="Potential risks or challenges")
+    risk_factors: list[str] = Field(description="Potential risks or challenges")
     success_probability: float = Field(description="Probability of success (0.0-1.0)")
     confidence_score: float = Field(description="Confidence in analysis (0.0-1.0)")
 
@@ -51,9 +51,9 @@ class KnowledgeResponse(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
     success: bool
-    results: List[Any] = Field(default_factory=list)
-    error: Optional[str] = None
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    results: list[Any] = Field(default_factory=list)
+    error: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class LLMBaseAgent:
@@ -63,12 +63,12 @@ class LLMBaseAgent:
         self,
         agent_name: str,
         role: str,
-        expertise: List[str],
+        expertise: list[str],
         model: str = "o3-mini",
         temperature: float = 0.7,
-        neo4j_uri: Optional[str] = None,
-        neo4j_user: Optional[str] = None,
-        neo4j_password: Optional[str] = None,
+        neo4j_uri: str | None = None,
+        neo4j_user: str | None = None,
+        neo4j_password: str | None = None,
     ):
         """
         Initializes the LLMBaseAgent.
@@ -98,11 +98,11 @@ class LLMBaseAgent:
         self,
         content: str,
         source: str,
-        knowledge_type: Optional[str] = None,
-        metadata: Optional[Dict] = None,
-        repo_id: Optional[str] = None,
+        knowledge_type: str | None = None,
+        metadata: dict | None = None,
+        repo_id: str | None = None,
         check_similarity: bool = True,
-        document_type: Optional[str] = None,
+        document_type: str | None = None,
     ) -> KnowledgeResponse:
         """
         Stores knowledge content in the Neo4j database as Document and Chunk nodes.
@@ -147,8 +147,8 @@ class LLMBaseAgent:
 
     def llm_call(
         self,
-        messages: List[BaseMessage],
-        response_format: Optional[BaseModel] = None,
+        messages: list[BaseMessage],
+        response_format: BaseModel | None = None,
         **kwargs,
     ) -> Any:
         """
@@ -162,8 +162,8 @@ class LLMBaseAgent:
         Returns:
             AI response with structured parsing if response_format provided
         """
-        from datetime import datetime
         import time
+        from datetime import datetime
 
         api_logger = logging.getLogger("oamat.api")
 
@@ -304,8 +304,8 @@ ERROR: {str(e)}
             raise
 
     def generate_workflow(
-        self, user_request: str, context: Optional[str] = None
-    ) -> Dict[str, Any]:
+        self, user_request: str, context: str | None = None
+    ) -> dict[str, Any]:
         """
         Generate workflow using structured responses
 
@@ -349,7 +349,7 @@ ERROR: {str(e)}
         else:
             raise ValueError("Structured response format not received")
 
-    def execute_task(self, task: str, context: Optional[Dict[str, Any]] = None) -> str:
+    def execute_task(self, task: str, context: dict[str, Any] | None = None) -> str:
         """
         Execute a specific task
 

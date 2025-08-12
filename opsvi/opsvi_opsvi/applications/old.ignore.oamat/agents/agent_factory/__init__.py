@@ -33,13 +33,13 @@ class AgentOutput(BaseModel):
     agent_role: str = Field(..., description="Role/type of the agent")
     success: bool = Field(..., description="Whether the task succeeded")
     result: Any = Field(None, description="Main result from agent execution")
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict, description="Additional context"
     )
     confidence_score: float = Field(
         0.7, ge=0.0, le=1.0, description="Confidence in results"
     )
-    errors: List[str] = Field(
+    errors: list[str] = Field(
         default_factory=list, description="Any errors encountered"
     )
     timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())

@@ -5,10 +5,10 @@ AI-driven request validation using dynamic analysis rather than
 predefined schemas. Adapts validation approach based on content analysis.
 """
 
+import logging
 from dataclasses import dataclass, field
 from enum import Enum
-import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
@@ -52,8 +52,8 @@ class RequestField:
     description: str
     field_type: type
     required: bool = True
-    default: Optional[Any] = None
-    validation_pattern: Optional[str] = None
+    default: Any | None = None
+    validation_pattern: str | None = None
 
 
 @dataclass
@@ -62,13 +62,13 @@ class RequestSchema:
 
     request_type: RequestType
     description: str
-    fields: List[RequestField]
+    fields: list[RequestField]
 
-    def get_required_fields(self) -> List[RequestField]:
+    def get_required_fields(self) -> list[RequestField]:
         """Get all required fields for this schema."""
         return [field for field in self.fields if field.required]
 
-    def get_optional_fields(self) -> List[RequestField]:
+    def get_optional_fields(self) -> list[RequestField]:
         """Get all optional fields for this schema."""
         return [field for field in self.fields if not field.required]
 
@@ -79,10 +79,10 @@ class ValidationResult:
 
     request_type: RequestType
     is_valid: bool
-    missing_fields: List[str]
-    extracted_info: Dict[str, Any]
+    missing_fields: list[str]
+    extracted_info: dict[str, Any]
     confidence: float
-    validation_errors: List[str] = field(default_factory=list)
+    validation_errors: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -93,32 +93,32 @@ class InformationGap:
     priority: GapPriority
     description: str
     researchable: bool
-    suggested_defaults: List[Any] = field(default_factory=list)
-    research_keywords: List[str] = field(default_factory=list)
+    suggested_defaults: list[Any] = field(default_factory=list)
+    research_keywords: list[str] = field(default_factory=list)
 
 
 @dataclass
 class GapAnalysisResult:
     """Result of gap analysis process."""
 
-    gaps: List[InformationGap]
+    gaps: list[InformationGap]
     confidence: float
     completeness_score: float
     critical_gaps_count: int
-    researchable_gaps: List[InformationGap] = field(default_factory=list)
-    unresearchable_gaps: List[InformationGap] = field(default_factory=list)
+    researchable_gaps: list[InformationGap] = field(default_factory=list)
+    unresearchable_gaps: list[InformationGap] = field(default_factory=list)
 
 
 @dataclass
 class CompletionResult:
     """Result of information completion process."""
 
-    filled_fields: Dict[str, Any]
-    applied_defaults: Dict[str, Any]
-    research_results: Dict[str, Any]
-    assumptions: List[str]
+    filled_fields: dict[str, Any]
+    applied_defaults: dict[str, Any]
+    research_results: dict[str, Any]
+    assumptions: list[str]
     escalation_required: bool
-    critical_gaps_remaining: List[str]
+    critical_gaps_remaining: list[str]
 
 
 @dataclass
@@ -128,15 +128,15 @@ class ClarificationQuestion:
     field_name: str
     question: str
     importance_explanation: str
-    options: List[str] = field(default_factory=list)
-    default_option: Optional[str] = None
+    options: list[str] = field(default_factory=list)
+    default_option: str | None = None
 
 
 class RequestSchemaRegistry:
     """Registry for request schemas and validation rules."""
 
     def __init__(self):
-        self._schemas: Dict[RequestType, RequestSchema] = {}
+        self._schemas: dict[RequestType, RequestSchema] = {}
         self._initialize_default_schemas()
 
     def _initialize_default_schemas(self):
@@ -249,7 +249,7 @@ class RequestSchemaRegistry:
             fields=script_fields,
         )
 
-    def get_schema(self, request_type: RequestType) -> Optional[RequestSchema]:
+    def get_schema(self, request_type: RequestType) -> RequestSchema | None:
         """Get schema for a specific request type."""
         return self._schemas.get(request_type)
 
@@ -257,13 +257,13 @@ class RequestSchemaRegistry:
         """Register a new schema."""
         self._schemas[schema.request_type] = schema
 
-    def list_schemas(self) -> List[RequestType]:
+    def list_schemas(self) -> list[RequestType]:
         """List all available schema types."""
         return list(self._schemas.keys())
 
     def validate_compliance(
-        self, request_type: RequestType, data: Dict[str, Any]
-    ) -> Tuple[bool, List[str]]:
+        self, request_type: RequestType, data: dict[str, Any]
+    ) -> tuple[bool, list[str]]:
         """Validate data compliance with schema."""
         schema = self.get_schema(request_type)
         if not schema:
@@ -292,8 +292,8 @@ class RequestValidationAgent(IRequestValidationAgent):
 
     def __init__(
         self,
-        schema_registry: Optional[RequestSchemaRegistry] = None,
-        model_config: Optional[Dict[str, Any]] = None,
+        schema_registry: RequestSchemaRegistry | None = None,
+        model_config: dict[str, Any] | None = None,
     ):
         self.schema_registry = schema_registry or RequestSchemaRegistry()
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
@@ -361,7 +361,7 @@ class RequestValidationAgent(IRequestValidationAgent):
 
     async def extract_information_dynamically(
         self, request: RequestInput
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Use AI to extract information from natural language
 
@@ -404,7 +404,7 @@ class RequestValidationAgent(IRequestValidationAgent):
 
     async def generate_validation_strategy(
         self, content: str
-    ) -> Tuple[Optional[RequestType], float]:
+    ) -> tuple[RequestType | None, float]:
         """
         Dynamically generate validation approach for this specific content
 
@@ -451,8 +451,8 @@ class RequestValidationAgent(IRequestValidationAgent):
             return None, 0.0
 
     async def _analyze_validation_issues(
-        self, request: RequestInput, extracted_info: Dict[str, Any]
-    ) -> List[str]:
+        self, request: RequestInput, extracted_info: dict[str, Any]
+    ) -> list[str]:
         """Use AI to identify potential validation issues"""
 
         issues_prompt = f"""
@@ -525,7 +525,7 @@ class RequestValidationAgent(IRequestValidationAgent):
 
     def extract_information(
         self, request_text: str, request_type: RequestType
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Extract available information from the request text."""
         extracted = {}
         request_lower = request_text.lower()
@@ -555,8 +555,8 @@ class RequestValidationAgent(IRequestValidationAgent):
         return extracted
 
     def identify_missing_fields(
-        self, request_type: RequestType, extracted_info: Dict[str, Any]
-    ) -> List[str]:
+        self, request_type: RequestType, extracted_info: dict[str, Any]
+    ) -> list[str]:
         """Identify missing required and important optional fields."""
         schema = self.schema_registry.get_schema(request_type)
         if not schema:
@@ -625,8 +625,8 @@ class GapAnalysisAgent:
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
     def prioritize_gaps(
-        self, missing_fields: List[str], request_type: RequestType
-    ) -> List[InformationGap]:
+        self, missing_fields: list[str], request_type: RequestType
+    ) -> list[InformationGap]:
         """Prioritize missing information gaps."""
         schema = self.schema_registry.get_schema(request_type)
         if not schema:
@@ -671,7 +671,7 @@ class GapAnalysisAgent:
 
         return gaps
 
-    def calculate_confidence(self, gaps: List[InformationGap]) -> float:
+    def calculate_confidence(self, gaps: list[InformationGap]) -> float:
         """Calculate confidence based on gaps."""
         if not gaps:
             return 1.0
@@ -687,8 +687,8 @@ class GapAnalysisAgent:
         return confidence
 
     def categorize_gaps(
-        self, gaps: List[InformationGap]
-    ) -> Tuple[List[InformationGap], List[InformationGap]]:
+        self, gaps: list[InformationGap]
+    ) -> tuple[list[InformationGap], list[InformationGap]]:
         """Categorize gaps into researchable and unresearchable."""
         researchable = [gap for gap in gaps if gap.researchable]
         unresearchable = [gap for gap in gaps if not gap.researchable]
@@ -730,7 +730,7 @@ class InformationCompletionAgent:
         self.schema_registry = schema_registry
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
-    async def research_gap(self, gap: InformationGap) -> Optional[Any]:
+    async def research_gap(self, gap: InformationGap) -> Any | None:
         """Research information for a specific gap."""
         if not gap.researchable:
             return None
@@ -747,7 +747,7 @@ class InformationCompletionAgent:
 
         return research_db.get(gap.field_name)
 
-    def apply_defaults(self, gaps: List[InformationGap]) -> Dict[str, Any]:
+    def apply_defaults(self, gaps: list[InformationGap]) -> dict[str, Any]:
         """Apply reasonable defaults for gaps that have them."""
         defaults = {}
 
@@ -758,8 +758,8 @@ class InformationCompletionAgent:
         return defaults
 
     def document_assumptions(
-        self, filled_fields: Dict[str, Any], applied_defaults: Dict[str, Any]
-    ) -> List[str]:
+        self, filled_fields: dict[str, Any], applied_defaults: dict[str, Any]
+    ) -> list[str]:
         """Document assumptions made during completion."""
         assumptions = []
 
@@ -830,8 +830,8 @@ class UserClarificationInterface:
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
     def generate_focused_questions(
-        self, critical_gaps: List[str], request_type: RequestType
-    ) -> List[ClarificationQuestion]:
+        self, critical_gaps: list[str], request_type: RequestType
+    ) -> list[ClarificationQuestion]:
         """Generate focused questions for critical gaps."""
         schema = self.schema_registry.get_schema(request_type)
         if not schema:
@@ -867,7 +867,7 @@ class UserClarificationInterface:
 
     def _get_field_options(
         self, field_name: str, request_type: RequestType
-    ) -> List[str]:
+    ) -> list[str]:
         """Get reasonable options for a field."""
         options_map = {
             "framework": ["React", "Vue.js", "Angular", "Svelte", "Next.js"],
@@ -896,8 +896,8 @@ class UserClarificationInterface:
         return f"{base_explanation} in {request_type.value} development."
 
     def handle_user_response(
-        self, questions: List[ClarificationQuestion], responses: Dict[str, str]
-    ) -> Dict[str, Any]:
+        self, questions: list[ClarificationQuestion], responses: dict[str, str]
+    ) -> dict[str, Any]:
         """Handle user responses to clarification questions."""
         filled_data = {}
 
@@ -914,7 +914,7 @@ class UserClarificationInterface:
 
     async def _parse_extraction_response(
         self, ai_response: str, request: RequestInput
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Parse AI extraction response into structured data"""
         # Simple parsing for TDD - would be more sophisticated in full implementation
         extracted_info = {}
@@ -946,7 +946,7 @@ class UserClarificationInterface:
 
     def _parse_type_response(
         self, ai_response: str
-    ) -> Tuple[Optional[RequestType], float]:
+    ) -> tuple[RequestType | None, float]:
         """Parse AI response to extract request type and confidence"""
         response_lower = ai_response.lower()
 
@@ -978,7 +978,7 @@ class UserClarificationInterface:
 
         return detected_type, confidence
 
-    def _parse_issues_response(self, ai_response: str) -> List[str]:
+    def _parse_issues_response(self, ai_response: str) -> list[str]:
         """Parse AI response to extract validation issues"""
         issues = []
 

@@ -5,8 +5,8 @@ Tests the O3-powered master agent that performs sophisticated request analysis,
 complexity evaluation, and agent strategy generation.
 """
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -18,6 +18,7 @@ sys.path.insert(0, str(project_root))
 from oamat_sd.src.agents.complexity_model import ComplexityAnalysisResult
 from oamat_sd.src.agents.o3_master_agent import O3MasterAgent
 from oamat_sd.src.models.data_models import RequestInput, RequestType, ValidationResult
+
 from tests.fixtures.test_data import (
     COMPLEXITY_TEST_CASES,
 )

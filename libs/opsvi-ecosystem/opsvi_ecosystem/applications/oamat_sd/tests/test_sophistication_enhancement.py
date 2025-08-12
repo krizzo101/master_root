@@ -13,10 +13,10 @@ Tests focus on:
 
 import importlib.util
 import json
-from pathlib import Path
 import subprocess
 import sys
-from typing import Any, Dict, List
+from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -51,7 +51,7 @@ class SophisticationEnhancementValidator:
         "create_react_agent",
     ]
 
-    def run_sophistication_validation(self) -> Dict[str, Any]:
+    def run_sophistication_validation(self) -> dict[str, Any]:
         """Run the main sophistication validation script"""
         try:
             result = subprocess.run(
@@ -75,7 +75,7 @@ class SophisticationEnhancementValidator:
         except Exception as e:
             return {"error": f"Validation failed: {str(e)}"}
 
-    def check_file_for_asyncio_gather(self, file_path: Path) -> List[Dict[str, Any]]:
+    def check_file_for_asyncio_gather(self, file_path: Path) -> list[dict[str, Any]]:
         """Check specific file for asyncio.gather violations"""
         violations = []
 
@@ -103,7 +103,7 @@ class SophisticationEnhancementValidator:
 
         return violations
 
-    def check_file_for_send_api(self, file_path: Path) -> List[Dict[str, Any]]:
+    def check_file_for_send_api(self, file_path: Path) -> list[dict[str, Any]]:
         """Check specific file for LangGraph Send API implementation"""
         implementations = []
 

@@ -2,7 +2,7 @@
 
 import logging
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 import json
 from pathlib import Path
@@ -12,9 +12,6 @@ from pydantic import BaseModel, Field, field_validator, ConfigDict
 from opsvi_auto_forge.config.models import AgentRole
 from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
 from opsvi_auto_forge.infrastructure.monitoring.metrics.decision_metrics import (
-    decision_success,
-    decision_failure,
-    dk_decision_confidence_bucket,
     router_escalations_total,
 )
 

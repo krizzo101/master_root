@@ -1,39 +1,28 @@
 """Main FastAPI application for the autonomous software factory."""
 
-import logging
 import os
 import time
 from contextlib import asynccontextmanager
-from typing import Dict, Any
 from datetime import datetime, timezone
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
 from prometheus_client import Counter, Histogram, Gauge, make_asgi_app
-import structlog
-from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-import traceback
 from fastapi.exception_handlers import RequestValidationError
-from fastapi.exceptions import RequestValidationError as FastAPIRequestValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from opsvi_auto_forge.config.settings import settings
 from .routes import health, runs, tasks, projects, websockets, debug, decisions
 from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
 from opsvi_auto_forge.application.orchestrator.registry import TaskRegistryManager
-from opsvi_auto_forge.infrastructure.monitoring.metrics.decision_metrics import (
-    ro_evidence_retrieval_success_total,
-    ro_evidence_retrieval_failure_total,
-)
 from opsvi_auto_forge.infrastructure.monitoring.logging_config import (
     configure_logging,
     get_logger,
     log_request_start,
     log_request_end,
-    log_debug,
     log_error,
     generate_correlation_id,
     set_correlation_id,

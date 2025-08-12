@@ -28,7 +28,6 @@ from __future__ import annotations
 import asyncio
 import logging
 from typing import Dict, List, Optional, Set
-from uuid import UUID
 
 from opsvi_auto_forge.config.models import AgentRole
 from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
@@ -126,7 +125,7 @@ class TaskRegistryManager:
             )
             return True
 
-        except Exception as exc:  # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             _LOGGER.exception(
                 "Unable to register task",
                 extra={"task_name": getattr(task, "name", "<unknown>")},

@@ -1,12 +1,12 @@
 """
 RESTful API endpoints for posts, tags, categories, analytics.
 """
-from flask import Blueprint, jsonify, request, abort
-from flask_login import login_required, current_user
-from app.models import Post, Tag, Category, User, db
-from app.api_schemas import PostSchema, TagSchema, CategorySchema
+from flask import Blueprint, abort, jsonify
+from flask_login import login_required
 from sqlalchemy.orm import joinedload
-from sqlalchemy.exc import SQLAlchemyError
+
+from app.api_schemas import CategorySchema, PostSchema, TagSchema
+from app.models import Category, Post, Tag, db
 
 api_bp = Blueprint("api", __name__)
 

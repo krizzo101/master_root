@@ -8,10 +8,8 @@ import asyncio
 import json
 import logging
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, Any
 from arango import ArangoClient
-from arango.database import StandardDatabase
-import os
 from dataclasses import dataclass
 
 # Configure logging
@@ -659,7 +657,7 @@ async def main():
         json.dump(results, f, indent=2)
 
     logger.info(f"Results saved to {results_filename}")
-    print(f"\nAdvanced Semantic Enhancement Results:")
+    print("\nAdvanced Semantic Enhancement Results:")
     print(
         f"Entities Enhanced: {results.get('enhancement_metrics', {}).get('entities_enhanced', 0)}"
     )

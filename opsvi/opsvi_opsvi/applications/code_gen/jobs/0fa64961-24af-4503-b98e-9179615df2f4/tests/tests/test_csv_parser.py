@@ -1,7 +1,8 @@
-import pytest
-import pandas as pd
-import csv_reporter.csv_parser as parser
 from unittest import mock
+
+import csv_reporter.csv_parser as parser
+import pandas as pd
+import pytest
 
 
 @pytest.fixture

@@ -1,5 +1,5 @@
 import pytest
-from backend.metrics import get_realtime_metrics, get_historical_metrics
+from backend.metrics import get_historical_metrics, get_realtime_metrics
 
 
 def test_get_realtime_metrics_returns_all_metrics():
@@ -13,7 +13,6 @@ def test_get_realtime_metrics_returns_all_metrics():
 
 def test_get_historical_metrics_valid_and_invalid():
     import time
-    import pytest
 
     current_time = int(time.time())
     metric_type = "cpu"

@@ -1,7 +1,7 @@
 import unittest
+
 from ai_collab_task_manager.app import app, db
 from ai_collab_task_manager.models import User
-from flask.testing import FlaskClient
 
 
 class FlaskAppTest(unittest.TestCase):

@@ -1,9 +1,7 @@
-import pytest
-from app.weather import fetch_weather
-
-
 import time
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
+from app.weather import fetch_weather
 
 
 @patch("app.weather.requests.get")

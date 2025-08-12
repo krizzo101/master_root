@@ -16,7 +16,6 @@ For new implementation, see: database_refactored.py
 # Use database_refactored.py for new implementations
 
 import asyncio
-import logging
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 

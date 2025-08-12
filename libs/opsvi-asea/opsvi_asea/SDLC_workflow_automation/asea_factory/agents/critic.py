@@ -1,5 +1,4 @@
 from asea_factory.schemas import CriticReview
-import uuid
 from asea_factory.agents.base_agent import BaseAgent
 
 

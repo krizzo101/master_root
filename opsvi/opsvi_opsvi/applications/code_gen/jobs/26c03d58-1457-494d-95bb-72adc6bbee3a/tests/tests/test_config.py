@@ -1,5 +1,4 @@
-import pytest
-from app.config import get_api_settings, ApiSettings, Config
+from app.config import ApiSettings, Config, get_api_settings
 
 
 def test_get_api_settings_returns_settings_instance():

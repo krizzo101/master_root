@@ -7,10 +7,8 @@ This system extracts reusable patterns from operational experience to enable
 autonomous improvement identification and systematic optimization.
 """
 
-import json
-import os
 from datetime import datetime
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any
 from collections import defaultdict
 
 
@@ -547,7 +545,7 @@ def main():
     # Run test
     test_results = test_operational_pattern_recognition()
 
-    print(f"\n=== PATTERN RECOGNITION PERFORMANCE ===")
+    print("\n=== PATTERN RECOGNITION PERFORMANCE ===")
     if "quality_metrics" in test_results:
         metrics = test_results["quality_metrics"]
         print(f"Total Patterns Found: {metrics['total_patterns']}")

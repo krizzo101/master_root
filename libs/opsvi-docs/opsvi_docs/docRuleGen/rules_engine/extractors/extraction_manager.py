@@ -12,7 +12,7 @@ This module provides functionality to manage the extraction process.
 
 import os
 import logging
-from typing import Dict, Any, List, Optional, Type
+from typing import Dict, Any, Optional
 
 from .base_extractor import BaseExtractor
 from .markdown_extractor import MarkdownExtractor

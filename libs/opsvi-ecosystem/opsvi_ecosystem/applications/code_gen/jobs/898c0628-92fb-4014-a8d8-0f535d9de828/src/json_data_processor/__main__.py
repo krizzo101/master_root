@@ -1,4 +1,5 @@
 import uvicorn
+
 from .logger import setup_logger
 
 if __name__ == "__main__":

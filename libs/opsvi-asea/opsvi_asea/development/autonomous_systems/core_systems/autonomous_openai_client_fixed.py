@@ -18,7 +18,7 @@ import asyncio
 import json
 import os
 from datetime import datetime
-from typing import Dict, Any, List, Optional, Union, Type
+from typing import Dict, Any, List, Optional, Type
 from dataclasses import dataclass
 
 from openai import AsyncOpenAI
@@ -276,7 +276,7 @@ class AutonomousOpenAIClient:
             # Log API call
             self.logger.log_api_call(
                 "OpenAI_Chat",
-                f"/chat/completions",
+                "/chat/completions",
                 "POST",
                 request_data={"model": model, "message_count": len(messages)},
                 response_data={"content_length": len(content) if content else 0},

@@ -1,9 +1,6 @@
-import pytest
-import os
-from simple_news_scraper.config import load_config, setup_logging
-
-
 import json
+
+from simple_news_scraper.config import load_config, setup_logging
 
 
 def test_load_config_returns_dict_for_valid_file(tmp_path):

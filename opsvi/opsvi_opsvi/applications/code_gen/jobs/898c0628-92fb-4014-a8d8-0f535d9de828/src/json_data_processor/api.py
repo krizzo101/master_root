@@ -1,13 +1,10 @@
 import logging
-import os
 import uuid
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException, status, Response
-from pydantic import BaseModel
-from fastapi.responses import StreamingResponse
-from typing import Optional
-import tempfile
 
-from .converter import validate_json_data, convert_json, SUPPORTED_FORMATS
+from fastapi import FastAPI, File, Form, HTTPException, Response, UploadFile
+from pydantic import BaseModel
+
+from .converter import SUPPORTED_FORMATS, convert_json, validate_json_data
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +73,7 @@ def upload_and_convert(file: UploadFile = File(...), output_format: str = Form(.
         raise HTTPException(status_code=400, detail="File size exceeds 10MB limit.")
     try:
         json_data = validate_json_data(content.decode("utf-8"))
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=400, detail="Uploaded file contains invalid JSON."
         )

@@ -9,21 +9,21 @@ for comprehensive research capabilities including vector storage and similarity 
 import asyncio
 import json
 import os
-import time
 from datetime import datetime
-from typing import Dict, List, Any, Optional
+from typing import Any
+
+from opsvi_http import HTTPXClient, HTTPXConfig
 
 # OPSVI imports
 from opsvi_llm import (
-    OpenAIProvider,
-    OpenAIConfig,
-    PerplexityProvider,
-    PerplexityConfig,
     ChatRequest,
     Message,
+    OpenAIConfig,
+    OpenAIProvider,
+    PerplexityConfig,
+    PerplexityProvider,
 )
-from opsvi_http import HTTPXClient, HTTPXConfig
-from opsvi_rag import QdrantStore, QdrantConfig
+from opsvi_rag import QdrantConfig, QdrantStore
 
 
 class EnhancedResearchAssistantWithQdrant:
@@ -132,7 +132,7 @@ class EnhancedResearchAssistantWithQdrant:
 
         print("✅ All components shut down successfully")
 
-    async def fetch_research_data(self, topic: str) -> List[Dict[str, Any]]:
+    async def fetch_research_data(self, topic: str) -> list[dict[str, Any]]:
         """Fetch research data from multiple sources."""
         print(f"🔍 Fetching research data for: {topic}")
         research_data = []
@@ -185,7 +185,7 @@ class EnhancedResearchAssistantWithQdrant:
 
     def _parse_arxiv_response(
         self, response_text: str, topic: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Parse ArXiv XML response."""
         import xml.etree.ElementTree as ET
 
@@ -236,7 +236,7 @@ class EnhancedResearchAssistantWithQdrant:
 
     def _parse_pubmed_response(
         self, response_text: str, topic: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Parse PubMed JSON response."""
         papers = []
         try:
@@ -259,7 +259,7 @@ class EnhancedResearchAssistantWithQdrant:
 
         return papers
 
-    async def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
+    async def generate_embeddings(self, texts: list[str]) -> list[list[float]]:
         """Generate embeddings for texts using OpenAI."""
         if not self.openai_provider:
             raise Exception("OpenAI provider not available for embeddings")
@@ -280,8 +280,8 @@ class EnhancedResearchAssistantWithQdrant:
         return embeddings
 
     async def store_research_in_qdrant(
-        self, research_data: List[Dict[str, Any]]
-    ) -> List[str]:
+        self, research_data: list[dict[str, Any]]
+    ) -> list[str]:
         """Store research data in Qdrant vector store."""
         if not research_data:
             return []
@@ -324,7 +324,7 @@ class EnhancedResearchAssistantWithQdrant:
 
     async def search_similar_research(
         self, query: str, limit: int = 5
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Search for similar research papers in Qdrant."""
         try:
             # Generate embedding for query
@@ -346,10 +346,10 @@ class EnhancedResearchAssistantWithQdrant:
 
     async def analyze_with_llm(
         self,
-        research_data: List[Dict[str, Any]],
+        research_data: list[dict[str, Any]],
         topic: str,
         provider_name: str = "auto",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Analyze research data with LLM."""
         if not research_data:
             return {"error": "No research data to analyze"}
@@ -413,7 +413,7 @@ class EnhancedResearchAssistantWithQdrant:
 
     async def conduct_research(
         self, topic: str, use_perplexity: bool = True, use_openai: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Conduct comprehensive research with vector storage."""
         print(f"\n🚀 Starting ENHANCED research on: {topic}")
         print("=" * 60)
@@ -458,7 +458,7 @@ class EnhancedResearchAssistantWithQdrant:
                 if "error" not in perplexity_analysis:
                     session_data["analysis_results"].append(perplexity_analysis)
                     analysis_count += 1
-                    print(f"  ✅ Perplexity Score: 8/10")
+                    print("  ✅ Perplexity Score: 8/10")
 
             if use_openai and self.openai_provider:
                 print("🧠 Analyzing content with OpenAI LLM...")
@@ -468,7 +468,7 @@ class EnhancedResearchAssistantWithQdrant:
                 if "error" not in openai_analysis:
                     session_data["analysis_results"].append(openai_analysis)
                     analysis_count += 1
-                    print(f"  ✅ OpenAI Score: 8/10")
+                    print("  ✅ OpenAI Score: 8/10")
 
             session_data["papers_analyzed"] = analysis_count
 
@@ -493,7 +493,7 @@ class EnhancedResearchAssistantWithQdrant:
             session_data["error"] = str(e)
             return session_data
 
-    async def get_qdrant_stats(self) -> Dict[str, Any]:
+    async def get_qdrant_stats(self) -> dict[str, Any]:
         """Get Qdrant statistics."""
         if not self.qdrant_store:
             return {"error": "Qdrant store not available"}
@@ -558,7 +558,7 @@ class EnhancedResearchAssistantWithQdrant:
             print(f"     Papers Found: {session['papers_found']}")
             print(f"     Papers Analyzed: {session['papers_analyzed']}")
             print(f"     Sources: {', '.join(session['sources'])}")
-            print(f"     Status: completed")
+            print("     Status: completed")
             print(
                 f"     Vector Storage: {'✅' if session.get('vector_storage', False) else '❌'}"
             )

@@ -1,8 +1,4 @@
-import pytest
-import yaml
 import csv_reporter.config as config
-import os
-import tempfile
 
 
 def test_config_init_default_values():

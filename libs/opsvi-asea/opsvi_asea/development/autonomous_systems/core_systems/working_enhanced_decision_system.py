@@ -7,7 +7,6 @@ NO FALLBACKS - either works with AI or fails explicitly.
 
 import asyncio
 import sys
-from pathlib import Path
 
 from working_external_reasoning import WorkingExternalReasoning
 
@@ -68,7 +67,7 @@ async def test_working_enhanced_system():
         )
 
         print("🚀 WORKING ENHANCED DECISION ASSESSMENT:")
-        print(f"Context: Production database performance issue")
+        print("Context: Production database performance issue")
         print(f"Analysis Method: {assessment['analysis_method']}")
         print(f"Assessment Score: {assessment['assessment_score']}/100")
         print(f"Evidence-based: {assessment['evidence_based']}")

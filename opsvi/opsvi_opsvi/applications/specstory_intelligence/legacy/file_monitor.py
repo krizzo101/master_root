@@ -4,13 +4,12 @@ Watches directories for new/modified SpecStory files and queues them for process
 """
 
 import asyncio
-from datetime import datetime
 import hashlib
 import json
 import os
-from pathlib import Path
 import re
-from typing import Dict, Optional, Set
+from datetime import datetime
+from pathlib import Path
 
 import aiofiles
 from watchdog.events import FileSystemEventHandler
@@ -20,12 +19,12 @@ from watchdog.observers import Observer
 class SpecStoryFileWatcher(FileSystemEventHandler):
     """Enhanced file system event handler for SpecStory files"""
 
-    def __init__(self, processor_queue: asyncio.Queue, config: Dict, loop=None):
+    def __init__(self, processor_queue: asyncio.Queue, config: dict, loop=None):
         super().__init__()
         self.processor_queue = processor_queue
         self.config = config
-        self.processed_files: Set[str] = set()
-        self.file_hashes: Dict[str, str] = {}
+        self.processed_files: set[str] = set()
+        self.file_hashes: dict[str, str] = {}
         self.loop = loop or asyncio.get_event_loop()
 
         # Load file patterns from config or external file
@@ -139,7 +138,7 @@ class SpecStoryFileWatcher(FileSystemEventHandler):
 class RealTimeFileMonitor:
     """Main file monitoring coordinator"""
 
-    def __init__(self, config: Dict):
+    def __init__(self, config: dict):
         self.config = config
         self.watch_directories = config.get("watch_directories", [])
         self.processor_queue = asyncio.Queue(maxsize=config.get("queue_size", 1000))
@@ -234,7 +233,7 @@ class RealTimeFileMonitor:
         """Get the processing queue for consumers"""
         return self.processor_queue
 
-    def get_stats(self) -> Dict:
+    def get_stats(self) -> dict:
         """Get monitoring statistics"""
         runtime = (
             (datetime.utcnow() - self.stats["start_time"]).total_seconds()
@@ -253,7 +252,7 @@ class MonitoringConfiguration:
     """Configuration management for file monitoring"""
 
     @staticmethod
-    def load_config(config_path: Optional[str] = None) -> Dict:
+    def load_config(config_path: str | None = None) -> dict:
         """Load monitoring configuration"""
         default_config = {
             "watch_directories": [
@@ -277,7 +276,7 @@ class MonitoringConfiguration:
         return default_config
 
     @staticmethod
-    def save_config(config: Dict, config_path: str):
+    def save_config(config: dict, config_path: str):
         """Save configuration to file"""
         try:
             with open(config_path, "w") as f:

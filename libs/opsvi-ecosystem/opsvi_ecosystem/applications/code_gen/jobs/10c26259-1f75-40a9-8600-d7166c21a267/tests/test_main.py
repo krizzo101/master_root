@@ -8,7 +8,6 @@ sys.path.insert(0, SRC_DIR)
 
 import subprocess
 import sys
-from pathlib import Path
 
 
 def test_cli_help():

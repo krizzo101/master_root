@@ -5,8 +5,9 @@ Test Auto-Attach Functionality
 Demonstrates the auto-attach script with various test scenarios.
 """
 
-import sys
 import os
+import sys
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from auto_attach import AutoAttach
@@ -47,7 +48,7 @@ def test_multiple_files():
     # Test with multiple files
     test_files = [
         "libs/opsvi-security/opsvi_security/core.py",
-        "libs/opsvi-core/opsvi_core/core/base.py"
+        "libs/opsvi-core/opsvi_core/core/base.py",
     ]
 
     related_files = auto_attach.find_related_files(test_files)
@@ -79,8 +80,8 @@ def test_file_analysis():
         print(f"Directory: {analysis['directory']}")
         print(f"Imports: {analysis['imports']}")
         print(f"Imported by: {len(analysis['imported_by'])} files")
-        print(f"Related files breakdown:")
-        for category, files in analysis['related_files'].items():
+        print("Related files breakdown:")
+        for category, files in analysis["related_files"].items():
             print(f"  {category}: {len(files)} files")
         print("✅ File analysis test passed")
         return True
@@ -101,7 +102,9 @@ def test_filtering():
         return False
 
     # Get all files
-    all_files = auto_attach.find_related_files(["libs/opsvi-security/opsvi_security/core.py"])
+    all_files = auto_attach.find_related_files(
+        ["libs/opsvi-security/opsvi_security/core.py"]
+    )
 
     # Filter by type
     source_files = auto_attach.filter_files_by_type(all_files, ["source"])
@@ -158,7 +161,7 @@ def main():
         test_multiple_files,
         test_file_analysis,
         test_filtering,
-        test_indexes
+        test_indexes,
     ]
 
     passed = 0

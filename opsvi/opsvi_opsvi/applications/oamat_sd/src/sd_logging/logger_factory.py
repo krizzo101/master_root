@@ -4,11 +4,11 @@ Logger Factory for Smart Decomposition Architecture
 Creates specialized loggers with structured JSON output and intelligent routing.
 """
 
-from datetime import datetime
 import json
 import logging
 import logging.handlers
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any
 
 import structlog
 from structlog.stdlib import LoggerFactory as StructlogLoggerFactory
@@ -61,7 +61,7 @@ class LoggerFactory:
 
     def __init__(self, config: LogConfig, setup_file_handlers: bool = True):
         self.config = config
-        self._loggers: Dict[str, structlog.stdlib.BoundLogger] = {}
+        self._loggers: dict[str, structlog.stdlib.BoundLogger] = {}
         self._file_handlers_setup = False
         self._setup_structlog()
         if setup_file_handlers:
@@ -202,11 +202,11 @@ class LoggerFactory:
         self,
         method: str,
         url: str,
-        request_data: Optional[Dict[str, Any]] = None,
-        response_data: Optional[Dict[str, Any]] = None,
-        status_code: Optional[int] = None,
-        duration_ms: Optional[float] = None,
-        error: Optional[str] = None,
+        request_data: dict[str, Any] | None = None,
+        response_data: dict[str, Any] | None = None,
+        status_code: int | None = None,
+        duration_ms: float | None = None,
+        error: str | None = None,
     ):
         """Log an API call with comprehensive details"""
         api_logger = self.get_api_logger()
@@ -234,10 +234,10 @@ class LoggerFactory:
         self,
         agent_id: str,
         action: str,
-        input_data: Optional[Dict[str, Any]] = None,
-        output_data: Optional[Dict[str, Any]] = None,
-        duration_ms: Optional[float] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        input_data: dict[str, Any] | None = None,
+        output_data: dict[str, Any] | None = None,
+        duration_ms: float | None = None,
+        metadata: dict[str, Any] | None = None,
     ):
         """Log agent interactions and handoffs"""
         workflow_logger = self.get_workflow_logger()
@@ -262,7 +262,7 @@ class LoggerFactory:
     def log_complexity_analysis(
         self,
         user_request: str,
-        factors: Dict[str, float],
+        factors: dict[str, float],
         overall_score: float,
         decision: str,
         reasoning: str,
@@ -285,8 +285,8 @@ class LoggerFactory:
         self,
         operation: str,
         duration_ms: float,
-        resource_usage: Optional[Dict[str, Any]] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        resource_usage: dict[str, Any] | None = None,
+        metadata: dict[str, Any] | None = None,
     ):
         """Log performance and resource usage metrics"""
         performance_logger = self.get_performance_logger()
@@ -308,10 +308,10 @@ class LoggerFactory:
         self,
         workflow_type: str,  # "linear" or "dag"
         agents: list,
-        dependencies: Optional[Dict[str, list]] = None,
-        execution_plan: Optional[Dict[str, Any]] = None,
-        results: Optional[Dict[str, Any]] = None,
-        total_duration_ms: Optional[float] = None,
+        dependencies: dict[str, list] | None = None,
+        execution_plan: dict[str, Any] | None = None,
+        results: dict[str, Any] | None = None,
+        total_duration_ms: float | None = None,
     ):
         """Log complete workflow execution"""
         workflow_logger = self.get_workflow_logger()
@@ -367,7 +367,7 @@ class LoggerFactory:
         execution_time_ms: float = 0,
         success: bool = False,
         correlation_id: str = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ):
         """Log comprehensive tool execution details"""
         tool_logger = self.get_tool_logger(tool_name)
@@ -421,8 +421,8 @@ class LoggerFactory:
         self,
         agent_role: str,
         stage: str,
-        data: Dict[str, Any],
-        execution_time_ms: Optional[float] = None,
+        data: dict[str, Any],
+        execution_time_ms: float | None = None,
     ):
         """Log agent lifecycle events (creation, execution, completion)"""
         agent_logger = self.get_agent_logger(agent_role)
@@ -463,8 +463,8 @@ class LoggerFactory:
         self,
         component: str,
         operation: str,
-        data: Dict[str, Any],
-        execution_time_ms: Optional[float] = None,
+        data: dict[str, Any],
+        execution_time_ms: float | None = None,
         success: bool = True,
     ):
         """Log component operations with context"""
@@ -499,7 +499,7 @@ class LoggerFactory:
         self,
         audit_type: str,
         event: str,
-        data: Dict[str, Any],
+        data: dict[str, Any],
         severity: str = "info",
     ):
         """Log audit and security events"""
@@ -525,9 +525,9 @@ class LoggerFactory:
         self,
         operation: str,
         total_time_ms: float,
-        breakdown: Dict[str, float],
-        bottlenecks: Optional[List[str]] = None,
-        optimization_suggestions: Optional[List[str]] = None,
+        breakdown: dict[str, float],
+        bottlenecks: list[str] | None = None,
+        optimization_suggestions: list[str] | None = None,
     ):
         """Log detailed timing breakdown for performance analysis"""
         performance_logger = self.get_performance_logger()
@@ -551,7 +551,7 @@ class LoggerFactory:
         success_count: int,
         total_count: int,
         success_rate: float,
-        quality_scores: Optional[Dict[str, float]] = None,
+        quality_scores: dict[str, float] | None = None,
     ):
         """Log success rates and quality metrics"""
         performance_logger = self.get_performance_logger()
@@ -573,7 +573,7 @@ class LoggerFactory:
         operation: str,
         memory_peak_mb: float,
         memory_average_mb: float,
-        memory_limit_mb: Optional[float] = None,
+        memory_limit_mb: float | None = None,
     ):
         """Log memory usage metrics"""
         performance_logger = self.get_performance_logger()
@@ -595,7 +595,7 @@ class LoggerFactory:
     def log_request_flow(
         self,
         request_id: str,
-        flow_stages: List[Dict[str, Any]],
+        flow_stages: list[dict[str, Any]],
         total_duration_ms: float,
     ):
         """Log end-to-end request processing flow"""
@@ -616,8 +616,8 @@ class LoggerFactory:
         self,
         error: Exception,
         operation: str,
-        context: Dict[str, Any],
-        recovery_action: Optional[str] = None,
+        context: dict[str, Any],
+        recovery_action: str | None = None,
     ):
         """Log errors with comprehensive context"""
         error_logger = self.get_error_logger()
@@ -841,10 +841,10 @@ class LoggerFactory:
 
 
 # Global logger factory instance
-_logger_factory: Optional[LoggerFactory] = None
+_logger_factory: LoggerFactory | None = None
 
 
-def get_logger_factory(config: Optional[LogConfig] = None) -> LoggerFactory:
+def get_logger_factory(config: LogConfig | None = None) -> LoggerFactory:
     """Get the global logger factory instance"""
     global _logger_factory
 

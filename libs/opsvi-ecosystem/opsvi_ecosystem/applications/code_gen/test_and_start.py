@@ -5,11 +5,11 @@ Automated Test and Application Startup Script
 Tests the system, fixes issues automatically, and starts the application.
 """
 
-import sys
-import subprocess
 import logging
-from pathlib import Path
 import os
+import subprocess
+import sys
+from pathlib import Path
 
 # Setup logging
 logging.basicConfig(

@@ -9,9 +9,8 @@ system, supporting both demo mode and production usage patterns.
 import argparse
 import asyncio
 import logging
-from pathlib import Path
 import sys
-from typing import Optional
+from pathlib import Path
 
 from .agents.research_agent import ResearchAgent
 from .agents.task_agent import TaskAgent
@@ -23,9 +22,7 @@ from .examples.workflow_examples import create_workflow_by_type, get_available_w
 from .orchestrator.workflow_orchestrator import ExecutionPattern, WorkflowOrchestrator
 
 
-def setup_logging(
-    level: str = "INFO", log_file: Optional[str] = None
-) -> logging.Logger:
+def setup_logging(level: str = "INFO", log_file: str | None = None) -> logging.Logger:
     """
     Setup logging configuration.
 
@@ -106,7 +103,7 @@ async def run_demo(
 async def run_single_workflow(
     workflow_type: str,
     work_dir: str = "./workspace",
-    agents_config: Optional[dict] = None,
+    agents_config: dict | None = None,
 ) -> None:
     """
     Run a single workflow.

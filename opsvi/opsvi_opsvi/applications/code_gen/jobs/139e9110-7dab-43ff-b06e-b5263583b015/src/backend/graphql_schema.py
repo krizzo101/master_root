@@ -1,8 +1,9 @@
 """
 GraphQL schema and resolvers using Ariadne for Python
 """
-from ariadne import QueryType, MutationType, make_executable_schema, gql
-from backend.api import list_projects, create_project, list_tasks, create_task
+from ariadne import MutationType, QueryType, gql, make_executable_schema
+
+from backend.api import create_project, create_task, list_projects, list_tasks
 
 type_defs = gql(
     """

@@ -3,9 +3,10 @@
 Simple test script to verify Perplexity integration works.
 """
 
-import os
 import asyncio
-from opsvi_llm.providers import PerplexityProvider, PerplexityConfig
+import os
+
+from opsvi_llm.providers import PerplexityConfig, PerplexityProvider
 from opsvi_llm.providers.base import ChatRequest, Message
 
 

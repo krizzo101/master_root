@@ -6,4 +6,4 @@ result = await orchestrator.run_workflow("insert_artifact", {})
 if result.get("error_message"):
     print(f"  ERROR: {result['error_message']}")
 else:
-    print(f"  SUCCESS.")
+    print("  SUCCESS.")

@@ -14,13 +14,10 @@ Features:
 - Batch processing of multiple scripts
 """
 
-import os
 import re
 import shutil
 from pathlib import Path
-from typing import List, Dict, Set, Tuple
-import ast
-import subprocess
+from typing import List, Dict
 from datetime import datetime
 
 from core_systems.comprehensive_logging_config import get_logger
@@ -687,7 +684,7 @@ def main():
             print(f"🚀 Auto-enhancing {args.enhance_priority} priority scripts...")
             results = enhancer.enhance_all_scripts(priority_filter=priority_filter)
 
-            print(f"\n✅ Enhancement completed:")
+            print("\n✅ Enhancement completed:")
             print(f"  - Enhanced: {results['enhanced']}")
             print(f"  - Failed: {results['failed']}")
             print(f"  - Total: {results['total_scripts']}")
@@ -717,7 +714,7 @@ def main():
         print("🚀 Enhancing high-priority scripts...")
         results = enhancer.enhance_all_scripts(priority_filter="high")
 
-        print(f"\n✅ Enhancement completed:")
+        print("\n✅ Enhancement completed:")
         print(f"  - Enhanced: {results['enhanced']}")
         print(f"  - Failed: {results['failed']}")
         print(f"  - Total: {results['total_scripts']}")

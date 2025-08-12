@@ -41,7 +41,7 @@ def analyze_baseline_results():
 def show_optimized_approach():
     """Show how our optimized approach would have handled this."""
 
-    print(f"\n\n=== OPTIMIZED APPROACH ANALYSIS ===")
+    print("\n\n=== OPTIMIZED APPROACH ANALYSIS ===")
     print("=" * 50)
 
     print("🎯 FIRST ITERATION (RUTHLESS):")
@@ -52,18 +52,18 @@ def show_optimized_approach():
     )
     print("- Prioritize: 'Fix JWT issue first - blocks all other functionality'")
 
-    print(f"\n🔧 SECOND ITERATION (MODERATE):")
+    print("\n🔧 SECOND ITERATION (MODERATE):")
     print("- Focus on remaining critical issues only")
     print("- Address security: 'Protect /config endpoint with authentication'")
     print("- Scalability: 'Replace RateLimiter with Redis-based implementation'")
     print("- Systematic fixes with clear next actions")
 
-    print(f"\n✨ THIRD ITERATION (LIGHT):")
+    print("\n✨ THIRD ITERATION (LIGHT):")
     print("- Only flag issues that prevent code from working")
     print("- Final validation of all fixes")
     print("- Ensure code is production-ready")
 
-    print(f"\n📊 EXPECTED IMPROVEMENTS:")
+    print("\n📊 EXPECTED IMPROVEMENTS:")
     print("- Token Usage: ~7,500 (25% reduction)")
     print("- Time: ~3-4 minutes (vs 4-5 minutes)")
     print("- Quality: Critical issues resolved systematically")
@@ -73,7 +73,7 @@ def show_optimized_approach():
 def detailed_comparison():
     """Detailed comparison of approaches."""
 
-    print(f"\n\n=== DETAILED COMPARISON ===")
+    print("\n\n=== DETAILED COMPARISON ===")
     print("=" * 50)
 
     comparison_data = {
@@ -112,7 +112,7 @@ def detailed_comparison():
 def implementation_benefits():
     """Show the concrete benefits of implementing our optimizations."""
 
-    print(f"\n\n=== IMPLEMENTATION BENEFITS ===")
+    print("\n\n=== IMPLEMENTATION BENEFITS ===")
     print("=" * 50)
 
     print("🎯 IMMEDIATE BENEFITS:")
@@ -121,14 +121,14 @@ def implementation_benefits():
     print("3. Higher quality final output")
     print("4. More actionable feedback")
 
-    print(f"\n🔧 SPECIFIC IMPROVEMENTS:")
+    print("\n🔧 SPECIFIC IMPROVEMENTS:")
     print("1. Structured JSON feedback instead of free-form text")
     print("2. Severity-based issue prioritization")
     print("3. Concrete, actionable fix suggestions")
     print("4. Iteration-specific prompts (ruthless → moderate → light)")
     print("5. Focus on 'it works' over elegance")
 
-    print(f"\n📈 LONG-TERM BENEFITS:")
+    print("\n📈 LONG-TERM BENEFITS:")
     print("1. More efficient use of API tokens")
     print("2. Higher user satisfaction with results")
     print("3. Better code quality and fewer bugs")
@@ -139,7 +139,7 @@ def implementation_benefits():
 def next_steps():
     """Recommend next steps for implementation."""
 
-    print(f"\n\n=== NEXT STEPS ===")
+    print("\n\n=== NEXT STEPS ===")
     print("=" * 50)
 
     print("1. IMPLEMENT OPTIMIZATIONS")
@@ -147,18 +147,18 @@ def next_steps():
     print("   - Update consult_agent_comprehensive.py with new prompts")
     print("   - Test with o3 model integration")
 
-    print(f"\n2. VALIDATION TESTING")
+    print("\n2. VALIDATION TESTING")
     print("   - Run same complex request with optimized system")
     print("   - Compare: token usage, time, quality, critic feedback")
     print("   - Measure improvement in issue resolution")
 
-    print(f"\n3. PRODUCTION DEPLOYMENT")
+    print("\n3. PRODUCTION DEPLOYMENT")
     print("   - Gradual rollout with feature flags")
     print("   - Monitor performance metrics")
     print("   - Collect user feedback")
     print("   - Iterate based on results")
 
-    print(f"\n4. EXPECTED OUTCOMES")
+    print("\n4. EXPECTED OUTCOMES")
     print("   - 25% reduction in token usage")
     print("   - Faster resolution of critical issues")
     print("   - Higher quality final output")

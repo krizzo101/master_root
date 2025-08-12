@@ -1,5 +1,5 @@
-import pytest
 import csv_reporter.report_generator as rg
+import pytest
 
 
 @pytest.fixture

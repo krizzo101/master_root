@@ -1,6 +1,5 @@
-import pytest
-from unittest.mock import patch
 import ai_service.main as main
+import pytest
 
 
 @pytest.fixture

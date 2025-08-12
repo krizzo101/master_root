@@ -7,8 +7,8 @@ This script demonstrates the core functionality of the Smart Decomposition syste
 """
 
 import asyncio
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Add the POC to the Python path
 poc_path = Path(__file__).parent

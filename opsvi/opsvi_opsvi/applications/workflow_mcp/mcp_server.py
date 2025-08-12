@@ -1,5 +1,4 @@
 import logging
-from typing import List
 
 from fastapi import FastAPI, HTTPException
 
@@ -56,7 +55,7 @@ def get_workflow(workflow_id: str):
     return doc["document"]
 
 
-@app.get("/workflows", response_model=List[WorkflowResponse])
+@app.get("/workflows", response_model=list[WorkflowResponse])
 def list_workflows(skip: int = 0, limit: int = 50):
     logger.debug(f"GET /workflows called with skip={skip}, limit={limit}")
     docs = db.list_workflows(skip=skip, limit=limit)
@@ -129,7 +128,7 @@ def run_workflow(workflow_id: str, run: WorkflowRunCreate):
     return doc["document"]
 
 
-@app.get("/runs", response_model=List[WorkflowRunResponse])
+@app.get("/runs", response_model=list[WorkflowRunResponse])
 def list_runs(skip: int = 0, limit: int = 50):
     logger.debug(f"GET /runs called with skip={skip}, limit={limit}")
     docs = db.list_runs(skip=skip, limit=limit)

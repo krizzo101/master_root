@@ -1,17 +1,12 @@
 from __future__ import annotations
 import logging
-from typing import List, Tuple, Optional
-from datetime import datetime, timedelta
+from typing import List
 import hashlib
 
-from .models import Snippet, RetrievalConfig, GraphPath
+from .models import Snippet, RetrievalConfig
 
 # Import inside functions to avoid circular imports
 from opsvi_auto_forge.infrastructure.monitoring.metrics.hooks import time_retriever
-from opsvi_auto_forge.infrastructure.monitoring.metrics.decision_metrics import (
-    retrieval_latency,
-    evidence_coverage,
-)
 
 logger = logging.getLogger(__name__)
 

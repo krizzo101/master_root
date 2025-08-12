@@ -478,7 +478,7 @@ class BestIdeaSelector:
 
         rationale_parts = [
             f"Selected '{best_idea.get('title', 'Untitled')}' as the optimal solution for '{original_problem}'.",
-            f"",
+            "",
             f"Selection Score: {best_score:.2f} out of 1.0",
             f"Evaluated against {num_ideas} total ideas"
             + (
@@ -486,8 +486,8 @@ class BestIdeaSelector:
                 if score_margin > 0
                 else "."
             ),
-            f"",
-            f"Key Strengths:",
+            "",
+            "Key Strengths:",
         ]
 
         # Add top scoring criteria
@@ -499,8 +499,8 @@ class BestIdeaSelector:
             )
 
         # Add specific reasons based on top criterion
-        rationale_parts.append(f"")
-        rationale_parts.append(f"Primary Selection Factors:")
+        rationale_parts.append("")
+        rationale_parts.append("Primary Selection Factors:")
 
         if top_criterion == "feasibility":
             rationale_parts.append(
@@ -532,8 +532,8 @@ class BestIdeaSelector:
         if best_idea.get("description"):
             rationale_parts.extend(
                 [
-                    f"",
-                    f"Idea Description:",
+                    "",
+                    "Idea Description:",
                     f"{best_idea['description']}",
                 ]
             )

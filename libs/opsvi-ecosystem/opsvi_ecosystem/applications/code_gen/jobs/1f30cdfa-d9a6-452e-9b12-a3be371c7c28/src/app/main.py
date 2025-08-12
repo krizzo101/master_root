@@ -1,10 +1,12 @@
 import logging
-from fastapi import FastAPI, Depends, HTTPException, status, Request
+
+from fastapi import Depends, FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from starlette.middleware.base import BaseHTTPMiddleware
-from app import crud, models, schemas, database
+
+from app import crud, database, schemas
 from app.exceptions import NotFoundException, ValidationException
 
 # Configure logging

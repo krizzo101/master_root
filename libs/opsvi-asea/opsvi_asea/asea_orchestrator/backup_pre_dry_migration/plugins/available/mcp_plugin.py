@@ -1,10 +1,9 @@
 from typing import List, Any, Optional, Dict
-import os
 import asyncio
 import logging
 
 from mcp.client.session import ClientSession
-from mcp.client.stdio import StdioServerParameters, stdio_client
+from mcp.client.stdio import StdioServerParameters
 
 from asea_orchestrator.plugins.base_plugin import BasePlugin, EventBus
 from asea_orchestrator.plugins.types import (

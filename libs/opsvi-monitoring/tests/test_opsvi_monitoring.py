@@ -4,13 +4,11 @@ Tests for opsvi-monitoring components
 """
 
 import pytest
-import asyncio
-from unittest.mock import Mock, patch, AsyncMock
-from typing import Any, Dict, List
 
 from opsvi_monitoring import OpsviMonitoringManager
 from opsvi_monitoring.config.settings import OpsviMonitoringConfig
 from opsvi_monitoring.exceptions.base import OpsviMonitoringError
+
 
 class TestOpsviMonitoring:
     """Test cases for opsvi-monitoring."""
@@ -36,7 +34,7 @@ class TestOpsviMonitoring:
         """Test component start and stop."""
         await component.start()
         assert component.is_active()
-        
+
         await component.stop()
         assert not component.is_active()
 
@@ -54,4 +52,3 @@ class TestOpsviMonitoring:
             pass
 
     # Component-specific tests
-    

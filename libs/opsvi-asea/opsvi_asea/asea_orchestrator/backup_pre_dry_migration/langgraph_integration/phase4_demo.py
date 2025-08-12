@@ -10,10 +10,8 @@ Demonstrates the full Phase 4 capabilities:
 6. Production Configuration and Deployment
 """
 
-import asyncio
 import json
 import time
-import uuid
 from typing import Dict, Any
 import sys
 from pathlib import Path
@@ -32,7 +30,7 @@ except ImportError:
     print("Testing dependencies not available. Install with: pip install httpx")
 
 from .api_gateway import create_api_gateway
-from .production_config import ProductionConfig, create_production_app
+from .production_config import ProductionConfig
 
 
 class APIGatewayTester:
@@ -226,7 +224,7 @@ class APIGatewayTester:
 
             if response.status_code == 200:
                 result = response.json()
-                print(f"✅ Synchronous execution successful")
+                print("✅ Synchronous execution successful")
                 print(f"   Execution ID: {result['execution_id']}")
                 print(f"   Status: {result['status']}")
                 print(f"   Execution Time: {execution_time:.2f}s")
@@ -280,7 +278,7 @@ class APIGatewayTester:
                 result = response.json()
                 execution_id = result["execution_id"]
 
-                print(f"✅ Async execution queued")
+                print("✅ Async execution queued")
                 print(f"   Execution ID: {execution_id}")
                 print(f"   Status: {result['status']}")
 
@@ -336,7 +334,7 @@ class APIGatewayTester:
 
             if response.status_code == 200:
                 metrics = response.json()
-                print(f"✅ Metrics retrieved successfully")
+                print("✅ Metrics retrieved successfully")
                 print(f"   Metric Categories: {len(metrics)}")
 
                 # Show some key metrics

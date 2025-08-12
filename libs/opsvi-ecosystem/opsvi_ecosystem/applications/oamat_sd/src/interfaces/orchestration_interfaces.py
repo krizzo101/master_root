@@ -6,7 +6,7 @@ workflow generation and adaptive coordination.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List
+from typing import Any
 
 from src.applications.oamat_sd.src.models.data_models import (
     AgentState,
@@ -17,7 +17,7 @@ class ILangGraphOrchestrator(ABC):
     """Interface for dynamic LangGraph workflow orchestration"""
 
     @abstractmethod
-    async def build_dynamic_workflow(self, workflow_spec: Dict[str, Any]) -> Any:
+    async def build_dynamic_workflow(self, workflow_spec: dict[str, Any]) -> Any:
         """
         Build LangGraph workflow from dynamically generated specifications
 
@@ -29,7 +29,7 @@ class ILangGraphOrchestrator(ABC):
     @abstractmethod
     async def execute_adaptive_workflow(
         self, workflow: Any, initial_state: AgentState
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute workflow with adaptive coordination
 
@@ -40,8 +40,8 @@ class ILangGraphOrchestrator(ABC):
 
     @abstractmethod
     async def coordinate_agents_dynamically(
-        self, agents: List[Any], coordination_plan: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, agents: list[Any], coordination_plan: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Coordinate agents using dynamically generated coordination strategies
 
@@ -52,7 +52,7 @@ class ILangGraphOrchestrator(ABC):
 
     @abstractmethod
     async def adapt_workflow_realtime(
-        self, workflow: Any, execution_state: Dict[str, Any]
+        self, workflow: Any, execution_state: dict[str, Any]
     ) -> Any:
         """
         Adapt workflow structure during execution based on results
@@ -68,8 +68,8 @@ class IMCPToolRegistry(ABC):
 
     @abstractmethod
     async def select_tools_intelligently(
-        self, requirements: Dict[str, Any]
-    ) -> List[Any]:
+        self, requirements: dict[str, Any]
+    ) -> list[Any]:
         """
         Intelligently select tools based on contextual analysis
 
@@ -80,8 +80,8 @@ class IMCPToolRegistry(ABC):
 
     @abstractmethod
     async def optimize_tool_usage(
-        self, tools: List[Any], execution_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, tools: list[Any], execution_context: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Optimize tool usage patterns based on context
 
@@ -92,8 +92,8 @@ class IMCPToolRegistry(ABC):
 
     @abstractmethod
     async def monitor_tool_performance_adaptively(
-        self, tools: List[Any]
-    ) -> Dict[str, Any]:
+        self, tools: list[Any]
+    ) -> dict[str, Any]:
         """
         Adaptively monitor and adjust tool performance
 

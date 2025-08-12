@@ -5,11 +5,10 @@ import openai
 import tiktoken
 
 logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
-from typing import Dict, List
 
 
 # Stub for OpenAI embedding API call
-def get_openai_embedding(text: str) -> List[float]:
+def get_openai_embedding(text: str) -> list[float]:
     try:
         model = os.environ.get("OAMAT_EMBEDDING_MODEL", "text-embedding-3-small")
         if not model:
@@ -39,7 +38,7 @@ def get_openai_embedding(text: str) -> List[float]:
         return [0.0] * 1536  # Return a dummy embedding for stub/demo mode
 
 
-def chunk_text(text: str, chunk_size: int = 1500, overlap: int = 200) -> List[str]:
+def chunk_text(text: str, chunk_size: int = 1500, overlap: int = 200) -> list[str]:
     """
     Split text into chunks of chunk_size tokens with overlap.
     """
@@ -58,7 +57,7 @@ def chunk_text(text: str, chunk_size: int = 1500, overlap: int = 200) -> List[st
     return chunks
 
 
-def chunk_and_embed_document(text: str) -> List[Dict]:
+def chunk_and_embed_document(text: str) -> list[dict]:
     """
     Chunk text and embed each chunk. Returns list of dicts with 'text' and 'embedding'.
     """

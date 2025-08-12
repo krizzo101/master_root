@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from shared.mcp.brave_mcp_search import BraveMCPSearch
 
@@ -7,7 +6,7 @@ from .expert_agent import ExpertAgent
 
 
 class ResearcherAgent(ExpertAgent):
-    def __init__(self, system_message: Optional[str] = None):
+    def __init__(self, system_message: str | None = None):
         super().__init__(
             name="Researcher",
             specialty="Research",
