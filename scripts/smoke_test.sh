@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-export OPENAI_API_KEY=sk-dummy-key-for-offline-mode
+export OPENAI_API_KEY=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
 export PERPLEXITY_API_KEY=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
 export OFFLINE_MODE=true
 docker-compose up -d --build

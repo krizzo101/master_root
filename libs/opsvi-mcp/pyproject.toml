@@ -13,7 +13,14 @@ dependencies = [
     "opsvi-foundation>=0.1.0",
     "pydantic>=2.0.0",
     "pydantic-settings>=2.0.0",
+    "fastmcp>=2.0.0",
+    "psutil>=5.9.0",
+    "python-dotenv>=1.0.0",
+    "uvloop>=0.19.0",
 ]
+
+[project.scripts]
+claude-code-server = "opsvi_mcp.servers.claude_code:main"
 
 [project.optional-dependencies]
 dev = [

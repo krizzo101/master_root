@@ -7,5 +7,4 @@ from .settings import OpsviAgentsSettings, get_settings
 
 __all__ = [
     "OpsviAgentsSettings",
-    "get_settings",
-]
+    "get_settings"]

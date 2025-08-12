@@ -8,5 +8,4 @@ from .base import Error, ConfigurationError, InitializationError
 __all__ = [
     "Error",
     "ConfigurationError",
-    "InitializationError",
-]
+    "InitializationError"]

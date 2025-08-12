@@ -13,11 +13,14 @@ async def test_ask_endpoint(monkeypatch):
             "citations": [],
             "generation_ts": "2025-01-01T00:00:00Z",
             "audit_id": "test",
-            "model_signature": "test"
+            "model_signature": "test",
         }
 
     from src.core import research_service as rs_module
-    monkeypatch.setattr(rs_module.ResearchService, "handle_query", staticmethod(mock_handle))
+
+    monkeypatch.setattr(
+        rs_module.ResearchService, "handle_query", staticmethod(mock_handle)
+    )
 
     client = TestClient(app)
     resp = client.post("/ask", json={"query": "test"})

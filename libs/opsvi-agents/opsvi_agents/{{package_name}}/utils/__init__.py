@@ -1,2 +1,2 @@
-"""{{package_name}}.utils. module."""
+""".utils. module."""
 

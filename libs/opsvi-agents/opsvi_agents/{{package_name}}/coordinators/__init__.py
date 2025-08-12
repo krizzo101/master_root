@@ -1,2 +1,2 @@
-"""{{package_name}}.coordinators. module."""
+""".coordinators. module."""
 

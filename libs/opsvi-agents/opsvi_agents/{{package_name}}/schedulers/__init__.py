@@ -1,2 +1,2 @@
-"""{{package_name}}.schedulers. module."""
+""".schedulers. module."""
 

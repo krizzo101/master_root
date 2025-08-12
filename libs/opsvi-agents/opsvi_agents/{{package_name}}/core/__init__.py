@@ -1,2 +1,2 @@
-"""{{package_name}}.core. module."""
+""".core. module."""
 

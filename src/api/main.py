@@ -12,10 +12,12 @@ class AskRequest(BaseModel):
     query: str
 
 
-@app.post("/ask")
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
+
+
+@app.post("/ask")
 async def ask(req: AskRequest):
     try:
         resp = await service.handle_query(req.query)

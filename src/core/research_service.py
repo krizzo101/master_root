@@ -25,13 +25,15 @@ class ResearchService:
             text_to_chunk = res.snippet or res.title or ""
             for idx, chunk in enumerate(chunk_text(text_to_chunk, 100)):
                 texts.append(chunk)
-                payloads.append({
-                    "source_url": res.url,
-                    "title": res.title,
-                    "text": chunk,
-                    "chunk_index": idx,
-                    "created": datetime.utcnow().isoformat(),
-                })
+                payloads.append(
+                    {
+                        "source_url": res.url,
+                        "title": res.title,
+                        "text": chunk,
+                        "chunk_index": idx,
+                        "created": datetime.utcnow().isoformat(),
+                    }
+                )
         if texts:
             embed_resp = await self.openai.embed_texts(texts)
             await self.qdrant.upsert_chunks(embed_resp.embeddings, payloads)
@@ -48,7 +50,7 @@ class ResearchService:
                     chunk_id=str(hit.id),
                     source_url=payload.get("source_url", "http://example.com"),
                     title=payload.get("title"),
-                    snippet=payload.get("text", "")
+                    snippet=payload.get("text", ""),
                 )
             )
             snippets.append(payload.get("text", ""))

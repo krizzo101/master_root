@@ -1,7 +1,7 @@
 """Configuration settings for opsvi-data."""
 
-from pydantic import BaseSettings, Field, validator
-from pydantic_settings import SettingsConfigDict
+from pydantic import Field, validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class OpsviDataSettings(BaseSettings):

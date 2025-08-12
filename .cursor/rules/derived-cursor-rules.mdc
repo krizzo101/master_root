@@ -25,6 +25,7 @@ This document outlines the rules, guidelines, and best practices for the AI codi
 *   mypy
 *   ruff
 *   pydantic-settings
+*   tsx
 
 ## PROJECT DOCUMENTATION & CONTEXT SYSTEM
 
@@ -38,7 +39,7 @@ This document outlines the rules, guidelines, and best practices for the AI codi
     *   `.proj-intel/project_analysis.jsonl`: Primary analysis data.
     *   `.proj-intel/project_analysis.index.json`: Index for selective reads.
     *   `.proj-intel/reverse_index.json`: O(1) path lookup.
-    *   `.proj-intel/agent_architecture.jsonl`: Agent class definitions.
+    *   `agent_architecture.jsonl`: Agent class definitions.
     *   `INTEGRATIONS_DIRECTORY_TREE.md`: Detailed integration mapping.
 
 ## CODING STANDARDS
@@ -103,7 +104,7 @@ This document outlines the rules, guidelines, and best practices for the AI codi
     *   Number of user prompts (detects formats like `_**User**_`, `User:`, `User input:`, `Human:`, `<user>`, `User says:`, etc.)
     *   Number of assistant responses (detects formats like `_**Assistant**_`, `Assistant:`, `AI:`, `<assistant>`, `Response:`, `Bot:`, etc.)
     *   Number of tool calls without a preceding `<think>` tag
-    *   Number of thoughts `<think>`
+    *   Number of thoughts `<think> </think> </think>` pairs
     *   Tool Calls per Line (Percentage)
     *   Thoughts per Line (Percentage)
     *   Assistant/User Ratio
@@ -344,13 +345,22 @@ The agent_world is eventually going away, so the following steps need to be take
 
 ## Using Shell Exec
 
-Always use `shell_exec`, not `run_terminal`
+Always use `shell_exec`, not `run_terminal_cmd`
+
+When extracting or manipulating files, the AI should:
+*   Log the current directory.
+*   List all files in the target directory.
+*   Check the git status if the target directory is a git repository.
+*   Request human confirmation before performing actions, especially if multiple files match the criteria.
+*   If multiple files match the criteria, use a loop or wildcard to process all matching files.
+*   Ensure the target directory exists before attempting to change into it.
+*   After extracting files, the AI should ask if the user wants to remove the archive or list the extracted contents.
 
 ## Consult Agent Usage Rules
 
 ### Core Purpose
 
-This rule governs how to properly integrate and use consult agents for development tasks requiring expert guidance, complex planning, production-ready code generation, or architectural decision-making.
+This rule governs how to properly integrate and use consult agents for development tasks requiring expert guidance, complex planning, production-ready code generation, or architectural decision-making. **Use when INTEGRATING CONSULT AGENTS to ENFORCE PATTERNS for QUALITY DEVELOPMENT**
 
 ### Key Requirements
 
@@ -382,7 +392,7 @@ The rule specifies WHEN to use consult agents:
 - **Architecture Planning**: ROLE + OBJECTIVE + CONTEXT + DELIVERABLES + FORMAT + RULES
 - **Documentation**: TARGET_AUDIENCE + DOC_TYPE + PRODUCT_CONTEXT + MUST_INCLUDE + TONE
 
-Always use `shell_exec`, not `run_terminal`
+Always use `shell_exec`, not `run_terminal_cmd`
 
 #### New Rule: Parameter Optimization
 - **Auto-Selection Trust**: Let intelligent gatekeeper determine optimal parameters
@@ -391,6 +401,7 @@ Always use `shell_exec`, not `run_terminal`
 - **Iteration Strategy**: 1 for simple tasks, 2 for complex, 3 for critical systems
 
 #### New Rule: Pattern Recognition Triggers
+
 The rule specifies WHEN to use consult agents:
 - Development tasks requiring expert guidance
 - Complex implementation planning
@@ -398,11 +409,12 @@ The rule specifies WHEN to use consult agents:
 - Architectural decision-making
 
 #### New Rule: Prompt Engineering Patterns
+
 - **Code Generation**: TASK + LANGUAGE/RUNTIME + INPUTS + CONSTRAINTS + OUTPUT_FORMAT
 - **Architecture Planning**: ROLE + OBJECTIVE + CONTEXT + DELIVERABLES + FORMAT + RULES
 - **Documentation**: TARGET_AUDIENCE + DOC_TYPE + PRODUCT_CONTEXT + MUST_INCLUDE + TONE
 
-Always use `shell_exec`, not `run_terminal`
+Always use `shell_exec`, not `run_terminal_cmd`
 
 ### Example Consult Agent Call
 When using a consult agent, ensure the following parameters are included in the request:
@@ -509,7 +521,7 @@ messages = [
 
         ## FORBIDDEN ACTIONS
         - Do not use deprecated libraries
-        - Do not hardcode sensitive data
+        - do not hardcode sensitive data
         - Do not skip input validation
         """
     },
@@ -564,7 +576,7 @@ response = client.responses.create(
     Finally, implement with comprehensive validation.
 
     ## OUTPUT STANDARDS
-    - Include step-by-step reasoning
+    - Include step by step reasoning
     - Provide code with error handling
     - Explain design decisions
     """,
@@ -830,19 +842,5 @@ async def real_time_code_generation():
         if partial_code.code:
             syntax_check(partial_code.code)
         if partial_code.dependencies:
-            validate_dependencies(partial_code.dependencies)
+            validate_
 ```
-
-## Security and Privacy (ENHANCED 2025)
-
-```python
-# ✅ COMPREHENSIVE SECURITY PATTERNS
-import re
-from typing import Dict, Any
-
-class DataSanitizer:
-    """Enhanced data sanitization for API calls"""
-
-    PII_PATTERNS = {
-        'email': r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
-        'phone': r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b',

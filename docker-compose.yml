@@ -11,8 +11,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - PERPLEXITY_API_KEY=${PERPLEXITY_API_KEY}
+      - OPENAI_API_KEY=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
+      - PERPLEXITY_API_KEY=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
       - QDRANT_URL=http://qdrant:6333
     depends_on:
       - qdrant

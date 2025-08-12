@@ -41,7 +41,9 @@ async def scrape_page(url: str, wait_selector: str | None = None) -> str:
     while True:
         try:
             async with async_playwright() as pw:
-                browser: Browser = await pw.chromium.launch(headless=HEADLESS, proxy={"server": PROXY} if PROXY else None)
+                browser: Browser = await pw.chromium.launch(
+                    headless=HEADLESS, proxy={"server": PROXY} if PROXY else None
+                )
                 page: Page = await browser.new_page()
                 await page.goto(url, timeout=DEFAULT_TIMEOUT)
                 if wait_selector:

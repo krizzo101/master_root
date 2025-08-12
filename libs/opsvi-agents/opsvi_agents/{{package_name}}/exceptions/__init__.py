@@ -1,2 +1,2 @@
-"""{{package_name}}.exceptions. module."""
+""".exceptions. module."""
 

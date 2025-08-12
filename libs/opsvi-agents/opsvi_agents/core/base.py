@@ -34,12 +34,13 @@ class Config(BaseSettings):
     log_level: str = "INFO"
 
     # Component-specific configuration
-    
+    max_retries: int = 3
+    timeout: int = 30
 
     class Config:
         env_prefix = "OPSVI_OPSVI_AGENTS__"
 
-class (BaseComponent):
+class BaseAgent(BaseComponent):
     """Base class for opsvi-agents components.
 
     Provides base functionality for all opsvi-agents components

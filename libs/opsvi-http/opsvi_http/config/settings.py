@@ -4,8 +4,8 @@
 """
 
 from typing import Any, Dict, List, Optional, Union
-from pydantic import BaseSettings, Field, validator
-from pydantic_settings import SettingsConfigDict
+from pydantic import Field, validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class OpsviHttpSettings(BaseSettings):
     """Settings for opsvi-http."""
