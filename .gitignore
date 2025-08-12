@@ -362,3 +362,70 @@ apps
 results_gpt5
 knowledge
 backups
+
+# Additional patterns for comprehensive coverage
+# Log files in subdirectories
+**/log/
+**/logs/
+**/*.log
+
+# Environment files (except examples)
+.env
+.env.*
+!.env.example
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary and test files
+*.tmp
+*.temp
+test_*.py
+*_test.py
+*_tests.py
+
+# Build and distribution
+build/
+dist/
+*.egg-info/
+
+# Coverage and testing
+.coverage
+.pytest_cache/
+htmlcov/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# MCP and AI specific
+mcp-shell.log
+*.mcp.log
+ai_*.log
+claude_*.log
+
+# Workflow and automation
+workflow_*.py
+recursive_*.py
+multi_step_*.py
+chain_*.py
+
+# Results and outputs
+results_*/
+output_*/
+generated_*/
+temp_*/
