@@ -468,6 +468,7 @@ current_time = current_time(format="YYYY-MM-DD HH:mm:ss")
 
 **APPROVED MODELS ONLY**: o3, o4 series, GPT-5 series
 **gpt-4o series models are FORBIDDEN**
+**NO GPT-3.5 MODELS**
 
 | Use‑Case                   | Primary Model                  | Alternative         | Notes                               |
 | ----- | --- | ---- | ----- |
@@ -582,7 +583,7 @@ response = client.responses.create(
     Finally, implement with comprehensive validation.
 
     ## OUTPUT STANDARDS
-    - Include step by step reasoning
+    - Include step-by-step reasoning
     - Provide code with error handling
     - Explain design decisions
     """,
@@ -825,4 +826,4 @@ def stream_structured_response(prompt: str, schema: BaseModel):
             elif event.type == "response.output_text.partial":
                 # Validate partial structure
                 try:
-                    partial_obj = schema.model_validate_json(event.
+                    partial_

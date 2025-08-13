@@ -11,7 +11,7 @@ import subprocess
 import uuid
 import time
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 import logging
 import websockets
 import aiofiles

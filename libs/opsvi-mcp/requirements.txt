@@ -1,0 +1,31 @@
+# Core MCP Framework
+fastmcp>=0.1.0
+
+# OpenAI Integration
+openai>=1.0.0
+
+# Async Support
+aiofiles>=23.0.0
+websockets>=11.0.0
+
+# Data Models
+pydantic>=2.0.0
+
+# Configuration
+pyyaml>=6.0.0
+
+# Claude Code Dependencies (if not using API)
+# anthropic>=0.18.0
+
+# Logging and Monitoring
+python-json-logger>=2.0.0
+
+# Testing (optional)
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.0.0
+
+# Development (optional)
+black>=23.0.0
+ruff>=0.1.0
+mypy>=1.0.0
