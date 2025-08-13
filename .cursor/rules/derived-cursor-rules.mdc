@@ -482,6 +482,7 @@ current_time = current_time(format="YYYY-MM-DD HH:mm:ss")
 - **OAMAT-SD Application**: MUST use `o4-mini` (reasoning) and `gpt-5-mini` (agents)
 - **Structured Outputs**: Use `gpt-5-mini` or `gpt-5` for JSON schema compliance
 - **NO GPT-4O VARIANTS**: Only o3, o4, and GPT-5 series approved for use
+- **NO GPT-3.5 MODELS**
 - **Resolution**: Use appropriate model for specific requirements, document conflicts
 
 ### Latest Responses API Patterns (2025 PREFERRED)
@@ -528,7 +529,7 @@ messages = [
 
         ## FORBIDDEN ACTIONS
         - Do not use deprecated libraries
-        - do not hardcode sensitive data
+        - Do not hardcode sensitive data
         - Do not skip input validation
         """
     },
@@ -776,6 +777,8 @@ def safe_api_call(**kwargs) -> Union[dict, None]:
                 raise OpenAITokenLimitError("Token limit exceeded - increase max_tokens")
             elif response.incomplete_details.reason == "content_filter":
                 raise OpenAIContentFilterError("Content filtered - revise input")
+            elif response.incomplete_details.reason == "max_model_tokens":
+                raise OpenAITokenLimitError("Model token limit exceeded - use a model with higher context")
             else:
                 raise OpenAIIncompleteError(f"Incomplete response: {response.incomplete_details.reason}")
 
@@ -820,10 +823,3 @@ def stream_structured_response(prompt: str, schema: BaseModel):
 
         for event in stream:
             if event.type == "response.output_text.delta":
-                # Process incremental structured data
-                process_delta(event.delta, accumulated_data)
-
-            elif event.type == "response.output_text.partial":
-                # Validate partial structure
-                try:
-                    partial_

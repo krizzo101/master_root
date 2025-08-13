@@ -1,6 +1,7 @@
 """
 Configuration & Secrets management for Multi-Agent CLI Tool
 """
+
 from pathlib import Path
 
 from dotenv import load_dotenv

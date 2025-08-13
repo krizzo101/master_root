@@ -8,7 +8,7 @@ httpx dependency issues. It includes comprehensive logging for debugging and mon
 Key improvements:
 - Modern AsyncOpenAI initialization (no httpx parameters)
 - Proper error handling and logging
-- Cost tracking and budget management  
+- Cost tracking and budget management
 - Structured outputs with fallback approaches
 - Performance monitoring and debug logging
 - Following established codebase patterns
@@ -343,12 +343,16 @@ class AutonomousOpenAIClient:
             # Extract response data
             content = response.output_text
             usage = TokenUsage(
-                input_tokens=response.usage.input_tokens
-                if hasattr(response.usage, "input_tokens")
-                else response.usage.prompt_tokens,
-                output_tokens=response.usage.output_tokens
-                if hasattr(response.usage, "output_tokens")
-                else response.usage.completion_tokens,
+                input_tokens=(
+                    response.usage.input_tokens
+                    if hasattr(response.usage, "input_tokens")
+                    else response.usage.prompt_tokens
+                ),
+                output_tokens=(
+                    response.usage.output_tokens
+                    if hasattr(response.usage, "output_tokens")
+                    else response.usage.completion_tokens
+                ),
                 total_tokens=response.usage.total_tokens,
             )
 
@@ -446,7 +450,7 @@ class AutonomousOpenAIClient:
             # Enhanced instructions for JSON requirement
             enhanced_instructions = f"""{instructions}
 
-IMPORTANT: You must respond with valid JSON that exactly matches the required schema. 
+IMPORTANT: You must respond with valid JSON that exactly matches the required schema.
 Do not include any text outside the JSON structure."""
 
             # Create completion with structured output
@@ -572,12 +576,12 @@ Do not include any text outside the JSON structure."""
             "request_count": self.request_count,
             "total_cost": self.total_cost,
             "budget_limit": self.budget_limit,
-            "budget_remaining": self.budget_limit - self.total_cost
-            if self.budget_limit
-            else None,
-            "average_cost_per_request": self.total_cost / self.request_count
-            if self.request_count > 0
-            else 0,
+            "budget_remaining": (
+                self.budget_limit - self.total_cost if self.budget_limit else None
+            ),
+            "average_cost_per_request": (
+                self.total_cost / self.request_count if self.request_count > 0 else 0
+            ),
         }
 
     def get_optimal_model(

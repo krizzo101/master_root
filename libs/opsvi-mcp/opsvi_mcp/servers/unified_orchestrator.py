@@ -415,8 +415,8 @@ class UnifiedMCPOrchestrator:
         await self.mcp.run()
 
 
-# Entry point
-if __name__ == "__main__":
+def main():
+    """Main entry point for the unified orchestrator"""
     import asyncio
 
     # Setup logging
@@ -437,3 +437,8 @@ if __name__ == "__main__":
     # Run orchestrator
     orchestrator = UnifiedMCPOrchestrator()
     asyncio.run(orchestrator.run())
+
+
+# Entry point
+if __name__ == "__main__":
+    main()

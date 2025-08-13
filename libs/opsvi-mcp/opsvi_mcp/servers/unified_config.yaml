@@ -6,61 +6,45 @@ servers:
     enabled: true
     version: v2  # Use v2 with fire-and-forget pattern
     config:
-      token: ${CLAUDE_CODE_TOKEN}
-      results_dir: /tmp/claude_results
-      max_concurrent_l1: 10
-      max_recursion: 3
+      claude_token: ${CLAUDE_CODE_TOKEN}
+      default_results_dir: /tmp/claude_results
+      max_concurrent_first_level: 10
+      max_recursion_depth: 3
       default_timeout: 600
-      enable_children: true
+      enable_child_management: true
       child_timeout_ratio: 0.5
     
   openai_codex:
     enabled: true
     config:
-      api_key: ${OPENAI_API_KEY}
+      openai_api_key: ${OPENAI_API_KEY}
       model: gpt-4  # or gpt-4-turbo-preview
       max_tokens: 2000
       temperature: 0.7
       streaming: false
-      cache:
-        enabled: true
-        dir: /tmp/codex_cache
-        ttl: 3600
-      context:
-        window: 8000
-        include_files: true
-        max_files: 5
+      enable_cache: true
+      cache_dir: /tmp/codex_cache
+      cache_ttl: 3600
+      context_window: 8000
+      include_file_context: true
     
   cursor_agent:
     enabled: true
     config:
-      executable: cursor
-      workspace: ${CURSOR_WORKSPACE}
-      communication:
-        method: websocket  # websocket, file, pipe, cli
-        websocket:
-          host: localhost
-          port: 7070
-        file:
-          watch_dir: .cursor/agent_requests
-          output_dir: .cursor/agent_outputs
-      agents:
-        default:
-          - "@diagram"
-          - "@code_review"
-          - "@documentation"
-          - "@test"
-          - "@refactor"
-        custom_dir: .cursor/prompts
-        timeout: 60
-      diagram:
-        theme: high-contrast
-        format: mermaid
-        auto_render: true
-      security:
-        require_confirmation: false
-        allowed_agents: null  # null means all allowed
-        blocked_agents: []
+      cursor_executable: cursor
+      cursor_workspace: ${CURSOR_WORKSPACE}
+      communication_method: websocket  # websocket, file, pipe, cli
+      websocket_host: localhost
+      websocket_port: 7070
+      file_watch_dir: .cursor/agent_requests
+      output_dir: .cursor/agent_outputs
+      custom_agents_dir: .cursor/prompts
+      agent_timeout: 60
+      diagram_theme: high-contrast
+      diagram_format: mermaid
+      diagram_auto_render: true
+      require_confirmation: false
+      # Note: allowed_agents and blocked_agents are set via environment variables
 
 # Integration patterns between servers
 integrations:

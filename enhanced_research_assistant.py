@@ -88,9 +88,7 @@ class EnhancedResearchAssistant:
                 await self.perplexity_provider.initialize()
                 print("  ✅ Perplexity provider initialized")
             else:
-                print(
-                    "  ⚠️  Perplexity API key not found, skipping Perplexity provider"
-                )
+                print("  ⚠️  Perplexity API key not found, skipping Perplexity provider")
 
             if not self.openai_provider and not self.perplexity_provider:
                 raise Exception(
