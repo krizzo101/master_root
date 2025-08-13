@@ -9,7 +9,7 @@ import sys
 import os
 
 # Set up environment for MCP
-os.environ['PYTHONPATH'] = '/home/opsvi/master_root/libs'
+os.environ["PYTHONPATH"] = "/home/opsvi/master_root/libs"
 
 # Import FastMCP for creating the MCP client
 from fastmcp import FastMCP
@@ -18,14 +18,14 @@ from fastmcp.exceptions import *
 
 async def run_recursive_analysis():
     """Run a multi-level recursive task."""
-    
+
     # Initialize FastMCP client
     mcp = FastMCP("claude-code-recursive-demo")
-    
+
     print("=" * 70)
     print("RECURSIVE CLAUDE CODE TASK DEMONSTRATION")
     print("=" * 70)
-    
+
     # Level 1: Main task that spawns child tasks
     main_task = """
     This is a recursive task demonstration. Please:
@@ -35,11 +35,11 @@ async def run_recursive_analysis():
     3. Report the child's output
     4. Confirm task completion
     """
-    
+
     print("\nMAIN TASK (Depth 0):")
     print(main_task)
     print("-" * 70)
-    
+
     # Connect to the Claude Code wrapper MCP server
     async with mcp:
         # Call the claude_run tool
@@ -49,17 +49,18 @@ async def run_recursive_analysis():
             cwd="/home/opsvi/master_root",
             outputFormat="text",
             permissionMode="bypassPermissions",
-            verbose=False
+            verbose=False,
         )
-        
+
         print("\nRESULT FROM MAIN INSTANCE:")
         print("=" * 70)
         print(result)
-    
+
     print("\n" + "=" * 70)
     print("✅ Recursive task demonstration complete!")
 
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(run_recursive_analysis())

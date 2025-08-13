@@ -9,18 +9,18 @@ This guide provides practical implementation strategies for using the SDLC agent
 
 ### Task-Based Agent Selection
 
-| Task Type | Primary Agent | Supporting Agents | Expected Output |
-|-----------|---------------|-------------------|-----------------|
-| **Requirements Gathering** | Product Manager | UX/UI Designer, System Architect | User stories, acceptance criteria, technical specs |
-| **System Design** | System Architect | Backend Developer, DevOps Engineer | Architecture diagrams, API specs, infrastructure plans |
-| **Frontend Development** | Frontend Developer | UX/UI Designer, Backend Developer | Component libraries, responsive designs, API integration |
-| **Backend Development** | Backend Developer | System Architect, Data Engineer | API implementations, database schemas, service architecture |
-| **Infrastructure Setup** | DevOps Engineer | System Architect, Security Engineer | CI/CD pipelines, monitoring, security controls |
-| **Testing Strategy** | QA Engineer | All Development Agents | Test plans, automation frameworks, quality metrics |
-| **Security Review** | Security Engineer | System Architect, DevOps Engineer | Security assessments, compliance reports, threat models |
-| **Data Pipeline Design** | Data Engineer | Backend Developer, DevOps Engineer | ETL processes, data models, analytics infrastructure |
-| **User Experience Design** | UX/UI Designer | Product Manager, Frontend Developer | Wireframes, prototypes, design systems |
-| **Team Coordination** | Technical Lead | All Agents | Technical vision, standards, collaboration frameworks |
+| Task Type                  | Primary Agent      | Supporting Agents                   | Expected Output                                             |
+| -------------------------- | ------------------ | ----------------------------------- | ----------------------------------------------------------- |
+| **Requirements Gathering** | Product Manager    | UX/UI Designer, System Architect    | User stories, acceptance criteria, technical specs          |
+| **System Design**          | System Architect   | Backend Developer, DevOps Engineer  | Architecture diagrams, API specs, infrastructure plans      |
+| **Frontend Development**   | Frontend Developer | UX/UI Designer, Backend Developer   | Component libraries, responsive designs, API integration    |
+| **Backend Development**    | Backend Developer  | System Architect, Data Engineer     | API implementations, database schemas, service architecture |
+| **Infrastructure Setup**   | DevOps Engineer    | System Architect, Security Engineer | CI/CD pipelines, monitoring, security controls              |
+| **Testing Strategy**       | QA Engineer        | All Development Agents              | Test plans, automation frameworks, quality metrics          |
+| **Security Review**        | Security Engineer  | System Architect, DevOps Engineer   | Security assessments, compliance reports, threat models     |
+| **Data Pipeline Design**   | Data Engineer      | Backend Developer, DevOps Engineer  | ETL processes, data models, analytics infrastructure        |
+| **User Experience Design** | UX/UI Designer     | Product Manager, Frontend Developer | Wireframes, prototypes, design systems                      |
+| **Team Coordination**      | Technical Lead     | All Agents                          | Technical vision, standards, collaboration frameworks       |
 
 ---
 

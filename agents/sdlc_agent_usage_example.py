@@ -15,9 +15,11 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class AgentTask:
     """Represents a task for a specific agent"""
+
     agent_type: str
     task_description: str
     expected_output: List[str]
@@ -25,9 +27,11 @@ class AgentTask:
     priority: str = "medium"
     estimated_duration: str = "2-4 hours"
 
+
 @dataclass
 class AgentResult:
     """Represents the result from an agent"""
+
     agent_type: str
     task_description: str
     output: Dict[str, Any]
@@ -35,11 +39,12 @@ class AgentResult:
     quality_score: float = 0.0
     feedback: List[str] = None
 
+
 class SDLCAgentTeam:
     """
     Manages a team of specialized SDLC agents using Claude Code MCP
     """
-    
+
     def __init__(self, claude_mcp_client):
         self.claude_mcp = claude_mcp_client
         self.agents = {
@@ -52,14 +57,14 @@ class SDLCAgentTeam:
             "security_engineer": self._get_security_engineer_prompt(),
             "data_engineer": self._get_data_engineer_prompt(),
             "ux_ui_designer": self._get_ux_ui_designer_prompt(),
-            "technical_lead": self._get_technical_lead_prompt()
+            "technical_lead": self._get_technical_lead_prompt(),
         }
         self.results: List[AgentResult] = []
-        
+
     def _get_product_manager_prompt(self) -> str:
         return """
         You are an expert Product Manager specializing in software product strategy, requirements gathering, and stakeholder management.
-        
+
         When working on tasks:
         1. Always start by understanding the business context and user needs
         2. Break down complex requirements into manageable user stories
@@ -67,7 +72,7 @@ class SDLCAgentTeam:
         4. Provide clear acceptance criteria and success metrics
         5. Document assumptions and dependencies
         6. Suggest MVP approaches for rapid validation
-        
+
         Output Format:
         - User stories with clear acceptance criteria
         - Technical specifications with business context
@@ -75,11 +80,11 @@ class SDLCAgentTeam:
         - Risk assessments and mitigation strategies
         - Stakeholder communication plans
         """
-    
+
     def _get_system_architect_prompt(self) -> str:
         return """
         You are an expert System Architect specializing in scalable, maintainable, and secure software architecture.
-        
+
         When designing systems:
         1. Start with business requirements and user needs
         2. Consider scalability, maintainability, and security from day one
@@ -87,7 +92,7 @@ class SDLCAgentTeam:
         4. Plan for failure and implement resilience patterns
         5. Design for observability and monitoring
         6. Consider cost optimization and resource efficiency
-        
+
         Output Format:
         - Architecture decision records (ADRs)
         - System design documents with diagrams
@@ -96,11 +101,11 @@ class SDLCAgentTeam:
         - Security and compliance guidelines
         - Performance and scalability plans
         """
-    
+
     def _get_frontend_developer_prompt(self) -> str:
         return """
         You are an expert Frontend Developer specializing in modern web development, user experience, and responsive design.
-        
+
         When developing interfaces:
         1. Start with user experience and accessibility requirements
         2. Design for performance and mobile-first approach
@@ -108,7 +113,7 @@ class SDLCAgentTeam:
         4. Ensure cross-browser compatibility
         5. Write clean, maintainable, and testable code
         6. Follow design system guidelines and component patterns
-        
+
         Output Format:
         - Component specifications and implementations
         - Responsive design patterns and breakpoints
@@ -117,11 +122,11 @@ class SDLCAgentTeam:
         - Cross-browser testing plans
         - SEO and meta tag specifications
         """
-    
+
     def _get_backend_developer_prompt(self) -> str:
         return """
         You are an expert Backend Developer specializing in server-side development, API design, and data management.
-        
+
         When developing backend services:
         1. Start with API design and data modeling
         2. Implement proper authentication and authorization
@@ -129,7 +134,7 @@ class SDLCAgentTeam:
         4. Ensure data integrity and validation
         5. Implement comprehensive error handling
         6. Write thorough tests and documentation
-        
+
         Output Format:
         - API specifications and documentation
         - Database schema designs and migrations
@@ -138,11 +143,11 @@ class SDLCAgentTeam:
         - Performance optimization strategies
         - Testing strategies and test cases
         """
-    
+
     def _get_devops_engineer_prompt(self) -> str:
         return """
         You are an expert DevOps Engineer specializing in infrastructure automation, CI/CD pipelines, and cloud operations.
-        
+
         When implementing DevOps practices:
         1. Start with security and compliance requirements
         2. Design for scalability and high availability
@@ -150,7 +155,7 @@ class SDLCAgentTeam:
         4. Automate everything possible
         5. Plan for disaster recovery and backup strategies
         6. Optimize for cost and performance
-        
+
         Output Format:
         - Infrastructure as Code templates
         - CI/CD pipeline configurations
@@ -159,11 +164,11 @@ class SDLCAgentTeam:
         - Disaster recovery procedures
         - Cost optimization strategies
         """
-    
+
     def _get_qa_engineer_prompt(self) -> str:
         return """
         You are an expert Quality Assurance Engineer specializing in comprehensive testing strategies and quality assurance processes.
-        
+
         When ensuring quality:
         1. Focus on user experience and business value
         2. Implement testing early in the development cycle
@@ -171,7 +176,7 @@ class SDLCAgentTeam:
         4. Ensure comprehensive coverage of critical paths
         5. Monitor and report on quality trends
         6. Collaborate with development teams for quality improvement
-        
+
         Output Format:
         - Test strategies and test plans
         - Automated test suites and frameworks
@@ -180,11 +185,11 @@ class SDLCAgentTeam:
         - Bug reports and issue tracking
         - Quality improvement recommendations
         """
-    
+
     def _get_security_engineer_prompt(self) -> str:
         return """
         You are an expert Security Engineer specializing in application security, compliance, and security architecture.
-        
+
         When implementing security:
         1. Start with threat modeling and risk assessment
         2. Implement security controls at all layers
@@ -192,7 +197,7 @@ class SDLCAgentTeam:
         4. Monitor and respond to security events
         5. Provide security training and awareness
         6. Continuously improve security posture
-        
+
         Output Format:
         - Security architecture designs
         - Security assessment reports
@@ -201,11 +206,11 @@ class SDLCAgentTeam:
         - Incident response procedures
         - Security training materials
         """
-    
+
     def _get_data_engineer_prompt(self) -> str:
         return """
         You are an expert Data Engineer specializing in data pipeline development, data warehousing, and analytics infrastructure.
-        
+
         When building data infrastructure:
         1. Start with data requirements and business needs
         2. Design scalable and maintainable data architectures
@@ -213,7 +218,7 @@ class SDLCAgentTeam:
         4. Ensure security and compliance requirements
         5. Optimize for performance and cost efficiency
         6. Enable self-service analytics and data access
-        
+
         Output Format:
         - Data architecture designs
         - ETL pipeline specifications
@@ -222,11 +227,11 @@ class SDLCAgentTeam:
         - Compliance and governance procedures
         - Analytics enablement plans
         """
-    
+
     def _get_ux_ui_designer_prompt(self) -> str:
         return """
         You are an expert UX/UI Designer specializing in user-centered design, interface design, and user experience optimization.
-        
+
         When designing user experiences:
         1. Start with user research and understanding user needs
         2. Create clear information architecture and user flows
@@ -234,7 +239,7 @@ class SDLCAgentTeam:
         4. Ensure consistency across all touchpoints
         5. Test and iterate based on user feedback
         6. Optimize for performance and usability
-        
+
         Output Format:
         - User research reports and personas
         - Wireframes and prototypes
@@ -243,11 +248,11 @@ class SDLCAgentTeam:
         - Usability testing results
         - Design guidelines and standards
         """
-    
+
     def _get_technical_lead_prompt(self) -> str:
         return """
         You are an expert Technical Lead specializing in team leadership, technical direction, and project delivery.
-        
+
         When leading technical teams:
         1. Start with clear technical vision and goals
         2. Establish coding standards and best practices
@@ -255,7 +260,7 @@ class SDLCAgentTeam:
         4. Foster continuous learning and improvement
         5. Balance technical debt with feature delivery
         6. Ensure team collaboration and communication
-        
+
         Output Format:
         - Technical vision and strategy documents
         - Code review guidelines and standards
@@ -264,8 +269,10 @@ class SDLCAgentTeam:
         - Technical debt management strategies
         - Innovation and improvement roadmaps
         """
-    
-    async def execute_agent_task(self, task: AgentTask, context: Dict[str, Any] = None) -> AgentResult:
+
+    async def execute_agent_task(
+        self, task: AgentTask, context: Dict[str, Any] = None
+    ) -> AgentResult:
         """
         Execute a task using the specified agent
         """
@@ -274,27 +281,27 @@ class SDLCAgentTeam:
             agent_prompt = self.agents[task.agent_type]
             full_prompt = f"""
             {agent_prompt}
-            
+
             TASK: {task.task_description}
-            
+
             EXPECTED OUTPUTS:
             {chr(10).join(f"- {output}" for output in task.expected_output)}
-            
+
             CONTEXT:
             {json.dumps(context, indent=2) if context else "No additional context provided"}
-            
+
             Please provide a comprehensive response that addresses all expected outputs.
             Structure your response as a JSON object with clear sections for each expected output.
             """
-            
+
             # Execute the task using Claude Code MCP
             result = await self.claude_mcp.claude_run_async(
                 task=full_prompt,
                 outputFormat="json",
                 permissionMode="bypassPermissions",
-                verbose=True
+                verbose=True,
             )
-            
+
             # Parse and structure the result
             agent_result = AgentResult(
                 agent_type=task.agent_type,
@@ -302,19 +309,23 @@ class SDLCAgentTeam:
                 output=result,
                 timestamp=datetime.now(),
                 quality_score=self._assess_quality(result, task.expected_output),
-                feedback=self._generate_feedback(result, task.expected_output)
+                feedback=self._generate_feedback(result, task.expected_output),
             )
-            
+
             self.results.append(agent_result)
-            logger.info(f"Completed task for {task.agent_type}: {task.task_description}")
-            
+            logger.info(
+                f"Completed task for {task.agent_type}: {task.task_description}"
+            )
+
             return agent_result
-            
+
         except Exception as e:
             logger.error(f"Error executing task for {task.agent_type}: {str(e)}")
             raise
-    
-    def _assess_quality(self, result: Dict[str, Any], expected_outputs: List[str]) -> float:
+
+    def _assess_quality(
+        self, result: Dict[str, Any], expected_outputs: List[str]
+    ) -> float:
         """
         Assess the quality of the agent's output
         """
@@ -322,100 +333,119 @@ class SDLCAgentTeam:
             # Simple quality assessment based on expected outputs coverage
             covered_outputs = 0
             for expected in expected_outputs:
-                if any(expected.lower() in str(result).lower() for expected in expected_outputs):
+                if any(
+                    expected.lower() in str(result).lower()
+                    for expected in expected_outputs
+                ):
                     covered_outputs += 1
-            
+
             return covered_outputs / len(expected_outputs) if expected_outputs else 0.0
         except:
             return 0.0
-    
-    def _generate_feedback(self, result: Dict[str, Any], expected_outputs: List[str]) -> List[str]:
+
+    def _generate_feedback(
+        self, result: Dict[str, Any], expected_outputs: List[str]
+    ) -> List[str]:
         """
         Generate feedback on the agent's output
         """
         feedback = []
-        
+
         # Check if all expected outputs are covered
         for expected in expected_outputs:
-            if not any(expected.lower() in str(result).lower() for expected in expected_outputs):
+            if not any(
+                expected.lower() in str(result).lower() for expected in expected_outputs
+            ):
                 feedback.append(f"Missing or incomplete: {expected}")
-        
+
         # Add general feedback
         if len(str(result)) < 500:
             feedback.append("Response seems too brief - consider providing more detail")
-        
+
         if not feedback:
             feedback.append("Good coverage of expected outputs")
-        
+
         return feedback
-    
-    async def execute_sequential_workflow(self, tasks: List[AgentTask], context: Dict[str, Any] = None) -> List[AgentResult]:
+
+    async def execute_sequential_workflow(
+        self, tasks: List[AgentTask], context: Dict[str, Any] = None
+    ) -> List[AgentResult]:
         """
         Execute a sequence of tasks where each depends on the previous
         """
         results = []
         current_context = context or {}
-        
+
         for task in tasks:
             # Add previous results to context
             if results:
                 current_context["previous_results"] = [r.output for r in results]
-            
+
             result = await self.execute_agent_task(task, current_context)
             results.append(result)
-            
+
             # Add this result to context for next iteration
             current_context[f"{task.agent_type}_result"] = result.output
-        
+
         return results
-    
-    async def execute_parallel_workflow(self, tasks: List[AgentTask], context: Dict[str, Any] = None) -> List[AgentResult]:
+
+    async def execute_parallel_workflow(
+        self, tasks: List[AgentTask], context: Dict[str, Any] = None
+    ) -> List[AgentResult]:
         """
         Execute multiple tasks in parallel
         """
         # Group tasks by dependencies
         independent_tasks = [t for t in tasks if not t.dependencies]
         dependent_tasks = [t for t in tasks if t.dependencies]
-        
+
         # Execute independent tasks first
         independent_results = await asyncio.gather(
             *[self.execute_agent_task(task, context) for task in independent_tasks]
         )
-        
+
         # Execute dependent tasks
         dependent_results = []
         for task in dependent_tasks:
             # Build context with results from dependencies
             task_context = context or {}
             for dep in task.dependencies:
-                dep_result = next((r for r in independent_results if r.agent_type == dep), None)
+                dep_result = next(
+                    (r for r in independent_results if r.agent_type == dep), None
+                )
                 if dep_result:
                     task_context[f"{dep}_result"] = dep_result.output
-            
+
             result = await self.execute_agent_task(task, task_context)
             dependent_results.append(result)
-        
+
         return independent_results + dependent_results
-    
+
     def generate_workflow_report(self) -> Dict[str, Any]:
         """
         Generate a comprehensive report of all agent activities
         """
         if not self.results:
             return {"message": "No results to report"}
-        
+
         report = {
             "summary": {
                 "total_tasks": len(self.results),
                 "agents_used": list(set(r.agent_type for r in self.results)),
-                "average_quality_score": sum(r.quality_score for r in self.results) / len(self.results),
-                "completion_time": (self.results[-1].timestamp - self.results[0].timestamp).total_seconds() / 3600
+                "average_quality_score": sum(r.quality_score for r in self.results)
+                / len(self.results),
+                "completion_time": (
+                    self.results[-1].timestamp - self.results[0].timestamp
+                ).total_seconds()
+                / 3600,
             },
             "agent_performance": {},
             "quality_analysis": {
                 "high_quality": [r for r in self.results if r.quality_score >= 0.8],
-                "medium_quality": [r for r in self.results if 0.6 <= r.quality_score < 0.8],
-                "low_quality": [r for r in self.results if r.quality_score < 0.6]
+                "medium_quality": [
+                    r for r in self.results if 0.6 <= r.quality_score < 0.8
+                ],
+                "low_quality": [r for r in self.results if r.quality_score < 0.6],
             },
             "detailed_results": [
                 {
@@ -423,52 +453,63 @@ class SDLCAgentTeam:
                     "task": r.task_description,
                     "quality_score": r.quality_score,
                     "feedback": r.feedback,
-                    "timestamp": r.timestamp.isoformat()
+                    "timestamp": r.timestamp.isoformat(),
                 }
                 for r in self.results
-            ]
+            ],
         }
-        
+
         # Calculate agent-specific performance
         for agent_type in set(r.agent_type for r in self.results):
             agent_results = [r for r in self.results if r.agent_type == agent_type]
             report["agent_performance"][agent_type] = {
                 "tasks_completed": len(agent_results),
-                "average_quality": sum(r.quality_score for r in agent_results) / len(agent_results),
-                "total_feedback_items": sum(len(r.feedback) for r in agent_results)
+                "average_quality": sum(r.quality_score for r in agent_results)
+                / len(agent_results),
+                "total_feedback_items": sum(len(r.feedback) for r in agent_results),
             }
-        
+
         return report
+
 
 # Example usage
 async def main():
     """
     Example demonstrating how to use the SDLC Agent Team
     """
-    
+
     # This would be your actual Claude Code MCP client
     # claude_mcp_client = YourClaudeMCPClient()
-    
+
     # For demonstration, we'll create a mock client
     class MockClaudeMCPClient:
-        async def claude_run_async(self, task, outputFormat="json", permissionMode="bypassPermissions", verbose=True):
+        async def claude_run_async(
+            self,
+            task,
+            outputFormat="json",
+            permissionMode="bypassPermissions",
+            verbose=True,
+        ):
             # Mock response
             return {
                 "status": "completed",
                 "output": {
-                    "user_stories": ["As a user, I want to...", "As a customer, I need to..."],
+                    "user_stories": [
+                        "As a user, I want to...",
+                        "As a customer, I need to...",
+                    ],
                     "acceptance_criteria": ["Given... When... Then..."],
                     "technical_specifications": "API endpoints, database schema...",
                     "risk_assessment": "Low risk implementation...",
-                    "success_metrics": ["Reduced cart abandonment by 20%"]
-                }
+                    "success_metrics": ["Reduced cart abandonment by 20%"],
+                },
             }
-    
+
     claude_mcp_client = MockClaudeMCPClient()
-    
+
     # Initialize the SDLC Agent Team
     agent_team = SDLCAgentTeam(claude_mcp_client)
-    
+
     # Define a sample project: E-commerce Checkout Optimization
     project_context = {
         "project_name": "E-commerce Checkout Optimization",
@@ -476,15 +517,15 @@ async def main():
         "current_metrics": {
             "cart_abandonment_rate": "68%",
             "average_checkout_time": "4.5 minutes",
-            "mobile_conversion_rate": "1.2%"
+            "mobile_conversion_rate": "1.2%",
         },
         "constraints": [
             "Must maintain existing payment gateway integration",
             "Should work on mobile devices",
-            "Must comply with PCI DSS standards"
-        ]
+            "Must comply with PCI DSS standards",
+        ],
     }
-    
+
     # Define tasks for the workflow
     tasks = [
         AgentTask(
@@ -494,8 +535,8 @@ async def main():
                 "User journey maps with pain points",
                 "A/B testing hypotheses",
                 "Success metrics and KPIs",
-                "Technical requirements for implementation"
-            ]
+                "Technical requirements for implementation",
+            ],
         ),
         AgentTask(
             agent_type="system_architect",
@@ -504,9 +545,9 @@ async def main():
                 "System architecture diagrams",
                 "API specifications",
                 "Database schema updates",
-                "Integration patterns"
+                "Integration patterns",
             ],
-            dependencies=["product_manager"]
+            dependencies=["product_manager"],
         ),
         AgentTask(
             agent_type="frontend_developer",
@@ -515,9 +556,9 @@ async def main():
                 "React components and hooks",
                 "Responsive CSS implementations",
                 "API integration code",
-                "Unit tests and accessibility tests"
+                "Unit tests and accessibility tests",
             ],
-            dependencies=["system_architect"]
+            dependencies=["system_architect"],
         ),
         AgentTask(
             agent_type="backend_developer",
@@ -526,9 +567,9 @@ async def main():
                 "RESTful API implementations",
                 "Payment gateway integrations",
                 "Database migrations",
-                "Service layer implementations"
+                "Service layer implementations",
             ],
-            dependencies=["system_architect"]
+            dependencies=["system_architect"],
         ),
         AgentTask(
             agent_type="qa_engineer",
@@ -537,37 +578,40 @@ async def main():
                 "Test automation scripts",
                 "Manual testing scenarios",
                 "Performance test suites",
-                "Quality metrics dashboard"
+                "Quality metrics dashboard",
             ],
-            dependencies=["frontend_developer", "backend_developer"]
-        )
+            dependencies=["frontend_developer", "backend_developer"],
+        ),
     ]
-    
+
     # Execute the workflow
     print("🚀 Starting SDLC Agent Team Workflow...")
     print(f"📋 Project: {project_context['project_name']}")
     print(f"🎯 Goal: {project_context['business_goal']}")
     print()
-    
+
     # Execute tasks sequentially (since they have dependencies)
     results = await agent_team.execute_sequential_workflow(tasks, project_context)
-    
+
     # Generate and display the report
     report = agent_team.generate_workflow_report()
-    
+
     print("📊 Workflow Report:")
     print(f"   Total Tasks: {report['summary']['total_tasks']}")
     print(f"   Agents Used: {', '.join(report['summary']['agents_used'])}")
     print(f"   Average Quality Score: {report['summary']['average_quality_score']:.2f}")
     print(f"   Completion Time: {report['summary']['completion_time']:.2f} hours")
     print()
-    
+
     print("🏆 Agent Performance:")
-    for agent, perf in report['agent_performance'].items():
-        print(f"   {agent}: {perf['tasks_completed']} tasks, {perf['average_quality']:.2f} avg quality")
-    
+    for agent, perf in report["agent_performance"].items():
+        print(
+            f"   {agent}: {perf['tasks_completed']} tasks, {perf['average_quality']:.2f} avg quality"
+        )
+
     print()
     print("✅ Workflow completed successfully!")
+
 
 if __name__ == "__main__":
     # Run the example

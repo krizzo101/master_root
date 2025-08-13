@@ -41,6 +41,7 @@ This document outlines the rules, guidelines, and best practices for the AI codi
     *   `.proj-intel/reverse_index.json`: O(1) path lookup.
     *   `agent_architecture.jsonl`: Agent class definitions.
     *   `INTEGRATIONS_DIRECTORY_TREE.md`: Detailed integration mapping.
+*   The `.mcp.json` file in the project root of this project defines the tools the claude code app has available and is located at: `/home/opsvi/master_root/.mcp.json`.
 
 ## CODING STANDARDS
 
@@ -74,6 +75,7 @@ This document outlines the rules, guidelines, and best practices for the AI codi
 *   Implement automated testing and CI/CD pipelines.
 *   Always use `shell_exec` instead of `run_terminal_cmd` for executing commands.
 *   When committing changes to git, include a special note in the description if the claude code MCP server is working properly.
+*   When I ask you to generate a diagram, I expect it to be rendered inline in the chat session.
 
 ## DEBUGGING
 
@@ -87,12 +89,14 @@ This document outlines the rules, guidelines, and best practices for the AI codi
 *   Format code blocks with proper syntax highlighting.
 *   Keep lines concise for readability.
 *   When presenting the chat name in the matrix, strip off the date and file extension for cleaner presentation.
+*   **CRITICAL CONTRAST RULE**: Dark text must be overlaid on a light background or vice versa. NEVER light on light or dark on dark.
+*   **MANDATORY CONTRAST CHECK**: Always verify all text-background combinations for sufficient contrast.
 
 ## CHAT LOG PROCESSING SCRIPTS
 
 *   Two Python scripts are available for processing chat logs:
     *   `collapse_chat_log.py`: Collapses tool calls into summary lines with truncation.
-    *   `log_stripper.py`: Completely removes tool calls and thought lines from the output.
+    *   `log_stripper.py`: Completely removes tool calls into summary lines with truncation.
 *   The `log_stripper.py` script removes thoughts and tool calls completely from a chat log to create a clean version with only user and assistant messages for better readability.
 *   When using the log processing scripts:
     *   The `input` argument specifies the input chat log file.
@@ -821,20 +825,4 @@ def stream_structured_response(prompt: str, schema: BaseModel):
             elif event.type == "response.output_text.partial":
                 # Validate partial structure
                 try:
-                    partial_obj = schema.model_validate_json(event.partial_json)
-                    yield partial_obj
-                except ValidationError:
-                    # Continue streaming - validation will complete at end
-                    pass
-
-            elif event.type == "response.error":
-                handle_streaming_error(event.error)
-
-            elif event.type == "response.completed":
-                final_response = stream.get_final_response()
-                return final_response.output_parsed
-
-# ✅ REAL-TIME PROCESSING EXAMPLE
-async def real_time_code_generation():
-    async for partial_code in stream_structured_response(
-        "Generate a FastAPI
+                    partial_obj = schema.model_validate_json(event.

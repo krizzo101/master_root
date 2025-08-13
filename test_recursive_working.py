@@ -18,7 +18,8 @@ import json
 
 # Call the MCP wrapper synchronously
 cmd = [
-    '/home/opsvi/miniconda/bin/python', '-c',
+    "/home/opsvi/miniconda/bin/python",
+    "-c",
     """
 import sys
 sys.path.insert(0, '/home/opsvi/master_root/libs')
@@ -41,7 +42,7 @@ result = asyncio.run(server.claude_run(
     verbose=False
 ))
 print(result)
-"""
+""",
 ]
 
 print("\n[PARENT] Executing child task...")
