@@ -19,6 +19,7 @@ files:
   - DESIGN_SPEC_FIXES_SUMMARY.md
   - DETAILED_MIGRATION_ANALYSIS.md
   - DETAILED_MIGRATION_PLANS.md
+  - DEVELOPER_REQUIREMENTS.md
   - Dockerfile
   - FINAL_OPTIMIZATION_IMPLEMENTATION_PLAN.md
   - FINAL_OPTIMIZATION_SUMMARY.md
@@ -39,10 +40,12 @@ files:
   - PEER_CODEBASE_ANALYSIS.md
   - PERPLEXITY_INTEGRATION_SUCCESS.md
   - PERPLEXITY_INTEGRATION_SUMMARY.md
+  - PROJECT_INTELLIGENCE_INTEGRATION_STRATEGY.md
   - QUICK_START.md
   - README.md
   - TEST_AUTO_MCP_LIVE.md
   - TEST_CLAUDE_INTEGRATION.md
+  - TIMING_ANALYSIS_DOCUMENTATION.md
   - TOURNAMENT_APPROACH_SUMMARY.md
   - V1_LANGGRAPH_ORCHESTRATION_DESIGN.md
   - V1_PARALLEL_RECURSIVE_ENHANCEMENT.md
@@ -60,6 +63,7 @@ files:
   - baseline_analysis.py
   - claude_code_architecture_diagrams.md
   - claude_code_log_analysis.md
+  - claude_code_mcp_technical_report.md
   - clean_log.py
   - comprehensive_optimization_analysis.py
   - consult_agent_optimization_strategy.md
@@ -3611,6 +3615,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - platform/observability/config/tempo.yaml
   - platform/observability/docker-compose.yml
   - platform/rag/docker-compose.yml
+  - proj_intel_wrapper.py
   - pyproject.toml
   - pytest.ini
   - real_research_assistant.py
@@ -3672,6 +3677,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - systemd/snapshot@.service
   - systemd/snapshot@.timer
   - temp.txt
+  - timing_analysis_system.py
   - tools/ai_populate.py
   - tools/autosave.sh
   - tools/libs_check.py

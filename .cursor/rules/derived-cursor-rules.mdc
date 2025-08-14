@@ -87,6 +87,8 @@ This document outlines the rules, guidelines, and best practices for the AI codi
     *   Show the current branch using `git branch --show-current`.
     *   Show the last 5 commits using `git log --oneline -5 | cat`.
     *   List git worktrees using `git worktree list | cat`.
+    *   Provide a summary of the commit, including the branch name, commit hash, commit message, and the number of files changed. Also include the state of the working tree (clean or not). If the working tree is clean and the commit is on a feature branch, suggest the command to push to the remote.
+    *   Include a JSON structured summary that includes all required metrics like actions, validation status, time, assumptions, and risks. It’s crucial to keep this minimal and maintain accuracy with the numbers reported.
 
 ## DEBUGGING
 
@@ -791,15 +793,4 @@ def safe_api_call(**kwargs) -> Union[dict, None]:
             elif response.incomplete_details.reason == "max_model_tokens":
                 raise OpenAITokenLimitError("Model token limit exceeded - use a model with higher context")
             else:
-                raise OpenAIIncompleteError(f"Incomplete response: {response.incomplete_details.reason}")
-
-        # Check for refusals
-        if hasattr(response, 'output') and response.output[0].content[0].type == "refusal":
-            raise OpenAIRefusalError(f"Model refused: {response.output[0].content[0].refusal}")
-
-        return response
-
-    except openai.AuthenticationError:
-        raise ConfigurationError("Invalid API key or authentication failure")
-    except openai.PermissionDeniedError:
-```
+                raise OpenAIIncompleteError(f"Incomplete
