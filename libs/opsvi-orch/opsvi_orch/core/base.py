@@ -39,7 +39,7 @@ class Config(BaseSettings):
     class Config:
         env_prefix = "OPSVI_OPSVI_ORCHESTRATION__"
 
-class (BaseComponent):
+class BaseComponent:
     """Base class for opsvi-orchestration components.
 
     Provides base functionality for all opsvi-orchestration components
@@ -50,16 +50,15 @@ class (BaseComponent):
         config: Optional[Config] = None,
         **kwargs: Any
     ) -> None:
-        """Initialize .
+        """Initialize component.
 
         Args:
             config: Configuration for the component
             **kwargs: Additional configuration parameters
         """
-        super().__init__("", config.dict() if config else {})
         self.config = config or Config(**kwargs)
         self._initialized = False
-        self._logger = logging.getLogger(f"{__name__}.")
+        self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
         # Component-specific initialization
         
@@ -71,16 +70,16 @@ class (BaseComponent):
             InitializationError: If initialization fails
         """
         try:
-            self._logger.info("Initializing ")
+            self._logger.info(f"Initializing {self.__class__.__name__}")
 
             # Component-specific initialization logic
             
 
             self._initialized = True
-            self._logger.info(" initialized successfully")
+            self._logger.info(f"{self.__class__.__name__} initialized successfully")
 
         except Exception as e:
-            self._logger.error(f"Failed to initialize : {e}")
+            self._logger.error(f"Failed to initialize {self.__class__.__name__}: {e}")
             raise InitializationError(f"Initialization failed: {e}") from e
 
     async def shutdown(self) -> None:

@@ -1,17 +1,33 @@
 """
-OPSVI Orchestration Library
-----------------------------
-Reusable orchestration patterns and executors for parallel and recursive execution.
-Based on LangGraph Send API for true parallelism.
+OPSVI Orchestration Library (opsvi_orch)
+-----------------------------------------
+Comprehensive orchestration library with multiple levels:
 
-Key Features:
-- NO asyncio.gather (forbidden pattern from OAMAT_SD)
-- Send API for parallel execution
-- Recursive orchestration with depth control
-- Integration with Claude Code servers
+1. Workflow Orchestration (Higher Level):
+   - DAG-based workflow management
+   - Pipeline coordination with Celery
+   - Task models and registry
+   
+2. Execution Orchestration (Lower Level):
+   - LangGraph patterns for parallel execution
+   - Send API for true parallelism (NO asyncio.gather)
+   - Recursive execution patterns
+   
+3. Integration:
+   - Claude Code server enhancement
+   - Configuration-based feature enablement
 """
 
 __version__ = "0.1.0"
+
+# Workflow orchestration (from original opsvi_orchestration)
+from .workflow import (
+    MetaOrchestrator,
+    dag_loader,
+    Project,
+    Run,
+    WorkflowRegistry,
+)
 
 # Core patterns
 from .patterns import (
@@ -50,6 +66,12 @@ from .managers import (
 __all__ = [
     # Version
     "__version__",
+    # Workflow (from original)
+    "MetaOrchestrator",
+    "dag_loader",
+    "Project",
+    "Run",
+    "WorkflowRegistry",
     # Patterns
     "ParallelOrchestrationPattern",
     "StateGraphBuilder",
