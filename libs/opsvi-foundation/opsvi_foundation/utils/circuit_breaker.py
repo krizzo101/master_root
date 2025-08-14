@@ -8,10 +8,10 @@ import asyncio
 import functools
 import logging
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from threading import Lock
-from typing import Any, Callable, Dict, Optional, Type, TypeVar, Union
+from typing import Any, Callable, Dict, Optional, Type, TypeVar
 
 from ..config.settings import FoundationConfig
 from ..core.base import ComponentError
@@ -251,7 +251,7 @@ class CircuitBreaker:
             result = func(*args, **kwargs)
             self._record_success()
             return result
-        except self.expected_exception as e:
+        except self.expected_exception:
             self._record_failure()
             raise
 
@@ -279,7 +279,7 @@ class CircuitBreaker:
             result = await func(*args, **kwargs)
             self._record_success()
             return result
-        except self.expected_exception as e:
+        except self.expected_exception:
             self._record_failure()
             raise
 

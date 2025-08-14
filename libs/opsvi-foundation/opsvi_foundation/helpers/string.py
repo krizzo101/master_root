@@ -10,7 +10,7 @@ import logging
 import re
 import secrets
 import string
-from typing import Any, Dict, List, Optional, Pattern, Union
+from typing import Any, Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 

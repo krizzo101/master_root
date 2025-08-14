@@ -3,7 +3,6 @@
 Provides JSON schema and Pydantic model validation capabilities.
 """
 
-import json
 import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Type, Union
@@ -116,7 +115,7 @@ class JSONSchemaValidator(SchemaValidator):
         try:
             self.validator.validate(data)
             return True, None
-        except JSONSchemaError as e:
+        except JSONSchemaError:
             # Collect all validation errors
             for error in self.validator.iter_errors(data):
                 error_path = (

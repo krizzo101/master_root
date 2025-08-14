@@ -20,6 +20,22 @@ from .core.base import (
     EventBusError,
     StateManagerError,
 )
+from .persistence import (
+    PersistenceBackend,
+    PersistenceError,
+    JSONBackend,
+    MemoryBackend,
+    RedisBackend,
+)
+from .middleware import (
+    AuthMiddleware,
+    BasicAuthMiddleware,
+    TokenAuthMiddleware,
+    MetricsMiddleware,
+    PrometheusMetricsMiddleware,
+    TracingMiddleware,
+    OpenTelemetryMiddleware,
+)
 
 __all__ = [
     # Core components
@@ -34,6 +50,20 @@ __all__ = [
     "ServiceRegistryError",
     "EventBusError",
     "StateManagerError",
+    # Persistence
+    "PersistenceBackend",
+    "PersistenceError",
+    "JSONBackend",
+    "MemoryBackend",
+    "RedisBackend",
+    # Middleware
+    "AuthMiddleware",
+    "BasicAuthMiddleware",
+    "TokenAuthMiddleware",
+    "MetricsMiddleware",
+    "PrometheusMetricsMiddleware",
+    "TracingMiddleware",
+    "OpenTelemetryMiddleware",
 ]
 
 

@@ -11,8 +11,10 @@ from datetime import datetime
 from enum import Enum
 import json
 from pathlib import Path
+from pydantic import Field
 
 from opsvi_foundation import BaseComponent, ComponentError, BaseSettings
+from ..persistence import PersistenceBackend, JSONBackend, MemoryBackend, RedisBackend
 
 logger = logging.getLogger(__name__)
 
@@ -83,6 +85,8 @@ class CoreConfig(BaseSettings):
     state_manager_enabled: bool = True
     state_persistence_enabled: bool = False
     state_backup_interval: float = 300.0  # seconds
+    state_backend: str = "memory"  # Options: memory, json, redis
+    state_backend_config: Dict[str, Any] = Field(default_factory=dict)
 
     class Config:
         env_prefix = "OPSVI_CORE_"
@@ -268,20 +272,37 @@ class EventBus(BaseComponent):
 
 
 class StateManager(BaseComponent):
-    """State manager for managing application state."""
+    """State manager for managing application state with pluggable backends."""
 
     def __init__(self, config: Optional[CoreConfig] = None, **kwargs: Any) -> None:
         """Initialize state manager."""
         super().__init__("state-manager", config.dict() if config else {})
         self.core_config = config or CoreConfig(**kwargs)
-        self._state: Dict[str, Any] = {}
+        self._backend: Optional[PersistenceBackend] = None
         self._backup_task: Optional[asyncio.Task] = None
-        self._state_file = Path("/tmp/opsvi_state_backup.json")
-        # Try to restore state on initialization
-        self._restore_state()
+        self._init_backend()
+
+    def _init_backend(self) -> None:
+        """Initialize the persistence backend based on configuration."""
+        backend_type = self.core_config.state_backend.lower()
+        backend_config = self.core_config.state_backend_config
+        
+        if backend_type == "json":
+            if "file_path" not in backend_config:
+                backend_config["file_path"] = "/tmp/opsvi_state.json"
+            self._backend = JSONBackend(backend_config)
+        elif backend_type == "redis":
+            self._backend = RedisBackend(backend_config)
+        else:  # Default to memory
+            self._backend = MemoryBackend(backend_config)
+        
+        logger.info(f"Using {backend_type} backend for state management")
 
     async def _initialize_impl(self) -> None:
         """Initialize state manager."""
+        if self._backend:
+            await self._backend.initialize()
+        
         if (
             self.core_config.state_manager_enabled
             and self.core_config.state_persistence_enabled
@@ -290,43 +311,51 @@ class StateManager(BaseComponent):
 
     async def _shutdown_impl(self) -> None:
         """Shutdown state manager."""
-        # Save state one final time before shutdown
-        if self.core_config.state_persistence_enabled:
-            await self._backup_state()
-
         if self._backup_task:
             self._backup_task.cancel()
             try:
                 await self._backup_task
             except asyncio.CancelledError:
                 pass
+        
+        if self._backend:
+            await self._backend.shutdown()
 
     async def _health_check_impl(self) -> bool:
         """Health check implementation."""
-        return True  # State manager is always healthy
+        if self._backend:
+            return await self._backend.health_check()
+        return True
 
     async def set_state(self, key: str, value: Any) -> None:
         """Set a state value."""
-        self._state[key] = value
-        logger.debug(f"Set state: {key} = {value}")
+        if self._backend:
+            await self._backend.set(key, value)
+        logger.debug(f"Set state: {key}")
 
     async def get_state(self, key: str, default: Any = None) -> Any:
         """Get a state value."""
-        return self._state.get(key, default)
+        if self._backend:
+            return await self._backend.get(key, default)
+        return default
 
     async def delete_state(self, key: str) -> None:
         """Delete a state value."""
-        if key in self._state:
-            del self._state[key]
-            logger.debug(f"Deleted state: {key}")
+        if self._backend:
+            deleted = await self._backend.delete(key)
+            if deleted:
+                logger.debug(f"Deleted state: {key}")
 
     async def list_state_keys(self) -> List[str]:
         """List all state keys."""
-        return list(self._state.keys())
+        if self._backend:
+            return await self._backend.keys()
+        return []
 
     async def clear_state(self) -> None:
         """Clear all state."""
-        self._state.clear()
+        if self._backend:
+            await self._backend.clear()
         logger.info("Cleared all state")
 
     async def _backup_loop(self) -> None:
@@ -342,55 +371,34 @@ class StateManager(BaseComponent):
 
     async def _backup_state(self) -> None:
         """Backup state to persistent storage."""
-        try:
-            # Create a copy of the state to avoid modification during serialization
-            state_copy = dict(self._state)
-
-            # Convert to JSON and write to file
-            state_json = json.dumps(state_copy, indent=2, default=str)
-
-            # Write atomically by using a temporary file
-            temp_file = self._state_file.with_suffix(".tmp")
-            temp_file.write_text(state_json)
-
-            # Move temp file to actual file (atomic on most systems)
-            temp_file.replace(self._state_file)
-
-            logger.debug(
-                f"State backup completed: {len(state_copy)} keys saved to {self._state_file}"
+        if self._backend:
+            backup_path = self.core_config.state_backend_config.get(
+                "backup_path", "/tmp/opsvi_state_backup.json"
             )
-        except Exception as e:
-            logger.error(f"Failed to backup state: {e}")
-            # Don't raise - we want the system to continue even if backup fails
+            try:
+                await self._backend.backup(backup_path)
+                logger.debug(f"State backup completed to {backup_path}")
+            except Exception as e:
+                logger.error(f"Failed to backup state: {e}")
 
-    def _restore_state(self) -> None:
-        """Restore state from persistent storage.
+    async def restore_state(self, path: str) -> None:
+        """Restore state from a backup file."""
+        if self._backend:
+            try:
+                await self._backend.restore(path)
+                logger.info(f"State restored from {path}")
+            except Exception as e:
+                logger.error(f"Failed to restore state: {e}")
+                raise StateManagerError(f"Failed to restore state: {e}")
 
-        This is a synchronous method called during initialization.
-        """
-        try:
-            if self._state_file.exists():
-                state_json = self._state_file.read_text()
-                restored_state = json.loads(state_json)
+    async def get_all_state(self) -> Dict[str, Any]:
+        """Get all state data."""
+        if self._backend:
+            return await self._backend.get_all()
+        return {}
 
-                if isinstance(restored_state, dict):
-                    self._state = restored_state
-                    logger.info(
-                        f"State restored: {len(self._state)} keys loaded from {self._state_file}"
-                    )
-                else:
-                    logger.warning(
-                        f"Invalid state file format: expected dict, got {type(restored_state)}"
-                    )
-            else:
-                logger.debug(
-                    f"No state file found at {self._state_file}, starting with empty state"
-                )
-        except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse state file: {e}")
-            # Start with empty state if file is corrupted
-            self._state = {}
-        except Exception as e:
-            logger.error(f"Failed to restore state: {e}")
-            # Start with empty state on any other error
-            self._state = {}
+    async def set_many_state(self, data: Dict[str, Any]) -> None:
+        """Set multiple state values at once."""
+        if self._backend:
+            await self._backend.set_many(data)
+            logger.debug(f"Set {len(data)} state values")

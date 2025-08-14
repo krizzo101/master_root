@@ -32,6 +32,12 @@ from .utils.retry import (
     ConstantBackoff,
     RetryContext,
 )
+from .middleware import (
+    Middleware,
+    MiddlewareChain,
+    LoggingMiddleware,
+    ErrorHandlingMiddleware,
+)
 
 __all__ = [
     # Core
@@ -61,6 +67,11 @@ __all__ = [
     "LinearBackoff",
     "ConstantBackoff",
     "RetryContext",
+    # Middleware
+    "Middleware",
+    "MiddlewareChain",
+    "LoggingMiddleware",
+    "ErrorHandlingMiddleware",
 ]
 
 
