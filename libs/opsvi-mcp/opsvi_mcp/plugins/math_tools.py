@@ -48,11 +48,11 @@ class CalculatorTool(BaseTool):
     async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
         """Execute the calculator operation."""
         self.validate_input(arguments)
-        
+
         operation = arguments["operation"]
         a = arguments["a"]
         b = arguments["b"]
-        
+
         result = None
         if operation == "add":
             result = a + b
@@ -69,7 +69,7 @@ class CalculatorTool(BaseTool):
                     )
                 ]
             result = a / b
-        
+
         return [
             TextContent(
                 type="text",
@@ -104,14 +104,14 @@ class FactorialTool(BaseTool):
     async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
         """Calculate the factorial."""
         self.validate_input(arguments)
-        
+
         n = arguments["n"]
-        
+
         # Calculate factorial
         result = 1
         for i in range(1, n + 1):
             result *= i
-        
+
         return [
             TextContent(
                 type="text",
@@ -146,9 +146,9 @@ class FibonacciTool(BaseTool):
     async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
         """Generate Fibonacci sequence."""
         self.validate_input(arguments)
-        
+
         n = arguments["n"]
-        
+
         if n == 1:
             sequence = [0]
         elif n == 2:
@@ -157,7 +157,7 @@ class FibonacciTool(BaseTool):
             sequence = [0, 1]
             for i in range(2, n):
                 sequence.append(sequence[-1] + sequence[-2])
-        
+
         return [
             TextContent(
                 type="text",

@@ -10,7 +10,7 @@ from enum import Enum
 
 class DatabaseType(str, Enum):
     """Supported database types"""
-    
+
     POSTGRESQL = "postgresql"
     MYSQL = "mysql"
     SQLITE = "sqlite"
@@ -19,7 +19,7 @@ class DatabaseType(str, Enum):
 @dataclass
 class ConnectionPoolConfig:
     """Connection pool configuration"""
-    
+
     min_size: int = 1
     max_size: int = 10
     max_idle_time: int = 300  # seconds
@@ -33,7 +33,7 @@ class ConnectionPoolConfig:
 @dataclass
 class DatabaseConnection:
     """Database connection configuration"""
-    
+
     name: str
     type: DatabaseType
     host: str = "localhost"
@@ -45,7 +45,7 @@ class DatabaseConnection:
     connection_string: Optional[str] = None
     pool_config: ConnectionPoolConfig = field(default_factory=ConnectionPoolConfig)
     extra_params: Dict[str, Any] = field(default_factory=dict)
-    
+
     def __post_init__(self):
         # Set default ports if not specified
         if self.port is None:
@@ -53,11 +53,11 @@ class DatabaseConnection:
                 self.port = 5432
             elif self.type == DatabaseType.MYSQL:
                 self.port = 3306
-        
+
         # Build connection string if not provided
         if not self.connection_string:
             self._build_connection_string()
-    
+
     def _build_connection_string(self):
         """Build connection string from components"""
         if self.type == DatabaseType.POSTGRESQL:
@@ -74,13 +74,13 @@ class DatabaseConnection:
                 params.append(f"password={self.password}")
             if self.ssl_mode:
                 params.append(f"sslmode={self.ssl_mode}")
-            
+
             # Add extra params
             for key, value in self.extra_params.items():
                 params.append(f"{key}={value}")
-            
+
             self.connection_string = " ".join(params)
-            
+
         elif self.type == DatabaseType.MYSQL:
             auth = ""
             if self.username:
@@ -88,14 +88,16 @@ class DatabaseConnection:
                 if self.password:
                     auth += f":{self.password}"
                 auth += "@"
-            
-            self.connection_string = f"mysql://{auth}{self.host}:{self.port}/{self.database}"
-            
+
+            self.connection_string = (
+                f"mysql://{auth}{self.host}:{self.port}/{self.database}"
+            )
+
             # Add extra params
             if self.extra_params:
                 params = "&".join([f"{k}={v}" for k, v in self.extra_params.items()])
                 self.connection_string += f"?{params}"
-        
+
         elif self.type == DatabaseType.SQLITE:
             self.connection_string = f"sqlite:///{self.database}"
 
@@ -103,7 +105,7 @@ class DatabaseConnection:
 @dataclass
 class MigrationConfig:
     """Migration management configuration"""
-    
+
     enabled: bool = True
     migrations_path: str = "migrations"
     auto_migrate: bool = False
@@ -115,7 +117,7 @@ class MigrationConfig:
 @dataclass
 class LoggingConfig:
     """Logging configuration"""
-    
+
     log_level: str = "INFO"
     log_queries: bool = False
     log_slow_queries: bool = True
@@ -128,10 +130,20 @@ class LoggingConfig:
 @dataclass
 class SecurityConfig:
     """Security configuration"""
-    
+
     encrypt_passwords: bool = True
     require_ssl: bool = False
-    allowed_statements: List[str] = field(default_factory=lambda: ["SELECT", "INSERT", "UPDATE", "DELETE", "CREATE", "ALTER", "DROP"])
+    allowed_statements: List[str] = field(
+        default_factory=lambda: [
+            "SELECT",
+            "INSERT",
+            "UPDATE",
+            "DELETE",
+            "CREATE",
+            "ALTER",
+            "DROP",
+        ]
+    )
     max_query_length: int = 100000
     prevent_sql_injection: bool = True
     sanitize_inputs: bool = True
@@ -140,7 +152,7 @@ class SecurityConfig:
 @dataclass
 class PerformanceConfig:
     """Performance configuration"""
-    
+
     query_cache_enabled: bool = True
     query_cache_size: int = 100
     query_cache_ttl: int = 300  # seconds
@@ -152,22 +164,22 @@ class PerformanceConfig:
 @dataclass
 class DatabaseServerConfig:
     """Main database server configuration"""
-    
+
     default_connection: Optional[str] = None
     connections: Dict[str, DatabaseConnection] = field(default_factory=dict)
     migration: MigrationConfig = field(default_factory=MigrationConfig)
     logging: LoggingConfig = field(default_factory=LoggingConfig)
     security: SecurityConfig = field(default_factory=SecurityConfig)
     performance: PerformanceConfig = field(default_factory=PerformanceConfig)
-    
+
     def __post_init__(self):
         # Load connections from environment
         self._load_env_connections()
-        
+
         # Set default connection if not specified
         if not self.default_connection and self.connections:
             self.default_connection = next(iter(self.connections.keys()))
-    
+
     def _load_env_connections(self):
         """Load database connections from environment variables"""
         # PostgreSQL connection
@@ -181,9 +193,9 @@ class DatabaseServerConfig:
                 database=os.getenv("DB_PG_DATABASE", "postgres"),
                 username=os.getenv("DB_PG_USERNAME"),
                 password=os.getenv("DB_PG_PASSWORD"),
-                ssl_mode=os.getenv("DB_PG_SSL_MODE", "prefer")
+                ssl_mode=os.getenv("DB_PG_SSL_MODE", "prefer"),
             )
-        
+
         # MySQL connection
         mysql_host = os.getenv("DB_MYSQL_HOST")
         if mysql_host:
@@ -194,19 +206,19 @@ class DatabaseServerConfig:
                 port=int(os.getenv("DB_MYSQL_PORT", 3306)),
                 database=os.getenv("DB_MYSQL_DATABASE", "mysql"),
                 username=os.getenv("DB_MYSQL_USERNAME"),
-                password=os.getenv("DB_MYSQL_PASSWORD")
+                password=os.getenv("DB_MYSQL_PASSWORD"),
             )
-        
+
         # SQLite connection
         sqlite_path = os.getenv("DB_SQLITE_PATH")
         if sqlite_path:
             self.connections["sqlite"] = DatabaseConnection(
-                name="sqlite",
-                type=DatabaseType.SQLITE,
-                database=sqlite_path
+                name="sqlite", type=DatabaseType.SQLITE, database=sqlite_path
             )
-    
-    def get_connection(self, name: Optional[str] = None) -> Optional[DatabaseConnection]:
+
+    def get_connection(
+        self, name: Optional[str] = None
+    ) -> Optional[DatabaseConnection]:
         """Get a database connection by name"""
         if name:
             return self.connections.get(name)

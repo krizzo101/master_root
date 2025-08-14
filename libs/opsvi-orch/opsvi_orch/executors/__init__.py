@@ -7,32 +7,30 @@ Execution engines for parallel and recursive orchestration.
 from .parallel_executor import (
     ParallelExecutor,
     ParallelExecutionConfig,
-    ExecutionResult
+    ExecutionResult,
 )
 from .recursive_executor import (
     RecursiveExecutor,
     RecursiveClaudeExecutor,
-    RecursiveExecutionResult
+    RecursiveExecutionResult,
 )
 from .claude_executor import (
     ClaudeJobExecutor,
     ClaudeBatchExecutor,
-    ClaudeExecutionMetrics
+    ClaudeExecutionMetrics,
 )
 
 __all__ = [
     # Parallel execution
-    'ParallelExecutor',
-    'ParallelExecutionConfig',
-    'ExecutionResult',
-    
+    "ParallelExecutor",
+    "ParallelExecutionConfig",
+    "ExecutionResult",
     # Recursive execution
-    'RecursiveExecutor',
-    'RecursiveClaudeExecutor',
-    'RecursiveExecutionResult',
-    
+    "RecursiveExecutor",
+    "RecursiveClaudeExecutor",
+    "RecursiveExecutionResult",
     # Claude-specific
-    'ClaudeJobExecutor',
-    'ClaudeBatchExecutor',
-    'ClaudeExecutionMetrics',
+    "ClaudeJobExecutor",
+    "ClaudeBatchExecutor",
+    "ClaudeExecutionMetrics",
 ]

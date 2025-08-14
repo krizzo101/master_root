@@ -10,7 +10,7 @@ from enum import Enum
 
 class QueryType(str, Enum):
     """Types of database queries"""
-    
+
     SELECT = "SELECT"
     INSERT = "INSERT"
     UPDATE = "UPDATE"
@@ -25,7 +25,7 @@ class QueryType(str, Enum):
 
 class TransactionState(str, Enum):
     """Transaction states"""
-    
+
     IDLE = "idle"
     ACTIVE = "active"
     COMMITTED = "committed"
@@ -35,7 +35,7 @@ class TransactionState(str, Enum):
 
 class MigrationStatus(str, Enum):
     """Migration execution status"""
-    
+
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -46,7 +46,7 @@ class MigrationStatus(str, Enum):
 @dataclass
 class QueryParameter:
     """Query parameter definition"""
-    
+
     name: str
     value: Any
     type: Optional[str] = None
@@ -56,7 +56,7 @@ class QueryParameter:
 @dataclass
 class QueryResult:
     """Database query result"""
-    
+
     query_id: str
     query: str
     query_type: QueryType
@@ -75,7 +75,7 @@ class QueryResult:
 @dataclass
 class PreparedStatement:
     """Prepared statement definition"""
-    
+
     statement_id: str
     name: str
     query: str
@@ -89,7 +89,7 @@ class PreparedStatement:
 @dataclass
 class Transaction:
     """Database transaction"""
-    
+
     transaction_id: str
     connection_name: str
     state: TransactionState = TransactionState.IDLE
@@ -106,7 +106,7 @@ class Transaction:
 @dataclass
 class ConnectionPool:
     """Connection pool state"""
-    
+
     pool_id: str
     connection_name: str
     min_size: int
@@ -124,7 +124,7 @@ class ConnectionPool:
 @dataclass
 class Migration:
     """Database migration"""
-    
+
     migration_id: str
     version: str
     name: str
@@ -141,7 +141,7 @@ class Migration:
 @dataclass
 class TableSchema:
     """Table schema information"""
-    
+
     table_name: str
     schema_name: Optional[str] = None
     columns: List[Dict[str, Any]] = field(default_factory=list)
@@ -159,7 +159,7 @@ class TableSchema:
 @dataclass
 class QueryBuilder:
     """SQL query builder state"""
-    
+
     builder_id: str
     query_type: QueryType
     table: Optional[str] = None
@@ -175,15 +175,15 @@ class QueryBuilder:
     values: Dict[str, Any] = field(default_factory=dict)
     returning: List[str] = field(default_factory=list)
     cte_expressions: List[str] = field(default_factory=list)
-    
+
     def to_sql(self) -> str:
         """Convert builder state to SQL query"""
         parts = []
-        
+
         # Handle CTEs
         if self.cte_expressions:
             parts.append(f"WITH {', '.join(self.cte_expressions)}")
-        
+
         # Handle different query types
         if self.query_type == QueryType.SELECT:
             columns = ", ".join(self.select_columns) if self.select_columns else "*"
@@ -191,7 +191,7 @@ class QueryBuilder:
             if self.table:
                 table_ref = f"{self.schema}.{self.table}" if self.schema else self.table
                 parts.append(f"FROM {table_ref}")
-        
+
         elif self.query_type == QueryType.INSERT:
             if self.table:
                 table_ref = f"{self.schema}.{self.table}" if self.schema else self.table
@@ -200,7 +200,7 @@ class QueryBuilder:
                     columns = ", ".join(self.values.keys())
                     placeholders = ", ".join([f":{k}" for k in self.values.keys()])
                     parts.append(f"({columns}) VALUES ({placeholders})")
-        
+
         elif self.query_type == QueryType.UPDATE:
             if self.table:
                 table_ref = f"{self.schema}.{self.table}" if self.schema else self.table
@@ -208,50 +208,53 @@ class QueryBuilder:
                 if self.values:
                     set_clauses = [f"{k} = :{k}" for k in self.values.keys()]
                     parts.append(f"SET {', '.join(set_clauses)}")
-        
+
         elif self.query_type == QueryType.DELETE:
             if self.table:
                 table_ref = f"{self.schema}.{self.table}" if self.schema else self.table
                 parts.append(f"DELETE FROM {table_ref}")
-        
+
         # Add JOIN clauses
         if self.join_clauses:
             parts.extend(self.join_clauses)
-        
+
         # Add WHERE conditions
         if self.where_conditions:
             parts.append(f"WHERE {' AND '.join(self.where_conditions)}")
-        
+
         # Add GROUP BY
         if self.group_by:
             parts.append(f"GROUP BY {', '.join(self.group_by)}")
-        
+
         # Add HAVING
         if self.having_conditions:
             parts.append(f"HAVING {' AND '.join(self.having_conditions)}")
-        
+
         # Add ORDER BY
         if self.order_by:
-            order_clauses = [f"{col['column']} {col.get('direction', 'ASC')}" for col in self.order_by]
+            order_clauses = [
+                f"{col['column']} {col.get('direction', 'ASC')}"
+                for col in self.order_by
+            ]
             parts.append(f"ORDER BY {', '.join(order_clauses)}")
-        
+
         # Add LIMIT/OFFSET
         if self.limit is not None:
             parts.append(f"LIMIT {self.limit}")
         if self.offset is not None:
             parts.append(f"OFFSET {self.offset}")
-        
+
         # Add RETURNING clause
         if self.returning:
             parts.append(f"RETURNING {', '.join(self.returning)}")
-        
+
         return " ".join(parts)
 
 
 @dataclass
 class DatabaseMetrics:
     """Database performance metrics"""
-    
+
     connection_name: str
     timestamp: datetime = field(default_factory=datetime.now)
     active_connections: int = 0
@@ -272,7 +275,7 @@ class DatabaseMetrics:
 @dataclass
 class BackupMetadata:
     """Database backup metadata"""
-    
+
     backup_id: str
     connection_name: str
     backup_type: Literal["full", "incremental", "differential"] = "full"

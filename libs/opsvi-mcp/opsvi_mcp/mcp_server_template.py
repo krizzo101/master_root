@@ -225,25 +225,31 @@ class MCPServerTemplate:
         """
         if plugin_dir is None:
             plugin_dir = os.getenv("MCP_PLUGIN_DIR", "./plugins")
-        
+
         plugin_path = Path(plugin_dir)
         if not plugin_path.exists():
-            logger.info("Plugin directory '%s' does not exist. Skipping plugin loading.", plugin_dir)
+            logger.info(
+                "Plugin directory '%s' does not exist. Skipping plugin loading.",
+                plugin_dir,
+            )
             return
-        
+
         if not plugin_path.is_dir():
-            logger.warning("Plugin path '%s' is not a directory. Skipping plugin loading.", plugin_dir)
+            logger.warning(
+                "Plugin path '%s' is not a directory. Skipping plugin loading.",
+                plugin_dir,
+            )
             return
-        
+
         # Add plugin directory to sys.path temporarily
         original_path = sys.path.copy()
         sys.path.insert(0, str(plugin_path.absolute()))
-        
+
         try:
             for plugin_file in plugin_path.glob("*.py"):
                 if plugin_file.name.startswith("_"):
                     continue  # Skip private modules
-                
+
                 try:
                     # Load the module dynamically
                     module_name = plugin_file.stem
@@ -251,13 +257,15 @@ class MCPServerTemplate:
                         module_name, plugin_file
                     )
                     if spec is None or spec.loader is None:
-                        logger.warning("Could not load spec for plugin: %s", plugin_file)
+                        logger.warning(
+                            "Could not load spec for plugin: %s", plugin_file
+                        )
                         continue
-                    
+
                     module = importlib.util.module_from_spec(spec)
                     sys.modules[module_name] = module
                     spec.loader.exec_module(module)
-                    
+
                     # Find and register all BaseTool subclasses
                     for name, obj in inspect.getmembers(module):
                         if (
@@ -378,10 +386,10 @@ def main() -> None:
     log_level = getattr(logging, args.log_level.upper(), logging.INFO)
     tools = [EchoTool()]
     server = MCPServerTemplate(name=args.name, tools=tools, log_level=log_level)
-    
+
     # Load plugins after server initialization
     server.load_plugins(args.plugin_dir)
-    
+
     asyncio.run(server.run())
 
 

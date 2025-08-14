@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class AgentJob:
     """Represents a spawned agent job"""
+
     job_id: str
     task: str
     agent_profile: Optional[str]
@@ -39,16 +40,16 @@ class AgentJob:
 
 class FireAndForgetJobManager:
     """Manages fire-and-forget jobs with real Claude Code execution"""
-    
+
     def __init__(self, config: ServerConfig):
         self.config = config
         self.active_jobs: Dict[str, AgentJob] = {}
-        
+
     async def spawn_agent(self, job_info: Dict[str, Any]) -> None:
         """Spawn a first-level agent that runs Claude Code independently"""
         try:
             job_id = job_info["job_id"]
-            
+
             # Create agent job
             job = AgentJob(
                 job_id=job_id,
@@ -60,53 +61,59 @@ class FireAndForgetJobManager:
                 spawned_at=datetime.now().isoformat(),
                 depth=0,
             )
-            
+
             # Store in active jobs
             self.active_jobs[job_id] = job
-            
+
             # Create the agent script that calls real Claude Code
             agent_script = self._create_claude_agent_script(job_info)
-            
+
             # Write script to temp file
             script_path = f"/tmp/agent_{job_id}.py"
             with open(script_path, "w") as f:
                 f.write(agent_script)
-            
+
             # Spawn the agent process
             env = os.environ.copy()
-            env.update({
-                "CLAUDE_CODE_TOKEN": self.config.claude_token or "",
-                "AGENT_JOB_ID": job_id,
-                "AGENT_OUTPUT_DIR": job_info.get("output_dir", "/tmp/claude_results"),
-                "AGENT_RESULT_FILE": job_info.get("result_file", f"/tmp/claude_results/{job_id}.json"),
-            })
-            
+            env.update(
+                {
+                    "CLAUDE_CODE_TOKEN": self.config.claude_token or "",
+                    "AGENT_JOB_ID": job_id,
+                    "AGENT_OUTPUT_DIR": job_info.get(
+                        "output_dir", "/tmp/claude_results"
+                    ),
+                    "AGENT_RESULT_FILE": job_info.get(
+                        "result_file", f"/tmp/claude_results/{job_id}.json"
+                    ),
+                }
+            )
+
             # Start process detached
             process = subprocess.Popen(
                 [sys.executable, script_path],
                 env=env,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                start_new_session=True
+                start_new_session=True,
             )
-            
+
             job.process = process
             job.status = "running"
-            
+
             logger.info(f"Spawned Claude Code agent {job_id} (PID: {process.pid})")
-            
+
         except Exception as e:
             logger.error(f"Failed to spawn agent {job_info.get('job_id')}: {e}")
             if job_id in self.active_jobs:
                 self.active_jobs[job_id].status = "failed"
                 self.active_jobs[job_id].error = str(e)
-    
+
     def _create_claude_agent_script(self, job_info: Dict[str, Any]) -> str:
         """Create a Python script that calls the real Claude Code CLI"""
-        
+
         # Escape the task string properly
-        task_escaped = repr(job_info['task'])
-        
+        task_escaped = repr(job_info["task"])
+
         return f'''#!/usr/bin/env python3
 """
 Claude Code Agent Script - Calls real Claude CLI
@@ -198,14 +205,14 @@ if __name__ == "__main__":
     result = execute_claude_code()
     sys.exit(0 if result["status"] == "completed" else 1)
 '''
-    
+
     async def check_job_status(self, job_id: str) -> Dict[str, Any]:
         """Check the status of a specific job"""
         if job_id not in self.active_jobs:
             return {"status": "not_found"}
-        
+
         job = self.active_jobs[job_id]
-        
+
         # Check if process is still running
         if job.process:
             poll = job.process.poll()
@@ -215,19 +222,19 @@ if __name__ == "__main__":
                 job.status = "completed"
             else:
                 job.status = "failed"
-        
+
         return {
             "job_id": job.job_id,
             "status": job.status,
             "spawned_at": job.spawned_at,
-            "task": job.task[:100] + "..." if len(job.task) > 100 else job.task
+            "task": job.task[:100] + "..." if len(job.task) > 100 else job.task,
         }
-    
+
     async def kill_job(self, job_id: str) -> bool:
         """Kill a running job"""
         if job_id not in self.active_jobs:
             return False
-        
+
         job = self.active_jobs[job_id]
         if job.process:
             try:
@@ -236,9 +243,9 @@ if __name__ == "__main__":
                 return True
             except:
                 pass
-        
+
         return False
-    
+
     async def get_active_jobs(self) -> List[Dict[str, Any]]:
         """Get all active jobs"""
         active = []

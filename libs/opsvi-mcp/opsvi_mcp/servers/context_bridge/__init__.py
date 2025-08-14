@@ -11,11 +11,11 @@ Version: 1.0.0
 from .server import ContextBridgeServer
 from .client import ContextBridgeClient, EnhancedAgentBase
 from .models import (
-    ContextEvent, 
-    IDEContext, 
+    ContextEvent,
+    IDEContext,
     DiagnosticInfo,
     DiagnosticSeverity,
-    FileSelection
+    FileSelection,
 )
 from .knowledge_aggregator import KnowledgeAggregator
 from .config import ContextBridgeConfig
@@ -34,5 +34,5 @@ __all__ = [
     "FileSelection",
     "ContextBridgeConfig",
     "PubSubBackend",
-    "InMemoryPubSub"
+    "InMemoryPubSub",
 ]

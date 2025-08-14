@@ -10,7 +10,7 @@ from datetime import datetime
 
 class GeminiMode(Enum):
     """Execution modes for Gemini agent"""
-    
+
     CHAT = "chat"  # Interactive chat mode
     CODE = "code"  # Code generation mode
     ANALYZE = "analyze"  # Code analysis mode
@@ -25,7 +25,7 @@ class GeminiMode(Enum):
 
 class GeminiCapabilities(Enum):
     """Capabilities of Gemini agent"""
-    
+
     WEB_SEARCH = "web_search"
     FILE_OPERATIONS = "file_operations"
     SHELL_COMMANDS = "shell_commands"
@@ -39,7 +39,7 @@ class GeminiCapabilities(Enum):
 @dataclass
 class GeminiRequest:
     """Request to Gemini agent"""
-    
+
     task: str
     mode: GeminiMode = GeminiMode.REACT
     context_files: List[str] = field(default_factory=list)
@@ -50,24 +50,24 @@ class GeminiRequest:
     enable_file_ops: bool = True
     enable_shell: bool = True
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
     def to_cli_prompt(self) -> str:
         """Convert request to CLI prompt"""
         prompt = self.task
-        
+
         if self.context_files:
             prompt += f"\n\nContext files: {', '.join(self.context_files)}"
-        
+
         if self.mode != GeminiMode.REACT:
             prompt += f"\n\nMode: {self.mode.value}"
-        
+
         return prompt
 
 
 @dataclass
 class GeminiResponse:
     """Response from Gemini agent"""
-    
+
     request_id: str
     status: str  # 'success', 'failure', 'timeout', 'partial'
     mode: GeminiMode
@@ -89,7 +89,7 @@ class GeminiResponse:
 @dataclass
 class GeminiTask:
     """Internal task representation"""
-    
+
     id: str
     request: GeminiRequest
     status: str = "pending"  # pending, running, completed, failed
@@ -98,7 +98,7 @@ class GeminiTask:
     end_time: Optional[datetime] = None
     output_file: Optional[str] = None
     error_file: Optional[str] = None
-    
+
     def duration_seconds(self) -> Optional[float]:
         """Calculate task duration"""
         if self.start_time and self.end_time:
@@ -109,7 +109,7 @@ class GeminiTask:
 @dataclass
 class GeminiMetrics:
     """Metrics for Gemini agent usage"""
-    
+
     total_requests: int = 0
     successful_requests: int = 0
     failed_requests: int = 0
@@ -119,7 +119,7 @@ class GeminiMetrics:
     average_response_time_ms: float = 0.0
     requests_today: int = 0
     requests_this_minute: int = 0
-    
+
     def success_rate(self) -> float:
         """Calculate success rate"""
         if self.total_requests == 0:

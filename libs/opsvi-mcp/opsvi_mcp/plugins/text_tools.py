@@ -41,30 +41,34 @@ class TextStatsTool(BaseTool):
     async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
         """Analyze text and return statistics."""
         self.validate_input(arguments)
-        
+
         text = arguments["text"]
-        
+
         # Calculate statistics
         char_count = len(text)
-        char_count_no_spaces = len(text.replace(" ", "").replace("\n", "").replace("\t", ""))
+        char_count_no_spaces = len(
+            text.replace(" ", "").replace("\n", "").replace("\t", "")
+        )
         word_count = len(text.split())
         line_count = text.count("\n") + 1 if text else 0
-        
+
         # Find most common word
-        words = re.findall(r'\b\w+\b', text.lower())
+        words = re.findall(r"\b\w+\b", text.lower())
         word_freq = {}
         for word in words:
             word_freq[word] = word_freq.get(word, 0) + 1
-        
-        most_common = max(word_freq.items(), key=lambda x: x[1]) if word_freq else ("", 0)
-        
+
+        most_common = (
+            max(word_freq.items(), key=lambda x: x[1]) if word_freq else ("", 0)
+        )
+
         stats = f"""Text Statistics:
 - Total characters: {char_count}
 - Characters (no spaces): {char_count_no_spaces}
 - Word count: {word_count}
 - Line count: {line_count}
 - Most common word: '{most_common[0]}' (appears {most_common[1]} times)"""
-        
+
         return [TextContent(type="text", text=stats)]
 
 
@@ -97,10 +101,10 @@ class Base64Tool(BaseTool):
     async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
         """Perform Base64 encoding or decoding."""
         self.validate_input(arguments)
-        
+
         operation = arguments["operation"]
         text = arguments["text"]
-        
+
         try:
             if operation == "encode":
                 result = base64.b64encode(text.encode()).decode()
@@ -141,21 +145,21 @@ class HashTool(BaseTool):
     async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
         """Generate hash digest."""
         self.validate_input(arguments)
-        
+
         algorithm = arguments["algorithm"]
         text = arguments["text"]
-        
+
         text_bytes = text.encode()
-        
+
         if algorithm == "md5":
             hash_obj = hashlib.md5(text_bytes)
         elif algorithm == "sha1":
             hash_obj = hashlib.sha1(text_bytes)
         else:  # sha256
             hash_obj = hashlib.sha256(text_bytes)
-        
+
         digest = hash_obj.hexdigest()
-        
+
         return [
             TextContent(
                 type="text",
@@ -209,13 +213,13 @@ class RegexTool(BaseTool):
     async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
         """Perform regex operation."""
         self.validate_input(arguments)
-        
+
         operation = arguments["operation"]
         pattern = arguments["pattern"]
         text = arguments["text"]
         replacement = arguments.get("replacement", "")
         flags_list = arguments.get("flags", [])
-        
+
         # Build flags
         flags = 0
         for flag_name in flags_list:
@@ -225,7 +229,7 @@ class RegexTool(BaseTool):
                 flags |= re.MULTILINE
             elif flag_name == "DOTALL":
                 flags |= re.DOTALL
-        
+
         try:
             if operation == "match":
                 match = re.match(pattern, text, flags)
@@ -242,7 +246,7 @@ class RegexTool(BaseTool):
             else:  # replace
                 result_text = re.sub(pattern, replacement, text, flags=flags)
                 result = f"Replaced text:\n{result_text}"
-            
+
             return [TextContent(type="text", text=result)]
         except re.error as e:
             return [TextContent(type="text", text=f"Regex error: {str(e)}")]

@@ -10,6 +10,7 @@ from datetime import datetime
 
 class TestType(Enum):
     """Types of tests supported"""
+
     UNIT = "unit"
     INTEGRATION = "integration"
     E2E = "e2e"
@@ -23,6 +24,7 @@ class TestType(Enum):
 
 class TestStatus(Enum):
     """Test execution status"""
+
     PENDING = "pending"
     RUNNING = "running"
     PASSED = "passed"
@@ -34,6 +36,7 @@ class TestStatus(Enum):
 
 class Language(Enum):
     """Supported programming languages"""
+
     PYTHON = "python"
     JAVASCRIPT = "javascript"
     TYPESCRIPT = "typescript"
@@ -46,6 +49,7 @@ class Language(Enum):
 
 class CoverageType(Enum):
     """Types of code coverage"""
+
     LINE = "line"
     BRANCH = "branch"
     FUNCTION = "function"
@@ -55,6 +59,7 @@ class CoverageType(Enum):
 @dataclass
 class TestCase:
     """Represents a single test case"""
+
     id: str
     name: str
     type: TestType
@@ -72,6 +77,7 @@ class TestCase:
 @dataclass
 class TestResult:
     """Result of a test execution"""
+
     test_id: str
     status: TestStatus
     duration: float  # seconds
@@ -82,13 +88,16 @@ class TestResult:
     stack_trace: Optional[str] = None
     assertions: Dict[str, bool] = field(default_factory=dict)
     metrics: Dict[str, Any] = field(default_factory=dict)
-    artifacts: List[str] = field(default_factory=list)  # paths to screenshots, logs, etc.
+    artifacts: List[str] = field(
+        default_factory=list
+    )  # paths to screenshots, logs, etc.
     retry_count: int = 0
 
 
 @dataclass
 class CoverageReport:
     """Code coverage report"""
+
     file_path: str
     language: Language
     coverage_type: CoverageType
@@ -104,6 +113,7 @@ class CoverageReport:
 @dataclass
 class PerformanceMetrics:
     """Performance test metrics"""
+
     test_id: str
     response_time_avg: float  # ms
     response_time_min: float
@@ -123,6 +133,7 @@ class PerformanceMetrics:
 @dataclass
 class LoadTestResult:
     """Load test execution result"""
+
     test_id: str
     virtual_users: int
     ramp_up_time: int  # seconds
@@ -143,6 +154,7 @@ class LoadTestResult:
 @dataclass
 class MutationTestResult:
     """Mutation testing result"""
+
     file_path: str
     language: Language
     total_mutants: int
@@ -158,6 +170,7 @@ class MutationTestResult:
 @dataclass
 class TestSuite:
     """Collection of test cases"""
+
     id: str
     name: str
     description: str
@@ -174,6 +187,7 @@ class TestSuite:
 @dataclass
 class TestGenerationRequest:
     """Request for test generation"""
+
     source_code: str
     language: Language
     test_type: TestType
@@ -188,6 +202,7 @@ class TestGenerationRequest:
 @dataclass
 class TestGenerationResponse:
     """Response from test generation"""
+
     test_suite: TestSuite
     estimated_coverage: float
     generation_time: float  # seconds
@@ -198,6 +213,7 @@ class TestGenerationResponse:
 @dataclass
 class TestAnalysis:
     """Analysis of test suite quality"""
+
     total_tests: int
     test_distribution: Dict[TestType, int]
     coverage_summary: Dict[CoverageType, float]
@@ -212,6 +228,7 @@ class TestAnalysis:
 @dataclass
 class QAReport:
     """Comprehensive QA report"""
+
     project_id: str
     timestamp: datetime
     test_results: List[TestResult]
@@ -223,7 +240,7 @@ class QAReport:
     overall_status: TestStatus = TestStatus.PENDING
     quality_score: float = 0.0  # 0-100
     summary: Dict[str, Any] = field(default_factory=dict)
-    
+
     def calculate_quality_score(self) -> float:
         """Calculate overall quality score based on various metrics"""
         score = 0.0
@@ -232,33 +249,39 @@ class QAReport:
             "coverage": 0.25,
             "performance": 0.15,
             "mutation_score": 0.15,
-            "maintainability": 0.15
+            "maintainability": 0.15,
         }
-        
+
         # Calculate test pass rate
         if self.test_results:
             passed = sum(1 for r in self.test_results if r.status == TestStatus.PASSED)
             test_pass_rate = (passed / len(self.test_results)) * 100
             score += test_pass_rate * weights["test_pass_rate"]
-        
+
         # Calculate average coverage
         if self.coverage_reports:
-            avg_coverage = sum(r.coverage_percentage for r in self.coverage_reports) / len(self.coverage_reports)
+            avg_coverage = sum(
+                r.coverage_percentage for r in self.coverage_reports
+            ) / len(self.coverage_reports)
             score += avg_coverage * weights["coverage"]
-        
+
         # Include performance score if available
         if self.performance_metrics and self.performance_metrics.error_rate is not None:
             perf_score = max(0, 100 - self.performance_metrics.error_rate)
             score += perf_score * weights["performance"]
-        
+
         # Include mutation score if available
         if self.mutation_test_results:
-            avg_mutation = sum(r.mutation_score for r in self.mutation_test_results) / len(self.mutation_test_results)
+            avg_mutation = sum(
+                r.mutation_score for r in self.mutation_test_results
+            ) / len(self.mutation_test_results)
             score += avg_mutation * weights["mutation_score"]
-        
+
         # Include maintainability score if available
         if self.test_analysis and self.test_analysis.maintainability_score:
-            score += self.test_analysis.maintainability_score * weights["maintainability"]
-        
+            score += (
+                self.test_analysis.maintainability_score * weights["maintainability"]
+            )
+
         self.quality_score = min(100, max(0, score))
         return self.quality_score

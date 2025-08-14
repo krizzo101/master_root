@@ -9,10 +9,10 @@ from .orchestrator import MultiAgentOrchestrator
 
 __all__ = [
     "CriticAgent",
-    "TestingAgent", 
+    "TestingAgent",
     "DocumentationAgent",
     "SecurityAgent",
     "ModeDetector",
     "ExecutionMode",
-    "MultiAgentOrchestrator"
+    "MultiAgentOrchestrator",
 ]

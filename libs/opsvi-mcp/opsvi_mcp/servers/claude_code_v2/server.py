@@ -48,12 +48,12 @@ class ClaudeCodeV2Server:
             agent_profile: Optional[str] = None,
             output_dir: Optional[str] = None,
             timeout: int = 600,
-            metadata: Optional[Dict[str, Any]] = None
+            metadata: Optional[Dict[str, Any]] = None,
         ) -> Dict[str, Any]:
             """
             Spawn a new agent that runs independently.
             Returns immediately with job ID and result location.
-            
+
             Args:
                 task: Task for the agent to perform
                 agent_profile: Optional agent profile to use
@@ -155,12 +155,12 @@ class ClaudeCodeV2Server:
             job_ids: Optional[List[str]] = None,
             output_dir: Optional[str] = None,
             include_partial: bool = False,
-            cleanup: bool = False
+            cleanup: bool = False,
         ) -> Dict[str, Any]:
             """
             Collect results from spawned agents.
             Non-blocking - returns whatever is available.
-            
+
             Args:
                 job_ids: Optional list of specific job IDs to check
                 output_dir: Optional directory to check for results

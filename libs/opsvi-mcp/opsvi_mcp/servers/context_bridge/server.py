@@ -230,12 +230,18 @@ class ContextBridgeServer:
         try:
             if self.pubsub_backend:
                 channel = f"context:{event.event_type.value}"
-                message = event.to_redis_message()  # JSON format works for both backends
+                message = (
+                    event.to_redis_message()
+                )  # JSON format works for both backends
                 delivered = await self.pubsub_backend.publish(channel, message)
                 self.metrics["events_published"] += 1
-                logger.debug(f"Published event: {event.event_type} to {delivered} subscribers")
+                logger.debug(
+                    f"Published event: {event.event_type} to {delivered} subscribers"
+                )
             else:
-                logger.debug(f"No pub/sub backend available, event not published: {event.event_type}")
+                logger.debug(
+                    f"No pub/sub backend available, event not published: {event.event_type}"
+                )
         except Exception as e:
             logger.error(f"Failed to publish event: {e}")
 
@@ -292,15 +298,15 @@ class ContextBridgeServer:
         """Start the server and initialize pub/sub backend"""
         # Configure logging
         self.config.configure_logging()
-        
+
         backend_mode = self.config.get_effective_backend()
-        
+
         if backend_mode == "memory":
             # Use in-memory pub/sub
             self.pubsub_backend = InMemoryPubSub()
             self.backend_type = "memory"
             logger.info("Using in-memory pub/sub backend")
-        
+
         elif backend_mode == "redis":
             # Try Redis only
             if await self._init_redis():
@@ -309,7 +315,7 @@ class ContextBridgeServer:
             else:
                 logger.error("Redis required but not available")
                 raise RuntimeError("Redis backend required but connection failed")
-        
+
         else:  # auto mode
             # Try Redis first, fallback to in-memory
             if await self._init_redis():
@@ -320,31 +326,31 @@ class ContextBridgeServer:
                 self.pubsub_backend = InMemoryPubSub()
                 self.backend_type = "memory"
                 logger.info("Using in-memory pub/sub backend")
-        
+
         logger.info(f"Context Bridge Server started with {self.backend_type} backend")
-    
+
     async def _init_redis(self) -> bool:
         """Initialize Redis connection and adapter"""
         try:
             import redis.asyncio as redis
-            
+
             redis_client = await redis.from_url(
                 self.config.redis_url,
                 socket_connect_timeout=self.config.redis_connect_timeout,
                 retry_on_timeout=self.config.redis_retry_on_timeout,
-                max_connections=self.config.redis_max_connections
+                max_connections=self.config.redis_max_connections,
             )
-            
+
             # Test connection
             await redis_client.ping()
-            
+
             # Create adapter
             adapter = RedisPubSubAdapter(redis_client)
             await adapter.initialize()
             self.pubsub_backend = adapter
-            
+
             return True
-            
+
         except ImportError:
             logger.warning("Redis library not installed, cannot use Redis backend")
             return False
@@ -361,6 +367,7 @@ class ContextBridgeServer:
 
 # Create and export server instance with default config
 from .config import get_default_config
+
 server = ContextBridgeServer(config=get_default_config())
 mcp = server.mcp
 
