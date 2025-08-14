@@ -76,6 +76,7 @@ This document outlines the rules, guidelines, and best practices for the AI codi
 *   Always use `shell_exec` instead of `run_terminal_cmd` for executing commands.
 *   When committing changes to git, include a special note in the description if the claude code MCP server is working properly.
 *   When I ask you to generate a diagram, I expect it to be rendered inline in the chat session.
+*   When the user requests a git commit without specifying a commit message, propose a generic commit message such as "chore: commit all changes [skip ci]".
 
 ## DEBUGGING
 
@@ -818,8 +819,4 @@ def stream_structured_response(prompt: str, schema: BaseModel):
     with client.responses.stream(
         model="gpt-5-mini",
         input=prompt,
-        text_format=schema,
-    ) as stream:
-
-        for event in stream:
-            if event.type == "response.output_text.delta":
+        text_
