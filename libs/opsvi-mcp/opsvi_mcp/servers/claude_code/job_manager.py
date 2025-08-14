@@ -217,15 +217,14 @@ class JobManager:
 
         # Clean environment of potentially conflicting variables
         # IMPORTANT: Remove ANTHROPIC_API_KEY as it conflicts with CLAUDE_CODE_TOKEN
-        # Since ANTHROPIC_API_KEY is set by default, we must override it
+        # The claude CLI uses CLAUDE_CODE_TOKEN for authentication
         removed_vars = []
 
-        # First, explicitly handle ANTHROPIC_API_KEY
+        # Remove ANTHROPIC_API_KEY completely - don't set to empty string
+        # as that could cause different behavior than not having it at all
         if "ANTHROPIC_API_KEY" in env:
             del env["ANTHROPIC_API_KEY"]
             removed_vars.append("ANTHROPIC_API_KEY")
-        # Set to empty string as double safety measure
-        env["ANTHROPIC_API_KEY"] = ""
 
         # Then clean other conflicting variables
         for key in list(env.keys()):

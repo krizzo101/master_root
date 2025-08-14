@@ -35,13 +35,23 @@ class MultiTokenManager:
         if primary:
             tokens.append(primary)
 
-        # Additional numbered tokens (CLAUDE_CODE_TOKEN1, CLAUDE_CODE_TOKEN2, etc.)
+        # Additional numbered tokens - try both formats for compatibility
+        # Format 1: CLAUDE_CODE_TOKEN1, CLAUDE_CODE_TOKEN2 (as in .mcp.json)
+        # Format 2: CLAUDE_CODE_TOKEN_1, CLAUDE_CODE_TOKEN_2 (legacy)
         for i in range(1, 11):  # Support up to 10 additional tokens
+            # Try format without underscore first (matches .mcp.json)
             token_key = f"CLAUDE_CODE_TOKEN{i}"
             token = os.getenv(token_key)
             if token:
                 tokens.append(token)
                 logger.log("TOKEN_MANAGER", "load", f"Found token: {token_key}")
+            else:
+                # Try format with underscore (legacy support)
+                token_key_alt = f"CLAUDE_CODE_TOKEN_{i}"
+                token = os.getenv(token_key_alt)
+                if token:
+                    tokens.append(token)
+                    logger.log("TOKEN_MANAGER", "load", f"Found token: {token_key_alt}")
 
         if not tokens:
             # Try loading from .env file if not in environment
@@ -70,12 +80,33 @@ class MultiTokenManager:
 
         return tokens
 
-    def get_token_for_job(self, job_id: str) -> str:
-        """Get a token for a specific job using round-robin distribution"""
-        # Round-robin token assignment for load balancing
-        token = self.tokens[self.token_index]
-        self.token_index = (self.token_index + 1) % len(self.tokens)
+    def get_token_for_job(self, job_id: str, retry_count: int = 0) -> str:
+        """Get a token for a specific job using round-robin distribution
+
+        Args:
+            job_id: The job ID
+            retry_count: Number of retry attempts (used to get different token)
+
+        Returns:
+            A token from the available pool
+        """
+        # For retries, offset the index to get a different token
+        effective_index = (self.token_index + retry_count) % len(self.tokens)
+        token = self.tokens[effective_index]
+
+        # Only advance the main index on the first attempt
+        if retry_count == 0:
+            self.token_index = (self.token_index + 1) % len(self.tokens)
+
         return token
+
+    def has_multiple_tokens(self) -> bool:
+        """Check if multiple tokens are available for parallel execution"""
+        return len(self.tokens) > 1
+
+    def get_token_count(self) -> int:
+        """Get the number of available tokens"""
+        return len(self.tokens)
 
 
 class ParallelBatchExecutor:
@@ -207,11 +238,23 @@ class ParallelBatchExecutor:
             },
         }
 
-    async def _execute_single_job(self, job: ClaudeJob) -> Any:
-        """Execute a single job asynchronously with its own token"""
+    async def _execute_single_job(self, job: ClaudeJob, retry_count: int = 0) -> Any:
+        """Execute a single job asynchronously with its own token
+
+        Args:
+            job: The job to execute
+            retry_count: Number of retry attempts
+
+        Returns:
+            Job result or exception
+        """
+        max_retries = min(
+            2, self.token_manager.get_token_count() - 1
+        )  # Retry with different tokens if available
+
         try:
-            # Get a dedicated token for this job
-            token = self.token_manager.get_token_for_job(job.id)
+            # Get a dedicated token for this job (different token on retry)
+            token = self.token_manager.get_token_for_job(job.id, retry_count)
 
             # Set the token in the job's environment
             if not hasattr(job, "env") or job.env is None:
@@ -222,13 +265,54 @@ class ParallelBatchExecutor:
                 "BATCH",
                 job.id,
                 f"Executing job with dedicated token (token #{self.token_manager.tokens.index(token) + 1} of {len(self.token_manager.tokens)})",
+                {"retry_count": retry_count},
             )
 
             # Use the job manager's async execution
             await self.job_manager.execute_job_async(job)
-            return {"job_id": job.id, "status": "completed"}
+
+            # Check if job failed due to token issues
+            if job.status == JobStatus.FAILED and job.error:
+                error_lower = job.error.lower()
+                if any(
+                    msg in error_lower
+                    for msg in [
+                        "credit balance",
+                        "rate limit",
+                        "unauthorized",
+                        "authentication",
+                    ]
+                ):
+                    if (
+                        retry_count < max_retries
+                        and self.token_manager.has_multiple_tokens()
+                    ):
+                        logger.log(
+                            "BATCH",
+                            job.id,
+                            f"Token-related failure detected, retrying with different token (attempt {retry_count + 2}/{max_retries + 1})",
+                            {"error": job.error[:200]},
+                        )
+                        # Reset job status for retry
+                        job.status = JobStatus.RUNNING
+                        job.error = None
+                        return await self._execute_single_job(job, retry_count + 1)
+
+            return {"job_id": job.id, "status": job.status.value}
+
         except Exception as e:
-            logger.log_error("BATCH", f"Job {job.id} failed during batch execution", e)
+            if retry_count < max_retries and self.token_manager.has_multiple_tokens():
+                logger.log(
+                    "BATCH",
+                    job.id,
+                    f"Job failed, retrying with different token (attempt {retry_count + 2}/{max_retries + 1})",
+                    {"error": str(e)},
+                )
+                return await self._execute_single_job(job, retry_count + 1)
+
+            logger.log_error(
+                "BATCH", f"Job {job.id} failed after {retry_count + 1} attempts", e
+            )
             return e
 
     async def _execute_with_semaphore(

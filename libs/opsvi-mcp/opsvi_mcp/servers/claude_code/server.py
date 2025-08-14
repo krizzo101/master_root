@@ -11,11 +11,11 @@ from fastmcp import FastMCP
 from .config import config
 from .job_manager import JobManager
 from .parallel_logger import logger
-from .parallel_enhancement import enhance_job_manager_with_parallel
 
 
 # Initialize FastMCP server
-mcp = FastMCP("claude-code-server")
+# Name matches the MCP registration in .mcp.json
+mcp = FastMCP("claude-code")
 
 # Initialize job manager globally
 job_manager = JobManager()
@@ -351,7 +351,7 @@ async def claude_run_batch(
             tasks=tasks, parent_job_id=parent_job_id, max_concurrent=max_concurrent
         )
 
-        logger.log("API", "BATCH", f"Batch execution completed", result)
+        logger.log("API", "BATCH", "Batch execution completed", result)
 
         return json.dumps(result, indent=2)
 

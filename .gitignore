@@ -345,7 +345,7 @@ apps
 .pytest_cache/
 
 # Project intelligence cache
-.proj-intel/
+#.proj-intel/
 .cursor/project_intelligence_cache/
 
 # genFileMap directories

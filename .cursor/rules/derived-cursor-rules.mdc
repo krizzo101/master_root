@@ -77,6 +77,16 @@ This document outlines the rules, guidelines, and best practices for the AI codi
 *   When committing changes to git, include a special note in the description if the claude code MCP server is working properly.
 *   When I ask you to generate a diagram, I expect it to be rendered inline in the chat session.
 *   When the user requests a git commit without specifying a commit message, propose a generic commit message such as "chore: commit all changes [skip ci]".
+*   When committing changes via `shell_exec`, the AI should:
+    *   Stage all changes using `git add -A`.
+    *   Check if there are any changes to commit using `git diff --cached --quiet --ignore-submodules --`.
+    *   If there are changes, commit with a message formatted with the current date and time: `git commit --no-verify -m "chore: autosave commit of all changes ($(date -u +%Y-%m-%dT%H:%M:%SZ))"`.
+    *   Print the current working directory using `pwd`.
+    *   List all files in the directory using `ls -a`.
+    *   Show the git status using `git status | cat`.
+    *   Show the current branch using `git branch --show-current`.
+    *   Show the last 5 commits using `git log --oneline -5 | cat`.
+    *   List git worktrees using `git worktree list | cat`.
 
 ## DEBUGGING
 
@@ -792,31 +802,4 @@ def safe_api_call(**kwargs) -> Union[dict, None]:
     except openai.AuthenticationError:
         raise ConfigurationError("Invalid API key or authentication failure")
     except openai.PermissionDeniedError:
-        raise ConfigurationError("Permission denied - check model access")
-    except openai.BadRequestError as e:
-        raise ConfigurationError(f"Invalid request configuration: {e}")
-
-    # NO fallback return - must succeed or fail explicitly
-
-# ❌ FALLBACK PATTERNS - ABSOLUTELY PROHIBITED
-def prohibited_fallback_pattern(**kwargs):
-    try:
-        return safe_api_call(**kwargs)
-    except Exception:
-        # FORBIDDEN - No fallback mechanisms allowed
-        return simple_text_response()  # VIOLATION
 ```
-
-## Streaming with Structured Outputs (2025 PATTERN)
-
-```python
-# ✅ STRUCTURED STREAMING WITH REAL-TIME PROCESSING
-def stream_structured_response(prompt: str, schema: BaseModel):
-    """Stream structured response with real-time validation"""
-
-    accumulated_data = {}
-
-    with client.responses.stream(
-        model="gpt-5-mini",
-        input=prompt,
-        text_
