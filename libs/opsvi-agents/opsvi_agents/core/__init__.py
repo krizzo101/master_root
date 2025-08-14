@@ -1,8 +1,21 @@
-"""Core module for opsvi-agents.
+"""Core agent components."""
 
-Provides base classes and core functionality.
-"""
+from .base import (
+    BaseAgent,
+    AgentConfig,
+    AgentContext,
+    AgentMessage,
+    AgentResult,
+    AgentState,
+    AgentCapability,
+)
 
-from .base import Error, ConfigurationError, InitializationError
-
-__all__ = ["Error", "ConfigurationError", "InitializationError"]
+__all__ = [
+    "BaseAgent",
+    "AgentConfig",
+    "AgentContext",
+    "AgentMessage",
+    "AgentResult",
+    "AgentState",
+    "AgentCapability",
+]
