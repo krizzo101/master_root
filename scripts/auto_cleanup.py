@@ -127,7 +127,8 @@ class ProjectCleaner:
         return moved
     
     def archive_old_documents(self, days: int = 30) -> int:
-        """Archive documents older than specified days"""
+        """Archive ONLY temporary documents (date-prefixed) older than specified days
+        Core documentation in architecture/ and guides/ NEVER expires"""
         docs_dir = self.root / 'docs'
         archive_dir = docs_dir / 'archive'
         archive_dir.mkdir(parents=True, exist_ok=True)
@@ -135,21 +136,19 @@ class ProjectCleaner:
         count = 0
         cutoff = datetime.now() - timedelta(days=days)
         
-        for subdir in ['analysis', 'guides', 'migration']:
+        # Only archive from temporary directories (analysis, migration)
+        # NEVER archive from architecture or guides (permanent documentation)
+        for subdir in ['analysis', 'migration']:
             source_dir = docs_dir / subdir
             if source_dir.exists():
                 for doc in source_dir.glob('*.md'):
-                    mtime = datetime.fromtimestamp(doc.stat().st_mtime)
-                    if mtime < cutoff:
-                        # Add date prefix if not present
-                        if not doc.name[:10].replace('-', '').isdigit():
-                            new_name = f"{mtime.strftime('%Y-%m-%d')}_{doc.name}"
-                        else:
-                            new_name = doc.name
-                            
-                        target = archive_dir / new_name
-                        shutil.move(str(doc), str(target))
-                        count += 1
+                    # Only archive if file has date prefix (YYYY-MM-DD format)
+                    if doc.name[:10].replace('-', '').isdigit() and len(doc.name) > 10 and doc.name[10] == '_':
+                        mtime = datetime.fromtimestamp(doc.stat().st_mtime)
+                        if mtime < cutoff:
+                            target = archive_dir / doc.name
+                            shutil.move(str(doc), str(target))
+                            count += 1
                         
         if count:
             self.actions_taken.append(f"Archived {count} old documents")

@@ -29,11 +29,11 @@ BEFORE CREATING ANY FILE:
 ```
 master_root/
 ├── docs/                    # ALL documentation except README, CLAUDE.md, QUICK_START
-│   ├── architecture/        # System design, architecture decisions
-│   ├── analysis/           # Reports, analysis (prefix with YYYY-MM-DD)
-│   ├── guides/             # How-to guides, tutorials
-│   ├── migration/          # Migration plans, upgrade guides
-│   └── archive/            # Old versions (auto-moved after 30 days)
+│   ├── architecture/        # PERMANENT - System design, architecture decisions
+│   ├── guides/             # PERMANENT - How-to guides, tutorials, API docs
+│   ├── analysis/           # TEMPORARY - Reports, analysis (YYYY-MM-DD prefix, archive after 30 days)
+│   ├── migration/          # TEMPORARY - Migration plans (archive when complete)
+│   └── archive/            # Old temporary docs and obsolete versions
 ├── apps/                   # Applications only
 ├── libs/                   # Libraries only
 ├── servers/                # Server implementations only
@@ -44,10 +44,11 @@ master_root/
 
 ### AUTOMATIC CLEANUP PROTOCOLS (RUN WITHOUT ASKING)
 1. **DAILY**: Delete files in .tmp/ older than 24 hours
-2. **WEEKLY**: Move docs >30 days old to docs/archive/
+2. **WEEKLY**: Archive ONLY date-prefixed analysis/reports >30 days old
 3. **WEEKLY**: Compress .log files >7 days old
 4. **MONTHLY**: Alert on directories >100MB for review
-5. **ALWAYS**: Run cleanup before starting new tasks
+5. **NEVER**: Auto-archive core documentation (architecture, guides, APIs)
+6. **ALWAYS**: Run cleanup CHECK before starting new tasks (fix only with permission)
 
 ### FILE NAMING CONVENTIONS (STRICTLY ENFORCED)
 - **Documentation**: `YYYY-MM-DD_description.md` for time-sensitive docs
@@ -60,8 +61,8 @@ master_root/
 - **ONE authoritative document per topic** - Update existing, don't create new
 - **Git for versioning** - Never use filename versioning
 - **Maximum 5 .md files in root** - Only README, CLAUDE, QUICK_START, LICENSE, CONTRIBUTING
-- **Archive threshold**: Documents untouched for 30 days → auto-archive
-- **Report expiry**: Analysis/reports older than 30 days → compress and archive
+- **Core documentation NEVER expires** - Architecture, guides, API docs are permanent
+- **Only temporary items expire**: Analysis/reports with date prefixes → archive after 30 days
 
 ### SIZE MANAGEMENT PROTOCOLS
 - **File size limit**: Alert at 10MB, fail at 50MB (except data files)

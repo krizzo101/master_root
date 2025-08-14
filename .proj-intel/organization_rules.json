@@ -7,12 +7,14 @@
     "documentation": {
       "path": "docs/",
       "subdirs": {
-        "architecture": "System design, architecture decisions",
-        "analysis": "Reports, analysis (YYYY-MM-DD prefix required)",
-        "guides": "How-to guides, tutorials",
-        "migration": "Migration plans, upgrade guides",
-        "archive": "Old versions (auto-moved after 30 days)"
+        "architecture": "PERMANENT - System design, architecture decisions",
+        "guides": "PERMANENT - How-to guides, tutorials, API documentation",
+        "analysis": "TEMPORARY - Reports, analysis (YYYY-MM-DD prefix required, archive after 30 days)",
+        "migration": "TEMPORARY - Migration plans, upgrade guides (archive when complete)",
+        "archive": "Storage for expired temporary docs only"
       },
+      "permanent_dirs": ["architecture", "guides"],
+      "temporary_dirs": ["analysis", "migration"],
       "root_allowed": ["README.md", "CLAUDE.md", "QUICK_START.md", "LICENSE.md", "CONTRIBUTING.md"],
       "max_root_docs": 5
     },
