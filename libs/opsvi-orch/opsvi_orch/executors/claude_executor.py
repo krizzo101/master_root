@@ -338,7 +338,7 @@ class ClaudeBatchExecutor:
         output_format: str = "json",
     ) -> Dict[str, Any]:
         """
-        Execute batch of Claude tasks in parallel.
+        Execute batch of Claude tasks in parallel using Send API.
 
         Args:
             tasks: Tasks to execute
@@ -354,54 +354,35 @@ class ClaudeBatchExecutor:
 
         logger.info(f"Starting Claude batch {batch_id}: {len(tasks)} tasks")
 
-        # Create job configurations
-        job_configs = []
-        for i, task in enumerate(tasks):
-            job_id = f"{batch_id}_{i}"
-            job_configs.append(
-                {
-                    "job_id": job_id,
-                    "task": task,
-                    "parent_job_id": parent_job_id,
+        # Create Send objects for parallel execution
+        sends = self.create_claude_sends(
+            tasks=tasks, parent_job_id=parent_job_id, recursion_depth=0
+        )
+
+        # Create and execute the graph using proper Send API
+        graph = self.send_executor.create_send_graph(
+            sends=sends,
+            executor_func=self._execute_single_task,
+            context={"cwd": cwd, "output_format": output_format, "batch_id": batch_id},
+        )
+
+        # Execute the graph
+        graph_result = await graph.ainvoke(
+            {
+                "sends": sends,
+                "results": [],
+                "errors": [],
+                "context": {
                     "cwd": cwd,
                     "output_format": output_format,
-                }
-            )
+                    "batch_id": batch_id,
+                },
+            }
+        )
 
-        # Execute in parallel (would use Send API in full implementation)
-        results = []
-        errors = []
-
-        import asyncio
-
-        # Create tasks for parallel execution
-        async_tasks = []
-        for config in job_configs:
-            async_task = self.job_executor.execute_claude_job(
-                task=config["task"],
-                job_id=config["job_id"],
-                parent_job_id=config["parent_job_id"],
-                cwd=config["cwd"],
-                output_format=config["output_format"],
-            )
-            async_tasks.append(async_task)
-
-        # Execute all in parallel
-        # NOTE: In production, this would use Send API, not gather
-        task_results = await asyncio.gather(*async_tasks, return_exceptions=True)
-
-        # Process results
-        for i, result in enumerate(task_results):
-            if isinstance(result, Exception):
-                errors.append(
-                    {"job_id": job_configs[i]["job_id"], "error": str(result)}
-                )
-            else:
-                success, job_result = result
-                if success:
-                    results.append(job_result)
-                else:
-                    errors.append(job_result)
+        # Process results from graph execution
+        results = graph_result.get("results", [])
+        errors = graph_result.get("errors", [])
 
         execution_time = (datetime.now() - start_time).total_seconds() * 1000
 
@@ -418,3 +399,34 @@ class ClaudeBatchExecutor:
                 "success_rate": len(results) / len(tasks) if tasks else 0,
             },
         }
+
+    async def _execute_single_task(
+        self, send_data: Dict[str, Any], context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Execute a single task from Send data.
+
+        Args:
+            send_data: Data from Send object
+            context: Execution context
+
+        Returns:
+            Task execution result
+        """
+        task = send_data.get("task")
+        job_id = send_data.get("job_id")
+        parent_job_id = send_data.get("parent_job_id")
+
+        try:
+            success, result = await self.job_executor.execute_claude_job(
+                task=task,
+                job_id=job_id,
+                parent_job_id=parent_job_id,
+                cwd=context.get("cwd"),
+                output_format=context.get("output_format"),
+            )
+
+            return {"success": success, "result": result, "job_id": job_id}
+        except Exception as e:
+            logger.error(f"Task execution failed for {job_id}: {e}")
+            return {"success": False, "error": str(e), "job_id": job_id}

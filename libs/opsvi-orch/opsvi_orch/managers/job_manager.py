@@ -10,12 +10,13 @@ Provides:
 - Result collection and aggregation
 """
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 import logging
 import json
 import uuid
+import os
 
 from ..patterns.langgraph_patterns import ParallelOrchestrationPattern
 from ..patterns.send_api import ParallelSendExecutor, SendBuilder
@@ -296,17 +297,138 @@ class JobManager:
 
     async def _execute_sends(self, sends: List[Any]) -> ExecutionResult:
         """
-        Execute Send objects.
-        In real implementation, this would spawn Claude processes.
+        Execute Send objects using LangGraph's Send API.
+        Creates a graph that properly handles parallel execution.
         """
-        # Placeholder for actual Claude spawning
-        # Would integrate with V1's subprocess spawning
+        from langgraph.graph import StateGraph
+        from typing import TypedDict, Annotated
+        import operator
+        import subprocess
+
+        class JobExecutionState(TypedDict):
+            sends: List[Any]
+            results: Annotated[List[Dict[str, Any]], operator.add]
+            errors: Annotated[List[Dict[str, Any]], operator.add]
+
+        # Build execution graph
+        graph = StateGraph(JobExecutionState)
+
+        def prepare_jobs(state: Dict[str, Any]) -> Dict[str, Any]:
+            """Prepare jobs for execution."""
+            return {"sends": sends}
+
+        def execute_job(state: Dict[str, Any]) -> Dict[str, Any]:
+            """Execute a single job via Claude CLI."""
+            job_data = state.get("job_data", {})
+            job_id = job_data.get("job_id")
+            task = job_data.get("task")
+            cwd = job_data.get("cwd")
+
+            try:
+                # Build Claude command
+                cmd = [
+                    "claude",
+                    "--output-format",
+                    job_data.get("output_format", "json"),
+                    "--dangerously-skip-permissions",
+                ]
+
+                if cwd:
+                    mcp_config = os.path.join(cwd, ".mcp.json")
+                    if os.path.exists(mcp_config):
+                        cmd.extend(["--mcp-config", mcp_config])
+
+                cmd.extend(["-p", task])
+
+                # Execute
+                env = os.environ.copy()
+                env.pop("ANTHROPIC_API_KEY", None)  # Force token auth
+
+                process = subprocess.Popen(
+                    cmd,
+                    cwd=cwd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    env=env,
+                    text=True,
+                )
+
+                stdout, stderr = process.communicate(timeout=30)
+
+                if process.returncode == 0:
+                    return {
+                        "results": [
+                            {
+                                "job_id": job_id,
+                                "success": True,
+                                "output": stdout,
+                                "task": task,
+                            }
+                        ]
+                    }
+                else:
+                    return {
+                        "errors": [
+                            {
+                                "job_id": job_id,
+                                "error": stderr
+                                or f"Process exited with code {process.returncode}",
+                                "task": task,
+                            }
+                        ]
+                    }
+
+            except subprocess.TimeoutExpired:
+                return {
+                    "errors": [
+                        {"job_id": job_id, "error": "Execution timeout", "task": task}
+                    ]
+                }
+            except Exception as e:
+                return {"errors": [{"job_id": job_id, "error": str(e), "task": task}]}
+
+        def route_jobs(state: Dict[str, Any]) -> List[Send]:
+            """Route jobs for parallel execution."""
+            from langgraph.constants import Send
+
+            job_sends = []
+            for send in sends:
+                if hasattr(send, "state"):
+                    job_sends.append(Send("execute_job", {"job_data": send.state}))
+            return job_sends
+
+        def aggregate(state: Dict[str, Any]) -> Dict[str, Any]:
+            """Aggregate results."""
+            return {
+                "results": state.get("results", []),
+                "errors": state.get("errors", []),
+            }
+
+        # Build graph
+        graph.add_node("prepare", prepare_jobs)
+        graph.add_node("execute_job", execute_job)
+        graph.add_node("aggregate", aggregate)
+
+        graph.add_edge("__start__", "prepare")
+        graph.add_conditional_edges("prepare", route_jobs, ["execute_job"])
+        graph.add_edge("execute_job", "aggregate")
+        graph.add_edge("aggregate", "__end__")
+
+        compiled_graph = graph.compile()
+
+        # Execute
+        start_time = datetime.now()
+        result = await compiled_graph.ainvoke(
+            {"sends": sends, "results": [], "errors": []}
+        )
+
+        execution_time = (datetime.now() - start_time).total_seconds() * 1000
 
         return ExecutionResult(
-            success=True,
-            results=[{"job_id": s.state.get("job_id")} for s in sends],
-            errors=[],
-            execution_time_ms=100,
-            tasks_completed=len(sends),
-            tasks_failed=0,
+            success=len(result.get("errors", [])) == 0,
+            results=result.get("results", []),
+            errors=result.get("errors", []),
+            execution_time_ms=execution_time,
+            tasks_completed=len(result.get("results", [])),
+            tasks_failed=len(result.get("errors", [])),
         )

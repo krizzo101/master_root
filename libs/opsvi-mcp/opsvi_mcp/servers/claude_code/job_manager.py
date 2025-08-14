@@ -20,6 +20,10 @@ from .recursion_manager import RecursionManager
 from .performance_monitor import PerformanceMonitor
 
 
+from .parallel_enhancement import enhance_job_manager_with_parallel
+
+
+@enhance_job_manager_with_parallel
 class JobManager:
     """Manages Claude Code job execution and lifecycle"""
 
@@ -78,6 +82,7 @@ class JobManager:
         permission_mode: str = "bypassPermissions",
         verbose: bool = False,
         parent_job_id: Optional[str] = None,
+        model: Optional[str] = None,
     ) -> ClaudeJob:
         """Create a new job"""
         job_id = str(uuid.uuid4())
@@ -106,6 +111,7 @@ class JobManager:
             verbose=verbose,
             recursion_context=recursion_context,
             parent_job_id=parent_job_id,
+            model=model,
         )
 
         # Create performance metrics
@@ -156,6 +162,11 @@ class JobManager:
         # Build command
         cmd = ["claude"]
 
+        # Add model if specified
+        if job.model:
+            cmd.extend(["--model", job.model])
+            logger.log_debug(job.id, f"Using model: {job.model}")
+
         # Add MCP configuration if needed
         if required_servers:
             # Create minimal MCP config for this job
@@ -191,7 +202,14 @@ class JobManager:
 
         # Set up environment
         env = os.environ.copy()
-        if config.claude_code_token:
+
+        # Check if job has custom environment variables (e.g., dedicated token)
+        if job.env and "CLAUDE_CODE_TOKEN" in job.env:
+            env["CLAUDE_CODE_TOKEN"] = job.env["CLAUDE_CODE_TOKEN"]
+            logger.log_trace(
+                job.id, "Using job-specific auth token for parallel execution"
+            )
+        elif config.claude_code_token:
             env["CLAUDE_CODE_TOKEN"] = config.claude_code_token
             logger.log_trace(job.id, "Auth token set in environment")
         else:

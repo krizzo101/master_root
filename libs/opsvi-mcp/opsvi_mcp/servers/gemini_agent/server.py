@@ -7,10 +7,8 @@ Provides MCP interface to Google's Gemini CLI for AI-powered coding assistance.
 import asyncio
 import json
 import os
-import subprocess
 import uuid
 import tempfile
-from pathlib import Path
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 import logging
@@ -330,18 +328,9 @@ class GeminiAgentServer:
         request_id = str(uuid.uuid4())
 
         try:
-            # Prepare command - use prompt flag for non-interactive mode
-            cmd = ["gemini", "--prompt", request.task]
-
-            # Add model if specified
-            if self.config.model:
-                cmd.extend(["--model", self.config.model])
-
-            # Add approval mode based on settings
-            if request.enable_file_ops or request.enable_shell:
-                cmd.extend(
-                    ["--approval-mode", "yolo"]
-                )  # Auto-approve for programmatic use
+            # Prepare command matching working manual usage
+            # Rely on gemini-settings.json for model selection (now set to 2.5-pro)
+            cmd = ["gemini", "-p", request.task]
 
             # Create temp file for output
             output_file = tempfile.NamedTemporaryFile(
@@ -422,7 +411,7 @@ class GeminiAgentServer:
             if "output_file" in locals():
                 try:
                     os.unlink(output_file.name)
-                except:
+                except Exception:
                     pass
 
     async def _execute_task_async(self, task: GeminiTask):

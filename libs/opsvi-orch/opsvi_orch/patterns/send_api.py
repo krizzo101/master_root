@@ -15,9 +15,9 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime
 import logging
-import asyncio
 
 from langgraph.constants import Send
+from langgraph.graph import StateGraph
 
 logger = logging.getLogger(__name__)
 
@@ -212,6 +212,121 @@ class ParallelSendExecutor:
             f"Batched {len(sends)} sends into {len(batches)} batches of max {batch_size}"
         )
         return batches
+
+    def create_send_graph(
+        self,
+        sends: List[Send],
+        executor_func: Callable,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> StateGraph:
+        """
+        Create a LangGraph StateGraph that properly executes Send objects in parallel.
+
+        This method creates a graph structure that uses LangGraph's native Send API
+        for parallel execution, replacing the asyncio.gather anti-pattern.
+
+        Args:
+            sends: List of Send objects to execute
+            executor_func: Function to execute each send's data
+            context: Optional shared context for all executions
+
+        Returns:
+            Compiled StateGraph ready for execution
+        """
+        from typing import TypedDict, Annotated
+        import operator
+
+        class SendExecutionState(TypedDict):
+            sends: List[Send]
+            results: Annotated[List[Dict[str, Any]], operator.add]
+            errors: Annotated[List[Dict[str, Any]], operator.add]
+            context: Dict[str, Any]
+
+        graph = StateGraph(SendExecutionState)
+
+        def prepare_sends(state: Dict[str, Any]) -> Dict[str, Any]:
+            """Prepare sends for parallel execution."""
+            return {"sends": sends, "context": context or {}}
+
+        def execute_send(state: Dict[str, Any]) -> Dict[str, Any]:
+            """Execute a single send."""
+            send_data = state.get("send_data", {})
+            ctx = state.get("context", {})
+            start_time = datetime.now()
+
+            try:
+                # Execute the actual function
+                result = executor_func(send_data, ctx)
+                duration = (datetime.now() - start_time).total_seconds() * 1000
+
+                if self.enable_metrics:
+                    self.metrics.update(True, duration)
+
+                return {
+                    "results": [
+                        {
+                            "success": True,
+                            "data": result,
+                            "job_id": send_data.get("job_id"),
+                            "duration_ms": duration,
+                        }
+                    ]
+                }
+            except Exception as e:
+                duration = (datetime.now() - start_time).total_seconds() * 1000
+
+                if self.enable_metrics:
+                    self.metrics.update(False, duration)
+
+                logger.error(f"Send execution failed: {e}")
+                return {
+                    "errors": [
+                        {
+                            "success": False,
+                            "error": str(e),
+                            "job_id": send_data.get("job_id"),
+                            "task": send_data.get("task"),
+                        }
+                    ]
+                }
+
+        def route_sends(state: Dict[str, Any]) -> List[Send]:
+            """Route to parallel send execution using LangGraph Send API."""
+            sends_list = state.get("sends", sends)
+            # Return Send objects for parallel execution
+            return [
+                Send(
+                    "execute_send",
+                    {
+                        "send_data": s.state if hasattr(s, "state") else {},
+                        "context": state.get("context", {}),
+                    },
+                )
+                for s in sends_list
+            ]
+
+        def aggregate_results(state: Dict[str, Any]) -> Dict[str, Any]:
+            """Aggregate results from parallel execution."""
+            return {
+                "results": state.get("results", []),
+                "errors": state.get("errors", []),
+            }
+
+        # Build the graph
+        graph.add_node("prepare", prepare_sends)
+        graph.add_node("execute_send", execute_send)
+        graph.add_node("aggregate", aggregate_results)
+
+        # Add edges
+        graph.add_edge("__start__", "prepare")
+        # This is the critical part - using conditional edges with Send objects
+        graph.add_conditional_edges(
+            "prepare", route_sends, ["execute_send"]  # Possible destinations
+        )
+        graph.add_edge("execute_send", "aggregate")
+        graph.add_edge("aggregate", "__end__")
+
+        return graph.compile()
 
 
 class BatchSendCoordinator:

@@ -1,12 +1,16 @@
 version: 1
 generator: project-intelligence-fast
 files:
+  - ACTIVATE_AUTO_MCP_INSTRUCTIONS.md
   - AGENTS.md
   - AGENT_WORLD_TO_OPSVI_MAPPING.md
   - AI_CAPABILITY_IMPLEMENTATION_PLAN.md
+  - AUTO_MCP_INTEGRATION_GUIDE.md
+  - AUTO_MCP_PROJECT_PATHS.md
   - CLAUDE.local.md
   - CLAUDE.md
   - CLAUDE_CODE_MIGRATION_STATUS.md
+  - CLAUDE_CODE_USE_CASES.md
   - COMPREHENSIVE_MIGRATION_PLAN.md
   - CONSULT_AGENT_CONTEXT_PACKAGE.md
   - CONSULT_AGENT_OPTIMIZATION_DESIGN_SPEC.md
@@ -19,16 +23,29 @@ files:
   - FINAL_OPTIMIZATION_SUMMARY.md
   - FINAL_STATUS_REPORT.md
   - GAP_ANALYSIS.md
+  - GEMINI_API_KEY_ISSUE.md
+  - GEMINI_SUBSCRIPTION_CLARIFICATION.md
+  - MCP_SERVERS_TRUTH_REPORT.md
+  - MCP_TOKEN_FIX_SUMMARY.md
   - MIGRATION_ROADMAP.md
   - MIGRATION_SUMMARY.md
   - MULTI_CRITIC_APPROACH.md
   - OPSVI_LIBS_GAP_ANALYSIS.md
+  - OPSVI_MCP_ANALYSIS_REPORT.md
+  - ORCHESTRATION_MODULE_PLAN.md
   - PEER_CODEBASE_ANALYSIS.md
   - PERPLEXITY_INTEGRATION_SUCCESS.md
   - PERPLEXITY_INTEGRATION_SUMMARY.md
   - QUICK_START.md
   - README.md
+  - TEST_AUTO_MCP_LIVE.md
+  - TEST_CLAUDE_INTEGRATION.md
   - TOURNAMENT_APPROACH_SUMMARY.md
+  - V1_LANGGRAPH_ORCHESTRATION_DESIGN.md
+  - V1_PARALLEL_RECURSIVE_ENHANCEMENT.md
+  - V3_ACTUAL_BEHAVIOR.md
+  - V3_PARALLEL_BEHAVIOR_ANALYSIS.md
+  - V3_TEST_REPORT.md
   - agents/integration_architect_agent.md
   - agents/sdlc_agent_implementation_guide.md
   - agents/sdlc_agent_usage_example.py
@@ -38,6 +55,7 @@ files:
   - autonomous_research_assistant.py
   - baseline_analysis.py
   - claude_code_architecture_diagrams.md
+  - claude_code_log_analysis.md
   - clean_log.py
   - comprehensive_optimization_analysis.py
   - consult_agent_optimization_strategy.md
@@ -85,6 +103,7 @@ files:
   - factorial_recursive.py
   - fast_migrate.py
   - fibonacci.py
+  - gemini-settings.json
   - generate_project_visualizations.py
   - generate_project_visualizations_fixed.py
   - hello_mcp.py
@@ -615,32 +634,32 @@ files:
   - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/workers/celery_app.py
   - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/workers/tasks.py
   - libs/opsvi-auto-forge/pyproject.toml
-  - libs/opsvi-communication/README.md
-  - libs/opsvi-communication/opsvi_communication/__init__.py
-  - libs/opsvi-communication/opsvi_communication/collaboration_framework.py
-  - libs/opsvi-communication/opsvi_communication/config/__init__.py
-  - libs/opsvi-communication/opsvi_communication/config/settings.py
-  - libs/opsvi-communication/opsvi_communication/core/__init__.py
-  - libs/opsvi-communication/opsvi_communication/core/base.py
-  - libs/opsvi-communication/opsvi_communication/exceptions/__init__.py
-  - libs/opsvi-communication/opsvi_communication/exceptions/base.py
-  - libs/opsvi-communication/opsvi_communication/tests/__init__.py
-  - libs/opsvi-communication/opsvi_communication/{{package_name}}/__init__.py
-  - libs/opsvi-communication/opsvi_communication/{{package_name}}/config/__init__.py
-  - libs/opsvi-communication/opsvi_communication/{{package_name}}/core/__init__.py
-  - libs/opsvi-communication/opsvi_communication/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-communication/opsvi_communication/{{package_name}}/providers/__init__.py
-  - libs/opsvi-communication/opsvi_communication/{{package_name}}/schemas/__init__.py
-  - libs/opsvi-communication/opsvi_communication/{{package_name}}/utils/__init__.py
-  - libs/opsvi-communication/pyproject.toml
-  - libs/opsvi-communication/tests/__init__.py
-  - libs/opsvi-coordination/README.md
-  - libs/opsvi-coordination/opsvi_coordination/__init__.py
-  - libs/opsvi-coordination/opsvi_coordination/agent_registry.py
-  - libs/opsvi-coordination/opsvi_coordination/enhanced_agent_registry.py
-  - libs/opsvi-coordination/opsvi_coordination/enhanced_message_bus.py
-  - libs/opsvi-coordination/opsvi_coordination/message_bus.py
-  - libs/opsvi-coordination/pyproject.toml
+  - libs/opsvi-comm/README.md
+  - libs/opsvi-comm/opsvi_communication/__init__.py
+  - libs/opsvi-comm/opsvi_communication/collaboration_framework.py
+  - libs/opsvi-comm/opsvi_communication/config/__init__.py
+  - libs/opsvi-comm/opsvi_communication/config/settings.py
+  - libs/opsvi-comm/opsvi_communication/core/__init__.py
+  - libs/opsvi-comm/opsvi_communication/core/base.py
+  - libs/opsvi-comm/opsvi_communication/exceptions/__init__.py
+  - libs/opsvi-comm/opsvi_communication/exceptions/base.py
+  - libs/opsvi-comm/opsvi_communication/tests/__init__.py
+  - libs/opsvi-comm/opsvi_communication/{{package_name}}/__init__.py
+  - libs/opsvi-comm/opsvi_communication/{{package_name}}/config/__init__.py
+  - libs/opsvi-comm/opsvi_communication/{{package_name}}/core/__init__.py
+  - libs/opsvi-comm/opsvi_communication/{{package_name}}/exceptions/__init__.py
+  - libs/opsvi-comm/opsvi_communication/{{package_name}}/providers/__init__.py
+  - libs/opsvi-comm/opsvi_communication/{{package_name}}/schemas/__init__.py
+  - libs/opsvi-comm/opsvi_communication/{{package_name}}/utils/__init__.py
+  - libs/opsvi-comm/pyproject.toml
+  - libs/opsvi-comm/tests/__init__.py
+  - libs/opsvi-coord/README.md
+  - libs/opsvi-coord/opsvi_coordination/__init__.py
+  - libs/opsvi-coord/opsvi_coordination/agent_registry.py
+  - libs/opsvi-coord/opsvi_coordination/enhanced_agent_registry.py
+  - libs/opsvi-coord/opsvi_coordination/enhanced_message_bus.py
+  - libs/opsvi-coord/opsvi_coordination/message_bus.py
+  - libs/opsvi-coord/pyproject.toml
   - libs/opsvi-core/README.md
   - libs/opsvi-core/opsvi_core/__init__.py
   - libs/opsvi-core/opsvi_core/config/__init__.py
@@ -1851,16 +1870,56 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-master/opsvi_master/workflow/quality_gates.py
   - libs/opsvi-master/opsvi_master/workflow/step_handlers.py
   - libs/opsvi-master/pyproject.toml
+  - libs/opsvi-mcp/AGENT_PROFILE.md
+  - libs/opsvi-mcp/AUDIT_REPORT.md
+  - libs/opsvi-mcp/CLAUDE.md
+  - libs/opsvi-mcp/CLAUDE_CODE_AGENT_GUIDANCE.md
+  - libs/opsvi-mcp/CLAUDE_CODE_SCENARIOS.md
+  - libs/opsvi-mcp/CLAUDE_CODE_TOOLS_GUIDE.md
+  - libs/opsvi-mcp/CRITICAL_COMMANDS.md
+  - libs/opsvi-mcp/DOCUMENTATION_REVIEW_REPORT.md
+  - libs/opsvi-mcp/DispatchPolicy.md
+  - libs/opsvi-mcp/ENHANCEMENT_PROPOSAL.md
+  - libs/opsvi-mcp/ENV_FIX_SUMMARY.md
+  - libs/opsvi-mcp/Examples/01-bulk-lint-fixes.md
+  - libs/opsvi-mcp/Examples/02-parallel-test-scaffolding.md
+  - libs/opsvi-mcp/Examples/03-complex-refactor.md
+  - libs/opsvi-mcp/Findings-Gemini-Update.md
+  - libs/opsvi-mcp/Findings.md
+  - libs/opsvi-mcp/GEMINI_INTEGRATION.md
   - libs/opsvi-mcp/IMPLEMENTATION_SUMMARY.md
+  - libs/opsvi-mcp/MULTI_AGENT_ENHANCEMENT.md
+  - libs/opsvi-mcp/ORCHESTRATION_STATUS.md
+  - libs/opsvi-mcp/OrchestrationDesign.md
+  - libs/opsvi-mcp/Progress.md
   - libs/opsvi-mcp/QUICKSTART.md
   - libs/opsvi-mcp/README.md
+  - libs/opsvi-mcp/RECOMMENDATION-GEMINI-UPDATE.md
+  - libs/opsvi-mcp/RECOMMENDATION.md
+  - libs/opsvi-mcp/SESSION_PRESERVATION.md
+  - libs/opsvi-mcp/SYSTEM_PROMPT.md
+  - libs/opsvi-mcp/V2_PARAMETER_FIX_REPORT.md
+  - libs/opsvi-mcp/V2_V3_FIX_SUMMARY.md
+  - libs/opsvi-mcp/docs/CLAUDE_CODE_DIRECTORY_CONFIG.md
   - libs/opsvi-mcp/docs/CLAUDE_CODE_MIGRATION.md
+  - libs/opsvi-mcp/docs/CLAUDE_CODE_ORCHESTRATION_DESIGN.md
+  - libs/opsvi-mcp/docs/CLAUDE_CODE_SELF_ANALYSIS.md
+  - libs/opsvi-mcp/docs/CONVERSATION_BRANCHING_ARCHITECTURE.md
+  - libs/opsvi-mcp/docs/EMERGENT_QUESTIONS_AND_CONSIDERATIONS.md
+  - libs/opsvi-mcp/docs/IMPLEMENTATION_ROADMAP.md
+  - libs/opsvi-mcp/docs/MCP_INTEGRATION_POINTS.md
+  - libs/opsvi-mcp/docs/SESSION_CONCURRENCY_FINDINGS.md
+  - libs/opsvi-mcp/docs/UNIFIED_MCP_ARCHITECTURE.md
   - libs/opsvi-mcp/docs/claude-code-api-reference.md
   - libs/opsvi-mcp/docs/claude-code-quickstart.md
   - libs/opsvi-mcp/docs/claude-code-server.md
   - libs/opsvi-mcp/docs/claude-code-v2-architecture.md
+  - libs/opsvi-mcp/docs/claude-code-v3-architecture.md
   - libs/opsvi-mcp/docs/context_bridge_visualization_brief.md
+  - libs/opsvi-mcp/docs/migration-guide.md
   - libs/opsvi-mcp/docs/recursive-mcp-best-practices.md
+  - libs/opsvi-mcp/docs/troubleshooting.md
+  - libs/opsvi-mcp/opsvi_mcp/API_REFERENCE.md
   - libs/opsvi-mcp/opsvi_mcp/README.md
   - libs/opsvi-mcp/opsvi_mcp/__init__.py
   - libs/opsvi-mcp/opsvi_mcp/arxiv_mcp_client.py
@@ -1872,6 +1931,9 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/opsvi_mcp/mcp_integration_template.py
   - libs/opsvi-mcp/opsvi_mcp/mcp_server_template.py
   - libs/opsvi-mcp/opsvi_mcp/neo4j_mcp_client.py
+  - libs/opsvi-mcp/opsvi_mcp/plugins/README.md
+  - libs/opsvi-mcp/opsvi_mcp/plugins/math_tools.py
+  - libs/opsvi-mcp/opsvi_mcp/plugins/text_tools.py
   - libs/opsvi-mcp/opsvi_mcp/prefect_workflow_generation.py
   - libs/opsvi-mcp/opsvi_mcp/requirements.txt
   - libs/opsvi-mcp/opsvi_mcp/research_workflow_tool.py
@@ -1890,16 +1952,38 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/__init__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/__main__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/context_manager.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/job_manager.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/job_manager.py.stub_backup
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/job_manager_fixed.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/mcp_manager.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/result_collector.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/README.md
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/__main__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/critic_agent.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/documentation_agent.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/mode_detector.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/orchestrator.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/security_agent.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/testing_agent.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/server.py.stub_backup
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/server_fixed.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/task_decomposer.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/timeout_manager.py
   - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/README.md
   - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/__init__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/client.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/config.py
   - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/example_enhanced_agent.py
   - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/example_neo4j_integration.py
   - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/knowledge_aggregator.py
   - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/models.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/pubsub.py
   - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/requirements.txt
   - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/server.py
   - libs/opsvi-mcp/opsvi_mcp/servers/cursor_agent/__init__.py
@@ -1907,11 +1991,48 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/opsvi_mcp/servers/cursor_agent/config.py
   - libs/opsvi-mcp/opsvi_mcp/servers/cursor_agent/models.py
   - libs/opsvi-mcp/opsvi_mcp/servers/cursor_agent/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/database/config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/database/models.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/gemini_agent/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/gemini_agent/__main__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/gemini_agent/config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/gemini_agent/models.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/gemini_agent/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/monitoring/config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/monitoring/models.py
   - libs/opsvi-mcp/opsvi_mcp/servers/openai_codex/__init__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/openai_codex/__main__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/openai_codex/config.py
   - libs/opsvi-mcp/opsvi_mcp/servers/openai_codex/models.py
   - libs/opsvi-mcp/opsvi_mcp/servers/openai_codex/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/__main__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/api_client.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/endpoints/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/endpoints/base.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/endpoints/health.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/middleware/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/middleware/auth.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/middleware/cors.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/middleware/logging.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/models.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/schemas/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/schemas/request.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/schemas/response.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/utils.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/security/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/security/__main__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/security/config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/security/models.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/security/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/simple_python/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/simple_python/__main__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/simple_python/config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/simple_python/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/testing_qa/config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/testing_qa/models.py
   - libs/opsvi-mcp/opsvi_mcp/servers/unified_config.yaml
   - libs/opsvi-mcp/opsvi_mcp/servers/unified_orchestrator.py
   - libs/opsvi-mcp/pyproject.toml
@@ -1960,28 +2081,31 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-monitoring/opsvi_monitoring/{{package_name}}/utils/__init__.py
   - libs/opsvi-monitoring/pyproject.toml
   - libs/opsvi-monitoring/tests/__init__.py
-  - libs/opsvi-orchestration/README.md
-  - libs/opsvi-orchestration/opsvi_orchestration/__init__.py
-  - libs/opsvi-orchestration/opsvi_orchestration/config/__init__.py
-  - libs/opsvi-orchestration/opsvi_orchestration/config/settings.py
-  - libs/opsvi-orchestration/opsvi_orchestration/core/__init__.py
-  - libs/opsvi-orchestration/opsvi_orchestration/core/base.py
-  - libs/opsvi-orchestration/opsvi_orchestration/dag_loader.py
-  - libs/opsvi-orchestration/opsvi_orchestration/exceptions/__init__.py
-  - libs/opsvi-orchestration/opsvi_orchestration/exceptions/base.py
-  - libs/opsvi-orchestration/opsvi_orchestration/meta_orchestrator.py
-  - libs/opsvi-orchestration/opsvi_orchestration/registry.py
-  - libs/opsvi-orchestration/opsvi_orchestration/task_models.py
-  - libs/opsvi-orchestration/opsvi_orchestration/tests/__init__.py
-  - libs/opsvi-orchestration/opsvi_orchestration/{{package_name}}/__init__.py
-  - libs/opsvi-orchestration/opsvi_orchestration/{{package_name}}/config/__init__.py
-  - libs/opsvi-orchestration/opsvi_orchestration/{{package_name}}/coordinators/__init__.py
-  - libs/opsvi-orchestration/opsvi_orchestration/{{package_name}}/core/__init__.py
-  - libs/opsvi-orchestration/opsvi_orchestration/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-orchestration/opsvi_orchestration/{{package_name}}/schedulers/__init__.py
-  - libs/opsvi-orchestration/opsvi_orchestration/{{package_name}}/utils/__init__.py
-  - libs/opsvi-orchestration/pyproject.toml
-  - libs/opsvi-orchestration/tests/__init__.py
+  - libs/opsvi-orch/README.md
+  - libs/opsvi-orch/opsvi_orch/__init__.py
+  - libs/opsvi-orch/opsvi_orch/config/__init__.py
+  - libs/opsvi-orch/opsvi_orch/config/settings.py
+  - libs/opsvi-orch/opsvi_orch/core/__init__.py
+  - libs/opsvi-orch/opsvi_orch/core/base.py
+  - libs/opsvi-orch/opsvi_orch/exceptions/__init__.py
+  - libs/opsvi-orch/opsvi_orch/exceptions/base.py
+  - libs/opsvi-orch/opsvi_orch/executors/__init__.py
+  - libs/opsvi-orch/opsvi_orch/executors/claude_executor.py
+  - libs/opsvi-orch/opsvi_orch/executors/parallel_executor.py
+  - libs/opsvi-orch/opsvi_orch/integration/__init__.py
+  - libs/opsvi-orch/opsvi_orch/integration/claude_integration.py
+  - libs/opsvi-orch/opsvi_orch/managers/__init__.py
+  - libs/opsvi-orch/opsvi_orch/managers/job_manager.py
+  - libs/opsvi-orch/opsvi_orch/patterns/__init__.py
+  - libs/opsvi-orch/opsvi_orch/patterns/langgraph_patterns.py
+  - libs/opsvi-orch/opsvi_orch/patterns/send_api.py
+  - libs/opsvi-orch/opsvi_orch/workflow/__init__.py
+  - libs/opsvi-orch/opsvi_orch/workflow/dag_loader.py
+  - libs/opsvi-orch/opsvi_orch/workflow/meta_orchestrator.py
+  - libs/opsvi-orch/opsvi_orch/workflow/registry.py
+  - libs/opsvi-orch/opsvi_orch/workflow/task_models.py
+  - libs/opsvi-orch/pyproject.toml
+  - libs/opsvi-orch/tests/__init__.py
   - libs/opsvi-pipeline/README.md
   - libs/opsvi-pipeline/opsvi_pipeline/__init__.py
   - libs/opsvi-pipeline/opsvi_pipeline/config/__init__.py
@@ -2310,6 +2434,8 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/recommended_structure.yaml
   - libs/templates.yaml
   - libs/variable_schema.yaml
+  - mcp_server_test_report.md
+  - mcp_server_test_results.md
   - mcp_server_upgrade_report.md
   - mermaid_diagram_expert_prompt.md
   - migration_mapping.json
@@ -3541,5 +3667,6 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - tools/template_vars_check.py
   - unified_optimization_system.py
   - uv.lock
+  - validate_email.py
   - visualization_agent_activation_prompt.md
   - working_demo.py

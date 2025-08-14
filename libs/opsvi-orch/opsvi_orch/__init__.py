@@ -26,6 +26,7 @@ from .workflow import (
     dag_loader,
     Project,
     Run,
+    TaskRecord,
     WorkflowRegistry,
 )
 
@@ -63,6 +64,13 @@ from .managers import (
     BatchJobResult,
 )
 
+# Integration
+from .integration import (
+    ClaudeOrchestrationConfig,
+    ClaudeOrchestrationIntegration,
+    enhance_claude_code_server,
+)
+
 __all__ = [
     # Version
     "__version__",
@@ -71,6 +79,7 @@ __all__ = [
     "dag_loader",
     "Project",
     "Run",
+    "TaskRecord",
     "WorkflowRegistry",
     # Patterns
     "ParallelOrchestrationPattern",
@@ -97,4 +106,8 @@ __all__ = [
     "JobManager",
     "JobConfig",
     "BatchJobResult",
+    # Integration
+    "ClaudeOrchestrationConfig",
+    "ClaudeOrchestrationIntegration",
+    "enhance_claude_code_server",
 ]

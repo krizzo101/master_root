@@ -3,7 +3,7 @@
 
 """
 
-from pydantic import Field, validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,7 +11,11 @@ class OpsviOrchestrationSettings(BaseSettings):
     """Settings for opsvi-orchestration."""
 
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore"
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+        env_prefix="OPSVI_OPSVI_ORCHESTRATION__",
     )
 
     # Core settings
@@ -21,16 +25,14 @@ class OpsviOrchestrationSettings(BaseSettings):
 
     # Library-specific settings
 
-    @validator("log_level")
+    @field_validator("log_level", mode="before")
+    @classmethod
     def validate_log_level(cls, v: str) -> str:
         """Validate log level."""
         valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
         if v.upper() not in valid_levels:
             raise ValueError(f"Invalid log level: {v}")
         return v.upper()
-
-    class Config:
-        env_prefix = "OPSVI_OPSVI_ORCHESTRATION__"
 
 
 # Convenience function

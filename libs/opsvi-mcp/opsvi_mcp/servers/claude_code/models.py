@@ -69,6 +69,8 @@ class ClaudeJob:
     parent_job_id: Optional[str] = None
     stdout_buffer: str = ""
     stderr_buffer: str = ""
+    env: Optional[Dict[str, str]] = None  # Custom environment variables
+    model: Optional[str] = None  # Model to use (e.g., 'sonnet', 'opus')
 
 
 @dataclass
