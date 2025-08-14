@@ -9,6 +9,8 @@ import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+import json
+from pathlib import Path
 
 from opsvi_foundation import BaseComponent, ComponentError, BaseSettings
 
@@ -274,6 +276,9 @@ class StateManager(BaseComponent):
         self.core_config = config or CoreConfig(**kwargs)
         self._state: Dict[str, Any] = {}
         self._backup_task: Optional[asyncio.Task] = None
+        self._state_file = Path("/tmp/opsvi_state_backup.json")
+        # Try to restore state on initialization
+        self._restore_state()
 
     async def _initialize_impl(self) -> None:
         """Initialize state manager."""
@@ -285,6 +290,10 @@ class StateManager(BaseComponent):
 
     async def _shutdown_impl(self) -> None:
         """Shutdown state manager."""
+        # Save state one final time before shutdown
+        if self.core_config.state_persistence_enabled:
+            await self._backup_state()
+
         if self._backup_task:
             self._backup_task.cancel()
             try:
@@ -333,5 +342,55 @@ class StateManager(BaseComponent):
 
     async def _backup_state(self) -> None:
         """Backup state to persistent storage."""
-        # TODO: Implement actual persistence
-        logger.debug("State backup completed")
+        try:
+            # Create a copy of the state to avoid modification during serialization
+            state_copy = dict(self._state)
+
+            # Convert to JSON and write to file
+            state_json = json.dumps(state_copy, indent=2, default=str)
+
+            # Write atomically by using a temporary file
+            temp_file = self._state_file.with_suffix(".tmp")
+            temp_file.write_text(state_json)
+
+            # Move temp file to actual file (atomic on most systems)
+            temp_file.replace(self._state_file)
+
+            logger.debug(
+                f"State backup completed: {len(state_copy)} keys saved to {self._state_file}"
+            )
+        except Exception as e:
+            logger.error(f"Failed to backup state: {e}")
+            # Don't raise - we want the system to continue even if backup fails
+
+    def _restore_state(self) -> None:
+        """Restore state from persistent storage.
+
+        This is a synchronous method called during initialization.
+        """
+        try:
+            if self._state_file.exists():
+                state_json = self._state_file.read_text()
+                restored_state = json.loads(state_json)
+
+                if isinstance(restored_state, dict):
+                    self._state = restored_state
+                    logger.info(
+                        f"State restored: {len(self._state)} keys loaded from {self._state_file}"
+                    )
+                else:
+                    logger.warning(
+                        f"Invalid state file format: expected dict, got {type(restored_state)}"
+                    )
+            else:
+                logger.debug(
+                    f"No state file found at {self._state_file}, starting with empty state"
+                )
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse state file: {e}")
+            # Start with empty state if file is corrupted
+            self._state = {}
+        except Exception as e:
+            logger.error(f"Failed to restore state: {e}")
+            # Start with empty state on any other error
+            self._state = {}
