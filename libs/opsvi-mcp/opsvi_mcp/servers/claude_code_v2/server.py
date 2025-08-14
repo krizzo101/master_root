@@ -18,7 +18,6 @@ from datetime import datetime
 import logging
 
 from fastmcp import FastMCP
-from pydantic import BaseModel, Field
 
 from .job_manager import FireAndForgetJobManager
 from .result_collector import ResultCollector
@@ -26,35 +25,6 @@ from .config import ServerConfig
 
 
 logger = logging.getLogger(__name__)
-
-
-class SpawnAgentRequest(BaseModel):
-    """Request to spawn a new agent"""
-
-    task: str = Field(description="Task for the agent to perform")
-    agent_profile: Optional[str] = Field(
-        default=None, description="Agent profile to use"
-    )
-    output_dir: Optional[str] = Field(default=None, description="Directory for results")
-    timeout: int = Field(default=600, description="Timeout in seconds")
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict, description="Additional metadata"
-    )
-
-
-class CollectResultsRequest(BaseModel):
-    """Request to collect results from spawned agents"""
-
-    job_ids: Optional[List[str]] = Field(
-        default=None, description="Specific job IDs to check"
-    )
-    output_dir: Optional[str] = Field(
-        default=None, description="Directory to check for results"
-    )
-    include_partial: bool = Field(default=False, description="Include partial results")
-    cleanup: bool = Field(
-        default=False, description="Remove collected results from disk"
-    )
 
 
 class ClaudeCodeV2Server:
@@ -73,30 +43,43 @@ class ClaudeCodeV2Server:
         """Register MCP tools"""
 
         @self.mcp.tool()
-        async def spawn_agent(request: SpawnAgentRequest) -> Dict[str, Any]:
+        async def spawn_agent(
+            task: str,
+            agent_profile: Optional[str] = None,
+            output_dir: Optional[str] = None,
+            timeout: int = 600,
+            metadata: Optional[Dict[str, Any]] = None
+        ) -> Dict[str, Any]:
             """
             Spawn a new agent that runs independently.
             Returns immediately with job ID and result location.
+            
+            Args:
+                task: Task for the agent to perform
+                agent_profile: Optional agent profile to use
+                output_dir: Optional directory for results
+                timeout: Timeout in seconds (default: 600)
+                metadata: Optional additional metadata
             """
             try:
                 # Generate unique job ID
                 job_id = str(uuid.uuid4())
 
                 # Determine output directory
-                output_dir = request.output_dir or self.config.default_results_dir
+                output_dir = output_dir or self.config.default_results_dir
                 os.makedirs(output_dir, exist_ok=True)
 
                 # Create job info
                 job_info = {
                     "job_id": job_id,
-                    "task": request.task,
-                    "agent_profile": request.agent_profile,
+                    "task": task,
+                    "agent_profile": agent_profile,
                     "output_dir": output_dir,
                     "result_file": f"{output_dir}/{job_id}.json",
                     "status": "spawning",
                     "spawned_at": datetime.now().isoformat(),
-                    "timeout": request.timeout,
-                    "metadata": request.metadata,
+                    "timeout": timeout,
+                    "metadata": metadata or {},
                 }
 
                 # Spawn agent in background (fire and forget)
@@ -168,23 +151,34 @@ class ClaudeCodeV2Server:
                 return {"success": False, "error": str(e)}
 
         @self.mcp.tool()
-        async def collect_results(request: CollectResultsRequest) -> Dict[str, Any]:
+        async def collect_results(
+            job_ids: Optional[List[str]] = None,
+            output_dir: Optional[str] = None,
+            include_partial: bool = False,
+            cleanup: bool = False
+        ) -> Dict[str, Any]:
             """
             Collect results from spawned agents.
             Non-blocking - returns whatever is available.
+            
+            Args:
+                job_ids: Optional list of specific job IDs to check
+                output_dir: Optional directory to check for results
+                include_partial: Include partial results (default: False)
+                cleanup: Remove collected results from disk (default: False)
             """
             try:
-                output_dir = request.output_dir or self.config.default_results_dir
+                output_dir = output_dir or self.config.default_results_dir
 
                 # Collect available results
                 results = await self.result_collector.collect(
                     output_dir=output_dir,
-                    job_ids=request.job_ids,
-                    include_partial=request.include_partial,
+                    job_ids=job_ids,
+                    include_partial=include_partial,
                 )
 
                 # Optionally cleanup
-                if request.cleanup and results["completed"]:
+                if cleanup and results["completed"]:
                     for job_id in results["completed"]:
                         result_file = f"{output_dir}/{job_id}.json"
                         if os.path.exists(result_file):

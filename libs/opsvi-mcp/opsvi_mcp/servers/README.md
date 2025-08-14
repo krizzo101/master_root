@@ -4,25 +4,40 @@ This directory contains MCP (Model Context Protocol) server implementations for 
 
 ## Available Servers
 
-### 1. Claude Code Server (`claude_code/` and `claude_code_v2/`)
+### 1. Claude Code Servers (`claude_code/`, `claude_code_v2/`, and `claude_code_v3/`)
 
 **Purpose**: Recursive agent execution for complex multi-step tasks
 
 **Versions**:
-- **Original**: Traditional async/await pattern with job tracking
-- **V2**: Fire-and-forget pattern with first-level decoupling (recommended)
+- **V1 (Original)**: Traditional async/await pattern with job tracking
+- **V2**: Fire-and-forget pattern with first-level decoupling
+- **V3**: Intelligent multi-agent orchestration with automatic mode selection (recommended for production)
 
-**Key Features**:
-- Recursive task decomposition
-- Parallel agent execution
-- Job management and monitoring
-- Performance tracking
+**Key Features by Version**:
+
+#### V1 - Traditional (8 Tools)
+- Synchronous and asynchronous execution
+- Job tracking and management
+- Basic recursion support (3 levels)
+- Dashboard and metrics
+
+#### V2 - Fire-and-Forget (6 Tools)
+- Decoupled first-level agents
+- High parallelism support
+- Result aggregation patterns
+- Failure isolation
+
+#### V3 - Multi-Agent Orchestration (2 Tools)
+- Automatic mode detection (10 modes)
+- Specialized agent coordination
+- Built-in quality assurance
+- Checkpointing and recovery
+- Adaptive resource management
 
 **MCP Tools**:
-- `claude_run`: Synchronous execution
-- `claude_run_async`: Asynchronous execution with job tracking
-- `spawn_agent`: Fire-and-forget agent spawning (v2)
-- `collect_results`: Collect results from spawned agents (v2)
+- **V1**: `claude_run`, `claude_run_async`, `claude_status`, `claude_result`, `claude_list_jobs`, `claude_kill_job`, `claude_dashboard`, `claude_recursion_stats`
+- **V2**: `spawn_agent`, `spawn_parallel_agents`, `collect_results`, `check_agent_health`, `kill_agent`, `aggregate_results`
+- **V3**: `claude_run_v3`, `get_v3_status`
 
 ### 2. OpenAI Codex Server (`openai_codex/`)
 
@@ -143,7 +158,16 @@ servers:
 ### Standalone Server Usage
 
 ```python
-# Claude Code V2
+# Claude Code V1 - Traditional
+from opsvi_mcp.servers.claude_code import ClaudeCodeServer
+
+server = ClaudeCodeServer()
+result = await server.claude_run(
+    task="Create a function",
+    outputFormat="json"
+)
+
+# Claude Code V2 - Fire-and-Forget
 from opsvi_mcp.servers.claude_code_v2 import ClaudeCodeV2Server
 
 server = ClaudeCodeV2Server()
@@ -151,6 +175,15 @@ await server.spawn_agent({
     "task": "Analyze the codebase",
     "output_dir": "/tmp/results"
 })
+
+# Claude Code V3 - Multi-Agent
+from opsvi_mcp.servers.claude_code_v3 import ClaudeCodeV3Server
+
+server = ClaudeCodeV3Server()
+result = await server.claude_run_v3(
+    task="Create production-ready API",
+    auto_detect=True  # Automatically selects best mode
+)
 ```
 
 ```python
@@ -236,12 +269,16 @@ result = await orchestrator.code_review_pipeline(
 
 ## Best Practices
 
-1. **Use V2 Claude Code** for better scalability and protocol compliance
+1. **Choose the right Claude Code version**:
+   - V1: Simple tasks, debugging, synchronous needs
+   - V2: Parallel analysis, independent tasks
+   - V3: Production systems, quality-critical tasks
 2. **Enable caching** for OpenAI Codex to reduce API costs
 3. **Configure appropriate timeouts** for long-running operations
 4. **Use WebSocket communication** with Cursor for real-time interactions
 5. **Implement proper error handling** for network failures
 6. **Monitor resource usage** with performance metrics
+7. **Use V3's auto-detect mode** for intelligent execution planning
 
 ## Security Considerations
 

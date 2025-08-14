@@ -1,8 +1,11 @@
 version: 1
 generator: project-intelligence-fast
 files:
+  - AGENTS.md
   - AGENT_WORLD_TO_OPSVI_MAPPING.md
   - AI_CAPABILITY_IMPLEMENTATION_PLAN.md
+  - CLAUDE.local.md
+  - CLAUDE.md
   - CLAUDE_CODE_MIGRATION_STATUS.md
   - COMPREHENSIVE_MIGRATION_PLAN.md
   - CONSULT_AGENT_CONTEXT_PACKAGE.md
@@ -26,22 +29,28 @@ files:
   - QUICK_START.md
   - README.md
   - TOURNAMENT_APPROACH_SUMMARY.md
+  - agents/integration_architect_agent.md
   - agents/sdlc_agent_implementation_guide.md
+  - agents/sdlc_agent_usage_example.py
   - agents/sdlc_team_prompts.md
   - analyze_all_custom_projects.py
   - analyze_log_reality.py
   - autonomous_research_assistant.py
   - baseline_analysis.py
+  - claude_code_architecture_diagrams.md
   - clean_log.py
   - comprehensive_optimization_analysis.py
   - consult_agent_optimization_strategy.md
   - demo_ecosystem.py
+  - discovery_agent_enhanced_prompt.md
   - docker-compose.yml
   - docs/ADR-001-initial-architecture.md
   - docs/ADR-002-scraper.md
   - docs/ADR-003-api-key-fallbacks.md
   - docs/DEVELOPMENT.md
   - docs/WORKSPACE_OPTIMIZATION.md
+  - docs/agent_ide_integration_architecture.md
+  - docs/agent_ide_integration_roadmap.md
   - docs/ai_populate_openai_responses_knowledge.md
   - docs/auto-attach-script-optimized-spec.md
   - docs/combined-project-intelligence-spec.md
@@ -63,6 +72,7 @@ files:
   - docs/libs/templates/create_opsvi_library.py
   - docs/status/workspace_status_2025-08-03_18-44-43.md
   - docs/template_notes.txt
+  - enhanced_agent_capabilities.md
   - enhanced_critic_accountability.py
   - enhanced_research_assistant.py
   - enhanced_research_assistant_with_qdrant.py
@@ -78,6 +88,7 @@ files:
   - generate_project_visualizations.py
   - generate_project_visualizations_fixed.py
   - hello_mcp.py
+  - invoke_orchestrator.py
   - justfile
   - libs.dir
   - libs/ECOSYSTEM_STATUS.md
@@ -1840,9 +1851,16 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-master/opsvi_master/workflow/quality_gates.py
   - libs/opsvi-master/opsvi_master/workflow/step_handlers.py
   - libs/opsvi-master/pyproject.toml
+  - libs/opsvi-mcp/IMPLEMENTATION_SUMMARY.md
+  - libs/opsvi-mcp/QUICKSTART.md
   - libs/opsvi-mcp/README.md
   - libs/opsvi-mcp/docs/CLAUDE_CODE_MIGRATION.md
+  - libs/opsvi-mcp/docs/claude-code-api-reference.md
+  - libs/opsvi-mcp/docs/claude-code-quickstart.md
   - libs/opsvi-mcp/docs/claude-code-server.md
+  - libs/opsvi-mcp/docs/claude-code-v2-architecture.md
+  - libs/opsvi-mcp/docs/context_bridge_visualization_brief.md
+  - libs/opsvi-mcp/docs/recursive-mcp-best-practices.md
   - libs/opsvi-mcp/opsvi_mcp/README.md
   - libs/opsvi-mcp/opsvi_mcp/__init__.py
   - libs/opsvi-mcp/opsvi_mcp/arxiv_mcp_client.py
@@ -1858,6 +1876,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/opsvi_mcp/requirements.txt
   - libs/opsvi-mcp/opsvi_mcp/research_workflow_tool.py
   - libs/opsvi-mcp/opsvi_mcp/sequential_thinking_mcp_client.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/README.md
   - libs/opsvi-mcp/opsvi_mcp/servers/__init__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code/__init__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code/__main__.py
@@ -1868,8 +1887,39 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code/performance_monitor.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code/recursion_manager.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/__main__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/job_manager.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/result_collector.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/README.md
+  - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/client.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/example_enhanced_agent.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/example_neo4j_integration.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/knowledge_aggregator.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/models.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/requirements.txt
+  - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/cursor_agent/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/cursor_agent/__main__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/cursor_agent/config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/cursor_agent/models.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/cursor_agent/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/openai_codex/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/openai_codex/__main__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/openai_codex/config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/openai_codex/models.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/openai_codex/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/unified_config.yaml
+  - libs/opsvi-mcp/opsvi_mcp/servers/unified_orchestrator.py
   - libs/opsvi-mcp/pyproject.toml
+  - libs/opsvi-mcp/requirements.txt
   - libs/opsvi-mcp/scripts/migrate_claude_code.py
+  - libs/opsvi-mcp/setup.py
+  - libs/opsvi-mcp/src/agent_profiles.py
+  - libs/opsvi-mcp/src/orchestrator_agent_profile.py
   - libs/opsvi-memory/README.md
   - libs/opsvi-memory/opsvi_memory/__init__.py
   - libs/opsvi-memory/opsvi_memory/config/__init__.py
@@ -2260,6 +2310,8 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/recommended_structure.yaml
   - libs/templates.yaml
   - libs/variable_schema.yaml
+  - mcp_server_upgrade_report.md
+  - mermaid_diagram_expert_prompt.md
   - migration_mapping.json
   - migration_reports/any_by_file_20250811_183802.txt
   - migration_reports/any_by_file_20250811_183901.txt
@@ -3410,6 +3462,9 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - optimized_critic_implementation.py
   - optimized_main_agent.py
   - optimized_nano_instructions.py
+  - orchestrator_agent_prompt.md
+  - orchestrator_agent_prompt_v2.md
+  - orchestrator_resume_prompt.md
   - platform/mcp/registry.json
   - platform/observability/config/grafana/provisioning/datasources/tempo.yaml
   - platform/observability/config/otel-collector-config.yaml
@@ -3428,6 +3483,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - requirements.txt
   - research_reports_research_20250810_190708.json
   - ruff.toml
+  - run_orchestrated_analysis.md
   - scripts/README_auto_attach.md
   - scripts/agents/gatekeeper_summarize_projects.py
   - scripts/auto_attach.py
@@ -3449,6 +3505,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - scripts/wave1_data_extraction.sh
   - scripts/wave1_data_extraction_copy.sh
   - sort_example.py
+  - specialized_discovery_agents.md
   - src/__init__.py
   - src/adapters/__init__.py
   - src/adapters/playwright_scraper.py
@@ -3484,4 +3541,5 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - tools/template_vars_check.py
   - unified_optimization_system.py
   - uv.lock
+  - visualization_agent_activation_prompt.md
   - working_demo.py

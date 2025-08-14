@@ -1,10 +1,5 @@
 """
-Fire-and-Forget Job Manager with Hybrid Decoupling
-
-This manager implements a hybrid approach:
-1. First-level agents are decoupled from the parent (fire-and-forget)
-2. Each first-level agent is fully responsible for its children
-3. Sub-agents use traditional synchronous management within their scope
+Fire-and-Forget Job Manager - Fixed to use real Claude Code CLI
 """
 
 import asyncio
@@ -22,14 +17,12 @@ import traceback
 
 from .config import ServerConfig
 
-
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class AgentJob:
     """Represents a spawned agent job"""
-
     job_id: str
     task: str
     agent_profile: Optional[str]
@@ -37,54 +30,68 @@ class AgentJob:
     result_file: str
     status: str = "pending"
     spawned_at: str = ""
-    completed_at: Optional[str] = None
+    completed_at: str = ""
     process: Optional[subprocess.Popen] = None
-    parent_job_id: Optional[str] = None
-    depth: int = 0
-    children: List[str] = field(default_factory=list)
     error: Optional[str] = None
-
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary for serialization"""
-        return {
-            "job_id": self.job_id,
-            "task": self.task[:200] + "..." if len(self.task) > 200 else self.task,
-            "agent_profile": self.agent_profile,
-            "status": self.status,
-            "spawned_at": self.spawned_at,
-            "completed_at": self.completed_at,
-            "parent_job_id": self.parent_job_id,
-            "depth": self.depth,
-            "children": self.children,
-            "error": self.error,
-            "result_file": self.result_file,
-        }
+    depth: int = 0
+    parent_id: Optional[str] = None
 
 
 class FireAndForgetJobManager:
-    """
-    Manages fire-and-forget jobs with hybrid decoupling.
-
-    Key principles:
-    - First-level agents are fully decoupled (fire-and-forget)
-    - Each agent manages its own children synchronously
-    - Results include full recursive tree of sub-agent results
-    """
-
+    """Manages fire-and-forget jobs with real Claude Code execution"""
+    
     def __init__(self, config: ServerConfig):
         self.config = config
         self.active_jobs: Dict[str, AgentJob] = {}
-        self.completed_jobs: Dict[str, AgentJob] = {}
-
+        
     async def spawn_agent(self, job_info: Dict[str, Any]) -> None:
-        """
-        Spawn a first-level agent that runs independently.
-        This agent will manage its own children synchronously.
-        """
+        """Spawn a first-level agent that runs Claude Code independently"""
         try:
             job_id = job_info["job_id"]
-
-            # Create agent job
+            
+            # PARENT DETERMINES MCP REQUIREMENTS
+            from .mcp_manager import MCPRequirementAnalyzer, MCPConfigManager
+            import json  # Need for passing servers via environment
+            required_servers = MCPRequirementAnalyzer.analyze_task(job_info['task'])
+            
+            # Create minimal MCP config if needed
+            mcp_config_path = None
+            if required_servers:
+                mcp_config_path = MCPConfigManager.create_instance_config(
+                    instance_id=job_id,
+                    custom_servers=list(required_servers)
+                )
+                logger.info(f"Parent created MCP config for {job_id}: {list(required_servers)}")
+            else:
+                logger.info(f"Parent determined no MCP servers needed for {job_id}")
+            
+            # CONTEXT MANAGEMENT: Prepare specialized agent context
+            from .context_manager import (
+                prepare_specialized_agent,
+                ContextInheritanceManager,
+                SessionManager
+            )
+            
+            # Get parent context if this is a child agent
+            parent_id = job_info.get('parent_id')
+            inherit_session = job_info.get('inherit_session', False)
+            
+            # Prepare specialized agent with context and prompts
+            agent_config = prepare_specialized_agent(
+                job_id=job_id,
+                task=job_info['task'],
+                parent_id=parent_id,
+                inherit_session=inherit_session
+            )
+            
+            logger.info(f"Agent {job_id} specialized as '{agent_config['role']}' role")
+            
+            # Add MCP and context info to job_info for script generation
+            job_info['mcp_config_path'] = mcp_config_path
+            job_info['required_servers'] = list(required_servers) if required_servers else []
+            job_info['agent_config'] = agent_config  # Add context configuration
+            
+            # Create agent job with parent tracking
             job = AgentJob(
                 job_id=job_id,
                 task=job_info["task"],
@@ -93,333 +100,341 @@ class FireAndForgetJobManager:
                 result_file=job_info["result_file"],
                 status="spawning",
                 spawned_at=datetime.now().isoformat(),
-                depth=0,  # First-level agent
+                depth=job_info.get('depth', 0),
+                parent_id=parent_id,
             )
-
+            
             # Store in active jobs
             self.active_jobs[job_id] = job
-
-            # Create the agent script that will run independently
-            agent_script = self._create_agent_script(job_info)
-
+            
+            # Create the agent script with pre-determined MCP config
+            agent_script = self._create_claude_agent_script(job_info)
+            
             # Write script to temp file
             script_path = f"/tmp/agent_{job_id}.py"
             with open(script_path, "w") as f:
                 f.write(agent_script)
-
-            # Spawn the agent process (fire-and-forget)
+            
+            # Spawn the agent process
             env = os.environ.copy()
-            env.update(
-                {
-                    "PYTHONPATH": self.config.python_path,
-                    "CLAUDE_CODE_TOKEN": self.config.claude_token,
-                    "AGENT_JOB_ID": job_id,
-                    "AGENT_OUTPUT_DIR": job_info["output_dir"],
-                    "AGENT_RESULT_FILE": job_info["result_file"],
-                    "AGENT_PROFILE": job_info.get("agent_profile", ""),
-                    "AGENT_TIMEOUT": str(job_info.get("timeout", 600)),
-                    # Enable child management for this agent
-                    "AGENT_MANAGE_CHILDREN": "true",
-                    "AGENT_MAX_RECURSION": "3",
-                }
-            )
-
-            # Start process detached from parent
+            
+            # CRITICAL: Remove ANTHROPIC_API_KEY to prevent API token usage
+            if "ANTHROPIC_API_KEY" in env:
+                del env["ANTHROPIC_API_KEY"]
+            
+            # Set Claude Code token and job-specific variables
+            env.update({
+                "CLAUDE_CODE_TOKEN": self.config.claude_token or "",
+                "AGENT_JOB_ID": job_id,
+                "AGENT_OUTPUT_DIR": job_info.get("output_dir", "/tmp/claude_results"),
+                "AGENT_RESULT_FILE": job_info.get("result_file", f"/tmp/claude_results/{job_id}.json"),
+                # PARENT PASSES MCP CONFIG TO CHILD
+                "AGENT_MCP_CONFIG": mcp_config_path or "",
+                "AGENT_MCP_SERVERS": json.dumps(job_info.get('required_servers', [])),
+                # CONTEXT CONFIGURATION
+                "AGENT_SESSION_ID": agent_config.get('session_id', ''),
+                "AGENT_ROLE": agent_config.get('role', 'general'),
+                "AGENT_SYSTEM_PROMPT": agent_config.get('system_prompt', ''),
+                "AGENT_RESUME_SESSION": agent_config.get('resume_command', ''),
+                "AGENT_PARENT_CONTEXT": json.dumps(agent_config.get('parent_context', {})),
+            })
+            
+            # Also remove any other ANTHROPIC_* variables
+            # Keep other CLAUDE_* variables as they might be needed for configuration
+            for key in list(env.keys()):
+                if key.startswith("ANTHROPIC_"):
+                    del env[key]
+            
+            # Start process detached
             process = subprocess.Popen(
                 [sys.executable, script_path],
                 env=env,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                start_new_session=True,  # Detach from parent process group
-                preexec_fn=os.setsid if os.name != "nt" else None,
+                start_new_session=True
             )
-
+            
             job.process = process
             job.status = "running"
-
-            # Log spawn
-            logger.info(f"Spawned agent {job_id} (PID: {process.pid})")
-
-            # Write initial status file
-            self._write_status_file(job)
-
+            
+            logger.info(f"Spawned Claude Code agent {job_id} (PID: {process.pid})")
+            
         except Exception as e:
             logger.error(f"Failed to spawn agent {job_info.get('job_id')}: {e}")
             if job_id in self.active_jobs:
                 self.active_jobs[job_id].status = "failed"
                 self.active_jobs[job_id].error = str(e)
-                self._write_status_file(self.active_jobs[job_id])
-
-    def _create_agent_script(self, job_info: Dict[str, Any]) -> str:
-        """
-        Create the Python script that will run as the independent agent.
-        This script manages its own children synchronously.
-        """
+    
+    def _create_claude_agent_script(self, job_info: Dict[str, Any]) -> str:
+        """Create a Python script that uses parent-determined MCP configuration"""
+        
+        # Escape the task string properly
+        task_escaped = repr(job_info['task'])
+        
+        # Use parent-provided MCP and context configuration
+        mcp_config_path = job_info.get('mcp_config_path')
+        required_servers = job_info.get('required_servers', [])
+        agent_config = job_info.get('agent_config', {})
+        
         return f'''#!/usr/bin/env python3
 """
-Independent Agent Script
+Claude Code Agent Script - Uses parent-determined MCP and context configuration
 Job ID: {job_info['job_id']}
-This agent manages its own children synchronously and reports complete results.
-"""
+Role: {agent_config.get('role', 'general')}
+MCP Config: {'Custom' if mcp_config_path else 'None (no MCP servers needed)'}
+Required Servers: {required_servers if required_servers else 'None'}
+
+IMPORTANT: Both MCP and context configuration are determined by the PARENT process.
+This child process receives all configuration via environment variables.
+"""'
 
 import os
 import sys
 import json
-import asyncio
-import traceback
-from datetime import datetime
-from typing import Dict, Any, List
 import subprocess
 import time
+import asyncio
+from datetime import datetime
 
-# Agent configuration from environment
-JOB_ID = os.environ.get("AGENT_JOB_ID")
-OUTPUT_DIR = os.environ.get("AGENT_OUTPUT_DIR")
-RESULT_FILE = os.environ.get("AGENT_RESULT_FILE")
-AGENT_PROFILE = os.environ.get("AGENT_PROFILE", "")
-TIMEOUT = int(os.environ.get("AGENT_TIMEOUT", "600"))
-MANAGE_CHILDREN = os.environ.get("AGENT_MANAGE_CHILDREN", "true") == "true"
-MAX_RECURSION = int(os.environ.get("AGENT_MAX_RECURSION", "3"))
+# CRITICAL: Ensure ANTHROPIC_API_KEY is not used
+# This must happen BEFORE any other operations
+if "ANTHROPIC_API_KEY" in os.environ:
+    del os.environ["ANTHROPIC_API_KEY"]
+# Also set it to empty as a double safety measure
+os.environ["ANTHROPIC_API_KEY"] = ""
 
-# Task to execute
-TASK = {repr(job_info['task'])}
+# Configuration from parent process
+JOB_ID = os.environ.get("AGENT_JOB_ID", "{job_info['job_id']}")
+OUTPUT_DIR = os.environ.get("AGENT_OUTPUT_DIR", "{job_info['output_dir']}")
+RESULT_FILE = os.environ.get("AGENT_RESULT_FILE", "{job_info['result_file']}")
+TASK = {task_escaped}
+TIMEOUT = {job_info.get('timeout', 600)}
 
+# MCP configuration determined by parent
+MCP_CONFIG_PATH = os.environ.get("AGENT_MCP_CONFIG", "") or None
+REQUIRED_MCP_SERVERS = json.loads(os.environ.get("AGENT_MCP_SERVERS", "[]"))
 
-class ChildManager:
-    """Manages child agents synchronously"""
+# Context configuration from parent
+SESSION_ID = os.environ.get("AGENT_SESSION_ID", "")
+ROLE = os.environ.get("AGENT_ROLE", "general")
+SYSTEM_PROMPT = os.environ.get("AGENT_SYSTEM_PROMPT", "")
+RESUME_SESSION = os.environ.get("AGENT_RESUME_SESSION", "")
+PARENT_CONTEXT = json.loads(os.environ.get("AGENT_PARENT_CONTEXT", "{{}}"))
+
+print(f"Agent {{JOB_ID}} starting with parent-provided configuration")
+print(f"  Role: {{ROLE}}")
+if SESSION_ID:
+    print(f"  Session ID: {{SESSION_ID}}")
+if RESUME_SESSION:
+    print(f"  Resuming from: {{RESUME_SESSION}}")
+if MCP_CONFIG_PATH:
+    print(f"  MCP Config: {{MCP_CONFIG_PATH}}")
+    print(f"  Required Servers: {{REQUIRED_MCP_SERVERS}}")
+else:
+    print(f"  No MCP servers required (parent determined)")
+
+def check_mcp_ready(attempt=1, max_attempts=10):
+    """Check if MCP servers are ready with exponential backoff"""
+    if not REQUIRED_MCP_SERVERS:
+        return True
     
-    def __init__(self, parent_id: str):
-        self.parent_id = parent_id
-        self.children = {{}}
-        
-    async def spawn_child(self, task: str, depth: int) -> Dict[str, Any]:
-        """Spawn a child agent and wait for completion"""
-        
-        if depth >= MAX_RECURSION:
-            return {{
-                "status": "skipped",
-                "reason": "Max recursion depth reached"
-            }}
-        
-        child_id = f"{{self.parent_id}}_child_{{len(self.children)}}"
-        
-        try:
-            # Use claude_run (synchronous) for child agents
-            from subprocess import run, PIPE
-            
-            # Create command to run child task
-            cmd = [
-                sys.executable, "-c",
-                f"""
-import os
-os.environ['CLAUDE_CODE_TOKEN'] = '{os.environ.get('CLAUDE_CODE_TOKEN', '')}'
-
-# Execute child task using Claude
-# This would use the claude_run tool synchronously
-result = {{'child_id': '{child_id}', 'task': '{task}', 'status': 'completed'}}
-print(json.dumps(result))
-"""
-            ]
-            
-            # Run child synchronously
-            result = run(cmd, capture_output=True, text=True, timeout=TIMEOUT//2)
-            
-            if result.returncode == 0:
-                child_result = json.loads(result.stdout)
-                self.children[child_id] = child_result
-                return child_result
-            else:
-                return {{
-                    "status": "failed",
-                    "error": result.stderr
-                }}
-                
-        except Exception as e:
-            return {{
-                "status": "failed",
-                "error": str(e)
-            }}
+    # Simulate MCP readiness check (in real implementation, would probe servers)
+    # For now, use timing-based approach
+    elapsed = time.time() - START_TIME
     
-    def get_all_results(self) -> Dict[str, Any]:
-        """Get results from all children"""
-        return self.children
+    # Assume 1-2 seconds per server when loading minimal set
+    expected_time = len(REQUIRED_MCP_SERVERS) * 1.5
+    
+    if elapsed >= expected_time:
+        print(f"MCP servers ready after {{elapsed:.1f}}s")
+        return True
+    
+    if attempt >= max_attempts:
+        print(f"MCP servers failed to initialize after {{attempt}} attempts")
+        return False
+    
+    # Exponential backoff
+    wait_time = min(0.5 * (2 ** (attempt - 1)), 2.0)
+    time.sleep(wait_time)
+    return check_mcp_ready(attempt + 1, max_attempts)
 
-
-async def execute_task():
-    """Execute the main task with child management"""
+def execute_claude_code():
+    """Execute task using real Claude Code CLI with intelligent MCP management"""
     
     result = {{
         "job_id": JOB_ID,
+        "task": TASK,
         "status": "running",
         "started_at": datetime.now().isoformat(),
-        "task": TASK,
-        "agent_profile": AGENT_PROFILE,
-        "depth": 0,
-        "children": {{}},
-        "output": {{}}
+        "role": ROLE,
+        "session_id": SESSION_ID,
+        "parent_context": PARENT_CONTEXT,
+        "mcp_servers_required": REQUIRED_MCP_SERVERS,
+        "mcp_config": MCP_CONFIG_PATH
     }}
     
     try:
-        # Write initial status
-        status_file = f"{{OUTPUT_DIR}}/{{JOB_ID}}_status.json"
-        with open(status_file, "w") as f:
-            json.dump(result, f, indent=2)
+        # Build Claude command
+        cmd = [
+            "claude",
+            "--dangerously-skip-permissions",  # For automation
+            "--output-format", "json"
+        ]
         
-        # Initialize child manager if enabled
-        child_manager = ChildManager(JOB_ID) if MANAGE_CHILDREN else None
+        # Add session management
+        if SESSION_ID:
+            cmd.extend(["--session-id", SESSION_ID])
         
-        # Execute main task logic here
-        # This is where the actual Claude API call would happen
-        print(f"Executing task: {{TASK[:100]}}...")
+        # Add session resumption if needed
+        if RESUME_SESSION and RESUME_SESSION.startswith("--resume"):
+            # Parse the --resume command
+            resume_parts = RESUME_SESSION.split()
+            cmd.extend(resume_parts)
         
-        # Simulate task execution with potential child spawning
-        if "analyze" in TASK.lower() and child_manager:
-            # Example: Spawn child agents for sub-analyses
-            sub_tasks = [
-                "Analyze code structure",
-                "Analyze dependencies",
-                "Analyze patterns"
-            ]
+        # Add custom system prompt if provided
+        if SYSTEM_PROMPT:
+            cmd.extend(["--append-system-prompt", SYSTEM_PROMPT])
+        
+        # Add MCP configuration if needed
+        if MCP_CONFIG_PATH:
+            cmd.extend(["--mcp-config", MCP_CONFIG_PATH])
+            cmd.append("--strict-mcp-config")  # Only load specified servers
+        
+        # Prepare environment for Claude Code
+        env = os.environ.copy()
+        
+        # Ensure CLAUDE_CODE_TOKEN is set (passed from parent)
+        claude_token = os.environ.get("CLAUDE_CODE_TOKEN", "")
+        if claude_token:
+            env["CLAUDE_CODE_TOKEN"] = claude_token
+        
+        # CRITICAL: Remove ANTHROPIC_API_KEY to force user auth
+        if "ANTHROPIC_API_KEY" in env:
+            del env["ANTHROPIC_API_KEY"]
+            print("Removed ANTHROPIC_API_KEY to use Claude Code auth")
+        
+        # Remove any other conflicting variables
+        for key in list(env.keys()):
+            if key.startswith("ANTHROPIC_"):
+                del env[key]
+        
+        # Start Claude process
+        print(f"Starting Claude with {{len(REQUIRED_MCP_SERVERS)}} MCP servers...")
+        process = subprocess.Popen(
+            cmd,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            env=env
+        )
+        
+        # Wait for MCP servers to be ready if needed
+        if REQUIRED_MCP_SERVERS:
+            print(f"Waiting for MCP servers: {{REQUIRED_MCP_SERVERS}}")
+            if not check_mcp_ready():
+                result["status"] = "failed"
+                result["error"] = "MCP servers failed to initialize within timeout"
+                process.terminate()
+                raise RuntimeError("MCP initialization timeout")
+        
+        # Send task and get result with timeout
+        stdout, stderr = process.communicate(input=TASK, timeout=TIMEOUT)
+        
+        if process.returncode == 0:
+            # Parse Claude's JSON output
+            try:
+                claude_result = json.loads(stdout)
+                result["status"] = "completed"
+                result["output"] = claude_result
+                result["claude_session_id"] = claude_result.get("session_id")
+                result["claude_cost"] = claude_result.get("total_cost_usd", 0)
+                result["mcp_initialization_time"] = time.time() - START_TIME if REQUIRED_MCP_SERVERS else 0
+            except json.JSONDecodeError:
+                # Fallback for non-JSON output
+                result["status"] = "completed"
+                result["output"] = stdout
+        else:
+            result["status"] = "failed"
+            result["error"] = stderr or f"Process exited with code {{process.returncode}}"
             
-            for sub_task in sub_tasks:
-                child_result = await child_manager.spawn_child(sub_task, 1)
-                print(f"Child task completed: {{child_result.get('status')}}")
-        
-        # Simulate main task completion
-        await asyncio.sleep(2)  # Simulate work
-        
-        # Collect all results
-        result["status"] = "completed"
-        result["completed_at"] = datetime.now().isoformat()
-        
-        if child_manager:
-            result["children"] = child_manager.get_all_results()
-        
-        result["output"] = {{
-            "summary": f"Successfully executed task with {{len(result['children'])}} sub-agents",
-            "details": {{
-                "task_type": "analysis" if "analyze" in TASK.lower() else "execution",
-                "confidence": 0.95,
-                "findings": []
-            }}
-        }}
-        
-        # Write final result
-        with open(RESULT_FILE, "w") as f:
-            json.dump(result, f, indent=2)
-        
-        # Update status file
-        with open(status_file, "w") as f:
-            json.dump(result, f, indent=2)
-            
-        print(f"Task completed successfully. Results written to {{RESULT_FILE}}")
-        
+    except subprocess.TimeoutExpired:
+        result["status"] = "timeout"
+        result["error"] = f"Task timed out after {{TIMEOUT}} seconds"
+        process.terminate()
     except Exception as e:
-        # Handle errors gracefully
         result["status"] = "failed"
         result["error"] = str(e)
-        result["traceback"] = traceback.format_exc()
+    
+    finally:
         result["completed_at"] = datetime.now().isoformat()
         
-        # Write error result
+        # Write result to file
+        os.makedirs(OUTPUT_DIR, exist_ok=True)
         with open(RESULT_FILE, "w") as f:
             json.dump(result, f, indent=2)
         
-        print(f"Task failed: {{e}}")
-        sys.exit(1)
+        # Also print for debugging
+        print(f"Task completed: {{result['status']}}")
+        if REQUIRED_MCP_SERVERS:
+            print(f"MCP initialization took: {{result.get('mcp_initialization_time', 0):.1f}}s")
+        print(f"Result saved to: {{RESULT_FILE}}")
+    
+    return result
 
+# Global start time for MCP timing
+START_TIME = time.time()
 
 if __name__ == "__main__":
-    # Run the task
-    asyncio.run(execute_task())
+    result = execute_claude_code()
+    sys.exit(0 if result["status"] == "completed" else 1)
 '''
-
-    def _write_status_file(self, job: AgentJob) -> None:
-        """Write job status to file for monitoring"""
-        try:
-            status_file = f"{job.output_dir}/{job.job_id}_status.json"
-            with open(status_file, "w") as f:
-                json.dump(job.to_dict(), f, indent=2)
-        except Exception as e:
-            logger.error(f"Failed to write status file for {job.job_id}: {e}")
-
+    
     async def check_job_status(self, job_id: str) -> Dict[str, Any]:
         """Check the status of a specific job"""
-
-        # Check active jobs
-        if job_id in self.active_jobs:
-            job = self.active_jobs[job_id]
-
-            # Check if process is still running
-            if job.process and job.process.poll() is None:
-                return {"status": "running", "job": job.to_dict()}
+        if job_id not in self.active_jobs:
+            return {"status": "not_found"}
+        
+        job = self.active_jobs[job_id]
+        
+        # Check if process is still running
+        if job.process:
+            poll = job.process.poll()
+            if poll is None:
+                job.status = "running"
+            elif poll == 0:
+                job.status = "completed"
             else:
-                # Process completed, move to completed
-                job.status = "completed" if job.process.returncode == 0 else "failed"
-                job.completed_at = datetime.now().isoformat()
-
-                self.completed_jobs[job_id] = job
-                del self.active_jobs[job_id]
-
-                return {"status": job.status, "job": job.to_dict()}
-
-        # Check completed jobs
-        if job_id in self.completed_jobs:
-            job = self.completed_jobs[job_id]
-            return {"status": job.status, "job": job.to_dict()}
-
-        # Job not found
-        return {"status": "not_found", "job_id": job_id}
-
+                job.status = "failed"
+        
+        return {
+            "job_id": job.job_id,
+            "status": job.status,
+            "spawned_at": job.spawned_at,
+            "task": job.task[:100] + "..." if len(job.task) > 100 else job.task
+        }
+    
+    async def kill_job(self, job_id: str) -> bool:
+        """Kill a running job"""
+        if job_id not in self.active_jobs:
+            return False
+        
+        job = self.active_jobs[job_id]
+        if job.process:
+            try:
+                os.killpg(os.getpgid(job.process.pid), signal.SIGTERM)
+                job.status = "terminated"
+                return True
+            except:
+                pass
+        
+        return False
+    
     async def get_active_jobs(self) -> List[Dict[str, Any]]:
         """Get all active jobs"""
         active = []
-
-        for job_id, job in list(self.active_jobs.items()):
-            # Check if still running
-            if job.process and job.process.poll() is None:
-                active.append(job.to_dict())
-            else:
-                # Move to completed
-                job.status = "completed" if job.process.returncode == 0 else "failed"
-                job.completed_at = datetime.now().isoformat()
-
-                self.completed_jobs[job_id] = job
-                del self.active_jobs[job_id]
-
+        for job_id, job in self.active_jobs.items():
+            status = await self.check_job_status(job_id)
+            if status["status"] in ["running", "spawning"]:
+                active.append(status)
         return active
-
-    async def kill_job(self, job_id: str) -> bool:
-        """Kill a running job"""
-
-        if job_id not in self.active_jobs:
-            return False
-
-        job = self.active_jobs[job_id]
-
-        if job.process:
-            try:
-                # Kill the process group (includes children)
-                os.killpg(os.getpgid(job.process.pid), signal.SIGTERM)
-
-                # Wait a moment for graceful shutdown
-                await asyncio.sleep(1)
-
-                # Force kill if still running
-                if job.process.poll() is None:
-                    os.killpg(os.getpgid(job.process.pid), signal.SIGKILL)
-
-                job.status = "killed"
-                job.completed_at = datetime.now().isoformat()
-
-                # Move to completed
-                self.completed_jobs[job_id] = job
-                del self.active_jobs[job_id]
-
-                return True
-
-            except Exception as e:
-                logger.error(f"Failed to kill job {job_id}: {e}")
-                return False
-
-        return False

@@ -145,8 +145,30 @@ class JobManager:
             {"job_status": job.status.value, "start_time": job.start_time.isoformat()},
         )
 
+        # Analyze task to determine required MCP servers
+        from ..claude_code_v2.mcp_manager import MCPRequirementAnalyzer, MCPConfigManager
+        
+        required_servers = MCPRequirementAnalyzer.analyze_task(job.task)
+        
         # Build command
         cmd = ["claude"]
+        
+        # Add MCP configuration if needed
+        if required_servers:
+            # Create minimal MCP config for this job
+            config_path = MCPConfigManager.create_instance_config(
+                instance_id=job.id,
+                custom_servers=list(required_servers)
+            )
+            cmd.extend(["--mcp-config", config_path])
+            cmd.append("--strict-mcp-config")  # Only use our specified servers
+            logger.log_debug(
+                job.id,
+                "Using custom MCP configuration",
+                {"required_servers": list(required_servers), "config_path": config_path}
+            )
+        else:
+            logger.log_debug(job.id, "No MCP servers required for this task")
 
         # Always skip permission prompts for automation
         cmd.append("--dangerously-skip-permissions")
@@ -172,11 +194,22 @@ class JobManager:
 
         # Clean environment of potentially conflicting variables
         # IMPORTANT: Remove ANTHROPIC_API_KEY as it conflicts with CLAUDE_CODE_TOKEN
+        # Since ANTHROPIC_API_KEY is set by default, we must override it
         removed_vars = []
+        
+        # First, explicitly handle ANTHROPIC_API_KEY
+        if "ANTHROPIC_API_KEY" in env:
+            del env["ANTHROPIC_API_KEY"]
+            removed_vars.append("ANTHROPIC_API_KEY")
+        # Set to empty string as double safety measure
+        env["ANTHROPIC_API_KEY"] = ""
+        
+        # Then clean other conflicting variables
         for key in list(env.keys()):
-            if (
-                key.startswith("CLAUDE_") and key != "CLAUDE_CODE_TOKEN"
-            ) or key == "ANTHROPIC_API_KEY":
+            if key.startswith("CLAUDE_") and key != "CLAUDE_CODE_TOKEN":
+                del env[key]
+                removed_vars.append(key)
+            elif key.startswith("ANTHROPIC_") and key != "ANTHROPIC_API_KEY":
                 del env[key]
                 removed_vars.append(key)
 
@@ -209,6 +242,76 @@ class JobManager:
 
             job.process = process
             self.performance_monitor.update_metrics(job.id, "spawned")
+            
+            # If MCP servers are required, wait for them to be ready
+            if required_servers:
+                from ..claude_code_v2.mcp_manager import (
+                    MCPInstanceConfig, 
+                    MCPAvailabilityChecker
+                )
+                
+                instance_config = MCPInstanceConfig(
+                    instance_id=job.id,
+                    config_path=config_path,
+                    required_servers=required_servers,
+                    max_wait_seconds=7,
+                    exponential_backoff=True
+                )
+                
+                checker = MCPAvailabilityChecker(instance_config)
+                
+                # Run async check in sync context
+                import asyncio
+                loop = asyncio.new_event_loop()
+                try:
+                    ready, metrics = loop.run_until_complete(
+                        checker.wait_for_mcp_servers(required_servers=required_servers)
+                    )
+                finally:
+                    loop.close()
+                
+                if not ready:
+                    # MCP servers failed to initialize
+                    process.terminate()
+                    job.status = JobStatus.FAILED
+                    job.error = "MCP servers failed to initialize within timeout"
+                    
+                    failed_servers = [
+                        m.server_name for m in metrics.values() 
+                        if m.status.value == "failed"
+                    ]
+                    
+                    logger.log_error(
+                        job.id,
+                        "MCP initialization failed",
+                        {"failed_servers": failed_servers}
+                    )
+                    
+                    job.result = {
+                        "error": "MCP server initialization timeout",
+                        "failed_servers": failed_servers,
+                        "metrics": {
+                            s: {
+                                "status": m.status.value,
+                                "attempts": m.check_attempts,
+                                "error": m.error_message
+                            }
+                            for s, m in metrics.items()
+                        }
+                    }
+                    return
+                else:
+                    logger.log_debug(
+                        job.id,
+                        "MCP servers ready",
+                        {
+                            "initialization_times": {
+                                s: m.initialization_duration_ms
+                                for s, m in metrics.items()
+                                if m.initialization_duration_ms
+                            }
+                        }
+                    )
 
             logger.log(
                 "INFO",

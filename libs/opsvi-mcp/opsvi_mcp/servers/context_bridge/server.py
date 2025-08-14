@@ -6,13 +6,12 @@ Provides IDE context to all MCP agents through a unified interface.
 
 import asyncio
 import json
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Union
 from datetime import datetime, timedelta
 import logging
 from pathlib import Path
 
 from fastmcp import FastMCP
-import redis.asyncio as redis
 from pydantic import ValidationError
 
 from .models import (
@@ -24,6 +23,8 @@ from .models import (
     DiagnosticInfo,
     FileSelection,
 )
+from .config import ContextBridgeConfig
+from .pubsub import PubSubBackend, InMemoryPubSub, RedisPubSubAdapter
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -36,21 +37,22 @@ class ContextBridgeServer:
 
     Features:
     - Maintains current IDE context state
-    - Publishes context changes via Redis pub/sub
+    - Publishes context changes via Redis or in-memory pub/sub
     - Provides query interface for agents
     - Caches context for performance
+    - Automatic fallback from Redis to in-memory when Redis is unavailable
     """
 
-    def __init__(self, redis_url: str = "redis://localhost:6379"):
+    def __init__(self, config: Optional[ContextBridgeConfig] = None):
+        self.config = config or ContextBridgeConfig()
         self.mcp = FastMCP("context-bridge")
-        self.redis_url = redis_url
-        self.redis_client: Optional[redis.Redis] = None
-        self.pubsub: Optional[redis.client.PubSub] = None
+        self.pubsub_backend: Optional[PubSubBackend] = None
+        self.backend_type: str = "none"  # 'redis', 'memory', or 'none'
 
         # Current context state
         self.current_context: Optional[IDEContext] = None
         self.context_history: List[IDEContext] = []
-        self.max_history_size = 100
+        self.max_history_size = self.config.max_history_size
 
         # Subscriptions
         self.subscriptions: Dict[str, ContextSubscription] = {}
@@ -224,13 +226,16 @@ class ContextBridgeServer:
             return self.metrics
 
     async def _publish_event(self, event: ContextEvent):
-        """Publish event to Redis pub/sub"""
+        """Publish event to pub/sub backend"""
         try:
-            if self.redis_client:
+            if self.pubsub_backend:
                 channel = f"context:{event.event_type.value}"
-                await self.redis_client.publish(channel, event.to_redis_message())
+                message = event.to_redis_message()  # JSON format works for both backends
+                delivered = await self.pubsub_backend.publish(channel, message)
                 self.metrics["events_published"] += 1
-                logger.debug(f"Published event: {event.event_type}")
+                logger.debug(f"Published event: {event.event_type} to {delivered} subscribers")
+            else:
+                logger.debug(f"No pub/sub backend available, event not published: {event.event_type}")
         except Exception as e:
             logger.error(f"Failed to publish event: {e}")
 
@@ -284,24 +289,80 @@ class ContextBridgeServer:
         ) / count
 
     async def start(self):
-        """Start the server and connect to Redis"""
+        """Start the server and initialize pub/sub backend"""
+        # Configure logging
+        self.config.configure_logging()
+        
+        backend_mode = self.config.get_effective_backend()
+        
+        if backend_mode == "memory":
+            # Use in-memory pub/sub
+            self.pubsub_backend = InMemoryPubSub()
+            self.backend_type = "memory"
+            logger.info("Using in-memory pub/sub backend")
+        
+        elif backend_mode == "redis":
+            # Try Redis only
+            if await self._init_redis():
+                self.backend_type = "redis"
+                logger.info("Using Redis pub/sub backend")
+            else:
+                logger.error("Redis required but not available")
+                raise RuntimeError("Redis backend required but connection failed")
+        
+        else:  # auto mode
+            # Try Redis first, fallback to in-memory
+            if await self._init_redis():
+                self.backend_type = "redis"
+                logger.info("Using Redis pub/sub backend")
+            else:
+                logger.warning("Redis not available, falling back to in-memory pub/sub")
+                self.pubsub_backend = InMemoryPubSub()
+                self.backend_type = "memory"
+                logger.info("Using in-memory pub/sub backend")
+        
+        logger.info(f"Context Bridge Server started with {self.backend_type} backend")
+    
+    async def _init_redis(self) -> bool:
+        """Initialize Redis connection and adapter"""
         try:
-            self.redis_client = await redis.from_url(self.redis_url)
-            await self.redis_client.ping()
-            logger.info("Connected to Redis")
+            import redis.asyncio as redis
+            
+            redis_client = await redis.from_url(
+                self.config.redis_url,
+                socket_connect_timeout=self.config.redis_connect_timeout,
+                retry_on_timeout=self.config.redis_retry_on_timeout,
+                max_connections=self.config.redis_max_connections
+            )
+            
+            # Test connection
+            await redis_client.ping()
+            
+            # Create adapter
+            adapter = RedisPubSubAdapter(redis_client)
+            await adapter.initialize()
+            self.pubsub_backend = adapter
+            
+            return True
+            
+        except ImportError:
+            logger.warning("Redis library not installed, cannot use Redis backend")
+            return False
         except Exception as e:
-            logger.warning(f"Redis connection failed, running without pub/sub: {e}")
-            self.redis_client = None
+            logger.warning(f"Redis connection failed: {e}")
+            return False
 
     async def stop(self):
         """Cleanup connections"""
-        if self.redis_client:
-            await self.redis_client.close()
+        if self.pubsub_backend:
+            await self.pubsub_backend.close()
+            logger.info(f"Closed {self.backend_type} pub/sub backend")
 
 
-# Create and export server instance
-server = ContextBridgeServer()
+# Create and export server instance with default config
+from .config import get_default_config
+server = ContextBridgeServer(config=get_default_config())
 mcp = server.mcp
 
 # Export for direct import
-__all__ = ["ContextBridgeServer", "server", "mcp"]
+__all__ = ["ContextBridgeServer", "server", "mcp", "ContextBridgeConfig"]

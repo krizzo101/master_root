@@ -1,0 +1,141 @@
+{
+  "version": "1.0.0",
+  "auto_mcp": {
+    "enabled": true,
+    "threshold": 2,
+    "default_server": "V1",
+    "guidance_path": "/home/opsvi/master_root/libs/opsvi-mcp",
+    "preload_docs": true,
+    "silent_mode": true
+  },
+  "mcp_servers": {
+    "claude_code_v1": {
+      "enabled": true,
+      "path": "mcp__claude-code-wrapper",
+      "auto_trigger_keywords": [
+        "debug", "fix", "error", "issue", "bug",
+        "investigate", "trace", "why", "understand"
+      ],
+      "default_config": {
+        "outputFormat": "json",
+        "permissionMode": "default",
+        "timeout": 600
+      }
+    },
+    "claude_code_v2": {
+      "enabled": true,
+      "path": "mcp__claude-code-v2",
+      "auto_trigger_keywords": [
+        "all files", "all python", "every", "multiple", "parallel",
+        "batch", "entire codebase", "analyze all"
+      ],
+      "default_config": {
+        "timeout": 300,
+        "output_dir": "/tmp/claude_results"
+      }
+    },
+    "claude_code_v3": {
+      "enabled": true,
+      "path": "mcp__claude-code-v3",
+      "auto_trigger_keywords": [
+        "production", "enterprise", "robust", "comprehensive",
+        "system", "application", "with tests", "documented"
+      ],
+      "default_config": {
+        "auto_detect": true,
+        "quality_level": "normal"
+      },
+      "mode_detection": {
+        "RAPID": ["quick", "prototype", "poc"],
+        "CODE": ["standard", "implement", "create"],
+        "QUALITY": ["quality", "review", "refactor"],
+        "FULL_CYCLE": ["production", "complete", "comprehensive"],
+        "TESTING": ["test", "tests", "coverage"],
+        "DOCUMENTATION": ["document", "docs", "api docs"],
+        "DEBUG": ["debug", "fix", "troubleshoot"],
+        "ANALYSIS": ["analyze", "understand", "investigate"],
+        "REVIEW": ["review", "critique", "assess"]
+      }
+    }
+  },
+  "complexity_scoring": {
+    "keywords": {
+      "multiple": 3,
+      "all": 3,
+      "every": 3,
+      "entire": 3,
+      "production": 4,
+      "enterprise": 4,
+      "robust": 3,
+      "comprehensive": 4,
+      "system": 3,
+      "application": 3,
+      "create": 2,
+      "implement": 2,
+      "build": 2,
+      "analyze": 2,
+      "review": 2,
+      "audit": 2,
+      "test": 2,
+      "document": 2,
+      "refactor": 3,
+      "migrate": 3
+    },
+    "thresholds": {
+      "simple": 0,
+      "use_v1": 2,
+      "use_v2": 3,
+      "use_v3": 6
+    }
+  },
+  "guidance_documents": {
+    "quick_reference": {
+      "path": "/home/opsvi/master_root/libs/opsvi-mcp/CLAUDE.md",
+      "preload": true,
+      "cache_ttl": 3600
+    },
+    "agent_guidance": {
+      "path": "/home/opsvi/master_root/libs/opsvi-mcp/CLAUDE_CODE_AGENT_GUIDANCE.md",
+      "preload": true,
+      "cache_ttl": 3600
+    },
+    "scenarios": {
+      "path": "/home/opsvi/master_root/libs/opsvi-mcp/CLAUDE_CODE_SCENARIOS.md",
+      "preload": false,
+      "cache_ttl": 1800
+    },
+    "use_cases": {
+      "path": "/home/opsvi/master_root/libs/opsvi-mcp/CLAUDE_CODE_USE_CASES.md",
+      "preload": false,
+      "cache_ttl": 1800
+    }
+  },
+  "fallback_chain": {
+    "V3": ["V2", "V1", "direct"],
+    "V2": ["V1", "direct"],
+    "V1": ["direct"]
+  },
+  "telemetry": {
+    "enabled": true,
+    "log_path": "/tmp/claude_mcp_usage.log",
+    "metrics": [
+      "server_selection",
+      "task_completion",
+      "fallback_usage",
+      "performance"
+    ]
+  },
+  "performance": {
+    "decision_timeout_ms": 100,
+    "cache_decisions": true,
+    "cache_size": 100,
+    "preemptive_loading": true,
+    "parallel_evaluation": true
+  },
+  "user_experience": {
+    "show_mcp_usage": "minimal",
+    "explain_decisions": false,
+    "auto_fallback": true,
+    "success_notifications": false
+  }
+}

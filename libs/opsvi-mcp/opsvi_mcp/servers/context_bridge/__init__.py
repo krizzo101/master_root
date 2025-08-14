@@ -18,6 +18,8 @@ from .models import (
     FileSelection
 )
 from .knowledge_aggregator import KnowledgeAggregator
+from .config import ContextBridgeConfig
+from .pubsub import PubSubBackend, InMemoryPubSub
 
 __version__ = "1.0.0"
 __all__ = [
@@ -29,5 +31,8 @@ __all__ = [
     "IDEContext",
     "DiagnosticInfo",
     "DiagnosticSeverity",
-    "FileSelection"
+    "FileSelection",
+    "ContextBridgeConfig",
+    "PubSubBackend",
+    "InMemoryPubSub"
 ]
