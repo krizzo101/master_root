@@ -1,0 +1,88 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-08-14T00:00:00Z",
+  "active_tasks": {},
+  "completed_tasks": {},
+  "agent_registry": {
+    "development-specialist": {
+      "capabilities": ["code_generation", "implementation", "feature_development"],
+      "typical_duration_ms": 5000,
+      "success_rate": 0.92
+    },
+    "code-analyzer": {
+      "capabilities": ["code_review", "pattern_detection", "quality_assessment"],
+      "typical_duration_ms": 3000,
+      "success_rate": 0.95
+    },
+    "research-genius": {
+      "capabilities": ["information_gathering", "analysis", "synthesis"],
+      "typical_duration_ms": 4000,
+      "success_rate": 0.88
+    },
+    "refactoring-master": {
+      "capabilities": ["code_transformation", "optimization", "cleanup"],
+      "typical_duration_ms": 6000,
+      "success_rate": 0.90
+    },
+    "qa-testing-guru": {
+      "capabilities": ["test_creation", "validation", "coverage_analysis"],
+      "typical_duration_ms": 4500,
+      "success_rate": 0.93
+    },
+    "technical-writer": {
+      "capabilities": ["documentation", "api_docs", "user_guides"],
+      "typical_duration_ms": 3500,
+      "success_rate": 0.96
+    },
+    "solution-architect": {
+      "capabilities": ["system_design", "architecture", "planning"],
+      "typical_duration_ms": 7000,
+      "success_rate": 0.89
+    },
+    "excellence-optimizer": {
+      "capabilities": ["complex_problems", "innovation", "cutting_edge_solutions"],
+      "typical_duration_ms": 10000,
+      "success_rate": 0.85
+    }
+  },
+  "pipeline_templates": {
+    "feature_development": {
+      "agents": ["code-analyzer", "development-specialist", "qa-testing-guru", "technical-writer"],
+      "parallel": true,
+      "typical_duration_ms": 10000
+    },
+    "bug_fix": {
+      "agents": ["code-analyzer", "development-specialist", "qa-testing-guru"],
+      "parallel": true,
+      "typical_duration_ms": 8000
+    },
+    "refactoring": {
+      "agents": ["code-analyzer", "refactoring-master", "qa-testing-guru"],
+      "parallel": true,
+      "typical_duration_ms": 9000
+    },
+    "research": {
+      "agents": ["research-genius", "requirements-analyst", "solution-architect"],
+      "parallel": true,
+      "typical_duration_ms": 12000
+    },
+    "code_review": {
+      "agents": ["code-analyzer", "reviewer-critic", "qa-testing-guru"],
+      "parallel": true,
+      "typical_duration_ms": 7000
+    }
+  },
+  "shared_context": {
+    "files_modified": [],
+    "errors_found": [],
+    "decisions_made": [],
+    "test_results": {},
+    "performance_metrics": {}
+  },
+  "communication_protocol": {
+    "update_frequency_ms": 1000,
+    "max_message_size_kb": 10,
+    "retry_attempts": 3,
+    "timeout_ms": 30000
+  }
+}
