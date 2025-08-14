@@ -13,43 +13,45 @@ from ..core import BaseAgent, AgentConfig, AgentContext, AgentResult
 logger = structlog.get_logger()
 
 
-class ResearchDepth(Enum):
-    """Depth levels for research."""
-    SHALLOW = "shallow"  # Quick search, top results
-    MEDIUM = "medium"    # Standard search, some analysis
-    DEEP = "deep"        # Comprehensive search, detailed analysis
-    EXHAUSTIVE = "exhaustive"  # All available sources, full analysis
+class ResearchMethod(Enum):
+    """Research methods available."""
+    SEARCH = "search"
+    ANALYZE = "analyze"
+    SUMMARIZE = "summarize"
+    EXTRACT = "extract"
+    COMPARE = "compare"
+    SYNTHESIZE = "synthesize"
 
 
 class SourceType(Enum):
     """Types of information sources."""
-    WEB = "web"
-    DATABASE = "database"
-    API = "api"
     FILE = "file"
+    API = "api"
+    DATABASE = "database"
+    WEB = "web"
     CACHE = "cache"
-    MODEL = "model"
-    EXPERT = "expert"
+    TOOL = "tool"
+    AGENT = "agent"
 
 
 @dataclass
 class Source:
     """Information source."""
+    id: str
     type: SourceType
-    name: str
-    url: Optional[str] = None
-    reliability: float = 0.5  # 0-1 scale
-    timestamp: Optional[float] = None
+    location: str
+    reliability: float = 1.0  # 0-1 reliability score
+    accessed_at: Optional[float] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
+            "id": self.id,
             "type": self.type.value,
-            "name": self.name,
-            "url": self.url,
+            "location": self.location,
             "reliability": self.reliability,
-            "timestamp": self.timestamp,
+            "accessed_at": self.accessed_at,
             "metadata": self.metadata
         }
 
@@ -57,24 +59,24 @@ class Source:
 @dataclass
 class Finding:
     """Research finding."""
-    content: str
+    id: str
+    content: Any
     source: Source
-    relevance: float = 0.5  # 0-1 scale
-    confidence: float = 0.5  # 0-1 scale
-    supporting_evidence: List[str] = field(default_factory=list)
-    contradicting_evidence: List[str] = field(default_factory=list)
-    tags: List[str] = field(default_factory=list)
+    relevance: float = 1.0  # 0-1 relevance score
+    confidence: float = 1.0  # 0-1 confidence score
+    keywords: List[str] = field(default_factory=list)
+    summary: Optional[str] = None
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
+            "id": self.id,
             "content": self.content,
             "source": self.source.to_dict(),
             "relevance": self.relevance,
             "confidence": self.confidence,
-            "supporting_evidence": self.supporting_evidence,
-            "contradicting_evidence": self.contradicting_evidence,
-            "tags": self.tags
+            "keywords": self.keywords,
+            "summary": self.summary
         }
 
 
@@ -82,17 +84,17 @@ class Finding:
 class ResearchResult:
     """Complete research result."""
     query: str
-    depth: ResearchDepth
     findings: List[Finding]
-    summary: str
-    key_insights: List[str]
-    gaps: List[str]
-    sources_consulted: List[Source]
-    duration: float
+    sources_searched: int
+    time_taken: float
+    method: ResearchMethod
+    summary: Optional[str] = None
+    conclusions: List[str] = field(default_factory=list)
+    recommendations: List[str] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
     
     def get_top_findings(self, n: int = 5) -> List[Finding]:
-        """Get top N most relevant findings."""
+        """Get top N findings by relevance and confidence."""
         sorted_findings = sorted(
             self.findings,
             key=lambda f: f.relevance * f.confidence,
@@ -100,57 +102,48 @@ class ResearchResult:
         )
         return sorted_findings[:n]
     
-    def get_high_confidence_findings(self, threshold: float = 0.7) -> List[Finding]:
-        """Get findings above confidence threshold."""
-        return [f for f in self.findings if f.confidence >= threshold]
-    
-    def get_conflicting_findings(self) -> List[Tuple[Finding, Finding]]:
-        """Get pairs of conflicting findings."""
-        conflicts = []
-        
-        for i, f1 in enumerate(self.findings):
-            for f2 in self.findings[i+1:]:
-                # Simple conflict detection based on contradicting evidence
-                if (f1.content in f2.contradicting_evidence or 
-                    f2.content in f1.contradicting_evidence):
-                    conflicts.append((f1, f2))
-        
-        return conflicts
+    def get_findings_by_source(self, source_type: SourceType) -> List[Finding]:
+        """Get findings from specific source type."""
+        return [f for f in self.findings if f.source.type == source_type]
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
             "query": self.query,
-            "depth": self.depth.value,
-            "findings_count": len(self.findings),
+            "findings": [f.to_dict() for f in self.findings],
+            "sources_searched": self.sources_searched,
+            "time_taken": self.time_taken,
+            "method": self.method.value,
             "summary": self.summary,
-            "key_insights": self.key_insights,
-            "gaps": self.gaps,
-            "sources_count": len(self.sources_consulted),
-            "duration": self.duration,
+            "conclusions": self.conclusions,
+            "recommendations": self.recommendations,
             "metadata": self.metadata
         }
 
 
 class ResearchAgent(BaseAgent):
-    """Information gathering and research agent."""
+    """Gathers and analyzes information from various sources."""
     
     def __init__(self, config: Optional[AgentConfig] = None):
         """Initialize research agent."""
         super().__init__(config or AgentConfig(
             name="ResearchAgent",
             description="Information gathering and research",
-            capabilities=["search", "analyze", "summarize", "synthesize"],
+            capabilities=["search", "analyze", "summarize", "extract", "synthesize"],
             max_retries=3,
             timeout=120
         ))
-        self.cache = {}  # Simple in-memory cache
-        self.research_history = []
-        self.sources = self._initialize_sources()
-        self._research_counter = 0
+        self.sources: Dict[str, Source] = {}
+        self.findings_cache: Dict[str, List[Finding]] = {}
+        self.research_history: List[ResearchResult] = []
+        self._finding_counter = 0
+        self._source_counter = 0
+        self.max_history = 50
     
     def initialize(self) -> bool:
         """Initialize the research agent."""
+        # Initialize available sources
+        self._initialize_sources()
         logger.info("research_agent_initialized", agent=self.config.name)
         return True
     
@@ -163,26 +156,30 @@ class ResearchAgent(BaseAgent):
         elif action == "search":
             return self._search_sources(task)
         elif action == "analyze":
-            return self._analyze_findings(task)
+            return self._analyze_data(task)
+        elif action == "summarize":
+            return self._summarize_findings(task)
+        elif action == "extract":
+            return self._extract_information(task)
         elif action == "synthesize":
-            return self._synthesize_information(task)
-        elif action == "verify":
-            return self._verify_information(task)
-        elif action == "expand":
-            return self._expand_research(task)
+            return self._synthesize_knowledge(task)
+        elif action == "history":
+            return self._get_history(task)
         else:
             return {"error": f"Unknown action: {action}"}
     
     def research(self, 
-                topic: str,
-                depth: ResearchDepth = ResearchDepth.MEDIUM,
-                sources: Optional[List[str]] = None) -> ResearchResult:
-        """Conduct research on a topic."""
+                query: str,
+                method: ResearchMethod = ResearchMethod.SEARCH,
+                sources: Optional[List[SourceType]] = None,
+                max_results: int = 10) -> ResearchResult:
+        """Conduct research on a query."""
         result = self.execute({
             "action": "research",
-            "topic": topic,
-            "depth": depth,
-            "sources": sources
+            "query": query,
+            "method": method.value,
+            "sources": sources,
+            "max_results": max_results
         })
         
         if "error" in result:
@@ -192,513 +189,582 @@ class ResearchAgent(BaseAgent):
     
     def _conduct_research(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Conduct comprehensive research."""
-        topic = task.get("topic", "")
-        depth = task.get("depth", ResearchDepth.MEDIUM)
-        specific_sources = task.get("sources", None)
+        query = task.get("query", "")
+        method = task.get("method", "search")
+        source_types = task.get("sources")
+        max_results = task.get("max_results", 10)
         
-        if not topic:
-            return {"error": "Research topic is required"}
-        
-        # Convert depth if string
-        if isinstance(depth, str):
-            depth = ResearchDepth[depth.upper()]
+        if not query:
+            return {"error": "Query is required"}
         
         start_time = time.time()
         
-        # Check cache first
-        cache_key = f"{topic}_{depth.value}"
-        if cache_key in self.cache:
-            cached_result = self.cache[cache_key]
-            if time.time() - cached_result["timestamp"] < 3600:  # 1 hour cache
-                logger.info("research_cache_hit", topic=topic)
-                return {"research_result": cached_result["result"]}
+        # Determine research method
+        method_enum = ResearchMethod[method.upper()] if isinstance(method, str) else method
         
-        # Generate research ID
-        self._research_counter += 1
-        research_id = f"research_{self._research_counter}"
+        # Determine sources to search
+        if source_types:
+            sources_to_search = [
+                SourceType[s.upper()] if isinstance(s, str) else s 
+                for s in source_types
+            ]
+        else:
+            sources_to_search = list(SourceType)
         
-        # Determine sources to use
-        sources_to_use = self._select_sources(depth, specific_sources)
+        # Conduct research based on method
+        if method_enum == ResearchMethod.SEARCH:
+            findings = self._search_all_sources(query, sources_to_search, max_results)
+        elif method_enum == ResearchMethod.ANALYZE:
+            findings = self._analyze_query(query, sources_to_search)
+        elif method_enum == ResearchMethod.EXTRACT:
+            findings = self._extract_from_sources(query, sources_to_search)
+        else:
+            findings = self._general_research(query, sources_to_search, max_results)
         
-        # Gather information from sources
-        raw_findings = []
-        sources_consulted = []
+        # Generate summary and conclusions
+        summary = self._generate_summary(findings)
+        conclusions = self._draw_conclusions(findings, query)
+        recommendations = self._make_recommendations(findings, query)
         
-        for source in sources_to_use:
-            findings = self._search_source(source, topic, depth)
-            raw_findings.extend(findings)
-            sources_consulted.append(source)
-        
-        # Process and filter findings
-        processed_findings = self._process_findings(raw_findings, topic)
-        
-        # Analyze findings
-        analysis = self._analyze_findings_internal(processed_findings, topic)
-        
-        # Generate summary and insights
-        summary = self._generate_summary(processed_findings, analysis)
-        key_insights = self._extract_insights(processed_findings, analysis)
-        gaps = self._identify_gaps(processed_findings, topic)
+        time_taken = time.time() - start_time
         
         # Create research result
-        duration = time.time() - start_time
-        
-        research_result = ResearchResult(
-            query=topic,
-            depth=depth,
-            findings=processed_findings,
+        result = ResearchResult(
+            query=query,
+            findings=findings,
+            sources_searched=len(sources_to_search),
+            time_taken=time_taken,
+            method=method_enum,
             summary=summary,
-            key_insights=key_insights,
-            gaps=gaps,
-            sources_consulted=sources_consulted,
-            duration=duration,
-            metadata={"research_id": research_id}
+            conclusions=conclusions,
+            recommendations=recommendations
         )
         
-        # Cache result
-        self.cache[cache_key] = {
-            "result": research_result,
-            "timestamp": time.time()
-        }
-        
-        # Track in history
-        self.research_history.append({
-            "id": research_id,
-            "topic": topic,
-            "depth": depth.value,
-            "timestamp": time.time(),
-            "duration": duration,
-            "findings_count": len(processed_findings)
-        })
+        # Store in history
+        self.research_history.append(result)
+        if len(self.research_history) > self.max_history:
+            self.research_history = self.research_history[-self.max_history:]
         
         logger.info(
             "research_completed",
-            research_id=research_id,
-            topic=topic,
-            depth=depth.value,
-            findings_count=len(processed_findings),
-            duration=duration
+            query=query,
+            method=method_enum.value,
+            findings_count=len(findings),
+            time_taken=time_taken
         )
         
         return {
-            "research_result": research_result,
-            "research_id": research_id
+            "research_result": result,
+            "findings_count": len(findings),
+            "top_findings": [f.to_dict() for f in result.get_top_findings(3)]
         }
     
-    def _initialize_sources(self) -> List[Source]:
+    def _initialize_sources(self):
         """Initialize available information sources."""
-        return [
-            Source(
-                type=SourceType.WEB,
-                name="General Web Search",
-                reliability=0.6
-            ),
-            Source(
-                type=SourceType.DATABASE,
-                name="Knowledge Base",
-                reliability=0.9
-            ),
-            Source(
-                type=SourceType.API,
-                name="External APIs",
-                reliability=0.8
-            ),
-            Source(
-                type=SourceType.CACHE,
-                name="Local Cache",
-                reliability=1.0
-            ),
-            Source(
-                type=SourceType.MODEL,
-                name="AI Model Knowledge",
-                reliability=0.7
-            )
-        ]
+        # Add default sources
+        self._add_source("local_files", SourceType.FILE, ".", reliability=1.0)
+        self._add_source("cache", SourceType.CACHE, "memory", reliability=0.9)
+        self._add_source("web_search", SourceType.WEB, "internet", reliability=0.7)
+        self._add_source("internal_api", SourceType.API, "localhost", reliability=0.95)
     
-    def _select_sources(self, depth: ResearchDepth, 
-                       specific_sources: Optional[List[str]]) -> List[Source]:
-        """Select sources based on depth and requirements."""
-        if specific_sources:
-            # Use specific sources if provided
-            return [s for s in self.sources if s.name in specific_sources]
+    def _add_source(self, id: str, type: SourceType, location: str, 
+                   reliability: float = 1.0) -> Source:
+        """Add an information source."""
+        source = Source(
+            id=id,
+            type=type,
+            location=location,
+            reliability=reliability
+        )
+        self.sources[id] = source
+        return source
+    
+    def _search_all_sources(self, query: str, source_types: List[SourceType], 
+                           max_results: int) -> List[Finding]:
+        """Search all specified source types."""
+        all_findings = []
         
-        # Select based on depth
-        if depth == ResearchDepth.SHALLOW:
-            return [s for s in self.sources if s.type == SourceType.CACHE][:1]
-        elif depth == ResearchDepth.MEDIUM:
-            return [s for s in self.sources if s.type in [SourceType.CACHE, SourceType.DATABASE]][:2]
-        elif depth == ResearchDepth.DEEP:
-            return [s for s in self.sources if s.reliability >= 0.7][:4]
-        else:  # EXHAUSTIVE
-            return self.sources
+        for source_type in source_types:
+            # Get sources of this type
+            sources = [s for s in self.sources.values() if s.type == source_type]
+            
+            for source in sources:
+                findings = self._search_source(source, query, max_results // len(sources))
+                all_findings.extend(findings)
+        
+        # Sort by relevance
+        all_findings.sort(key=lambda f: f.relevance * f.confidence, reverse=True)
+        
+        return all_findings[:max_results]
     
-    def _search_source(self, source: Source, query: str, 
-                      depth: ResearchDepth) -> List[Finding]:
-        """Search a specific source for information."""
+    def _search_source(self, source: Source, query: str, max_results: int) -> List[Finding]:
+        """Search a specific source."""
         findings = []
         
-        # Simulate source searching (would be real implementation)
-        if source.type == SourceType.CACHE:
-            # Check cache
-            if query in self.cache:
-                cached = self.cache[query]
-                if isinstance(cached, dict) and "findings" in cached:
-                    return cached["findings"]
+        # Check cache first
+        cache_key = f"{source.id}:{query}"
+        if cache_key in self.findings_cache:
+            cached = self.findings_cache[cache_key]
+            logger.debug(f"Using cached findings for {cache_key}")
+            return cached[:max_results]
         
-        elif source.type == SourceType.MODEL:
-            # Use model knowledge
-            finding = Finding(
-                content=f"Based on training data: {query} involves multiple aspects including technical, practical, and theoretical components.",
-                source=source,
-                relevance=0.7,
-                confidence=0.6,
-                tags=["model_knowledge", "general"]
-            )
-            findings.append(finding)
-        
-        elif source.type == SourceType.DATABASE:
-            # Simulate database query
-            finding = Finding(
-                content=f"Database entry for '{query}': Comprehensive information available with high reliability.",
-                source=source,
-                relevance=0.9,
-                confidence=0.8,
-                tags=["database", "verified"]
-            )
-            findings.append(finding)
-        
+        # Simulate searching based on source type
+        if source.type == SourceType.FILE:
+            findings = self._search_files(query, max_results)
+        elif source.type == SourceType.CACHE:
+            findings = self._search_cache(query, max_results)
+        elif source.type == SourceType.WEB:
+            findings = self._search_web(query, max_results)
+        elif source.type == SourceType.API:
+            findings = self._search_api(query, max_results)
         else:
-            # Generic search simulation
-            num_findings = {
-                ResearchDepth.SHALLOW: 1,
-                ResearchDepth.MEDIUM: 3,
-                ResearchDepth.DEEP: 5,
-                ResearchDepth.EXHAUSTIVE: 10
-            }.get(depth, 3)
-            
-            for i in range(num_findings):
-                finding = Finding(
-                    content=f"Finding {i+1} from {source.name}: Information about {query}",
-                    source=source,
-                    relevance=0.5 + (i * 0.1),
-                    confidence=source.reliability,
-                    tags=[source.type.value, f"result_{i+1}"]
-                )
+            findings = self._mock_search(source, query, max_results)
+        
+        # Set source for all findings
+        for finding in findings:
+            finding.source = source
+            finding.confidence *= source.reliability
+        
+        # Cache findings
+        self.findings_cache[cache_key] = findings
+        
+        # Update source access time
+        source.accessed_at = time.time()
+        
+        return findings
+    
+    def _search_files(self, query: str, max_results: int) -> List[Finding]:
+        """Search local files (mock implementation)."""
+        findings = []
+        
+        # Mock file search results
+        for i in range(min(3, max_results)):
+            self._finding_counter += 1
+            finding = Finding(
+                id=f"finding_{self._finding_counter}",
+                content=f"File content matching '{query}' in file_{i}.txt",
+                source=Source(id="files", type=SourceType.FILE, location=f"file_{i}.txt"),
+                relevance=0.8 - i * 0.1,
+                confidence=0.9,
+                keywords=query.split()[:3],
+                summary=f"Found match in file_{i}.txt"
+            )
+            findings.append(finding)
+        
+        return findings
+    
+    def _search_cache(self, query: str, max_results: int) -> List[Finding]:
+        """Search cached information."""
+        findings = []
+        
+        # Check previous research results
+        for result in self.research_history[-10:]:
+            if query.lower() in result.query.lower():
+                for finding in result.findings[:max_results]:
+                    # Create new finding from cached
+                    self._finding_counter += 1
+                    new_finding = Finding(
+                        id=f"finding_{self._finding_counter}",
+                        content=finding.content,
+                        source=Source(id="cache", type=SourceType.CACHE, location="memory"),
+                        relevance=finding.relevance * 0.9,  # Slightly lower for cached
+                        confidence=finding.confidence,
+                        keywords=finding.keywords,
+                        summary=f"Cached: {finding.summary}"
+                    )
+                    findings.append(new_finding)
+        
+        return findings[:max_results]
+    
+    def _search_web(self, query: str, max_results: int) -> List[Finding]:
+        """Search web (mock implementation)."""
+        findings = []
+        
+        # Mock web search results
+        for i in range(min(5, max_results)):
+            self._finding_counter += 1
+            finding = Finding(
+                id=f"finding_{self._finding_counter}",
+                content=f"Web result {i+1} for '{query}'",
+                source=Source(id="web", type=SourceType.WEB, location=f"http://example.com/result{i}"),
+                relevance=0.7 - i * 0.1,
+                confidence=0.6,  # Lower confidence for web
+                keywords=query.split()[:3],
+                summary=f"Web result from example.com"
+            )
+            findings.append(finding)
+        
+        return findings
+    
+    def _search_api(self, query: str, max_results: int) -> List[Finding]:
+        """Search via API (mock implementation)."""
+        findings = []
+        
+        # Mock API results
+        self._finding_counter += 1
+        finding = Finding(
+            id=f"finding_{self._finding_counter}",
+            content={"api_response": f"Data for query: {query}"},
+            source=Source(id="api", type=SourceType.API, location="internal_api"),
+            relevance=0.9,
+            confidence=0.95,
+            keywords=query.split()[:3],
+            summary="API response data"
+        )
+        findings.append(finding)
+        
+        return findings
+    
+    def _mock_search(self, source: Source, query: str, max_results: int) -> List[Finding]:
+        """Mock search for other source types."""
+        findings = []
+        
+        self._finding_counter += 1
+        finding = Finding(
+            id=f"finding_{self._finding_counter}",
+            content=f"Mock result from {source.type.value} for '{query}'",
+            source=source,
+            relevance=0.5,
+            confidence=0.5,
+            keywords=query.split()[:2],
+            summary=f"Mock {source.type.value} result"
+        )
+        findings.append(finding)
+        
+        return findings
+    
+    def _analyze_query(self, query: str, source_types: List[SourceType]) -> List[Finding]:
+        """Analyze query to extract information."""
+        findings = []
+        
+        # Extract key concepts from query
+        keywords = self._extract_keywords(query)
+        
+        # Search for each keyword
+        for keyword in keywords[:3]:
+            keyword_findings = self._search_all_sources(keyword, source_types, 3)
+            findings.extend(keyword_findings)
+        
+        return findings
+    
+    def _extract_from_sources(self, query: str, source_types: List[SourceType]) -> List[Finding]:
+        """Extract specific information from sources."""
+        findings = []
+        
+        # Define extraction patterns based on query
+        patterns = self._define_extraction_patterns(query)
+        
+        # Search and extract
+        raw_findings = self._search_all_sources(query, source_types, 20)
+        
+        for finding in raw_findings:
+            # Extract based on patterns
+            extracted = self._apply_extraction_patterns(finding.content, patterns)
+            if extracted:
+                finding.content = extracted
+                finding.relevance = min(1.0, finding.relevance * 1.2)  # Boost relevance
                 findings.append(finding)
         
         return findings
     
-    def _process_findings(self, findings: List[Finding], query: str) -> List[Finding]:
-        """Process and filter findings."""
-        processed = []
+    def _general_research(self, query: str, source_types: List[SourceType], 
+                         max_results: int) -> List[Finding]:
+        """General research combining multiple methods."""
+        findings = []
         
+        # Search
+        search_findings = self._search_all_sources(query, source_types, max_results // 2)
+        findings.extend(search_findings)
+        
+        # Analyze
+        analysis_findings = self._analyze_query(query, source_types)
+        findings.extend(analysis_findings[:max_results // 4])
+        
+        # Extract
+        extraction_findings = self._extract_from_sources(query, source_types)
+        findings.extend(extraction_findings[:max_results // 4])
+        
+        # Deduplicate and sort
+        seen = set()
+        unique_findings = []
         for finding in findings:
-            # Calculate relevance based on query terms
-            query_terms = query.lower().split()
-            content_lower = finding.content.lower()
-            
-            matches = sum(1 for term in query_terms if term in content_lower)
-            finding.relevance = min(1.0, matches / len(query_terms) if query_terms else 0)
-            
-            # Deduplicate similar findings
-            is_duplicate = False
-            for p in processed:
-                if self._similarity(finding.content, p.content) > 0.9:
-                    # Merge evidence
-                    p.supporting_evidence.extend(finding.supporting_evidence)
-                    p.confidence = max(p.confidence, finding.confidence)
-                    is_duplicate = True
+            if finding.id not in seen:
+                seen.add(finding.id)
+                unique_findings.append(finding)
+        
+        unique_findings.sort(key=lambda f: f.relevance * f.confidence, reverse=True)
+        
+        return unique_findings[:max_results]
+    
+    def _extract_keywords(self, query: str) -> List[str]:
+        """Extract keywords from query."""
+        # Simple keyword extraction
+        stop_words = {"the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for"}
+        words = query.lower().split()
+        keywords = [w for w in words if w not in stop_words and len(w) > 2]
+        return keywords
+    
+    def _define_extraction_patterns(self, query: str) -> List[str]:
+        """Define extraction patterns based on query."""
+        patterns = []
+        
+        # Add patterns based on query keywords
+        if "function" in query.lower():
+            patterns.append("def ")
+        if "class" in query.lower():
+            patterns.append("class ")
+        if "error" in query.lower():
+            patterns.append("Error")
+        if "config" in query.lower():
+            patterns.append("config")
+        
+        return patterns
+    
+    def _apply_extraction_patterns(self, content: Any, patterns: List[str]) -> Any:
+        """Apply extraction patterns to content."""
+        if not patterns or not isinstance(content, str):
+            return content
+        
+        extracted = []
+        lines = content.split('\n') if isinstance(content, str) else []
+        
+        for line in lines:
+            for pattern in patterns:
+                if pattern in line:
+                    extracted.append(line.strip())
                     break
-            
-            if not is_duplicate and finding.relevance > 0.3:
-                processed.append(finding)
         
-        return processed
+        return '\n'.join(extracted) if extracted else None
     
-    def _similarity(self, text1: str, text2: str) -> float:
-        """Calculate simple text similarity."""
-        # Simple word overlap similarity
-        words1 = set(text1.lower().split())
-        words2 = set(text2.lower().split())
-        
-        if not words1 or not words2:
-            return 0.0
-        
-        intersection = words1.intersection(words2)
-        union = words1.union(words2)
-        
-        return len(intersection) / len(union) if union else 0.0
-    
-    def _analyze_findings_internal(self, findings: List[Finding], query: str) -> Dict[str, Any]:
-        """Analyze findings for patterns and insights."""
-        analysis = {
-            "total_findings": len(findings),
-            "avg_confidence": sum(f.confidence for f in findings) / len(findings) if findings else 0,
-            "avg_relevance": sum(f.relevance for f in findings) / len(findings) if findings else 0,
-            "source_distribution": {},
-            "common_tags": {},
-            "confidence_distribution": {
-                "high": 0,
-                "medium": 0,
-                "low": 0
-            }
-        }
-        
-        # Analyze source distribution
-        for finding in findings:
-            source_type = finding.source.type.value
-            analysis["source_distribution"][source_type] = \
-                analysis["source_distribution"].get(source_type, 0) + 1
-        
-        # Analyze tags
-        for finding in findings:
-            for tag in finding.tags:
-                analysis["common_tags"][tag] = analysis["common_tags"].get(tag, 0) + 1
-        
-        # Confidence distribution
-        for finding in findings:
-            if finding.confidence >= 0.7:
-                analysis["confidence_distribution"]["high"] += 1
-            elif finding.confidence >= 0.4:
-                analysis["confidence_distribution"]["medium"] += 1
-            else:
-                analysis["confidence_distribution"]["low"] += 1
-        
-        return analysis
-    
-    def _generate_summary(self, findings: List[Finding], analysis: Dict[str, Any]) -> str:
-        """Generate research summary."""
+    def _generate_summary(self, findings: List[Finding]) -> str:
+        """Generate summary of findings."""
         if not findings:
-            return "No relevant information found for the query."
+            return "No relevant findings discovered."
         
-        top_findings = sorted(findings, key=lambda f: f.relevance * f.confidence, reverse=True)[:3]
-        
+        top_findings = findings[:3]
         summary_parts = [
-            f"Found {len(findings)} relevant pieces of information.",
-            f"Average confidence: {analysis['avg_confidence']:.2f}.",
-            f"Top sources: {', '.join(list(analysis['source_distribution'].keys())[:3])}."
+            f"Found {len(findings)} relevant results.",
+            f"Top sources: {', '.join(set(f.source.type.value for f in top_findings))}.",
         ]
         
         if top_findings:
-            summary_parts.append("Key findings: " + "; ".join(
-                f.content[:100] + "..." if len(f.content) > 100 else f.content
-                for f in top_findings[:2]
-            ))
+            avg_confidence = sum(f.confidence for f in top_findings) / len(top_findings)
+            summary_parts.append(f"Average confidence: {avg_confidence:.2f}")
         
         return " ".join(summary_parts)
     
-    def _extract_insights(self, findings: List[Finding], analysis: Dict[str, Any]) -> List[str]:
-        """Extract key insights from findings."""
-        insights = []
+    def _draw_conclusions(self, findings: List[Finding], query: str) -> List[str]:
+        """Draw conclusions from findings."""
+        conclusions = []
         
-        # High confidence findings
-        high_conf = [f for f in findings if f.confidence >= 0.8]
-        if high_conf:
-            insights.append(f"Found {len(high_conf)} highly reliable findings")
+        if not findings:
+            conclusions.append("Insufficient data to draw conclusions")
+            return conclusions
         
-        # Consensus findings
-        if len(findings) > 3:
-            # Find common themes
-            common_words = {}
-            for finding in findings:
-                words = finding.content.lower().split()
-                for word in words:
-                    if len(word) > 4:  # Skip short words
-                        common_words[word] = common_words.get(word, 0) + 1
-            
-            top_themes = sorted(common_words.items(), key=lambda x: x[1], reverse=True)[:3]
-            if top_themes:
-                insights.append(f"Common themes: {', '.join(word for word, _ in top_themes)}")
+        # Analyze finding patterns
+        high_confidence = [f for f in findings if f.confidence > 0.8]
+        if high_confidence:
+            conclusions.append(f"High confidence results found ({len(high_confidence)} findings)")
         
-        # Source reliability
-        if analysis["source_distribution"]:
-            most_used = max(analysis["source_distribution"].items(), key=lambda x: x[1])
-            insights.append(f"Primary source type: {most_used[0]}")
+        # Source diversity
+        source_types = set(f.source.type for f in findings)
+        if len(source_types) > 2:
+            conclusions.append("Multiple source types corroborate findings")
         
-        return insights
+        # Relevance analysis
+        avg_relevance = sum(f.relevance for f in findings) / len(findings)
+        if avg_relevance > 0.7:
+            conclusions.append("Findings are highly relevant to the query")
+        elif avg_relevance < 0.4:
+            conclusions.append("Limited relevance found - consider refining the query")
+        
+        return conclusions
     
-    def _identify_gaps(self, findings: List[Finding], query: str) -> List[str]:
-        """Identify information gaps."""
-        gaps = []
+    def _make_recommendations(self, findings: List[Finding], query: str) -> List[str]:
+        """Make recommendations based on findings."""
+        recommendations = []
         
-        # Check for low confidence areas
-        if all(f.confidence < 0.5 for f in findings):
-            gaps.append("No high-confidence information available")
+        if not findings:
+            recommendations.append("Broaden search criteria or try alternative sources")
+            return recommendations
         
-        # Check for missing source types
-        source_types = {f.source.type for f in findings}
-        all_types = set(SourceType)
-        missing_types = all_types - source_types
+        # Analyze gaps
+        source_types_used = set(f.source.type for f in findings)
+        unused_types = set(SourceType) - source_types_used
         
-        if missing_types:
-            gaps.append(f"No information from: {', '.join(t.value for t in missing_types)}")
+        if unused_types:
+            recommendations.append(f"Consider searching: {', '.join(t.value for t in unused_types)}")
         
-        # Check for conflicting information
-        conflicts = []
-        for i, f1 in enumerate(findings):
-            for f2 in findings[i+1:]:
-                if f1.contradicting_evidence or f2.contradicting_evidence:
-                    conflicts.append((f1, f2))
+        # Quality recommendations
+        low_confidence = [f for f in findings if f.confidence < 0.5]
+        if len(low_confidence) > len(findings) / 2:
+            recommendations.append("Verify findings with more reliable sources")
         
-        if conflicts:
-            gaps.append(f"Found {len(conflicts)} conflicting pieces of information")
+        # Depth recommendations
+        if len(findings) < 5:
+            recommendations.append("Expand search to gather more comprehensive data")
         
-        # Check query coverage
-        query_terms = set(query.lower().split())
-        covered_terms = set()
-        
-        for finding in findings:
-            content_terms = set(finding.content.lower().split())
-            covered_terms.update(query_terms.intersection(content_terms))
-        
-        uncovered = query_terms - covered_terms
-        if uncovered:
-            gaps.append(f"Limited information on: {', '.join(uncovered)}")
-        
-        return gaps
+        return recommendations
     
     def _search_sources(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Search specific sources."""
         query = task.get("query", "")
-        sources = task.get("sources", [])
+        source_ids = task.get("source_ids", [])
+        max_results = task.get("max_results", 10)
         
         if not query:
-            return {"error": "Search query is required"}
+            return {"error": "Query is required"}
         
-        results = []
-        for source_name in sources:
-            source = next((s for s in self.sources if s.name == source_name), None)
-            if source:
-                findings = self._search_source(source, query, ResearchDepth.MEDIUM)
-                results.extend(findings)
+        findings = []
+        for source_id in source_ids:
+            if source_id in self.sources:
+                source = self.sources[source_id]
+                source_findings = self._search_source(source, query, max_results)
+                findings.extend(source_findings)
         
         return {
-            "search_results": results,
-            "count": len(results)
+            "findings": [f.to_dict() for f in findings],
+            "count": len(findings)
         }
     
-    def _analyze_findings(self, task: Dict[str, Any]) -> Dict[str, Any]:
-        """Analyze research findings."""
-        findings = task.get("findings", [])
+    def _analyze_data(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze data."""
+        data = task.get("data")
+        analysis_type = task.get("analysis_type", "general")
         
-        if not findings:
-            return {"error": "Findings are required for analysis"}
+        if data is None:
+            return {"error": "Data is required"}
         
-        # Convert to Finding objects if needed
-        if isinstance(findings[0], dict):
-            findings = [
-                Finding(
-                    content=f.get("content", ""),
-                    source=Source(
-                        type=SourceType[f.get("source", {}).get("type", "WEB").upper()],
-                        name=f.get("source", {}).get("name", "Unknown")
-                    ),
-                    relevance=f.get("relevance", 0.5),
-                    confidence=f.get("confidence", 0.5)
-                )
-                for f in findings
-            ]
+        analysis = {
+            "type": analysis_type,
+            "data_type": type(data).__name__,
+            "size": len(str(data))
+        }
         
-        analysis = self._analyze_findings_internal(findings, "")
+        if isinstance(data, (list, dict)):
+            analysis["structure"] = "structured"
+            analysis["elements"] = len(data)
+        elif isinstance(data, str):
+            analysis["structure"] = "text"
+            analysis["lines"] = data.count('\n') + 1
+            analysis["words"] = len(data.split())
         
         return {"analysis": analysis}
     
-    def _synthesize_information(self, task: Dict[str, Any]) -> Dict[str, Any]:
-        """Synthesize information from multiple findings."""
-        findings = task.get("findings", [])
+    def _summarize_findings(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Summarize findings."""
+        findings_data = task.get("findings", [])
+        max_length = task.get("max_length", 500)
         
-        if not findings:
-            return {"error": "Findings are required for synthesis"}
+        if not findings_data:
+            return {"error": "Findings are required"}
         
-        # Group by theme
-        themes = {}
-        for finding in findings:
-            # Simple theme extraction based on tags
-            theme = finding.tags[0] if finding.tags else "general"
-            if theme not in themes:
-                themes[theme] = []
-            themes[theme].append(finding)
+        # Convert to Finding objects if needed
+        findings = []
+        for f in findings_data:
+            if isinstance(f, dict):
+                # Reconstruct Finding from dict
+                source = Source(
+                    id=f.get("source", {}).get("id", "unknown"),
+                    type=SourceType[f.get("source", {}).get("type", "FILE").upper()],
+                    location=f.get("source", {}).get("location", "")
+                )
+                finding = Finding(
+                    id=f.get("id", ""),
+                    content=f.get("content"),
+                    source=source,
+                    relevance=f.get("relevance", 1.0),
+                    confidence=f.get("confidence", 1.0)
+                )
+                findings.append(finding)
+            else:
+                findings.append(f)
         
-        # Synthesize per theme
-        synthesis = {}
-        for theme, theme_findings in themes.items():
-            synthesis[theme] = {
-                "main_points": [f.content[:100] for f in theme_findings[:3]],
-                "confidence": sum(f.confidence for f in theme_findings) / len(theme_findings),
-                "sources": list(set(f.source.name for f in theme_findings))
-            }
+        summary = self._generate_summary(findings)
+        
+        # Truncate if needed
+        if len(summary) > max_length:
+            summary = summary[:max_length-3] + "..."
+        
+        return {"summary": summary}
+    
+    def _extract_information(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract specific information."""
+        content = task.get("content", "")
+        patterns = task.get("patterns", [])
+        
+        if not content:
+            return {"error": "Content is required"}
+        
+        extracted = self._apply_extraction_patterns(content, patterns)
+        
+        return {
+            "extracted": extracted,
+            "patterns_used": patterns
+        }
+    
+    def _synthesize_knowledge(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Synthesize knowledge from multiple sources."""
+        sources_data = task.get("sources", [])
+        
+        if not sources_data:
+            return {"error": "Sources are required"}
+        
+        # Combine and synthesize
+        synthesis = {
+            "source_count": len(sources_data),
+            "combined_knowledge": [],
+            "contradictions": [],
+            "consensus": []
+        }
+        
+        # Simple synthesis (can be enhanced with NLP)
+        all_content = []
+        for source in sources_data:
+            if isinstance(source, dict):
+                all_content.append(source.get("content", ""))
+            else:
+                all_content.append(str(source))
+        
+        # Find common themes
+        common_words = {}
+        for content in all_content:
+            words = content.lower().split() if isinstance(content, str) else []
+            for word in words:
+                if len(word) > 4:  # Focus on longer words
+                    common_words[word] = common_words.get(word, 0) + 1
+        
+        # Top themes
+        top_themes = sorted(common_words.items(), key=lambda x: x[1], reverse=True)[:5]
+        synthesis["consensus"] = [theme[0] for theme in top_themes]
         
         return {"synthesis": synthesis}
     
-    def _verify_information(self, task: Dict[str, Any]) -> Dict[str, Any]:
-        """Verify information across sources."""
-        claim = task.get("claim", "")
-        sources_to_check = task.get("sources", [])
+    def _get_history(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Get research history."""
+        limit = task.get("limit", 10)
+        query_filter = task.get("query_filter")
         
-        if not claim:
-            return {"error": "Claim to verify is required"}
+        history = self.research_history[-limit:]
         
-        verification_results = []
-        
-        for source_name in sources_to_check:
-            source = next((s for s in self.sources if s.name == source_name), None)
-            if source:
-                findings = self._search_source(source, claim, ResearchDepth.SHALLOW)
-                
-                # Check if findings support or contradict claim
-                support_score = 0
-                for finding in findings:
-                    if self._similarity(claim, finding.content) > 0.5:
-                        support_score += finding.confidence
-                
-                verification_results.append({
-                    "source": source_name,
-                    "support_score": support_score,
-                    "findings_count": len(findings)
-                })
-        
-        # Overall verification
-        avg_support = sum(v["support_score"] for v in verification_results) / len(verification_results) \
-            if verification_results else 0
+        if query_filter:
+            history = [
+                r for r in history
+                if query_filter.lower() in r.query.lower()
+            ]
         
         return {
-            "verification": {
-                "claim": claim,
-                "verified": avg_support > 0.5,
-                "confidence": avg_support,
-                "source_results": verification_results
-            }
-        }
-    
-    def _expand_research(self, task: Dict[str, Any]) -> Dict[str, Any]:
-        """Expand existing research with additional queries."""
-        research_id = task.get("research_id")
-        additional_queries = task.get("queries", [])
-        
-        if not additional_queries:
-            return {"error": "Additional queries required for expansion"}
-        
-        expanded_findings = []
-        
-        for query in additional_queries:
-            result = self._conduct_research({
-                "topic": query,
-                "depth": ResearchDepth.MEDIUM
-            })
-            
-            if "research_result" in result:
-                expanded_findings.extend(result["research_result"].findings)
-        
-        return {
-            "expanded_findings": expanded_findings,
-            "queries_processed": len(additional_queries)
+            "history": [r.to_dict() for r in history],
+            "total_research": len(self.research_history)
         }
     
     def shutdown(self) -> bool:
         """Shutdown the research agent."""
         logger.info("research_agent_shutdown", 
-                   cache_size=len(self.cache),
+                   sources_count=len(self.sources),
+                   cache_size=len(self.findings_cache),
                    history_size=len(self.research_history))
-        self.cache.clear()
+        self.sources.clear()
+        self.findings_cache.clear()
         self.research_history.clear()
         return True
