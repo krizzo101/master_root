@@ -1,5 +1,93 @@
 # PROJECT DIRECTIVES
 
+## PROJECT ORGANIZATION & CHAOS PREVENTION (ZERO TOLERANCE)
+
+### FILE CREATION DECISION TREE (MANDATORY - CHECK BEFORE EVERY FILE OPERATION)
+```
+BEFORE CREATING ANY FILE:
+1. Does similar file exist? → YES: UPDATE IT (never create duplicate)
+                           → NO: Continue to step 2
+2. Is it temporary? → YES: Use /tmp/ with auto-cleanup
+                   → NO: Continue to step 3  
+3. Is it documentation? → YES: Goes in docs/* (NEVER in root)
+                       → NO: Continue to step 4
+4. Is it a report/analysis? → YES: Goes in docs/analysis/ with date prefix
+                           → NO: Continue to step 5
+5. Is it configuration? → YES: Root allowed (if no subdirectory exists)
+                       → NO: Must go in appropriate subdirectory
+```
+
+### PROHIBITED ACTIONS (VIOLATIONS = IMMEDIATE TASK FAILURE)
+- **NEVER create files with version suffixes**: No V1, V2, _v2, _final, _updated, _new
+- **NEVER place documentation in root**: Maximum 5 .md files allowed in root
+- **NEVER create "just temporary" files in root**: Use /tmp/ or .tmp/
+- **NEVER duplicate existing functionality**: Update existing files instead
+- **NEVER exceed size limits**: Alert if any file >10MB, any directory >100MB
+- **NEVER create analysis files without expiry**: All reports must have cleanup date
+
+### MANDATORY FILE LOCATIONS (ENFORCED)
+```
+master_root/
+├── docs/                    # ALL documentation except README, CLAUDE.md, QUICK_START
+│   ├── architecture/        # System design, architecture decisions
+│   ├── analysis/           # Reports, analysis (prefix with YYYY-MM-DD)
+│   ├── guides/             # How-to guides, tutorials
+│   ├── migration/          # Migration plans, upgrade guides
+│   └── archive/            # Old versions (auto-moved after 30 days)
+├── apps/                   # Applications only
+├── libs/                   # Libraries only
+├── servers/                # Server implementations only
+├── scripts/                # Utility scripts, tools
+├── tests/                  # Test files (mirror source structure)
+└── .tmp/                   # Temporary files (auto-cleaned daily)
+```
+
+### AUTOMATIC CLEANUP PROTOCOLS (RUN WITHOUT ASKING)
+1. **DAILY**: Delete files in .tmp/ older than 24 hours
+2. **WEEKLY**: Move docs >30 days old to docs/archive/
+3. **WEEKLY**: Compress .log files >7 days old
+4. **MONTHLY**: Alert on directories >100MB for review
+5. **ALWAYS**: Run cleanup before starting new tasks
+
+### FILE NAMING CONVENTIONS (STRICTLY ENFORCED)
+- **Documentation**: `YYYY-MM-DD_description.md` for time-sensitive docs
+- **Analysis/Reports**: `YYYY-MM-DD_analysis_name.md` (auto-archive after 30 days)
+- **Configs**: `service.config.ext` or `service.env`
+- **Scripts**: `action_verb_noun.sh` (e.g., `cleanup_logs.sh`)
+- **PROHIBITED**: version numbers, "final", "updated", "new", "old", "backup"
+
+### DOCUMENTATION CONSOLIDATION RULES
+- **ONE authoritative document per topic** - Update existing, don't create new
+- **Git for versioning** - Never use filename versioning
+- **Maximum 5 .md files in root** - Only README, CLAUDE, QUICK_START, LICENSE, CONTRIBUTING
+- **Archive threshold**: Documents untouched for 30 days → auto-archive
+- **Report expiry**: Analysis/reports older than 30 days → compress and archive
+
+### SIZE MANAGEMENT PROTOCOLS
+- **File size limit**: Alert at 10MB, fail at 50MB (except data files)
+- **Directory limit**: Alert at 100MB, investigate at 500MB
+- **Archive compression**: Files >30 days old → compress with gzip
+- **Reference cleanup**: .reference/ >1GB → move to cloud storage
+- **Build artifacts**: Clean before each build, never commit
+
+### PRE-COMMIT ENFORCEMENT CHECKS (AUTOMATIC)
+```python
+# These checks run BEFORE any commit
+1. No .md files in root except allowed 5
+2. No version suffixes in filenames  
+3. No .log, .tmp, .bak files in commit
+4. No files >10MB without explicit flag
+5. Documentation in correct subdirectories
+6. Analysis files have date prefixes
+```
+
+### CONTINUOUS ORGANIZATION TASKS
+- **Before EVERY task**: Check for cleanup opportunities
+- **After file creation**: Verify correct location
+- **Before commits**: Run organization checks
+- **Weekly**: Generate organization report
+- **On violations**: STOP and fix immediately
+
 ## File Management Rules (ALL FILES)
 
 ### APPLIES TO: Code, Documentation, Configuration, Scripts, Tests - EVERYTHING
