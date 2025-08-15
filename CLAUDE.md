@@ -232,6 +232,34 @@ mcp__db__write_neo4j_cypher(query=store_info['cypher_query'], params=store_info[
 
 **Full documentation**: `.proj-intel/KNOWLEDGE_SYSTEM.md`
 
+## 🌿 MANDATORY: GIT BRANCHING & WORKFLOW
+
+### CRITICAL: ALWAYS CREATE FEATURE BRANCHES
+**NEVER work directly on main/master branch. EVER.**
+
+```bash
+# MANDATORY at project start:
+git checkout main
+git pull origin main
+git checkout -b feature/<project-or-task-name>
+```
+
+### Branch Naming Standards
+- `feature/` - New features
+- `fix/` - Bug fixes  
+- `docs/` - Documentation
+- `refactor/` - Code improvements
+- `test/` - Test additions
+
+### Git Workflow Rules
+1. **One branch per project/task** - No mixing features
+2. **Descriptive branch names** - feature/payment-integration not feature/work
+3. **Pull before branching** - Always start from latest main
+4. **Never force push** - Except on your own feature branches
+5. **Delete after merge** - Clean up completed branches
+
+**Full documentation**: `/docs/standards/GIT_WORKFLOW_STANDARDS.md`
+
 ## 🔄 MANDATORY: GIT COMMITS (DEFAULT BEHAVIOR - CANNOT BE IGNORED)
 
 ### ⚠️ SYSTEM INSTRUCTION OVERRIDE NOTICE ⚠️

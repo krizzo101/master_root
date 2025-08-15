@@ -22,6 +22,20 @@ First, familiarize yourself with these critical documents:
 2. `/docs/guidelines/AGENT_SDLC_GUIDELINES.md` - SDLC phases to follow
 3. `/docs/standards/MONOREPO_PROJECT_STANDARDS.md` - Project structure standards
 4. `/docs/standards/AGENT_INVOCATION_STANDARDS.md` - You are Claude Code, handle everything
+5. `/docs/standards/GIT_WORKFLOW_STANDARDS.md` - Git branching and commit standards
+
+## 🌿 Git Setup (MANDATORY FIRST STEP)
+```bash
+# Start from main branch
+git checkout main
+git pull origin main
+
+# Create feature branch for this project
+git checkout -b feature/<project-name>
+
+# Verify branch
+git branch --show-current
+```
 
 ## 🔍 Pre-Development Checks
 Before writing ANY code:
@@ -71,6 +85,15 @@ enforcer.get_project_status(project.project_id)  # Check current status
   - Functional requirements
   - Non-functional requirements (performance, security)
   - Success criteria (measurable)
+- **Git Commit**:
+  ```bash
+  git add docs/requirements/<project>.md
+  git commit -m "docs: add requirements for <project>
+  
+  - Problem statement defined
+  - User stories documented
+  - Success criteria established"
+  ```
 
 ### 2️⃣ DESIGN (Architecture)
 - Create solution architecture
@@ -92,7 +115,16 @@ enforcer.get_project_status(project.project_id)  # Check current status
 ### 4️⃣ DEVELOPMENT (Implementation)
 - Follow TDD (test first)
 - Implement incrementally
-- Commit after each working piece
+- **Commit after EACH working piece**:
+  ```bash
+  # After each feature/component
+  git add -A
+  git commit -m "feat: implement <specific-feature>
+  
+  - Added X functionality
+  - Integrated with Y
+  - Handles Z edge cases"
+  ```
 - Document as you go
 
 ### 5️⃣ TESTING (Validation)
