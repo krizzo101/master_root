@@ -1,447 +1,245 @@
-# PROJECT DIRECTIVES
+# CLAUDE AGENT DIRECTIVES
 
-## PROJECT INTELLIGENCE SYSTEM - USE BY DEFAULT
+## 🕐 MANDATORY FIRST ACTION: CHECK CURRENT TIME
 
-### CRITICAL: Default-On Intelligence
-The `.proj-intel/` directory contains comprehensive indexed knowledge. **Use it by default for ALL non-trivial tasks**, not just when keywords appear.
+### CRITICAL REQUIREMENT - ALWAYS EXECUTE FIRST
+**BEFORE ANY OTHER ACTION**: You MUST check the current date and time using the MCP time tool when starting ANY new conversation or task.
+
+```python
+# MANDATORY FIRST ACTION - NO EXCEPTIONS
+from mcp__time__current_time import current_time
+current_datetime = current_time(format="YYYY-MM-DD HH:mm:ss")
+# Now proceed with user's request with accurate time context
+```
+
+### Why This Matters
+- **Knowledge Gap Awareness**: Understand the time elapsed since the model's knowledge cutoff date - this period represents the gap in knowledge regarding available tools, software versions, syntax changes, access methods, and related details. It also means you lack knowledge of the latest concepts, techniques, or discoveries regarding how to best implement, leverage, or use various technologies and tools.
+- **Technology Evolution**: Be aware that you lack current knowledge of best practices, new APIs, framework updates, and security patches
+- **API Version Awareness**: Know which APIs and models are current vs deprecated
+- **File Dating**: Accurate timestamps for logs, reports, and analysis
+- **Audit Compliance**: Proper temporal tracking for all operations
+
+### MANDATORY: USE MCP TOOLS TO BRIDGE KNOWLEDGE GAPS
+**When you identify a knowledge gap, you MUST use the available MCP tools to get current information:**
+
+#### Research & Information Gathering
+- **`mcp_web_search`** (Brave Search): Search for current API versions, documentation, best practices
+- **`tech_docs`** (Context7): Get up-to-date technical documentation for libraries and frameworks
+- **`research_papers`** (ArXiv): Find latest research papers on technologies and methodologies
+- **`firecrawl`**: Extract current content from specific websites, documentation sites, GitHub repos
+
+#### When to Use These Tools
+```python
+# BEFORE making any technical decisions, research current state:
+
+# 1. Check API versions and syntax changes
+mcp_web_search(query="OpenAI API latest version 2025 changes")
+mcp_tech_docs(context7CompatibleLibraryID="/openai/openai-python")
+
+# 2. Research best practices for frameworks
+mcp_web_search(query="FastAPI latest best practices 2025 security")
+mcp_firecrawl_scrape(url="https://fastapi.tiangolo.com/")
+
+# 3. Find current solutions to common problems
+mcp_web_search(query="Python async database connection pooling 2025")
+mcp_research_papers(query="microservices architecture patterns")
+
+# 4. Verify library compatibility and versions
+mcp_web_search(query="pydantic v2 vs v1 migration guide 2025")
+```
+
+#### Available MCP Tools for Knowledge Updates
+
+| Tool                         | Purpose          | When to Use                                      | Example Queries                                                                           |
+| ---------------------------- | ---------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| **`mcp_web_search`**         | Brave Search API | Current versions, breaking changes, new features | "Python 3.12 new features", "Docker latest security best practices 2025"                  |
+| **`tech_docs`**              | Context7 docs    | Library documentation, API references            | "/fastapi/fastapi", "/openai/openai-python"                                               |
+| **`research_papers`**        | ArXiv papers     | Latest research, methodologies, algorithms       | "transformer architecture improvements", "microservices patterns"                         |
+| **`firecrawl`**              | Web scraping     | Official docs, changelogs, GitHub releases       | "https://docs.python.org/3/whatsnew/", "https://github.com/openai/openai-python/releases" |
+| **`consult_suite_enhanced`** | Expert AI agents | Complex architecture decisions, code reviews     | Complex system design, production-ready implementations                                   |
+
+#### MANDATORY Research Protocol
+**BEFORE making technical decisions, you MUST:**
+1. **Search for current information** using `mcp_web_search`
+2. **Verify with official documentation** using `tech_docs` or `firecrawl`
+3. **Check for recent changes** in APIs, libraries, best practices
+4. **Research latest methodologies** if implementing new patterns
+5. **Only THEN proceed** with informed implementation
+
+### Enforcement
+- ❌ **VIOLATION**: Starting work without checking time
+- ❌ **VIOLATION**: Making technical decisions without researching current state
+- ❌ **VIOLATION**: Using outdated information from training data
+- ✅ **COMPLIANT**: First action is always `mcp__time__current_time`
+- ✅ **COMPLIANT**: Research current information before implementation
+
+## 🔄 MANDATORY: GIT COMMITS (DEFAULT BEHAVIOR - CANNOT BE IGNORED)
+
+### CRITICAL: FREQUENT COMMITTING IS MANDATORY
+Git commits are NOT optional - they are fundamental requirements for all development work. This is default behavior that cannot be skipped, ignored, or postponed.
+
+### MANDATORY COMMIT TRIGGERS (NO EXCEPTIONS)
+**You MUST commit after:**
+- **EVERY functional change** - Any code that adds, fixes, or modifies functionality
+- **EVERY logical unit of work** - Complete a feature, fix a bug, then commit
+- **EVERY 2-3 file modifications** - Never let more than 3 files go uncommitted
+- **BEFORE switching tasks** - Never leave uncommitted work when changing focus
+- **AFTER any significant refactoring** - Code improvements that enhance performance/functionality
+
+### GIT COMMIT PROTOCOL (MANDATORY EXECUTION)
+```bash
+# MANDATORY COMMIT SEQUENCE - EXECUTE AFTER EVERY LOGICAL UNIT OF WORK
+git add -A
+git diff --cached --quiet --ignore-submodules -- || git commit --no-verify -m "chore: autosave commit of all changes ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+git status | cat
+```
+
+### COMMIT FREQUENCY REQUIREMENTS
+- **MINIMUM**: Commit after every 2-3 file changes
+- **MAXIMUM**: Never let more than 10 file changes go uncommitted
+- **EMERGENCY**: If approaching token limits or session issues, commit immediately
+
+### ENHANCED GIT COMMIT PROTOCOL
+```bash
+# MANDATORY COMMIT SEQUENCE - EXECUTE AFTER EVERY LOGICAL UNIT OF WORK
+git add -A
+git diff --cached --quiet --ignore-submodules -- || git commit --no-verify -m "chore: autosave commit of all changes ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+pwd
+ls -a
+git status | cat
+git branch --show-current
+git log --oneline -5 | cat
+```
+
+### COMMIT FAILURE PROTOCOLS
+- **If commit fails**: Investigate immediately, don't continue without committing
+- **If hooks block**: Use `--no-verify` flag to bypass non-critical hooks
+- **If merge conflicts**: Resolve immediately, don't leave conflicts uncommitted
+
+### ENFORCEMENT RULES
+- ❌ **VIOLATION**: Making changes without committing
+- ❌ **VIOLATION**: Switching tasks with uncommitted work
+- ❌ **VIOLATION**: More than 3 files modified without commit
+- ✅ **COMPLIANT**: Committing after every logical unit of work
+- ✅ **COMPLIANT**: Using enhanced git status monitoring
+
+## 📋 TASK MANAGEMENT (MANDATORY)
+
+### TodoWrite Tool Usage (REQUIRED)
+**Use TodoWrite tool for ALL non-trivial tasks:**
+- **ALWAYS create todos** for complex multi-step tasks (3+ steps)
+- **TRACK PROGRESS** by updating task status (pending → in_progress → completed)
+- **MARK COMPLETED IMMEDIATELY** after finishing each task
+- **ONLY ONE IN_PROGRESS** at a time to maintain focus
+- **BREAK DOWN COMPLEX TASKS** into smaller, manageable steps
+
+### When to Use TodoWrite
+- Complex multi-step tasks requiring planning
+- User provides multiple tasks or requirements
+- Non-trivial tasks that need careful tracking
+- When switching between different aspects of work
+
+### Task States
+- **pending**: Task not yet started
+- **in_progress**: Currently working on (limit to ONE task at a time)
+- **completed**: Task finished successfully
+
+## 📊 PROJECT INTELLIGENCE (USE BY DEFAULT)
+
+### MANDATORY: READ AGENT_ONBOARDING.md FIRST
+**BEFORE attempting to use project intelligence data, you MUST:**
+1. **READ and UNDERSTAND** the `.proj-intel/AGENT_ONBOARDING.md` file
+2. **COMPREHEND** what data is available, how to access it, and why you should use it
+3. **ONLY THEN** proceed to review or use the intelligence data
+
+### MANDATORY DATA REFRESH PROTOCOL
+**ALWAYS refresh project intelligence data before major tasks:**
+1. **CHECK TIMESTAMP**: Compare `.proj-intel/proj_intel_manifest.json` timestamp with current time
+2. **EXECUTE REFRESH**: Run `project-intelligence full-package` from project root (recommended every time since it's fast and ensures current data)
+3. **VERIFY SUCCESS**: Confirm new timestamp is current
 
 ### What's Available
-- **10MB+ of indexed data** about every file, class, function, and import
-- **1,221 agent/class definitions** in `agent_architecture.jsonl`
+- **Comprehensive indexed data** about every file, class, function, and import (size varies as project evolves)
+- **Agent/class definitions** in `agent_architecture.jsonl` (count varies as architecture changes)
 - **O(1) lookups** via reverse_index.json and symbol_index.json
 - **File statistics** in file_elements.min.jsonl (lines, functions, classes)
 - **Gatekeeper tools** in apps/ACCF/src/accf/tools/ for smart context selection
 
-### THINK → CHECK → ACT Pattern (Use for EVERY task)
+**Note**: All statistics and counts are snapshots in time and change as the project evolves. Always check current data rather than relying on hardcoded numbers.
+
+### Usage Pattern
 1. **THINK**: What am I trying to accomplish?
 2. **CHECK**: What does project intelligence tell me about this?
 3. **ACT**: Proceed with intelligence-informed action
 
-### Intent-Based Intelligence Usage (Not Keyword-Based)
-
-**Before ANY action, ask yourself:**
-- Am I about to search for something? → Use `symbol_index.json` FIRST
-- Am I about to understand how something works? → Load `architecture` FIRST  
-- Am I about to edit/create code? → Find similar patterns FIRST
-- Am I debugging an issue? → Check `dependencies` FIRST
-- Am I exploring the codebase? → Use `file_elements.min.jsonl` FIRST
-
-### Self-Triggering Rules
-- **If thinking "I need to find..."** → Stop. Use intelligence.
-- **If thinking "Let me search..."** → Stop. Use intelligence.
-- **If thinking "I should check..."** → Stop. Use intelligence.
-- **If reading >2 files to understand something** → Stop. Use architecture.
-- **If grepping/searching manually** → Stop. Use indices.
-- **If creating new code** → Stop. Find patterns first.
-
-### Dynamic Recognition Examples
-```python
-# User says: "The app crashes during logout"
-# Agent thinks: "Debug intent detected"
-# Automatically runs:
-intel.find("logout")  # Don't grep
-intel.dependencies("auth/logout.py")  # Understand relationships
-
-# User says: "Make the API faster"  
-# Agent thinks: "Performance improvement needed"
-# Automatically runs:
-intel.find("api")  # Locate API code
-intel.stats()  # Understand complexity
-
-# User says: "Set up testing"
-# Agent thinks: "Need to understand test patterns"  
-# Automatically runs:
-intel.find("test")  # Find existing tests
-intel.architecture("test")  # Understand test structure
-```
-
 ### Quick Access Commands
-```python
-# Import Gatekeeper tools (ALWAYS available)
-from apps.ACCF.src.accf.tools.gatekeeper_data_tools import ProjectIntelligenceQuerier, DataPackager
-from apps.ACCF.src.accf.tools.gatekeeper_query_templates import generate_query_template
-
-# Example: Find relevant files for a task
-querier = ProjectIntelligenceQuerier('.proj-intel')
-files = querier.find_files_by_pattern(['agent', 'orchestrat'])
-
-# Example: Get architecture context
-template = generate_query_template('architecture_question', keywords=['agents'])
-package = DataPackager(querier).create_package(template)
-```
-
-### Shell Commands for Quick Queries
 ```bash
 # Find files by pattern
 jq -r '.path' .proj-intel/file_elements.min.jsonl | grep -i "pattern"
 
-# Find symbol definitions
-jq -r '.["SymbolName"]' .proj-intel/symbol_index.json
-
 # Check file statistics
 jq 'select(.path | contains("filename"))' .proj-intel/file_elements.min.jsonl
 
-# Get architecture info
-grep -l "ClassName" .proj-intel/agent_architecture.jsonl
+# Get freshness info
+jq -r .generated_at .proj-intel/proj_intel_manifest.json
 ```
 
-### Integration Rules
-1. **ALWAYS check intelligence FIRST** before searching/grepping the codebase
-2. **Use Gatekeeper tools** for relevance scoring and context packaging
-3. **Prefer indexed lookups** over file system scans
-4. **Update intelligence** after major refactoring (>10 files changed)
-5. **Refresh command**: `project-intelligence full-package` (updates .proj-intel/)
+## 📝 FILE OPERATIONS (CRITICAL ERROR PREVENTION)
 
-### Performance Benefits
-- **80% faster** file discovery vs grep/find
-- **50% less tokens** used due to targeted context
-- **Zero wrong-file edits** when using symbol_index
-- **Instant** architecture understanding
+### MANDATORY: CHECK FILE EXISTENCE BEFORE WRITING
+**ALWAYS check if file exists before writing to prevent errors:**
+- **Edit**: For modifying existing files (PREFERRED)
+- **Write**: ONLY for creating new files or complete rewrites
+- **ERROR PREVENTION**: If you get errors trying to write to a file, check for existence first and switch to edit if it exists
+- **DEFAULT BEHAVIOR**: Always check file existence before writing - this prevents wasted tokens and time from failed write operations
 
-## OUTPUT MANAGEMENT & TOKEN LIMITS (CRITICAL - PREVENTS SESSION CORRUPTION)
-
-### CHUNKED OUTPUT STRATEGY (MANDATORY)
-**Batch sizes based on file complexity:**
-- **SMALL files (<100 lines)**: Process 10-15 files per batch
-- **MEDIUM files (100-300 lines)**: Process 5-8 files per batch  
-- **LARGE files (300-1000 lines)**: Process 2-4 files per batch
-- **VERY LARGE files (1000+ lines)**: Process 1-2 files maximum
-
-**Output approach:**
-- Show summaries and confirmations, not full file contents
-- Use MultiEdit for coordinated changes across multiple files
-- Display only relevant excerpts (10-20 lines) when showing code
-- Write large generated content directly to files
-
-### TOKEN LIMIT AWARENESS
-**Current limits for Opus 4.1:**
-- Maximum output: 32,000 tokens (~24,000 words)
-- Safe target: 20,000 tokens per response
-- If approaching limit: STOP and continue in next response
-
-### PREVENTING SESSION CORRUPTION
-1. **NEVER attempt operations that might exceed token limits**
-2. **SPLIT large tasks**: "Update 50 files" → "Update 10 files at a time"
-3. **USE FILE OPERATIONS**: Write large outputs to files, don't display them
-4. **FREQUENT COMMITS**: Commit after each logical chunk of work
-5. **WARN when output will be large**: "This will generate ~X lines, shall I write to file?"
-
-### OPTIMAL TOOL USAGE (MANDATORY)
-
-**ALWAYS use the most efficient tool for the task:**
-
-1. **MultiEdit** (PREFERRED for multiple changes):
-   - Use for ANY task involving 2+ edits to the same file
-   - Use for coordinated changes across 2-10 files
-   - More efficient than multiple Edit calls
-   - Atomic operations - all succeed or all fail
-
-2. **Edit vs Write**:
-   - **Edit**: For modifying existing files (PREFERRED)
-   - **Write**: ONLY for creating new files or complete rewrites
-   - NEVER use Write to update existing files
-
-3. **Parallel Operations**:
-   - **Read multiple files**: Use single tool call with multiple file paths
-   - **Search operations**: Run grep/find commands in parallel
-   - **Status checks**: Run git status, diff, log in parallel
-
-4. **Tool Selection Priority**:
-   ```
-   For file changes:
-   1st choice: MultiEdit (for multiple edits)
-   2nd choice: Edit (for single edit)
-   Last resort: Write (only for new files)
-   
-   For searching:
-   1st choice: Project intelligence indices
-   2nd choice: Grep with specific paths
-   Last resort: Find with full scan
-   ```
-
-### SAFE OUTPUT PATTERNS
-
-**For batch file operations:**
-```python
-# WRONG - Showing full content of multiple files
-for file in files:
-    print(f"=== {file} ===")
-    print(read_entire_file(file))  # Could be thousands of lines
-
-# CORRECT - Summary approach
-print(f"Processing {len(files)} files...")
-for file in files:
-    result = process_file(file)
-    print(f"✓ {file}: Updated {result.lines_changed} lines")
-
-# Show only critical excerpts if needed
-print(f"\nKey change in {file} (lines 45-55):")
-print_excerpt(file, start=45, end=55)
-```
-
-**For large content generation:**
-```python
-# WRONG - Outputting large generated content
-print(generate_large_content())  # 5000 lines
-
-# CORRECT - Write to file with confirmation
-content = generate_large_content()
-write_to_file('output.txt', content)
-print(f"✓ Generated {len(content.splitlines())} lines → output.txt")
-```
-
-## PROJECT ORGANIZATION & CHAOS PREVENTION (ZERO TOLERANCE)
-
-### FILE CREATION DECISION TREE (MANDATORY - CHECK BEFORE EVERY FILE OPERATION)
-```
-BEFORE CREATING ANY FILE:
-1. Does similar file exist? → YES: UPDATE IT (never create duplicate)
-                           → NO: Continue to step 2
-2. Is it temporary? → YES: Use /tmp/ with auto-cleanup
-                   → NO: Continue to step 3  
-3. Is it documentation? → YES: Goes in docs/* (NEVER in root)
-                       → NO: Continue to step 4
-4. Is it a report/analysis? → YES: Goes in docs/analysis/ with date prefix
-                           → NO: Continue to step 5
-5. Is it configuration? → YES: Root allowed (if no subdirectory exists)
-                       → NO: Must go in appropriate subdirectory
-```
-
-### PROHIBITED ACTIONS (VIOLATIONS = IMMEDIATE TASK FAILURE)
-- **NEVER create files with version suffixes**: No V1, V2, _v2, _final, _updated, _new
-- **NEVER place documentation in root**: Maximum 5 .md files allowed in root
-- **NEVER create "just temporary" files in root**: Use /tmp/ or .tmp/
-- **NEVER duplicate existing functionality**: Update existing files instead
-- **NEVER exceed size limits**: Alert if any file >10MB, any directory >100MB
-- **NEVER create analysis files without expiry**: All reports must have cleanup date
-
-### MANDATORY FILE LOCATIONS (ENFORCED)
-```
-master_root/
-├── docs/                    # ALL documentation except README, CLAUDE.md, QUICK_START
-│   ├── architecture/        # PERMANENT - System design, architecture decisions
-│   ├── guides/             # PERMANENT - How-to guides, tutorials, API docs
-│   ├── analysis/           # TEMPORARY - Reports, analysis (YYYY-MM-DD prefix, archive after 30 days)
-│   ├── migration/          # TEMPORARY - Migration plans (archive when complete)
-│   └── archive/            # Old temporary docs and obsolete versions
-├── apps/                   # Applications only
-├── libs/                   # Libraries only
-├── servers/                # Server implementations only
-├── scripts/                # Utility scripts, tools
-├── tests/                  # Test files (mirror source structure)
-└── .tmp/                   # Temporary files (auto-cleaned daily)
-```
-
-### AUTOMATIC CLEANUP PROTOCOLS (RUN WITHOUT ASKING)
-1. **DAILY**: Delete files in .tmp/ older than 24 hours
-2. **WEEKLY**: Archive ONLY date-prefixed analysis/reports >30 days old
-3. **WEEKLY**: Compress .log files >7 days old
-4. **MONTHLY**: Alert on directories >100MB for review
-5. **NEVER**: Auto-archive core documentation (architecture, guides, APIs)
-6. **ALWAYS**: Run cleanup CHECK before starting new tasks (fix only with permission)
-
-### FILE NAMING CONVENTIONS (STRICTLY ENFORCED)
-- **Documentation**: `YYYY-MM-DD_description.md` for time-sensitive docs
-- **Analysis/Reports**: `YYYY-MM-DD_analysis_name.md` (auto-archive after 30 days)
-- **Configs**: `service.config.ext` or `service.env`
-- **Scripts**: `action_verb_noun.sh` (e.g., `cleanup_logs.sh`)
-- **PROHIBITED**: version numbers, "final", "updated", "new", "old", "backup"
-
-### DOCUMENTATION CONSOLIDATION RULES
-- **ONE authoritative document per topic** - Update existing, don't create new
-- **Git for versioning** - Never use filename versioning
-- **Maximum 5 .md files in root** - Only README, CLAUDE, QUICK_START, LICENSE, CONTRIBUTING
-- **Core documentation NEVER expires** - Architecture, guides, API docs are permanent
-- **Only temporary items expire**: Analysis/reports with date prefixes → archive after 30 days
-
-### SIZE MANAGEMENT PROTOCOLS
-- **File size limit**: Alert at 10MB, fail at 50MB (except data files)
-- **Directory limit**: Alert at 100MB, investigate at 500MB
-- **Archive compression**: Files >30 days old → compress with gzip
-- **Reference cleanup**: .reference/ >1GB → move to cloud storage
-- **Build artifacts**: Clean before each build, never commit
-
-### PRE-COMMIT ENFORCEMENT CHECKS (AUTOMATIC)
-```python
-# These checks run BEFORE any commit
-1. No .md files in root except allowed 5
-2. No version suffixes in filenames  
-3. No .log, .tmp, .bak files in commit
-4. No files >10MB without explicit flag
-5. Documentation in correct subdirectories
-6. Analysis files have date prefixes
-```
-
-### CONTINUOUS ORGANIZATION TASKS
-- **Before EVERY task**: Check for cleanup opportunities
-- **After file creation**: Verify correct location
-- **Before commits**: Run organization checks
-- **Weekly**: Generate organization report
-- **On violations**: STOP and fix immediately
-
-## File Management Rules (ALL FILES)
-
-### APPLIES TO: Code, Documentation, Configuration, Scripts, Tests - EVERYTHING
+### File Management Rules
 1. **UPDATE existing files** - Do not create duplicate versions
 2. **NO versioning in filenames** - No "v2", "verified", "final", "updated", "new", "fixed" suffixes
 3. **Single source of truth** - One file per purpose
-4. **Fix in place** - Correct errors in the original file
-5. **No parallel versions** - Never have multiple versions of the same functionality
-6. **USE GIT FOR VERSIONING** - Commit changes regularly with descriptive messages
+4. **USE GIT FOR VERSIONING** - Commit changes regularly with descriptive messages
 
-### Git Commit Requirements
-- **PRIORITIZE FUNCTIONALITY** - Focus on working code, not cosmetic improvements
-- **COMMIT FREQUENTLY** - After completing each logical unit of work
-- **Check git status regularly** - Use `git status` before and after changes
-- **Descriptive messages** - Explain functional changes, not formatting fixes
-- **Atomic commits** - Each commit should be a single logical change
-- **USE --no-verify** - When only formatting/linting issues remain that don't affect functionality
-- **Never rely on filenames for versioning** - That's what git is for
-- **Commit at least**:
-  - After fixing functional errors
-  - After implementing new features
-  - After significant refactoring that improves performance/functionality
-  - Before switching to different tasks
-  - Skip commits for pure formatting unless blocking functionality
+## ⚡ BATCH & PARALLEL BY DEFAULT (MANDATORY)
 
-### Quality Standards
-- All content must be tested and accurate
-- Do not document/code assumptions or guesses as facts
-- If something is untested, mark it as "NOT TESTED"
-- Do not add meta-commentary about verification or corrections
-- No comments about "fixing" or "updating" previous versions
+### BATCH OPERATIONS ARE DEFAULT BEHAVIOR
+**Batch operations are the DEFAULT behavior for all work:**
+- **ALWAYS batch independent operations** - Never run sequential when parallel is possible
+- **BATCH file operations** - Process multiple files in single operations
+- **BATCH analysis tasks** - Use parallel processing for multiple analyses
+- **BATCH test execution** - Run test suites simultaneously
+- **BATCH git operations** - Status, diff, log in parallel
 
-## WORKING SMART: AGENT SELECTION & TOOL LEVERAGE
+### PARALLEL OPERATIONS (MANDATORY DEFAULT)
+**Parallel execution is the DEFAULT behavior:**
+- **Read multiple files**: Use single tool call with multiple file paths
+- **Search operations**: Use project intelligence methods FIRST, then grep/find as secondary behavior
+- **Status checks**: Run git status, diff, log in parallel
+- **DEFAULT BEHAVIOR**: Always use parallel execution when possible - this is mandatory, not optional
 
-### Dynamic Agent Profile Selection
-- **SELF-ANALYZE TASKS** - Automatically determine best agent profile for the work
-- **SWITCH AGENTS FREELY** - Change between specialized agents as task requirements evolve
-- **NO PERMISSION NEEDED** - Proactively load optimal agents without asking
-- **LEVERAGE ALL TOOLS** - Use every available resource to work efficiently
-- **WORK SMART, NOT HARD** - Choose tools that minimize effort and maximize results
+### Tool Selection Priority
+```
+For file changes:
+1st choice: MultiEdit (for multiple edits)
+2nd choice: Edit (for single edit)
+Last resort: Write (only for new files)
 
-### Agent Selection Guidelines
-- **Code Development**: Use development-specialist or solution-architect agents
-- **Debugging/Analysis**: Use code-analyzer or technical review agents  
-- **Research Tasks**: Use research-genius or requirements-analyst agents
-- **Refactoring**: Use refactoring-master for efficient code transformation
-- **Documentation**: Use technical-writer for clear documentation
-- **Complex Problems**: Use excellence-optimizer for cutting-edge solutions
-
-
-### Quick Access Commands
-```python
-# Import Gatekeeper tools (ALWAYS available)
-from apps.ACCF.src.accf.tools.gatekeeper_data_tools import ProjectIntelligenceQuerier, DataPackager
-from apps.ACCF.src.accf.tools.gatekeeper_query_templates import generate_query_template
-
-# Example: Find relevant files for a task
-querier = ProjectIntelligenceQuerier('.proj-intel')
-files = querier.find_files_by_pattern(['agent', 'orchestrat'])
-
-# Example: Get architecture context
-template = generate_query_template('architecture_question', keywords=['agents'])
-package = DataPackager(querier).create_package(template)
+For searching:
+1st choice: Project intelligence indices
+2nd choice: Grep with specific paths
+Last resort: Find with full scan
 ```
 
-### Shell Commands for Quick Queries
-```bash
-# Find files by pattern
-jq -r '.path' .proj-intel/file_elements.min.jsonl | grep -i "pattern"
-
-# Find symbol definitions
-jq -r '.["SymbolName"]' .proj-intel/symbol_index.json
-
-# Check file statistics
-jq 'select(.path | contains("filename"))' .proj-intel/file_elements.min.jsonl
-
-# Get architecture info
-grep -l "ClassName" .proj-intel/agent_architecture.jsonl
-```
-
-### Intelligence Freshness Check
-Before major tasks, verify intelligence is current:
-```bash
-jq -r .generated_at .proj-intel/proj_intel_manifest.json
-# If older than 24 hours, consider: project-intelligence full-package
-```
-
-### Integration Rules
-1. **ALWAYS check intelligence FIRST** before searching/grepping the codebase
-2. **Use Gatekeeper tools** for relevance scoring and context packaging
-3. **Prefer indexed lookups** over file system scans
-4. **Update intelligence** after major refactoring (>10 files changed)
-5. **Refresh command**: `project-intelligence full-package` (updates .proj-intel/)
-
-### Performance Benefits
-- **80% faster** file discovery vs grep/find
-- **50% less tokens** used due to targeted context
-- **Zero wrong-file edits** when using symbol_index
-- **Instant** architecture understanding
-
-## PARALLEL-BY-DEFAULT EXECUTION (MANDATORY)
-
-### PARALLELIZATION REQUIREMENTS
-- **BATCH ALL INDEPENDENT OPERATIONS**: Never run sequential when parallel is possible
-- **USE claude_run_batch**: For multiple analysis tasks - ALWAYS
-- **CONCURRENT FILE READS**: Always read multiple files in single tool call
-- **PARALLEL TEST EXECUTION**: Run test suites simultaneously
-- **ASYNC MCP OPERATIONS**: Use _async variants for long-running tasks
-- **TARGET**: 70% reduction in execution time through parallelization
-
-### Parallel Execution Patterns
-```python
-# WRONG - Sequential execution
-file1 = read("file1.py")
-file2 = read("file2.py")
-file3 = read("file3.py")
-
-# CORRECT - Parallel execution
-files = parallel_read(["file1.py", "file2.py", "file3.py"])
-```
-
-### MCP Batch Operations
-- **Multiple agents**: Use `mcp__claude-code__claude_run_batch` for parallel agent tasks
-- **Async patterns**: Start with `_async`, check status, retrieve results
-- **Web operations**: Batch scrape/search operations when possible
-- **Git operations**: Run status, diff, log in parallel
-
-## PROGRESSIVE CONTEXT LOADING (TOKEN OPTIMIZATION)
-
-### TOKEN BUDGET PROTOCOL
-- **START MINIMAL**: Use `file_elements.min.jsonl` for stats only (5-10 tokens)
-- **LOAD INCREMENTALLY**: Read specific line ranges via offset/limit parameters
-- **CONTEXT BUDGET**: Track token usage, auto-summarize at 50% capacity
-- **SMART TRUNCATION**: Keep first 10 lines of errors, not full stacks
-- **AUTO-CLEANUP**: Drop irrelevant context after task completion
-- **TARGET**: 60% token reduction while maintaining effectiveness
-
-### Progressive Loading Strategy
-1. **STATS FIRST**: Get file metrics from `file_elements.min.jsonl`
-2. **SYMBOLS NEXT**: Load only relevant symbols from `symbol_index.json`
-3. **SNIPPETS ONLY**: Read 5-10 lines around target code
-4. **EXPAND AS NEEDED**: Load more context only when required
-5. **SUMMARIZE OLD**: Compress older context to key points
-
-### Token Usage Limits
-- **Per file**: Max 500 tokens initially, expand to 2000 if needed
-- **Error messages**: First 10 lines + last 5 lines only
-- **Search results**: Top 5 most relevant, summarize rest
-- **Context window**: Monitor usage, alert at 70% capacity
-
-## AUTOMATIC TEST VALIDATION (ZERO-ASK PROTOCOL)
+## 🧪 AUTOMATIC TEST VALIDATION (ZERO-ASK PROTOCOL)
 
 ### TEST EXECUTION REQUIREMENTS
 - **AUTO-DISCOVER TESTS**: Find relevant tests for changed code WITHOUT ASKING
 - **RUN WITHOUT ASKING**: Execute tests immediately after changes
-- **GENERATE TEST STUBS**: Create tests for new functions automatically
-- **COVERAGE TRACKING**: Monitor and report test coverage changes
 - **FAIL-FAST**: Stop execution if tests fail, auto-rollback changes
 - **TEST COMMAND CACHE**: Store discovered test commands in `.proj-intel/test_commands.json`
 
 ### Test Discovery Pattern
 1. **ON CODE CHANGE**: Automatically identify affected test files
-2. **CHECK CACHE**: Look for known test commands in `.proj-intel/test_commands.json`
+2. **CHECK CACHE**: Look for known test commands in cache
 3. **DISCOVER IF NEW**: Search for pytest, unittest, or project-specific test runners
 4. **RUN IMMEDIATELY**: Execute without user confirmation
 5. **CACHE RESULTS**: Store successful test commands for future use
@@ -449,25 +247,21 @@ files = parallel_read(["file1.py", "file2.py", "file3.py"])
 ### Test Generation Rules
 - **New functions**: Auto-generate basic test with edge cases
 - **Modified functions**: Update existing tests or flag for review
-- **Deleted functions**: Remove corresponding tests
 - **Coverage target**: Maintain or improve coverage percentage
 
-## ERROR PATTERN LEARNING SYSTEM
+## 🔧 ERROR PATTERN LEARNING SYSTEM
 
 ### AUTOMATIC ERROR RECOVERY
 - **CREATE `.proj-intel/error_patterns.json`**: Cache all errors and solutions
 - **CHECK BEFORE FIXING**: Query error cache before attempting new solutions
-- **AUTO-ROLLBACK POINTS**: Git stash before major changes
 - **PATTERN RECOGNITION**: Identify recurring error types
 - **PREEMPTIVE FIXES**: Apply known solutions before errors occur
-- **SHARE ACROSS AGENTS**: All agents learn from each other's fixes
 
 ### Error Pattern Structure
 ```json
 {
   "error_signature": "hash_of_error",
   "error_type": "ImportError|SyntaxError|RuntimeError|etc",
-  "pattern": "regex_or_exact_match",
   "solutions": [
     {
       "fix": "description_of_fix",
@@ -476,7 +270,6 @@ files = parallel_read(["file1.py", "file2.py", "file3.py"])
     }
   ],
   "first_seen": "timestamp",
-  "last_seen": "timestamp",
   "occurrences": 10
 }
 ```
@@ -488,169 +281,105 @@ files = parallel_read(["file1.py", "file2.py", "file3.py"])
 4. **IF NEW ERROR**: Solve, then cache solution
 5. **UPDATE METRICS**: Track success/failure of solutions
 
-## MULTI-AGENT COLLABORATION PIPELINES
+## 📋 OUTPUT MANAGEMENT & TOKEN LIMITS
 
-### CONCURRENT AGENT SPECIALIZATION
-- **AUTOMATIC DISPATCH**: Split complex tasks to specialized agents WITHOUT ASKING
-- **PARALLEL WORKFLOWS**: Multiple agents work simultaneously on different aspects
-- **AGENT COMMUNICATION**: Share context via `.proj-intel/agent_state.json`
-- **PIPELINE TEMPLATES**: Pre-defined workflows for common tasks
-- **NO SEQUENTIAL HANDOFFS**: Agents work in parallel, not in sequence
+### CHUNKED OUTPUT STRATEGY (MANDATORY)
+**Batch sizes based on file complexity:**
+- **SMALL files (<100 lines)**: Process 10-15 files per batch
+- **MEDIUM files (100-300 lines)**: Process 5-8 files per batch
+- **LARGE files (300-1000 lines)**: Process 2-4 files per batch
+- **VERY LARGE files (1000+ lines)**: Process 1-2 files maximum
 
-### Agent Pipeline Patterns
-```python
-# Development Pipeline (runs in parallel)
-agents = {
-    "analyzer": mcp__consult_suite(agent_type="code_review", prompt="analyze existing code"),
-    "developer": mcp__consult_suite(agent_type="development_specialist", prompt="implement feature"),
-    "tester": mcp__consult_suite(agent_type="qa_testing_guru", prompt="create tests"),
-    "documenter": mcp__consult_suite(agent_type="technical_writer", prompt="update docs")
-}
-# All agents work simultaneously, share state via agent_state.json
+### PROGRESSIVE CONTEXT LOADING (TOKEN OPTIMIZATION)
+**TOKEN BUDGET PROTOCOL:**
+- **START MINIMAL**: Use `file_elements.min.jsonl` for stats only (5-10 tokens)
+- **LOAD INCREMENTALLY**: Read specific line ranges via offset/limit parameters
+- **CONTEXT BUDGET**: Track token usage, auto-summarize at 50% capacity
+- **SMART TRUNCATION**: Keep first 10 lines of errors, not full stacks
+- **Per file**: Max 500 tokens initially, expand to 2000 if needed
+
+### TOKEN LIMIT AWARENESS
+- **Maximum output**: 32,000 tokens (~24,000 words)
+- **Safe target**: 20,000 tokens per response
+- **If approaching limit**: STOP and continue in next response
+
+### SAFE OUTPUT PATTERNS
+- Show summaries and confirmations, not full file contents
+- Use MultiEdit for coordinated changes across multiple files
+- Display only relevant excerpts (10-20 lines) when showing code
+- Write large generated content directly to files
+
+## 🗂️ ORGANIZATION RULES (ZERO TOLERANCE FOR CHAOS)
+
+### FILE CREATION DECISION TREE
+```
+BEFORE CREATING ANY FILE:
+1. Does similar file exist? → YES: UPDATE IT (never create duplicate)
+2. Is it documentation? → YES: Goes in docs/* (NEVER in root)
+3. Is it temporary? → YES: Use /tmp/ with auto-cleanup
+4. Must go in appropriate subdirectory
 ```
 
-### Standard Pipeline Templates
-- **Feature Development**: analyzer + developer + tester + documenter
-- **Bug Fix**: analyzer + developer + tester
-- **Refactoring**: analyzer + refactoring-master + tester
-- **Research**: research-genius + requirements-analyst + solution-architect
-- **Code Review**: code-analyzer + reviewer-critic + qa-testing-guru
+### PROHIBITED ACTIONS
+- **NEVER create files with version suffixes**: No V1, V2, _v2, _final, _updated, _new
+- **NEVER place documentation in root**: Maximum 5 .md files allowed in root
+- **NEVER create "just temporary" files in root**: Use /tmp/ or .tmp/
 
-### Agent State Sharing Protocol
-```json
-{
-  "task_id": "unique_task_identifier",
-  "agents": {
-    "agent_name": {
-      "status": "running|completed|failed",
-      "output": "key_findings_or_results",
-      "dependencies": ["other_agent_names"],
-      "timestamp": "last_update"
-    }
-  },
-  "shared_context": {
-    "files_modified": [],
-    "errors_found": [],
-    "decisions_made": []
-  }
-}
+### MANDATORY FILE LOCATIONS
+```
+master_root/
+├── docs/                    # ALL documentation except README, CLAUDE.md, QUICK_START
+│   ├── architecture/        # System design, architecture decisions
+│   ├── guides/             # How-to guides, tutorials, API docs
+│   └── analysis/           # Reports with YYYY-MM-DD prefix, archive after 30 days
+├── apps/                   # Applications only
+├── scripts/                # Utility scripts, tools
+└── .tmp/                   # Temporary files (auto-cleaned daily)
 ```
 
-## PERFORMANCE MONITORING & OPTIMIZATION
+## 📊 QUICK REFERENCE
 
-### EXECUTION METRICS TRACKING
-- **TIME TRACKING**: Monitor execution time per operation type
-- **BOTTLENECK DETECTION**: Identify slow operations automatically
-- **OPTIMIZATION SUGGESTIONS**: Propose faster alternatives
-- **CACHE EVERYTHING**: Results, searches, analysis - reuse aggressively
-- **METRICS STORAGE**: Track in `.proj-intel/performance_metrics.json`
+### Essential Commands
+```bash
+# Time check (FIRST ACTION)
+mcp__time__current_time(format="YYYY-MM-DD HH:mm:ss")
 
-### Performance Benchmarks (REQUIRED)
-- **File discovery**: <100ms using indices
-- **Symbol lookup**: <50ms via symbol_index.json
-- **Test execution**: <5s for unit tests
-- **Context loading**: <500ms for initial load
-- **Agent dispatch**: <1s to start parallel agents
-- **Error pattern match**: <100ms lookup time
+# Task management (FOR COMPLEX TASKS)
+TodoWrite(todos=[{"content": "task description", "status": "pending", "id": "unique_id"}])
 
-### Optimization Rules
-1. **CACHE FIRST**: Check if result already exists
-2. **BATCH SECOND**: Combine similar operations
-3. **PARALLEL THIRD**: Execute independent tasks concurrently
-4. **MINIMIZE FOURTH**: Reduce data transfer and context
-5. **MEASURE ALWAYS**: Track every operation's performance
+# Research current information (BEFORE TECHNICAL DECISIONS)
+mcp_web_search(query="technology latest version 2025")
+mcp_tech_docs(context7CompatibleLibraryID="/library/name")
 
-## INTELLIGENT FAILURE RECOVERY
+# Enhanced commit workflow (AFTER EVERY CHANGE)
+git add -A
+git diff --cached --quiet --ignore-submodules -- || git commit --no-verify -m "chore: autosave commit of all changes ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+pwd && ls -a && git status | cat && git branch --show-current
 
-### RESILIENCE & CONTINUITY PROTOCOL
-- **CHECKPOINT SYSTEM**: Save state every 5 operations to `.proj-intel/checkpoints/`
-- **RESUME CAPABILITY**: Continue from last checkpoint on failure
-- **RETRY LOGIC**: Automatic retry with exponential backoff (1s, 2s, 4s, 8s)
-- **ALTERNATIVE STRATEGIES**: If approach A fails, auto-try B, C without asking
-- **DEGRADED MODE**: Continue with reduced functionality vs complete stop
-- **ROLLBACK SAFETY**: Git stash push before risky operations
+# Intelligence refresh (BEFORE MAJOR TASKS)
+project-intelligence full-package
 
-### Checkpoint Structure
-```json
-{
-  "checkpoint_id": "timestamp_taskid",
-  "operation_count": 5,
-  "state": {
-    "files_modified": [],
-    "tests_run": [],
-    "errors_encountered": [],
-    "progress_percentage": 45
-  },
-  "next_actions": ["action1", "action2"],
-  "rollback_point": "git_stash_ref"
-}
+# File existence check (BEFORE WRITING)
+ls -la target_file.ext || echo "File does not exist, safe to write"
 ```
 
-### Recovery Strategies
-1. **NETWORK FAILURE**: Cache results locally, retry with backoff
-2. **TEST FAILURE**: Rollback changes, try alternative implementation
-3. **IMPORT ERROR**: Auto-install missing packages, update requirements
-4. **SYNTAX ERROR**: Use AST to fix common issues automatically
-5. **TIMEOUT**: Switch to async operations, increase limits progressively
+### Tool Priority
+1. **Time Check** → MANDATORY first action every session
+2. **TodoWrite** → MANDATORY for complex multi-step tasks
+3. **Research Tools** → MANDATORY before technical decisions (web_search, tech_docs, firecrawl)
+4. **Project Intelligence** → Fast, indexed, accurate for existing codebase
+5. **Auto Test Execution** → MANDATORY after code changes
+6. **Error Pattern Cache** → Check before fixing, update after solving
+7. **MultiEdit** → Efficient for multiple changes
+8. **Parallel Operations** → Always when possible
+9. **Enhanced Git Status** → Full monitoring with every commit
 
-## CONTEXT-AWARE DECISION MAKING
+---
 
-### SMART AGENT BEHAVIOR
-- **DETECT CODE PATTERNS**: Identify framework/library from imports automatically
-- **INFER CONVENTIONS**: Learn project style from existing code
-- **PREDICT NEEDS**: Anticipate next steps based on current task
-- **ADJUST VERBOSITY**: More detail for complex tasks, less for simple
-- **RISK ASSESSMENT**: Flag high-risk changes, auto-create backups
+**REMEMBER**: These are not suggestions - they are mandatory requirements. Compliance is not optional.
 
-### Pattern Detection Rules
-```python
-# Automatically detect and adapt to:
-- Framework: Django/Flask/FastAPI from imports
-- Test framework: pytest/unittest from test files
-- Code style: PEP8/Black/custom from existing files
-- Package manager: pip/poetry/conda from config files
-- CI/CD: GitHub Actions/Jenkins from .github/ or Jenkinsfile
-```
-
-### Adaptive Behavior Matrix
-| Task Complexity | Verbosity | Testing | Documentation | Review |
-|----------------|-----------|---------|---------------|---------|
-| Simple (1-10 lines) | Minimal | Basic | Inline | Skip |
-| Medium (10-100 lines) | Standard | Full | Docstrings | Quick |
-| Complex (100+ lines) | Detailed | Comprehensive | Full docs | Thorough |
-| Critical (auth/payment) | Maximum | Extensive | Complete | Multiple |
-
-## CONTINUOUS IMPROVEMENT LOOP
-
-### SELF-OPTIMIZING SYSTEM
-- **EXECUTION LOGS**: Track all operations in `.proj-intel/execution_logs.jsonl`
-- **PATTERN MINING**: Identify successful vs failed approaches weekly
-- **RULE GENERATION**: Create new rules from learned patterns
-- **FEEDBACK INTEGRATION**: Update procedures based on results
-- **WEEKLY OPTIMIZATION**: Auto-review and update intelligence indices
-
-### Learning Metrics
-```json
-{
-  "pattern": "specific_approach_or_technique",
-  "success_rate": 0.89,
-  "avg_time_saved": "45s",
-  "error_reduction": "60%",
-  "recommendation": "make_default|avoid|conditional_use",
-  "evidence": ["task_id_1", "task_id_2"]
-}
-```
-
-### Automatic Improvement Triggers
-1. **DAILY**: Update error_patterns.json with new solutions
-2. **AFTER 10 TASKS**: Analyze performance, suggest optimizations
-3. **WEEKLY**: Run pattern mining, update best practices
-4. **ON MAJOR SUCCESS**: Document approach, add to templates
-5. **ON REPEATED FAILURE**: Flag for human review, adjust strategy
-
-### Feedback Loop Implementation
-- **Success patterns** → Convert to mandatory rules
-- **Failure patterns** → Add to avoidance list
-- **Performance wins** → Make default behavior
-- **Token savings** → Update context loading strategy
-- **Time savings** → Prioritize in execution order
+**Detailed documentation moved to:**
+- Error patterns: `docs/architecture/error_patterns.md`
+- Agent collaboration: `docs/architecture/agent_collaboration.md`
+- Performance monitoring: `docs/architecture/performance_tracking.md`
+- Advanced behaviors: `docs/guides/agent_behavior.md`
