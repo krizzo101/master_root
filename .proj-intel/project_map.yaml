@@ -12,7 +12,9 @@ files:
   - agents/sdlc_agent_implementation_guide.md
   - agents/sdlc_agent_usage_example.py
   - agents/sdlc_team_prompts.md
+  - autonomous_claude_agent/AI_FIRST_IMPLEMENTATION_SUMMARY.md
   - autonomous_claude_agent/ARCHITECTURE.md
+  - autonomous_claude_agent/AUTONOMOUS_AI_REDESIGN.md
   - autonomous_claude_agent/CODE_VALUE_ASSESSMENT_REPORT.md
   - autonomous_claude_agent/Dockerfile
   - autonomous_claude_agent/IMPLEMENTATION_SUMMARY.md
@@ -20,6 +22,9 @@ files:
   - autonomous_claude_agent/README.md
   - autonomous_claude_agent/config/limits.yaml
   - autonomous_claude_agent/config/settings.yaml
+  - autonomous_claude_agent/demo_ai_first.py
+  - autonomous_claude_agent/demo_ai_self_improvement.py
+  - autonomous_claude_agent/demo_complete.py
   - autonomous_claude_agent/demo_self_improvement.py
   - autonomous_claude_agent/demo_simple.py
   - autonomous_claude_agent/docker-compose.yml
@@ -28,15 +33,23 @@ files:
   - autonomous_claude_agent/pytest.ini
   - autonomous_claude_agent/requirements.txt
   - autonomous_claude_agent/run_demo.py
+  - autonomous_claude_agent/run_with_claude.py
+  - autonomous_claude_agent/run_with_mcp.py
   - autonomous_claude_agent/scripts/bootstrap.sh
   - autonomous_claude_agent/src/__init__.py
+  - autonomous_claude_agent/src/ai_core/ai_decision_engine.py
+  - autonomous_claude_agent/src/ai_core/ai_orchestrator.py
+  - autonomous_claude_agent/src/ai_core/ai_pattern_engine.py
   - autonomous_claude_agent/src/capabilities/__init__.py
   - autonomous_claude_agent/src/capabilities/discovery.py
   - autonomous_claude_agent/src/capabilities/integrator.py
   - autonomous_claude_agent/src/capabilities/registry.py
   - autonomous_claude_agent/src/capabilities/validator.py
+  - autonomous_claude_agent/src/claude_mcp_client.py
   - autonomous_claude_agent/src/core/__init__.py
   - autonomous_claude_agent/src/core/agent.py
+  - autonomous_claude_agent/src/core/ai_decision_engine.py
+  - autonomous_claude_agent/src/core/ai_orchestrator.py
   - autonomous_claude_agent/src/core/claude_client.py
   - autonomous_claude_agent/src/core/context_manager.py
   - autonomous_claude_agent/src/core/error_recovery.py
@@ -47,6 +60,7 @@ files:
   - autonomous_claude_agent/src/governance/resource_monitor.py
   - autonomous_claude_agent/src/governance/safety_rules.py
   - autonomous_claude_agent/src/learning/__init__.py
+  - autonomous_claude_agent/src/learning/ai_pattern_engine.py
   - autonomous_claude_agent/src/learning/experience_replay.py
   - autonomous_claude_agent/src/learning/knowledge_base.py
   - autonomous_claude_agent/src/learning/metrics_tracker.py
@@ -75,6 +89,7 @@ files:
   - autonomous_claude_agent/tests/__init__.py
   - autonomous_claude_agent/tests/conftest.py
   - autonomous_coder/IMPLEMENTATION_PLAN.md
+  - autonomous_coder/INTELLIGENT_SYSTEM_README.md
   - autonomous_coder/ITERATIVE_START.py
   - autonomous_coder/README.md
   - autonomous_coder/START_HERE.py
@@ -85,15 +100,25 @@ files:
   - autonomous_coder/core/__init__.py
   - autonomous_coder/core/base.py
   - autonomous_coder/core/config.py
+  - autonomous_coder/intelligent_autonomous.py
   - autonomous_coder/main.py
+  - autonomous_coder/main_intelligent.py
   - autonomous_coder/mcp_research_autonomous.py
   - autonomous_coder/mcp_workspace/package.json
   - autonomous_coder/modules/__init__.py
+  - autonomous_coder/modules/continuous_learning_system.py
+  - autonomous_coder/modules/dynamic_agent_selector.py
   - autonomous_coder/modules/generator.py
+  - autonomous_coder/modules/intelligent_orchestrator.py
+  - autonomous_coder/modules/llm_orchestrator.py
+  - autonomous_coder/modules/llm_request_analyzer.py
   - autonomous_coder/modules/mcp_enhanced_research_engine.py
   - autonomous_coder/modules/mcp_research_engine.py
+  - autonomous_coder/modules/multi_agent_framework.py
   - autonomous_coder/modules/orchestrator.py
+  - autonomous_coder/modules/parallel_executor.py
   - autonomous_coder/modules/research_engine.py
+  - autonomous_coder/modules/sdlc_orchestrator.py
   - autonomous_coder/requirements.txt
   - autonomous_coder/research_enabled_autonomous.py
   - autonomous_coder/research_module.py
@@ -160,7 +185,11 @@ files:
   - docs/analysis/2025-01-15_autonomous_agent_v3_final.md
   - docs/analysis/2025-01-15_coder_agent_refactoring_plan.md
   - docs/analysis/2025-08-15_autonomous_agent_architecture_improvements.md
+  - docs/analysis/2025-08-15_autonomous_coder_intelligence_assessment.md
+  - docs/analysis/2025-08-15_autonomous_coder_intelligence_opportunities.md
+  - docs/analysis/2025-08-15_llm_driven_autonomous_coder.md
   - docs/analysis/2025-08-15_mcp_research_integration_architecture.md
+  - docs/analysis/2025-08-15_sdlc_lifecycle_design.md
   - docs/analysis/CLAUDE_CODE_MIGRATION_STATUS.md
   - docs/analysis/DESIGN_SPEC_FIXES_SUMMARY.md
   - docs/analysis/DETAILED_MIGRATION_ANALYSIS.md
@@ -203,12 +232,14 @@ files:
   - docs/architecture/MULTI_CRITIC_APPROACH.md
   - docs/architecture/ORCHESTRATION_MODULE_PLAN.md
   - docs/architecture/PARALLEL_SPAWNING_STRATEGY.md
+  - docs/architecture/autonomous_coder_upgrade_architecture.md
   - docs/architecture/consult_agent_optimization_strategy.md
   - docs/architecture/discovery_agent_enhanced_prompt.md
   - docs/architecture/enhanced_agent_capabilities.md
   - docs/architecture/orchestrator_agent_prompt.md
   - docs/architecture/specialized_discovery_agents.md
   - docs/architecture/visualization_agent_activation_prompt.md
+  - docs/archive/2025-08-15_CLAUDE-original.md
   - docs/archive/AGENT_CORE_IMPLEMENTATION_PROPOSAL_V2.md
   - docs/archive/V1_LANGGRAPH_ORCHESTRATION_DESIGN.md
   - docs/archive/V1_PARALLEL_RECURSIVE_ENHANCEMENT.md
@@ -243,6 +274,7 @@ files:
   - docs/guides/mcp_server_test_report.md
   - docs/guides/mcp_server_test_results.md
   - docs/guides/mcp_server_upgrade_report.md
+  - docs/guides/wsl2_memory_management_guide.md
   - docs/libs/COMPLETE_LIBRARY_STRUCTURE.md
   - docs/libs/COMPLIANCE_VERIFICATION.md
   - docs/libs/DEVELOPMENT_ROADMAP.md
@@ -2612,6 +2644,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - requirements.txt
   - ruff.toml
   - scripts/README_auto_attach.md
+  - scripts/WSL-Memory-Manager.ps1
   - scripts/agents/gatekeeper_summarize_projects.py
   - scripts/analysis/analyze_all_custom_projects.py
   - scripts/analysis/analyze_log_reality.py
@@ -2644,6 +2677,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - scripts/proj_intel_wrapper.py
   - scripts/refactor_coder_agent.py
   - scripts/scaffold_libs_codegen.py
+  - scripts/setup_wsl_memory_management.sh
   - scripts/smoke_test.sh
   - scripts/utilities/clean_log.py
   - scripts/utilities/fast_migrate.py
@@ -2655,6 +2689,9 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - scripts/verify_ai_setup.py
   - scripts/wave1_data_extraction.sh
   - scripts/wave1_data_extraction_copy.sh
+  - scripts/wsl-memory-monitor.service
+  - scripts/wsl_memory_monitor.py
+  - scripts/wsl_quick_cleanup.sh
   - src/__init__.py
   - src/adapters/__init__.py
   - src/adapters/playwright_scraper.py

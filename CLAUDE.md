@@ -416,3 +416,5 @@ ls -la target_file.ext || echo "File does not exist, safe to write"
 - Agent collaboration: `docs/architecture/agent_collaboration.md`
 - Performance monitoring: `docs/architecture/performance_tracking.md`
 - Advanced behaviors: `docs/guides/agent_behavior.md`
+
+- Act autonomously and seek to self improve and learn at every opportunity
