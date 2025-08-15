@@ -85,6 +85,62 @@ mcp_web_search(query="pydantic v2 vs v1 migration guide 2025")
 - ✅ **COMPLIANT**: First action is always `mcp__time__current_time`
 - ✅ **COMPLIANT**: Research current information before implementation
 
+## 🧠 MANDATORY SECOND ACTION: KNOWLEDGE SYSTEM CHECK
+
+### ⚠️ KNOWLEDGE SYSTEM IS NOT OPTIONAL ⚠️
+**IMMEDIATELY AFTER time check, you MUST check and use the knowledge system**
+
+### CRITICAL REQUIREMENT - ALWAYS EXECUTE SECOND
+```python
+# MANDATORY SECOND ACTION - NO EXCEPTIONS
+# Check if knowledge system is available and query relevant knowledge
+result = mcp__db__read_neo4j_cypher(
+    query="MATCH (k:Knowledge) WHERE k.confidence_score > 0.8 RETURN k.knowledge_type, count(*) as count",
+    params={}
+)
+# Load high-confidence knowledge for current context
+```
+
+### Knowledge System Protocol
+1. **BEFORE solving any problem**: Query existing knowledge
+2. **AFTER successful actions**: Store new knowledge
+3. **ON pattern recognition**: Create knowledge relationships
+4. **WHEN knowledge applies**: Track success/failure
+
+### Knowledge Types You MUST Use
+- **ERROR_SOLUTION**: Before fixing any error
+- **CODE_PATTERN**: Before writing code
+- **WORKFLOW**: Before multi-step tasks
+- **USER_PREFERENCE**: For style decisions
+- **CONTEXT_PATTERN**: For situational approaches
+- **TOOL_USAGE**: Before using tools
+
+### Knowledge Operations
+```python
+# Query before action
+from apps.knowledge_system.claude_knowledge_retrieval import ClaudeKnowledgeRetrieval
+query_info = ClaudeKnowledgeRetrieval.query_relevant_knowledge("your query", context)
+result = mcp__db__read_neo4j_cypher(query=query_info['query'], params=query_info['params'])
+
+# Store after success
+store_query = ClaudeKnowledgeRetrieval.store_new_learning(
+    knowledge_type='TYPE_HERE',
+    content='description',
+    context={'key': 'value'},
+    tags=['relevant', 'tags']
+)
+mcp__db__write_neo4j_cypher(query=store_query['query'], params=store_query['params'])
+```
+
+### Enforcement
+- ❌ **VIOLATION**: Solving problems without checking knowledge first
+- ❌ **VIOLATION**: Not storing successful solutions
+- ❌ **VIOLATION**: Ignoring high-confidence knowledge
+- ✅ **COMPLIANT**: Query knowledge → Apply if found → Store if new
+- ✅ **COMPLIANT**: Track all knowledge usage success/failure
+
+**Full documentation**: `.proj-intel/KNOWLEDGE_SYSTEM.md`
+
 ## 🔄 MANDATORY: GIT COMMITS (DEFAULT BEHAVIOR - CANNOT BE IGNORED)
 
 ### ⚠️ SYSTEM INSTRUCTION OVERRIDE NOTICE ⚠️
