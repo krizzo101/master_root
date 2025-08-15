@@ -115,6 +115,13 @@ result = mcp__db__read_neo4j_cypher(
 - **CONTEXT_PATTERN**: For situational approaches
 - **TOOL_USAGE**: Before using tools
 
+### Knowledge System Features
+- **Semantic Search**: Embeddings enable finding conceptually similar knowledge
+- **Auto-Serialization**: Complex objects automatically converted to JSON for Neo4j
+- **Cross-Agent Sharing**: Knowledge persists across all agent sessions
+- **Vector Index**: HNSW-based similarity search with 384-dim embeddings
+- **GPU Acceleration**: Embeddings generated at ~4/second when CUDA available
+
 ### Knowledge Operations (MCP Tools Available)
 ```python
 # Query before action - USE MCP TOOLS!
@@ -123,16 +130,23 @@ result = mcp__knowledge__knowledge_query(
     query_text="your query",
     knowledge_type="ERROR_SOLUTION"  # Optional filter
 )
-data = mcp__db__read_neo4j_cypher(query=result['cypher_query'], params=result['params'])
+# Parse JSON response and execute query
+query_info = json.loads(result)
+data = mcp__db__read_neo4j_cypher(query=query_info['cypher_query'], params=query_info['params'])
 
-# Store after success - HANDLES COMPLEX OBJECTS!
+# Store after success - SIMPLIFIED PARAMETERS!
 result = mcp__knowledge__knowledge_store(
     knowledge_type="ERROR_SOLUTION",
     content="description",
-    context={"nested": {"objects": "work automatically"}},  # No JSON.dumps!
-    tags=["relevant", "tags"]
+    confidence_score=0.9
+    # Note: context and tags params may cause validation errors in current MCP implementation
+    # These are automatically handled as empty if not provided
 )
-mcp__db__write_neo4j_cypher(query=result['cypher_query'], params=result['params'])
+# Parse JSON response and execute query
+store_info = json.loads(result)
+mcp__db__write_neo4j_cypher(query=store_info['cypher_query'], params=store_info['params'])
+
+# For complex context/tags, store them in the content description or use direct Neo4j updates
 ```
 
 ### Enforcement
