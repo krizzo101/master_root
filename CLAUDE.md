@@ -1,5 +1,27 @@
 # PROJECT DIRECTIVES
 
+## TASK INITIALIZATION (RUN IMMEDIATELY ON ANY REQUEST)
+
+### FIRST ACTION - INTELLIGENCE CHECK
+```bash
+# BEFORE DOING ANYTHING ELSE, RUN THIS:
+ls -la .proj-intel/ 2>/dev/null && echo "Intelligence available" || echo "No intelligence"
+
+# If available, immediately check relevant indices:
+# For agent work:
+jq -r 'select(.path | contains("agent")) | .path' .proj-intel/file_elements.min.jsonl | head -20
+
+# For finding specific code:
+jq -r 'keys[]' .proj-intel/symbol_index.json | grep -i "agent" | head -20
+```
+
+### TASK STARTUP CHECKLIST
+1. ✓ Check .proj-intel/ exists
+2. ✓ Load relevant indices for the task
+3. ✓ Use TodoWrite for complex multi-step tasks
+4. ✓ Plan batch sizes based on file complexity
+5. ✓ Use MultiEdit for coordinated changes
+
 ## OUTPUT MANAGEMENT & TOKEN LIMITS (CRITICAL - PREVENTS SESSION CORRUPTION)
 
 ### CHUNKED OUTPUT STRATEGY (MANDATORY)
@@ -230,21 +252,58 @@ master_root/
 - **Documentation**: Use technical-writer for clear documentation
 - **Complex Problems**: Use excellence-optimizer for cutting-edge solutions
 
+## STARTUP INTELLIGENCE CHECK (EXECUTE ON EVERY NEW TASK)
+
+### IMMEDIATE STARTUP SEQUENCE
+```python
+# AUTOMATICALLY RUN AT TASK START (no user prompt needed):
+1. Check if .proj-intel/ exists
+2. If yes, load key indices into memory:
+   - symbol_index.json (for finding code)
+   - file_elements.min.jsonl (for file stats)
+   - agent_architecture.jsonl (for patterns)
+3. Use this for ALL subsequent operations
+```
+
+### HOW TO USE PROJECT INTELLIGENCE
+
+**Finding code/files:**
+```python
+# WRONG - Don't search blindly
+grep -r "class AgentName" .
+
+# CORRECT - Check intelligence first
+# 1. Check symbol_index.json for exact location
+jq '.["AgentName"]' .proj-intel/symbol_index.json
+# 2. Then go directly to the file
+```
+
+**Understanding project structure:**
+```python
+# WRONG - Don't read files randomly
+find . -name "*.py" | xargs cat
+
+# CORRECT - Use file stats first
+# 1. Check file metrics
+jq 'select(.path | contains("agent"))' .proj-intel/file_elements.min.jsonl
+# 2. Read only relevant files based on stats
+```
+
+**Finding similar patterns:**
+```python
+# Before writing new agent code:
+grep "class.*Agent" .proj-intel/agent_architecture.jsonl
+# Use found patterns as templates
+```
+
 ## MANDATORY INTELLIGENCE-FIRST PATTERNS (ENFORCED)
 
 ### NON-NEGOTIABLE ENFORCEMENT RULES
-- **BEFORE ANY FILE READ**: MUST check `symbol_index.json` first - NO EXCEPTIONS
-- **BEFORE ANY SEARCH**: MUST query `reverse_index.json` first - NO EXCEPTIONS
-- **BEFORE ANY EDIT**: MUST find similar patterns in `agent_architecture.jsonl`
-- **AUTOMATIC FALLBACK**: If manual search attempted, auto-redirect to intelligence
+- **BEFORE ANY FILE READ**: MUST check indices for file location/stats
+- **BEFORE ANY SEARCH**: MUST check if answer exists in indices
+- **BEFORE ANY EDIT**: MUST find similar patterns for consistency
+- **AUTOMATIC FALLBACK**: If manual search attempted, check intelligence first
 - **VIOLATION = FAILURE**: Any bypass of intelligence is considered task failure
-
-### Intelligence Access Order (MANDATORY)
-1. **ALWAYS START**: Check `.proj-intel/file_elements.min.jsonl` for file stats
-2. **THEN**: Use `symbol_index.json` for exact symbol locations
-3. **THEN**: Query `reverse_index.json` for relationships
-4. **ONLY THEN**: Proceed with actual file operations
-5. **NEVER**: Use grep/find without checking indices first
 
 ## PROJECT INTELLIGENCE SYSTEM - DYNAMIC USAGE
 
