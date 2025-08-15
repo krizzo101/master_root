@@ -50,13 +50,13 @@ mcp_web_search(query="pydantic v2 vs v1 migration guide 2025")
 
 #### Available MCP Tools for Knowledge Updates
 
-| Tool | Purpose | When to Use | Example Queries |
-|------|---------|-------------|-----------------|
-| **`mcp_web_search`** | Brave Search API | Current versions, breaking changes, new features | "Python 3.12 new features", "Docker latest security best practices 2025" |
-| **`tech_docs`** | Context7 docs | Library documentation, API references | "/fastapi/fastapi", "/openai/openai-python" |
-| **`research_papers`** | ArXiv papers | Latest research, methodologies, algorithms | "transformer architecture improvements", "microservices patterns" |
-| **`firecrawl`** | Web scraping | Official docs, changelogs, GitHub releases | "https://docs.python.org/3/whatsnew/", "https://github.com/openai/openai-python/releases" |
-| **`consult_suite_enhanced`** | Expert AI agents | Complex architecture decisions, code reviews | Complex system design, production-ready implementations |
+| Tool                         | Purpose          | When to Use                                      | Example Queries                                                                           |
+| ---------------------------- | ---------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| **`mcp_web_search`**         | Brave Search API | Current versions, breaking changes, new features | "Python 3.12 new features", "Docker latest security best practices 2025"                  |
+| **`tech_docs`**              | Context7 docs    | Library documentation, API references            | "/fastapi/fastapi", "/openai/openai-python"                                               |
+| **`research_papers`**        | ArXiv papers     | Latest research, methodologies, algorithms       | "transformer architecture improvements", "microservices patterns"                         |
+| **`firecrawl`**              | Web scraping     | Official docs, changelogs, GitHub releases       | "https://docs.python.org/3/whatsnew/", "https://github.com/openai/openai-python/releases" |
+| **`consult_suite_enhanced`** | Expert AI agents | Complex architecture decisions, code reviews     | Complex system design, production-ready implementations                                   |
 
 #### MANDATORY Research Protocol
 **BEFORE making technical decisions, you MUST:**
@@ -94,10 +94,55 @@ git diff --cached --quiet --ignore-submodules -- || git commit --no-verify -m "c
 git status | cat
 ```
 
+### COMMIT FREQUENCY REQUIREMENTS
+- **MINIMUM**: Commit after every 2-3 file changes
+- **MAXIMUM**: Never let more than 10 file changes go uncommitted
+- **EMERGENCY**: If approaching token limits or session issues, commit immediately
+
+### ENHANCED GIT COMMIT PROTOCOL
+```bash
+# MANDATORY COMMIT SEQUENCE - EXECUTE AFTER EVERY LOGICAL UNIT OF WORK
+git add -A
+git diff --cached --quiet --ignore-submodules -- || git commit --no-verify -m "chore: autosave commit of all changes ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+pwd
+ls -a
+git status | cat
+git branch --show-current
+git log --oneline -5 | cat
+```
+
+### COMMIT FAILURE PROTOCOLS
+- **If commit fails**: Investigate immediately, don't continue without committing
+- **If hooks block**: Use `--no-verify` flag to bypass non-critical hooks
+- **If merge conflicts**: Resolve immediately, don't leave conflicts uncommitted
+
 ### ENFORCEMENT RULES
 - ❌ **VIOLATION**: Making changes without committing
 - ❌ **VIOLATION**: Switching tasks with uncommitted work
+- ❌ **VIOLATION**: More than 3 files modified without commit
 - ✅ **COMPLIANT**: Committing after every logical unit of work
+- ✅ **COMPLIANT**: Using enhanced git status monitoring
+
+## 📋 TASK MANAGEMENT (MANDATORY)
+
+### TodoWrite Tool Usage (REQUIRED)
+**Use TodoWrite tool for ALL non-trivial tasks:**
+- **ALWAYS create todos** for complex multi-step tasks (3+ steps)
+- **TRACK PROGRESS** by updating task status (pending → in_progress → completed)
+- **MARK COMPLETED IMMEDIATELY** after finishing each task
+- **ONLY ONE IN_PROGRESS** at a time to maintain focus
+- **BREAK DOWN COMPLEX TASKS** into smaller, manageable steps
+
+### When to Use TodoWrite
+- Complex multi-step tasks requiring planning
+- User provides multiple tasks or requirements
+- Non-trivial tasks that need careful tracking
+- When switching between different aspects of work
+
+### Task States
+- **pending**: Task not yet started
+- **in_progress**: Currently working on (limit to ONE task at a time)
+- **completed**: Task finished successfully
 
 ## 📊 PROJECT INTELLIGENCE (USE BY DEFAULT)
 
@@ -184,6 +229,58 @@ For searching:
 Last resort: Find with full scan
 ```
 
+## 🧪 AUTOMATIC TEST VALIDATION (ZERO-ASK PROTOCOL)
+
+### TEST EXECUTION REQUIREMENTS
+- **AUTO-DISCOVER TESTS**: Find relevant tests for changed code WITHOUT ASKING
+- **RUN WITHOUT ASKING**: Execute tests immediately after changes
+- **FAIL-FAST**: Stop execution if tests fail, auto-rollback changes
+- **TEST COMMAND CACHE**: Store discovered test commands in `.proj-intel/test_commands.json`
+
+### Test Discovery Pattern
+1. **ON CODE CHANGE**: Automatically identify affected test files
+2. **CHECK CACHE**: Look for known test commands in cache
+3. **DISCOVER IF NEW**: Search for pytest, unittest, or project-specific test runners
+4. **RUN IMMEDIATELY**: Execute without user confirmation
+5. **CACHE RESULTS**: Store successful test commands for future use
+
+### Test Generation Rules
+- **New functions**: Auto-generate basic test with edge cases
+- **Modified functions**: Update existing tests or flag for review
+- **Coverage target**: Maintain or improve coverage percentage
+
+## 🔧 ERROR PATTERN LEARNING SYSTEM
+
+### AUTOMATIC ERROR RECOVERY
+- **CREATE `.proj-intel/error_patterns.json`**: Cache all errors and solutions
+- **CHECK BEFORE FIXING**: Query error cache before attempting new solutions
+- **PATTERN RECOGNITION**: Identify recurring error types
+- **PREEMPTIVE FIXES**: Apply known solutions before errors occur
+
+### Error Pattern Structure
+```json
+{
+  "error_signature": "hash_of_error",
+  "error_type": "ImportError|SyntaxError|RuntimeError|etc",
+  "solutions": [
+    {
+      "fix": "description_of_fix",
+      "success_rate": 0.95,
+      "code_snippet": "actual_fix_code"
+    }
+  ],
+  "first_seen": "timestamp",
+  "occurrences": 10
+}
+```
+
+### Error Recovery Flow
+1. **DETECT ERROR**: Capture error message and context
+2. **CHECK CACHE**: Search `.proj-intel/error_patterns.json` for matches
+3. **APPLY KNOWN FIX**: Use highest success rate solution
+4. **IF NEW ERROR**: Solve, then cache solution
+5. **UPDATE METRICS**: Track success/failure of solutions
+
 ## 📋 OUTPUT MANAGEMENT & TOKEN LIMITS
 
 ### CHUNKED OUTPUT STRATEGY (MANDATORY)
@@ -192,6 +289,14 @@ Last resort: Find with full scan
 - **MEDIUM files (100-300 lines)**: Process 5-8 files per batch
 - **LARGE files (300-1000 lines)**: Process 2-4 files per batch
 - **VERY LARGE files (1000+ lines)**: Process 1-2 files maximum
+
+### PROGRESSIVE CONTEXT LOADING (TOKEN OPTIMIZATION)
+**TOKEN BUDGET PROTOCOL:**
+- **START MINIMAL**: Use `file_elements.min.jsonl` for stats only (5-10 tokens)
+- **LOAD INCREMENTALLY**: Read specific line ranges via offset/limit parameters
+- **CONTEXT BUDGET**: Track token usage, auto-summarize at 50% capacity
+- **SMART TRUNCATION**: Keep first 10 lines of errors, not full stacks
+- **Per file**: Max 500 tokens initially, expand to 2000 if needed
 
 ### TOKEN LIMIT AWARENESS
 - **Maximum output**: 32,000 tokens (~24,000 words)
@@ -239,12 +344,17 @@ master_root/
 # Time check (FIRST ACTION)
 mcp__time__current_time(format="YYYY-MM-DD HH:mm:ss")
 
+# Task management (FOR COMPLEX TASKS)
+TodoWrite(todos=[{"content": "task description", "status": "pending", "id": "unique_id"}])
+
 # Research current information (BEFORE TECHNICAL DECISIONS)
 mcp_web_search(query="technology latest version 2025")
 mcp_tech_docs(context7CompatibleLibraryID="/library/name")
 
-# Commit workflow (AFTER EVERY CHANGE)
-git add -A && git commit --no-verify -m "chore: autosave ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+# Enhanced commit workflow (AFTER EVERY CHANGE)
+git add -A
+git diff --cached --quiet --ignore-submodules -- || git commit --no-verify -m "chore: autosave commit of all changes ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+pwd && ls -a && git status | cat && git branch --show-current
 
 # Intelligence refresh (BEFORE MAJOR TASKS)
 project-intelligence full-package
@@ -255,11 +365,14 @@ ls -la target_file.ext || echo "File does not exist, safe to write"
 
 ### Tool Priority
 1. **Time Check** → MANDATORY first action every session
-2. **Research Tools** → MANDATORY before technical decisions (web_search, tech_docs, firecrawl)
-3. **Project Intelligence** → Fast, indexed, accurate for existing codebase
-4. **MultiEdit** → Efficient for multiple changes
-5. **Parallel Operations** → Always when possible
-6. **Batch Processing** → Default behavior for all work
+2. **TodoWrite** → MANDATORY for complex multi-step tasks
+3. **Research Tools** → MANDATORY before technical decisions (web_search, tech_docs, firecrawl)
+4. **Project Intelligence** → Fast, indexed, accurate for existing codebase
+5. **Auto Test Execution** → MANDATORY after code changes
+6. **Error Pattern Cache** → Check before fixing, update after solving
+7. **MultiEdit** → Efficient for multiple changes
+8. **Parallel Operations** → Always when possible
+9. **Enhanced Git Status** → Full monitoring with every commit
 
 ---
 
