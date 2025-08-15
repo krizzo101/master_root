@@ -49,6 +49,35 @@ else:
     store_new_knowledge(solution)
 ```
 
+## 🛠️ SIMPLIFIED TOOLS (USE THESE TO AVOID ERRORS)
+
+### CRITICAL: Use mcp_knowledge_tools.py for All Operations
+**Neo4j has strict type requirements that frequently cause errors. Use these simplified tools:**
+
+```python
+from apps.knowledge_system.mcp_knowledge_tools import store_knowledge, query_knowledge, update_knowledge
+
+# ✅ CORRECT - Using simplified tools (handles JSON serialization automatically)
+result = store_knowledge(
+    knowledge_type="ERROR_SOLUTION",
+    content="Your solution here",
+    context={"any": "complex", "nested": {"objects": "work"}},  # No JSON.dumps needed!
+    tags=["your", "tags"]
+)
+mcp__db__write_neo4j_cypher(query=result['query'], params=result['params'])
+
+# ❌ WRONG - Direct Cypher with complex objects (will fail)
+# mcp__db__write_neo4j_cypher(
+#     query="CREATE (k:Knowledge {context: $context})",
+#     params={"context": {"nested": "object"}}  # This will ERROR!
+# )
+```
+
+### Common Neo4j Error and Solution:
+- **Error**: `Property values can only be of primitive types or arrays thereof`
+- **Cause**: Trying to store nested objects/arrays directly
+- **Solution**: Use `mcp_knowledge_tools.py` which handles serialization automatically
+
 ## 📝 WHEN TO STORE KNOWLEDGE (MANDATORY)
 
 ### ALWAYS store knowledge AFTER:
