@@ -1,0 +1,276 @@
+# Autonomous Claude Agent .gitignore
+# Generated: 2025-08-15
+# Version: 1.0.0
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv/
+.ENV/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.fleet/
+.cursor/
+
+# Testing
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+htmlcov/
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Documentation
+docs/_build/
+site/
+.mkdocs/
+
+# Environment and Config
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+config/local.yaml
+config/production.yaml
+secrets.yaml
+credentials.json
+
+# Application Data
+data/
+logs/
+*.log
+checkpoints/
+cache/
+temp/
+tmp/
+exports/
+imports/
+backups/
+*.db
+*.sqlite
+*.sqlite3
+
+# Model and ML
+models/
+*.pkl
+*.joblib
+*.h5
+*.pt
+*.pth
+*.onnx
+embeddings/
+vectors/
+
+# Security
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+certificates/
+ssl/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+docker-compose.*.yml
+!docker-compose.yml
+
+# Kubernetes
+*.kubeconfig
+kubeconfig
+helm/values.*.yaml
+!helm/values.yaml
+
+# OS
+Thumbs.db
+.DS_Store
+.directory
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Editor
+*.sublime-project
+*.sublime-workspace
+.vscode/
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+
+# Node (if using any JS tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.pnpm-debug.log*
+
+# Monitoring
+prometheus_data/
+grafana_data/
+metrics/
+traces/
+
+# Backup
+*.bak
+*.backup
+*.old
+*.orig
+*.tmp
+~*
+
+# Archives
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# System
+.directory
+.Trash-*
+.nfs*
+
+# Project Specific
+/autonomous_claude_agent.egg-info/
+/results/
+/output/
+/experiments/
+/.hypothesis/
+/benchmarks/
+*.session
+*.checkpoint
+*.ckpt
+*.safetensors
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+!examples/*.ipynb
+
+# Redis
+dump.rdb
+appendonly.aof
+
+# ChromaDB
+chroma/
+.chroma/
+
+# Agent specific
+agent_state.json
+agent_memory.db
+task_queue.json
+execution_logs.jsonl
+error_patterns.json
+performance_metrics.json
+
+# Development
+scratch/
+playground/
+sandbox/
+experiments/
+poc/
+
+# CI/CD
+.gitlab-ci-local/
+.github/workflows/local/
+.circleci/local/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Secrets scanning
+.gitleaks.toml
+.secrets.baseline
+
+# Large files
+*.csv
+!test/*.csv
+*.parquet
+*.feather
+*.hdf5
+*.zarr
+
+# Temporary patterns
+*_temp/
+*_tmp/
+.tmp/
+.temp/
+
+# Lock files (keep for reproducibility)
+!poetry.lock
+!Pipfile.lock
+!requirements.txt
+!requirements-*.txt
+
+# Keep important examples
+!examples/
+!templates/
+!prompts/
+!scripts/
+
+# Keep configuration templates
+!config/*.example
+!config/*.template
+
+# Keep test fixtures
+!tests/fixtures/
+
+# Keep documentation
+!docs/
+!README.md
+!LICENSE
+!CONTRIBUTING.md
+!CHANGELOG.md
