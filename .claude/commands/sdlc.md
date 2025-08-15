@@ -1,5 +1,19 @@
 # SDLC Project Initialization
 
+This command initiates a new project following strict SDLC phases and monorepo standards.
+
+## Usage
+```
+/sdlc <project description>
+```
+
+## What This Command Does
+1. **Initializes SDLC tracking** for your project
+2. **Enforces phase progression** (can't skip ahead)
+3. **Creates project structure** in the correct location
+4. **Tracks deliverables** for each phase
+5. **Ensures standards compliance** throughout
+
 You are about to start a new project. Follow these mandatory requirements:
 
 ## 📚 Required Reading
@@ -26,7 +40,23 @@ Before writing ANY code:
    ```
 
 ## 📋 SDLC Phases (MANDATORY)
-You MUST follow these phases in order and produce concrete deliverables:
+You MUST follow these phases in order and produce concrete deliverables.
+
+### Phase Tracking with SDLC Enforcer
+```python
+# Initialize enforcer and create project at start
+from libs.opsvi_mcp.tools.sdlc_enforcer_scoped import ScopedSDLCEnforcer
+enforcer = ScopedSDLCEnforcer()
+project = enforcer.create_project(
+    project_name="[project-name]",
+    description="[project description]",
+    root_path="apps/[project-name]"
+)
+
+# Progress through phases
+enforcer.advance_phase(project.project_id)  # After completing each phase
+enforcer.get_project_status(project.project_id)  # Check current status
+```
 
 ### 1️⃣ DISCOVERY (Research & Requirements)
 - Research current technology (2025 best practices)
@@ -114,6 +144,19 @@ apps/<app-name>/
 ```
 
 ## 🛠️ Available Tools
+
+### SDLC Enforcement
+- `/libs/opsvi_mcp/tools/sdlc_enforcer_scoped.py` - Enforces SDLC phases
+  ```python
+  from libs.opsvi_mcp.tools.sdlc_enforcer_scoped import ScopedSDLCEnforcer
+  enforcer = ScopedSDLCEnforcer()
+  # Create project with SDLC tracking
+  project = enforcer.create_project(
+      project_name="your-project",
+      description="Project description",
+      root_path="apps/your-project"
+  )
+  ```
 
 ### Project Scaffolding
 - `project_initializer.py` - Creates standardized project structures
