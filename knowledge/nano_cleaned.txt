@@ -1,0 +1,1120 @@
+2025-08-08 04:41:12.000 [info] Successfully called tool 'consult'
+2025-08-08 04:51:50.900 [info] Handling CallTool action for tool 'consult'
+2025-08-08 04:51:50.901 [info] Calling tool 'consult' with toolCallId: tool_975b59b6-09e2-4371-a9a4-22ddbe1ae20
+2025-08-08 04:51:50.903 [error] 2025-08-08 04:51:50,903 [INFO] mcp.server.lowlevel.server: Processing request of type CallToolRequest
+
+2025-08-08 04:51:50.907 [error] 2025-08-08 04:51:50,907 [INFO] accf.shared.mcp.mcp_server_template: Tool call requested: consult with arguments: {'prompt': 'Design and implement a distributed task scheduling system with the following requirements:\n\n1. A master node that coordinates task distribution across multiple worker nodes\n2. Worker nodes that can execute tasks and report back results\n3. Fault tolerance - if a worker fails, tasks should be redistributed\n4. Load balancing - distribute tasks evenly across available workers\n5. Task prioritization - high priority tasks should be executed first\n6. Real-time monitoring - track task progress and worker health\n7. REST API for submitting tasks and checking status\n8. Database persistence for task history and worker registration\n9. Authentication and authorization for API access\n10. Comprehensive logging and metrics collection\n\nThe system should be production-ready with proper error handling, security, and scalability considerations.', 'session_id': 'test_session_007', 'artifact_type': 'code', 'iterate': 3, 'critic_enabled': True, 'model': 'gpt-5-nano', 'auto_attach_project_intelligence': False, 'response_format': 'json'}
+2025-08-08 04:51:50.908 [error] 2025-08-08 04:51:50,907 [INFO] __main__: All parameters explicitly provided by user
+2025-08-08 04:51:50.908 [error] 2025-08-08 04:51:50,908 [INFO] ConsultAgent: Started new session: test_session_007
+2025-08-08 04:51:50,908 [INFO] ConsultAgent: Using user-specified model: gpt-5-nano
+2025-08-08 04:51:50,908 [INFO] ConsultAgent: === CRITIC INITIALIZATION START ===
+2025-08-08 04:51:50.908 [error] 2025-08-08 04:51:50,908 [DEBUG] ConsultAgent: Current working directory: /home/opsvi/master_root
+2025-08-08 04:51:50.908 [error] 2025-08-08 04:51:50,908 [DEBUG] ConsultAgent: Python path: ['/home/opsvi/master_root', '/home/opsvi/ACCF/src', '/home/opsvi/miniconda/lib/python312.zip', '/home/opsvi/miniconda/lib/python3.12', '/home/opsvi/miniconda/lib/python3.12/lib-dynload', '/home/opsvi/.local/lib/python3.12/site-packages', '/home/opsvi/miniconda/lib/python3.12/site-packages', '/home/opsvi/agent_world/src', '/home/opsvi/asea/asea_orchestrator/src', '/home/opsvi/genFileMap/src', '/home/opsvi/master_root/apps/proj-mapper/src', '/home/opsvi/master/projects/nested-workflow-architecture/mcp-servers/mcp-atlassian/src', '/home/opsvi/project-intelligence/src']
+2025-08-08 04:51:50,908 [DEBUG] ConsultAgent: Current file location: /home/opsvi/ACCF/src/accf/agents/consult_agent_comprehensive.py
+2025-08-08 04:51:50.932 [error] 2025-08-08 04:51:50,932 [INFO] Critic: === CRITIC AGENT INITIALIZED WITH DEBUG LOGGING ===
+2025-08-08 04:51:50,932 [INFO] Critic: CriticAgent initialized with model: o3
+2025-08-08 04:51:50.932 [error] 2025-08-08 04:51:50,932 [INFO] ConsultAgent: Critic agent enabled for quality control (relative import)
+2025-08-08 04:51:50,932 [INFO] ConsultAgent: === CRITIC INITIALIZATION END - Agent exists: True ===
+2025-08-08 04:51:50.976 [error] 2025-08-08 04:51:50,976 [INFO] ConsultAgent: Starting iteration 1/3
+2025-08-08 04:51:50,976 [DEBUG] ConsultAgent: === API CALL START ===
+2025-08-08 04:51:50.976 [error] 2025-08-08 04:51:50,976 [DEBUG] ConsultAgent: Model: gpt-5-nano
+2025-08-08 04:51:50,976 [DEBUG] ConsultAgent: Prompt length: 4601 characters
+2025-08-08 04:51:50,976 [DEBUG] ConsultAgent: Context:
+2025-08-08 04:51:50,976 [DEBUG] ConsultAgent: Timestamp: 1754643110.9764569
+2025-08-08 04:51:50,976 [INFO] ConsultAgent: === FULL PROMPT BEING SENT TO MODEL ===
+2025-08-08 04:51:50,976 [INFO] ConsultAgent: Prompt length: 4601 characters
+2025-08-08 04:51:50,976 [INFO] ConsultAgent: Context: Model: gpt-5-nano, Artifact Type: code
+2025-08-08 04:51:50,976 [INFO] ConsultAgent: --- PROMPT CONTENT START ---
+2025-08-08 04:51:50,976 [INFO] ConsultAgent: You are a specialized professional with the role profile and expertise described below. Your mission is to generate the actual code artifact requested by the user.
+## ARTIFACT TYPE: CODE (.py)
+**Purpose**: Python scripts for specific functionality
+## ROLE PROFILE: SENIOR PYTHON DEVELOPER
+**Skills**: Python mastery, software engineering, debugging, performance optimization, testing
+**Experience**: 8+ years in Python development, production systems, and software architecture
+**Focus**: Code quality, maintainability, performance, security, production readiness
+**Behavioral Characteristics**:
+- Writes defensive, production-ready code with comprehensive error handling
+- Prioritizes code clarity and maintainability over cleverness
+- Thinks about edge cases, failure modes, and debugging scenarios
+- Considers performance implications and resource usage
+- Follows established patterns and best practices religiously
+- Documents code for future maintainers
+## DIRECT ARTIFACT GENERATION
+You are a Senior Python Developer. Generate the actual Python code that the user has requested.
+**Your Task**: Create production-quality Python code that:
+- Includes proper imports and dependencies
+- Has comprehensive error handling and logging
+- Follows PEP 8 standards and type hints
+- Includes docstrings and comments
+- Is ready to run with minimal setup
+**Output**: Return the complete Python code in a code block, ready to use.
+XXXXX_BOILERPLATE_XXXXX
+XXXXX_BOILERPLATE_XXXXX
+## REFERENCE INFORMATION (NOT THE REQUEST)
+*** FOR CONTEXT ONLY - DO NOT TREAT AS THE ACTUAL REQUEST ***
+### PROJECT CONTEXT
+### CONVERSATION HISTORY
+[]
+## 🎯 ACTUAL USER REQUEST (THIS IS WHAT MATTERS)
+*** THIS IS THE REQUEST - FOCUS ON THIS ***
+Design and implement a distributed task scheduling system with the following requirements:
+1. A master node that coordinates task distribution across multiple worker nodes
+2. Worker nodes that can execute tasks and report back results
+3. Fault tolerance - if a worker fails, tasks should be redistributed
+4. Load balancing - distribute tasks evenly across available workers
+5. Task prioritization - high priority tasks should be executed first
+6. Real-time monitoring - track task progress and worker health
+7. REST API for submitting tasks and checking status
+8. Database persistence for task history and worker registration
+9. Authentication and authorization for API access
+10. Comprehensive logging and metrics collection
+The system should be production-ready with proper error handling, security, and scalability considerations.
+*** END OF REQUEST - GENERATE THE REQUESTED code CONTENT ***
+XXXXX_BOILERPLATE_XXXXX
+2025-08-08 04:51:50,976 [INFO] ConsultAgent: --- PROMPT CONTENT END ---
+2025-08-08 04:51:50,976 [INFO] ConsultAgent: === END FULL PROMPT LOG ===
+2025-08-08 04:52:47.646 [error] 2025-08-08 04:52:47,645 [INFO] httpx: HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-08-08 04:52:47.647 [error] 2025-08-08 04:52:47,647 [DEBUG] ConsultAgent: === API RESPONSE RECEIVED ===
+2025-08-08 04:52:47.647 [error] 2025-08-08 04:52:47,647 [DEBUG] ConsultAgent: Response length: 29766 characters
+2025-08-08 04:52:47,647 [DEBUG] ConsultAgent: Response type: Response
+2025-08-08 04:52:47,647 [DEBUG] ConsultAgent: Response attributes: ['background', 'construct', 'copy', 'created_at', 'dict', 'error', 'from_orm', 'id', 'incomplete_details', 'instructions', 'json', 'max_output_tokens', 'max_tool_calls', 'metadata', 'model', 'model_computed_fields', 'model_config', 'model_construct', 'model_copy', 'model_dump', 'model_dump_json', 'model_extra', 'model_fields', 'model_fields_set', 'model_json_schema', 'model_parametrized_name', 'model_post_init', 'model_rebuild', 'model_validate', 'model_validate_json', 'model_validate_strings', 'object', 'output', 'output_text', 'parallel_tool_calls', 'parse_file', 'parse_obj', 'parse_raw', 'previous_response_id', 'prompt', 'prompt_cache_key', 'reasoning', 'safety_identifier', 'schema', 'schema_json', 'service_tier', 'status', 'temperature', 'text', 'to_dict', 'to_json', 'tool_choice', 'tools', 'top_logprobs', 'top_p', 'truncation', 'update_forward_refs', 'usage', 'user', 'validate']
+2025-08-08 04:52:47,647 [DEBUG] ConsultAgent: Has error: None
+2025-08-08 04:52:47.647 [error] 2025-08-08 04:52:47,647 [DEBUG] ConsultAgent: Usage: ResponseUsage(input_tokens=957, input_tokens_details=InputTokensDetails(cached_tokens=0), output_tokens=13221, output_tokens_details=OutputTokensDetails(reasoning_tokens=6784), total_tokens=14178)
+2025-08-08 04:52:47,647 [DEBUG] ConsultAgent: Output type: <class 'list'>
+2025-08-08 04:52:47,647 [DEBUG] ConsultAgent: Output length: 2
+2025-08-08 04:52:47,647 [DEBUG] ConsultAgent: Timestamp: 1754643167.6478508
+2025-08-08 04:52:47.656 [error] 2025-08-08 04:52:47,656 [INFO] ConsultAgent: === TOKEN USAGE ===
+2025-08-08 04:52:47.656 [error] 2025-08-08 04:52:47,656 [INFO] ConsultAgent: Model: gpt-5-nano
+2025-08-08 04:52:47,656 [INFO] ConsultAgent: Prompt tokens: 940
+2025-08-08 04:52:47,656 [INFO] ConsultAgent: Response tokens: 6386
+2025-08-08 04:52:47,656 [INFO] ConsultAgent: Total tokens: 7326
+2025-08-08 04:52:47,656 [INFO] ConsultAgent: Token usage tracked: {'prompt_tokens': 940, 'response_tokens': 6386, 'total_tokens': 7326, 'model': 'gpt-5-nano'}
+2025-08-08 04:52:47,656 [DEBUG] ConsultAgent: ConsultAgent iteration 1 output length: 29766 characters
+2025-08-08 04:52:47,656 [DEBUG] ConsultAgent: === CONSULT AGENT RESPONSE CONTENT ===
+2025-08-08 04:52:47,656 [DEBUG] ConsultAgent: FINAL
+Below is a self-contained production-quality Python module that implements a distributed task scheduling system with a master node and worker nodes. It includes:
+- Master node with a REST API (FastAPI) to submit tasks, register workers, receive heartbeats, fetch next tasks, report results, and fetch task/status details.
+- Worker node logic (as a runnable mode) that registers itself, sends heartbeats, pulls tasks, executes a small set of predefined operations, and reports results.
+- Fault tolerance: tasks assigned to offline workers are re-queued; worker offline detection via heartbeat timeout.
+- Load balancing: simple least-running-task heuristic when assigning new tasks.
+- Task prioritization: tasks carry a priority; higher priority tasks are picked first.
+- Real-time monitoring and metrics: basic Prometheus-compatible metrics exposed at /metrics.
+- Database persistence: SQLite via SQLAlchemy (async) for tasks, workers, and API keys (with initial keys).
+- Authentication/authorization: API keys (master and worker roles) stored in DB; endpoints require proper role authorization.
+- Comprehensive logging and error handling.
+- Ready to run with minimal setup; includes a CLI to start in master or worker mode.
+How to run (minimal setup)
+- Install dependencies:
+  - fastapi uvicorn sqlalchemy aiosqlite pydantic httpx prometheus_client
+- Run Master:
+  - python scheduler_system.py --mode master
+  - Use MASTER_TOKEN (in code) to authenticate the master API (the code seeds the DB with MASTER_TOKEN).
+- Run Worker (in separate process):
+  - python scheduler_system.py --mode worker --name "worker-1" --master-url http://127.0.0.1:8000
+  - Use WORKER_TOKEN (in code) to authenticate the worker API.
+Code (single file)
+```python
+#!/usr/bin/env python3
+"""
+Distributed Task Scheduling System (Master + Worker)
+- Master API (FastAPI) with REST endpoints to submit tasks, register workers, heartbeats, fetch next task, report results, and query status.
+- Worker mode that registers, heartbeats, fetches tasks, executes a small set of operations, and reports results.
+- Persistence with SQLite via async SQLAlchemy.
+- Simple API-key based authentication (Master vs Worker roles).
+- Fault tolerance: requeue tasks from offline workers; time-based worker health checks.
+- Basic load balancing and task prioritization.
+- Metrics via Prometheus-compatible /metrics endpoint.
+import asyncio
+import hashlib
+import json
+import logging
+import os
+import signal
+import ssl
+import sqlite3
+import sys
+import time
+import uuid
+from datetime import datetime, timedelta
+from typing import Any, Dict, Optional, List
+import httpx
+from fastapi import Depends, FastAPI, HTTPException, Header, Request, Response, status
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
+# Prometheus metrics
+from prometheus_client import CollectorRegistry, Gauge, Counter, generate_latest, CONTENT_TYPE_LATEST
+# --------- Logging setup -------------
+LOG = logging.getLogger("scheduler")
+LOG.setLevel(logging.INFO)
+handler = logging.StreamHandler(sys.stdout)
+formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s")
+handler.setFormatter(formatter)
+LOG.addHandler(handler)
+# --------- Config & constants ---------
+DB_URL = "sqlite+aiosqlite:///scheduler.db"
+WORKER_HEARTBEAT_SECONDS = 15
+WORKER_TIMEOUT_SECONDS = 60  # if not seen, worker considered offline
+CLEANUP_INTERVAL_SECONDS = 30
+# Task statuses
+STATUS_PENDING = "PENDING"
+STATUS_RUNNING = "RUNNING"
+STATUS_SUCCESS = "SUCCESS"
+STATUS_FAILED = "FAILED"
+# Roles
+ROLE_MASTER = "master"
+ROLE_WORKER = "worker"
+# --------- Database models -------------
+Base = declarative_base()
+class Worker(Base):
+    __tablename__ = "workers"
+    id = Column(String, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    last_seen = Column(DateTime, nullable=False)
+    status = Column(String, default="ONLINE")
+    load = Column(Float, default=0.0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+class Task(Base):
+    __tablename__ = "tasks"
+    id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    type = Column(String, nullable=False)
+    payload = Column(JSON, default={})
+    priority = Column(Integer, default=5)
+    status = Column(String, default=STATUS_PENDING, index=True)
+    assigned_worker_id = Column(String, ForeignKey("workers.id"), nullable=True, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    retries = Column(Integer, default=0)
+    max_retries = Column(Integer, default=3)
+    result = Column(JSON, default=None)
+    error_message = Column(Text, default=None)
+class APIKey(Base):
+    __tablename__ = "api_keys"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    key_hash = Column(String, unique=True, nullable=False)
+    role = Column(String, nullable=False)  # 'master' or 'worker'
+# --------- Pydantic models (API payloads) -------------
+class TaskCreate(BaseModel):
+    type: str
+    payload: Dict[str, Any] = Field(default_factory=dict)
+    priority: int = 5
+    max_retries: int = 3
+class TaskResponse(BaseModel):
+    id: str
+    payload: Dict[str, Any]
+    priority: int
+    status: str
+    assigned_worker_id: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+    retries: int
+    max_retries: int
+    result: Optional[Dict[str, Any]] = None
+    error_message: Optional[str] = None
+class WorkerRegister(BaseModel):
+    name: str
+class Heartbeat(BaseModel):
+    worker_id: str
+    load: float
+class TaskResultSubmission(BaseModel):
+    task_id: str
+    success: bool
+class TaskNextResponse(BaseModel):
+# --------- Utils -------------
+def hash_key(raw: str) -> str:
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+def ensure_parent_dirs():
+    db_path = os.path.abspath("scheduler.db")
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+# --------- DB Engine & Session -------------
+engine = create_async_engine(DB_URL, echo=False, future=True)
+AsyncSessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
+async def get_session() -> AsyncSession:
+    async with AsyncSessionLocal() as session:
+        yield session
+# --------- Prometheus Metrics (registry-based) -------------
+registry = CollectorRegistry()
+tasks_submitted = Counter("tasks_submitted_total", "Total tasks submitted", registry=registry)
+tasks_completed = Counter("tasks_completed_total", "Total tasks completed", registry=registry)
+workers_online = Gauge("workers_online", "Number of online workers", registry=registry)
+task_latency_seconds = Gauge("task_latency_seconds", "Last task latency (seconds)", registry=registry)  # simple per-event metric
+# --------- DB initialization & seed keys -------------
+MASTER_TOKEN = "MASTER_TOKEN_ABC123"  # For demonstration; replace with real secret handling in prod
+WORKER_TOKEN = "WORKER_TOKEN_XYZ789"
+async def seed_keys_if_missing(session: AsyncSession) -> None:
+    """Seed master/worker API keys if not present."""
+    try:
+        from sqlalchemy import select
+        # Check if keys exist
+        result = await session.execute(select(APIKey))
+        keys = result.scalars().all()
+        if not keys:
+            master_hash = hash_key(MASTER_TOKEN)
+            worker_hash = hash_key(WORKER_TOKEN)
+            master_key = APIKey(key_hash=master_hash, name="Master Key", role=ROLE_MASTER)
+            worker_key = APIKey(key_hash=worker_hash, name="Worker Key", role=ROLE_WORKER)
+            session.add_all([master_key, worker_key])
+            await session.commit()
+            LOG.info("Seeded master and worker API keys.")
+    except Exception as e:
+        LOG.exception("Failed to seed API keys: %s", e)
+async def init_db_and_seed():
+    # Create tables
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    # Seed keys
+        await seed_keys_if_missing(session)
+# --------- API Key auth helpers -------------
+async def get api_key_from_header(x_api_key: str | None, session: AsyncSession) -> APIKey:
+    """Lookup API key in DB; returns APIKey object or raises."""
+    if not x_api_key:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing API key")
+    hashed = hash_key(x_api_key)
+    from sqlalchemy import select
+    stmt = select(APIKey).where(APIKey.key_hash == hashed)
+    result = await session.execute(stmt)
+    key = result.scalar_one_or_none()
+    if not key:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid API key")
+    return key
+async def require_role(key: APIKey, required_role: str) -> None:
+    if key.role != required_role:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Requires {required_role} role")
+# Dependency factory to provide access to current API key (with DB session)
+async def api_key_dependency(request: Request) -> APIKey:
+    # Accept header: X-API-KEY
+    x_api = request.headers.get("X-API-KEY")
+    # For simplicity, we reuse a runtime DB session
+        key = await get_api_key_from_header(x_api, session)
+        return key
+# --------- Master API (FastAPI app) -------------
+app = FastAPI(title="Distributed Scheduler Master", version="1.0")
+@app.on_event("startup")
+async def on_startup():
+    await init_db_and_seed()
+# Mount a lightweight health endpoint
+@app.get("/health", summary="Liveness check")
+async def health():
+    return {"status": "UP"}
+# Submit a new task (master-protected)
+@app.post("/tasks", response_model=TaskResponse)
+async def submit_task(task_in: TaskCreate, api_key: APIKey = Depends(api_key_dependency)):
+    # Master must be used
+        await require_role(api_key, ROLE_MASTER)
+    except HTTPException:
+        raise
+        # Create task
+        t = Task(
+            type=task_in.type,
+            payload=task_in.payload,
+            priority=task_in.priority,
+            max_retries=task_in.max_retries,
+            status=STATUS_PENDING,
+        )
+        session.add(t)
+        await session.commit()
+        await session.refresh(t)
+        # Metrics
+        tasks_submitted.inc()
+        LOG.info("Submitted task id=%s, type=%s, priority=%d", t.id, t.type, t.priority)
+        return TaskResponse(
+            id=t.id,
+            type=t.type,
+            payload=t.payload,
+            priority=t.priority,
+            status=t.status,
+            assigned_worker_id=t.assigned_worker_id,
+            created_at=t.created_at,
+            updated_at=t.updated_at,
+            retries=t.retries,
+            max_retries=t.max_retries,
+            result=t.result,
+            error_message=t.error_message,
+# List tasks (master-protected)
+@app.get("/tasks", response_model=List[TaskResponse])
+async def list_tasks(api_key: APIKey = Depends(api_key_dependency)):
+        result = await session.execute(select(Task).order_by(Task.created_at.desc()))
+        tasks = result.scalars().all()
+        return [
+            TaskResponse(
+                id=t.id,
+                type=t.type,
+                payload=t.payload,
+                priority=t.priority,
+                status=t.status,
+                assigned_worker_id=t.assigned_worker_id,
+                created_at=t.created_at,
+                updated_at=t.updated_at,
+                retries=t.retries,
+                max_retries=t.max_retries,
+                result=t.result,
+                error_message=t.error_message,
+            )
+            for t in tasks
+        ]
+# Get a single task
+@app.get("/tasks/{task_id}", response_model=TaskResponse)
+async def get_task(task_id: str, api_key: APIKey = Depends(api_key_dependency)):
+        result = await session.execute(select(Task).where(Task.id == task_id))
+        t = result.scalar_one_or_none()
+        if t is None:
+            raise HTTPException(status_code=404, detail="Task not found")
+# Register a worker (master-protected)
+@app.post("/register_worker")
+async def register_worker(worker_in: WorkerRegister, api_key: APIKey = Depends(api_key_dependency)):
+        w = Worker(
+            id=str(uuid.uuid4()),
+            name=worker_in.name,
+            last_seen=datetime.utcnow(),
+            status="ONLINE",
+            load=0.0,
+        session.add(w)
+        await session.refresh(w)
+        LOG.info("Registered new worker id=%s name=%s", w.id, w.name)
+        workers_online.set(1)  # simplistic; we recompute in heartbeat/background
+        return {"worker_id": w.id, "name": w.name}
+# Heartbeat from worker
+@app.post("/heartbeat")
+async def heartbeat(beat: Heartbeat, api_key: APIKey = Depends(api_key_dependency)):
+        await require_role(api_key, ROLE_WORKER)
+        # Upsert worker's last_seen and load
+        result = await session.execute(select(Worker).where(Worker.id == beat.worker_id))
+        w = result.scalar_one_or_none()
+        if w is None:
+            raise HTTPException(status_code=404, detail="Worker not found; register first.")
+        w.last_seen = datetime.utcnow()
+        w.load = float(beat.load)
+        LOG.info("Heartbeat from worker_id=%s, load=%.2f", w.id, w.load)
+        return {"worker_id": w.id, "status": w.status, "load": w.load, "last_seen": w.last_seen.isoformat()}
+# Worker fetches next task (load-balanced)
+@app.get("/work/next_task", response_model=TaskNextResponse)
+async def next_task(worker_id: str, api_key: APIKey = Depends(api_key_dependency)):
+        # 1) compute the worker with the least RUNNING tasks
+        from sqlalchemy import select, func
+        # Get online workers and their running counts
+        result = await session.execute(select(Worker))
+        workers = result.scalars().all()
+        worker_loads: Dict[str, int] = {}
+        for w in workers:
+            w_id = w.id
+            # running count
+            r_stmt = select(Task).where(
+                Task.assigned_worker_id == w_id,
+                Task.status == STATUS_RUNNING
+            r_res = await session.execute(r_stmt)
+            count = len(r_res.scalars().all())
+            worker_loads[w_id] = count
+        if not worker_loads:
+            # no workers registered yet
+            raise HTTPException(status_code=503, detail="No workers registered")
+        # pick worker with minimum running tasks
+        min_worker_id = min(worker_loads, key=lambda k: worker_loads[k])
+        # ensure that the requesting worker is the least-loaded
+        if worker_id != min_worker_id:
+            # Optional: still let the requester try later
+            LOG.info("Worker %s requested task but is not the least-loaded (preferred: %s).", worker_id, min_worker_id)
+            raise HTTPException(status_code=204, detail="No task available for this worker at the moment (balancing).")
+        # 2) pick highest-priority pending task
+        from sqlalchemy import asc
+        stmt = select(Task).where(Task.status == STATUS_PENDING).order_by(Task.priority.desc(), Task.created_at.asc())
+        result = await session.execute(stmt)
+        t: Task | None = result.scalars().first()
+            # no pending tasks
+            raise HTTPException(status_code=204, detail="No pending tasks")
+        # assign to this worker and mark RUNNING
+        t.assigned_worker_id = worker_id
+        t.status = STATUS_RUNNING
+        t.updated_at = datetime.utcnow()
+        LOG.info("Assigned task id=%s to worker_id=%s", t.id, worker_id)
+        return TaskNextResponse(
+# Worker reports task result
+@app.post("/tasks/{task_id}/result")
+async def report_result(task_id: str, res: TaskResultSubmission, api_key: APIKey = Depends(api_key_dependency)):
+        if res.success:
+            t.status = STATUS_SUCCESS
+            t.result = res.result
+            t.error_message = None
+            session.add(t)
+            tasks_completed.inc()
+            LOG.info("Task id=%s completed successfully by worker_id=%s", t.id, t.assigned_worker_id)
+        else:
+            t.result = None
+            t.error_message = res.error_message or "Unknown error"
+            # retry if allowed
+            if t.retries < t.max_retries:
+                t.retries += 1
+                t.status = STATUS_PENDING
+                t.assigned_worker_id = None
+                session.add(t)
+                await session.commit()
+                LOG.info("Task id=%s failed on worker_id=%s; requeued (retry %d/%d).",
+                         t.id, t.assigned_worker_id, t.retries, t.max_retries)
+            else:
+                t.status = STATUS_FAILED
+                LOG.info("Task id=%s failed after max retries.", t.id)
+        return {"task_id": t.id, "status": t.status}
+# Metrics endpoint for Prometheus
+@app.get("/metrics")
+async def metrics():
+    data = generate_latest(registry)
+    return Response(content=data, media_type=CONTENT_TYPE_LATEST)
+# Health & readiness
+@app.get("/readiness")
+async def readiness():
+    return {"readiness": "READY"}
+# ------------- Background: offline worker cleanup -------------
+async def cleanup_offline_workers():
+    while True:
+        try:
+            await asyncio.sleep(CLEANUP_INTERVAL_SECONDS)
+            async with AsyncSessionLocal() as session:
+                now = datetime.utcnow()
+                # find offline workers
+                from sqlalchemy import select
+                stmt = select(Worker).where(Worker.status == "ONLINE")
+                result = await session.execute(stmt)
+                workers = result.scalars().all()
+                for w in workers:
+                    if (now - w.last_seen).total_seconds() > WORKER_TIMEOUT_SECONDS:
+                        w.status = "OFFLINE"
+                        session.add(w)
+                        # Requeue tasks assigned to this worker
+                        t_stmt = select(Task).where(Task.assigned_worker_id == w.id, Task.status == STATUS_RUNNING)
+                        t_res = await session.execute(t_stmt)
+                        tasks = t_res.scalars().all()
+                        for t in tasks:
+                            t.status = STATUS_PENDING
+                            t.assigned_worker_id = None
+                            t.updated_at = datetime.utcnow()
+                            session.add(t)
+                        await session.commit()
+                        LOG.warning("Worker id=%s offline; requeued %d tasks.", w.id, len(tasks))
+        except Exception as e:
+            LOG.exception("Error in offline worker cleanup: %s", e)
+# Run cleanup task in background
+async def start_background_tasks():
+    asyncio.create_task(cleanup_offline_workers())
+# ------------- Worker mode (standalone) -------------
+class WorkerClient:
+    def __init__(self, name: str, master_url: str):
+        self.name = name
+        self.master_url = master_url.rstrip("/")
+        self.session = httpx.AsyncClient(timeout=10.0)
+        self.worker_id: Optional[str] = None
+        self.running = True
+    async def register(self) -> None:
+        url = f"{self.master_url}/register_worker"
+        payload = {"name": self.name}
+        headers = {"Content-Type": "application/json", "X-API-KEY": WORKER_TOKEN}
+        resp = await self.session.post(url, json=payload, headers=headers)
+        if resp.status_code != 200:
+            raise RuntimeError(f"Failed to register worker: {resp.status_code} {resp.text}")
+        data = resp.json()
+        self.worker_id = data.get("worker_id")
+        LOG.info("Registered as worker_id=%s with name=%s", self.worker_id, self.name)
+    async def heartbeat_loop(self):
+        if not self.worker_id:
+            raise RuntimeError("Worker not registered")
+        url = f"{self.master_url}/heartbeat"
+        while self.running:
+            payload = {"worker_id": self.worker_id, "load": max(0.0, min(100.0, self._generate_load()))}
+            try:
+                resp = await self.session.post(url, json=payload, headers=headers)
+                if resp.status_code not in (200, 201, 204):
+                    LOG.warning("Heartbeat failed: %s", resp.status_code)
+            except Exception as e:
+                LOG.exception("Heartbeat error: %s", e)
+            await asyncio.sleep(WORKER_HEARTBEAT_SECONDS)
+    def _generate_load(self) -> float:
+        # Simple dummy load estimator; in real usage, gather actual metrics
+        return 10.0
+    async def fetch_and_execute(self):
+        url = f"{self.master_url}/work/next_task?worker_id={self.worker_id}"
+        headers = {"X-API-KEY": WORKER_TOKEN}
+                resp = await self.session.get(url, headers=headers)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    task_id = data["id"]
+                    ttype = data["type"]
+                    payload = data["payload"]
+                    max_retries = data.get("max_retries", 3)
+                    # Execute
+                    LOG.info("Worker %s executing task %s type=%s", self.worker_id, task_id, ttype)
+                    result, error = self._execute_task(ttype, payload)
+                    # Report
+                    report = {
+                        "task_id": task_id,
+                        "success": error is None,
+                        "result": result,
+                        "error_message": error,
+                    }
+                    post_url = f"{self.master_url}/tasks/{task_id}/result"
+                    resp2 = await self.session.post(post_url, json=report, headers=headers)
+                    if resp2.status_code not in (200, 201, 204):
+                        LOG.warning("Failed to report result for task %s: %s", task_id, resp2.status_code)
+                elif resp.status_code == 204:
+                    # no task ready; back off a bit
+                    await asyncio.sleep(1)
+                else:
+                    LOG.warning("Unexpected response when requesting task: %s", resp.status_code)
+                    await asyncio.sleep(2)
+                LOG.exception("Error in task fetch/execute loop: %s", e)
+                await asyncio.sleep(2)
+    def _execute_task(self, ttype: str, payload: Dict[str, Any]):
+        """Very small, safe set of operations for demonstration."""
+            if ttype == "echo":
+                return payload, None
+            if ttype == "sleep":
+                secs = float(payload.get("seconds", 1.0))
+                time.sleep(secs)
+                return {"slept": secs}, None
+            if ttype == "sum":
+                numbers = payload.get("numbers", [])
+                if not isinstance(numbers, list):
+                    raise ValueError("numbers must be a list")
+                total = sum([float(n) for n in numbers])
+                return {"sum": total}, None
+            # default: unrecognized
+            return {"message": "unimplemented task type"}, None
+            return None, str(e)
+    async def close(self):
+        self.running = False
+        if self.session:
+            await self.session.aclose()
+async def run_worker_mode(name: str, master_url: str):
+    client = WorkerClient(name=name, master_url=master_url)
+        await client.register()
+        # Start heartbeat and fetch loop concurrently
+        await asyncio.gather(
+            client.heartbeat_loop(),
+            client.fetch_and_execute(),
+        LOG.exception("Worker encountered an error: %s", e)
+    finally:
+        await client.close()
+# --------- CLI & entrypoint -------------
+def _parse_args():
+    import argparse
+    parser = argparse.ArgumentParser(description="Distributed Task Scheduler - Master/Worker")
+    subparsers = parser.add_subparsers(dest="mode", required=True)
+    master_p = subparsers.add_parser("master", help="Run in Master mode (REST API)")
+    master_p.add_argument("--bind", default="0.0.0.0")
+    master_p.add_argument("--port", type=int, default=8000)
+    worker_p = subparsers.add_parser("worker", help="Run in Worker mode")
+    worker_p.add_argument("--name", required=True, help="Human-readable worker name")
+    worker_p.add_argument("--master-url", default="http://127.0.0.1:8000")
+    return parser.parse_args()
+def main():
+    args = _parse_args()
+    if args.mode == "master":
+        # Run FastAPI with Uvicorn
+        import uvicorn
+        LOG.info("Starting Master on %s:%d", "0.0.0.0", args.port)
+        uvicorn.run(app, host=args.bind, port=args.port, log_level="info")
+    elif args.mode == "worker":
+        # Run worker mode
+        LOG.info("Starting Worker: name=%s master_url=%s", args.name, args.master_url)
+        asyncio.run(run_worker_mode(name=args.name, master_url=args.master_url))
+    else:
+        raise SystemExit("Unknown mode")
+# --------- Guard -------------
+if __name__ == "__main__":
+    main()
+```
+Notes and considerations
+- This code provides a solid production-ready baseline, including:
+  - Async SQLAlchemy models for tasks, workers, and API keys with persistent storage in SQLite for simplicity.
+  - Master endpoints for task creation, task status, worker registration, heartbeats, next-task pull, and results, all with role-based access via API keys.
+  - Worker mode that registers, sends heartbeats, pulls tasks, executes a defined small set of operations (echo, sleep, sum), and reports results back to the master.
+  - Fault tolerance by re-queuing tasks when a worker goes offline (based on heartbeat timeout).
+  - Basic load balancing by choosing the online worker with the fewest currently running tasks before assigning a new task.
+  - Task prioritization through a priority field (higher values come first when selecting tasks).
+  - Basic logging with structured INFO logs for important events.
+  - Prometheus-style metrics exposure at /metrics via prometheus_client (task submissions, completions, worker counts).
+  - Security: simple API key mechanism with role separation (master vs worker). The code seeds MASTER_TOKEN and WORKER_TOKEN for demonstration; in production, you should replace seed logic with a secure secret store.
+- How to extend
+  - Add more task types and workers’ capabilities as needed.
+  - Replace SQLite with PostgreSQL for production workloads.
+  - Add more robust authentication/authorization (OAuth2, JWT, or mernet-secured tokens) if needed.
+  - Integrate a richer metrics surface (latency histograms, per-task-type metrics, etc.).
+  - Introduce retries strategy, backoff policy, and dead-letter queues for failed tasks.
+If you want, I can tailor the code to your preferred tech stack (e.g., PostgreSQL, Redis-backed queues, or a Kubernetes deployment approach) or provide separate master/worker scripts for easier deployment.
+2025-08-08 04:52:47,656 [DEBUG] ConsultAgent: === END CONSULT AGENT RESPONSE CONTENT ===
+2025-08-08 04:52:47.657 [error] 2025-08-08 04:52:47,656 [INFO] ConsultAgent: === CRITIC STATUS CHECK ===
+2025-08-08 04:52:47,656 [INFO] ConsultAgent: Critic agent exists: True
+2025-08-08 04:52:47,656 [INFO] ConsultAgent: Critic enabled: True
+2025-08-08 04:52:47,656 [INFO] ConsultAgent: Running critic review for iteration 1
+2025-08-08 04:52:47,656 [DEBUG] Critic: === CRITIC API CALL START ===
+2025-08-08 04:52:47,656 [DEBUG] Critic: Model: o3
+2025-08-08 04:52:47,656 [DEBUG] Critic: Review prompt length: 32195 characters
+2025-08-08 04:52:47,656 [DEBUG] Critic: Response to review length: 29766 characters
+2025-08-08 04:52:47,656 [DEBUG] Critic: Artifact type: code
+2025-08-08 04:52:47,656 [DEBUG] Critic: Timestamp: 1754643167.6567633
+2025-08-08 04:52:47,656 [DEBUG] Critic: === CRITIC REVIEW PROMPT CONTENT ===
+2025-08-08 04:52:47,656 [DEBUG] Critic: You are a fast, pragmatic code reviewer focused on correctness and major issues. Your job is to catch glaring errors, incorrect code, security vulnerabilities, and major problems - NOT minor stylistic issues.
+## REVIEW CRITERIA
+### CRITICAL ISSUES (FAIL the response):
+- Syntax errors that prevent execution
+- Logic errors that break functionality
+- Security vulnerabilities (SQL injection, XSS, etc.)
+- Missing critical components or dependencies
+- Incorrect API usage that would cause runtime errors
+- Data type mismatches or validation errors
+- Missing error handling for critical operations
+### MINOR ISSUES (Suggestions only):
+- Code style and formatting preferences
+- Optional optimizations
+- Documentation improvements
+- Minor naming conventions
+- Performance suggestions (unless they're critical)
+## RESPONSE FORMAT
+Respond in this exact format:
+### VERDICT
+PASS | FAIL
+### FEEDBACK
+[Brief explanation of the verdict - if PASS, just say "Response passes review" or similar]
+### CRITICAL ISSUES
+- [List any critical issues that caused a FAIL]
+- [Leave empty if PASS]
+### SUGGESTIONS
+- [List any minor improvements or suggestions]
+- [Leave empty if none]
+## OPTIMIZATION RULE
+If the response PASSES review with no critical issues and only minor suggestions, keep your feedback minimal. Just state that it passes and move on - no need for detailed analysis that won't be used.
+## YAML AND CODE BLOCK HANDLING
+When reviewing prompts that contain YAML examples or nested code blocks:
+- Focus on the correctness of the content and instructions
+- Be lenient with YAML syntax in examples if the content is correct
+- Allow nested code blocks if they serve instructional purposes
+- Only fail on actual functional issues, not formatting preferences
+## CONTEXT
+Original Request:
+Context: Artifact type: code
+## RESPONSE TO REVIEW
+FINAL
+## REVIEW INSTRUCTIONS
+1. Focus on correctness and functionality
+2. Be pragmatic - only fail on major issues
+3. Provide specific, actionable feedback
+4. If unsure, default to PASS with suggestions
+5. Consider the artifact type when reviewing
+Review the response above and provide your verdict.
+## CODE-SPECIFIC CRITERIA
+- Check for syntax errors, missing imports, undefined variables
+- Verify logic flow and algorithm correctness
+- Look for security issues (eval, exec, unsafe file operations)
+- Ensure proper error handling and edge cases
+- Check for resource leaks or improper cleanup
+2025-08-08 04:52:47,656 [DEBUG] Critic: === END CRITIC REVIEW PROMPT CONTENT ===
+2025-08-08 04:53:39.070 [error] 2025-08-08 04:53:39,070 [INFO] httpx: HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-08-08 04:53:39.071 [error] 2025-08-08 04:53:39,071 [DEBUG] Critic: === CRITIC API RESPONSE RECEIVED ===
+2025-08-08 04:53:39.071 [error] 2025-08-08 04:53:39,071 [DEBUG] Critic: Response length: 1173 characters
+2025-08-08 04:53:39,071 [DEBUG] Critic: Response keys: ['raw', 'output_text']
+2025-08-08 04:53:39,071 [DEBUG] Critic: Has error: False
+2025-08-08 04:53:39,071 [DEBUG] Critic: Timestamp: 1754643219.0717568
+2025-08-08 04:53:39,071 [DEBUG] Critic: === CRITIC REVIEW RESPONSE CONTENT ===
+2025-08-08 04:53:39,071 [DEBUG] Critic: ### VERDICT
+FAIL
+Response contains syntax errors and logic flaws that prevent the system from running as described.
+- Syntax error: function definition `async def get api_key_from_header(...)` contains a space in the name, so the module will not even import.
+- Worker registration flow is impossible: `/register_worker` endpoint is protected by `ROLE_MASTER`, but `WorkerClient.register()` calls it with a worker key, resulting in 403 Forbidden and preventing any worker from joining the system.
+- Blocking call in async code: `_execute_task` uses `time.sleep`, which blocks the entire event loop and will stall heart-beats and task fetching, causing workers to be marked offline.
+- Rename the function to `get_api_key_from_header` (and update all references).
+- Allow workers to self-register (change `/register_worker` to accept `ROLE_WORKER` or remove role restriction).
+- Replace `time.sleep(secs)` with `await asyncio.sleep(secs)` inside `_execute_task` (and make the method async) to avoid blocking the event loop.
+- Optionally fix metrics updating, remove unused imports, and address minor logging inconsistencies.
+2025-08-08 04:53:39,071 [DEBUG] Critic: === END CRITIC REVIEW RESPONSE CONTENT ===
+2025-08-08 04:53:39,071 [DEBUG] Critic: === CRITIC RESULT PARSED ===
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,071 [DEBUG] Critic: Response length: 1173 characters
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,071 [DEBUG] Critic: Passed: False
+2025-08-08 04:53:39,071 [DEBUG] Critic: Feedback: Response contains syntax errors and logic flaws that prevent the system from running as described.
+2025-08-08 04:53:39,072 [DEBUG] Critic: Critical issues count: 3
+2025-08-08 04:53:39,072 [DEBUG] Critic: Suggestions count: 4
+2025-08-08 04:53:39,072 [DEBUG] Critic: Critical issue 1: Syntax error: function definition `async def get api_key_from_header(...)` contains a space in the name, so the module will not even import.
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,072 [DEBUG] Critic: Critical issue 2: Worker registration flow is impossible: `/register_worker` endpoint is protected by `ROLE_MASTER`, but `WorkerClient.register()` calls it with a worker key, resulting in 403 Forbidden and preventing any worker from joining the system.
+2025-08-08 04:53:39,072 [DEBUG] Critic: Critical issue 3: Blocking call in async code: `_execute_task` uses `time.sleep`, which blocks the entire event loop and will stall heart-beats and task fetching, causing workers to be marked offline.
+2025-08-08 04:53:39,072 [DEBUG] Critic: Suggestion 1: Rename the function to `get_api_key_from_header` (and update all references).
+2025-08-08 04:53:39,072 [DEBUG] Critic: Suggestion 2: Allow workers to self-register (change `/register_worker` to accept `ROLE_WORKER` or remove role restriction).
+2025-08-08 04:53:39,072 [DEBUG] Critic: Suggestion 3: Replace `time.sleep(secs)` with `await asyncio.sleep(secs)` inside `_execute_task` (and make the method async) to avoid blocking the event loop.
+2025-08-08 04:53:39,072 [DEBUG] Critic: Suggestion 4: Optionally fix metrics updating, remove unused imports, and address minor logging inconsistencies.
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,072 [DEBUG] Critic: Timestamp: 1754643219.0721402
+2025-08-08 04:53:39,072 [INFO] Critic: Critic review result: FAILED
+2025-08-08 04:53:39,072 [WARNING] Critic: Critic found 3 critical issues
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: === CRITIC RESPONSE RECEIVED ===
+2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Passed: False
+2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Feedback: Response contains syntax errors and logic flaws that prevent the system from running as described.
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Critical issues count: 3
+2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Suggestions count: 4
+2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Critical issue 1: Syntax error: function definition `async def get api_key_from_header(...)` contains a space in the name, so the module will not even import.
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Critical issue 2: Worker registration flow is impossible: `/register_worker` endpoint is protected by `ROLE_MASTER`, but `WorkerClient.register()` calls it with a worker key, resulting in 403 Forbidden and preventing any worker from joining the system.
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Critical issue 3: Blocking call in async code: `_execute_task` uses `time.sleep`, which blocks the entire event loop and will stall heart-beats and task fetching, causing workers to be marked offline.
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Suggestion 1: Rename the function to `get_api_key_from_header` (and update all references).
+2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Suggestion 2: Allow workers to self-register (change `/register_worker` to accept `ROLE_WORKER` or remove role restriction).
+2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Suggestion 3: Replace `time.sleep(secs)` with `await asyncio.sleep(secs)` inside `_execute_task` (and make the method async) to avoid blocking the event loop.
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Suggestion 4: Optionally fix metrics updating, remove unused imports, and address minor logging inconsistencies.
+2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Timestamp: 1754643219.072441
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,072 [INFO] ConsultAgent: Critic review: FAILED
+2025-08-08 04:53:39,072 [WARNING] ConsultAgent: Critic feedback: Response contains syntax errors and logic flaws that prevent the system from running as described.
+2025-08-08 04:53:39,072 [WARNING] ConsultAgent: Critical issue: Syntax error: function definition `async def get api_key_from_header(...)` contains a space in the name, so the module will not even import.
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,072 [WARNING] ConsultAgent: Critical issue: Worker registration flow is impossible: `/register_worker` endpoint is protected by `ROLE_MASTER`, but `WorkerClient.register()` calls it with a worker key, resulting in 403 Forbidden and preventing any worker from joining the system.
+2025-08-08 04:53:39,072 [WARNING] ConsultAgent: Critical issue: Blocking call in async code: `_execute_task` uses `time.sleep`, which blocks the entire event loop and will stall heart-beats and task fetching, causing workers to be marked offline.
+2025-08-08 04:53:39,072 [WARNING] ConsultAgent: Critic failed - forcing retry 2/3
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,072 [INFO] ConsultAgent: Starting iteration 2/3
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: === API CALL START ===
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Model: gpt-5-nano
+2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Prompt length: 34797 characters
+2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Context:
+2025-08-08 04:53:39,072 [DEBUG] ConsultAgent: Timestamp: 1754643219.072756
+2025-08-08 04:53:39,072 [INFO] ConsultAgent: === FULL PROMPT BEING SENT TO MODEL ===
+2025-08-08 04:53:39,072 [INFO] ConsultAgent: Prompt length: 34797 characters
+2025-08-08 04:53:39,072 [INFO] ConsultAgent: Context: Model: gpt-5-nano, Artifact Type: code
+2025-08-08 04:53:39.072 [error] 2025-08-08 04:53:39,072 [INFO] ConsultAgent: --- PROMPT CONTENT START ---
+2025-08-08 04:53:39.073 [error] 2025-08-08 04:53:39,072 [INFO] ConsultAgent: You are a specialized professional with the role profile and expertise described below. Your mission is to generate the actual code artifact requested by the user.
+## ITERATION REVIEW INSTRUCTIONS
+Review the previous response for errors, omissions, unclear points, inefficiency, or any area that could be clarified, optimized, or enhanced. Improve the response for accuracy, completeness, clarity, and practical value.
+Pay special attention to the critic feedback below and address any issues identified.
+After revising, evaluate whether another review would likely add significant value.
+If not, append [STOP] to your output; otherwise, do not include [STOP].
+Output only the improved response, appending [STOP] if you determine further iteration is unnecessary.
+## PREVIOUS RESPONSE TO IMPROVE
+## CRITIC FEEDBACK FROM PREVIOUS ITERATION
+### CRITICAL ISSUES IDENTIFIED:
+### SUGGESTIONS FOR IMPROVEMENT:
+## USER REQUEST
+2025-08-08 04:53:39.073 [error] 2025-08-08 04:53:39,072 [INFO] ConsultAgent: --- PROMPT CONTENT END ---
+2025-08-08 04:53:39,073 [INFO] ConsultAgent: === END FULL PROMPT LOG ===
+2025-08-08 04:54:14.669 [error] 2025-08-08 04:54:14,669 [INFO] httpx: HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-08-08 04:54:14.674 [error] 2025-08-08 04:54:14,674 [DEBUG] ConsultAgent: === API RESPONSE RECEIVED ===
+2025-08-08 04:54:14.675 [error] 2025-08-08 04:54:14,674 [DEBUG] ConsultAgent: Response length: 27453 characters
+2025-08-08 04:54:14,674 [DEBUG] ConsultAgent: Response type: Response
+2025-08-08 04:54:14,674 [DEBUG] ConsultAgent: Response attributes: ['background', 'construct', 'copy', 'created_at', 'dict', 'error', 'from_orm', 'id', 'incomplete_details', 'instructions', 'json', 'max_output_tokens', 'max_tool_calls', 'metadata', 'model', 'model_computed_fields', 'model_config', 'model_construct', 'model_copy', 'model_dump', 'model_dump_json', 'model_extra', 'model_fields', 'model_fields_set', 'model_json_schema', 'model_parametrized_name', 'model_post_init', 'model_rebuild', 'model_validate', 'model_validate_json', 'model_validate_strings', 'object', 'output', 'output_text', 'parallel_tool_calls', 'parse_file', 'parse_obj', 'parse_raw', 'previous_response_id', 'prompt', 'prompt_cache_key', 'reasoning', 'safety_identifier', 'schema', 'schema_json', 'service_tier', 'status', 'temperature', 'text', 'to_dict', 'to_json', 'tool_choice', 'tools', 'top_logprobs', 'top_p', 'truncation', 'update_forward_refs', 'usage', 'user', 'validate']
+2025-08-08 04:54:14,674 [DEBUG] ConsultAgent: Has error: None
+2025-08-08 04:54:14,674 [DEBUG] ConsultAgent: Usage: ResponseUsage(input_tokens=7430, input_tokens_details=InputTokensDetails(cached_tokens=0), output_tokens=8653, output_tokens_details=OutputTokensDetails(reasoning_tokens=2688), total_tokens=16083)
+2025-08-08 04:54:14.675 [error] 2025-08-08 04:54:14,674 [DEBUG] ConsultAgent: Output type: <class 'list'>
+2025-08-08 04:54:14,674 [DEBUG] ConsultAgent: Output length: 2
+2025-08-08 04:54:14,674 [DEBUG] ConsultAgent: Timestamp: 1754643254.674986
+2025-08-08 04:54:14.682 [error] 2025-08-08 04:54:14,682 [INFO] ConsultAgent: === TOKEN USAGE ===
+2025-08-08 04:54:14.683 [error] 2025-08-08 04:54:14,682 [INFO] ConsultAgent: Model: gpt-5-nano
+2025-08-08 04:54:14,682 [INFO] ConsultAgent: Prompt tokens: 7366
+2025-08-08 04:54:14,682 [INFO] ConsultAgent: Response tokens: 5930
+2025-08-08 04:54:14,682 [INFO] ConsultAgent: Total tokens: 13296
+2025-08-08 04:54:14,682 [INFO] ConsultAgent: Token usage tracked: {'prompt_tokens': 7366, 'response_tokens': 5930, 'total_tokens': 13296, 'model': 'gpt-5-nano'}
+2025-08-08 04:54:14,682 [DEBUG] ConsultAgent: ConsultAgent iteration 2 output length: 27453 characters
+2025-08-08 04:54:14,682 [DEBUG] ConsultAgent: === CONSULT AGENT RESPONSE CONTENT ===
+2025-08-08 04:54:14,682 [DEBUG] ConsultAgent: ```python
+Overview
+- Master node (FastAPI) coordinates task distribution across Worker nodes.
+- Workers register, heartbeat, fetch tasks, execute them, and report results.
+- Fault tolerance: if a worker goes offline, in-flight tasks are re-queued.
+- Load balancing: tasks are distributed to online workers with the lightest current load.
+- Task prioritization: higher priority tasks are executed first.
+- Real-time monitoring: basic worker health via heartbeats and Prometheus-like metrics.
+- REST API with API-key based authentication (Master vs Worker roles).
+- Persistence: SQLite via async SQLAlchemy for tasks, workers, and API keys.
+- Comprehensive logging and defensive error handling.
+- Ready to run with a minimal setup; includes a CLI to start in master or worker mode.
+Notes
+- This is a production-ready baseline. In a real environment, replace the in-code
+  tokens with a secure secret store (e.g., Vault) and consider PostgreSQL for
+  durability and performance at scale.
+- Requires: fastapi, uvicorn, sqlalchemy, aiosqlite, pydantic, httpx, prometheus_client
+How to run
+- Start Master:
+  python scheduler_system.py --mode master --bind 0.0.0.0 --port 8000
+- Start Worker:
+  python scheduler_system.py --mode worker --name "worker-1" --master-url http://127.0.0.1:8000
+Dependencies (pip):
+  fastapi uvicorn sqlalchemy aiosqlite pydantic httpx prometheus_client
+from datetime import datetime, timezone
+from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
+# ------------------ Logging ------------------
+STREAM = logging.StreamHandler(sys.stdout)
+STREAM.setFormatter(
+    logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s")
+)
+LOG.addHandler(STREAM)
+# ------------------ Config & constants ------------------
+# Heartbeat and health checks
+WORKER_TIMEOUT_SECONDS = 60       # time after which a worker is considered offline
+CLEANUP_INTERVAL_SECONDS = 30     # how often to scan for offline workers
+# Task statuses and roles
+# API keys (for demonstration; replace with secure store in prod)
+MASTER_TOKEN = "MASTER_TOKEN_ABC123"
+# -------------- Database & ORM setup --------------
+    last_seen = Column(DateTime(timezone=True), nullable=False)
+    status = Column(String, default="ONLINE", nullable=False)
+    priority = Column(Integer, default=5, index=True)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+# -------------- Pydantic models (API payloads) --------------
+# -------------- Utils --------------
+# -------------- DB Engine & Session --------------
+# -------------- Prometheus-like metrics --------------
+task_latency_seconds = Gauge("task_latency_seconds", "Last task latency (seconds)", registry=registry)
+# -------------- Seed API keys --------------
+# -------------- API Key auth helpers --------------
+async def get_api_key_from_header(x_api_key: Optional[str], session: AsyncSession) -> APIKey:
+    """Lookup API key in DB; returns APIKey object or raises HTTPException."""
+    if key.role != required_role and key.role != ROLE_MASTER:
+        # Allow master to act as superuser; for master-only actions, explicit ROLE_MASTER is still enforced
+# Dependency: get current API key (with DB session)
+# -------------- Master API (FastAPI app) --------------
+# Health
+    await require_role(api_key, ROLE_MASTER)
+# Register a worker (master or worker can register)
+    # Anyone with a valid API key can register a worker; master keys create a worker, worker keys can too
+    if api_key.role not in (ROLE_MASTER, ROLE_WORKER):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid role for registration")
+            last_seen=datetime.now(timezone.utc),
+        # Update metric
+        await _update_workers_online_metric(session)
+    await require_role(api_key, ROLE_WORKER)
+        w.last_seen = datetime.now(timezone.utc)
+        stmt = select(Worker).where(Worker.status == "ONLINE")
+        if not workers:
+            raise HTTPException(status_code=503, detail="No workers registered or online")
+        # Compute loads: number of RUNNING tasks per worker
+            t_stmt = select(Task).where(Task.assigned_worker_id == w_id, Task.status == STATUS_RUNNING)
+            t_res = await session.execute(t_stmt)
+            count = len(t_res.scalars().all())
+        # Pick the least-loaded worker
+        # If the requester is not the least-loaded, optionally allow retry later
+            # Return 204-like signal via HTTP 204
+            raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="No task available for this worker at the moment (balancing).")
+            raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="No pending tasks")
+        t.updated_at = datetime.now(timezone.utc)
+            # Retry if allowed
+async def _update_workers_online_metric(session: AsyncSession) -> None:
+    """Update the workers_online gauge to reflect current online workers."""
+    result = await session.execute(select(Worker).where(Worker.status == "ONLINE"))
+    online = len(result.scalars().all())
+    workers_online._value = online  # mutate gauge value (preferred API)
+    return
+                now = datetime.now(timezone.utc)
+                # find online workers
+                        # Requeue tasks assigned to this offline worker
+                            t.updated_at = datetime.now(timezone.utc)
+                await _update_workers_online_metric(session)
+# -------------- Worker mode (standalone) --------------
+        # Placeholder for real metrics; increased load indicates busier worker
+        return 5.0
+                    result, error = await self._execute_task(ttype, payload)
+    async def _execute_task(self, ttype: str, payload: Dict[str, Any]):
+        """Async execution for safety in the event loop."""
+                await asyncio.sleep(secs)
+            if ttype == "reverse":
+                s = payload.get("text", "")
+                if not isinstance(s, str):
+                    raise ValueError("text must be a string")
+                return {"reversed": s[::-1]}, None
+# -------------- CLI & entrypoint --------------
+    subparsers = parser.add_subparsers(dest="mode")
+        LOG.info("Starting Master on %s:%d", args.bind, args.port)
+# -------------- Guard --------------
+[STOP]
+2025-08-08 04:54:14,682 [DEBUG] ConsultAgent: === END CONSULT AGENT RESPONSE CONTENT ===
+2025-08-08 04:54:14,682 [INFO] ConsultAgent: === CRITIC STATUS CHECK ===
+2025-08-08 04:54:14,682 [INFO] ConsultAgent: Critic agent exists: True
+2025-08-08 04:54:14.683 [error] 2025-08-08 04:54:14,682 [INFO] ConsultAgent: Critic enabled: True
+2025-08-08 04:54:14,682 [INFO] ConsultAgent: Running critic review for iteration 2
+2025-08-08 04:54:14,682 [DEBUG] Critic: === CRITIC API CALL START ===
+2025-08-08 04:54:14,682 [DEBUG] Critic: Model: o3
+2025-08-08 04:54:14,682 [DEBUG] Critic: Review prompt length: 29882 characters
+2025-08-08 04:54:14,682 [DEBUG] Critic: Response to review length: 27453 characters
+2025-08-08 04:54:14,682 [DEBUG] Critic: Artifact type: code
+2025-08-08 04:54:14,682 [DEBUG] Critic: Timestamp: 1754643254.6829863
+2025-08-08 04:54:14,683 [DEBUG] Critic: === CRITIC REVIEW PROMPT CONTENT ===
+2025-08-08 04:54:14,683 [DEBUG] Critic: You are a fast, pragmatic code reviewer focused on correctness and major issues. Your job is to catch glaring errors, incorrect code, security vulnerabilities, and major problems - NOT minor stylistic issues.
+2025-08-08 04:54:14,683 [DEBUG] Critic: === END CRITIC REVIEW PROMPT CONTENT ===
+2025-08-08 04:54:47.600 [error] 2025-08-08 04:54:47,600 [INFO] httpx: HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-08-08 04:54:47.601 [error] 2025-08-08 04:54:47,600 [INFO] httpx: HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-08-08 04:54:47.601 [error] 2025-08-08 04:54:47,601 [DEBUG] Critic: === CRITIC API RESPONSE RECEIVED ===
+2025-08-08 04:54:47.601 [error] 2025-08-08 04:54:47,601 [DEBUG] Critic: Response length: 893 characters
+2025-08-08 04:54:47,601 [DEBUG] Critic: Response keys: ['raw', 'output_text']
+2025-08-08 04:54:47,601 [DEBUG] Critic: Has error: False
+2025-08-08 04:54:47,601 [DEBUG] Critic: Timestamp: 1754643287.6015553
+2025-08-08 04:54:47,601 [DEBUG] Critic: === CRITIC REVIEW RESPONSE CONTENT ===
+2025-08-08 04:54:47,601 [DEBUG] Critic: ### VERDICT
+One critical runtime bug found that will break the service; must be fixed before deployment.
+- Function `_update_workers_online_metric` assigns directly to the private attribute `workers_online._value = online`.
+  This overwrites the internal value wrapper and breaks the Gauge object.
+  After the first call, any subsequent call to `/metrics` (or other Gauge operations) will raise exceptions because the
+  exporter expects `workers_online._value` to be a value wrapper, not an int.
+  Fix: use the public API ― `workers_online.set(online)`.
+- Use `workers_online.set()` everywhere instead of touching internals.
+- Optionally replace the per-worker `len(select(Task ...).all())` counting in `/work/next_task` with a single aggregate SQL query for efficiency.
+- Consider removing the unused import `asc` in `next_task`.
+2025-08-08 04:54:47,601 [DEBUG] Critic: === END CRITIC REVIEW RESPONSE CONTENT ===
+2025-08-08 04:54:47.601 [error] 2025-08-08 04:54:47,601 [DEBUG] Critic: === CRITIC RESULT PARSED ===
+2025-08-08 04:54:47,601 [DEBUG] Critic: Passed: False
+2025-08-08 04:54:47,601 [DEBUG] Critic: Feedback: One critical runtime bug found that will break the service; must be fixed before deployment.
+2025-08-08 04:54:47,601 [DEBUG] Critic: Critical issues count: 1
+2025-08-08 04:54:47,601 [DEBUG] Critic: Suggestions count: 3
+2025-08-08 04:54:47,601 [DEBUG] Critic: Critical issue 1: Function `_update_workers_online_metric` assigns directly to the private attribute `workers_online._value = online`.
+2025-08-08 04:54:47,601 [DEBUG] Critic: Suggestion 1: Use `workers_online.set()` everywhere instead of touching internals.
+2025-08-08 04:54:47,601 [DEBUG] Critic: Suggestion 2: Optionally replace the per-worker `len(select(Task ...).all())` counting in `/work/next_task` with a single aggregate SQL query for efficiency.
+2025-08-08 04:54:47,601 [DEBUG] Critic: Suggestion 3: Consider removing the unused import `asc` in `next_task`.
+2025-08-08 04:54:47,601 [DEBUG] Critic: Timestamp: 1754643287.601769
+2025-08-08 04:54:47,601 [INFO] Critic: Critic review result: FAILED
+2025-08-08 04:54:47,601 [WARNING] Critic: Critic found 1 critical issues
+2025-08-08 04:54:47,601 [DEBUG] ConsultAgent: === CRITIC RESPONSE RECEIVED ===
+2025-08-08 04:54:47,601 [DEBUG] ConsultAgent: Passed: False
+2025-08-08 04:54:47,601 [DEBUG] ConsultAgent: Feedback: One critical runtime bug found that will break the service; must be fixed before deployment.
+2025-08-08 04:54:47.601 [error] 2025-08-08 04:54:47,601 [DEBUG] ConsultAgent: Critical issues count: 1
+2025-08-08 04:54:47,601 [DEBUG] ConsultAgent: Suggestions count: 3
+2025-08-08 04:54:47,601 [DEBUG] ConsultAgent: Critical issue 1: Function `_update_workers_online_metric` assigns directly to the private attribute `workers_online._value = online`.
+2025-08-08 04:54:47,601 [DEBUG] ConsultAgent: Suggestion 1: Use `workers_online.set()` everywhere instead of touching internals.
+2025-08-08 04:54:47,601 [DEBUG] ConsultAgent: Suggestion 2: Optionally replace the per-worker `len(select(Task ...).all())` counting in `/work/next_task` with a single aggregate SQL query for efficiency.
+2025-08-08 04:54:47,601 [DEBUG] ConsultAgent: Suggestion 3: Consider removing the unused import `asc` in `next_task`.
+2025-08-08 04:54:47,601 [DEBUG] ConsultAgent: Timestamp: 1754643287.6019454
+2025-08-08 04:54:47.602 [error] 2025-08-08 04:54:47,601 [DEBUG] ConsultAgent: Critical issues count: 1
+2025-08-08 04:54:47.602 [error] 2025-08-08 04:54:47,601 [INFO] ConsultAgent: Critic review: FAILED
+2025-08-08 04:54:47,601 [WARNING] ConsultAgent: Critic feedback: One critical runtime bug found that will break the service; must be fixed before deployment.
+2025-08-08 04:54:47,602 [WARNING] ConsultAgent: Critical issue: Function `_update_workers_online_metric` assigns directly to the private attribute `workers_online._value = online`.
+2025-08-08 04:54:47,602 [WARNING] ConsultAgent: Critic failed - forcing retry 3/3
+2025-08-08 04:54:47.602 [error] 2025-08-08 04:54:47,602 [INFO] ConsultAgent: Starting iteration 3/3
+2025-08-08 04:54:47.602 [error] 2025-08-08 04:54:47,602 [DEBUG] ConsultAgent: === API CALL START ===
+2025-08-08 04:54:47,602 [DEBUG] ConsultAgent: Model: gpt-5-nano
+2025-08-08 04:54:47.602 [error] 2025-08-08 04:54:47,602 [DEBUG] ConsultAgent: Prompt length: 31868 characters
+2025-08-08 04:54:47,602 [DEBUG] ConsultAgent: Context:
+2025-08-08 04:54:47,602 [DEBUG] ConsultAgent: Timestamp: 1754643287.6021495
+2025-08-08 04:54:47.602 [error] 2025-08-08 04:54:47,602 [INFO] ConsultAgent: === FULL PROMPT BEING SENT TO MODEL ===
+2025-08-08 04:54:47,602 [INFO] ConsultAgent: Prompt length: 31868 characters
+2025-08-08 04:54:47,602 [INFO] ConsultAgent: Context: Model: gpt-5-nano, Artifact Type: code
+2025-08-08 04:54:47.602 [error] 2025-08-08 04:54:47,602 [INFO] ConsultAgent: --- PROMPT CONTENT START ---
+2025-08-08 04:54:47,602 [INFO] ConsultAgent: You are a specialized professional with the role profile and expertise described below. Your mission is to generate the actual code artifact requested by the user.
+2025-08-08 04:54:47,602 [INFO] ConsultAgent: --- PROMPT CONTENT END ---
+2025-08-08 04:54:47.602 [error] 2025-08-08 04:54:47,602 [INFO] ConsultAgent: === END FULL PROMPT LOG ===
+2025-08-08 04:55:17.617 [error] 2025-08-08 04:55:17,617 [INFO] httpx: HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-08-08 04:55:17.621 [error] 2025-08-08 04:55:17,621 [DEBUG] ConsultAgent: === API RESPONSE RECEIVED ===
+2025-08-08 04:55:17.622 [error] 2025-08-08 04:55:17,621 [DEBUG] ConsultAgent: Response length: 29471 characters
+2025-08-08 04:55:17,621 [DEBUG] ConsultAgent: Response type: Response
+2025-08-08 04:55:17,621 [DEBUG] ConsultAgent: Response attributes: ['background', 'construct', 'copy', 'created_at', 'dict', 'error', 'from_orm', 'id', 'incomplete_details', 'instructions', 'json', 'max_output_tokens', 'max_tool_calls', 'metadata', 'model', 'model_computed_fields', 'model_config', 'model_construct', 'model_copy', 'model_dump', 'model_dump_json', 'model_extra', 'model_fields', 'model_fields_set', 'model_json_schema', 'model_parametrized_name', 'model_post_init', 'model_rebuild', 'model_validate', 'model_validate_json', 'model_validate_strings', 'object', 'output', 'output_text', 'parallel_tool_calls', 'parse_file', 'parse_obj', 'parse_raw', 'previous_response_id', 'prompt', 'prompt_cache_key', 'reasoning', 'safety_identifier', 'schema', 'schema_json', 'service_tier', 'status', 'temperature', 'text', 'to_dict', 'to_json', 'tool_choice', 'tools', 'top_logprobs', 'top_p', 'truncation', 'update_forward_refs', 'usage', 'user', 'validate']
+2025-08-08 04:55:17,621 [DEBUG] ConsultAgent: Has error: None
+2025-08-08 04:55:17.622 [error] 2025-08-08 04:55:17,622 [DEBUG] ConsultAgent: Usage: ResponseUsage(input_tokens=6832, input_tokens_details=InputTokensDetails(cached_tokens=0), output_tokens=8373, output_tokens_details=OutputTokensDetails(reasoning_tokens=2048), total_tokens=15205)
+2025-08-08 04:55:17,622 [DEBUG] ConsultAgent: Output type: <class 'list'>
+2025-08-08 04:55:17,622 [DEBUG] ConsultAgent: Output length: 2
+2025-08-08 04:55:17,622 [DEBUG] ConsultAgent: Timestamp: 1754643317.6220758
+2025-08-08 04:55:17.628 [error] 2025-08-08 04:55:17,628 [INFO] ConsultAgent: === TOKEN USAGE ===
+2025-08-08 04:55:17.629 [error] 2025-08-08 04:55:17,628 [INFO] ConsultAgent: Model: gpt-5-nano
+2025-08-08 04:55:17,628 [INFO] ConsultAgent: Prompt tokens: 6784
+2025-08-08 04:55:17,628 [INFO] ConsultAgent: Response tokens: 6292
+2025-08-08 04:55:17,628 [INFO] ConsultAgent: Total tokens: 13076
+2025-08-08 04:55:17,628 [INFO] ConsultAgent: Token usage tracked: {'prompt_tokens': 6784, 'response_tokens': 6292, 'total_tokens': 13076, 'model': 'gpt-5-nano'}
+2025-08-08 04:55:17,628 [DEBUG] ConsultAgent: ConsultAgent iteration 3 output length: 29471 characters
+2025-08-08 04:55:17,628 [DEBUG] ConsultAgent: === CONSULT AGENT RESPONSE CONTENT ===
+2025-08-08 04:55:17,628 [DEBUG] ConsultAgent: ```python
+- This is a production-ready baseline. In a real environment, replace in-code tokens
+  with a secure secret store (e.g., Vault) and consider PostgreSQL for durability and performance at scale.
+from __future__ import annotations
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    JSON,
+    String,
+    Text,
+    func,
+STREAM.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s"))
+        # Master acts as superuser for most admin actions
+            await session.rollback()
+            LOG.exception("Failed to submit task: %s", e)
+            raise HTTPException(status_code=500, detail="Failed to submit task")
+            LOG.exception("Failed to register worker: %s", e)
+            raise HTTPException(status_code=500, detail="Failed to register worker")
+            LOG.exception("Failed to update heartbeat: %s", e)
+            raise HTTPException(status_code=500, detail="Heartbeat failed")
+        # Get online workers
+        # Compute current running loads per online worker (efficiently using COUNT)
+            count_stmt = select(func.count(Task.id)).where(Task.assigned_worker_id == w_id, Task.status == STATUS_RUNNING)
+            c_res = await session.execute(count_stmt)
+            count = int(c_res.scalar_one())
+        # Select least-loaded worker
+            # No task for this worker at the moment
+        # Order by priority desc, then created_at asc
+        stmt2 = select(Task).where(Task.status == STATUS_PENDING).order_by(Task.priority.desc(), Task.created_at.asc()).limit(1)
+        result2 = await session.execute(stmt2)
+        t: Task | None = result2.scalars().first()
+            await session.refresh(t)
+            LOG.exception("Failed to assign task: %s", e)
+            raise HTTPException(status_code=500, detail="Failed to assign task")
+                await session.rollback()
+                LOG.exception("Failed to finalize successful task: %s", e)
+                raise HTTPException(status_code=500, detail="Failed to finalize task")
+                prev_worker = t.assigned_worker_id
+                t.updated_at = datetime.now(timezone.utc)
+                try:
+                    session.add(t)
+                    await session.commit()
+                except Exception as e:
+                    await session.rollback()
+                    LOG.exception("Failed to requeue task: %s", e)
+                    raise HTTPException(status_code=500, detail="Failed to requeue task")
+                LOG.info(
+                    "Task id=%s failed on worker_id=%s; requeued (retry %d/%d).",
+                    t.id, prev_worker, t.retries, t.max_retries
+                )
+                    LOG.exception("Failed to mark task as failed: %s", e)
+                    raise HTTPException(status_code=500, detail="Failed to finalize task failure")
+    # Use the public API to set gauge value
+    workers_online.set(online)
+                    start = asyncio.get_event_loop().time()
+                    latency = asyncio.get_event_loop().time() - start
+                    task_latency_seconds.set(latency)
+2025-08-08 04:55:17,628 [DEBUG] ConsultAgent: === END CONSULT AGENT RESPONSE CONTENT ===
+2025-08-08 04:55:17,628 [INFO] ConsultAgent: === CRITIC STATUS CHECK ===
+2025-08-08 04:55:17,628 [INFO] ConsultAgent: Critic agent exists: True
+2025-08-08 04:55:17,628 [INFO] ConsultAgent: Critic enabled: True
+2025-08-08 04:55:17,628 [INFO] ConsultAgent: Running critic review for iteration 3
+2025-08-08 04:55:17.629 [error] 2025-08-08 04:55:17,628 [DEBUG] Critic: === CRITIC API CALL START ===
+2025-08-08 04:55:17,628 [DEBUG] Critic: Model: o3
+2025-08-08 04:55:17,628 [DEBUG] Critic: Review prompt length: 32735 characters
+2025-08-08 04:55:17,628 [DEBUG] Critic: Response to review length: 29471 characters
+2025-08-08 04:55:17,628 [DEBUG] Critic: Artifact type: code
+2025-08-08 04:55:17,628 [DEBUG] Critic: Timestamp: 1754643317.628993
+2025-08-08 04:55:17,629 [DEBUG] Critic: === CRITIC REVIEW PROMPT CONTENT ===
+2025-08-08 04:55:17,629 [DEBUG] Critic: You are a fast, pragmatic code reviewer focused on correctness and major issues. Your job is to catch glaring errors, incorrect code, security vulnerabilities, and major problems - NOT minor stylistic issues.
+Original Request: Design and implement a distributed task scheduling system with the following requirements:
+2025-08-08 04:55:17,629 [DEBUG] Critic: === END CRITIC REVIEW PROMPT CONTENT ===
+2025-08-08 04:55:55.578 [error] 2025-08-08 04:55:55,578 [INFO] httpx: HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-08-08 04:55:55.579 [error] 2025-08-08 04:55:55,579 [DEBUG] Critic: === CRITIC API RESPONSE RECEIVED ===
+2025-08-08 04:55:55.579 [error] 2025-08-08 04:55:55,579 [DEBUG] Critic: Response length: 598 characters
+2025-08-08 04:55:55,579 [DEBUG] Critic: Response keys: ['raw', 'output_text']
+2025-08-08 04:55:55,579 [DEBUG] Critic: Has error: False
+2025-08-08 04:55:55,579 [DEBUG] Critic: Timestamp: 1754643355.5797641
+2025-08-08 04:55:55,579 [DEBUG] Critic: === CRITIC REVIEW RESPONSE CONTENT ===
+2025-08-08 04:55:55,579 [DEBUG] Critic: ### VERDICT
+PASS
+Response passes review – implementation is largely correct and contains no blocking faults.
+- (none)
+- The use of the `|` union operator (e.g., `Task | None`) requires Python ≥3.10. If 3.9 compatibility is needed, replace with `Optional[Task]`.
+- `/metrics` is publicly reachable; consider protecting it if sensitive in your environment.
+- `next_task` only checks that the caller supplies a worker‐id, not that it belongs to the caller’s API key. If stronger multi-tenant isolation is required, bind API keys to specific workers.
+2025-08-08 04:55:55,579 [DEBUG] Critic: === END CRITIC REVIEW RESPONSE CONTENT ===
+2025-08-08 04:55:55,579 [DEBUG] Critic: === CRITIC RESULT PARSED ===
+2025-08-08 04:55:55.580 [error] 2025-08-08 04:55:55,579 [DEBUG] Critic: Passed: True
+2025-08-08 04:55:55,579 [DEBUG] Critic: Feedback: Response passes review – implementation is largely correct and contains no blocking faults.
+2025-08-08 04:55:55,579 [DEBUG] Critic: Critical issues count: 1
+2025-08-08 04:55:55,579 [DEBUG] Critic: Suggestions count: 3
+2025-08-08 04:55:55,579 [DEBUG] Critic: Critical issue 1: (none)
+2025-08-08 04:55:55.580 [error] 2025-08-08 04:55:55,580 [DEBUG] Critic: Suggestion 1: The use of the `|` union operator (e.g., `Task | None`) requires Python ≥3.10. If 3.9 compatibility is needed, replace with `Optional[Task]`.
+2025-08-08 04:55:55,580 [DEBUG] Critic: Suggestion 2: `/metrics` is publicly reachable; consider protecting it if sensitive in your environment.
+2025-08-08 04:55:55,580 [DEBUG] Critic: Suggestion 3: `next_task` only checks that the caller supplies a worker‐id, not that it belongs to the caller’s API key. If stronger multi-tenant isolation is required, bind API keys to specific workers.
+2025-08-08 04:55:55,580 [DEBUG] Critic: Timestamp: 1754643355.5800517
+2025-08-08 04:55:55.580 [error] 2025-08-08 04:55:55,580 [INFO] Critic: Critic review result: PASSED
+2025-08-08 04:55:55,580 [DEBUG] ConsultAgent: === CRITIC RESPONSE RECEIVED ===
+2025-08-08 04:55:55,580 [DEBUG] ConsultAgent: Passed: True
+2025-08-08 04:55:55.580 [error] 2025-08-08 04:55:55,580 [DEBUG] ConsultAgent: Feedback: Response passes review – implementation is largely correct and contains no blocking faults.
+2025-08-08 04:55:55,580 [DEBUG] ConsultAgent: Critical issues count: 1
+2025-08-08 04:55:55,580 [DEBUG] ConsultAgent: Suggestions count: 3
+2025-08-08 04:55:55.580 [error] 2025-08-08 04:55:55,580 [DEBUG] ConsultAgent: Critical issue 1: (none)
+2025-08-08 04:55:55,580 [DEBUG] ConsultAgent: Suggestion 1: The use of the `|` union operator (e.g., `Task | None`) requires Python ≥3.10. If 3.9 compatibility is needed, replace with `Optional[Task]`.
+2025-08-08 04:55:55,580 [DEBUG] ConsultAgent: Suggestion 2: `/metrics` is publicly reachable; consider protecting it if sensitive in your environment.
+2025-08-08 04:55:55.580 [error] 2025-08-08 04:55:55,580 [DEBUG] ConsultAgent: Suggestion 3: `next_task` only checks that the caller supplies a worker‐id, not that it belongs to the caller’s API key. If stronger multi-tenant isolation is required, bind API keys to specific workers.
+2025-08-08 04:55:55,580 [DEBUG] ConsultAgent: Timestamp: 1754643355.5802612
+2025-08-08 04:55:55.580 [error] 2025-08-08 04:55:55,580 [INFO] ConsultAgent: Critic review: PASSED
+2025-08-08 04:55:55,580 [INFO] ConsultAgent: Critic passed with 3 suggestions
+2025-08-08 04:55:55.580 [error] 2025-08-08 04:55:55,580 [INFO] ConsultAgent: STOP signal detected at iteration 3
+2025-08-08 04:55:55.584 [info] Successfully called tool 'consult'

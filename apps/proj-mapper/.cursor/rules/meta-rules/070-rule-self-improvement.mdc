@@ -1,0 +1,232 @@
+---
+description: WHEN missing needed rules or receiving feedback on mistakes TO ensure continuous improvement you MUST create or update rules
+globs: 
+---
+{
+  "rule_name": "Rule Self-Improvement",
+  
+  "purpose": {
+    "description": "This rule ensures the AI continuously improves the rule framework by creating missing rules and updating existing rules based on user feedback, identified gaps, and self-recognized mistakes."
+  },
+  
+  "cognitive_process": {
+    "understanding_gaps": {
+      "steps": [
+        "1. When you expect a rule but can't find it, make note of the missing rule",
+        "2. When a user points out a mistake that could have been prevented by a rule, identify the gap",
+        "3. When you recognize a pattern of similar issues across multiple interactions, consider rule creation",
+        "4. When existing rules prove inadequate or lead to confusion, identify improvement opportunities"
+      ]
+    },
+    "rule_creation_decision": {
+      "evaluation_criteria": [
+        "Frequency: Is this a recurring issue or need?",
+        "Impact: How significant is the problem this rule would solve?",
+        "Scope: Is this applicable beyond the current context?",
+        "Clarity: Can this rule be defined with clear, actionable guidance?",
+        "Consistency: Does this align with existing rules and frameworks?"
+      ],
+      "questions_to_ask": [
+        "Would a specific rule have prevented this issue?",
+        "Is this a one-time edge case or a recurring pattern?",
+        "Can I formulate clear, actionable guidance for this situation?",
+        "Would this rule benefit multiple users or projects?"
+      ]
+    },
+    "directive_language_processing": {
+      "description": "When users express requirements using ALL CAPS directive language, these often represent implicit rule creation or updates",
+      "trigger_words": [
+        "ALWAYS", "MUST", "NEVER", "SHOULD", "REQUIRED"
+      ],
+      "requirements": [
+        "Words MUST be in ALL CAPS to trigger this process",
+        "Words MUST be absolute directives (e.g., 'ALWAYS', not 'ENFORCE')",
+        "Lowercase variations (e.g., 'always', 'never') do NOT trigger this process"
+      ],
+      "evaluation_steps": [
+        "1. Identify the ALL CAPS directive language and the specific requirement being expressed",
+        "2. Determine the context and scope of the directive (specific file type, domain, etc.)",
+        "3. Search for existing rules that cover this domain or requirement",
+        "4. Evaluate whether the directive can be incorporated into an existing rule or warrants a new rule",
+        "5. Formulate the directive in proper rule format using the WHEN/TO/MUST structure"
+      ]
+    },
+    "self_recognized_mistakes": {
+      "description": "Actively learning from your own mistakes is essential for continuous improvement",
+      "recognition_triggers": [
+        "Having to correct your own output after realizing an error",
+        "Discovering inconsistency between your implementation and existing code",
+        "Failing to check important context before generating code or responses",
+        "Receiving implicit feedback indicating a misunderstanding",
+        "Noticing a pattern in your own errors across different conversations"
+      ],
+      "analysis_process": [
+        "1. Pause and explicitly acknowledge the mistake",
+        "2. Identify the root cause (e.g., missing context check, incorrect assumption)",
+        "3. Determine if the mistake represents a systematic issue or gap in rules",
+        "4. Evaluate whether the mistake could have been prevented by a better procedure",
+        "5. Consider what specific rule or guideline would prevent similar mistakes"
+      ],
+      "common_patterns": [
+        "Test function naming that doesn't match implementation file conventions",
+        "Generating code without checking existing patterns in the codebase",
+        "Making assumptions about code structure without verification",
+        "Failing to check for existing implementations before creating new ones",
+        "Inconsistent style or naming conventions across generated files"
+      ]
+    }
+  },
+  
+  "application_context": {
+    "when_to_apply": [
+      "When searching for a rule you expect to exist but cannot find",
+      "When a user points out a mistake that could have been prevented",
+      "When you observe a pattern of similar issues across conversations",
+      "When existing rules are unclear, too general, or too specific",
+      "When a user directly suggests creating or improving a rule",
+      "When a user employs ALL CAPS directive language (ALWAYS, MUST, NEVER, etc.) in their prompts",
+      "When you recognize you've made a mistake that could be prevented by a rule"
+    ],
+    "implementation_guidance": {
+      "for_missing_rules": [
+        "Proactively suggest creating the missing rule",
+        "Explain why this rule would be beneficial",
+        "Draft a properly structured rule following standards",
+        "Suggest appropriate naming, ID, and location in the hierarchy",
+        "Reference related or parent rules as appropriate"
+      ],
+      "for_rule_updates": [
+        "Identify the specific section or language causing issues",
+        "Propose concrete changes with clear improvements",
+        "Ensure backward compatibility where possible",
+        "Preserve the rule's core purpose and intent",
+        "Update any references to this rule from other rules"
+      ],
+      "for_directive_language": [
+        "First, complete the immediate task as requested by the user",
+        "Identify all ALL CAPS directive language in the user's prompt (ALWAYS, MUST, NEVER, etc.)",
+        "Ignore lowercase variations of these words (e.g., 'always', 'never')",
+        "Search for existing rules in the relevant domain that could be updated",
+        "If no suitable rule exists, propose creating a new rule based on the directive",
+        "Format the directive properly using the WHEN/TO/MUST structure",
+        "Suggest appropriate placement in the rule hierarchy",
+        "Explicitly confirm with the user before implementation"
+      ],
+      "for_self_recognized_mistakes": [
+        "First, correct the immediate mistake and complete the user's task",
+        "Explicitly acknowledge the mistake to the user",
+        "Identify the systematic issue that led to the mistake",
+        "Search for existing rules that could be updated to prevent this mistake",
+        "If no suitable rule exists, draft a new rule focused on prevention",
+        "Explain to the user how this rule will prevent similar mistakes",
+        "Ask for user approval before implementing the rule change"
+      ]
+    },
+    "immediate_actions": {
+      "description": "When a rule gap is identified during an active conversation:",
+      "steps": [
+        "1. First, complete the current task using available rules and best judgment",
+        "2. Then, proactively inform the user of the identified rule gap",
+        "3. Suggest creation of a new rule or update to existing rule",
+        "4. Ask for user approval before implementing the change",
+        "5. Create or update the rule following proper standards"
+      ]
+    }
+  },
+  
+  "examples": {
+    "missing_rule_scenario": {
+      "context": "User asks for assistance with React component styling, but no React-specific rules exist.",
+      "response": "I'll help with your React component styling. I notice we don't have specific rules for React development yet. After we address your current needs, would you like me to create a structured rule for React development standards? This would ensure consistent quality across all React components in the future."
+    },
+    "rule_update_scenario": {
+      "context": "User points out that the AI's Python documentation doesn't match their preferred style, despite following the rules.",
+      "response": "You're right, our current Python documentation rule doesn't align with your team's preferred style. Let me fix your current code first, and then I'll suggest updates to our Python documentation rule to incorporate your preferred style guide, ensuring consistency for all future work."
+    },
+    "directive_language_scenario": {
+      "context": "User says: 'When writing TypeScript, you should ALWAYS use explicit return types on functions.'",
+      "response": "I'll ensure I use explicit return types for all TypeScript functions. I've noticed you used directive language ('ALWAYS use explicit return types'). This seems like an important TypeScript standard for your project. Would you like me to update our TypeScript style rule to include this requirement, or create a new rule if we don't have one yet? This would ensure all future TypeScript code follows this standard."
+    },
+    "self_recognized_mistake_scenario": {
+      "context": "AI generates test functions with incorrectly named methods, then realizes they don't match the implementation file.",
+      "response": "I need to correct the test function names I provided, as they don't follow the naming pattern in your implementation file. I should have checked the implementation file first. To prevent this from happening again, I'd like to create a rule about verifying function names in test files against their implementation counterparts. This would ensure consistency and prevent similar errors in the future. Would you like me to create this rule?"
+    },
+    "rule_creation_pattern": {
+      "template": "I've noticed [observation about gap or recurring issue]. This could be addressed by creating a new rule for [domain/purpose]. The rule would provide [brief description of guidance]. Would you like me to create this rule now?",
+      "example": "I've noticed we've discussed error handling patterns in JavaScript several times. This could be addressed by creating a new rule for JavaScript error handling standards. The rule would provide specific guidance on error types, catching mechanisms, and reporting formats. Would you like me to create this rule now?"
+    },
+    "directive_to_rule_pattern": {
+      "template": "I notice you used directive language ('[DIRECTIVE] [REQUIREMENT]'). This is an important standard that could be formalized as a rule. Would you like me to [update existing rule/create new rule] to ensure this requirement is consistently followed in the future?",
+      "example": "I notice you used directive language ('NEVER use var in JavaScript'). This is an important standard that could be formalized as a rule. Would you like me to update our JavaScript style rule to ensure this requirement is consistently followed in the future?"
+    },
+    "self_improvement_pattern": {
+      "template": "I made a mistake regarding [specific issue]. To prevent this in the future, I'd like to [update/create] a rule about [topic] that would ensure [benefit]. This would help me consistently [desired behavior]. Would you like me to implement this rule improvement?",
+      "example": "I made a mistake regarding test function naming. To prevent this in the future, I'd like to create a rule about test function naming conventions that would ensure consistency with implementation files. This would help me consistently verify naming patterns before generating test code. Would you like me to implement this rule improvement?"
+    }
+  },
+  
+  "integration": {
+    "with_rule_hierarchy": {
+      "description": "When creating new rules, position them appropriately in the hierarchical framework:",
+      "guidelines": [
+        "New domain-specific rules should be added as sub-rules under appropriate parent rules",
+        "When creating a rule in a new domain, create both parent and sub-rules",
+        "Update parent rules when adding new sub-rules to reference them appropriately",
+        "If multiple related sub-rules become necessary, suggest organizing them properly"
+      ]
+    },
+    "with_existing_processes": {
+      "description": "Integrate self-improvement with other reasoning processes:",
+      "connections": [
+        "Context Awareness: Use workspace context to identify domain-specific rule needs",
+        "Response Structure: Ensure rule suggestions are clearly separated from task responses",
+        "Quality Foundations: Apply same quality standards to rule creation as to other outputs"
+      ]
+    },
+    "with_directive_language": {
+      "description": "When processing directive language in user prompts:",
+      "translation_approach": [
+        "Convert ALL CAPS directive language to proper rule format",
+        "ALWAYS → 'WHEN [context] TO [purpose] you MUST [action]'",
+        "NEVER → 'WHEN [context] TO [purpose] you MUST NOT [action]'",
+        "SHOULD → 'WHEN [context] TO [purpose] you SHOULD [action]' (with clear reasoning)",
+        "Determine appropriate scope and glob pattern based on context"
+      ]
+    },
+    "with_self_learning": {
+      "description": "Create a continuous improvement cycle from self-recognized mistakes:",
+      "process": [
+        "Mistake identification → Rule gap analysis → Rule creation/update → Application of improved rule → Verification",
+        "Document the mistake and solution to build institutional knowledge",
+        "Link related rules to create comprehensive guidance networks",
+        "Review and refine rules periodically based on their effectiveness in preventing mistakes"
+      ]
+    }
+  },
+  
+  "limitations": {
+    "boundaries": [
+      "Do not create rules for highly specific, one-time scenarios",
+      "Do not modify core system rules without explicit permission",
+      "Do not create rules that contradict established frameworks or methodologies",
+      "Do not suggest rule changes during time-sensitive or critical tasks",
+      "Do not create excessive rules that might overwhelm the framework",
+      "Do not convert every casual directive into a formal rule without considering importance and scope",
+      "Do not over-react to a single mistake by creating overly restrictive rules"
+    ]
+  },
+  
+  "danger": {
+    "warnings": [
+      "NEVER create rules without user approval",
+      "NEVER make conflicting rules that create confusion",
+      "NEVER overspecify rules to the point of rigidity",
+      "NEVER change rule IDs or fundamental structure of existing rules",
+      "NEVER delete rules without explicit permission and understanding of dependencies",
+      "NEVER elevate casual suggestions to rule status without confirmation",
+      "NEVER interpret every use of directive language as requiring a rule without context",
+      "NEVER ignore the ALL CAPS requirement for directive language processing",
+      "NEVER create rules that might prevent creative problem-solving or innovation"
+    ]
+  }
+} 

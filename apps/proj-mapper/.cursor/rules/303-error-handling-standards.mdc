@@ -1,0 +1,148 @@
+---
+description: WHEN implementing error handling TO ensure robust and maintainable code you MUST follow these error handling standards
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"error_patterns": "17-45",
+"recovery_strategies": "47-75",
+"logging_requirements": "77-95"
+},
+"key_elements": {
+"pattern_validation": "20-30",
+"strategy_validation": "50-60",
+"logging_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: error_patterns -> recovery_strategies -> logging_requirements. Validate against pattern_validation before proceeding."
+}
+
+{
+"rule_name": "Error Handling Standards",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"handling errors",
+"implementing recovery",
+"logging issues",
+"ensuring reliability"
+],
+"priority": 5,
+"domain": "development"
+},
+
+"overview": {
+"description": "Defines comprehensive error handling standards",
+"importance": "Proper error handling ensures robust and reliable systems"
+},
+
+"error_patterns": {
+"exception_handling": {
+"requirements": [
+"Catch specific exceptions",
+"Handle errors at appropriate levels",
+"Maintain error context",
+"Preserve stack traces"
+],
+"validation": {"specific": true, "contextual": true}
+},
+"error_types": {
+"requirements": [
+"Distinguish error categories",
+"Use custom error types",
+"Include error codes",
+"Provide error details"
+],
+"validation": {"categorized": true, "detailed": true}
+},
+"boundary_handling": {
+"requirements": [
+"Validate inputs",
+"Check preconditions",
+"Handle edge cases",
+"Verify outputs"
+],
+"validation": {"complete": true, "thorough": true}
+}
+},
+
+"recovery_strategies": {
+"retry_mechanisms": {
+"requirements": [
+"Implement backoff",
+"Set retry limits",
+"Handle permanent failures",
+"Log retry attempts"
+],
+"validation": {"implemented": true, "logged": true}
+},
+"fallback_behavior": {
+"requirements": [
+"Define default values",
+"Implement graceful degradation",
+"Maintain core functionality",
+"Notify users appropriately"
+],
+"validation": {"defined": true, "graceful": true}
+},
+"cleanup_procedures": {
+"requirements": [
+"Release resources",
+"Restore state",
+"Clean temporary data",
+"Log cleanup results"
+],
+"validation": {"complete": true, "logged": true}
+}
+},
+
+"logging_requirements": {
+"error_logging": {
+"requirements": [
+"Log error details",
+"Include context",
+"Add timestamps",
+"Use log levels"
+],
+"validation": {"detailed": true, "contextual": true}
+},
+"monitoring_integration": {
+"requirements": [
+"Alert on critical errors",
+"Track error patterns",
+"Monitor recovery",
+"Analyze trends"
+],
+"validation": {"integrated": true, "monitored": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER catch generic exceptions",
+"NEVER swallow errors silently",
+"NEVER ignore cleanup",
+"NEVER skip logging",
+"NEVER hardcode retry counts",
+"NEVER omit error context",
+"NEVER ignore resource leaks",
+"NEVER skip monitoring"
+],
+"validation_rules": {
+"exceptions": {"specific": true},
+"handling": {"explicit": true},
+"cleanup": {"performed": true},
+"logging": {"complete": true},
+"retries": {"configured": true},
+"context": {"included": true},
+"resources": {"managed": true},
+"monitoring": {"implemented": true}
+}
+}
+}

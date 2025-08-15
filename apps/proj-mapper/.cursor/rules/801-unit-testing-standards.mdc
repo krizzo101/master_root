@@ -1,0 +1,209 @@
+---
+description: WHEN writing unit tests TO ensure code quality and reliability you MUST follow THESE testing standards
+globs: **/*.test.*,**/*.spec.*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"test_structure": "17-45",
+"naming_conventions": "47-65",
+"assertion_guidelines": "67-85",
+"mocking_standards": "87-95"
+},
+"key_elements": {
+"validation_patterns": "20-35",
+"test_templates": "47-60",
+"assertion_rules": "67-80"
+},
+"ai_instructions": "Process sections in order: test_structure -> naming_conventions -> specific guidelines. Always validate against assertion_guidelines before proceeding."
+}
+
+{
+"rule_name": "Unit Testing Standards",
+"version": "1.0.0",
+"ai_processing_priority": "high",
+"enhanced_metadata": {
+"activation_context": [
+"writing unit tests",
+"updating test suites",
+"verifying code behavior",
+"ensuring code quality"
+],
+"priority": 5,
+"domain": "testing"
+},
+
+"overview": {
+"description": "Defines comprehensive standards for writing effective unit tests",
+"importance": "Unit tests ensure code reliability and serve as living documentation"
+},
+
+"test_structure": {
+"organization": {
+"file_location": "Tests must be adjacent to the code being tested",
+"file_naming": "{filename}.test.{ext} or {filename}.spec.{ext}",
+"grouping": {
+"pattern": "describe('${ComponentName}', () => { ... })",
+"nesting": {
+"max_depth": 3,
+"hierarchy": ["component", "feature", "scenario"]
+}
+}
+},
+"test_case": {
+"format": {
+"pattern": "test('should ${expected_behavior} when ${condition}', () => { ... })",
+"validation": {
+"description": "^should\\s[a-z]+.*when\\s[a-z]+.*$",
+"max_length": 120
+}
+},
+"structure": {
+"pattern": "// Arrange\n// Act\n// Assert",
+"required": true,
+"validation": {
+"sections": ["arrange", "act", "assert"],
+"order": true
+}
+}
+},
+"validation_rules": {
+"file_structure": {
+"imports_first": true,
+"mocks_after_imports": true,
+"tests_after_mocks": true
+},
+"test_isolation": {
+"independent": true,
+"no_shared_state": true,
+"cleanup_required": true
+}
+}
+},
+
+"naming_conventions": {
+"test_files": {
+"pattern": "^[a-zA-Z][a-zA-Z0-9]*\\.(test|spec)\\.[a-z]+$",
+"examples": [
+"user.test.ts",
+"auth.spec.js"
+]
+},
+"test_suites": {
+"pattern": "^describe\\('[A-Z][a-zA-Z0-9]+',",
+"examples": [
+"describe('UserAuthentication'",
+"describe('PaymentProcessor'"
+]
+},
+"test_cases": {
+"pattern": "^test\\('should [a-z]+.*when [a-z]+.\*'",
+"examples": [
+"test('should return error when password is invalid'",
+"test('should update user when data is valid'"
+]
+},
+"validation": {
+"files": {"pattern": true, "required": true},
+"suites": {"pattern": true, "required": true},
+"cases": {"pattern": true, "required": true}
+}
+},
+
+"assertion_guidelines": {
+"principles": {
+"single_concept": "Each test should verify one logical concept",
+"clear_intent": "Assertions should clearly indicate expected behavior",
+"meaningful_messages": "Custom messages should explain failure context"
+},
+"patterns": {
+"equality": {
+"exact": "expect(actual).toBe(expected)",
+"deep": "expect(actual).toEqual(expected)",
+"validation": {"pattern_required": true}
+},
+"truthiness": {
+"boolean": "expect(actual).toBeTruthy()/toBeFalsy()",
+"null_undefined": "expect(actual).toBeNull()/toBeUndefined()",
+"validation": {"context_required": true}
+},
+"errors": {
+"throwing": "expect(() => {}).toThrow(ErrorType)",
+"async": "await expect(async () => {}).rejects.toThrow()",
+"validation": {"error_type_required": true}
+}
+},
+"validation_rules": {
+"assertions_per_test": {"min": 1, "max": 5},
+"custom_messages": {"required": true},
+"matcher_specificity": {"prefer_specific": true}
+}
+},
+
+"mocking_standards": {
+"principles": {
+"minimal_mocking": "Mock only what's necessary",
+"explicit_returns": "Always specify return values",
+"reset_after_test": "Clear all mocks after each test"
+},
+"patterns": {
+"function_mocks": {
+"creation": "jest.fn(() => expectedValue)",
+"verification": "expect(mockFn).toHaveBeenCalledWith(args)"
+},
+"module_mocks": {
+"creation": "jest.mock('./module')",
+"implementation": "jest.spyOn(object, 'method')"
+}
+},
+"validation_rules": {
+"mock_cleanup": {"required": true},
+"implementation_required": true,
+"verification_required": true
+}
+},
+
+"verification": {
+"pre_commit_checks": [
+"Tests follow naming conventions",
+"Assertions are properly structured",
+"Mocks are cleaned up",
+"No shared state between tests",
+"Documentation is clear and complete"
+],
+"validation_rules": {
+"naming": {"patterns": true, "conventions": true},
+"structure": {"format": true, "organization": true},
+"isolation": {"independent": true, "cleanup": true},
+"documentation": {"clear": true, "complete": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER skip test isolation",
+"NEVER share state between tests",
+"NEVER use ambiguous assertions",
+"NEVER leave mocks uncleaned",
+"NEVER test multiple concepts",
+"NEVER use non-standard patterns",
+"NEVER skip error cases",
+"NEVER hardcode test data"
+],
+"validation_rules": {
+"isolation": {"required": true},
+"state_sharing": {"allowed": false},
+"assertions": {"specific": true},
+"mocks": {"cleanup": true},
+"concepts": {"single": true},
+"patterns": {"standard": true},
+"error_cases": {"required": true},
+"test_data": {"dynamic": true}
+}
+}
+}

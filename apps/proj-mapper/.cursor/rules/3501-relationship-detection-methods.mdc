@@ -1,0 +1,107 @@
+---
+description: MUST apply relationship detection methods WHEN analyzing data structures TO improve mapping accuracy
+globs: ["**/relationship/**", "**/*relationship*/**", "**/*", "**/*detection*/**", "**/detection/**", "**/methods/**", "**/*methods*/**"]
+---
+# relationship-detection-methods
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3501-relationship-detection-methods",
+  "taxonomy": {
+    "category": "Relationship Mapping Standards",
+    "parent": "Relationship Mapping StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Relationship Mapping StandardsRule"
+    ],
+    "children": [
+      "3502-relationship-visualization-methods",
+      "3503-relationship-analysis-methods"
+    ]
+  },
+  "tags": [
+    "relationship-detection",
+    "mapping",
+    "data-relationships",
+    "AI-assistant"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "To establish guidelines for detecting relationships within data structures to ensure accurate mapping and understanding of interconnections.",
+  "application": "This rule MUST be applied during the analysis phase of data structures, particularly when identifying and categorizing relationships between different data entities. It SHOULD be used in conjunction with other mapping standards to enhance the overall accuracy and reliability of data interpretations.",
+  "importance": "Implementing this rule is crucial because accurate relationship detection directly impacts the quality of data mapping, which in turn affects decision-making processes, data analysis, and the effectiveness of AI interactions. By adhering to these methods, developers can minimize errors and improve the system's responsiveness to user queries."
+}
+
+## data_relationship_detection
+
+{
+  "description": "This section outlines the methods that MUST be employed to detect relationships within data structures effectively.",
+  "requirements": [
+    "MUST utilize pattern recognition algorithms to identify common relationship patterns.",
+    "MUST implement data mining techniques to extract hidden relationships from large datasets.",
+    "SHOULD apply statistical methods to quantify the strength of identified relationships."
+  ]
+}
+
+## relationship_mapping_accuracy
+
+{
+  "description": "This section specifies the criteria for ensuring the accuracy of detected relationships and their mappings.",
+  "requirements": [
+    "MUST validate detected relationships against a predefined set of criteria to ensure consistency.",
+    "MUST incorporate feedback mechanisms to refine relationship detection based on user inputs.",
+    "SHOULD perform regular audits of relationship mappings to identify discrepancies and update as necessary."
+  ]
+}
+
+## contextual_relationship_analysis
+
+{
+  "description": "This section emphasizes the importance of context in relationship detection and mapping.",
+  "requirements": [
+    "MUST consider the contextual relevance of data entities when determining relationships.",
+    "MUST utilize contextual data to enhance the accuracy of relationship detection methods.",
+    "SHOULD avoid making assumptions about relationships without sufficient contextual evidence."
+  ]
+}
+
+<example>
+relationship-detection-methods Example
+
+```python
+# Example for relationship-detection-methods
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement relationship-detection-methods according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER ignore contextual information when detecting relationships, as this may lead to incorrect mappings.",
+    "NEVER apply relationship detection methods without validating the results against established criteria.",
+    "NEVER assume relationships based solely on superficial patterns without deeper analysis.",
+    "NEVER use outdated or irrelevant data sets for relationship detection, as this compromises the integrity of the mapping.",
+    "NEVER overlook the need for feedback mechanisms in refining relationship detection methods."
+  ],
+  "specific_risks": [
+    "Violating the rule by ignoring contextual information can result in misinterpretation of data, leading to flawed decision-making.",
+    "Failure to validate detected relationships may cause the implementation of erroneous mappings, impacting user trust and system reliability.",
+    "Assuming relationships without thorough analysis can introduce biases and inaccuracies, skewing data outputs and insights.",
+    "Using irrelevant data sets for detection can produce misleading relationships, which could misguide project directions or strategies.",
+    "Neglecting feedback mechanisms may hinder the evolution of relationship detection methods, trapping the analysis within outdated paradigms."
+  ]
+}
+</danger>

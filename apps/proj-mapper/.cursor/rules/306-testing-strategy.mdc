@@ -1,0 +1,148 @@
+---
+description: WHEN implementing testing TO ensure comprehensive quality assurance you MUST follow these testing strategy standards
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"testing_principles": "17-45",
+"implementation_guidelines": "47-75",
+"quality_metrics": "77-95"
+},
+"key_elements": {
+"principle_validation": "20-30",
+"implementation_validation": "50-60",
+"metrics_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: testing_principles -> implementation_guidelines -> quality_metrics. Validate against principle_validation before proceeding."
+}
+
+{
+"rule_name": "Testing Strategy",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"implementing tests",
+"ensuring quality",
+"validating code",
+"measuring coverage"
+],
+"priority": 5,
+"domain": "development"
+},
+
+"overview": {
+"description": "Defines comprehensive testing strategy standards",
+"importance": "Proper testing ensures code quality and reliability"
+},
+
+"testing_principles": {
+"test_types": {
+"requirements": [
+"Write unit tests",
+"Implement integration tests",
+"Perform system tests",
+"Include acceptance tests"
+],
+"validation": {"comprehensive": true, "layered": true}
+},
+"test_design": {
+"requirements": [
+"Follow AAA pattern",
+"Test edge cases",
+"Include error scenarios",
+"Maintain independence"
+],
+"validation": {"structured": true, "thorough": true}
+},
+"test_coverage": {
+"requirements": [
+"Meet coverage targets",
+"Test critical paths",
+"Cover edge cases",
+"Include error paths"
+],
+"validation": {"complete": true, "targeted": true}
+}
+},
+
+"implementation_guidelines": {
+"test_organization": {
+"requirements": [
+"Group related tests",
+"Use descriptive names",
+"Maintain test hierarchy",
+"Follow naming conventions"
+],
+"validation": {"organized": true, "clear": true}
+},
+"test_maintenance": {
+"requirements": [
+"Keep tests current",
+"Refactor when needed",
+"Remove obsolete tests",
+"Update dependencies"
+],
+"validation": {"maintained": true, "current": true}
+},
+"test_automation": {
+"requirements": [
+"Automate test runs",
+"Configure CI/CD",
+"Report results",
+"Track metrics"
+],
+"validation": {"automated": true, "tracked": true}
+}
+},
+
+"quality_metrics": {
+"coverage_requirements": {
+"requirements": [
+"Track code coverage",
+"Measure branch coverage",
+"Monitor test quality",
+"Report metrics"
+],
+"validation": {"measured": true, "reported": true}
+},
+"performance_metrics": {
+"requirements": [
+"Measure test speed",
+"Track reliability",
+"Monitor flakiness",
+"Assess maintainability"
+],
+"validation": {"monitored": true, "assessed": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER skip unit tests",
+"NEVER ignore test failures",
+"NEVER commit without tests",
+"NEVER leave tests broken",
+"NEVER skip edge cases",
+"NEVER ignore coverage",
+"NEVER write untestable code",
+"NEVER skip test automation"
+],
+"validation_rules": {
+"unit_tests": {"present": true},
+"failures": {"addressed": true},
+"commits": {"tested": true},
+"maintenance": {"current": true},
+"edge_cases": {"covered": true},
+"coverage": {"met": true},
+"testability": {"ensured": true},
+"automation": {"implemented": true}
+}
+}
+}

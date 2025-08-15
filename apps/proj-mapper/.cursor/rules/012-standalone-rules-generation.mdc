@@ -1,0 +1,220 @@
+---
+description: WHEN creating standalone rule files TO ensure completeness you MUST follow single-file structure standards
+globs: .cursor/rules/*.mdc
+alwaysApply: false
+---
+
+
+{
+"sections": {
+"overview": "12-15",
+"structure_requirements": "17-45",
+"validation_requirements": "47-75",
+"generation_requirements": "77-95"
+},
+"key_elements": {
+"structure_validation": "20-30",
+"format_validation": "50-60",
+"generation_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: structure_requirements -> validation_requirements -> generation_requirements. Validate against structure_validation before proceeding."
+}
+
+{
+"rule_name": "Standalone Rules Generation",
+"version": "2.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"creating standalone rules",
+"editing standalone rules",
+"accessing standalone rules",
+"validating standalone rules"
+],
+"priority": 5,
+"domain": "meta-rules"
+},
+
+"overview": {
+"description": "Defines standards for creating and managing standalone rules",
+"importance": "Proper standalone rule structure ensures consistent AI processing"
+},
+
+"structure*requirements": {
+"frontmatter": {
+"requirements": [
+"Use WHEN/TO/MUST format",
+"Define globs without quotes",
+"Specify version",
+"Include metadata"
+],
+"validation": {"formatted": true, "complete": true},
+"examples": {
+"description": "WHEN writing code TO ensure quality you MUST follow standards",
+"globs": \**/\_.ts,
+"version": "1.0.0"
+}
+},
+"file_map": {
+"requirements": [
+"Include section ranges",
+"Define key elements",
+"Specify AI instructions",
+"Maintain line count"
+],
+"validation": {"mapped": true, "instructed": true}
+},
+"content_structure": {
+"requirements": [
+"Use JSON format",
+"Include all sections",
+"Define validations",
+"Add examples"
+],
+"validation": {"structured": true, "validated": true}
+}
+},
+
+"validation_requirements": {
+"format_validation": {
+"requirements": [
+"Check frontmatter",
+"Verify file map",
+"Validate JSON",
+"Confirm sections"
+],
+"validation": {"checked": true, "verified": true}
+},
+"content_validation": {
+"requirements": [
+"Verify completeness",
+"Check consistency",
+"Validate examples",
+"Test processing"
+],
+"validation": {"complete": true, "consistent": true}
+}
+},
+
+"generation_requirements": {
+"rule_creation": {
+"requirements": [
+"Follow template",
+"Include all sections",
+"Add validations",
+"Test processing"
+],
+"validation": {"created": true, "tested": true}
+},
+"rule_updates": {
+"requirements": [
+"Maintain structure",
+"Update versions",
+"Track changes",
+"Validate updates"
+],
+"validation": {"maintained": true, "tracked": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER skip frontmatter",
+"NEVER use quotes in globs",
+"NEVER omit file map",
+"NEVER skip validation",
+"NEVER mix formats",
+"NEVER ignore structure",
+"NEVER skip testing",
+"NEVER lose metadata"
+],
+"validation_rules": {
+"frontmatter": {"present": true},
+"globs": {"unquoted": true},
+"file_map": {"included": true},
+"validation": {"performed": true},
+"format": {"consistent": true},
+"structure": {"maintained": true},
+"testing": {"completed": true},
+"metadata": {"preserved": true}
+}
+}
+}
+
+# Standalone Rule Generation Standards
+
+## State Requirements
+
+1. Rule State Declaration:
+
+   - MUST explicitly declare intended state
+   - MUST include all required fields
+   - MUST validate state configuration
+
+2. State-Specific Requirements:
+
+   Always Rules:
+
+   - Set alwaysApply: true
+   - Consider global impact
+   - Validate core behavior
+
+   Auto-Attached Rules:
+
+   - Define precise glob patterns
+   - Validate file matching
+   - Consider scope impact
+
+   Agent Requested Rules:
+
+   - Use WHEN-TO-MUST format
+   - Ensure discoverability
+   - Provide clear examples
+
+   Manual Rules:
+
+   - Minimize configuration
+   - Document attachment
+   - Define user control
+
+## Structure Requirements
+
+1. File Organization:
+
+   - Clear sections
+   - Logical flow
+   - Complete coverage
+
+2. Content Requirements:
+   - Comprehensive guidance
+   - Specific examples
+   - Clear validation
+
+## Critical Violations
+
+1. NEVER leave state undefined
+2. NEVER mix state types
+3. NEVER skip validation
+4. NEVER omit sections
+5. NEVER ignore format
+6. NEVER skip testing
+
+## Validation Rules
+
+{
+"state": {
+"declared": true,
+"validated": true,
+"consistent": true
+},
+"structure": {
+"complete": true,
+"organized": true,
+"validated": true
+},
+"content": {
+"comprehensive": true,
+"specific": true,
+"tested": true
+}
+}

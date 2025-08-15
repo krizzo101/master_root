@@ -1,0 +1,12 @@
+{
+  "description": "MUST optimize token usage WHEN generating output TO enhance performance and reduce costs",
+  "globs": [
+    "**/*efficiency*/**",
+    "**/*",
+    "**/optimization/**",
+    "**/token/**",
+    "**/*optimization*/**",
+    "**/efficiency/**",
+    "**/*token*/**"
+  ]
+}

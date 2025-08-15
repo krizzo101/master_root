@@ -1,0 +1,79 @@
+{
+  "description": "MUST optimize cursor usage WHEN executing database queries TO enhance performance efficiency.",
+  "globs": ["**/*", "**/optimization/**", "**/*cursor*/**", "**/*specific*/**", "**/*optimization*/**", "**/cursor/**", "**/specific/**"],
+  "rule_id": "3802-cursor-specific-optimization",
+  "taxonomy": {
+    "category": "IDE Integration Standards",
+    "parent": "IDE Integration StandardsRule",
+    "ancestors": [
+      "Rule",
+      "IDE Integration StandardsRule"
+    ],
+    "children": [
+      "3803-cursor-performance-enhancement",
+      "3804-cursor-memory-usage-optimization"
+    ]
+  },
+  "tags": [
+    "cursor optimization",
+    "IDE performance",
+    "AI assistant enhancement"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ],
+  "overview": {
+    "purpose": "MUST ensure that cursor usage in database queries is optimized to prevent performance bottlenecks and improve overall application responsiveness.",
+    "application": "SHOULD be applied whenever executing database queries that involve cursor operations, specifically in high-load scenarios where performance is critical.",
+    "importance": "This rule matters because optimizing cursor usage directly impacts the efficiency of database interactions, leading to faster execution times and a more responsive user experience in the IDE."
+  },
+  "cursor_optimization_techniques": {
+    "description": "This section outlines various techniques to optimize cursor usage during database query execution.",
+    "requirements": [
+      "MUST utilize 'FOR UPDATE' cursors to lock records when necessary, preventing concurrent modifications.",
+      "SHOULD prefer 'FETCH' statements over 'SELECT' for retrieving data from cursors to minimize resource consumption.",
+      "MUST close cursors promptly after completion of operations to free up resources and avoid memory leaks.",
+      "MUST limit the number of records fetched by cursors to a manageable size to reduce memory usage."
+    ]
+  },
+  "performance_monitoring": {
+    "description": "This section describes the importance of monitoring cursor performance metrics.",
+    "requirements": [
+      "MUST implement logging for cursor execution times to identify slow operations.",
+      "SHOULD analyze cursor usage patterns regularly to detect potential optimizations.",
+      "MUST alert developers when cursor operations exceed predefined performance thresholds to ensure timely intervention.",
+      "MUST maintain a log of all cursor operations including execution time and record counts for performance analysis."
+    ]
+  },
+  "best_practices": {
+    "description": "This section presents best practices for effective cursor management.",
+    "requirements": [
+      "MUST avoid using cursors in loops where possible, opting for set-based operations instead.",
+      "SHOULD use named cursors for clarity and reusability in complex queries.",
+      "NEVER leave cursors open longer than necessary to maintain optimal application performance.",
+      "SHOULD use parameterized queries with cursors to prevent SQL injection vulnerabilities."
+    ]
+  },
+  "example": {
+    "description": "Example for cursor-specific-optimization",
+    "code": "def optimized_cursor_query(db_connection):\n    cursor = db_connection.cursor()\n    try:\n        cursor.execute('SELECT * FROM table_name WHERE condition')\n        for row in cursor.fetchall():\n            process_row(row)\n    finally:\n        cursor.close()"
+  },
+  "danger": {
+    "critical_violations": [
+      "NEVER leave cursors open after their intended operations to prevent resource leaks.",
+      "NEVER use cursors without proper locking mechanisms when modifying data, as this can lead to data corruption.",
+      "NEVER ignore performance metrics related to cursor execution times; doing so may result in undetected bottlenecks.",
+      "NEVER use cursors in a way that violates the set-based operations principle, as this undermines performance optimization.",
+      "NEVER allow the usage of cursors in high-load scenarios without prior optimization checks, as this can degrade application responsiveness."
+    ],
+    "specific_risks": [
+      "Leaving cursors open can lead to memory leaks, causing the application to consume excessive resources and potentially crash.",
+      "Improper locking of records during cursor operations can result in data inconsistencies and corruption, impacting overall data integrity.",
+      "Ignoring performance metrics may lead to prolonged execution times for database queries, negatively affecting user experience and application performance.",
+      "Using cursors in a way that contradicts set-based operations can cause significant performance degradation, making the application sluggish under load.",
+      "Failing to optimize cursor usage in high-load situations can overwhelm the database, resulting in slow response times and potential application downtime."
+    ]
+  }
+}

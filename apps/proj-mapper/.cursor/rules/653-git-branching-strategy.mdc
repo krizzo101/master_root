@@ -1,0 +1,198 @@
+---
+description: WHEN creating and managing branches TO ensure efficient collaboration you MUST follow THESE branching strategy guidelines
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 97 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"branch_types": "17-60",
+"workflow": "62-80",
+"protection": "82-95",
+"verification": "97-97"
+},
+"key_elements": {
+"branch_requirements": "20-45",
+"protection_rules": "82-90",
+"workflow_patterns": "62-75"
+},
+"ai_instructions": "Process sections in order: branch_types -> workflow -> protection. Always validate against branch requirements before proceeding."
+}
+
+{
+"rule_name": "Git Branching Strategy",
+"version": "1.0.0",
+"ai_processing_priority": "high",
+"enhanced_metadata": {
+"activation_context": [
+"creating branches",
+"managing git workflow",
+"collaborating on code",
+"maintaining repository structure"
+],
+"priority": 4,
+"domain": "version-control"
+},
+
+"overview": {
+"description": "Defines comprehensive standards for branch management in git repositories",
+"importance": "Proper branching strategy ensures clean history, efficient collaboration, and reliable releases"
+},
+
+"branch_types": {
+"main": {
+"description": "Primary branch containing production-ready code",
+"protection_requirements": [
+"No direct commits allowed",
+"Requires pull request review",
+"Must pass CI/CD checks",
+"Must be up to date before merging"
+]
+},
+"develop": {
+"description": "Integration branch for feature development",
+"requirements": [
+"Must be created from main",
+"Regular integration of feature branches",
+"Continuous testing and validation",
+"Source for feature branches"
+]
+},
+"feature": {
+"description": "Branches for new feature development",
+"naming": "feature/<issue-id>-<brief-description>",
+"requirements": [
+"Create from develop branch",
+"One branch per feature",
+"Regular rebasing with develop",
+"Delete after merging"
+]
+},
+"bugfix": {
+"description": "Branches for bug fixes",
+"naming": "bugfix/<issue-id>-<brief-description>",
+"requirements": [
+"Create from affected branch",
+"Focus on single bug fix",
+"Quick turnaround time",
+"Delete after merging"
+]
+},
+"hotfix": {
+"description": "Emergency fixes for production issues",
+"naming": "hotfix/<issue-id>-<brief-description>",
+"requirements": [
+"Create from main branch",
+"Minimal scope of changes",
+"Merge to both main and develop",
+"Immediate deployment"
+]
+},
+"release": {
+"description": "Preparation branches for new releases",
+"naming": "release/<version>",
+"requirements": [
+"Create from develop",
+"Version bumps and final fixes",
+"Merge to main and develop",
+"Tag with version number"
+]
+}
+},
+
+"ai_specific_guidelines": {
+"feature_development": {
+"requirements": [
+"Create separate branches for major AI-assisted changes",
+"Use clear branch names indicating AI involvement",
+"Review AI-generated code before merging",
+"Keep AI experiments in feature branches"
+],
+"naming": "ai-feature/<issue-id>-<description>"
+},
+"experimentation": {
+"requirements": [
+"Use throwaway branches for AI experiments",
+"Never merge experimental branches directly",
+"Extract validated changes to proper feature branches",
+"Document AI-specific considerations"
+],
+"naming": "ai-exp/<description>"
+}
+},
+
+"branch_lifecycle": {
+"creation": {
+"requirements": [
+"Use descriptive, hyphenated names",
+"Include issue/ticket reference",
+"Create from appropriate base branch",
+"Document branch purpose"
+]
+},
+"maintenance": {
+"requirements": [
+"Regular rebasing with base branch",
+"Keep branches focused and small",
+"Update branch when base changes",
+"Resolve conflicts promptly"
+]
+},
+"completion": {
+"requirements": [
+"Clean up commits before merging",
+"Delete branch after successful merge",
+"Ensure CI/CD passes",
+"Update related tickets"
+]
+}
+},
+
+"merge_strategy": {
+"requirements": {
+"review": [
+"Code review by team member",
+"All tests passing",
+"No merge conflicts",
+"Up-to-date with base branch"
+],
+"process": [
+"Squash commits when appropriate",
+"Use merge commits for feature branches",
+"Fast-forward for small changes",
+"Preserve important commit history"
+]
+},
+"methods": {
+"merge_commit": "Default for feature branches",
+"squash_merge": "For cleanup before merge",
+"rebase_merge": "For linear history"
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER commit directly to protected branches",
+"NEVER force push to shared branches",
+"NEVER merge without review",
+"NEVER leave stale branches",
+"NEVER rewrite public history",
+"NEVER merge broken code",
+"NEVER bypass CI/CD checks",
+"NEVER use ambiguous branch names"
+],
+"common_mistakes": [
+"Long-lived feature branches",
+"Merging without testing",
+"Unclear branch purposes",
+"Missing issue references",
+"Poor conflict resolution",
+"Premature branch deletion",
+"Inconsistent naming conventions"
+]
+}
+}

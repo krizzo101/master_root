@@ -1,0 +1,276 @@
+---
+description: WHEN solving complex problems TO ensure thorough analysis and optimal solutions you MUST APPLY appropriate reasoning methods
+globs:
+alwaysApply: false
+---
+
+taxonomy:
+category: "Core"
+parent: "CoreRule"
+ancestors: ["Rule", "CoreRule"]
+children: ["TreeOfThoughtRule", "ChainOfThoughtRule", "SelfRefinementRule"]
+priority: 85
+version: "1.0.0"
+
+---
+
+# Reasoning Methods
+
+<version>1.0.0</version>
+
+## Overview
+
+{
+"purpose": "Define systematic reasoning approaches to ensure comprehensive problem-solving",
+"application": "Apply methods selectively based on task complexity and requirements",
+"adaptation": "Combine methods as needed to address multifaceted problems"
+}
+
+## Reasoning Method Selection
+
+{
+"selection_criteria": {
+"task_complexity": {
+"simple": "Use minimal reasoning for straightforward tasks",
+"moderate": "Apply targeted methods for specific problem aspects",
+"complex": "Employ multiple complementary methods for comprehensive analysis"
+},
+"task_type": {
+"design": ["tree_of_thought", "dependency_aware_modification"],
+"implementation": ["chain_of_thought", "task_tracking_reasoning"],
+"debugging": ["chain_of_thought", "knowledge_scope_awareness"],
+"analysis": ["tree_of_thought", "self_refinement"]
+},
+"risk_level": {
+"low": "Basic validation is sufficient",
+"medium": "Include self-refinement and validation",
+"high": "Apply all relevant methods with thorough validation"
+}
+}
+}
+
+## Core Reasoning Methods
+
+{
+"tree_of_thought": {
+"required_for": ["Design", "T3 Complexity", "High Risk"],
+"optional_for": ["Debug", "T2 Complexity"],
+"steps": [
+"Enumerate implementation strategies",
+"Analyze bottlenecks and security gaps",
+"Evaluate trade-offs",
+"Refine based on constraints",
+"Document discarded approaches"
+],
+"application_process": {
+"strategy_enumeration": "List at least 2-3 distinct approaches",
+"comparative_analysis": "Evaluate each approach against requirements",
+"constraint_mapping": "Identify limiting factors affecting each approach",
+"solution_refinement": "Improve selected approach based on analysis",
+"approach_documentation": "Record reasons for selection and rejection"
+}
+},
+"chain_of_thought": {
+"required_for": ["Code", "Debug", "Design"],
+"optional_for": ["Analysis", "Question"],
+"steps": [
+"Decompose into subproblems",
+"Map dependencies",
+"Identify edge cases",
+"Validate intermediate steps",
+"Summarize reasoning"
+],
+"application_process": {
+"problem_decomposition": "Break down into manageable components",
+"dependency_mapping": "Determine relationships between components",
+"edge_case_identification": "List potential failure points",
+"incremental_validation": "Verify correctness at each step",
+"reasoning_summary": "Provide clear explanation of thought process"
+}
+},
+"self_refinement": {
+"required_for": ["High Risk", "T3 Complexity"],
+"optional_for": ["T2 Complexity", "Medium Risk"],
+"steps": [
+"Assess output for accuracy and completeness",
+"Identify and address weaknesses",
+"Refine iteratively for optimal results",
+"Verify alignment with requirements",
+"Document improvements and discarded changes"
+],
+"application_process": {
+"critical_assessment": "Evaluate solution against requirements",
+"weakness_identification": "Identify gaps, inefficiencies, or vulnerabilities",
+"iterative_improvement": "Make targeted enhancements",
+"requirement_alignment": "Verify all requirements are met",
+"change_documentation": "Record improvements made and alternatives rejected"
+}
+}
+}
+
+## Extended Reasoning Methods
+
+{
+"context_persistent_reasoning": {
+"required_for": ["Multi-step tasks", "Long conversations"],
+"steps": [
+"Maintain full project context",
+"Track tasks and dependencies",
+"Return to big-picture goals after tasks",
+"Prevent redundant work",
+"Ensure long-term consistency"
+],
+"application_process": {
+"context_maintenance": "Continuously update mental model of the project",
+"task_tracking": "Maintain awareness of completed and pending tasks",
+"goal_alignment": "Relate individual tasks to overall objectives",
+"efficiency_optimization": "Avoid repeating analyses or implementations",
+"consistency_enforcement": "Ensure coherence across multiple interactions"
+}
+},
+"dependency_aware_modification": {
+"required_for": ["Code modifications", "Refactoring"],
+"steps": [
+"Identify affected functions and dependencies",
+"Update related code and calls",
+"Adjust documentation accordingly",
+"Validate correctness post-change",
+"Ensure backward compatibility"
+],
+"application_process": {
+"impact_analysis": "Determine all code affected by changes",
+"comprehensive_updates": "Modify all dependent code components",
+"documentation_alignment": "Update related documentation",
+"validation": "Verify changes maintain correctness",
+"compatibility_assurance": "Ensure changes don't break existing functionality"
+}
+},
+"task_tracking_reasoning": {
+"required_for": ["Multi-step tasks", "Complex implementations"],
+"steps": [
+"Log completed, in-progress, and pending tasks",
+"Check for existing code before regenerating",
+"Prevent duplicate or conflicting efforts",
+"Alert user of inconsistencies",
+"Summarize outstanding work"
+],
+"application_process": {
+"task_logging": "Track progress on all tasks",
+"code_reuse": "Leverage existing implementations",
+"conflict_prevention": "Avoid duplicative or contradictory work",
+"inconsistency_alerting": "Highlight potential problems or contradictions",
+"progress_summarization": "Provide overviews of completed and pending work"
+}
+},
+"knowledge_scope_awareness": {
+"required_for": ["All interactions"],
+"steps": [
+"Verify need for changes before modifying",
+"Avoid assumptions based on outdated knowledge",
+"Flag, don't auto-correct, unknown terms",
+"Explain suggested changes for validation",
+"Adapt based on user confirmations"
+],
+"application_process": {
+"change_verification": "Confirm necessity of modifications",
+"knowledge_currency": "Be aware of limitations in contextual understanding",
+"uncertainty_flagging": "Highlight rather than assume meanings",
+"change_explanation": "Provide rationale for suggested modifications",
+"feedback_adaptation": "Adjust approach based on user input"
+}
+}
+}
+
+## Integration Approaches
+
+{
+"parallel_application": {
+"description": "Apply multiple methods simultaneously to different aspects of the problem",
+"use_cases": ["Complex system design", "Multi-component implementations"],
+"process": [
+"Divide problem into domains",
+"Apply appropriate methods to each domain",
+"Integrate insights across domains",
+"Resolve contradictions",
+"Synthesize unified solution"
+]
+},
+"sequential_application": {
+"description": "Apply methods in sequence, using outputs from one as inputs to another",
+"use_cases": ["Progressive refinement", "Problem decomposition and solution"],
+"process": [
+"Begin with high-level methods (e.g., tree of thought)",
+"Refine with mid-level methods (e.g., chain of thought)",
+"Validate with verification methods (e.g., self-refinement)",
+"Document with knowledge scope awareness"
+]
+},
+"adaptive_application": {
+"description": "Dynamically select and adjust methods based on emerging insights",
+"use_cases": ["Exploratory problem-solving", "Debugging unknown issues"],
+"process": [
+"Begin with general-purpose methods",
+"Identify problem characteristics",
+"Transition to specialized methods",
+"Adjust method parameters based on findings",
+"Return to general methods for integration"
+]
+}
+}
+
+<example>
+## Tree of Thought Application Example
+
+When designing a scalable e-commerce architecture:
+
+1. **Strategy Enumeration**:
+
+   - Monolithic with vertical scaling
+   - Microservices with horizontal scaling
+   - Serverless with function-based decomposition
+
+2. **Comparative Analysis**:
+
+   - Monolithic: Simplest to implement but limited scalability
+   - Microservices: Greatest scalability but highest complexity
+   - Serverless: Good scalability with managed infrastructure but potential cost issues
+
+3. **Constraint Mapping**:
+
+   - Development resources: Microservices require more initial investment
+   - Timeline: Monolithic fastest to deploy initially
+   - Expected load: Microservices best for variable high load
+
+4. **Solution Refinement**:
+   Selected microservices with:
+
+   - API Gateway for unified entry point
+   - Circuit breakers for resilience
+   - Event-driven communication for decoupling
+
+5. **Approach Documentation**:
+   - Rejected monolithic due to scalability limitations
+   - Rejected serverless due to unpredictable costs at scale
+   - Selected microservices with specific patterns to address complexity challenges
+     </example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER skip reasoning processes for complex or high-risk tasks",
+    "NEVER mix incompatible reasoning methods without integration",
+    "NEVER rely on single reasoning method for complex problems",
+    "NEVER assume problem understanding without proper decomposition",
+    "NEVER rush evaluation of alternatives",
+    "NEVER skip documentation of discarded approaches",
+    "NEVER ignore dependencies in code modifications",
+    "NEVER lose track of overall context during focused problem-solving"
+  ],
+  "reasoning_risks": [
+    "Insufficient reasoning leads to suboptimal solutions",
+    "Skipping systematic analysis results in overlooked edge cases",
+    "Rushed reasoning processes produce incomplete problem understanding",
+    "Lack of structured approaches makes solutions difficult to validate"
+  ]
+}
+</danger>

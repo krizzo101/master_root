@@ -1,0 +1,107 @@
+---
+description: MUST validate configurations WHEN loading settings TO ensure correct application behavior
+globs: ["**/*config*/**", "**/*", "**/*validation*/**", "**/config/**", "**/validation/**"]
+---
+# config-validation
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3302-config-validation",
+  "taxonomy": {
+    "category": "Configuration Management",
+    "parent": "Configuration ManagementRule",
+    "ancestors": [
+      "Rule",
+      "Configuration ManagementRule"
+    ],
+    "children": [
+      "3303-config-check",
+      "3304-config-standards"
+    ]
+  },
+  "tags": [
+    "config-validation",
+    "configuration",
+    "validation",
+    "best-practices"
+  ],
+  "priority": "50",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "The rule's purpose is to ensure that all configuration files are validated correctly before they are loaded into the application, preventing errors and misconfigurations.",
+  "application": "This rule should be applied during the initialization phase of the application when loading configuration settings. It MUST validate configurations to ensure they adhere to defined schemas and standards.",
+  "importance": "This rule is critical as it helps maintain application stability and performance by catching configuration errors early, thereby reducing the risk of runtime failures and ensuring a smooth user experience."
+}
+
+## validation_criteria
+
+{
+  "description": "This section outlines the criteria that configurations must meet to be considered valid.",
+  "requirements": [
+    "MUST conform to the defined schema for configuration files.",
+    "MUST include all required fields specified in the schema.",
+    "MUST have data types that match the expected types in the schema."
+  ]
+}
+
+## error_handling
+
+{
+  "description": "This section specifies how to handle errors encountered during configuration validation.",
+  "requirements": [
+    "MUST log all validation errors with clear messages indicating the nature of the error.",
+    "MUST provide user-friendly feedback to guide users in resolving validation issues.",
+    "SHOULD abort the loading process if critical validation errors are detected."
+  ]
+}
+
+## best_practices
+
+{
+  "description": "This section provides best practices for ensuring effective configuration validation.",
+  "requirements": [
+    "SHOULD create unit tests to verify that configurations are validated correctly.",
+    "SHOULD regularly review and update validation schemas to accommodate new requirements.",
+    "NEVER ignore validation warnings; they may indicate potential issues that could lead to failures."
+  ]
+}
+
+<example>
+config-validation Example
+
+```python
+# Example for config-validation
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement config-validation according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER skip the validation of configuration files before loading them into the application.",
+    "NEVER allow configurations with missing required fields to be loaded.",
+    "NEVER accept configurations that do not conform to the defined schema.",
+    "NEVER ignore validation errors during the initialization phase of the application.",
+    "NEVER load configurations that contain data types mismatching the expected types in the schema."
+  ],
+  "specific_risks": [
+    "Loading invalid configurations can lead to application crashes or unexpected behavior, resulting in downtime.",
+    "Missing required fields in configurations can cause critical functionalities to fail, impacting user experience.",
+    "Non-conforming configurations may introduce security vulnerabilities, exposing the application to potential attacks.",
+    "Ignoring validation errors can result in misconfigurations that may lead to data loss or corruption.",
+    "Data type mismatches can lead to runtime exceptions, causing disruptions in service and affecting overall application performance."
+  ]
+}
+</danger>

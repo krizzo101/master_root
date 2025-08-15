@@ -1,0 +1,104 @@
+---
+description: MUST follow naming conventions WHEN creating storage variables TO enhance code readability
+globs: ["**/*", "**/*storage*/**", "**/storage/**", "**/*conventions*/**", "**/conventions/**"]
+---
+# storage-conventions
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3605-storage-conventions",
+  "taxonomy": {
+    "category": "Output Generation Standards",
+    "parent": "Output Generation StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Output Generation StandardsRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "storage",
+    "conventions",
+    "output",
+    "standards"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST ensure consistent naming conventions when creating storage variables to enhance code readability and maintainability.",
+  "application": "SHOULD be applied during the design phase of code development and whenever storage variables are introduced or modified in the codebase.",
+  "importance": "This rule matters because adhering to storage naming conventions improves collaboration among developers, facilitates easier code reviews, and reduces the likelihood of errors stemming from misnamed variables."
+}
+
+## naming_conventions
+
+{
+  "description": "MUST adhere to specific naming patterns for storage variables to enhance clarity and uniformity across the codebase.",
+  "requirements": [
+    "MUST use camelCase for variable names, e.g., 'userDataStorage'.",
+    "MUST prefix storage variables with 'storage_' to clearly identify their purpose, e.g., 'storage_userData'.",
+    "NEVER use ambiguous or generic names such as 'data' or 'info' for storage variables."
+  ]
+}
+
+## type_specification
+
+{
+  "description": "MUST specify the data type of storage variables explicitly to prevent type-related errors.",
+  "requirements": [
+    "MUST declare the type of storage variable directly in its definition, e.g., 'const userDataStorage: UserData = {};'.",
+    "SHOULD use consistent type annotations to improve type safety and code readability.",
+    "MUST ensure that the variable type reflects its content, e.g., use 'Array' for lists and 'Object' for structured data."
+  ]
+}
+
+## documentation_requirements
+
+{
+  "description": "MUST document the purpose and usage of storage variables to aid understanding and maintenance.",
+  "requirements": [
+    "MUST include comments explaining the storage variable's role and expected content, e.g., '// Store user data for retrieval later'.",
+    "SHOULD provide examples of how the storage variable is used within the code to assist other developers.",
+    "NEVER omit documentation for complex or critical storage variables, as this can lead to misuse or confusion."
+  ]
+}
+
+<example>
+storage-conventions Example
+
+```python
+# Example for storage-conventions
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement storage-conventions according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER use vague or generic names for storage variables, such as 'temp' or 'data', as it undermines clarity.",
+    "NEVER forget to prefix storage variables with 'storage_' to clearly distinguish them from other variable types.",
+    "NEVER mix naming conventions; for example, using snake_case for some storage variables while using camelCase for others.",
+    "NEVER declare storage variables without specifying their data types, as this can lead to unexpected type errors during execution.",
+    "NEVER omit comments or documentation for storage variables, especially if they are complex or critical to the application."
+  ],
+  "specific_risks": [
+    "Violating naming conventions can lead to confusion among developers, making it difficult to identify the purpose of storage variables, which can result in errors and increased debugging time.",
+    "Using ambiguous names may cause misinterpretation of the data being stored, leading to incorrect usage and potentially causing runtime errors.",
+    "Failing to specify data types can create type-related bugs that are hard to trace, especially in larger codebases, resulting in runtime failures and diminished software reliability.",
+    "Lack of documentation can lead to misuse of storage variables, especially by new team members or when the code is revisited after a long period, increasing the risk of incorrect implementations.",
+    "Inconsistent naming and documentation practices can hinder collaboration and code reviews, ultimately slowing down development and reducing overall code quality."
+  ]
+}
+</danger>

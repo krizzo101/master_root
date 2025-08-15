@@ -1,0 +1,11 @@
+# Project Mapper configuration for demo project
+
+project_name: Demo Project
+output_dir: .maps
+include_patterns:
+  - "**/*.py"
+  - "**/*.md"
+exclude_patterns:
+  - "**/__pycache__/**"
+analyze_code: true
+analyze_docs: true

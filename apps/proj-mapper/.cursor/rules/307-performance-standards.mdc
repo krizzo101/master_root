@@ -1,0 +1,148 @@
+---
+description: WHEN writing or modifying code TO ensure optimal performance and scalability you MUST follow these performance standards
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"performance_principles": "17-45",
+"optimization_guidelines": "47-75",
+"monitoring_requirements": "77-95"
+},
+"key_elements": {
+"principle_validation": "20-30",
+"optimization_validation": "50-60",
+"monitoring_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: performance_principles -> optimization_guidelines -> monitoring_requirements. Validate against principle_validation before proceeding."
+}
+
+{
+"rule_name": "Performance Standards",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"optimizing performance",
+"improving efficiency",
+"handling scale",
+"managing resources"
+],
+"priority": 5,
+"domain": "development"
+},
+
+"overview": {
+"description": "Defines comprehensive performance standards for code development",
+"importance": "Performance is critical for user experience and system efficiency"
+},
+
+"performance_principles": {
+"resource_management": {
+"requirements": [
+"Optimize memory usage",
+"Manage CPU utilization",
+"Control I/O operations",
+"Handle concurrency"
+],
+"validation": {"efficient": true, "controlled": true}
+},
+"algorithmic_efficiency": {
+"requirements": [
+"Use optimal algorithms",
+"Minimize complexity",
+"Avoid redundant work",
+"Cache effectively"
+],
+"validation": {"optimized": true, "efficient": true}
+},
+"scalability_patterns": {
+"requirements": [
+"Design for scale",
+"Handle load increases",
+"Support distribution",
+"Enable horizontal scaling"
+],
+"validation": {"scalable": true, "distributed": true}
+}
+},
+
+"optimization_guidelines": {
+"code_optimization": {
+"requirements": [
+"Profile before optimizing",
+"Target bottlenecks",
+"Measure improvements",
+"Document trade-offs"
+],
+"validation": {"profiled": true, "measured": true}
+},
+"data_efficiency": {
+"requirements": [
+"Optimize data structures",
+"Minimize data transfer",
+"Use appropriate formats",
+"Implement caching"
+],
+"validation": {"efficient": true, "optimized": true}
+},
+"system_resources": {
+"requirements": [
+"Monitor resource usage",
+"Set resource limits",
+"Handle resource exhaustion",
+"Implement pooling"
+],
+"validation": {"monitored": true, "managed": true}
+}
+},
+
+"monitoring_requirements": {
+"performance_metrics": {
+"requirements": [
+"Track response times",
+"Monitor throughput",
+"Measure latency",
+"Log resource usage"
+],
+"validation": {"tracked": true, "measured": true}
+},
+"optimization_validation": {
+"requirements": [
+"Benchmark performance",
+"Compare metrics",
+"Validate improvements",
+"Document results"
+],
+"validation": {"validated": true, "documented": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER ignore performance metrics",
+"NEVER skip profiling",
+"NEVER implement premature optimization",
+"NEVER ignore resource leaks",
+"NEVER block main thread",
+"NEVER use inefficient algorithms",
+"NEVER skip performance testing",
+"NEVER ignore scalability"
+],
+"validation_rules": {
+"metrics": {"monitored": true},
+"profiling": {"performed": true},
+"optimization": {"justified": true},
+"resources": {"managed": true},
+"threading": {"efficient": true},
+"algorithms": {"optimal": true},
+"testing": {"completed": true},
+"scalability": {"considered": true}
+}
+}
+}

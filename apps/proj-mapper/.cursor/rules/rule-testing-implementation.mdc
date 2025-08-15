@@ -1,0 +1,982 @@
+---
+description: WHEN implementing rule tests TO ensure effective validation you MUST follow these implementation guidelines
+globs: .cursor/rules/*.mdc
+alwaysApply: false
+---
+
+# Rule Testing Implementation Guide
+
+{
+"rule_name": "Rule Testing Implementation Guide",
+"version": "1.0.0",
+"ai_processing_priority": "high",
+"enhanced_metadata": {
+"activation_context": [
+"implementing rule tests",
+"executing rule validation",
+"debugging rule behavior",
+"analyzing rule effectiveness"
+],
+"priority": 4,
+"domain": "meta-rules"
+}
+}
+
+## Overview
+
+This guide provides practical implementation steps and code examples for applying the Rule Testing Framework in real-world scenarios. It includes sample test runners, validation utilities, and analysis tools.
+
+## Implementation Structure
+
+The rule testing implementation consists of these components:
+
+1. **Test Runner**: Orchestrates test execution
+2. **Rule Parser**: Extracts and validates rule structure
+3. **Test Environment**: Sets up isolation and context
+4. **Behavior Analyzer**: Evaluates rule effectiveness
+5. **Report Generator**: Creates comprehensive test reports
+
+## Sample Implementation
+
+### Rule Parser
+
+```javascript
+// rule-parser.js
+const fs = require("fs");
+const matter = require("gray-matter");
+
+/**
+ * Parses a rule file and extracts components
+ */
+function parseRule(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, "utf8");
+    const { data: frontmatter, content: body } = matter(content);
+
+    // Determine rule state
+    const state = determineRuleState(frontmatter);
+
+    return {
+      path: filePath,
+      filename: filePath.split("/").pop(),
+      frontmatter,
+      body,
+      state,
+      valid: validateRuleStructure(frontmatter, body, state),
+    };
+  } catch (error) {
+    return {
+      path: filePath,
+      error: error.message,
+      valid: false,
+    };
+  }
+}
+
+/**
+ * Determines rule state based on frontmatter
+ */
+function determineRuleState(frontmatter) {
+  if (frontmatter.alwaysApply === true) {
+    return "always_rule";
+  }
+
+  if (frontmatter.alwaysApply === false) {
+    if (frontmatter.globs && frontmatter.globs.length > 0) {
+      return "auto_attached_rule";
+    }
+
+    if (frontmatter.globs === "" || frontmatter.globs === null) {
+      if (
+        frontmatter.description &&
+        /WHEN.*TO.*MUST/.test(frontmatter.description)
+      ) {
+        return "agent_requested_rule";
+      }
+    }
+
+    if (
+      !frontmatter.description &&
+      (!frontmatter.globs || frontmatter.globs === undefined)
+    ) {
+      return "manual_rule";
+    }
+  }
+
+  return "unknown";
+}
+
+/**
+ * Validates rule structure based on its state
+ */
+function validateRuleStructure(frontmatter, body, state) {
+  const errors = [];
+
+  // Common validations
+  if (!frontmatter) {
+    errors.push("Missing frontmatter");
+  }
+
+  if (!body || body.trim() === "") {
+    errors.push("Empty rule body");
+  }
+
+  // State-specific validations
+  switch (state) {
+    case "always_rule":
+      if (frontmatter.alwaysApply !== true) {
+        errors.push("Always rules must have alwaysApply: true");
+      }
+      break;
+
+    case "auto_attached_rule":
+      if (frontmatter.alwaysApply !== false) {
+        errors.push("Auto-attached rules must have alwaysApply: false");
+      }
+      if (!frontmatter.globs || frontmatter.globs === "") {
+        errors.push("Auto-attached rules must have non-empty globs");
+      }
+      break;
+
+    case "agent_requested_rule":
+      if (frontmatter.alwaysApply !== false) {
+        errors.push("Agent-requested rules must have alwaysApply: false");
+      }
+      if (frontmatter.globs !== "" && frontmatter.globs !== null) {
+        errors.push("Agent-requested rules must have empty globs field");
+      }
+      if (
+        !frontmatter.description ||
+        !/WHEN.*TO.*MUST/.test(frontmatter.description)
+      ) {
+        errors.push(
+          "Agent-requested rules must have description in WHEN-TO-MUST format"
+        );
+      }
+      break;
+
+    case "manual_rule":
+      if (frontmatter.alwaysApply !== false) {
+        errors.push("Manual rules must have alwaysApply: false");
+      }
+      if (frontmatter.description) {
+        errors.push("Manual rules must not have description");
+      }
+      if (frontmatter.globs !== undefined) {
+        errors.push("Manual rules must not have globs field");
+      }
+      break;
+
+    default:
+      errors.push("Unknown rule state");
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+module.exports = {
+  parseRule,
+  determineRuleState,
+  validateRuleStructure,
+};
+```
+
+### Test Runner
+
+```javascript
+// rule-test-runner.js
+const { parseRule } = require("./rule-parser");
+const { runActivationTest } = require("./activation-tester");
+const { runBehaviorTest } = require("./behavior-tester");
+const { generateReport } = require("./report-generator");
+
+/**
+ * Main test runner
+ */
+async function testRule(rulePath, options = {}) {
+  console.log(`Testing rule: ${rulePath}`);
+
+  // Parse and validate rule
+  const rule = parseRule(rulePath);
+  if (!rule.valid) {
+    console.error(`Rule validation failed: ${rule.error}`);
+    return {
+      rule: rule.filename,
+      valid: false,
+      errors: rule.valid.errors || [rule.error],
+      tests: [],
+    };
+  }
+
+  // Run state-specific activation tests
+  const activationResults = await runActivationTests(rule);
+
+  // Run behavior tests if activation tests passed
+  let behaviorResults = [];
+  if (activationResults.passed) {
+    behaviorResults = await runBehaviorTests(rule, options.behaviorTests || []);
+  }
+
+  // Generate consolidated report
+  const report = generateReport(rule, activationResults, behaviorResults);
+
+  // Output report summary
+  console.log(`Test completed: ${report.summary.passed ? "PASSED" : "FAILED"}`);
+  console.log(`Activation score: ${report.summary.activationScore}`);
+  console.log(`Behavior score: ${report.summary.behaviorScore}`);
+
+  return report;
+}
+
+/**
+ * Run appropriate activation tests based on rule state
+ */
+async function runActivationTests(rule) {
+  const tests = [];
+
+  switch (rule.state) {
+    case "always_rule":
+      tests.push({
+        name: "Global Activation",
+        context: { files: [] },
+        expectedActivation: true,
+      });
+      break;
+
+    case "auto_attached_rule":
+      // Extract glob patterns and create matching test files
+      const testFiles = generateTestFilesFromGlobs(rule.frontmatter.globs);
+      tests.push({
+        name: "Matching Files Activation",
+        context: { files: testFiles },
+        expectedActivation: true,
+      });
+      tests.push({
+        name: "Non-Matching Files Non-Activation",
+        context: { files: ["unrelated.txt"] },
+        expectedActivation: false,
+      });
+      break;
+
+    case "agent_requested_rule":
+      tests.push({
+        name: "Explicit Request Activation",
+        context: {
+          request: `Please apply the rule ${rule.filename}`,
+        },
+        expectedActivation: true,
+      });
+      tests.push({
+        name: "No Request Non-Activation",
+        context: { request: "Help me with my code" },
+        expectedActivation: false,
+      });
+      break;
+
+    case "manual_rule":
+      tests.push({
+        name: "Manual Attachment Test",
+        context: {
+          explicitAttachment: true,
+          request: `Using ${rule.filename}, help me with my code`,
+        },
+        expectedActivation: true,
+      });
+      tests.push({
+        name: "No Attachment Non-Activation",
+        context: {
+          explicitAttachment: false,
+          request: "Help me with my code",
+        },
+        expectedActivation: false,
+      });
+      break;
+  }
+
+  const results = [];
+  for (const test of tests) {
+    const result = await runActivationTest(rule, test);
+    results.push(result);
+  }
+
+  return {
+    passed: results.every((r) => r.passed),
+    results,
+  };
+}
+
+/**
+ * Generate test files that would match the given glob patterns
+ */
+function generateTestFilesFromGlobs(globs) {
+  // Simple implementation - in practice this would be more sophisticated
+  if (typeof globs === "string") {
+    if (globs.includes("*.js")) return ["test.js"];
+    if (globs.includes("*.ts")) return ["test.ts"];
+    if (globs.includes("*.mdc")) return ["test.mdc"];
+    return ["test.txt"];
+  }
+
+  if (Array.isArray(globs)) {
+    return globs.map((g) => `test${g.replace("*", "")}`);
+  }
+
+  return ["test.txt"];
+}
+
+/**
+ * Run behavior tests to verify rule effectiveness
+ */
+async function runBehaviorTests(rule, tests) {
+  if (!tests || tests.length === 0) {
+    // Generate default behavior tests based on rule state
+    tests = generateDefaultBehaviorTests(rule);
+  }
+
+  const results = [];
+  for (const test of tests) {
+    const result = await runBehaviorTest(rule, test);
+    results.push(result);
+  }
+
+  return {
+    passed: results.every((r) => r.passed),
+    results,
+  };
+}
+
+module.exports = {
+  testRule,
+  runActivationTests,
+  runBehaviorTests,
+};
+```
+
+### Activation Tester
+
+```javascript
+// activation-tester.js
+const { simulateAgentInteraction } = require("./agent-simulator");
+
+/**
+ * Tests if a rule activates in the given context
+ */
+async function runActivationTest(rule, test) {
+  console.log(`Running activation test: ${test.name}`);
+
+  // Simulate agent interaction with rule and context
+  const interaction = await simulateAgentInteraction(rule, test.context);
+
+  // Check if rule was activated
+  const activated = detectRuleActivation(interaction, rule);
+  const passed = activated === test.expectedActivation;
+
+  return {
+    name: test.name,
+    expectedActivation: test.expectedActivation,
+    actualActivation: activated,
+    passed,
+    context: test.context,
+    interaction: interaction.summary,
+  };
+}
+
+/**
+ * Detects if rule was activated based on agent response
+ */
+function detectRuleActivation(interaction, rule) {
+  // This is a simplified implementation
+  // In practice, this would use more sophisticated detection methods
+
+  const ruleNamePattern = new RegExp(rule.filename, "i");
+  const ruleActivationPattern = /(applying|following|using) (rule|guidance)/i;
+
+  // Look for explicit rule mention
+  if (ruleNamePattern.test(interaction.agentResponse)) {
+    return true;
+  }
+
+  // Look for behavior that indicates rule application
+  if (ruleActivationPattern.test(interaction.agentResponse)) {
+    return true;
+  }
+
+  // For content-specific rules, look for specific patterns
+  // This would be customized based on rule content
+
+  return false;
+}
+
+module.exports = {
+  runActivationTest,
+  detectRuleActivation,
+};
+```
+
+### Agent Simulator
+
+```javascript
+// agent-simulator.js
+
+/**
+ * Simulates interaction with an agent to test rule activation
+ */
+async function simulateAgentInteraction(rule, context) {
+  console.log(`Simulating agent interaction for rule: ${rule.filename}`);
+
+  // In a real implementation, this would actually interface with the Cursor agent
+  // For demonstration, we're mocking the agent behavior
+
+  // Create prompt and context
+  const prompt = buildPrompt(context);
+  const fullContext = assembleContext(rule, context);
+
+  // Mock the agent response
+  const agentResponse = mockAgentResponse(rule, fullContext, prompt);
+
+  return {
+    prompt,
+    context: fullContext,
+    agentResponse,
+    summary: {
+      promptLength: prompt.length,
+      contextSize: JSON.stringify(fullContext).length,
+      responseLength: agentResponse.length,
+    },
+  };
+}
+
+/**
+ * Builds a test prompt from the context
+ */
+function buildPrompt(context) {
+  if (context.request) {
+    return context.request;
+  }
+
+  if (context.files && context.files.length > 0) {
+    return `Help me understand these files: ${context.files.join(", ")}`;
+  }
+
+  return "Give me general coding advice";
+}
+
+/**
+ * Assembles the full context for the agent, including the rule if applicable
+ */
+function assembleContext(rule, context) {
+  const fullContext = { ...context };
+
+  // For always rules, always include the rule
+  if (rule.state === "always_rule") {
+    fullContext.rules = [rule];
+  }
+
+  // For auto-attached rules, include if matching files are present
+  if (
+    rule.state === "auto_attached_rule" &&
+    context.files &&
+    fileMatchesGlobs(context.files, rule.frontmatter.globs)
+  ) {
+    fullContext.rules = [rule];
+  }
+
+  // For agent-requested rules, include if explicitly requested
+  if (
+    rule.state === "agent_requested_rule" &&
+    context.request &&
+    context.request.includes(rule.filename)
+  ) {
+    fullContext.rules = [rule];
+  }
+
+  // For manual rules, include only if explicitly attached
+  if (rule.state === "manual_rule" && context.explicitAttachment) {
+    fullContext.rules = [rule];
+  }
+
+  return fullContext;
+}
+
+/**
+ * Simple check if any file matches the rule's glob patterns
+ */
+function fileMatchesGlobs(files, globs) {
+  // Simple implementation - in practice this would use proper glob matching
+  if (!files || !globs) return false;
+
+  const globPatterns = Array.isArray(globs) ? globs : [globs];
+
+  for (const file of files) {
+    for (const pattern of globPatterns) {
+      // Very basic glob matching - just for demonstration
+      const regex = new RegExp(pattern.replace("*", ".*"));
+      if (regex.test(file)) return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Mocks an agent response based on the rule and context
+ */
+function mockAgentResponse(rule, context, prompt) {
+  // In a real implementation, this would call the actual Cursor agent
+  // For demonstration, we'll generate mock responses
+
+  // Check if the rule is included in the context
+  const ruleApplied = context.rules && context.rules.includes(rule);
+
+  if (ruleApplied) {
+    return `I'm applying the guidance from ${
+      rule.filename
+    }. ${generateRuleBasedResponse(rule)}`;
+  } else {
+    return "I'll help you with that. Here's my general advice without any specific rules applied.";
+  }
+}
+
+/**
+ * Generates a response that would indicate the rule has been applied
+ */
+function generateRuleBasedResponse(rule) {
+  // In a real implementation, this would analyze the rule content
+  // and generate a response that shows the rule was followed
+
+  switch (rule.state) {
+    case "always_rule":
+      return "I'm following the global standards as defined in our codebase.";
+
+    case "auto_attached_rule":
+      return `I see you're working with files that require specific handling. I'll apply those standards.`;
+
+    case "agent_requested_rule":
+      return `As requested, I'll follow the specific guidelines for this task.`;
+
+    case "manual_rule":
+      return `I'll apply the manually attached guidelines you specified.`;
+
+    default:
+      return "I'll do my best to help with your request.";
+  }
+}
+
+module.exports = {
+  simulateAgentInteraction,
+};
+```
+
+### Behavior Tester
+
+```javascript
+// behavior-tester.js
+
+/**
+ * Tests rule effectiveness by analyzing agent behavior
+ */
+async function runBehaviorTest(rule, test) {
+  console.log(`Running behavior test: ${test.name}`);
+
+  // Set up test context
+  const context = test.context || {
+    files: test.files,
+    request: test.prompt || "Help me with my code",
+  };
+
+  // Ensure rule is activated for the behavior test
+  if (rule.state === "auto_attached_rule") {
+    context.files =
+      context.files || generateMatchingFiles(rule.frontmatter.globs);
+  } else if (rule.state === "agent_requested_rule") {
+    context.request = `Using ${rule.filename}, ${context.request}`;
+  } else if (rule.state === "manual_rule") {
+    context.explicitAttachment = true;
+  }
+
+  // Simulate agent interaction
+  const { agentResponse } = await simulateAgentInteraction(rule, context);
+
+  // Evaluate against expected behaviors
+  const evaluation = evaluateBehaviors(agentResponse, test.expectedBehaviors);
+
+  return {
+    name: test.name,
+    passed: evaluation.passed,
+    expectedBehaviors: test.expectedBehaviors,
+    evaluation: evaluation.details,
+    score: evaluation.score,
+    response: agentResponse.substring(0, 200) + "...", // Truncated for brevity
+  };
+}
+
+/**
+ * Evaluates if the agent response exhibits the expected behaviors
+ */
+function evaluateBehaviors(response, expectedBehaviors) {
+  // In a real implementation, this would use more sophisticated analysis
+  // For demonstration, we'll use simple pattern matching
+
+  const results = [];
+
+  for (const behavior of expectedBehaviors) {
+    // Convert behavior description to a simple regex pattern
+    const pattern = new RegExp(behavior.replace(/\s+/g, "\\s+"), "i");
+    const matches = pattern.test(response);
+
+    results.push({
+      behavior,
+      matched: matches,
+      confidence: matches ? 0.85 : 0.15, // Simplified confidence score
+    });
+  }
+
+  const score =
+    results.reduce((sum, r) => sum + (r.matched ? 1 : 0), 0) / results.length;
+
+  return {
+    passed: score >= 0.7, // Pass threshold
+    score,
+    details: results,
+  };
+}
+
+module.exports = {
+  runBehaviorTest,
+  evaluateBehaviors,
+};
+```
+
+### Report Generator
+
+```javascript
+// report-generator.js
+
+/**
+ * Generates a comprehensive test report
+ */
+function generateReport(rule, activationResults, behaviorResults) {
+  const activationScore = calculateActivationScore(activationResults);
+  const behaviorScore = calculateBehaviorScore(behaviorResults);
+  const overallScore = activationScore * 0.4 + behaviorScore * 0.6;
+
+  return {
+    rule: {
+      name: rule.filename,
+      state: rule.state,
+      path: rule.path,
+    },
+    summary: {
+      passed: overallScore >= 0.7,
+      overallScore: formatScore(overallScore),
+      activationScore: formatScore(activationScore),
+      behaviorScore: formatScore(behaviorScore),
+      timestamp: new Date().toISOString(),
+    },
+    activation: {
+      passed: activationResults.passed,
+      tests: activationResults.results,
+    },
+    behavior: {
+      passed: behaviorResults.passed,
+      tests: behaviorResults.results,
+    },
+    recommendations: generateRecommendations(
+      rule,
+      activationResults,
+      behaviorResults
+    ),
+  };
+}
+
+/**
+ * Calculates activation test score
+ */
+function calculateActivationScore(activationResults) {
+  if (!activationResults || !activationResults.results) return 0;
+
+  return (
+    activationResults.results.reduce((sum, r) => sum + (r.passed ? 1 : 0), 0) /
+    activationResults.results.length
+  );
+}
+
+/**
+ * Calculates behavior test score
+ */
+function calculateBehaviorScore(behaviorResults) {
+  if (!behaviorResults || !behaviorResults.results) return 0;
+
+  return (
+    behaviorResults.results.reduce((sum, r) => sum + r.score, 0) /
+    behaviorResults.results.length
+  );
+}
+
+/**
+ * Formats a score as a percentage
+ */
+function formatScore(score) {
+  return `${(score * 100).toFixed(1)}%`;
+}
+
+/**
+ * Generates improvement recommendations based on test results
+ */
+function generateRecommendations(rule, activationResults, behaviorResults) {
+  const recommendations = [];
+
+  // Structure recommendations
+  if (rule.state === "unknown") {
+    recommendations.push(
+      "Fix rule structure to match one of the defined states"
+    );
+  }
+
+  // Activation recommendations
+  if (!activationResults.passed) {
+    const failedTests = activationResults.results.filter((r) => !r.passed);
+    for (const test of failedTests) {
+      if (test.expectedActivation && !test.actualActivation) {
+        recommendations.push(`Improve activation for test "${test.name}"`);
+      } else if (!test.expectedActivation && test.actualActivation) {
+        recommendations.push(
+          `Rule activating when it shouldn't in test "${test.name}"`
+        );
+      }
+    }
+  }
+
+  // Behavior recommendations
+  if (behaviorResults && behaviorResults.results) {
+    for (const test of behaviorResults.results) {
+      if (test.score < 0.7) {
+        recommendations.push(
+          `Improve effectiveness for behavior test "${test.name}"`
+        );
+
+        // Specific behavior issues
+        const failedBehaviors = test.evaluation.filter((e) => !e.matched);
+        for (const behavior of failedBehaviors) {
+          recommendations.push(
+            `- Rule doesn't effectively enforce: ${behavior.behavior}`
+          );
+        }
+      }
+    }
+  }
+
+  return recommendations;
+}
+
+module.exports = {
+  generateReport,
+  calculateActivationScore,
+  calculateBehaviorScore,
+};
+```
+
+## Command Line Interface
+
+```javascript
+// rule-test-cli.js
+const fs = require("fs");
+const path = require("path");
+const { testRule } = require("./rule-test-runner");
+
+async function main() {
+  const args = process.argv.slice(2);
+
+  if (args.length === 0) {
+    console.log(
+      "Usage: node rule-test-cli.js <rule-path-or-directory> [--all] [--verbose]"
+    );
+    process.exit(1);
+  }
+
+  const targetPath = args[0];
+  const testAll = args.includes("--all");
+  const verbose = args.includes("--verbose");
+
+  try {
+    if (testAll || fs.statSync(targetPath).isDirectory()) {
+      await testDirectory(targetPath, verbose);
+    } else {
+      await testSingleRule(targetPath, verbose);
+    }
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+async function testDirectory(dirPath, verbose) {
+  console.log(`Testing all rules in: ${dirPath}`);
+
+  const files = fs.readdirSync(dirPath);
+  const ruleFiles = files.filter((file) => file.endsWith(".mdc"));
+
+  console.log(`Found ${ruleFiles.length} rule files`);
+
+  const results = [];
+
+  for (const file of ruleFiles) {
+    const rulePath = path.join(dirPath, file);
+    const result = await testSingleRule(rulePath, verbose);
+    results.push(result);
+  }
+
+  // Generate summary report
+  console.log("\n======= Test Summary =======");
+  console.log(`Total rules tested: ${results.length}`);
+  console.log(`Passed: ${results.filter((r) => r.summary.passed).length}`);
+  console.log(`Failed: ${results.filter((r) => !r.summary.passed).length}`);
+
+  // Save results to file
+  const reportPath = path.join(process.cwd(), "rule-test-report.json");
+  fs.writeFileSync(reportPath, JSON.stringify(results, null, 2));
+  console.log(`\nDetailed report saved to: ${reportPath}`);
+}
+
+async function testSingleRule(rulePath, verbose) {
+  console.log(`\nTesting rule: ${rulePath}`);
+
+  const result = await testRule(rulePath, { verbose });
+
+  if (verbose) {
+    console.log(JSON.stringify(result, null, 2));
+  } else {
+    console.log(`Status: ${result.summary.passed ? "PASSED" : "FAILED"}`);
+    console.log(`Overall Score: ${result.summary.overallScore}`);
+
+    if (result.recommendations.length > 0) {
+      console.log("\nRecommendations:");
+      result.recommendations.forEach((rec) => console.log(`- ${rec}`));
+    }
+  }
+
+  return result;
+}
+
+main().catch(console.error);
+```
+
+## Usage Examples
+
+### Testing a Single Rule
+
+```bash
+# Test a single rule with standard output
+node rule-test-cli.js .cursor/rules/my-rule.mdc
+
+# Test a single rule with verbose output
+node rule-test-cli.js .cursor/rules/my-rule.mdc --verbose
+```
+
+### Testing All Rules
+
+```bash
+# Test all rules in a directory
+node rule-test-cli.js .cursor/rules/ --all
+
+# Generate a comprehensive report
+node rule-test-cli.js .cursor/rules/ --all --verbose > rule-test-report.txt
+```
+
+## Integration with Development Workflow
+
+### Pre-Commit Hook
+
+```bash
+#!/bin/bash
+# .git/hooks/pre-commit
+
+# Get all staged .mdc files
+STAGED_RULES=$(git diff --cached --name-only | grep '\.cursor/rules/.*\.mdc$')
+
+if [ -n "$STAGED_RULES" ]; then
+  echo "Testing staged rule files..."
+
+  for rule in $STAGED_RULES; do
+    node scripts/rule-test-cli.js "$rule"
+
+    if [ $? -ne 0 ]; then
+      echo "Rule test failed for $rule"
+      echo "Please fix the issues before committing"
+      exit 1
+    fi
+  done
+fi
+
+exit 0
+```
+
+### GitHub Action
+
+```yaml
+# .github/workflows/test-rules.yml
+name: Test Cursor Rules
+
+on:
+  push:
+    paths:
+      - ".cursor/rules/**"
+  pull_request:
+    paths:
+      - ".cursor/rules/**"
+
+jobs:
+  test-rules:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Test rules
+        run: node scripts/rule-test-cli.js .cursor/rules/ --all
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v2
+        with:
+          name: rule-test-report
+          path: rule-test-report.json
+```
+
+## Best Practices
+
+1. **Test Early, Test Often**: Integrate rule testing into your development workflow
+2. **Test All States**: Ensure tests cover all rule states
+3. **Simulate Real Contexts**: Test with realistic file patterns and requests
+4. **Track Changes**: Monitor rule effectiveness over time
+5. **Fix Issues Promptly**: Address failing tests immediately
+
+## Critical Violations
+
+- NEVER deploy a rule that fails format validation
+- NEVER ignore activation test failures
+- NEVER skip behavior verification
+- NEVER assume tests will pass without verification
+- NEVER rely on subjective assessment of rule effectiveness
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER deploy a rule that fails format validation",
+    "NEVER ignore activation test failures",
+    "NEVER skip behavior verification",
+    "NEVER assume tests will pass without verification",
+    "NEVER rely on subjective assessment of rule effectiveness"
+  ]
+}
+</danger>

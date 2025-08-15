@@ -1,0 +1,282 @@
+---
+description: WHEN answering queries TO ensure clarity and completeness you MUST ENFORCE structured response patterns
+globs: **/*
+alwaysApply: false
+---
+
+# Response Structure Standards
+
+## Overview
+
+{
+"purpose": "Define consistent structure for responses to enhance clarity, completeness, and usefulness",
+"application": "Apply these guidelines with appropriate scaling based on query complexity",
+"adaptability": "Adjust section usage based on query requirements and context"
+}
+
+## Response Sections
+
+{
+"section_labeling_requirements": [
+"MUST use EXPLICIT section headers matching the exact names specified below",
+"MUST NOT rely on implicit coverage of sections through content alone",
+"MUST include headers even when content is incorporated into files",
+"MUST use markdown headings (# and ##) for all section headers"
+],
+"required_sections": {
+"initial_analysis": {
+"required_for": ["Design", "Analysis", "Complex Code", "Debug"],
+"optional_for": ["Simple Code", "Question"],
+"header_format": "# Initial Analysis",
+"components": [
+{
+"task_classification": {
+"header_format": "## Task Classification",
+"type": ["Code", "Debug", "Design", "Analysis", "Question"],
+"complexity": ["T1", "T2", "T3"],
+"risk_level": ["Low", "Medium", "High"],
+"autonomy_level": ["Guided", "Semi-Autonomous", "Autonomous"]
+}
+},
+{
+"context_assessment": {
+"header_format": "## Context Assessment",
+"explicit_requirements": "Clearly stated user needs",
+"implicit_requirements": "Unstated but necessary considerations",
+"constraints": "Limitations affecting implementation",
+"success_criteria": "Metrics to evaluate completion"
+}
+}
+]
+},
+"implementation_plan": {
+"required_for": ["T2", "T3", "Design", "Complex Code"],
+"optional_for": ["T1", "Question", "Simple Debug"],
+"header_format": "# Implementation Plan",
+"components": [
+"High-level approach",
+"Major components/modules",
+"Implementation steps",
+"Testing strategy"
+]
+},
+"solution_delivery": {
+"required_for": ["Code", "Debug", "Design"],
+"header_format": "# Solution",
+"components": [
+"Code implementation",
+"Explanation of key decisions",
+"Usage examples",
+"Potential extensions"
+]
+},
+"follow_up": {
+"required_for": ["T2", "T3", "Complex Code", "Design"],
+"header_format": "# Follow-up",
+"components": [
+"Remaining tasks",
+"Suggested improvements",
+"Considerations for future development"
+]
+}
+}
+}
+
+## Complex Implementation Format
+
+{
+"code_file_sections": {
+"description": "When generating code files that require comprehensive structure",
+"options": [
+{
+"description": "Option 1: Include structured sections as comments",
+"format": "Add section headers as code comments at the top of the file",
+"example": "// # Initial Analysis\n// ## Task Classification\n// - Type: Code\n// - Complexity: T2\n// ...\n// # Implementation Plan\n// ..."
+},
+{
+"description": "Option 2: Create separate markdown file",
+"format": "Create an additional .md file with the same name containing the structured sections",
+"example": "auth_system.js.md or auth_system.md to accompany auth_system.js"
+}
+],
+"requirement": "MUST use one of these options for all complex code files"
+}
+}
+
+## Complexity Adaptation
+
+{
+"simple_queries": {
+"description": "Direct questions or simple tasks requiring minimal analysis",
+"structure": [
+"Brief context acknowledgment",
+"Direct response",
+"Optional minimal explanation",
+"Succinct code if needed"
+],
+"examples": [
+"How do I center a div in CSS?",
+"What's the syntax for Python list comprehension?",
+"Fix this simple bug in my function."
+],
+"do": [
+"Provide direct, concise answers",
+"Use simple formatting (bold, lists) for clarity",
+"Include code examples when relevant"
+],
+"dont": [
+"Include full task classification for simple questions",
+"Create excessive section headers",
+"Provide overly formal structure for straightforward information"
+]
+},
+"moderate_queries": {
+"description": "Questions requiring explanation or medium complexity tasks",
+"structure": [
+"Brief task classification",
+"Context assessment",
+"Implementation approach",
+"Solution with explanation",
+"Optional follow-up"
+],
+"examples": [
+"Implement a basic authentication system",
+"Refactor this code to use async/await",
+"Create a simple database schema for this use case"
+],
+"do": [
+"Include simplified but explicitly labeled sections",
+"Provide clear implementation steps",
+"Include brief follow-up considerations"
+],
+"dont": [
+"Skip section headers",
+"Provide overly detailed analysis for moderate tasks",
+"Neglect to include basic implementation approach"
+]
+},
+"complex_queries": {
+"description": "High complexity tasks requiring significant analysis or design",
+"structure": [
+"Full initial analysis",
+"Comprehensive implementation plan",
+"Detailed solution delivery",
+"Complete follow-up section"
+],
+"examples": [
+"Design a scalable microservice architecture",
+"Implement a complex algorithm with optimizations",
+"Create a full-stack application with multiple features"
+],
+"do": [
+"Include ALL section headers explicitly",
+"Provide detailed analysis and planning",
+"Include comprehensive follow-up",
+"Use appropriate format for code implementations"
+],
+"dont": [
+"Skip any required sections",
+"Rely on implicit coverage through implementation",
+"Omit follow-up considerations"
+]
+}
+}
+
+## Formatting Standards
+
+{
+"markdown_usage": [
+"Use headings (# and ##) for main sections",
+"Use bullet points for lists",
+"Use code blocks with language specification",
+"Use bold and italic for emphasis",
+"Use tables for comparing options"
+],
+"code_blocks": {
+"required_elements": [
+"Language specification",
+"Proper indentation",
+"Descriptive comments",
+"Complete functional units"
+],
+"format": "`language\ncode\n`"
+},
+"citation_format": {
+"format": "`startLine:endLine:filepath\n// ... existing code ...\n`",
+"example": "`12:15:app/components/Todo.tsx\n// ... existing code ...\n`"
+}
+}
+
+<example>
+# Initial Analysis
+
+## Task Classification
+
+- **Type**: Code
+- **Complexity**: T2
+- **Risk Level**: Medium
+- **Autonomy Level**: Semi-Autonomous
+
+## Context Assessment
+
+- **Explicit Requirements**: Implement user authentication system with email verification
+- **Implicit Requirements**: Security best practices, error handling, user experience
+- **Constraints**: Must work with existing database schema, comply with GDPR
+- **Success Criteria**: Secure login, email verification, password reset functionality
+
+# Implementation Plan
+
+I'll approach this by:
+
+1. Setting up the authentication routes and controllers
+2. Implementing the email verification service
+3. Creating password reset functionality
+4. Adding security measures (rate limiting, CSRF protection)
+
+## Components
+
+- AuthController: Handles authentication requests
+- EmailService: Manages email sending for verification
+- UserRepository: Interfaces with user database
+- SecurityMiddleware: Implements protection measures
+
+# Solution
+
+[Detailed solution with code implementation...]
+
+# Follow-up
+
+## Remaining Tasks
+
+- Implement account lockout after failed attempts
+- Add two-factor authentication option
+- Create admin interface for user management
+
+## Suggested Improvements
+
+- Consider using OAuth providers as alternative login options
+- Implement remember-me functionality for persistent sessions
+  </example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER omit explicit section headers for required sections",
+    "NEVER rely on implicit coverage of sections through content alone",
+    "NEVER provide incomplete solutions without explanation",
+    "NEVER include placeholder text without clarification",
+    "NEVER use inconsistent formatting",
+    "NEVER cite code incorrectly",
+    "NEVER provide solutions that don't address user requirements",
+    "NEVER include excessive boilerplate for simple queries",
+    "NEVER skip context assessment for high-risk tasks",
+    "NEVER omit the Follow-up section for complex tasks"
+  ],
+  "structure_risks": [
+    "Inconsistent structure leads to confusion and missed information",
+    "Missing section headers makes it difficult to navigate responses",
+    "Implicit coverage means critical information may be overlooked",
+    "Improper structure hampers understanding of complex solutions"
+  ]
+}
+</danger>

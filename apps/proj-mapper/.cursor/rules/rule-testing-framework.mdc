@@ -1,0 +1,292 @@
+---
+description: WHEN testing rules TO ensure proper implementation you MUST follow this testing framework
+globs: .cursor/rules/*.mdc
+alwaysApply: false
+---
+
+# Rule Testing Framework
+
+{
+"rule_name": "Rule Testing Framework",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"testing rules",
+"validating rules",
+"debugging rules",
+"rule effectiveness"
+],
+"priority": 5,
+"domain": "meta-rules"
+}
+}
+
+## Overview
+
+This framework provides comprehensive testing strategies to validate Cursor rules for proper formatting, structure, and effectiveness. It ensures that rules achieve their intended behavior when activated.
+
+## Testing Components
+
+### 1. Rule Format Validation
+
+```javascript
+function validateRuleFormat(rulePath) {
+  // Read rule content
+  const ruleContent = fs.readFileSync(rulePath, "utf8");
+
+  // Parse frontmatter
+  const frontmatter = extractFrontmatter(ruleContent);
+
+  // Validate structure based on rule state
+  const state = determineRuleState(frontmatter);
+  const formatErrors = validateFormatByState(state, frontmatter);
+
+  return {
+    valid: formatErrors.length === 0,
+    errors: formatErrors,
+    state: state,
+  };
+}
+```
+
+### 2. Rule State Testing
+
+Each rule state requires specific tests:
+
+#### Always Rules
+
+- **Required Test**: Verify activation without context
+- **Validation**: Rule should apply in all contexts
+- **Criteria**: Agent behavior consistently reflects rule guidance
+
+#### Auto-Attached Rules
+
+- **Required Test**: Verify activation with matching files
+- **Validation**: Rule should apply only with matching files
+- **Criteria**: Agent behavior changes when context includes matching files
+
+#### Agent-Requested Rules
+
+- **Required Test**: Verify activation with explicit request
+- **Validation**: Rule should apply when requested by name
+- **Criteria**: Agent acknowledges rule and adjusts behavior accordingly
+
+#### Manual Rules
+
+- **Required Test**: Verify non-activation without explicit attachment
+- **Validation**: Rule should not apply automatically
+- **Criteria**: Agent only applies rule when rule is manually included
+
+### 3. Behavioral Effectiveness Testing
+
+```javascript
+function testRuleEffectiveness(rule, testCases) {
+  const results = [];
+
+  // Run each test case
+  for (const test of testCases) {
+    // Prepare test environment
+    const env = prepareTestEnvironment(rule, test.context);
+
+    // Run agent with test input
+    const agentResponse = runAgentWithRule(env, test.input);
+
+    // Evaluate against expected behavior
+    const evaluation = evaluateResponse(agentResponse, test.expectedBehaviors);
+
+    results.push({
+      testName: test.name,
+      passed: evaluation.passed,
+      metrics: evaluation.metrics,
+      details: evaluation.details,
+    });
+  }
+
+  return {
+    rule: rule.name,
+    overallEffectiveness: calculateEffectivenessScore(results),
+    testResults: results,
+  };
+}
+```
+
+## Testing Process
+
+### Step 1: Static Analysis
+
+1. Scan rule file for proper structure:
+
+   - Validate frontmatter format
+   - Check for required sections
+   - Verify JSON structure if present
+   - Validate WHEN-TO-MUST format where required
+
+2. Validate state configuration:
+   - Verify state matches format requirements
+   - Check for consistency in state definition
+   - Ensure no conflicting state declarations
+
+### Step 2: Contextual Testing
+
+1. Prepare test environment:
+
+   - Create test files matching glob patterns (for auto-attached)
+   - Prepare agent request formats (for agent-requested)
+   - Set up isolation to prevent cross-rule interference
+
+2. Generate test cases:
+   - Positive tests (rule should activate)
+   - Negative tests (rule should not activate)
+   - Edge cases (boundary conditions)
+
+### Step 3: Behavior Verification
+
+1. Execute test with agent:
+
+   - Submit test input to agent
+   - Capture agent response
+   - Record full interaction
+
+2. Analyze response:
+
+   - Check for rule activation signals
+   - Verify behavior modifications
+   - Measure compliance with rule objectives
+
+3. Score effectiveness:
+   - Precision: How accurately rule targets intended contexts
+   - Recall: How consistently rule activates when needed
+   - Impact: How significantly rule affects agent behavior
+
+## Test Case Templates
+
+### Format Validation Test
+
+```json
+{
+  "testName": "Validate Always Rule Format",
+  "rulePath": ".cursor/rules/my-rule.mdc",
+  "expectedState": "always_rule",
+  "expectedFormat": {
+    "alwaysApply": true,
+    "hasDescription": true,
+    "hasGlobs": false
+  }
+}
+```
+
+### Activation Test
+
+```json
+{
+  "testName": "Auto-Attached Rule Activation Test",
+  "rulePath": ".cursor/rules/auto-rule.mdc",
+  "testFiles": ["test/file.ts", "test/another.ts"],
+  "agentPrompt": "Help me with these test files",
+  "expectedActivation": true,
+  "activationSignal": "Rule applied: auto-rule"
+}
+```
+
+### Behavior Test
+
+```json
+{
+  "testName": "Rule Behavior Effectiveness",
+  "rulePath": ".cursor/rules/style-rule.mdc",
+  "agentPrompt": "Write a function to calculate fibonacci",
+  "expectedBehaviors": [
+    "Uses specified naming convention",
+    "Follows required formatting",
+    "Includes specified comments"
+  ],
+  "metrics": {
+    "behaviorCompliance": 0.9,
+    "consistentApplication": 0.95
+  }
+}
+```
+
+## Reporting
+
+Test results should generate a comprehensive report:
+
+1. Summary metrics:
+
+   - Overall rule correctness
+   - Activation accuracy
+   - Behavior effectiveness
+
+2. Detailed breakdowns:
+
+   - Format validation results
+   - Activation test results by context
+   - Behavior test results by test case
+
+3. Improvement recommendations:
+   - Format corrections
+   - Activation refinements
+   - Behavior enhancement suggestions
+
+## Rule Debugging Tools
+
+### Rule Tracing
+
+```javascript
+function traceRuleActivation(rule, context) {
+  const activationSteps = [];
+
+  // Monitor rule processing steps
+  activationSteps.push(logFrontmatterProcessing(rule));
+  activationSteps.push(logGlobMatching(rule, context));
+  activationSteps.push(logStateEvaluation(rule));
+  activationSteps.push(logContentApplication(rule, context));
+
+  return {
+    rule: rule.name,
+    activated: didRuleActivate(activationSteps),
+    activationPath: activationSteps,
+    failurePoint: identifyFailurePoint(activationSteps),
+  };
+}
+```
+
+### Comparative Testing
+
+Test multiple rule variations to determine optimal formatting and structure:
+
+1. Create rule variants
+2. Run identical tests against each variant
+3. Compare effectiveness metrics
+4. Identify patterns in successful rules
+
+## Implementation Guidelines
+
+1. Integrate testing into rule development workflow
+2. Run format validation before rule deployment
+3. Execute comprehensive tests for critical rules
+4. Maintain test case library for regression testing
+5. Track rule effectiveness over time
+
+## Critical Violations
+
+- NEVER deploy untested rules
+- NEVER ignore format validation errors
+- NEVER assume rule activation without verification
+- NEVER rely on subjective assessments of effectiveness
+- NEVER skip testing state-specific requirements
+- NEVER deploy rules with conflicting behaviors
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER deploy untested rules",
+    "NEVER ignore format validation errors",
+    "NEVER assume rule activation without verification",
+    "NEVER rely on subjective assessments of effectiveness",
+    "NEVER skip testing state-specific requirements",
+    "NEVER deploy rules with conflicting behaviors"
+  ]
+}
+</danger>

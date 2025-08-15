@@ -1,0 +1,83 @@
+{
+  "description": "MUST implement chunking WHEN generating output TO optimize performance and readability.",
+  "globs": [
+    "**/implementation/**",
+    "**/chunking/**",
+    "**/*",
+    "**/*chunking*/**",
+    "**/*implementation*/**"
+  ],
+  "rule_id": "3603-chunking-implementation",
+  "taxonomy": {
+    "category": "Output Generation Standards",
+    "parent": "Output Generation StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Output Generation StandardsRule"
+    ],
+    "children": [
+      "3604-chunking-best-practices",
+      "3605-chunking-performance-optimization"
+    ]
+  },
+  "tags": [
+    "chunking",
+    "output generation",
+    "efficiency",
+    "performance"
+  ],
+  "priority": "70",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ],
+  "overview": {
+    "purpose": "The purpose of this rule is to ensure that output generation processes are optimized by implementing chunking techniques, which allow for the efficient handling and presentation of data.",
+    "application": "This rule MUST be applied during the output generation phase whenever large data sets or complex information are involved. It SHOULD be utilized to break down outputs into manageable segments that enhance clarity and user experience.",
+    "importance": "Implementing chunking is vital as it significantly improves performance and readability, enabling users to comprehend information more easily and interact with the system more effectively. This rule helps prevent information overload and enhances overall system efficiency."
+  },
+  "chunking_strategy": {
+    "description": "This section outlines the strategies for implementing chunking in output generation to enhance performance and readability.",
+    "requirements": [
+      "MUST identify logical segments within the data that can be independently processed and presented, such as paragraphs, lists, or sections.",
+      "SHOULD prioritize chunking based on data relevance, user context, and cognitive load to ensure optimal clarity and user engagement.",
+      "NEVER exceed a chunk size of 200 words or 5 bullet points; aim for manageable pieces to avoid overwhelming the user."
+    ]
+  },
+  "error_handling": {
+    "description": "This section specifies how to handle errors during the chunking process to maintain output integrity.",
+    "requirements": [
+      "MUST implement fallback mechanisms to ensure that if a chunk fails to generate, the remaining chunks are still processed correctly and presented to the user.",
+      "SHOULD log errors related to chunk generation, including the type of error and the chunk that failed, for future analysis and improvement.",
+      "NEVER present incomplete chunks to the user; if a chunk cannot be generated, provide a user-friendly error message that explains the issue."
+    ]
+  },
+  "performance_metrics": {
+    "description": "This section describes the metrics to evaluate the effectiveness of chunking implementation in output generation.",
+    "requirements": [
+      "MUST measure user engagement metrics post-implementation, such as time spent on page and interaction rates, to assess the impact of chunking on readability.",
+      "SHOULD collect feedback on user comprehension and satisfaction related to chunked outputs through surveys or user testing.",
+      "NEVER disregard performance data; continuously refine chunking strategies based on collected metrics and user feedback to improve output quality."
+    ]
+  },
+  "example": {
+    "description": "chunking-implementation Example",
+    "code": "def example():\n    # Implement according to standards\n    data = fetch_data()\n    chunks = chunk_data(data)\n    for chunk in chunks:\n        try:\n            process_chunk(chunk)\n        except ChunkGenerationError:\n            log_error('Failed to generate chunk')\n            continue\n    return 'Processing complete'"
+  },
+  "danger": {
+    "critical_violations": [
+      "NEVER implement chunking without identifying logical segments, as this will lead to ineffective output that confuses users.",
+      "NEVER exceed the recommended chunk size of 200 words or 5 bullet points, which can overwhelm users and reduce comprehension.",
+      "NEVER ignore user context when applying chunking, as irrelevant or poorly segmented information can hinder user experience.",
+      "NEVER present incomplete or failed chunks; always ensure that users receive complete and coherent outputs.",
+      "NEVER neglect to log errors related to chunk generation, as this prevents opportunities for improving the chunking process."
+    ],
+    "specific_risks": [
+      "Failure to identify logical segments may result in users being presented with disorganized information, leading to frustration and decreased trust in the system.",
+      "Exceeding the chunk size can overwhelm users, causing them to miss critical information and reducing overall engagement with the content.",
+      "Ignoring user context in chunking can lead to irrelevant outputs, which may confuse users and result in a poor interaction experience.",
+      "Presenting incomplete chunks can damage the user's perception of the system's reliability, leading to increased support requests and dissatisfaction.",
+      "Neglecting to log errors can result in recurring issues not being addressed, ultimately degrading the quality of output generation and user satisfaction."
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+[flake8]
+# Match Black's line length setting
+max-line-length = 88
+# Directories to exclude from analysis
+exclude = 
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    build,
+    dist,
+    *.egg-info
+
+# E203: whitespace before ':' (conflicts with Black)
+# W503: line break before binary operator (conflicts with Black)
+# These are ignored to be compatible with Black
+ignore = E203, W503
+
+# McCabe complexity threshold
+max-complexity = 10
+
+# Enforce the PEP8 naming conventions
+# Add custom plugins when needed 

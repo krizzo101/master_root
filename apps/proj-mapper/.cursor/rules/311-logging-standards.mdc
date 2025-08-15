@@ -1,0 +1,148 @@
+---
+description: WHEN implementing logging or monitoring TO ensure system observability you MUST follow these logging standards
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"logging_principles": "17-45",
+"component_standards": "47-75",
+"implementation_requirements": "77-95"
+},
+"key_elements": {
+"principle_validation": "20-30",
+"component_validation": "50-60",
+"implementation_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: logging_principles -> component_standards -> implementation_requirements. Validate against principle_validation before proceeding."
+}
+
+{
+"rule_name": "Logging Standards",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"implementing logging",
+"debugging systems",
+"monitoring operations",
+"auditing activities"
+],
+"priority": 4,
+"domain": "development"
+},
+
+"overview": {
+"description": "Defines comprehensive logging standards",
+"importance": "Proper logging ensures system observability and maintainability"
+},
+
+"logging_principles": {
+"level_usage": {
+"requirements": [
+"Use appropriate log levels",
+"Include context details",
+"Maintain consistency",
+"Enable filtering"
+],
+"validation": {"leveled": true, "contextual": true}
+},
+"data_inclusion": {
+"requirements": [
+"Include relevant data",
+"Mask sensitive info",
+"Structure messages",
+"Add timestamps"
+],
+"validation": {"complete": true, "secure": true}
+},
+"performance_impact": {
+"requirements": [
+"Minimize overhead",
+"Use async logging",
+"Buffer appropriately",
+"Handle failures"
+],
+"validation": {"efficient": true, "reliable": true}
+}
+},
+
+"component_standards": {
+"application_logging": {
+"requirements": [
+"Log state changes",
+"Track user actions",
+"Monitor errors",
+"Record metrics"
+],
+"validation": {"tracked": true, "monitored": true}
+},
+"security_logging": {
+"requirements": [
+"Log access attempts",
+"Track permissions",
+"Monitor threats",
+"Record audits"
+],
+"validation": {"secured": true, "audited": true}
+},
+"performance_logging": {
+"requirements": [
+"Track response times",
+"Monitor resources",
+"Log bottlenecks",
+"Record scaling"
+],
+"validation": {"measured": true, "analyzed": true}
+}
+},
+
+"implementation_requirements": {
+"format_standards": {
+"requirements": [
+"Use structured format",
+"Include correlationId",
+"Add source context",
+"Enable parsing"
+],
+"validation": {"structured": true, "traceable": true}
+},
+"storage_management": {
+"requirements": [
+"Rotate logs",
+"Compress old logs",
+"Archive properly",
+"Clean up timely"
+],
+"validation": {"managed": true, "maintained": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER log sensitive data",
+"NEVER skip error logging",
+"NEVER block on logging",
+"NEVER ignore log rotation",
+"NEVER mix log levels",
+"NEVER flood logs",
+"NEVER lose context",
+"NEVER skip correlation"
+],
+"validation_rules": {
+"sensitivity": {"protected": true},
+"errors": {"captured": true},
+"performance": {"nonblocking": true},
+"rotation": {"configured": true},
+"levels": {"appropriate": true},
+"volume": {"controlled": true},
+"context": {"maintained": true},
+"correlation": {"implemented": true}
+}
+}
+}

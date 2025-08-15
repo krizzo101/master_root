@@ -1,0 +1,110 @@
+---
+description: MUST enforce code quality checks WHEN code is committed TO maintain high standards and readability.
+globs: ["**/enforcement/**/*.py", "**/quality/**/*.py", "**/*code*/**/*.py", "**/*", "**/code/**/*.py", "**/*quality*/**/*.py", "**/*enforcement*/**/*.py"]
+---
+# code-quality-enforcement
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3105-code-quality-enforcement",
+  "taxonomy": {
+    "category": "Python Implementation Standards",
+    "parent": "Python Implementation StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Python Implementation StandardsRule"
+    ],
+    "children": [
+      "3106-code-quality-best-practices",
+      "3107-code-quality-metrics"
+    ]
+  },
+  "tags": [
+    "code-quality",
+    "python",
+    "standards",
+    "enforcement"
+  ],
+  "priority": "50",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST enforce code quality checks to ensure that all Python code adheres to established standards and practices.",
+  "application": "SHOULD be applied during the code commit process to automatically assess code quality and provide feedback to developers.",
+  "importance": "This rule matters because maintaining high code quality enhances readability, reduces bugs, and promotes maintainability in the long term."
+}
+
+## code_quality_checks
+
+{
+  "description": "This section outlines the mandatory checks that must be enforced to maintain code quality during development.",
+  "requirements": [
+    "MUST ensure all code follows PEP 8 style guidelines.",
+    "MUST enforce the use of type hints for all function definitions.",
+    "MUST check for the presence of unit tests for all new features and bug fixes.",
+    "MUST validate that the code passes all defined linting checks before allowing commits."
+  ]
+}
+
+## code_review_process
+
+{
+  "description": "This section describes the requirements for conducting code reviews effectively to ensure high-quality code submissions.",
+  "requirements": [
+    "MUST require at least two reviewers for every code change.",
+    "MUST ensure reviewers verify adherence to coding standards and best practices.",
+    "SHOULD provide constructive feedback focusing on code clarity and maintainability.",
+    "NEVER approve code that does not meet the established quality criteria."
+  ]
+}
+
+## automated_testing
+
+{
+  "description": "This section specifies the requirements for implementing automated testing to ensure code reliability.",
+  "requirements": [
+    "MUST require that all code changes include corresponding unit tests.",
+    "MUST ensure all tests are run and pass successfully in the CI/CD pipeline before merging.",
+    "SHOULD implement coverage checks to ensure adequate test coverage across new code.",
+    "NEVER allow deployment of code with failing tests."
+  ]
+}
+
+<example>
+code-quality-enforcement Example
+
+```python
+# Example for code-quality-enforcement
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement code-quality-enforcement according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER allow commits that contain code without proper adherence to PEP 8 style guidelines.",
+    "NEVER merge any code changes that lack type hints in function definitions.",
+    "NEVER accept code submissions that do not include unit tests for newly introduced features.",
+    "NEVER bypass linting checks for any committed code.",
+    "NEVER approve pull requests that do not have at least two reviewers verifying the code quality."
+  ],
+  "specific_risks": [
+    "Failing to enforce PEP 8 style guidelines can lead to inconsistent code formatting, making it harder for teams to read and maintain the codebase.",
+    "Lack of type hints may result in runtime errors that are difficult to debug, as type mismatches won't be caught until code execution.",
+    "Without unit tests, new features may introduce bugs that go unnoticed until they are deployed, leading to increased maintenance costs and potential application failures.",
+    "Bypassing linting checks can allow poor coding practices to enter the codebase, increasing technical debt and reducing overall code quality.",
+    "Not having multiple reviewers might result in undetected issues in the code, leading to a higher likelihood of defects and reduced reliability of the software."
+  ]
+}
+</danger>

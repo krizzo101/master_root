@@ -1,0 +1,202 @@
+---
+description: WHEN requiring meta-level guidance TO ensure system-wide consistency you MUST follow meta rule standards
+globs: 
+alwaysApply: false
+---
+
+# Meta Rules Router
+
+<version>1.1.0</version>
+
+## Overview
+
+{
+  "purpose": "Direct AI agents to appropriate meta-level rules",
+  "application": "Use when requiring guidance on system-wide consistency",
+  "adaptation": "Update as new meta rules are added to the system"
+}
+
+## Critical Rules
+
+These rules MUST be loaded into context before each response. Use the `read_file` tool with the specified line counts to ensure complete rule ingestion:
+
+1. `000-context-awareness` - 128 lines
+   ```
+   read_file(".cursor/rules/meta-rules/000-context-awareness.mdc", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=128)
+   ```
+
+2. `020-response-structure` - 283 lines
+   ```
+   read_file(".cursor/rules/meta-rules/020-response-structure.mdc", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=250)
+   read_file(".cursor/rules/meta-rules/020-response-structure.mdc", should_read_entire_file=false, start_line_one_indexed=251, end_line_one_indexed_inclusive=283)
+   ```
+
+3. `030-reasoning-methods` - 267 lines
+   ```
+   read_file(".cursor/rules/meta-rules/030-reasoning-methods.mdc", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=250)
+   read_file(".cursor/rules/meta-rules/030-reasoning-methods.mdc", should_read_entire_file=false, start_line_one_indexed=251, end_line_one_indexed_inclusive=267)
+   ```
+
+4. `050-advisor-behavior` - 173 lines
+   ```
+   read_file(".cursor/rules/meta-rules/050-advisor-behavior.mdc", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=173)
+   ```
+
+## Rule Processing Instructions
+
+{
+  "binding_nature": "ALL rules accessed via read_file MUST be processed with the SAME PRIORITY and BINDING AUTHORITY as those accessed via fetch_rules",
+  "directive_recognition": "Directives in the format 'WHEN X TO Y you MUST Z' are BINDING INSTRUCTIONS that MUST be followed",
+  "processing_steps": [
+    "Read the COMPLETE rule content using the provided line count instructions",
+    "Parse the rule content for directives and instructions",
+    "Apply all directives with the same priority as fetch_rules directives",
+    "Follow all instructions in the rule content",
+    "Reference the rule when explaining decisions influenced by it"
+  ],
+  "critical_warning": "NEVER proceed with a response until you have fully ingested all required rule content"
+}
+
+## Available Meta Rules
+
+{
+  "context_rules": [
+    {
+      "name": "000-context-awareness",
+      "path": "meta-rules/000-context-awareness.mdc",
+      "line_count": 128,
+      "description": "Ensures comprehensive awareness of conversation history and workspace context"
+    },
+    {
+      "name": "010-workspace-exploration",
+      "path": "meta-rules/010-workspace-exploration.mdc",
+      "line_count": 95,
+      "description": "Guides proactive exploration of workspace before requesting information"
+    }
+  ],
+  "response_rules": [
+    {
+      "name": "020-response-structure",
+      "path": "meta-rules/020-response-structure.mdc",
+      "line_count": 283,
+      "description": "Defines standards for structuring responses based on query complexity"
+    },
+    {
+      "name": "025-response-adaptability",
+      "path": "meta-rules/025-response-adaptability.mdc",
+      "line_count": 112,
+      "description": "Guides adaptation of response format to match user needs"
+    }
+  ],
+  "reasoning_rules": [
+    {
+      "name": "030-reasoning-methods",
+      "path": "meta-rules/030-reasoning-methods.mdc",
+      "line_count": 267,
+      "description": "Defines systematic reasoning approaches for comprehensive problem-solving"
+    },
+    {
+      "name": "035-reasoning-depth",
+      "path": "meta-rules/035-reasoning-depth.mdc",
+      "line_count": 105,
+      "description": "Guides appropriate depth of reasoning based on task complexity"
+    }
+  ],
+  "behavior_rules": [
+    {
+      "name": "050-advisor-behavior",
+      "path": "meta-rules/050-advisor-behavior.mdc",
+      "line_count": 173,
+      "description": "Defines standards for behavior as an advisor and assistant"
+    },
+    {
+      "name": "055-initiative-boundaries",
+      "path": "meta-rules/055-initiative-boundaries.mdc",
+      "line_count": 118,
+      "description": "Guides appropriate levels of initiative based on context"
+    }
+  ],
+  "improvement_rules": [
+    {
+      "name": "070-rule-self-improvement",
+      "path": "meta-rules/070-rule-self-improvement.mdc",
+      "line_count": 231,
+      "description": "Guides creation and improvement of rules based on feedback and mistakes"
+    }
+  ]
+}
+
+## Rule Selection
+
+- WHEN processing requests TO ensure continuity and relevance you MUST follow the context awareness rule by reading:
+  ```
+  read_file(".cursor/rules/meta-rules/000-context-awareness.mdc", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=128)
+  ```
+
+- WHEN creating rules for AI consumption TO ensure accurate algorithmic interpretation you MUST FORMAT rules with explicit directives as defined in:
+  ```
+  read_file(".cursor/rules/meta-rules/015-rule-ai-interpretability.mdc", should_read_entire_file=true)
+  ```
+
+- WHEN answering queries TO ensure clarity and completeness you MUST ENFORCE structured response patterns from:
+  ```
+  read_file(".cursor/rules/meta-rules/020-response-structure.mdc", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=250)
+  read_file(".cursor/rules/meta-rules/020-response-structure.mdc", should_read_entire_file=false, start_line_one_indexed=251, end_line_one_indexed_inclusive=283)
+  ```
+
+- WHEN solving complex problems TO ensure thorough analysis and optimal solutions you MUST APPLY appropriate reasoning methods from:
+  ```
+  read_file(".cursor/rules/meta-rules/030-reasoning-methods.mdc", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=250)
+  read_file(".cursor/rules/meta-rules/030-reasoning-methods.mdc", should_read_entire_file=false, start_line_one_indexed=251, end_line_one_indexed_inclusive=267)
+  ```
+
+- WHEN advising or assisting with tasks TO maximize value and efficiency you MUST adopt direct expert advisor behavior as specified in:
+  ```
+  read_file(".cursor/rules/meta-rules/050-advisor-behavior.mdc", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=173)
+  ```
+
+- WHEN missing needed rules or receiving feedback on mistakes TO ensure continuous improvement you MUST create or update rules following:
+  ```
+  read_file(".cursor/rules/meta-rules/070-rule-self-improvement.mdc", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=231)
+  ```
+
+## Fetch/Read Mapping
+
+| Rule Reference | Access Method |
+|----------------|---------------|
+| 000-context-awareness | `read_file(".cursor/rules/meta-rules/000-context-awareness.mdc", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=128)` |
+| 015-rule-ai-interpretability | `read_file(".cursor/rules/meta-rules/015-rule-ai-interpretability.mdc", should_read_entire_file=true)` |
+| 020-response-structure | `read_file(".cursor/rules/meta-rules/020-response-structure.mdc", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=250)` followed by `read_file(".cursor/rules/meta-rules/020-response-structure.mdc", should_read_entire_file=false, start_line_one_indexed=251, end_line_one_indexed_inclusive=283)` |
+| 030-reasoning-methods | `read_file(".cursor/rules/meta-rules/030-reasoning-methods.mdc", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=250)` followed by `read_file(".cursor/rules/meta-rules/030-reasoning-methods.mdc", should_read_entire_file=false, start_line_one_indexed=251, end_line_one_indexed_inclusive=267)` |
+| 050-advisor-behavior | `read_file(".cursor/rules/meta-rules/050-advisor-behavior.mdc", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=173)` |
+| 070-rule-self-improvement | `read_file(".cursor/rules/meta-rules/070-rule-self-improvement.mdc", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=231)` |
+| 010-cursor-rules-generation | `fetch_rules(["010-cursor-rules-generation"])` |
+| 011-subrule-generation | `fetch_rules(["011-subrule-generation"])` |
+| 100-python-development | `fetch_rules(["100-python-development"])` |
+| 700-markdown-formatting | `fetch_rules(["700-markdown-formatting"])` |
+
+## Domain Tracking Metadata
+
+```json
+{
+  "domain": "meta",
+  "domain_priority": "high",
+  "cross_domain_references": {
+    "allowed_source_domains": ["all"],
+    "context_preservation": {
+      "directive": "Apply meta rules while preserving source domain context"
+    },
+    "visitation_tracking": {
+      "record_domain_path": true,
+      "prevent_circular_references": true
+    }
+  }
+}
+```
+
+## Related Rules
+
+- [010-cursor-rules-generation.mdc](mdc:.cursor/rules/010-cursor-rules-generation.mdc) - Parent rule generation standards
+- [011-subrule-generation.mdc](mdc:.cursor/rules/011-subrule-generation.mdc) - Sub-rule generation standards
+- [100-python-development.mdc](mdc:.cursor/rules/100-python-development.mdc) - Python development standards
+- [700-markdown-formatting.mdc](mdc:.cursor/rules/700-markdown-formatting.mdc) - Markdown formatting standards 

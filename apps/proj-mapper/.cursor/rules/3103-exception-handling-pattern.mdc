@@ -1,0 +1,106 @@
+---
+description: MUST implement exception handling WHEN raising errors TO ensure program stability and reliability
+globs: ["**/*", "**/exception/**/*.py", "**/pattern/**/*.py", "**/*handling*/**/*.py", "**/*exception*/**/*.py", "**/handling/**/*.py", "**/*pattern*/**/*.py"]
+---
+# exception-handling-pattern
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3103-exception-handling-pattern",
+  "taxonomy": {
+    "category": "Python Implementation Standards",
+    "parent": "Python Implementation StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Python Implementation StandardsRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "exception handling",
+    "error management",
+    "best practices",
+    "Python"
+  ],
+  "priority": "50",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST establish a consistent pattern for exception handling in Python code TO enhance error management and ensure graceful degradation of functionality.",
+  "application": "SHOULD be applied whenever exceptions are anticipated in the codebase, especially during input/output operations, network requests, and user interactions, ensuring that exceptions are caught and handled appropriately.",
+  "importance": "This rule matters because effective exception handling contributes to program stability, reduces the likelihood of crashes, and improves user experience by providing meaningful feedback in case of errors."
+}
+
+## exception_handling_structure
+
+{
+  "description": "Define a structured approach to implement exception handling in Python to ensure clarity and maintainability.",
+  "requirements": [
+    "MUST use try-except blocks to catch exceptions and prevent program crashes.",
+    "SHOULD define specific exception types in the except clause to handle known error conditions explicitly.",
+    "MUST include a finally block when resource cleanup is necessary to ensure proper resource management.",
+    "SHOULD log exceptions using a logging framework to provide insights into error occurrences and facilitate debugging."
+  ]
+}
+
+## best_practices
+
+{
+  "description": "Outline best practices for exception handling that enhance code quality and reliability.",
+  "requirements": [
+    "MUST avoid using bare except statements; instead, specify the exception type to prevent catching unexpected exceptions.",
+    "SHOULD provide informative messages in exceptions to clarify the context of the error when raising them.",
+    "MUST not suppress exceptions without proper handling; ensure that every exception is either logged or handled appropriately.",
+    "SHOULD use custom exception classes for domain-specific errors to improve code readability and error management."
+  ]
+}
+
+## testing_and_validation
+
+{
+  "description": "Establish guidelines for testing exception handling implementations to ensure robustness.",
+  "requirements": [
+    "MUST write unit tests to cover scenarios where exceptions are expected to occur, verifying that they are handled correctly.",
+    "SHOULD implement automated tests that simulate error conditions to validate the effectiveness of exception handling.",
+    "MUST ensure that the codebase is reviewed for proper exception handling practices during code reviews to maintain quality standards."
+  ]
+}
+
+<example>
+exception-handling-pattern Example
+
+```python
+# Example for exception-handling-pattern
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement exception-handling-pattern according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER use bare except statements in your code as it can lead to unintentional suppression of critical exceptions.",
+    "NEVER catch exceptions without logging them; this obscures error occurrences and hinders debugging efforts.",
+    "NEVER fail to include a finally block when dealing with resources that require cleanup, leading to resource leaks and instability.",
+    "NEVER raise generic exceptions without providing context; this makes it difficult to identify the cause of errors.",
+    "NEVER ignore specific exception handling for anticipated error types; always define the specific exceptions in the except clause."
+  ],
+  "specific_risks": [
+    "Violating the bare except statement rule can result in hiding unexpected errors, causing the application to behave unpredictably and potentially leading to security vulnerabilities.",
+    "Not logging caught exceptions can prevent developers from understanding the operational issues within the application, making troubleshooting difficult and time-consuming.",
+    "Failing to clean up resources properly can lead to memory leaks and resource exhaustion, ultimately crashing the application or degrading its performance over time.",
+    "Raising generic exceptions without context may leave users confused about what went wrong, leading to a poor user experience and loss of trust in the application.",
+    "Ignoring specific exceptions can result in unhandled errors propagating through the application, potentially causing crashes or data corruption."
+  ]
+}
+</danger>

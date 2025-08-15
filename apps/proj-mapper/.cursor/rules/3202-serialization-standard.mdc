@@ -1,0 +1,113 @@
+---
+description: MUST use JSON format WHEN serializing data TO ensure interoperability and consistency
+globs: ["**/*serialization*/**", "**/*standard*/**", "**/standard/**", "**/*", "**/serialization/**"]
+---
+# serialization-standard
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3202-serialization-standard",
+  "taxonomy": {
+    "category": "Data Model Standards",
+    "parent": "Data Model StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Data Model StandardsRule"
+    ],
+    "children": [
+      "3203-serialization-optimization",
+      "3204-serialization-compatibility"
+    ]
+  },
+  "tags": [
+    "serialization",
+    "data model",
+    "standards",
+    "best practices"
+  ],
+  "priority": "70",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST define a standard for data serialization using JSON format to facilitate seamless data exchange between systems.",
+  "application": "SHOULD be applied whenever data is being transmitted or stored in a format that requires serialization, particularly in APIs and inter-service communication.",
+  "importance": "This rule matters as it ensures that data structures are consistently understood across different platforms, reducing errors and improving interoperability."
+}
+
+## data_serialization
+
+{
+  "description": "Defines the requirements for serializing data structures using JSON format to ensure compatibility and clarity.",
+  "requirements": [
+    "MUST serialize all complex data types (objects, arrays) into their JSON representations.",
+    "MUST represent string values in double quotes to comply with JSON standards.",
+    "MUST ensure that all keys in JSON objects are unique and string values.",
+    "SHOULD include null values explicitly where applicable to represent absence of data.",
+    "MUST NOT include comments or trailing commas in the JSON output."
+  ]
+}
+
+## data_interoperability
+
+{
+  "description": "Outlines standards for ensuring data can be exchanged and understood across different systems.",
+  "requirements": [
+    "MUST define a schema for data structures that specifies types and constraints.",
+    "SHOULD provide versioning for data formats to manage changes over time.",
+    "MUST validate JSON data against defined schemas before transmission.",
+    "MUST document all data types, structures, and serialization rules to facilitate understanding.",
+    "SHOULD adhere to industry-standard serialization practices to enhance compatibility."
+  ]
+}
+
+## error_handling
+
+{
+  "description": "Establishes protocols for managing errors during the serialization and deserialization processes.",
+  "requirements": [
+    "MUST return clear error messages indicating the nature of serialization failures.",
+    "MUST log errors in a structured format for troubleshooting and analysis.",
+    "SHOULD provide fallback mechanisms for partial serialization where applicable.",
+    "MUST validate input data prior to serialization to prevent runtime errors.",
+    "MUST NOT allow silent failures; all errors must be communicated to the user or log."
+  ]
+}
+
+<example>
+serialization-standard Example
+
+```python
+# Example for serialization-standard
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement serialization-standard according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER serialize data without adhering to the JSON format, as this will lead to interoperability issues.",
+    "NEVER allow duplicate keys in JSON objects, as this violates JSON standards and can cause data loss.",
+    "NEVER omit null values when they are part of the expected data structure, as this may misrepresent the actual state of the data.",
+    "NEVER use single quotes for string values in JSON, as this is not compliant with JSON specifications.",
+    "NEVER include comments or trailing commas in JSON output, as this can lead to parsing errors in consuming systems."
+  ],
+  "specific_risks": [
+    "Violating the JSON format can result in data being unreadable or improperly parsed by systems expecting standard-compliant JSON, leading to errors in data processing.",
+    "Duplicate keys in JSON objects can cause the last occurrence of the key to overwrite previous values, leading to data inconsistencies and loss of important information.",
+    "Omitting null values may lead to misunderstanding of the data's meaning, potentially causing incorrect processing logic in applications relying on the serialized data.",
+    "Using incorrect quote types can cause deserialization failures, preventing successful data exchange and integration between systems.",
+    "Including comments or trailing commas can cause JSON parsers to throw errors, disrupting the data flow and requiring additional debugging efforts."
+  ]
+}
+</danger>

@@ -1,0 +1,77 @@
+{
+  "description": "MUST update schema version WHEN data model changes TO ensure compatibility and traceability.",
+  "globs": ["**/schema/**", "**/*", "**/*schema*/**", "**/versioning/**", "**/*versioning*/**"],
+  "rule_id": "3203-schema-versioning",
+  "taxonomy": {
+    "category": "Data Model Standards",
+    "parent": "Data Model StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Data Model StandardsRule"
+    ],
+    "children": [
+      "3204-schema-versioning-compatibility",
+      "3205-schema-versioning-best-practices"
+    ]
+  },
+  "tags": [
+    "schema",
+    "versioning",
+    "data model",
+    "standards"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ],
+  "purpose": "MUST ensure that the schema version is updated whenever there are modifications to the data model to maintain compatibility across different versions.",
+  "application": "SHOULD be applied at any point when the data model undergoes changes, including but not limited to adding, removing, or altering fields within the schema.",
+  "importance": "This rule matters because it prevents potential data inconsistencies and errors that could arise from using outdated schema versions, thereby enhancing the overall integrity and reliability of the system.",
+  "schema_version_changes": {
+    "description": "This section outlines the requirements for updating schema versions when changes to the data model occur.",
+    "requirements": [
+      "MUST increment the schema version number each time a change is made to the data model.",
+      "MUST document the reason for the schema version change in the changelog.",
+      "SHOULD adhere to semantic versioning principles (MAJOR.MINOR.PATCH) when updating the version number."
+    ]
+  },
+  "compatibility_maintenance": {
+    "description": "This section defines how to maintain compatibility between different schema versions.",
+    "requirements": [
+      "MUST provide backward compatibility for at least one previous schema version when introducing breaking changes.",
+      "SHOULD include deprecation warnings for any fields that will be removed in future versions.",
+      "MUST ensure that migration paths are documented for transitioning from older schema versions to the new version."
+    ]
+  },
+  "testing_schema_versions": {
+    "description": "This section describes the necessary testing practices related to schema version updates.",
+    "requirements": [
+      "MUST create unit tests for new schema versions to validate data integrity.",
+      "SHOULD perform integration testing to ensure that dependent systems handle schema version changes correctly.",
+      "MUST validate that all changes to the schema do not introduce regressions in existing functionality."
+    ]
+  },
+  "example": {
+    "schema-versioning Example": {
+      "language": "python",
+      "code": "def update_schema_version(current_version, changes):\n    # Increment version based on changes\n    if changes['type'] == 'breaking':\n        new_version = increment_major(current_version)\n    elif changes['type'] == 'feature':\n        new_version = increment_minor(current_version)\n    else:\n        new_version = increment_patch(current_version)\n    log_version_change(new_version, changes['reason'])\n    return new_version"
+    }
+  },
+  "danger": {
+    "critical_violations": [
+      "NEVER forget to update the schema version after making changes to the data model.",
+      "NEVER use the same schema version for different data model configurations.",
+      "NEVER omit documentation of the reason for schema version changes in the changelog.",
+      "NEVER introduce breaking changes without ensuring backward compatibility with at least one previous schema version.",
+      "NEVER ignore deprecation warnings for fields that are slated for removal in future schema versions."
+    ],
+    "specific_risks": [
+      "Failure to update the schema version can lead to data inconsistencies, causing application errors and data loss.",
+      "Using the same schema version for different configurations can result in unpredictable behavior and make debugging difficult.",
+      "Not documenting schema version changes can lead to confusion among team members regarding the evolution of the data model.",
+      "Introducing breaking changes without maintaining backward compatibility may cause existing applications to fail, leading to significant downtime and user dissatisfaction.",
+      "Ignoring deprecation warnings may result in abrupt failures when older versions of the schema are no longer supported."
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "description": "MUST comply with pipeline architecture WHEN designing systems TO ensure scalability and efficiency.",
+  "globs": [
+    "**/architecture/**",
+    "**/pipeline/**",
+    "**/compliance/**",
+    "**/*compliance*/**",
+    "**/*pipeline*/**",
+    "**/docs/architecture/**",
+    "**/design/**",
+    "**/*architecture*/**",
+    "**/ARCHITECTURE.md"
+  ]
+}

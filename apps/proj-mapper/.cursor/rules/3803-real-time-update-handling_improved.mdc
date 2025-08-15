@@ -1,0 +1,96 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+{
+  "description": "MUST handle real-time updates WHEN project files change TO ensure accurate coding environment.",
+  "globs": [
+    "**/*",
+    "**/*update*/**",
+    "**/update/**",
+    "**/handling/**",
+    "**/*real*/**",
+    "**/*time*/**",
+    "**/time/**",
+    "**/*handling*/**",
+    "**/real/**"
+  ],
+  "version": "1.1.0",
+  "Metadata": {
+    "rule_id": "3803-real-time-update-handling",
+    "taxonomy": {
+      "category": "IDE Integration Standards",
+      "parent": "IDE Integration StandardsRule",
+      "ancestors": [
+        "Rule",
+        "IDE Integration StandardsRule"
+      ],
+      "children": [
+        "3804-async-update-handling",
+        "3805-transactional-update-handling"
+      ]
+    },
+    "tags": [
+      "real-time",
+      "update",
+      "IDE",
+      "integration",
+      "standards"
+    ],
+    "priority": "75",
+    "inherits": [
+      "000-context-awareness",
+      "001-ai-operating-rules"
+    ]
+  },
+  "Overview": {
+    "purpose": "MUST ensure that real-time updates are processed efficiently WHEN changes occur in project files TO maintain an accurate and responsive coding environment.",
+    "application": "This rule SHOULD be applied in scenarios involving live coding sessions, collaborative development, or any situation where project files may change frequently, requiring immediate reflection in the IDE.",
+    "importance": "Adhering to this rule is vital as it enhances user experience by preventing out-of-sync states, reduces errors during coding, and increases productivity by providing immediate feedback on changes."
+  },
+  "real_time_update_trigger": {
+    "description": "Defines the conditions under which real-time updates must be triggered within the IDE.",
+    "requirements": [
+      "MUST detect changes in project files immediately upon modification.",
+      "MUST notify the IDE of any status changes to ensure synchronization.",
+      "SHOULD provide feedback to the user indicating that updates are in progress."
+    ]
+  },
+  "update_processing": {
+    "description": "Outlines the processing rules for handling updates in real-time.",
+    "requirements": [
+      "MUST process updates in the order they are received to maintain consistency.",
+      "MUST ensure that the IDE state accurately reflects the latest changes without delay.",
+      "SHOULD implement throttling mechanisms to avoid overwhelming the system during rapid update scenarios."
+    ]
+  },
+  "error_handling": {
+    "description": "Specifies the error handling procedures for real-time updates.",
+    "requirements": [
+      "MUST log any errors encountered during the update process for further analysis.",
+      "MUST provide clear user notifications for any failures in update processing.",
+      "SHOULD implement fallback mechanisms to revert to the last known good state in case of critical errors."
+    ]
+  },
+  "example": {
+    "description": "real-time-update-handling Example",
+    "code": "def handle_real_time_updates(file_changes):\n    for change in file_changes:\n        if change.detected():\n            notify_ide(change)\n            process_update(change)\n            provide_user_feedback()"
+  },
+  "danger": {
+    "critical_violations": [
+      "NEVER ignore changes to project files when determining if a real-time update is necessary.",
+      "NEVER process updates out of order, as this can lead to inconsistent IDE states.",
+      "NEVER fail to notify the user of ongoing updates, which can create confusion and reduce trust in the IDE.",
+      "NEVER log errors without providing user notifications, as users must be aware of issues that affect their coding experience.",
+      "NEVER allow the IDE to become unresponsive during rapid updates; implementing throttling is required."
+    ],
+    "specific_risks": [
+      "Ignoring file changes can result in the IDE displaying outdated or incorrect information, leading to programming errors.",
+      "Processing updates out of order can cause the code to reflect an inaccurate state, making debugging and code reviews problematic.",
+      "Failing to notify users about ongoing updates can lead to misunderstandings about the current project state, which may affect collaboration.",
+      "Not logging errors or notifying users can obscure critical issues, making it difficult for developers to diagnose and fix problems.",
+      "Allowing the IDE to become unresponsive during rapid updates may lead to user frustration and decreased productivity, potentially driving users to seek alternative development environments."
+    ]
+  }
+}

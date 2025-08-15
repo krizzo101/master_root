@@ -1,0 +1,233 @@
+{% extends "base.html" %} {% block title %}Project Mapper - {{ project.name }}{%
+endblock %} {% block content %}
+<div class="container my-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+      <li class="breadcrumb-item">
+        <a href="{{ url_for('projects') }}">Projects</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        {{ project.name }}
+      </li>
+    </ol>
+  </nav>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1>
+          <i class="fas fa-project-diagram me-2"></i>
+          {{ project.name }}
+        </h1>
+        <div class="btn-group">
+          <a
+            href="{{ url_for('project_analyze', project_id=project.id) }}"
+            class="btn btn-success"
+          >
+            <i class="fas fa-sync-alt me-1"></i> Update
+          </a>
+          <a
+            href="{{ url_for('project_download', project_id=project.id) }}"
+            class="btn btn-primary"
+          >
+            <i class="fas fa-download me-1"></i> Download Map
+          </a>
+          <a
+            href="{{ url_for('project_delete', project_id=project.id) }}"
+            class="btn btn-danger"
+            onclick="return confirm('Are you sure you want to delete this project?')"
+          >
+            <i class="fas fa-trash-alt me-1"></i> Delete
+          </a>
+        </div>
+      </div>
+      <hr />
+      <p class="text-muted">
+        <i class="far fa-calendar-alt me-1"></i> Created: {{ project.timestamp |
+        default('Unknown') }}
+      </p>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Project Statistics</h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-md-4">
+              <div class="p-3">
+                <h2 class="text-primary">{{ project.files | length }}</h2>
+                <p class="mb-0">Files</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3">
+                <h2 class="text-success">{{ project.modules | length }}</h2>
+                <p class="mb-0">Modules</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3">
+                <h2 class="text-warning">
+                  {{ project.relationships | length }}
+                </h2>
+                <p class="mb-0">Relationships</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-5 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">Project Structure</h5>
+        </div>
+        <div class="card-body">
+          <div class="project-tree">
+            <!-- This will be populated by JavaScript -->
+            <ul class="tree list-unstyled">
+              {% for folder, items in project_tree.items() %}
+              <li>
+                <span class="folder" onclick="toggleFolder(this)">
+                  <i class="fas fa-folder me-1"></i> {{ folder }}
+                </span>
+                <ul class="list-unstyled ms-4" style="display: none">
+                  {% for item in items %}
+                  <li>
+                    {% if item.type == 'folder' %}
+                    <span class="folder" onclick="toggleFolder(this)">
+                      <i class="fas fa-folder me-1"></i> {{ item.name }}
+                    </span>
+                    <ul class="list-unstyled ms-4" style="display: none">
+                      {% for file in item.files %}
+                      <li>
+                        <span class="file">
+                          <i class="fas fa-file-code me-1"></i> {{ file }}
+                        </span>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                    {% else %}
+                    <span class="file">
+                      <i class="fas fa-file-code me-1"></i> {{ item.name }}
+                    </span>
+                    {% endif %}
+                  </li>
+                  {% endfor %}
+                </ul>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-7 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">Relationship Visualization</h5>
+        </div>
+        <div class="card-body">
+          <div id="relationship-visualization" class="relationship-viz">
+            <!-- This will be populated by JavaScript visualization library -->
+            <div class="text-center p-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-3">Loading visualization...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="mb-0">Project Modules</h5>
+        </div>
+        <div class="card-body">
+          {% if project.modules %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>File</th>
+                  <th>Lines</th>
+                  <th>Dependencies</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for module in project.modules %}
+                <tr>
+                  <td><strong>{{ module.name }}</strong></td>
+                  <td>
+                    <span class="badge bg-secondary">{{ module.type }}</span>
+                  </td>
+                  <td>{{ module.file }}</td>
+                  <td>{{ module.lines | default('N/A') }}</td>
+                  <td>
+                    {% if module.dependencies %}
+                    <button
+                      class="btn btn-sm btn-outline-info"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#deps-{{ loop.index }}"
+                      aria-expanded="false"
+                    >
+                      Show {{ module.dependencies | length }} dependencies
+                    </button>
+                    <div class="collapse mt-2" id="deps-{{ loop.index }}">
+                      <ul class="list-group">
+                        {% for dep in module.dependencies %}
+                        <li class="list-group-item">{{ dep }}</li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                    {% else %}
+                    <span class="text-muted">None</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="alert alert-warning">
+            No modules found in this project.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %} {{ super() }}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize relationship visualization
+    // This is a placeholder - would normally use a library like D3.js
+    setTimeout(function () {
+      const vizContainer = document.getElementById(
+        "relationship-visualization"
+      );
+      vizContainer.innerHTML =
+        '<div class="p-3 text-center">Relationship visualization would appear here.</div>';
+    }, 1500);
+  });
+</script>
+{% endblock %}

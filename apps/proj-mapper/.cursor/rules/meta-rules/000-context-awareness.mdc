@@ -1,0 +1,129 @@
+---
+description: WHEN processing requests TO ensure continuity and relevance you MUST MAINTAIN comprehensive context awareness
+globs: 
+---
+# Context Awareness Requirements
+
+<version>1.0.0</version>
+
+## Overview
+
+{
+  "purpose": "Ensure comprehensive understanding of conversation history and workspace context",
+  "application": "Apply to all interactions to maintain continuity and relevance",
+  "importance": "Critical for providing coherent, helpful responses that build on previous exchanges"
+}
+
+## Core Requirements
+
+{
+  "workspace_exploration": {
+    "description": "Proactively explore workspace before requesting information",
+    "required_actions": [
+      "Check relevant directories when queries reference files or locations",
+      "Search for mentioned files or similar file patterns",
+      "Examine file content to understand context",
+      "List directory contents to discover relevant files"
+    ]
+  },
+  "conversation_continuity": {
+    "description": "Maintain awareness of previous exchanges",
+    "required_actions": [
+      "Reference prior topics without requiring re-explanation",
+      "Connect new requests to established context",
+      "Recall previously discussed requirements and constraints",
+      "Acknowledge continuing threads of conversation"
+    ]
+  },
+  "request_handling": {
+    "description": "Process requests completely and in sequence",
+    "required_actions": [
+      "Address all parts of multi-part requests in the order presented",
+      "Complete each request component before moving to the next",
+      "Maintain focus on primary request before offering additional insights",
+      "Signal transitions between different parts of a response"
+    ]
+  }
+}
+
+<example>
+Context-Aware User Notification System in Python
+
+```python
+import smtplib
+from email.mime.text import MIMEText
+from datetime import datetime
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+
+class UserNotifier:
+    def __init__(self, user_email, user_preferences):
+        self.user_email = user_email
+        self.user_preferences = user_preferences  # Dictionary containing user preferences
+
+    def send_notification(self, message):
+        try:
+            if self._is_context_appropriate():  # Check if notification is appropriate
+                msg = MIMEText(message)
+                msg['Subject'] = 'Notification'
+                msg['From'] = 'noreply@example.com'
+                msg['To'] = self.user_email
+
+                # Send email
+                with smtplib.SMTP('smtp.example.com') as server:
+                    server.starttls()
+                    server.login('username', 'password')
+                    server.sendmail(msg['From'], [msg['To']], msg.as_string())
+                logging.info('Notification sent to %s', self.user_email)
+            else:
+                logging.warning('Context not appropriate for notification to %s', self.user_email)
+        except Exception as e:
+            logging.error('Failed to send notification: %s', str(e))
+
+    def _is_context_appropriate(self):
+        # Check user preferences and current context (e.g., time of day)
+        current_hour = datetime.now().hour
+        if current_hour < 9 or current_hour > 21:
+            logging.info('Sending notification outside of preferred hours.')
+            return False
+        return self.user_preferences.get('allow_notifications', True)
+
+# Example usage
+if __name__ == '__main__':
+    user_preferences = {'allow_notifications': True}
+    notifier = UserNotifier('user@example.com', user_preferences)
+    notifier.send_notification('This is a test notification.')
+```
+
+This example demonstrates the principle of 'Context Awareness' by implementing a User Notification System in Python. The context of the user is taken into account before sending a notification. The UserNotifier class is designed to encapsulate the logic for sending notifications based on user preferences and the current time. 
+
+1. **Clear Code Organization**: The code is organized into a class with clear methods that separate concerns. The `send_notification` method handles the notification process, while `_is_context_appropriate` checks if the current context allows for sending a notification.
+
+2. **Proper Error Handling**: The use of try-except blocks ensures that any errors encountered during the notification process, such as issues with the SMTP server, are logged without crashing the application.
+
+3. **Appropriate Comments**: The code includes comments that explain the purpose of each method and important steps within the methods, making it easier for other developers to understand the flow of the program.
+
+4. **Best Practices for the Domain**: The example demonstrates best practices such as using the logging module for better debugging and tracking of the application’s behavior, and checking user preferences to ensure that notifications are only sent when appropriate.
+
+Overall, this example encapsulates the concept of context awareness by ensuring that the notifications are sent only when it is appropriate based on user-defined preferences and the current time.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER ask for information that can be found in the workspace",
+    "NEVER ignore the historical context of the conversation",
+    "NEVER partially address the first part of a request before jumping to later parts",
+    "NEVER assume the user will provide information already discussed in the conversation",
+    "NEVER require the user to repeat explanations or context previously established"
+  ],
+  "context_risks": [
+    "Loss of context leads to disjointed, inefficient interactions",
+    "Asking for already available information damages user experience",
+    "Ignoring historical context forces repetitive explanations",
+    "Switching context incorrectly disrupts user workflow"
+  ]
+}
+</danger>

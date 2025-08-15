@@ -1,0 +1,88 @@
+{% extends "base.html" %} {% block title %}Project Mapper - Home{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-12 text-center mb-5">
+    <h1 class="display-4">Project Mapper</h1>
+    <p class="lead">
+      Analyze and visualize Python projects for AI agent consumption
+    </p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">
+          <i class="fas fa-upload me-2"></i>Upload Project
+        </h5>
+        <p class="card-text">
+          Upload a Python project for analysis. You can upload a zip file
+          containing your project files.
+        </p>
+        <a href="{{ url_for('projects.upload') }}" class="btn btn-primary"
+          >Upload Now</a
+        >
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">
+          <i class="fas fa-list me-2"></i>Browse Projects
+        </h5>
+        <p class="card-text">
+          View all your previously uploaded and analyzed projects.
+        </p>
+        <a
+          href="{{ url_for('projects.projects_list') }}"
+          class="btn btn-primary"
+          >Browse Projects</a
+        >
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">
+          <i class="fas fa-book me-2"></i>Documentation
+        </h5>
+        <p class="card-text">
+          Learn how to use Project Mapper and understand the output format.
+        </p>
+        <a href="#" class="btn btn-primary">Read Docs</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-5">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h3>What is Project Mapper?</h3>
+      </div>
+      <div class="card-body">
+        <p>
+          Project Mapper is a tool designed to analyze Python projects and
+          generate structured maps of their code and documentation components.
+          The system uses a pipeline architecture optimized for AI agent
+          consumption within VSCode-based IDEs, particularly Cursor.
+        </p>
+        <h5>Key Features:</h5>
+        <ul>
+          <li>Analyze Python code and documentation files</li>
+          <li>Detect relationships between components</li>
+          <li>Generate AI-optimized maps in various formats</li>
+          <li>Visualize project structure and relationships</li>
+          <li>Optimize token usage for AI consumption</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

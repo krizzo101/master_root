@@ -1,0 +1,112 @@
+/* Project Mapper Web UI Styles */
+
+/* General Styles */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.footer {
+  margin-top: auto;
+}
+
+/* Card enhancements */
+.card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: #0072b2;
+  border-color: #0072b2;
+}
+
+.btn-primary:hover {
+  background-color: #005b8f;
+  border-color: #005b8f;
+}
+
+/* Project tree view */
+.project-tree {
+  font-family: monospace;
+  margin-left: 20px;
+}
+
+.project-tree .folder {
+  color: #ffc107;
+}
+
+.project-tree .file {
+  color: #6c757d;
+}
+
+.project-tree .item {
+  margin: 5px 0;
+  padding-left: 15px;
+  position: relative;
+}
+
+.project-tree .item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 10px;
+  height: 1px;
+  background-color: #ccc;
+}
+
+.project-tree .item:last-child::after {
+  display: none;
+}
+
+/* Relationship visualization */
+.relationship-graph {
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  height: 500px;
+}
+
+/* Analysis progress bar */
+.progress-container {
+  margin: 2rem 0;
+}
+
+/* Config form */
+.config-form label {
+  font-weight: bold;
+}
+
+.config-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.config-section {
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.config-section h4 {
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 1.5rem;
+  }
+}

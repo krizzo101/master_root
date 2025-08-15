@@ -1,0 +1,36 @@
+{
+  "nodes": {
+    "code_element_1": {
+      "id": "code_element_1",
+      "node_type": "CLASS"
+    },
+    "code_element_2": {
+      "id": "code_element_2",
+      "node_type": "FUNCTION"
+    },
+    "doc_element_1": {
+      "id": "doc_element_1",
+      "node_type": "MARKDOWN"
+    },
+    "doc_element_2": {
+      "id": "doc_element_2",
+      "node_type": "DOCSTRING"
+    }
+  },
+  "edges": [
+    {
+      "source": "code_element_1",
+      "target": "doc_element_1",
+      "relationship_type": "DOCUMENTS",
+      "confidence": 0.9,
+      "metadata": {}
+    },
+    {
+      "source": "code_element_2",
+      "target": "doc_element_2",
+      "relationship_type": "REFERENCES",
+      "confidence": 0.85,
+      "metadata": {}
+    }
+  ]
+}

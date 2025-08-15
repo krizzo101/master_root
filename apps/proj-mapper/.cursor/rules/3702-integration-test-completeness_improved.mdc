@@ -1,0 +1,87 @@
+{
+  "description": "MUST verify test coverage WHEN running integration tests TO ensure comprehensive validation.",
+  "globs": [
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/*test*.*",
+    "**/*test*/**",
+    "**/completeness/**",
+    "**/integration/**",
+    "**/test/**",
+    "**/*completeness*/**",
+    "**/*integration*/**"
+  ],
+  "version": "1.1.0",
+  "Metadata": {
+    "rule_id": "3702-integration-test-completeness",
+    "taxonomy": {
+      "category": "Testing Standards",
+      "parent": "Testing StandardsRule",
+      "ancestors": [
+        "Rule",
+        "Testing StandardsRule"
+      ],
+      "children": []
+    },
+    "tags": [
+      "integration test",
+      "test completeness",
+      "quality assurance",
+      "software testing"
+    ],
+    "priority": "75",
+    "inherits": [
+      "000-context-awareness",
+      "001-ai-operating-rules"
+    ]
+  },
+  "Overview": {
+    "purpose": "The purpose of this rule is to ensure that all integration tests provide adequate coverage of the system's functionality, validating interactions between components.",
+    "application": "This rule MUST be applied during the integration testing phase of the development lifecycle. It MUST be ensured that all integration tests are executed and reviewed for completeness, addressing various interaction scenarios.",
+    "importance": "This rule is crucial as it helps identify potential defects in the interactions between different system components, thereby improving the overall reliability and robustness of the software. Incomplete integration testing could lead to undetected issues that manifest in production, ultimately affecting user satisfaction and trust."
+  },
+  "test_coverage": {
+    "description": "This section outlines the requirements for ensuring comprehensive test coverage in integration tests.",
+    "requirements": [
+      "MUST include tests that cover all critical paths of interaction between components, specifically identifying and testing each interaction point.",
+      "MUST ensure that edge cases are tested to verify system stability under unusual conditions, including but not limited to input validation and system limits.",
+      "SHOULD include tests for failure scenarios to assess system resilience, such as simulating service outages or invalid inputs."
+    ]
+  },
+  "test_execution": {
+    "description": "This section details the requirements for the execution of integration tests.",
+    "requirements": [
+      "MUST execute all integration tests on every relevant code change to ensure ongoing coverage, utilizing automated testing frameworks.",
+      "SHOULD report the results of integration tests clearly, including successes and failures with detailed logs for easy review.",
+      "MUST automate the execution of integration tests as part of the continuous integration pipeline, ensuring that tests run consistently with each build."
+    ]
+  },
+  "test_review": {
+    "description": "This section describes the requirements for reviewing integration tests for completeness and effectiveness.",
+    "requirements": [
+      "MUST conduct regular reviews of integration tests to identify any gaps in coverage, with a minimum frequency of once per sprint.",
+      "SHOULD involve multiple team members in the review process to gain diverse insights, ensuring that reviews are not limited to a single perspective.",
+      "MUST update tests promptly based on findings from the review process to maintain relevance, ensuring that all identified gaps are addressed in a timely manner."
+    ]
+  },
+  "example": {
+    "description": "Integration Test Completeness Example",
+    "code": "def test_integration_example():\n    # Implement integration tests covering all critical paths\n    assert component_a.interact_with(component_b) == expected_output\n    assert component_a.handle_edge_case(input) == expected_edge_case_output"
+  },
+  "danger": {
+    "critical_violations": [
+      "NEVER skip testing critical paths of interaction between components in integration tests, as this may lead to undetected defects.",
+      "NEVER overlook edge cases that could lead to system instability during integration testing, particularly under unusual conditions.",
+      "NEVER execute integration tests without ensuring that all relevant scenarios have been covered, as this compromises test integrity.",
+      "NEVER ignore the results of integration test reviews, especially if gaps in coverage are identified, as this can lead to significant issues in production.",
+      "NEVER automate integration test execution without maintaining a clear record of test results and their implications, as this hinders accountability."
+    ],
+    "specific_risks": [
+      "Incomplete integration tests may lead to undetected defects in the interaction between components, causing failures in production.",
+      "Failing to test edge cases could result in system crashes or unexpected behavior under unusual conditions, negatively impacting user experience.",
+      "Neglecting to review test results could allow critical issues to persist, leading to significant technical debt and reduced software reliability.",
+      "Overlooking the necessity of including failure scenarios may result in a lack of resilience in the system, increasing downtime and operational costs.",
+      "Inadequate documentation of test execution may hinder troubleshooting efforts, making it difficult to diagnose and resolve issues when they arise."
+    ]
+  }
+}

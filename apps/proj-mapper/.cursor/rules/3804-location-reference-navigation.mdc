@@ -1,0 +1,108 @@
+---
+description: MUST provide location navigation WHEN accessing code references TO enhance code comprehension.
+globs: ["**/*", "**/*reference*/**", "**/reference/**", "**/*location*/**", "**/location/**", "**/navigation/**", "**/*navigation*/**"]
+---
+# location-reference-navigation
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3804-location-reference-navigation",
+  "taxonomy": {
+    "category": "IDE Integration Standards",
+    "parent": "IDE Integration StandardsRule",
+    "ancestors": [
+      "Rule",
+      "IDE Integration StandardsRule"
+    ],
+    "children": [
+      "3805-location-precision",
+      "3806-navigation-optimization"
+    ]
+  },
+  "tags": [
+    "location",
+    "navigation",
+    "reference",
+    "IDE",
+    "integration"
+  ],
+  "priority": "50",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST enable efficient navigation to location references within code TO facilitate rapid comprehension and editing of code structures.",
+  "application": "SHOULD be applied whenever a user queries or interacts with code references in the IDE, ensuring that navigation links are readily available and functional.",
+  "importance": "This rule matters because it enhances the developer's experience by reducing time spent searching for location references, thereby improving code productivity and reducing cognitive load."
+}
+
+## navigation_requirements
+
+{
+  "description": "Requirements for enabling navigation to code location references.",
+  "requirements": [
+    "MUST provide clickable links for all code references that lead to their respective locations.",
+    "SHOULD support keyboard shortcuts for navigating to location references to enhance accessibility.",
+    "MUST ensure that all navigation links are contextually relevant and lead to accurate locations within the codebase."
+  ]
+}
+
+## error_handling
+
+{
+  "description": "Guidelines for handling errors during navigation to location references.",
+  "requirements": [
+    "MUST display a clear error message when a location reference link is broken or leads to a non-existent location.",
+    "SHOULD offer alternative navigation options or suggestions when a direct link fails.",
+    "MUST log navigation errors for debugging purposes to assist in maintaining link integrity."
+  ]
+}
+
+## user_experience
+
+{
+  "description": "Best practices for optimizing user experience during navigation.",
+  "requirements": [
+    "MUST provide visual feedback (e.g., highlighting or tooltips) when hovering over location reference links.",
+    "SHOULD allow users to customize their navigation settings, such as link colors or styles, to improve visibility.",
+    "NEVER obscure navigation links with other UI elements to ensure they are always accessible."
+  ]
+}
+
+<example>
+location-reference-navigation Example
+
+```python
+# Example for location-reference-navigation
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement location-reference-navigation according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER provide location links that lead to incorrect or outdated references within the codebase.",
+    "NEVER allow navigation links to be non-clickable or unresponsive when accessed by the user.",
+    "NEVER obscure location reference links with other UI elements, making them inaccessible to the user.",
+    "NEVER implement navigation features that do not consider context, leading users to irrelevant code locations.",
+    "NEVER ignore broken links without logging errors, which prevents troubleshooting navigation issues."
+  ],
+  "specific_risks": [
+    "Providing incorrect location links can mislead developers, resulting in wasted time and potential introduction of errors into the code.",
+    "Non-clickable navigation links hinder user productivity, causing frustration and reducing the overall efficiency of the coding process.",
+    "Obscured links may lead to missed opportunities for code comprehension, increasing cognitive load and complicating code maintenance.",
+    "Contextually irrelevant navigation can confuse users, causing them to lose track of their workflow and impairing their understanding of the code structure.",
+    "Failure to log broken links prevents timely resolution of navigation issues, leading to persistent problems that degrade the user experience."
+  ]
+}
+</danger>

@@ -1,0 +1,224 @@
+---
+description: WHEN creating, editing, or accessing sub-rule files TO ensure consistency and integration you MUST ENFORCE structure standards
+globs: .cursor/rules/**/*.mdc
+alwaysApply: false
+---
+
+
+{
+"sections": {
+"overview": "12-15",
+"structure_requirements": "17-45",
+"validation_requirements": "47-75",
+"generation_requirements": "77-95"
+},
+"key_elements": {
+"structure_validation": "20-30",
+"format_validation": "50-60",
+"generation_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: structure_requirements -> validation_requirements -> generation_requirements. Validate against structure_validation before proceeding."
+}
+
+{
+"rule_name": "Sub-Rule Generation",
+"version": "2.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"creating sub-rules",
+"editing sub-rules",
+"accessing sub-rules",
+"validating sub-rules"
+],
+"priority": 5,
+"domain": "meta-rules"
+},
+
+"overview": {
+"description": "Defines standards for creating and managing sub-rules",
+"importance": "Proper sub-rule structure ensures consistent AI processing"
+},
+
+"structure*requirements": {
+"frontmatter": {
+"requirements": [
+"Use WHEN/TO/MUST format",
+"Define globs without quotes",
+"Specify version",
+"Include metadata"
+],
+"validation": {"formatted": true, "complete": true},
+"examples": {
+"description": "WHEN writing code TO ensure quality you MUST follow standards",
+"globs": \**/\_.ts,
+"version": "1.0.0"
+}
+},
+"file_map": {
+"requirements": [
+"Include section ranges",
+"Define key elements",
+"Specify AI instructions",
+"Maintain line count"
+],
+"validation": {"mapped": true, "instructed": true}
+},
+"content_structure": {
+"requirements": [
+"Use JSON format",
+"Include all sections",
+"Define validations",
+"Add examples"
+],
+"validation": {"structured": true, "validated": true}
+}
+},
+
+"validation_requirements": {
+"format_validation": {
+"requirements": [
+"Check frontmatter",
+"Verify file map",
+"Validate JSON",
+"Confirm sections"
+],
+"validation": {"checked": true, "verified": true}
+},
+"content_validation": {
+"requirements": [
+"Verify completeness",
+"Check consistency",
+"Validate examples",
+"Test processing"
+],
+"validation": {"complete": true, "consistent": true}
+}
+},
+
+"generation_requirements": {
+"rule_creation": {
+"requirements": [
+"Follow template",
+"Include all sections",
+"Add validations",
+"Test processing"
+],
+"validation": {"created": true, "tested": true}
+},
+"rule_updates": {
+"requirements": [
+"Maintain structure",
+"Update versions",
+"Track changes",
+"Validate updates"
+],
+"validation": {"maintained": true, "tracked": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER skip frontmatter",
+"NEVER use quotes in globs",
+"NEVER omit file map",
+"NEVER skip validation",
+"NEVER mix formats",
+"NEVER ignore structure",
+"NEVER skip testing",
+"NEVER lose metadata"
+],
+"validation_rules": {
+"frontmatter": {"present": true},
+"globs": {"unquoted": true},
+"file_map": {"included": true},
+"validation": {"performed": true},
+"format": {"consistent": true},
+"structure": {"maintained": true},
+"testing": {"completed": true},
+"metadata": {"preserved": true}
+}
+}
+}
+
+# Subrule Generation Standards
+
+## State Inheritance Rules
+
+1. Child rules MUST NOT inherit state from parent rules
+2. Each rule MUST explicitly define its own state
+3. Parent rules MAY be in different states than their children
+4. State validation MUST be performed independently
+
+## Structure Requirements
+
+1. File Location:
+
+   - Place in appropriate subdirectory
+   - Follow consistent naming
+   - Maintain clear hierarchy
+
+2. Frontmatter:
+
+   - Define explicit state
+   - Include required fields
+   - Follow parent format
+
+3. Content:
+   - Clear scope
+   - Specific guidance
+   - Detailed examples
+
+## State Validation
+
+1. Always Rules:
+
+   - Verify alwaysApply: true
+   - Check description format
+   - Validate global scope
+
+2. Auto-Attached Rules:
+
+   - Confirm glob patterns
+   - Verify subdirectory scope
+   - Check file matching
+
+3. Agent Requested Rules:
+
+   - Validate WHEN-TO-MUST format
+   - Ensure discoverable
+   - Check description clarity
+
+4. Manual Rules:
+   - Verify minimal configuration
+   - Check explicit attachment
+   - Validate user control
+
+## Critical Violations
+
+1. NEVER assume state inheritance
+2. NEVER mix state requirements
+3. NEVER leave state ambiguous
+4. NEVER skip validation
+5. NEVER lose hierarchy
+6. NEVER break parent format
+
+## Validation Rules
+
+{
+"state": {
+"explicit": true,
+"validated": true,
+"independent": true
+},
+"structure": {
+"consistent": true,
+"hierarchical": true,
+"formatted": true
+},
+"content": {
+"clear": true,
+"specific": true,
+"examples": true
+}
+}

@@ -1,0 +1,148 @@
+---
+description: WHEN missing needed rules or receiving feedback on mistakes TO ensure continuous improvement you MUST create or update rules
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"improvement_triggers": "17-45",
+"update_processes": "47-75",
+"validation_requirements": "77-95"
+},
+"key_elements": {
+"trigger_patterns": "20-30",
+"process_validation": "50-60",
+"quality_checks": "80-90"
+},
+"ai_instructions": "Process sections in order: improvement_triggers -> update_processes -> validation_requirements. Validate against trigger_patterns before proceeding."
+}
+
+{
+"rule_name": "Rule Self-Improvement",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"identifying missing rules",
+"receiving error feedback",
+"updating existing rules",
+"improving rule quality"
+],
+"priority": 5,
+"domain": "meta-rules"
+},
+
+"overview": {
+"description": "Defines processes for continuous improvement of rule system",
+"importance": "Self-improvement ensures rules remain effective and current"
+},
+
+"improvement_triggers": {
+"missing_rules": {
+"detection": [
+"Identify gaps in coverage",
+"Note recurring issues",
+"Monitor user requests",
+"Track error patterns"
+],
+"validation": {"comprehensive": true, "accurate": true}
+},
+"error_feedback": {
+"types": [
+"Direct user feedback",
+"Observed mistakes",
+"Performance issues",
+"Integration problems"
+],
+"validation": {"tracked": true, "analyzed": true}
+},
+"update_needs": {
+"indicators": [
+"Changed requirements",
+"New use cases",
+"Improved practices",
+"Technology updates"
+],
+"validation": {"identified": true, "verified": true}
+}
+},
+
+"update_processes": {
+"rule_creation": {
+"steps": [
+"Analyze requirement gap",
+"Draft rule structure",
+"Include validation patterns",
+"Test effectiveness"
+],
+"validation": {"complete": true, "effective": true}
+},
+"rule_modification": {
+"steps": [
+"Review current version",
+"Identify improvements",
+"Update content",
+"Validate changes"
+],
+"validation": {"thorough": true, "validated": true}
+},
+"quality_assurance": {
+"steps": [
+"Check format compliance",
+"Verify completeness",
+"Test effectiveness",
+"Document changes"
+],
+"validation": {"rigorous": true, "documented": true}
+}
+},
+
+"validation_requirements": {
+"format_checks": {
+"requirements": [
+"MUST follow standard structure",
+"MUST include validation patterns",
+"MUST maintain consistency",
+"MUST document changes"
+],
+"validation": {"compliant": true, "consistent": true}
+},
+"effectiveness_tests": {
+"requirements": [
+"MUST solve original problem",
+"MUST prevent recurrence",
+"MUST integrate smoothly",
+"MUST improve system"
+],
+"validation": {"effective": true, "integrated": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER ignore improvement triggers",
+"NEVER skip validation steps",
+"NEVER compromise quality",
+"NEVER leave gaps unfilled",
+"NEVER rush updates",
+"NEVER ignore integration",
+"NEVER skip documentation",
+"NEVER bypass testing"
+],
+"validation_rules": {
+"triggers": {"addressed": true},
+"validation": {"complete": true},
+"quality": {"maintained": true},
+"coverage": {"complete": true},
+"process": {"followed": true},
+"integration": {"verified": true},
+"documentation": {"complete": true},
+"testing": {"performed": true}
+}
+}
+}

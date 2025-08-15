@@ -1,0 +1,74 @@
+{
+  "description": "MUST define interfaces WHEN designing components TO ensure seamless integration and reuse.",
+  "globs": ["**/interface/**", "**/*interface*/**", "**/component/**", "**/*design*/**", "**/*component*/**", "**/docs/architecture/**", "**/design/**", "**/ARCHITECTURE.md"],
+  "rule_id": "3002-component-interface-design",
+  "taxonomy": {
+    "category": "Architecture and Design Rules",
+    "parent": "Architecture and Design RulesRule",
+    "ancestors": [
+      "Rule",
+      "Architecture and Design RulesRule"
+    ],
+    "children": [
+      "3003-component-structure-design",
+      "3004-interface-usability-guidelines"
+    ]
+  },
+  "tags": [
+    "component design",
+    "interface design",
+    "best practices"
+  ],
+  "priority": "70",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ],
+  "purpose": "MUST define clear interfaces for components to facilitate seamless integration and enhance reusability across the system.",
+  "application": "SHOULD be applied during the design phase of component development. This involves creating and documenting interfaces that specify expected inputs, outputs, and behaviors to ensure compatibility with other system components.",
+  "importance": "This rule matters because well-defined interfaces are critical for maintaining system integrity, promoting code reusability, and reducing integration issues, ultimately leading to a more efficient development process and a more robust system architecture.",
+  "interface_definition": {
+    "description": "This section outlines the requirements for defining component interfaces.",
+    "requirements": [
+      "MUST specify all expected input parameters, including their data types and constraints, using clear and consistent naming conventions.",
+      "MUST define all output results, ensuring clarity on what the component returns to its callers, including data types and possible error states.",
+      "SHOULD include documentation for each interface method, detailing its purpose, usage, expected inputs and outputs, and examples of valid usage."
+    ]
+  },
+  "interface_versioning": {
+    "description": "This section provides guidelines for managing versioning of component interfaces.",
+    "requirements": [
+      "MUST use semantic versioning for all interfaces to clearly communicate changes and compatibility, following the MAJOR.MINOR.PATCH format.",
+      "MUST ensure that backward compatibility is maintained in minor and patch updates, explicitly documenting any changes made.",
+      "SHOULD provide migration guides whenever breaking changes are introduced to assist developers in adapting to new versions."
+    ]
+  },
+  "interface_testing": {
+    "description": "This section describes requirements for testing component interfaces.",
+    "requirements": [
+      "MUST implement unit tests for each interface to validate input/output behavior, covering all edge cases.",
+      "MUST include integration tests to verify that interfaces work correctly with dependent components, using realistic scenarios.",
+      "SHOULD automate testing processes to ensure consistent validation of interfaces with every code change, utilizing continuous integration tools."
+    ]
+  },
+  "example": {
+    "description": "component-interface-design Example",
+    "code": "def example_interface(param1: int, param2: str) -> bool:\n    \"\"\"Example interface method that checks conditions based on inputs.\n    \n    Args:\n        param1 (int): The first parameter that must be a positive integer.\n        param2 (str): The second parameter that must be a non-empty string.\n    \n    Returns:\n        bool: True if conditions are met, False otherwise.\n    \"\"\"\n    if param1 <= 0:\n        raise ValueError('param1 must be a positive integer')\n    if not param2:\n        raise ValueError('param2 must be a non-empty string')\n    return True"
+  },
+  "danger": {
+    "critical_violations": [
+      "NEVER define interfaces without specifying all expected input parameters, including their data types and constraints, as this leads to ambiguity and misuse.",
+      "NEVER omit documentation for interface methods, as this leads to ambiguity about their purpose and usage, increasing onboarding time for new developers.",
+      "NEVER ignore semantic versioning for interfaces, as failing to communicate changes can result in integration failures and confusion among developers.",
+      "NEVER allow breaking changes in minor or patch updates, as this violates backward compatibility and can disrupt dependent components.",
+      "NEVER skip unit or integration testing for interfaces, as this may cause undetected issues during integration, leading to higher maintenance costs."
+    ],
+    "specific_risks": [
+      "Failing to specify input parameters can lead to incorrect usage of the interface, causing runtime errors and unexpected behavior during execution.",
+      "Lack of documentation results in poor developer understanding, leading to misuse of interfaces and increased onboarding time for new team members.",
+      "Neglecting semantic versioning can result in incompatible interfaces being used together, leading to system failures and increased debugging time.",
+      "Introducing breaking changes without proper versioning can disrupt dependent components, resulting in significant integration challenges and project delays.",
+      "Not testing interfaces adequately can allow defects to propagate through the system, ultimately leading to higher maintenance costs and reduced software quality."
+    ]
+  }
+}

@@ -1,0 +1,207 @@
+---
+description: WHEN writing integration tests TO ensure system reliability you MUST follow THESE testing standards
+globs: **/*.integration.*,**/*.e2e.*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"test_organization": "17-45",
+"environment_setup": "47-65",
+"test_scenarios": "67-85",
+"data_management": "87-95"
+},
+"key_elements": {
+"validation_patterns": "20-35",
+"scenario_templates": "67-80",
+"setup_requirements": "47-60"
+},
+"ai_instructions": "Process sections in order: environment_setup -> test_organization -> specific scenarios. Always validate against data_management before proceeding."
+}
+
+{
+"rule_name": "Integration Testing Standards",
+"version": "1.0.0",
+"ai_processing_priority": "high",
+"enhanced_metadata": {
+"activation_context": [
+"writing integration tests",
+"testing system interactions",
+"verifying component integration",
+"ensuring system stability"
+],
+"priority": 5,
+"domain": "testing"
+},
+
+"overview": {
+"description": "Defines comprehensive standards for writing effective integration tests",
+"importance": "Integration tests verify system components work together correctly"
+},
+
+"test_organization": {
+"structure": {
+"file_location": "tests/integration/${feature_path}",
+"file_naming": "{feature}.integration.{ext}",
+"grouping": {
+"pattern": "describe('Integration: ${FeatureName}', () => { ... })",
+"nesting": {
+"max_depth": 4,
+"hierarchy": ["feature", "workflow", "scenario", "case"]
+}
+}
+},
+"validation_rules": {
+"file_structure": {
+"config_first": true,
+"helpers_after_config": true,
+"tests_after_helpers": true
+},
+"isolation": {
+"independent_workflows": true,
+"state_cleanup": true,
+"environment_reset": true
+}
+}
+},
+
+"environment_setup": {
+"configuration": {
+"test_environment": {
+"setup": "beforeAll(() => setupTestEnvironment())",
+"teardown": "afterAll(() => teardownTestEnvironment())",
+"validation": {
+"setup_required": true,
+"teardown_required": true
+}
+},
+"dependencies": {
+"services": ["database", "cache", "queues"],
+"external_apis": ["mocked", "sandboxed"],
+"validation": {
+"service_health_checks": true,
+"api_mocks_configured": true
+}
+}
+},
+"data_seeding": {
+"principles": {
+"minimal_data": "Seed only required test data",
+"isolation": "Each test suite has isolated data",
+"cleanup": "Remove all test data after suite"
+},
+"validation_rules": {
+"seed_scripts": {"required": true},
+"cleanup_scripts": {"required": true},
+"isolation_check": {"required": true}
+}
+}
+},
+
+"test_scenarios": {
+"workflow_testing": {
+"structure": {
+"setup": "Prepare workflow dependencies",
+"execution": "Execute workflow steps",
+"verification": "Verify expected outcomes"
+},
+"validation": {
+"steps_documented": true,
+"outcomes_verified": true,
+"errors_handled": true
+}
+},
+"patterns": {
+"happy_path": {
+"required": true,
+"validation": {"coverage": "complete"}
+},
+"error_cases": {
+"required": true,
+"validation": {"critical_paths": "covered"}
+},
+"edge_cases": {
+"required": true,
+"validation": {"boundaries": "tested"}
+}
+},
+"validation_rules": {
+"scenario_coverage": {"min_paths": 3},
+"step_verification": {"required": true},
+"error_handling": {"comprehensive": true}
+}
+},
+
+"data_management": {
+"test_data": {
+"generation": {
+"factories": "Use data factories for consistency",
+"fixtures": "Use fixtures for complex scenarios",
+"validation": {
+"factory_required": true,
+"fixture_documented": true
+}
+},
+"cleanup": {
+"timing": "After each test suite",
+"scope": "All generated test data",
+"validation": {
+"complete_cleanup": true,
+"verified_removal": true
+}
+}
+},
+"state_management": {
+"principles": {
+"isolation": "Each test manages its own state",
+"cleanup": "Reset state after each test",
+"verification": "Verify state changes"
+},
+"validation_rules": {
+"state_tracking": {"required": true},
+"cleanup_verification": {"required": true}
+}
+}
+},
+
+"verification": {
+"pre_execution_checks": [
+"Environment is properly configured",
+"Dependencies are available",
+"Test data is prepared",
+"State is clean"
+],
+"validation_rules": {
+"environment": {"configured": true},
+"dependencies": {"available": true},
+"data": {"prepared": true},
+"state": {"clean": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER skip environment setup",
+"NEVER leave test data uncleaned",
+"NEVER share state between suites",
+"NEVER ignore failed dependencies",
+"NEVER skip error scenarios",
+"NEVER use production services",
+"NEVER hardcode external dependencies",
+"NEVER leave resources uncleaned"
+],
+"validation_rules": {
+"environment": {"setup_required": true},
+"test_data": {"cleanup_required": true},
+"state": {"isolation_required": true},
+"dependencies": {"health_check_required": true},
+"scenarios": {"error_cases_required": true},
+"services": {"production_forbidden": true},
+"resources": {"cleanup_required": true}
+}
+}
+}

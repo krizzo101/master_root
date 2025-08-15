@@ -1,0 +1,108 @@
+---
+description: MUST implement relationship graph WHEN defining data connections TO enhance data visualization accuracy
+globs: ["**/relationship/**", "**/implementation/**", "**/*relationship*/**", "**/*graph*/**", "**/*", "**/graph/**", "**/*implementation*/**"]
+---
+# relationship-graph-implementation
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3504-relationship-graph-implementation",
+  "taxonomy": {
+    "category": "Relationship Mapping Standards",
+    "parent": "Relationship Mapping StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Relationship Mapping StandardsRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "relationship-graph",
+    "data-structure",
+    "implementation",
+    "graph-theory"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST establish a relationship graph to represent data connections in a structured manner.",
+  "application": "SHOULD be applied during the design phase of data models to ensure comprehensive mapping of relationships. This includes defining entities, their attributes, and the interconnections between them.",
+  "importance": "This rule matters because it enhances the clarity and functionality of data visualization, making it easier for developers and data analysts to understand complex relationships within the data, leading to better decision-making and insights."
+}
+
+## graph_structure
+
+{
+  "description": "Defines the structure and attributes of the relationship graph.",
+  "requirements": [
+    "MUST specify nodes to represent entities in the data model.",
+    "MUST define edges to represent relationships between entities.",
+    "SHOULD include attributes for nodes and edges to capture additional context.",
+    "MUST ensure that graph structure follows a hierarchical or directed acyclic format to prevent cycles."
+  ]
+}
+
+## graph_population
+
+{
+  "description": "Outlines the process for populating the relationship graph with data.",
+  "requirements": [
+    "MUST gather data from relevant sources and ensure accuracy before insertion.",
+    "MUST utilize algorithms to optimize the insertion of nodes and edges to maintain performance.",
+    "SHOULD validate relationships during population to ensure they conform to defined business rules.",
+    "NEVER allow duplicate nodes or edges within the graph to maintain data integrity."
+  ]
+}
+
+## graph_visualization
+
+{
+  "description": "Describes methods for visualizing the relationship graph effectively.",
+  "requirements": [
+    "MUST implement visualization tools that allow users to interact with the graph dynamically.",
+    "SHOULD provide filtering options to focus on specific entities or relationships.",
+    "MUST ensure that visual representations are intuitive and reflect the underlying structure of the data.",
+    "NEVER compromise on accessibility; visualizations should be usable by individuals with varying levels of expertise."
+  ]
+}
+
+<example>
+relationship-graph-implementation Example
+
+```python
+# Example for relationship-graph-implementation
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement relationship-graph-implementation according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER define a relationship graph without clearly identifying all entities and their attributes.",
+    "NEVER allow undefined relationships between nodes in the graph.",
+    "NEVER use a graph structure that introduces cycles, as this can lead to infinite loops in traversal algorithms.",
+    "NEVER ignore performance optimization when inserting nodes and edges into the graph.",
+    "NEVER create duplicate nodes or edges in the graph, which can compromise data integrity."
+  ],
+  "specific_risks": [
+    "Failure to properly define entities can lead to incomplete or inaccurate data representation, resulting in flawed analyses.",
+    "Undefined relationships may confuse users and lead to incorrect data interpretations and decisions.",
+    "Introducing cycles in the graph can cause algorithms to fail or hang, severely impacting system performance.",
+    "By skipping validation during population, incorrect data relationships can proliferate, leading to systemic errors in data processing.",
+    "Neglecting performance optimization can result in slow graph operations, affecting user experience and application responsiveness.",
+    "Duplicate nodes or edges can lead to data ambiguity, making it difficult to determine the correct relationships and affecting overall data quality."
+  ]
+}
+</danger>

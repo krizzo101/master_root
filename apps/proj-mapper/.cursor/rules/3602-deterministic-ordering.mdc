@@ -1,0 +1,104 @@
+---
+description: MUST maintain deterministic ordering WHEN generating output TO ensure consistent results.
+globs: ["**/*deterministic*/**", "**/ordering/**", "**/*", "**/*ordering*/**", "**/deterministic/**"]
+---
+# deterministic-ordering
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3602-deterministic-ordering",
+  "taxonomy": {
+    "category": "Output Generation Standards",
+    "parent": "Output Generation StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Output Generation StandardsRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "deterministic",
+    "ordering",
+    "output",
+    "consistency"
+  ],
+  "priority": "50",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST ensure deterministic ordering of generated output to maintain predictable and repeatable results.",
+  "application": "This rule SHOULD be applied in all output generation scenarios where order affects the interpretation or usability of the results. For example, when processing lists or sequences, the output MUST respect the original order of input data.",
+  "importance": "This rule matters because inconsistent ordering can lead to confusion and errors in the interpretation of results, undermining user trust and the reliability of the system."
+}
+
+## input_ordering
+
+{
+  "description": "This section defines the requirements for maintaining the order of input when generating output.",
+  "requirements": [
+    "MUST preserve the sequence of input items in the generated output.",
+    "SHOULD implement a mechanism to track the original order of inputs, ensuring that outputs reflect this order.",
+    "NEVER modify the order of input elements unless explicitly required by the processing logic."
+  ]
+}
+
+## output_formatting
+
+{
+  "description": "This section outlines the standards for formatting output to uphold deterministic ordering.",
+  "requirements": [
+    "MUST format output in a consistent structure that reflects the input order.",
+    "SHOULD use stable sorting algorithms when necessary to maintain the original input order in the output.",
+    "NEVER introduce randomness in output generation that could affect the order of elements."
+  ]
+}
+
+## error_handling
+
+{
+  "description": "This section addresses how to handle errors without disrupting the deterministic order of outputs.",
+  "requirements": [
+    "MUST ensure that error messages or fallback outputs maintain the original input order context.",
+    "SHOULD log any discrepancies in ordering for review without impacting the primary output.",
+    "NEVER allow errors to alter the sequence of correctly generated outputs."
+  ]
+}
+
+<example>
+deterministic-ordering Example
+
+```python
+# Example for deterministic-ordering
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement deterministic-ordering according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER alter the sequence of output elements derived from the input order unless specified by the business logic.",
+    "NEVER introduce any form of randomness in the output generation that could disrupt the expected deterministic order.",
+    "NEVER ignore the original input sequence when generating outputs that are sensitive to order, such as lists or collections.",
+    "NEVER produce outputs that are inconsistent in their ordering across multiple invocations of the same input.",
+    "NEVER handle errors in a way that modifies the output sequence, as this can mislead users about the data integrity."
+  ],
+  "specific_risks": [
+    "Violating deterministic ordering can lead to significant confusion for users, causing misinterpretation of results, especially in data-driven applications.",
+    "Inconsistent ordering may result in critical errors in automated processes, such as data processing pipelines, where precise order is essential.",
+    "Failing to maintain order can undermine user trust in the system, leading to decreased usage and reliance on the software.",
+    "Randomized output can disrupt data analysis tasks, making it impossible to reproduce results or conduct reliable comparisons.",
+    "Errors affecting output order can create misleading results that could lead to incorrect decisions based on faulty data interpretations."
+  ]
+}
+</danger>

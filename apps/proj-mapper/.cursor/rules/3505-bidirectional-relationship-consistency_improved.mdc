@@ -1,0 +1,12 @@
+{
+  "description": "MUST ensure bidirectional relationships WHEN mapping entities TO maintain data integrity",
+  "globs": [
+    "**/relationship/**",
+    "**/*relationship*/**",
+    "**/*consistency*/**",
+    "**/consistency/**",
+    "**/*",
+    "**/*bidirectional*/**",
+    "**/bidirectional/**"
+  ]
+}

@@ -1,0 +1,10 @@
+digraph RelationshipGraph {
+  // Graph styling
+  graph [rankdir=LR, fontname=Arial, splines=true];
+  node [shape=box, style=filled, fontname=Arial, margin=0.2];
+  edge [fontname=Arial];
+
+  // Nodes
+
+  // Edges
+}

@@ -1,0 +1,105 @@
+---
+description: MUST ensure bidirectional relationships WHEN mapping entities TO maintain data integrity
+globs: ["**/relationship/**", "**/*relationship*/**", "**/*consistency*/**", "**/consistency/**", "**/*", "**/*bidirectional*/**", "**/bidirectional/**"]
+---
+# bidirectional-relationship-consistency
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3505-bidirectional-relationship-consistency",
+  "taxonomy": {
+    "category": "Relationship Mapping Standards",
+    "parent": "Relationship Mapping StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Relationship Mapping StandardsRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "bidirectional",
+    "relationship",
+    "consistency",
+    "mapping",
+    "standards"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST ensure that all bidirectional relationships between entities are consistently represented in the mapping to prevent data discrepancies.",
+  "application": "SHOULD be applied during the design and implementation phases of entity relationship mapping, particularly when establishing links that require mutual recognition.",
+  "importance": "This rule matters as it maintains data integrity and coherence across systems, allowing for reliable data exchange and accurate representation of relationships."
+}
+
+## bidirectional_relationship_definition
+
+{
+  "description": "Defines what constitutes a bidirectional relationship within entity mappings.",
+  "requirements": [
+    "MUST explicitly define both ends of the relationship, ensuring that actions on one entity reflect appropriately on the other.",
+    "SHOULD include a clear notation or structure that indicates the bidirectional nature of the relationship in the mapping.",
+    "NEVER assume that relationships are inherently bidirectional without explicit definition."
+  ]
+}
+
+## consistency_checking_mechanism
+
+{
+  "description": "Outlines the mechanisms for checking and maintaining consistency in bidirectional relationships.",
+  "requirements": [
+    "MUST implement automated checks that validate bidirectional integrity after any modifications to the relationships.",
+    "MUST provide feedback or alerts when inconsistencies are detected in the relationship mappings.",
+    "SHOULD allow for manual verification processes to complement automated checks in complex scenarios."
+  ]
+}
+
+## documentation_and_communication
+
+{
+  "description": "Details the importance of documenting bidirectional relationships and communicating them to relevant stakeholders.",
+  "requirements": [
+    "MUST maintain comprehensive documentation of all bidirectional relationships, including their definitions and any changes made.",
+    "SHOULD ensure that all team members and stakeholders are informed of the bidirectional nature of relationships to facilitate collaboration.",
+    "NEVER overlook the need for regular updates to the documentation as relationships evolve over time."
+  ]
+}
+
+<example>
+bidirectional-relationship-consistency Example
+
+```python
+# Example for bidirectional-relationship-consistency
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement bidirectional-relationship-consistency according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER define a relationship without specifying its bidirectional nature, as this leads to ambiguity in data interpretation.",
+    "NEVER neglect to implement automated consistency checks after any changes to the relationships, risking unnoticed discrepancies.",
+    "NEVER assume that a relationship is bidirectional if it has not been explicitly documented, as this can cause confusion in data handling.",
+    "NEVER fail to update relationship documentation when modifications occur, which can result in outdated information being used by team members.",
+    "NEVER ignore feedback from automated checks regarding relationship inconsistencies, as this could lead to significant data integrity issues."
+  ],
+  "specific_risks": [
+    "Failing to define the bidirectional nature of a relationship can result in misinterpretation of data, leading to erroneous conclusions in analytics.",
+    "Not implementing automated checks may allow unnoticed errors to propagate throughout the system, causing widespread data integrity issues.",
+    "Assuming bidirectionality without explicit documentation can create confusion among team members, leading to inconsistent data entry and management practices.",
+    "Outdated documentation may lead to incorrect assumptions about relationship mappings, ultimately hindering effective communication and collaboration within teams.",
+    "Ignoring alerts from consistency checks can result in critical data discrepancies that compromise the reliability of systems relying on accurate relationship mappings."
+  ]
+}
+</danger>

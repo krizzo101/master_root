@@ -1,0 +1,72 @@
+---
+description: WHEN creating prompts for LLMs TO ensure optimal results you MUST FOLLOW prompt engineering best practices
+globs: *.prompt,*.txt,*.md,prompt*.py,prompt*.js,prompt*.ts
+alwaysApply: false
+---
+{
+  "rule_name": "Prompt Engineering Best Practices",
+  
+  "overview": {
+    "description": "Entry point for prompt engineering standards and best practices for working with Large Language Models",
+    "purpose": "Provides guidance on designing effective prompts that yield high-quality, consistent outputs from LLMs"
+  },
+  
+  "domain_summary": {
+    "description": "Prompt engineering is the practice of designing and optimizing inputs to language models to achieve desired outputs. It encompasses several key areas:",
+    "core_areas": [
+      "Prompt Structure - Formatting and organizing prompts for clarity and effectiveness",
+      "Context Management - Providing necessary context and managing context limitations",
+      "Instruction Design - Crafting clear, unambiguous instructions for the model",
+      "Response Formatting - Guiding the model to produce structured, parseable outputs",
+      "Reasoning Techniques - Incorporating advanced reasoning methods like chain-of-thought",
+      "Persona Design - Creating effective system messages and role definitions",
+      "Few-Shot Learning - Using examples to guide model behavior"
+    ]
+  },
+  
+  "rule_selection": {
+    "description": "Select the appropriate rule based on your current prompt engineering task:",
+    
+    "prompt_structure": {
+      "description": "WHEN designing prompt structure TO ensure clarity and effectiveness you MUST follow prompt structure guidelines by reading:",
+      "command": "```\nread_file(\".cursor/rules/prompt-engineering-rules/1010-prompt-structure.mdc\", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=200)\n```"
+    },
+    
+    "instruction_design": {
+      "description": "WHEN crafting instructions for LLMs TO ensure accurate interpretation you MUST follow instruction design guidelines by reading:",
+      "command": "```\nread_file(\".cursor/rules/prompt-engineering-rules/1020-instruction-design.mdc\", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=190)\n```"
+    },
+    
+    "reasoning_techniques": {
+      "description": "WHEN implementing advanced reasoning TO enhance model capabilities you MUST follow reasoning technique guidelines by reading:",
+      "command": "```\nread_file(\".cursor/rules/prompt-engineering-rules/1030-reasoning-techniques.mdc\", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=185)\n```"
+    },
+    
+    "response_formatting": {
+      "description": "WHEN guiding output formats TO ensure consistent, parseable responses you MUST follow response formatting guidelines by reading:",
+      "command": "```\nread_file(\".cursor/rules/prompt-engineering-rules/1040-response-formatting.mdc\", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=175)\n```"
+    }
+  },
+  
+  "line_count_metadata": {
+    "rules": [
+      "`1010-prompt-structure.mdc` - 200 lines",
+      "`1020-instruction-design.mdc` - 190 lines",
+      "`1030-reasoning-techniques.mdc` - 185 lines",
+      "`1040-response-formatting.mdc` - 175 lines"
+    ]
+  },
+  
+  "fetch_read_mapping": {
+    "table": "| Rule Reference | Access Method |\n|----|----|\n| 1000-prompt-engineering | `fetch_rules([\"1000-prompt-engineering\"])` |\n| 1010-prompt-structure | `read_file(\".cursor/rules/prompt-engineering-rules/1010-prompt-structure.mdc\", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=200)` |\n| 1020-instruction-design | `read_file(\".cursor/rules/prompt-engineering-rules/1020-instruction-design.mdc\", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=190)` |\n| 1030-reasoning-techniques | `read_file(\".cursor/rules/prompt-engineering-rules/1030-reasoning-techniques.mdc\", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=185)` |\n| 1040-response-formatting | `read_file(\".cursor/rules/prompt-engineering-rules/1040-response-formatting.mdc\", should_read_entire_file=false, start_line_one_indexed=1, end_line_one_indexed_inclusive=175)` |"
+  },
+  
+  "danger": [
+    "NEVER leak sensitive data in prompts",
+    "NEVER rely on implicit understanding without clear instructions",
+    "NEVER use ambiguous language in critical instructions",
+    "NEVER assume model capabilities without testing",
+    "NEVER waste tokens on unnecessary information",
+    "NEVER omit validation of model outputs for critical applications"
+  ]
+} 

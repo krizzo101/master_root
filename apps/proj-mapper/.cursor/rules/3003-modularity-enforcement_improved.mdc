@@ -1,0 +1,12 @@
+{
+  "description": "MUST enforce modularity WHEN designing system architecture TO enhance code reusability.",
+  "globs": [
+    "**/ARCHITECTURE.md",
+    "**/enforcement/**",
+    "**/modularity/**",
+    "**/docs/architecture/**",
+    "**/design/**",
+    "**/*enforcement*/**",
+    "**/*modularity*/**"
+  ]
+}

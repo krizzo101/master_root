@@ -1,0 +1,7 @@
+---
+description: WHEN organizing development rules TO ensure proper categorization you MUST follow section standards
+globs: .cursor/rules/3*.mdc
+alwaysApply: false
+---
+
+CONTEXT for rules 301-349 that provide GUIDANCE on DEVELOPMENT PRACTICES, CODE STANDARDS, and IMPLEMENTATION PATTERNS

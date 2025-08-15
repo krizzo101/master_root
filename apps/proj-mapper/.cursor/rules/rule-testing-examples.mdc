@@ -1,0 +1,491 @@
+---
+description: WHEN writing rule tests TO ensure comprehensive coverage you MUST include tests for all states
+globs: .cursor/rules/*.mdc
+alwaysApply: false
+---
+
+# Rule Testing Examples
+
+{
+"rule_name": "Rule Testing Examples",
+"version": "1.0.0",
+"ai_processing_priority": "medium",
+"enhanced_metadata": {
+"activation_context": [
+"writing rule tests",
+"testing different rule states",
+"example test cases",
+"rule validation"
+],
+"priority": 3,
+"domain": "meta-rules"
+}
+}
+
+## Overview
+
+This document provides example test cases for each rule state to ensure comprehensive validation of rule effectiveness. Each example demonstrates proper test setup, execution, and validation criteria.
+
+## Test Case Examples by Rule State
+
+### Always Rules Test Cases
+
+```javascript
+// always-rule-tests.js
+const { testRule } = require("./rule-test-runner");
+
+// Sample test suite for an always rule
+const alwaysRuleTests = {
+  rulePath: ".cursor/rules/global-standards.mdc",
+  tests: [
+    // Test 1: Basic Activation - should always apply regardless of context
+    {
+      name: "Global Activation Test",
+      context: { files: [] },
+      expectedActivation: true,
+      behaviorTests: [
+        {
+          name: "Standard Compliance",
+          expectedBehaviors: [
+            "Uses appropriate code style",
+            "Includes required documentation",
+            "Follows naming conventions",
+          ],
+        },
+      ],
+    },
+
+    // Test 2: Activation with unrelated files
+    {
+      name: "Unrelated Files Test",
+      context: { files: ["unrelated.txt", "random.log"] },
+      expectedActivation: true,
+    },
+
+    // Test 3: Activation with specific query
+    {
+      name: "Specific Query Test",
+      context: { request: "Help me with Python code" },
+      expectedActivation: true,
+    },
+  ],
+};
+
+// Run the test suite
+async function testAlwaysRule() {
+  const result = await testRule(alwaysRuleTests.rulePath, {
+    behaviorTests: alwaysRuleTests.tests,
+  });
+
+  console.log(JSON.stringify(result, null, 2));
+}
+
+testAlwaysRule();
+```
+
+### Auto-Attached Rules Test Cases
+
+```javascript
+// auto-attached-rule-tests.js
+const { testRule } = require("./rule-test-runner");
+
+// Sample test suite for an auto-attached rule
+const autoAttachedRuleTests = {
+  rulePath: ".cursor/rules/typescript-standards.mdc",
+  tests: [
+    // Test 1: Matching Files - should apply when matching files are present
+    {
+      name: "Matching Files Test",
+      context: { files: ["src/component.tsx", "lib/util.ts"] },
+      expectedActivation: true,
+      behaviorTests: [
+        {
+          name: "TypeScript Standards Compliance",
+          expectedBehaviors: [
+            "Uses TypeScript interfaces",
+            "Applies proper typing",
+            "Follows TypeScript best practices",
+          ],
+        },
+      ],
+    },
+
+    // Test 2: Non-Matching Files - should not apply with non-matching files
+    {
+      name: "Non-Matching Files Test",
+      context: { files: ["styles.css", "index.html"] },
+      expectedActivation: false,
+    },
+
+    // Test 3: Mixed Files - should apply when at least one file matches
+    {
+      name: "Mixed Files Test",
+      context: { files: ["index.html", "component.ts", "styles.css"] },
+      expectedActivation: true,
+    },
+
+    // Test 4: Nested Directory Files - should apply for nested matches
+    {
+      name: "Nested Directory Test",
+      context: { files: ["src/components/nested/Button.tsx"] },
+      expectedActivation: true,
+    },
+  ],
+};
+
+// Run the test suite
+async function testAutoAttachedRule() {
+  const result = await testRule(autoAttachedRuleTests.rulePath, {
+    behaviorTests: autoAttachedRuleTests.tests,
+  });
+
+  console.log(JSON.stringify(result, null, 2));
+}
+
+testAutoAttachedRule();
+```
+
+### Agent-Requested Rules Test Cases
+
+```javascript
+// agent-requested-rule-tests.js
+const { testRule } = require("./rule-test-runner");
+
+// Sample test suite for an agent-requested rule
+const agentRequestedRuleTests = {
+  rulePath: ".cursor/rules/code-review-standards.mdc",
+  tests: [
+    // Test 1: Explicit Request - should apply when explicitly requested
+    {
+      name: "Explicit Request Test",
+      context: {
+        request: "Please use the code-review-standards rule to review my code",
+      },
+      expectedActivation: true,
+      behaviorTests: [
+        {
+          name: "Code Review Standards Application",
+          expectedBehaviors: [
+            "Checks for security issues",
+            "Validates performance considerations",
+            "Examines code structure and organization",
+          ],
+        },
+      ],
+    },
+
+    // Test 2: Abbreviated Request - should apply with abbreviated reference
+    {
+      name: "Abbreviated Request Test",
+      context: {
+        request: "Review my code using @code-review-standards",
+      },
+      expectedActivation: true,
+    },
+
+    // Test 3: No Request - should not apply without explicit request
+    {
+      name: "No Request Test",
+      context: {
+        request: "Please review my code for issues",
+      },
+      expectedActivation: false,
+    },
+
+    // Test 4: Similar Name Request - should not apply with similar but different name
+    {
+      name: "Similar Name Test",
+      context: {
+        request: "Apply code-review guidelines to my code",
+      },
+      expectedActivation: false,
+    },
+  ],
+};
+
+// Run the test suite
+async function testAgentRequestedRule() {
+  const result = await testRule(agentRequestedRuleTests.rulePath, {
+    behaviorTests: agentRequestedRuleTests.tests,
+  });
+
+  console.log(JSON.stringify(result, null, 2));
+}
+
+testAgentRequestedRule();
+```
+
+### Manual Rules Test Cases
+
+```javascript
+// manual-rule-tests.js
+const { testRule } = require("./rule-test-runner");
+
+// Sample test suite for a manual rule
+const manualRuleTests = {
+  rulePath: ".cursor/rules/special-project-requirements.mdc",
+  tests: [
+    // Test 1: Explicit Attachment - should apply when manually attached
+    {
+      name: "Explicit Attachment Test",
+      context: {
+        explicitAttachment: true,
+        request: "Help me with my code",
+      },
+      expectedActivation: true,
+      behaviorTests: [
+        {
+          name: "Special Project Requirements Application",
+          expectedBehaviors: [
+            "Uses project-specific libraries",
+            "Follows custom architecture patterns",
+            "Implements required security measures",
+          ],
+        },
+      ],
+    },
+
+    // Test 2: No Attachment - should not apply without manual attachment
+    {
+      name: "No Attachment Test",
+      context: {
+        explicitAttachment: false,
+        request: "Help me with my code",
+      },
+      expectedActivation: false,
+    },
+
+    // Test 3: With Files - should only apply with explicit attachment regardless of files
+    {
+      name: "With Files Test",
+      context: {
+        explicitAttachment: false,
+        files: ["src/special-component.ts"],
+      },
+      expectedActivation: false,
+    },
+
+    // Test 4: With Request - should only apply with explicit attachment regardless of request
+    {
+      name: "With Request Test",
+      context: {
+        explicitAttachment: false,
+        request: "I need help with special project requirements",
+      },
+      expectedActivation: false,
+    },
+  ],
+};
+
+// Run the test suite
+async function testManualRule() {
+  const result = await testRule(manualRuleTests.rulePath, {
+    behaviorTests: manualRuleTests.tests,
+  });
+
+  console.log(JSON.stringify(result, null, 2));
+}
+
+testManualRule();
+```
+
+## Combined Test Suite Example
+
+```javascript
+// comprehensive-rule-tests.js
+const { testRule } = require("./rule-test-runner");
+const fs = require("fs");
+const path = require("path");
+
+// Map rule files to their expected states
+const ruleStateMap = {
+  "global-standards.mdc": "always_rule",
+  "typescript-standards.mdc": "auto_attached_rule",
+  "code-review-standards.mdc": "agent_requested_rule",
+  "special-project-requirements.mdc": "manual_rule",
+};
+
+// Directory containing rules
+const rulesDir = ".cursor/rules";
+
+// Run comprehensive tests
+async function runComprehensiveTests() {
+  const results = [];
+
+  // Get all rule files
+  const files = fs.readdirSync(rulesDir);
+  const ruleFiles = files.filter((file) => file.endsWith(".mdc"));
+
+  console.log(`Found ${ruleFiles.length} rule files to test`);
+
+  // Test each rule
+  for (const file of ruleFiles) {
+    const rulePath = path.join(rulesDir, file);
+
+    // Determine expected state
+    const expectedState = ruleStateMap[file] || null;
+
+    // Skip if we don't know the expected state
+    if (!expectedState) {
+      console.log(`Skipping ${file} - unknown expected state`);
+      continue;
+    }
+
+    console.log(`Testing ${file} as ${expectedState}`);
+
+    // Get appropriate tests for this rule state
+    const tests = getTestsForState(expectedState, file);
+
+    // Run the tests
+    const result = await testRule(rulePath, {
+      expectedState,
+      behaviorTests: tests,
+    });
+
+    results.push({
+      rule: file,
+      state: expectedState,
+      result,
+    });
+  }
+
+  // Generate summary report
+  console.log("\n=== Test Summary ===");
+  console.log(`Total rules tested: ${results.length}`);
+  console.log(
+    `Passed: ${results.filter((r) => r.result.summary.passed).length}`
+  );
+  console.log(
+    `Failed: ${results.filter((r) => !r.result.summary.passed).length}`
+  );
+
+  // Write detailed report
+  fs.writeFileSync(
+    "comprehensive-test-report.json",
+    JSON.stringify(results, null, 2)
+  );
+
+  console.log("Detailed report saved to comprehensive-test-report.json");
+}
+
+// Helper function to get appropriate tests for a rule state
+function getTestsForState(state, filename) {
+  switch (state) {
+    case "always_rule":
+      return [
+        {
+          name: "Global Activation Test",
+          context: { files: [] },
+          expectedActivation: true,
+        },
+      ];
+
+    case "auto_attached_rule":
+      return [
+        {
+          name: "Matching Files Test",
+          context: { files: generateMatchingFiles(filename) },
+          expectedActivation: true,
+        },
+        {
+          name: "Non-Matching Files Test",
+          context: { files: ["unrelated.txt"] },
+          expectedActivation: false,
+        },
+      ];
+
+    case "agent_requested_rule":
+      return [
+        {
+          name: "Explicit Request Test",
+          context: {
+            request: `Please use the ${filename.replace(".mdc", "")} rule`,
+          },
+          expectedActivation: true,
+        },
+        {
+          name: "No Request Test",
+          context: { request: "Help me with my code" },
+          expectedActivation: false,
+        },
+      ];
+
+    case "manual_rule":
+      return [
+        {
+          name: "Explicit Attachment Test",
+          context: { explicitAttachment: true },
+          expectedActivation: true,
+        },
+        {
+          name: "No Attachment Test",
+          context: { explicitAttachment: false },
+          expectedActivation: false,
+        },
+      ];
+
+    default:
+      return [];
+  }
+}
+
+// Generate sample matching files based on rule name
+function generateMatchingFiles(ruleName) {
+  if (ruleName.includes("typescript")) {
+    return ["file.ts", "component.tsx"];
+  } else if (ruleName.includes("javascript")) {
+    return ["file.js", "component.jsx"];
+  } else if (ruleName.includes("python")) {
+    return ["script.py", "module.py"];
+  } else {
+    return ["sample.txt", "example.md"];
+  }
+}
+
+runComprehensiveTests();
+```
+
+## Best Practices for Test Case Design
+
+1. **Test Edge Cases**: Include tests for boundary conditions and edge cases
+
+   - Partial matches in glob patterns
+   - Similar but not identical rule names
+   - Mixed contexts with both matching and non-matching elements
+
+2. **Test Performance**: Include tests for rule performance impact
+
+   - Measure response time with and without rule
+   - Test with large files or complex contexts
+   - Verify rules don't cause timeouts or excessive processing
+
+3. **Test Behavior Specificity**: Include detailed behavior expectations
+
+   - Test specific content patterns that should appear in responses
+   - Test for rule-specific language or terminology
+   - Test for absence of behaviors that should be suppressed
+
+4. **Test Interference**: Verify rules don't interfere with each other
+   - Test rule A in presence of rule B
+   - Test priority resolution between conflicting rules
+   - Test rules that should work in combination
+
+## Critical Test Coverage Areas
+
+1. **Format Validation**: Always test rule format against state requirements
+2. **Activation Logic**: Verify rules activate under correct conditions only
+3. **Behavior Impact**: Measure how effectively rules influence agent behavior
+4. **Error Handling**: Test rule behavior with malformed inputs or contexts
+5. **Regression Prevention**: Run tests after any rule modifications
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER deploy rules without testing all activation conditions",
+    "NEVER skip tests for rule state compliance",
+    "NEVER ignore rule interference potential",
+    "NEVER assume rule behavior without verification",
+    "NEVER implement rules without clear testable expectations"
+  ]
+}
+</danger>

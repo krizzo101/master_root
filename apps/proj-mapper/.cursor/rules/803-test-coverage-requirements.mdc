@@ -1,0 +1,208 @@
+---
+description: WHEN measuring test coverage TO ensure comprehensive testing you MUST follow THESE coverage requirements
+globs: **/*.test.*,**/*.spec.*,**/*.integration.*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"coverage_thresholds": "17-45",
+"measurement_rules": "47-65",
+"reporting_standards": "67-85",
+"enforcement_policy": "87-95"
+},
+"key_elements": {
+"threshold_definitions": "20-35",
+"measurement_patterns": "47-60",
+"enforcement_rules": "87-90"
+},
+"ai_instructions": "Process sections in order: coverage_thresholds -> measurement_rules -> enforcement. Always validate against reporting_standards before proceeding."
+}
+
+{
+"rule_name": "Test Coverage Requirements",
+"version": "1.0.0",
+"ai_processing_priority": "high",
+"enhanced_metadata": {
+"activation_context": [
+"measuring test coverage",
+"enforcing coverage standards",
+"analyzing test quality",
+"ensuring testing completeness"
+],
+"priority": 5,
+"domain": "testing"
+},
+
+"overview": {
+"description": "Defines comprehensive requirements for test coverage measurement and enforcement",
+"importance": "Test coverage ensures comprehensive testing and identifies untested code"
+},
+
+"coverage_thresholds": {
+"global_requirements": {
+"statements": {"min": 80, "target": 90},
+"branches": {"min": 75, "target": 85},
+"functions": {"min": 85, "target": 95},
+"lines": {"min": 80, "target": 90}
+},
+"critical_paths": {
+"patterns": [
+"**/auth/**",
+"**/payment/**",
+"**/core/**"
+],
+"thresholds": {
+"statements": {"min": 90, "target": 100},
+"branches": {"min": 85, "target": 95},
+"functions": {"min": 95, "target": 100},
+"lines": {"min": 90, "target": 100}
+}
+},
+"validation_rules": {
+"threshold_check": {
+"enforce_minimum": true,
+"warn_below_target": true
+},
+"path_specific": {
+"critical_paths_required": true,
+"custom_thresholds_allowed": true
+}
+}
+},
+
+"measurement_rules": {
+"included_patterns": [
+"**/*.{js,jsx,ts,tsx}",
+"!**/*.d.ts",
+"!**/node_modules/**",
+"!**/vendor/**"
+],
+"collection_config": {
+"statements": {
+"required": true,
+"ignore_comments": true
+},
+"branches": {
+"required": true,
+"include_switch": true
+},
+"functions": {
+"required": true,
+"include_arrow": true
+},
+"lines": {
+"required": true,
+"ignore_empty": true
+}
+},
+"validation_rules": {
+"config_presence": {"required": true},
+"patterns_defined": {"required": true},
+"collection_complete": {"required": true}
+}
+},
+
+"reporting_standards": {
+"output_format": {
+"console": {
+"format": "detailed",
+"colors": true
+},
+"html": {
+"required": true,
+"directory": "coverage"
+},
+"json": {
+"required": true,
+"file": "coverage/coverage.json"
+}
+},
+"report_contents": {
+"summary": {
+"overall_metrics": true,
+"file_breakdown": true
+},
+"details": {
+"uncovered_lines": true,
+"branch_analysis": true
+}
+},
+"validation_rules": {
+"formats_required": ["console", "html", "json"],
+"content_complete": {"required": true},
+"metrics_accurate": {"required": true}
+}
+},
+
+"enforcement_policy": {
+"ci_integration": {
+"blocking": {
+"below_minimum": true,
+"critical_paths": true
+},
+"warning": {
+"below_target": true,
+"decreasing_coverage": true
+}
+},
+"exemptions": {
+"patterns": [
+"**/tests/**",
+"**/mocks/**"
+],
+"process": {
+"request_required": true,
+"review_required": true,
+"temporary_only": true
+}
+},
+"validation_rules": {
+"ci_configured": {"required": true},
+"exemptions_documented": {"required": true},
+"process_followed": {"required": true}
+}
+},
+
+"verification": {
+"pre_merge_checks": [
+"Coverage meets minimum thresholds",
+"Critical paths meet stricter requirements",
+"Reports generated in all formats",
+"No unapproved exemptions"
+],
+"validation_rules": {
+"thresholds": {"enforced": true},
+"critical_paths": {"verified": true},
+"reports": {"complete": true},
+"exemptions": {"approved": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER merge with coverage below minimum",
+"NEVER skip critical path requirements",
+"NEVER ignore decreasing coverage",
+"NEVER exempt code without review",
+"NEVER modify coverage collection config",
+"NEVER disable coverage enforcement",
+"NEVER exclude required metrics",
+"NEVER bypass CI coverage checks"
+],
+"validation_rules": {
+"minimum_coverage": {"required": true},
+"critical_paths": {"enforced": true},
+"decreasing_coverage": {"blocked": true},
+"exemptions": {"reviewed": true},
+"collection_config": {"locked": true},
+"enforcement": {"enabled": true},
+"metrics": {"complete": true},
+"ci_checks": {"required": true}
+}
+}
+}

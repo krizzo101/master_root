@@ -1,0 +1,4 @@
+{
+  "description": "MUST define relationships WHEN creating data models TO ensure data integrity and clarity.",
+  "globs": ["**/relationship/**", "**/*relationship*/**", "**/*representation*/**", "**/*", "**/representation/**"]
+}

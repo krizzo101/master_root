@@ -1,0 +1,108 @@
+---
+description: MUST comply with pipeline architecture WHEN designing systems TO ensure scalability and efficiency.
+globs: ["**/architecture/**", "**/pipeline/**", "**/compliance/**", "**/*compliance*/**", "**/*pipeline*/**", "**/docs/architecture/**", "**/design/**", "**/*architecture*/**", "**/ARCHITECTURE.md"]
+---
+# pipeline-architecture-compliance
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3001-pipeline-architecture-compliance",
+  "taxonomy": {
+    "category": "Architecture and Design Rules",
+    "parent": "Architecture and Design RulesRule",
+    "ancestors": [
+      "Rule",
+      "Architecture and Design RulesRule"
+    ],
+    "children": [
+      "3002-data-flow-compliance",
+      "3003-pipeline-performance-efficiency"
+    ]
+  },
+  "tags": [
+    "pipeline",
+    "architecture",
+    "compliance",
+    "design",
+    "best-practices"
+  ],
+  "priority": "25",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "Ensure that all system designs adhere to the defined pipeline architecture, facilitating optimal data flow and processing efficiency.",
+  "application": "This rule MUST be applied during the initial design phase of a system and whenever modifications to the architecture are proposed. Developers SHOULD conduct regular reviews to verify compliance throughout the project lifecycle.",
+  "importance": "Adhering to pipeline architecture is crucial for maintaining scalability and performance in systems. It allows for easier maintenance, improved collaboration among teams, and ensures that the system can accommodate future growth and changes in technology."
+}
+
+## architecture_compliance
+
+{
+  "description": "Ensure that the system architecture follows the established pipeline design principles to facilitate efficient data processing and flow.",
+  "requirements": [
+    "MUST define clear boundaries for each stage of the pipeline to avoid data leakage and ensure separation of concerns.",
+    "MUST implement standardized data formats between stages to ensure compatibility and ease of integration.",
+    "SHOULD document the data flow and transformations at each stage of the pipeline for clarity and maintainability."
+  ]
+}
+
+## performance_scalability
+
+{
+  "description": "Ensure that the pipeline is designed for scalability, accommodating increased data loads without degradation of performance.",
+  "requirements": [
+    "MUST utilize load balancing strategies to distribute workload evenly across resources.",
+    "MUST allow for horizontal scaling of components to handle increased traffic and data volume.",
+    "SHOULD monitor performance metrics regularly to identify bottlenecks and optimize resource allocation."
+  ]
+}
+
+## compliance_verification
+
+{
+  "description": "Establish processes for verifying compliance with the pipeline architecture throughout the system lifecycle.",
+  "requirements": [
+    "MUST conduct regular architectural reviews to assess adherence to pipeline design principles.",
+    "MUST maintain a compliance checklist that is updated with each iteration of the architecture.",
+    "SHOULD involve cross-functional teams in compliance audits to ensure diverse perspectives and accountability."
+  ]
+}
+
+<example>
+pipeline-architecture-compliance Example
+
+```python
+# Example for pipeline-architecture-compliance
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement pipeline-architecture-compliance according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER define overlapping boundaries between pipeline stages, as this can lead to data inconsistency and confusion.",
+    "NEVER use incompatible data formats between pipeline stages, which will result in integration failures and increased debugging time.",
+    "NEVER neglect to document data flow and transformations, as this can hinder maintainability and understanding of the architecture.",
+    "NEVER bypass architectural reviews during the design phase, as this can lead to significant deviations from established standards.",
+    "NEVER ignore performance metrics when scaling the pipeline, as this can result in bottlenecks and degraded system performance."
+  ],
+  "specific_risks": [
+    "Failing to maintain clear boundaries between stages can lead to data leaks, making the system vulnerable to errors and inconsistencies.",
+    "Using incompatible data formats can cause integration issues, leading to delays in deployment and increased costs for troubleshooting.",
+    "Lack of documentation can result in knowledge silos, making it difficult for new team members to understand the system and leading to costly mistakes.",
+    "Skipping architectural reviews can allow critical flaws to go unnoticed, resulting in a system that does not meet performance or scalability requirements.",
+    "Neglecting performance monitoring can lead to unaddressed bottlenecks, causing slowdowns that affect user experience and system reliability."
+  ]
+}
+</danger>

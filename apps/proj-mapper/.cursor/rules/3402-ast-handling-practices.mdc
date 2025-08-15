@@ -1,0 +1,107 @@
+---
+description: MUST follow AST handling practices WHEN analyzing code TO improve code quality and accuracy.
+globs: ["**/*", "**/handling/**", "**/*practices*/**", "**/practices/**", "**/*handling*/**"]
+---
+# ast-handling-practices
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3402-ast-handling-practices",
+  "taxonomy": {
+    "category": "Analysis Subsystem Standards",
+    "parent": "Analysis Subsystem StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Analysis Subsystem StandardsRule"
+    ],
+    "children": [
+      "3403-ast-optimization-practices",
+      "3404-ast-security-practices"
+    ]
+  },
+  "tags": [
+    "AST",
+    "analysis",
+    "best practices",
+    "code quality"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "Ensure consistent and effective handling of Abstract Syntax Trees (AST) during code analysis to enhance overall code comprehension and manipulation.",
+  "application": "This rule MUST be applied whenever the AI assistant processes code for analysis, particularly when constructing, traversing, or modifying AST representations.",
+  "importance": "Adhering to AST handling practices is crucial for maintaining code quality, facilitating accurate analysis, and enabling the AI assistant to provide reliable insights and recommendations."
+}
+
+## ast_structure_handling
+
+{
+  "description": "Guidelines for properly structuring and managing Abstract Syntax Trees (AST) during code analysis.",
+  "requirements": [
+    "MUST ensure that AST nodes are clearly defined and follow a consistent structure to facilitate accurate traversal.",
+    "SHOULD utilize standardized naming conventions for AST nodes to improve readability and maintainability.",
+    "NEVER alter the fundamental structure of AST nodes without proper justification or documentation."
+  ]
+}
+
+## traversal_techniques
+
+{
+  "description": "Best practices for traversing ASTs to ensure efficient and effective analysis.",
+  "requirements": [
+    "MUST implement recursive traversal methods when handling complex AST structures to avoid stack overflow errors.",
+    "SHOULD optimize traversal algorithms for performance, especially when dealing with large codebases.",
+    "NEVER skip nodes during traversal unless explicitly required by the analysis context, as this could lead to incomplete insights."
+  ]
+}
+
+## modification_protocols
+
+{
+  "description": "Protocols for modifying ASTs to ensure changes do not compromise code integrity.",
+  "requirements": [
+    "MUST validate any modifications to the AST against the original code structure to prevent inconsistencies.",
+    "SHOULD document all changes made to the AST to maintain a clear history of modifications.",
+    "NEVER modify AST nodes without ensuring that the changes align with the intended analysis or transformation goals."
+  ]
+}
+
+<example>
+ast-handling-practices Example
+
+```python
+# Example for ast-handling-practices
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement ast-handling-practices according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER alter the definitions of AST nodes without thoroughly justifying the change in documentation.",
+    "NEVER bypass the validation checks when modifying an AST, as this can lead to corrupted structures.",
+    "NEVER ignore the original code structure when performing modifications to the AST.",
+    "NEVER assume default behaviors of AST traversals without reviewing the specific requirements of the analysis context.",
+    "NEVER skip necessary node checks during traversal that could lead to missing critical information in the analysis."
+  ],
+  "specific_risks": [
+    "Failure to properly document AST modifications can result in a lack of traceability, making future debugging and analysis challenging.",
+    "Corrupted AST structures due to bypassing validation can lead to incorrect analysis results, potentially affecting the quality of the codebase.",
+    "Ignoring the original code structure may lead to modifications that are inconsistent with the original intent, resulting in faulty logic or errors in the transformed code.",
+    "Assuming default behaviors without context can cause unexpected results during traversal, leading to incomplete or misleading insights.",
+    "Skipping necessary node checks can result in overlooking critical aspects of the code, leading to gaps in analysis and potential security vulnerabilities."
+  ]
+}
+</danger>
