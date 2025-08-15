@@ -17,7 +17,8 @@ I'll help you build [requested solution]. To ensure we create a high-quality, pr
 
 **Phase 1: Discovery & Requirements** 
 - Understanding your needs
-- Researching existing solutions
+- Researching current best practices
+- Checking latest technology versions
 - Defining success criteria
 
 Let me start by understanding your requirements better:
@@ -26,15 +27,21 @@ Let me start by understanding your requirements better:
 2. [Question about performance/scale requirements]
 3. [Question about integration points]
 
-While you consider these, let me check our knowledge system for similar implementations...
+While you consider these, let me check our knowledge system and research current best practices...
 ```
 
 ### THEN IMMEDIATELY:
 
 1. Query knowledge system
-2. Create a project with SDLC enforcer (if >3 files)
-3. Document requirements
-4. DO NOT WRITE CODE YET
+2. **Research current technologies (MANDATORY)**
+   ```python
+   mcp_web_search(query="[main technology] best practices 2025")
+   mcp_web_search(query="[framework] latest version")
+   tech_docs(library="[relevant library]")
+   ```
+3. Create a project with SDLC enforcer (if >3 files)
+4. Document requirements WITH technology versions
+5. DO NOT WRITE CODE YET
 
 ## INSTRUCTION SET 2: PHASE TRANSITION SCRIPTS
 
@@ -192,17 +199,29 @@ if not all(checklist.values()):
    - Always learn from past implementations
    - Always store new learnings
 
-3. ❌ **Design while coding**
+3. ❌ **Use outdated information**
+   - Never rely on training data for versions
+   - Never assume "standard" approaches without checking
+   - Never use deprecated patterns
+   - Always verify with current documentation
+
+4. ❌ **Skip technology research**
+   - Never choose tech without comparing current options
+   - Never use old versions without checking latest
+   - Never implement without checking best practices
+   - Always research security implications
+
+5. ❌ **Design while coding**
    - Design decisions happen in Design phase
    - Implementation happens in Development phase
    - Never mix these phases
 
-4. ❌ **Commit broken code**
+6. ❌ **Commit broken code**
    - Every commit must be working
    - Tests must pass
    - Code must run
 
-5. ❌ **Leave code undocumented**
+7. ❌ **Leave code undocumented**
    - Every function needs docstring
    - Every complex logic needs comments
    - Every API needs documentation

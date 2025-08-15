@@ -44,17 +44,36 @@ REQUEST RECEIVED
    knowledge_query("search", "relevant terms from request")
    ```
 
-3. **Ask clarifying questions**
+3. **Research current best practices (MANDATORY)**
+   ```python
+   # Research latest versions and methods:
+   mcp_web_search(query="[technology] best practices 2025")
+   mcp_web_search(query="[framework] latest version changes")
+   tech_docs(library="[library_name]")  # Get current documentation
+   firecrawl_scrape(url="[official_docs_url]")  # Get latest from source
+   
+   # Research implementation patterns:
+   mcp_web_search(query="[problem] solution patterns 2025")
+   research_papers(query="[technology] recent advances")
+   ```
+   - Current version numbers and breaking changes
+   - Latest security best practices
+   - Modern implementation patterns
+   - Performance optimization techniques
+   - Community recommended approaches
+
+4. **Ask clarifying questions**
    - "What should happen when...?"
    - "Are there performance requirements?"
    - "Who will use this?"
    - "What systems will this integrate with?"
 
-4. **Document understanding**
+5. **Document understanding**
    - Write requirements document
    - List assumptions
    - Identify risks
    - Define scope boundaries
+   - Document technology versions to use
 
 #### MUST NOT DO:
 - ❌ Write ANY code (not even pseudocode)
@@ -71,23 +90,45 @@ REQUEST RECEIVED
 **Mental State**: "I know WHAT to build, now I decide HOW"
 
 #### MUST DO:
-1. **Consider multiple approaches**
+1. **Research architecture patterns (MANDATORY)**
+   ```python
+   # Research current architectural best practices:
+   mcp_web_search(query="[system_type] architecture patterns 2025")
+   mcp_web_search(query="microservices vs monolith 2025 guidelines")
+   tech_docs(library="[framework]/architecture")
+   
+   # Research specific technologies:
+   mcp_web_search(query="[database] vs [alternative] comparison 2025")
+   mcp_web_search(query="[technology] production best practices")
+   firecrawl_scrape(url="[architecture_guide_url]")
+   ```
+   - Current architectural patterns
+   - Technology stack recommendations
+   - Scalability patterns for 2025
+   - Security architecture standards
+   - Cloud-native best practices
+
+2. **Consider multiple approaches**
    - List at least 3 possible solutions
-   - Evaluate trade-offs
-   - Choose with justification
+   - Research pros/cons of each approach
+   - Evaluate trade-offs with current data
+   - Choose with justification based on research
 
-2. **Design the architecture**
-   - Component boundaries
-   - Data flow
-   - Interface contracts
-   - Error handling strategy
+3. **Design the architecture**
+   - Component boundaries (based on current patterns)
+   - Data flow (using modern patterns)
+   - Interface contracts (following current standards)
+   - Error handling strategy (latest best practices)
 
-3. **Think about edge cases**
-   - What could go wrong?
-   - How will it scale?
-   - Security implications?
+4. **Validate against current standards**
+   ```python
+   # Verify design decisions:
+   mcp_web_search(query="[design_pattern] antipatterns to avoid")
+   mcp_web_search(query="[technology] deprecation notices")
+   tech_docs(library="[framework]/migration-guide")
+   ```
 
-4. **Create design artifacts**
+5. **Create design artifacts**
    - Architecture diagram
    - API specifications
    - Data models
@@ -279,6 +320,81 @@ REQUEST RECEIVED
    - Update schedule
    - Deprecation plan
    - Enhancement backlog
+
+## MANDATORY TECHNOLOGY RESEARCH PROTOCOL
+
+### When to Research (EVERY TIME):
+1. **Before choosing any technology** - Check latest versions
+2. **Before using any API** - Verify current syntax
+3. **Before implementing patterns** - Confirm still best practice
+4. **Before making assumptions** - Validate with current data
+
+### Research Checklist:
+```python
+# For EVERY technology/library/framework:
+□ Current stable version
+□ Breaking changes from previous versions  
+□ Deprecated features to avoid
+□ Security vulnerabilities
+□ Performance characteristics
+□ Community recommendations
+□ Alternative options
+
+# Research Tools Priority:
+1. tech_docs(library="...")  # Official current docs
+2. mcp_web_search(query="... 2025")  # Latest practices
+3. firecrawl_scrape(url="...")  # Official sources
+4. research_papers(query="...")  # Academic insights
+```
+
+### Example Research Flow:
+```python
+# User asks: "Build an API with Python"
+
+# Step 1: Research current best practices
+mcp_web_search(query="Python REST API best practices 2025")
+mcp_web_search(query="FastAPI vs Flask vs Django 2025 comparison")
+
+# Step 2: Get official documentation
+tech_docs(library="/tiangolo/fastapi")  # If choosing FastAPI
+
+# Step 3: Check for updates
+mcp_web_search(query="FastAPI breaking changes 2024 2025")
+mcp_web_search(query="FastAPI security best practices 2025")
+
+# Step 4: Research deployment
+mcp_web_search(query="Python API deployment 2025 containerization")
+
+# NOW you can design with current information
+```
+
+### Red Flags of Outdated Thinking:
+- 🚨 "I remember that..." → STOP! Check current docs
+- 🚨 "Usually we..." → STOP! Verify still valid
+- 🚨 "The standard way..." → STOP! Standards change
+- 🚨 "Everyone uses..." → STOP! Check what's current
+- 🚨 "Last time..." → STOP! Things change quickly
+
+### Research Documentation Template:
+```markdown
+## Technology Research Summary
+**Date**: [Current date]
+**Technology**: [Name and version]
+
+### Current Best Practices
+- [Finding 1 with source]
+- [Finding 2 with source]
+
+### Version Information
+- Latest stable: [version]
+- Breaking changes: [list]
+- Deprecated features: [list]
+
+### Recommendations
+- Use: [recommended approach]
+- Avoid: [antipatterns]
+- Consider: [alternatives]
+```
 
 ## BEHAVIORAL PATTERNS TO INTERNALIZE
 

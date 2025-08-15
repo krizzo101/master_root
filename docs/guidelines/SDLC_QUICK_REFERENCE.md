@@ -7,17 +7,23 @@
 
 ### □ DISCOVERY
 - [ ] Query knowledge system FIRST
+- [ ] Research current best practices
+- [ ] Check latest technology versions
 - [ ] Document requirements
 - [ ] Identify risks
 - [ ] Define success criteria
+- **MUST**: Use web_search, tech_docs, firecrawl
 - **CAN**: Write .md, .txt, .json files
 - **CANNOT**: Write code files
 
 ### □ DESIGN  
+- [ ] Research architecture patterns
+- [ ] Compare technology options
 - [ ] Architecture diagram
 - [ ] Interface specifications
 - [ ] Data models
 - [ ] Consider alternatives
+- **MUST**: Verify patterns still current
 - **CAN**: Create design docs
 - **CANNOT**: Write implementation code
 
@@ -84,6 +90,32 @@ Strict      Still need:
 SDLC        - Requirements
 Process     - Design sketch
             - Tests
+```
+
+## 🔍 RESEARCH TOOLS (MANDATORY USE)
+
+```python
+# Web Search - Latest practices
+mcp_web_search(query="technology best practices 2025")
+mcp_web_search(query="framework vs alternative 2025")
+
+# Technical Documentation - Current versions
+tech_docs(library="/org/project")  # Get latest docs
+tech_docs(library="/fastapi/fastapi")  # Example
+
+# Web Scraping - Official sources
+firecrawl_scrape(url="https://docs.python.org/3/whatsnew/")
+firecrawl_scrape(url="https://github.com/org/repo/releases")
+
+# Research Papers - Academic insights
+research_papers(query="distributed systems patterns")
+
+# ALWAYS CHECK:
+- Current stable version
+- Breaking changes
+- Deprecated features
+- Security advisories
+- Performance benchmarks
 ```
 
 ## 🔧 SDLC TOOL COMMANDS
