@@ -28,6 +28,39 @@
 4. **FREQUENT COMMITS**: Commit after each logical chunk of work
 5. **WARN when output will be large**: "This will generate ~X lines, shall I write to file?"
 
+### OPTIMAL TOOL USAGE (MANDATORY)
+
+**ALWAYS use the most efficient tool for the task:**
+
+1. **MultiEdit** (PREFERRED for multiple changes):
+   - Use for ANY task involving 2+ edits to the same file
+   - Use for coordinated changes across 2-10 files
+   - More efficient than multiple Edit calls
+   - Atomic operations - all succeed or all fail
+
+2. **Edit vs Write**:
+   - **Edit**: For modifying existing files (PREFERRED)
+   - **Write**: ONLY for creating new files or complete rewrites
+   - NEVER use Write to update existing files
+
+3. **Parallel Operations**:
+   - **Read multiple files**: Use single tool call with multiple file paths
+   - **Search operations**: Run grep/find commands in parallel
+   - **Status checks**: Run git status, diff, log in parallel
+
+4. **Tool Selection Priority**:
+   ```
+   For file changes:
+   1st choice: MultiEdit (for multiple edits)
+   2nd choice: Edit (for single edit)
+   Last resort: Write (only for new files)
+   
+   For searching:
+   1st choice: Project intelligence indices
+   2nd choice: Grep with specific paths
+   Last resort: Find with full scan
+   ```
+
 ### SAFE OUTPUT PATTERNS
 
 **For batch file operations:**
