@@ -115,21 +115,24 @@ result = mcp__db__read_neo4j_cypher(
 - **CONTEXT_PATTERN**: For situational approaches
 - **TOOL_USAGE**: Before using tools
 
-### Knowledge Operations
+### Knowledge Operations (MCP Tools Available)
 ```python
-# Query before action
-from apps.knowledge_system.claude_knowledge_retrieval import ClaudeKnowledgeRetrieval
-query_info = ClaudeKnowledgeRetrieval.query_relevant_knowledge("your query", context)
-result = mcp__db__read_neo4j_cypher(query=query_info['query'], params=query_info['params'])
-
-# Store after success
-store_query = ClaudeKnowledgeRetrieval.store_new_learning(
-    knowledge_type='TYPE_HERE',
-    content='description',
-    context={'key': 'value'},
-    tags=['relevant', 'tags']
+# Query before action - USE MCP TOOLS!
+result = mcp__knowledge__knowledge_query(
+    query_type="search",
+    query_text="your query",
+    knowledge_type="ERROR_SOLUTION"  # Optional filter
 )
-mcp__db__write_neo4j_cypher(query=store_query['query'], params=store_query['params'])
+data = mcp__db__read_neo4j_cypher(query=result['cypher_query'], params=result['params'])
+
+# Store after success - HANDLES COMPLEX OBJECTS!
+result = mcp__knowledge__knowledge_store(
+    knowledge_type="ERROR_SOLUTION",
+    content="description",
+    context={"nested": {"objects": "work automatically"}},  # No JSON.dumps!
+    tags=["relevant", "tags"]
+)
+mcp__db__write_neo4j_cypher(query=result['cypher_query'], params=result['params'])
 ```
 
 ### Enforcement

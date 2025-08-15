@@ -49,22 +49,30 @@ else:
     store_new_knowledge(solution)
 ```
 
-## 🛠️ SIMPLIFIED TOOLS (USE THESE TO AVOID ERRORS)
+## 🛠️ SIMPLIFIED MCP TOOLS (USE THESE TO AVOID ERRORS)
 
-### CRITICAL: Use mcp_knowledge_tools.py for All Operations
-**Neo4j has strict type requirements that frequently cause errors. Use these simplified tools:**
+### CRITICAL: Use MCP Knowledge Tools - Available as mcp__knowledge__*
+**Neo4j has strict type requirements that frequently cause errors. Use these MCP tools:**
 
 ```python
-from apps.knowledge_system.mcp_knowledge_tools import store_knowledge, query_knowledge, update_knowledge
-
-# ✅ CORRECT - Using simplified tools (handles JSON serialization automatically)
-result = store_knowledge(
+# ✅ CORRECT - Using MCP tools (handles JSON serialization automatically)
+# Store knowledge with complex nested objects - NO JSON.dumps needed!
+result = await mcp__knowledge__knowledge_store(
     knowledge_type="ERROR_SOLUTION",
     content="Your solution here",
-    context={"any": "complex", "nested": {"objects": "work"}},  # No JSON.dumps needed!
+    context={"any": "complex", "nested": {"objects": "work"}},  # Automatic serialization!
     tags=["your", "tags"]
 )
-mcp__db__write_neo4j_cypher(query=result['query'], params=result['params'])
+# Then execute the generated query
+await mcp__db__write_neo4j_cypher(query=result['cypher_query'], params=result['params'])
+
+# Query knowledge easily
+result = await mcp__knowledge__knowledge_query(
+    query_type="search",
+    query_text="ImportError",
+    knowledge_type="ERROR_SOLUTION"
+)
+data = await mcp__db__read_neo4j_cypher(query=result['cypher_query'], params=result['params'])
 
 # ❌ WRONG - Direct Cypher with complex objects (will fail)
 # mcp__db__write_neo4j_cypher(
