@@ -34,14 +34,11 @@ REQUEST RECEIVED
 
 The Claude Code agent can handle complete workflows from research to deployment in a single session, maintaining full context throughout. This is the default and preferred approach.
 
-```python
-# DEFAULT PATTERN - Use Claude Code for everything
-from opsvi_mcp.tools import claude_code_wrapper
-
-result = await claude_code_wrapper.execute(
-    task="Complete the entire task from research to deployment",
-    context=project_context
-)
+```
+# DEFAULT PATTERN - Use Claude Code (yourself) for everything
+# You ARE Claude Code - handle the complete workflow yourself
+# Don't try to import or call another Claude Code instance
+# Simply follow the SDLC phases and use available tools directly
 ```
 
 ### When to Use Specialized Agents (5% of Tasks)

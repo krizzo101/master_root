@@ -13,8 +13,11 @@ First, familiarize yourself with these critical documents:
 Before writing ANY code:
 1. **Knowledge System**: Query for existing solutions
    ```python
-   knowledge_query("search", "[your project terms]")
-   ```
+   # Check for existing knowledge using Neo4j
+   result = mcp__db__read_neo4j_cypher(
+       query="MATCH (k:Knowledge) WHERE k.content CONTAINS $searchTerm RETURN k",
+       params={"searchTerm": "your search terms"}
+   )
 2. **Resource Discovery**: Check what exists in libs/
    ```python
    from opsvi_mcp.tools.resource_discovery import ResourceDiscovery
@@ -23,19 +26,31 @@ Before writing ANY code:
    ```
 
 ## 📋 SDLC Phases (MANDATORY)
-You MUST follow these phases in order:
+You MUST follow these phases in order and produce concrete deliverables:
 
 ### 1️⃣ DISCOVERY (Research & Requirements)
 - Research current technology (2025 best practices)
-- Use: `mcp_web_search`, `tech_docs`, `firecrawl`
-- Document requirements
-- Define success criteria
+- Use tools:
+  - `mcp__mcp_web_search__brave_web_search()` - Search for current info
+  - `mcp__tech_docs__get-library-docs()` - Get library documentation
+  - `mcp__firecrawl__firecrawl_scrape()` - Scrape official docs
+- **Deliverable**: Requirements document with:
+  - Problem statement
+  - User stories/use cases
+  - Functional requirements
+  - Non-functional requirements (performance, security)
+  - Success criteria (measurable)
 
 ### 2️⃣ DESIGN (Architecture)
 - Create solution architecture
 - Design component boundaries
 - Define interfaces
-- Document design decisions
+- **Deliverable**: Design document with:
+  - Architecture diagram
+  - Component descriptions
+  - Data flow diagrams
+  - API specifications
+  - Technology choices with justification
 
 ### 3️⃣ PLANNING (Task Breakdown)
 - Break into <2 hour tasks
