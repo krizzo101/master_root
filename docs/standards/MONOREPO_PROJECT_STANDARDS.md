@@ -124,6 +124,62 @@ apps/<app-name>/
 └── .env.example
 ```
 
+## Agent Invocation Standards
+
+### Primary Agent Strategy
+**Claude Code is the default agent for all development tasks in the AI Factory.**
+
+```python
+# Standard pattern for agent invocation
+from opsvi_mcp.tools import claude_code_wrapper
+
+async def build_feature(requirements: str, app_name: str):
+    """Default pattern - use Claude Code for everything"""
+    return await claude_code_wrapper.execute(
+        task=requirements,
+        app_name=app_name,
+        require_tests=True,
+        require_docs=True,
+        commit_changes=True
+    )
+```
+
+### Agent Selection Guidelines
+1. **Use Claude Code (95% of cases)**
+   - All standard development tasks
+   - Feature implementation
+   - Bug fixing and debugging
+   - Testing and validation
+   - Documentation
+   - Integration work
+
+2. **Use Specialized Agents Only When**
+   - Batch operations exceed 1000 items
+   - Real-time response <1s required
+   - Domain-specific expertise needed (legal, medical)
+   - 100% deterministic results required
+   - Resource constraints prevent Claude Code usage
+
+### Integration Pattern
+```python
+# apps/<app-name>/src/<app_name>/services/agent_service.py
+from opsvi_mcp.tools import claude_code_wrapper
+
+class AgentService:
+    """Standard service for agent invocations"""
+    
+    async def execute_development_task(self, task: str):
+        """Execute any development task using Claude Code"""
+        return await claude_code_wrapper.execute(
+            task=task,
+            context={
+                "app_path": f"apps/{self.app_name}",
+                "standards": "Follow monorepo standards",
+                "sdlc": "Follow SDLC phases"
+            }
+        )
+```
+
 ## Mandatory Requirements
 
 ### 1. Module Execution

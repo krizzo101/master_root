@@ -27,6 +27,34 @@ REQUEST RECEIVED
 [7] DELIVER - "Package for production"
 ```
 
+## AGENT SELECTION STRATEGY
+
+### PRIMARY AGENT: Claude Code (95% of Tasks)
+**ALWAYS use Claude Code as your first choice for agent tasks.**
+
+The Claude Code agent can handle complete workflows from research to deployment in a single session, maintaining full context throughout. This is the default and preferred approach.
+
+```python
+# DEFAULT PATTERN - Use Claude Code for everything
+from opsvi_mcp.tools import claude_code_wrapper
+
+result = await claude_code_wrapper.execute(
+    task="Complete the entire task from research to deployment",
+    context=project_context
+)
+```
+
+### When to Use Specialized Agents (5% of Tasks)
+Only use specialized agents for these specific scenarios:
+1. **Batch Operations**: Processing >1000 files or operations requiring parallel processing
+2. **Real-time Processing**: <1s response requirement with event-driven architecture
+3. **Domain-Specific**: Legal, medical, or other highly specialized domains
+4. **Deterministic Operations**: 100% reproducible results with no LLM variability
+5. **Resource-Constrained**: Edge devices, limited memory environments
+
+### Decision Rule
+**If in doubt, use Claude Code.** It's better to let Claude Code handle the entire workflow than to orchestrate multiple agents.
+
 ## PHASE-BY-PHASE BEHAVIORAL GUIDELINES
 
 ### 🔍 PHASE 1: DISCOVERY (Understanding)
