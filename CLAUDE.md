@@ -3,11 +3,17 @@
 ## OUTPUT MANAGEMENT & TOKEN LIMITS (CRITICAL - PREVENTS SESSION CORRUPTION)
 
 ### CHUNKED OUTPUT STRATEGY (MANDATORY)
-**NEVER generate more than 500 lines of code/text in a single response**
-- Break large updates into multiple smaller edits
-- Use MultiEdit for multiple file changes
-- Write to files instead of outputting large content
-- Summarize rather than show full content when possible
+**Batch sizes based on file complexity:**
+- **SMALL files (<100 lines)**: Process 10-15 files per batch
+- **MEDIUM files (100-300 lines)**: Process 5-8 files per batch  
+- **LARGE files (300-1000 lines)**: Process 2-4 files per batch
+- **VERY LARGE files (1000+ lines)**: Process 1-2 files maximum
+
+**Output approach:**
+- Show summaries and confirmations, not full file contents
+- Use MultiEdit for coordinated changes across multiple files
+- Display only relevant excerpts (10-20 lines) when showing code
+- Write large generated content directly to files
 
 ### TOKEN LIMIT AWARENESS
 **Current limits for Opus 4.1:**
@@ -23,19 +29,34 @@
 5. **WARN when output will be large**: "This will generate ~X lines, shall I write to file?"
 
 ### SAFE OUTPUT PATTERNS
+
+**For batch file operations:**
 ```python
-# WRONG - May exceed token limit
-print(entire_file_content)  # 5000 lines
+# WRONG - Showing full content of multiple files
+for file in files:
+    print(f"=== {file} ===")
+    print(read_entire_file(file))  # Could be thousands of lines
 
-# CORRECT - Chunked approach
-# Write to file
-with open('output.txt', 'w') as f:
-    f.write(entire_file_content)
-print("Wrote 5000 lines to output.txt")
+# CORRECT - Summary approach
+print(f"Processing {len(files)} files...")
+for file in files:
+    result = process_file(file)
+    print(f"✓ {file}: Updated {result.lines_changed} lines")
 
-# CORRECT - Show excerpt
-print(f"First 50 lines of {len(lines)} total:")
-print('\n'.join(lines[:50]))
+# Show only critical excerpts if needed
+print(f"\nKey change in {file} (lines 45-55):")
+print_excerpt(file, start=45, end=55)
+```
+
+**For large content generation:**
+```python
+# WRONG - Outputting large generated content
+print(generate_large_content())  # 5000 lines
+
+# CORRECT - Write to file with confirmation
+content = generate_large_content()
+write_to_file('output.txt', content)
+print(f"✓ Generated {len(content.splitlines())} lines → output.txt")
 ```
 
 ## PROJECT ORGANIZATION & CHAOS PREVENTION (ZERO TOLERANCE)
