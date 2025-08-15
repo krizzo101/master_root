@@ -27,10 +27,11 @@ First, familiarize yourself with these critical documents:
 Before writing ANY code:
 1. **Knowledge System**: Query for existing solutions
    ```python
-   # Check for existing knowledge using Neo4j
-   result = mcp__db__read_neo4j_cypher(
-       query="MATCH (k:Knowledge) WHERE k.content CONTAINS $searchTerm RETURN k",
-       params={"searchTerm": "your search terms"}
+   # Check for existing knowledge using Knowledge MCP tools
+   result = mcp__knowledge__knowledge_query(
+       query_type="search",
+       query_text="your search terms",
+       knowledge_type="WORKFLOW"  # or ERROR_SOLUTION, CODE_PATTERN, etc.
    )
 2. **Resource Discovery**: Check what exists in libs/
    ```python
@@ -109,7 +110,15 @@ enforcer.get_project_status(project.project_id)  # Check current status
 ### 7️⃣ PRODUCTION (Operations)
 - Monitor actively
 - Document lessons
-- Update knowledge system
+- Update knowledge system:
+  ```python
+  # Store successful patterns and workflows
+  result = mcp__knowledge__knowledge_store(
+      knowledge_type="WORKFLOW",
+      content="Description of successful implementation pattern",
+      confidence_score=0.95
+  )
+  ```
 
 ## 🏗️ Project Structure
 
