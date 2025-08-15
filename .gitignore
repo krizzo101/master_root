@@ -2,6 +2,8 @@
 .git/
 .gitignore~
 
+.reference/
+
 # Python
 __pycache__/
 *.py[cod]
