@@ -1,0 +1,59 @@
+{
+  "9a697288": {
+    "project_id": "9a697288",
+    "project_name": "Context Intelligence",
+    "description": "Hybrid RAG system implementation",
+    "scope": {
+      "project_id": "9a697288",
+      "project_name": "Context Intelligence",
+      "root_path": "/home/opsvi/master_root/projects/context_intelligence",
+      "subdirs": [
+        "discovery",
+        "design",
+        "planning",
+        "development",
+        "testing",
+        "deployment",
+        "production",
+        "docs",
+        "src",
+        "tests",
+        "configs"
+      ],
+      "enforcement_level": "strict",
+      "allowed_external_paths": [
+        "/home/opsvi/master_root/docs",
+        "/home/opsvi/master_root/.proj-intel",
+        "/tmp"
+      ],
+      "phase_overrides": {
+        "discovery": [
+          "docs",
+          "discovery"
+        ],
+        "design": [
+          "docs",
+          "discovery",
+          "design"
+        ],
+        "planning": [
+          "docs",
+          "discovery",
+          "design",
+          "planning"
+        ]
+      }
+    },
+    "current_phase": "discovery",
+    "completed_phases": [],
+    "created_at": "2025-08-15T15:56:51.064122",
+    "last_updated": "2025-08-15T15:56:51.064125",
+    "is_active": true,
+    "metadata": {
+      "creator": "opsvi",
+      "enforcement_enabled": true,
+      "validation_results": {},
+      "knowledge_queries": []
+    }
+  }
+}
