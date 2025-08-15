@@ -1,26 +1,102 @@
 # PROJECT DIRECTIVES
 
-## TASK INITIALIZATION (RUN IMMEDIATELY ON ANY REQUEST)
+## PROJECT INTELLIGENCE SYSTEM - USE BY DEFAULT
 
-### FIRST ACTION - INTELLIGENCE CHECK
-```bash
-# BEFORE DOING ANYTHING ELSE, RUN THIS:
-ls -la .proj-intel/ 2>/dev/null && echo "Intelligence available" || echo "No intelligence"
+### CRITICAL: Default-On Intelligence
+The `.proj-intel/` directory contains comprehensive indexed knowledge. **Use it by default for ALL non-trivial tasks**, not just when keywords appear.
 
-# If available, immediately check relevant indices:
-# For agent work:
-jq -r 'select(.path | contains("agent")) | .path' .proj-intel/file_elements.min.jsonl | head -20
+### What's Available
+- **10MB+ of indexed data** about every file, class, function, and import
+- **1,221 agent/class definitions** in `agent_architecture.jsonl`
+- **O(1) lookups** via reverse_index.json and symbol_index.json
+- **File statistics** in file_elements.min.jsonl (lines, functions, classes)
+- **Gatekeeper tools** in apps/ACCF/src/accf/tools/ for smart context selection
 
-# For finding specific code:
-jq -r 'keys[]' .proj-intel/symbol_index.json | grep -i "agent" | head -20
+### THINK → CHECK → ACT Pattern (Use for EVERY task)
+1. **THINK**: What am I trying to accomplish?
+2. **CHECK**: What does project intelligence tell me about this?
+3. **ACT**: Proceed with intelligence-informed action
+
+### Intent-Based Intelligence Usage (Not Keyword-Based)
+
+**Before ANY action, ask yourself:**
+- Am I about to search for something? → Use `symbol_index.json` FIRST
+- Am I about to understand how something works? → Load `architecture` FIRST  
+- Am I about to edit/create code? → Find similar patterns FIRST
+- Am I debugging an issue? → Check `dependencies` FIRST
+- Am I exploring the codebase? → Use `file_elements.min.jsonl` FIRST
+
+### Self-Triggering Rules
+- **If thinking "I need to find..."** → Stop. Use intelligence.
+- **If thinking "Let me search..."** → Stop. Use intelligence.
+- **If thinking "I should check..."** → Stop. Use intelligence.
+- **If reading >2 files to understand something** → Stop. Use architecture.
+- **If grepping/searching manually** → Stop. Use indices.
+- **If creating new code** → Stop. Find patterns first.
+
+### Dynamic Recognition Examples
+```python
+# User says: "The app crashes during logout"
+# Agent thinks: "Debug intent detected"
+# Automatically runs:
+intel.find("logout")  # Don't grep
+intel.dependencies("auth/logout.py")  # Understand relationships
+
+# User says: "Make the API faster"  
+# Agent thinks: "Performance improvement needed"
+# Automatically runs:
+intel.find("api")  # Locate API code
+intel.stats()  # Understand complexity
+
+# User says: "Set up testing"
+# Agent thinks: "Need to understand test patterns"  
+# Automatically runs:
+intel.find("test")  # Find existing tests
+intel.architecture("test")  # Understand test structure
 ```
 
-### TASK STARTUP CHECKLIST
-1. ✓ Check .proj-intel/ exists
-2. ✓ Load relevant indices for the task
-3. ✓ Use TodoWrite for complex multi-step tasks
-4. ✓ Plan batch sizes based on file complexity
-5. ✓ Use MultiEdit for coordinated changes
+### Quick Access Commands
+```python
+# Import Gatekeeper tools (ALWAYS available)
+from apps.ACCF.src.accf.tools.gatekeeper_data_tools import ProjectIntelligenceQuerier, DataPackager
+from apps.ACCF.src.accf.tools.gatekeeper_query_templates import generate_query_template
+
+# Example: Find relevant files for a task
+querier = ProjectIntelligenceQuerier('.proj-intel')
+files = querier.find_files_by_pattern(['agent', 'orchestrat'])
+
+# Example: Get architecture context
+template = generate_query_template('architecture_question', keywords=['agents'])
+package = DataPackager(querier).create_package(template)
+```
+
+### Shell Commands for Quick Queries
+```bash
+# Find files by pattern
+jq -r '.path' .proj-intel/file_elements.min.jsonl | grep -i "pattern"
+
+# Find symbol definitions
+jq -r '.["SymbolName"]' .proj-intel/symbol_index.json
+
+# Check file statistics
+jq 'select(.path | contains("filename"))' .proj-intel/file_elements.min.jsonl
+
+# Get architecture info
+grep -l "ClassName" .proj-intel/agent_architecture.jsonl
+```
+
+### Integration Rules
+1. **ALWAYS check intelligence FIRST** before searching/grepping the codebase
+2. **Use Gatekeeper tools** for relevance scoring and context packaging
+3. **Prefer indexed lookups** over file system scans
+4. **Update intelligence** after major refactoring (>10 files changed)
+5. **Refresh command**: `project-intelligence full-package` (updates .proj-intel/)
+
+### Performance Benefits
+- **80% faster** file discovery vs grep/find
+- **50% less tokens** used due to targeted context
+- **Zero wrong-file edits** when using symbol_index
+- **Instant** architecture understanding
 
 ## OUTPUT MANAGEMENT & TOKEN LIMITS (CRITICAL - PREVENTS SESSION CORRUPTION)
 
@@ -252,113 +328,6 @@ master_root/
 - **Documentation**: Use technical-writer for clear documentation
 - **Complex Problems**: Use excellence-optimizer for cutting-edge solutions
 
-## STARTUP INTELLIGENCE CHECK (EXECUTE ON EVERY NEW TASK)
-
-### IMMEDIATE STARTUP SEQUENCE
-```python
-# AUTOMATICALLY RUN AT TASK START (no user prompt needed):
-1. Check if .proj-intel/ exists
-2. If yes, load key indices into memory:
-   - symbol_index.json (for finding code)
-   - file_elements.min.jsonl (for file stats)
-   - agent_architecture.jsonl (for patterns)
-3. Use this for ALL subsequent operations
-```
-
-### HOW TO USE PROJECT INTELLIGENCE
-
-**Finding code/files:**
-```python
-# WRONG - Don't search blindly
-grep -r "class AgentName" .
-
-# CORRECT - Check intelligence first
-# 1. Check symbol_index.json for exact location
-jq '.["AgentName"]' .proj-intel/symbol_index.json
-# 2. Then go directly to the file
-```
-
-**Understanding project structure:**
-```python
-# WRONG - Don't read files randomly
-find . -name "*.py" | xargs cat
-
-# CORRECT - Use file stats first
-# 1. Check file metrics
-jq 'select(.path | contains("agent"))' .proj-intel/file_elements.min.jsonl
-# 2. Read only relevant files based on stats
-```
-
-**Finding similar patterns:**
-```python
-# Before writing new agent code:
-grep "class.*Agent" .proj-intel/agent_architecture.jsonl
-# Use found patterns as templates
-```
-
-## MANDATORY INTELLIGENCE-FIRST PATTERNS (ENFORCED)
-
-### NON-NEGOTIABLE ENFORCEMENT RULES
-- **BEFORE ANY FILE READ**: MUST check indices for file location/stats
-- **BEFORE ANY SEARCH**: MUST check if answer exists in indices
-- **BEFORE ANY EDIT**: MUST find similar patterns for consistency
-- **AUTOMATIC FALLBACK**: If manual search attempted, check intelligence first
-- **VIOLATION = FAILURE**: Any bypass of intelligence is considered task failure
-
-## PROJECT INTELLIGENCE SYSTEM - DYNAMIC USAGE
-
-### CRITICAL: Default-On Intelligence
-The `.proj-intel/` directory contains comprehensive indexed knowledge. **Use it by default for ALL non-trivial tasks**, not just when keywords appear.
-
-### What's Available
-- **10MB+ of indexed data** about every file, class, function, and import
-- **1,221 agent/class definitions** in `agent_architecture.jsonl`
-- **O(1) lookups** via reverse_index.json and symbol_index.json
-- **File statistics** in file_elements.min.jsonl (lines, functions, classes)
-- **Gatekeeper tools** in apps/ACCF/src/accf/tools/ for smart context selection
-
-### THINK → CHECK → ACT Pattern (Use for EVERY task)
-1. **THINK**: What am I trying to accomplish?
-2. **CHECK**: What does project intelligence tell me about this?
-3. **ACT**: Proceed with intelligence-informed action
-
-### Intent-Based Intelligence Usage (Not Keyword-Based)
-
-**Before ANY action, ask yourself:**
-- Am I about to search for something? → Use `symbol_index.json` FIRST
-- Am I about to understand how something works? → Load `architecture` FIRST  
-- Am I about to edit/create code? → Find similar patterns FIRST
-- Am I debugging an issue? → Check `dependencies` FIRST
-- Am I exploring the codebase? → Use `file_elements.min.jsonl` FIRST
-
-### Self-Triggering Rules
-- **If thinking "I need to find..."** → Stop. Use intelligence.
-- **If thinking "Let me search..."** → Stop. Use intelligence.
-- **If thinking "I should check..."** → Stop. Use intelligence.
-- **If reading >2 files to understand something** → Stop. Use architecture.
-- **If grepping/searching manually** → Stop. Use indices.
-- **If creating new code** → Stop. Find patterns first.
-
-### Dynamic Recognition Examples
-```python
-# User says: "The app crashes during logout"
-# Agent thinks: "Debug intent detected"
-# Automatically runs:
-intel.find("logout")  # Don't grep
-intel.dependencies("auth/logout.py")  # Understand relationships
-
-# User says: "Make the API faster"  
-# Agent thinks: "Performance improvement needed"
-# Automatically runs:
-intel.find("api")  # Locate API code
-intel.stats()  # Understand complexity
-
-# User says: "Set up testing"
-# Agent thinks: "Need to understand test patterns"  
-# Automatically runs:
-intel.find("test")  # Find existing tests
-intel.architecture("test")  # Understand test structure
-```
 
 ### Quick Access Commands
 ```python
