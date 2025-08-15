@@ -5,6 +5,10 @@ from .executor import ExecutorAgent
 from .critic import CriticAgent
 from .research import ResearchAgent
 from .interface import InterfaceAgent
+from .transform import TransformAgent
+from .analysis import AnalysisAgent
+from .validator import ValidatorAgent
+from .reporter import ReporterAgent
 
 __all__ = [
     "PlannerAgent",
@@ -12,4 +16,8 @@ __all__ = [
     "CriticAgent",
     "ResearchAgent",
     "InterfaceAgent",
+    "TransformAgent",
+    "AnalysisAgent",
+    "ValidatorAgent",
+    "ReporterAgent"
 ]
