@@ -8,7 +8,7 @@ import json
 import structlog
 
 from ..core import BaseAgent, AgentConfig, AgentContext, AgentResult
-from ..tools import tool_registry
+from ..tools import registry as tool_registry
 
 
 logger = structlog.get_logger()

@@ -12,16 +12,16 @@ from datetime import datetime
 
 async def execute_claude_decision(prompt: str) -> dict:
     """Execute a decision through Claude MCP"""
-    
+
     # Since we're already in Claude, we can use the MCP tools directly
     # This simulates what would happen with a real MCP connection
-    
+
     print(f"\n🤖 Sending to Claude MCP:")
     print(f"   Prompt: {prompt[:100]}...")
-    
+
     # In a real implementation, this would call:
     # result = await mcp__claude_code__claude_run(task=prompt, outputFormat="json")
-    
+
     # For demonstration, return intelligent response
     if "pattern" in prompt.lower():
         return {
@@ -30,7 +30,7 @@ async def execute_claude_decision(prompt: str) -> dict:
                     "type": "optimization",
                     "description": "Parallel processing opportunity detected",
                     "impact": "Could reduce execution time by 60%",
-                    "confidence": 0.85
+                    "confidence": 0.85,
                 }
             ]
         }
@@ -39,39 +39,41 @@ async def execute_claude_decision(prompt: str) -> dict:
             "decision": "implement_caching_layer",
             "reasoning": "Analysis shows 70% of queries are repeated",
             "confidence": 0.92,
-            "expected_improvement": "3x faster response times"
+            "expected_improvement": "3x faster response times",
         }
     else:
         return {
             "analysis": "Task understood and processed",
-            "next_steps": ["profile", "optimize", "validate"]
+            "next_steps": ["profile", "optimize", "validate"],
         }
 
 
 async def main():
     """Demonstrate AI-first agent with MCP integration"""
-    
-    print("\n" + "="*100)
+
+    print("\n" + "=" * 100)
     print("   🚀 AI-FIRST AUTONOMOUS AGENT - MCP INTEGRATION")
-    print("="*100)
-    
-    print("""
+    print("=" * 100)
+
+    print(
+        """
     This demonstrates how the autonomous agent integrates with Claude Code MCP.
     In production, it would use the actual MCP tools:
     
     - mcp__claude_code__claude_run() - For synchronous AI decisions
     - mcp__claude_code__claude_run_async() - For deep analysis
     - mcp__claude_code__claude_run_batch() - For parallel processing
-    """)
-    
-    print("\n" + "="*100)
+    """
+    )
+
+    print("\n" + "=" * 100)
     print("   EXAMPLE: AI-DRIVEN OPTIMIZATION WORKFLOW")
-    print("="*100)
-    
+    print("=" * 100)
+
     # Step 1: Analyze current state
     print("\n📊 Step 1: AI Analyzes Current State")
     print("-" * 60)
-    
+
     analysis_prompt = """
     Analyze the system performance metrics:
     - Response time: 500ms average
@@ -82,15 +84,15 @@ async def main():
     Identify optimization opportunities and bottlenecks.
     Return JSON with findings.
     """
-    
+
     result1 = await execute_claude_decision(analysis_prompt)
     print(f"✅ AI Analysis Complete:")
     print(f"   {json.dumps(result1, indent=2)}")
-    
+
     # Step 2: Pattern Recognition
     print("\n🔍 Step 2: AI Pattern Recognition")
     print("-" * 60)
-    
+
     pattern_prompt = """
     Find patterns in these system behaviors:
     - High CPU during batch processing
@@ -100,18 +102,18 @@ async def main():
     
     Identify causal relationships and optimization patterns.
     """
-    
+
     result2 = await execute_claude_decision(pattern_prompt)
     print(f"✅ Patterns Discovered:")
     for pattern in result2.get("patterns_found", []):
         print(f"   • {pattern['description']}")
         print(f"     Impact: {pattern['impact']}")
         print(f"     Confidence: {pattern['confidence']:.0%}")
-    
+
     # Step 3: Decision Making
     print("\n🧠 Step 3: AI Strategic Decision")
     print("-" * 60)
-    
+
     decision_prompt = """
     Based on the analysis and patterns, decide on optimization strategy:
     - Available options: caching, parallel processing, query optimization, scaling
@@ -120,19 +122,20 @@ async def main():
     
     Make strategic decision with reasoning.
     """
-    
+
     result3 = await execute_claude_decision(decision_prompt)
     print(f"✅ AI Decision:")
     print(f"   Action: {result3.get('decision', 'Unknown')}")
     print(f"   Reasoning: {result3.get('reasoning', 'No reasoning')}")
     print(f"   Confidence: {result3.get('confidence', 0):.0%}")
     print(f"   Expected: {result3.get('expected_improvement', 'Unknown')}")
-    
-    print("\n" + "="*100)
+
+    print("\n" + "=" * 100)
     print("   HOW TO CONNECT TO REAL CLAUDE MCP")
-    print("="*100)
-    
-    print("""
+    print("=" * 100)
+
+    print(
+        """
     To use real Claude Code MCP in production:
     
     1. Direct MCP Tool Usage (from within Claude):
@@ -167,13 +170,15 @@ async def main():
         max_concurrent=3
     )
     ```
-    """)
-    
-    print("\n" + "="*100)
+    """
+    )
+
+    print("\n" + "=" * 100)
     print("   REAL-WORLD EXAMPLE: SELF-IMPROVING AGENT")
-    print("="*100)
-    
-    print("""
+    print("=" * 100)
+
+    print(
+        """
     Here's how the agent would self-improve in production:
     
     1. OBSERVE: Agent monitors its own performance
@@ -196,8 +201,9 @@ async def main():
     
     This creates a continuous improvement loop where the agent
     becomes more intelligent with each iteration!
-    """)
-    
+    """
+    )
+
     print(f"\n✨ Demonstration completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("🤖 The autonomous agent is ready to leverage Claude's full intelligence!\n")
 

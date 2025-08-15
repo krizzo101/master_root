@@ -13,47 +13,49 @@ from enum import Enum
 
 class PatternType(Enum):
     """Types of patterns the AI can recognize"""
-    BEHAVIORAL = "behavioral"           # Action-outcome relationships
-    TEMPORAL = "temporal"               # Time-based sequences
-    CAUSAL = "causal"                  # Cause-effect chains
-    OPTIMIZATION = "optimization"       # Performance improvements
-    ANOMALY = "anomaly"                # Unusual patterns
-    EMERGENT = "emergent"              # Unexpected correlations
-    PREDICTIVE = "predictive"          # Future predictions
-    META = "meta"                      # Patterns about patterns
+
+    BEHAVIORAL = "behavioral"  # Action-outcome relationships
+    TEMPORAL = "temporal"  # Time-based sequences
+    CAUSAL = "causal"  # Cause-effect chains
+    OPTIMIZATION = "optimization"  # Performance improvements
+    ANOMALY = "anomaly"  # Unusual patterns
+    EMERGENT = "emergent"  # Unexpected correlations
+    PREDICTIVE = "predictive"  # Future predictions
+    META = "meta"  # Patterns about patterns
 
 
 @dataclass
 class AIPattern:
     """AI-discovered pattern with semantic understanding"""
+
     id: str
     type: PatternType
     description: str
-    semantic_meaning: str              # What this pattern MEANS
-    trigger_conditions: List[str]      # When it applies (AI-understood)
-    expected_outcomes: List[str]       # What happens next
+    semantic_meaning: str  # What this pattern MEANS
+    trigger_conditions: List[str]  # When it applies (AI-understood)
+    expected_outcomes: List[str]  # What happens next
     confidence: float
-    evidence: List[Dict[str, Any]]    # Supporting observations
-    relationships: List[Dict[str, Any]] # Related patterns
-    predictive_power: float            # How well it predicts
+    evidence: List[Dict[str, Any]]  # Supporting observations
+    relationships: List[Dict[str, Any]]  # Related patterns
+    predictive_power: float  # How well it predicts
     metadata: Dict[str, Any] = field(default_factory=dict)
     discovered_at: datetime = field(default_factory=datetime.now)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary"""
         return {
-            'id': self.id,
-            'type': self.type.value,
-            'description': self.description,
-            'semantic_meaning': self.semantic_meaning,
-            'trigger_conditions': self.trigger_conditions,
-            'expected_outcomes': self.expected_outcomes,
-            'confidence': self.confidence,
-            'predictive_power': self.predictive_power,
-            'evidence_count': len(self.evidence),
-            'relationships': self.relationships,
-            'metadata': self.metadata,
-            'discovered_at': self.discovered_at.isoformat()
+            "id": self.id,
+            "type": self.type.value,
+            "description": self.description,
+            "semantic_meaning": self.semantic_meaning,
+            "trigger_conditions": self.trigger_conditions,
+            "expected_outcomes": self.expected_outcomes,
+            "confidence": self.confidence,
+            "predictive_power": self.predictive_power,
+            "evidence_count": len(self.evidence),
+            "relationships": self.relationships,
+            "metadata": self.metadata,
+            "discovered_at": self.discovered_at.isoformat(),
         }
 
 
@@ -62,7 +64,7 @@ class AIPatternEngine:
     Semantic pattern recognition using Claude's intelligence
     No regex, no string matching - only AI understanding
     """
-    
+
     def __init__(self, claude_client=None, ai_decision_engine=None):
         """Initialize with Claude client and decision engine"""
         self.claude = claude_client
@@ -71,61 +73,63 @@ class AIPatternEngine:
         self.pattern_graph = {}  # Relationships between patterns
         self.observation_buffer = []
         self.semantic_index = {}  # Semantic similarity index
-        
-    async def observe_and_learn(self, 
-                               observation: Dict[str, Any],
-                               context: Optional[Dict[str, Any]] = None) -> List[AIPattern]:
+
+    async def observe_and_learn(
+        self, observation: Dict[str, Any], context: Optional[Dict[str, Any]] = None
+    ) -> List[AIPattern]:
         """
         Observe data and discover patterns using AI
-        
+
         Args:
             observation: New observation data
             context: Additional context
-            
+
         Returns:
             List of discovered patterns
         """
-        
+
         # Add to buffer
-        self.observation_buffer.append({
-            'observation': observation,
-            'context': context,
-            'timestamp': datetime.now().isoformat()
-        })
-        
+        self.observation_buffer.append(
+            {
+                "observation": observation,
+                "context": context,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
+
         # Keep buffer manageable
         if len(self.observation_buffer) > 1000:
             self.observation_buffer = self.observation_buffer[-1000:]
-        
+
         # AI pattern discovery
         discovered_patterns = await self._ai_discover_patterns(observation, context)
-        
+
         # Update pattern relationships
         if discovered_patterns:
             await self._ai_find_relationships(discovered_patterns)
-        
+
         # Update predictive power
         await self._ai_validate_predictions()
-        
+
         return discovered_patterns
-    
-    async def find_matching_patterns(self, 
-                                   context: Dict[str, Any],
-                                   threshold: float = 0.5) -> List[Tuple[AIPattern, float]]:
+
+    async def find_matching_patterns(
+        self, context: Dict[str, Any], threshold: float = 0.5
+    ) -> List[Tuple[AIPattern, float]]:
         """
         Find patterns that match the context using AI semantic understanding
-        
+
         Args:
             context: Current context to match
             threshold: Minimum confidence threshold
-            
+
         Returns:
             List of (pattern, match_score) tuples
         """
-        
+
         if not self.patterns:
             return []
-        
+
         prompt = f"""
         You are a pattern matching AI with deep semantic understanding.
         
@@ -162,45 +166,45 @@ class AIPatternEngine:
             }}
         }}
         """
-        
+
         if self.claude:
             try:
                 result = await self.claude.execute(prompt, mode="sync")
-                
+
                 matches = []
-                for match in result.get('matches', []):
-                    if match['match_score'] >= threshold:
-                        pattern = self.patterns.get(match['pattern_id'])
+                for match in result.get("matches", []):
+                    if match["match_score"] >= threshold:
+                        pattern = self.patterns.get(match["pattern_id"])
                         if pattern:
-                            matches.append((pattern, match['match_score']))
-                
+                            matches.append((pattern, match["match_score"]))
+
                 # Check for new pattern opportunity
-                if result.get('potential_new_pattern', {}).get('detected'):
+                if result.get("potential_new_pattern", {}).get("detected"):
                     await self._create_pattern_from_insight(
-                        result['potential_new_pattern'], context
+                        result["potential_new_pattern"], context
                     )
-                
+
                 return sorted(matches, key=lambda x: x[1], reverse=True)
-                
+
             except Exception as e:
                 print(f"AI pattern matching failed: {e}")
-        
+
         return []
-    
-    async def predict_next(self, 
-                         current_state: Dict[str, Any],
-                         time_horizon: Optional[int] = None) -> List[Dict[str, Any]]:
+
+    async def predict_next(
+        self, current_state: Dict[str, Any], time_horizon: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
         """
         Predict what will happen next based on learned patterns
-        
+
         Args:
             current_state: Current system state
             time_horizon: How far ahead to predict (steps/time)
-            
+
         Returns:
             List of predictions with confidence scores
         """
-        
+
         prompt = f"""
         You are a predictive AI using learned patterns to forecast future states.
         
@@ -248,24 +252,28 @@ class AIPatternEngine:
             ]
         }}
         """
-        
+
         if self.claude:
             try:
                 result = await self.claude.execute(prompt, mode="sync")
-                return result.get('predictions', [])
+                return result.get("predictions", [])
             except Exception as e:
                 print(f"AI prediction failed: {e}")
-        
+
         return []
-    
-    async def _ai_discover_patterns(self, 
-                                  observation: Dict[str, Any],
-                                  context: Optional[Dict[str, Any]]) -> List[AIPattern]:
+
+    async def _ai_discover_patterns(
+        self, observation: Dict[str, Any], context: Optional[Dict[str, Any]]
+    ) -> List[AIPattern]:
         """Use AI to discover patterns in observations"""
-        
+
         # Get recent observations for pattern detection
-        recent = self.observation_buffer[-20:] if len(self.observation_buffer) > 20 else self.observation_buffer
-        
+        recent = (
+            self.observation_buffer[-20:]
+            if len(self.observation_buffer) > 20
+            else self.observation_buffer
+        )
+
         prompt = f"""
         You are an expert pattern discovery AI. Find meaningful patterns in this data.
         
@@ -318,43 +326,43 @@ class AIPatternEngine:
             ]
         }}
         """
-        
+
         if self.claude:
             try:
                 result = await self.claude.execute(prompt, mode="sync")
-                
+
                 new_patterns = []
-                for pattern_data in result.get('discovered_patterns', []):
+                for pattern_data in result.get("discovered_patterns", []):
                     pattern = AIPattern(
                         id=f"pattern_{len(self.patterns)}_{datetime.now().timestamp()}",
-                        type=PatternType(pattern_data['type']),
-                        description=pattern_data['description'],
-                        semantic_meaning=pattern_data['semantic_meaning'],
-                        trigger_conditions=pattern_data['trigger_conditions'],
-                        expected_outcomes=pattern_data['expected_outcomes'],
-                        confidence=pattern_data['confidence'],
-                        evidence=pattern_data['evidence'],
-                        relationships=pattern_data.get('relationships', []),
-                        predictive_power=pattern_data.get('predictive_power', 0.5),
-                        metadata={'discovery_context': context}
+                        type=PatternType(pattern_data["type"]),
+                        description=pattern_data["description"],
+                        semantic_meaning=pattern_data["semantic_meaning"],
+                        trigger_conditions=pattern_data["trigger_conditions"],
+                        expected_outcomes=pattern_data["expected_outcomes"],
+                        confidence=pattern_data["confidence"],
+                        evidence=pattern_data["evidence"],
+                        relationships=pattern_data.get("relationships", []),
+                        predictive_power=pattern_data.get("predictive_power", 0.5),
+                        metadata={"discovery_context": context},
                     )
-                    
+
                     self.patterns[pattern.id] = pattern
                     new_patterns.append(pattern)
-                
+
                 return new_patterns
-                
+
             except Exception as e:
                 print(f"AI pattern discovery failed: {e}")
-        
+
         return []
-    
+
     async def _ai_find_relationships(self, new_patterns: List[AIPattern]):
         """Use AI to find relationships between patterns"""
-        
+
         if len(self.patterns) < 2:
             return
-        
+
         prompt = f"""
         You are analyzing relationships between patterns.
         
@@ -390,44 +398,42 @@ class AIPatternEngine:
             ]
         }}
         """
-        
+
         if self.claude:
             try:
                 result = await self.claude.execute(prompt, mode="sync")
-                
+
                 # Update pattern graph
-                for rel in result.get('relationships', []):
-                    from_id = rel['from_pattern']
-                    to_id = rel['to_pattern']
-                    
+                for rel in result.get("relationships", []):
+                    from_id = rel["from_pattern"]
+                    to_id = rel["to_pattern"]
+
                     if from_id not in self.pattern_graph:
                         self.pattern_graph[from_id] = []
-                    
-                    self.pattern_graph[from_id].append({
-                        'to': to_id,
-                        'type': rel['relationship_type'],
-                        'strength': rel['strength']
-                    })
-                    
+
+                    self.pattern_graph[from_id].append(
+                        {"to": to_id, "type": rel["relationship_type"], "strength": rel["strength"]}
+                    )
+
             except Exception as e:
                 print(f"AI relationship discovery failed: {e}")
-    
+
     async def _ai_validate_predictions(self):
         """Validate and update predictive power of patterns"""
-        
+
         # This would track predictions and validate them against actual outcomes
         # Updates pattern.predictive_power based on accuracy
         pass
-    
+
     async def _create_pattern_from_insight(self, insight: Dict[str, Any], context: Dict[str, Any]):
         """Create a new pattern from AI insight"""
-        
+
         # This would create a new pattern when AI detects something not yet captured
         pass
-    
+
     async def explain_pattern(self, pattern: AIPattern) -> str:
         """Get detailed AI explanation of a pattern"""
-        
+
         prompt = f"""
         Explain this pattern in detail:
         
@@ -442,24 +448,24 @@ class AIPatternEngine:
         
         Make it clear for a human operator.
         """
-        
+
         if self.claude:
             try:
                 explanation = await self.claude.execute(prompt, mode="sync")
                 return explanation
             except:
                 pass
-        
+
         return pattern.semantic_meaning
-    
+
     async def merge_patterns(self, pattern_ids: List[str]) -> Optional[AIPattern]:
         """Use AI to merge related patterns into a higher-level pattern"""
-        
+
         patterns_to_merge = [self.patterns[pid] for pid in pattern_ids if pid in self.patterns]
-        
+
         if len(patterns_to_merge) < 2:
             return None
-        
+
         prompt = f"""
         Merge these related patterns into a higher-level pattern:
         
@@ -473,7 +479,7 @@ class AIPatternEngine:
         
         Return the merged pattern specification.
         """
-        
+
         if self.claude:
             try:
                 result = await self.claude.execute(prompt, mode="sync")
@@ -481,17 +487,17 @@ class AIPatternEngine:
                 # ... implementation
             except:
                 pass
-        
+
         return None
-    
+
     def get_pattern_graph(self) -> Dict[str, Any]:
         """Get the pattern relationship graph"""
         return self.pattern_graph
-    
+
     def get_all_patterns(self) -> List[AIPattern]:
         """Get all discovered patterns"""
         return list(self.patterns.values())
-    
+
     def get_patterns_by_type(self, pattern_type: PatternType) -> List[AIPattern]:
         """Get patterns of a specific type"""
         return [p for p in self.patterns.values() if p.type == pattern_type]

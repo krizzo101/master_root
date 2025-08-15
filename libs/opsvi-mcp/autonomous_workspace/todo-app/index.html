@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A modern, accessible TODO application">
+    <meta name="theme-color" content="#6366f1">
+    <title>Modern TODO App</title>
+    <link rel="stylesheet" href="/src/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1 class="app-title">
+                <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                </svg>
+                TODO Today
+            </h1>
+            <div class="header-stats">
+                <span id="task-count" class="stat-badge">0 tasks</span>
+                <span id="completed-count" class="stat-badge completed">0 completed</span>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <section class="input-section" role="region" aria-label="Add new task">
+                <form id="todo-form" class="todo-form">
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="todo-input" 
+                            class="todo-input"
+                            placeholder="What needs to be done?"
+                            aria-label="New task description"
+                            autocomplete="off"
+                            required
+                        >
+                        <select id="priority-select" class="priority-select" aria-label="Task priority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                        <button type="submit" class="add-button" aria-label="Add task">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="filters-section" role="region" aria-label="Task filters">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all" aria-pressed="true">
+                        All
+                    </button>
+                    <button class="filter-btn" data-filter="active" aria-pressed="false">
+                        Active
+                    </button>
+                    <button class="filter-btn" data-filter="completed" aria-pressed="false">
+                        Completed
+                    </button>
+                </div>
+                <div class="search-box">
+                    <input 
+                        type="search" 
+                        id="search-input" 
+                        class="search-input"
+                        placeholder="Search tasks..."
+                        aria-label="Search tasks"
+                    >
+                </div>
+            </section>
+
+            <section class="todos-section" role="region" aria-label="Task list">
+                <ul id="todo-list" class="todo-list" role="list">
+                    <!-- Tasks will be dynamically added here -->
+                </ul>
+                <div id="empty-state" class="empty-state">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <p>No tasks yet. Add one above!</p>
+                </div>
+            </section>
+
+            <footer class="app-footer">
+                <button id="clear-completed" class="clear-btn" disabled>
+                    Clear completed
+                </button>
+                <div class="keyboard-hint">
+                    <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to add task
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script type="module" src="/src/app.js"></script>
+</body>
+</html>

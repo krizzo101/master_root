@@ -1,0 +1,86 @@
+[
+  {
+    "id": "seq_001",
+    "type": "task_sequence",
+    "description": "Login \u2192 Fetch Data \u2192 Display Dashboard",
+    "trigger_conditions": [
+      "login"
+    ],
+    "actions": [
+      "fetch_data",
+      "display_dashboard"
+    ],
+    "confidence": 0.85,
+    "occurrences": 25,
+    "success_rate": 0.92,
+    "avg_execution_time": 1.2,
+    "metadata": {},
+    "created_at": "2025-08-15T09:09:02.081388",
+    "last_used": null,
+    "source_node": "local",
+    "global_occurrences": 0
+  },
+  {
+    "id": "error_001",
+    "type": "error_recovery",
+    "description": "Timeout Error \u2192 Retry with Exponential Backoff",
+    "trigger_conditions": [
+      "TimeoutError"
+    ],
+    "actions": [
+      "wait_exponential",
+      "retry_request"
+    ],
+    "confidence": 0.9,
+    "occurrences": 15,
+    "success_rate": 0.87,
+    "avg_execution_time": 3.5,
+    "metadata": {},
+    "created_at": "2025-08-15T09:09:02.081395",
+    "last_used": null,
+    "source_node": "local",
+    "global_occurrences": 0
+  },
+  {
+    "id": "tool_001",
+    "type": "tool_usage",
+    "description": "Code Analysis \u2192 Use AST Parser",
+    "trigger_conditions": [
+      "analyze_code"
+    ],
+    "actions": [
+      "use_tool:ast_parser"
+    ],
+    "confidence": 0.95,
+    "occurrences": 50,
+    "success_rate": 0.96,
+    "avg_execution_time": 0.8,
+    "metadata": {},
+    "created_at": "2025-08-15T09:09:02.081397",
+    "last_used": null,
+    "source_node": "local",
+    "global_occurrences": 0
+  },
+  {
+    "id": "opt_001",
+    "type": "optimization",
+    "description": "Data Processing \u2192 Use Parallel Method (10x faster)",
+    "trigger_conditions": [
+      "data_processing"
+    ],
+    "actions": [
+      "method:parallel"
+    ],
+    "confidence": 0.98,
+    "occurrences": 30,
+    "success_rate": 0.97,
+    "avg_execution_time": 0.5,
+    "metadata": {
+      "speedup": 10.0
+    },
+    "created_at": "2025-08-15T09:09:02.081399",
+    "last_used": null,
+    "source_node": "local",
+    "global_occurrences": 0
+  }
+]

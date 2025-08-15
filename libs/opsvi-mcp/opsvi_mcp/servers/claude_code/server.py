@@ -4,9 +4,15 @@ Claude Code MCP Server - Main server implementation
 
 import asyncio
 import json
+import sys
 from typing import Optional
 
-from fastmcp import FastMCP
+try:
+    from fastmcp import FastMCP
+except ImportError as e:
+    print(f"Error: Failed to import FastMCP: {e}", file=sys.stderr)
+    print("Please install fastmcp: pip install fastmcp", file=sys.stderr)
+    sys.exit(1)
 
 from .config import config
 from .job_manager import JobManager
@@ -40,7 +46,7 @@ async def claude_run(
     task: str,
     cwd: Optional[str] = None,
     outputFormat: str = "json",
-    permissionMode: str = "bypassPermissions",
+    permissionMode: str = "bypassPermissions",  # Full capabilities in sandbox environment
     verbose: bool = False,
     parentJobId: Optional[str] = None,
 ) -> str:
@@ -120,7 +126,7 @@ async def claude_run_async(
     task: str,
     cwd: Optional[str] = None,
     outputFormat: str = "json",
-    permissionMode: str = "bypassPermissions",
+    permissionMode: str = "bypassPermissions",  # Full capabilities in sandbox environment
     verbose: bool = False,
     parentJobId: Optional[str] = None,
 ) -> str:
@@ -253,7 +259,7 @@ async def claude_kill_job(jobId: str) -> str:
     Returns:
         JSON with success status
     """
-    success = job_manager.kill_job(jobId)
+    success = await job_manager.kill_job(jobId)
 
     return json.dumps(
         {
@@ -393,9 +399,17 @@ async def claude_list_batches() -> str:
 
 def main():
     """Main entry point for the MCP server"""
-    import uvloop
-
-    uvloop.install()
+    try:
+        import uvloop
+        uvloop.install()
+    except ImportError:
+        # uvloop is optional, fall back to default event loop
+        import warnings
+        warnings.warn(
+            "uvloop not available, using default event loop. "
+            "Install uvloop for better performance: pip install uvloop"
+        )
+    
     mcp.run()
 
 

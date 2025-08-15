@@ -1,74 +1,151 @@
 version: 1
 generator: project-intelligence-fast
 files:
-  - ACTIVATE_AUTO_MCP_INSTRUCTIONS.md
-  - AGENTS.md
-  - AGENT_WORLD_TO_OPSVI_MAPPING.md
-  - AI_CAPABILITY_IMPLEMENTATION_PLAN.md
-  - ARCHITECTURE_REFACTOR_PLAN.md
-  - AUTO_MCP_INTEGRATION_GUIDE.md
-  - AUTO_MCP_PROJECT_PATHS.md
   - CLAUDE.local.md
   - CLAUDE.md
-  - CLAUDE_CODE_MIGRATION_STATUS.md
-  - CLAUDE_CODE_USE_CASES.md
-  - COMPREHENSIVE_MIGRATION_PLAN.md
-  - CONSULT_AGENT_CONTEXT_PACKAGE.md
-  - CONSULT_AGENT_OPTIMIZATION_DESIGN_SPEC.md
-  - DEPLOYMENT_CHECKLIST.md
-  - DESIGN_SPEC_FIXES_SUMMARY.md
-  - DETAILED_MIGRATION_ANALYSIS.md
-  - DETAILED_MIGRATION_PLANS.md
-  - DEVELOPER_REQUIREMENTS.md
   - Dockerfile
-  - FINAL_OPTIMIZATION_IMPLEMENTATION_PLAN.md
-  - FINAL_OPTIMIZATION_SUMMARY.md
-  - FINAL_STATUS_REPORT.md
-  - GAP_ANALYSIS.md
-  - GEMINI.md
-  - GEMINI_API_KEY_ISSUE.md
-  - GEMINI_SUBSCRIPTION_CLARIFICATION.md
-  - MCP_SERVERS_TRUTH_REPORT.md
-  - MCP_TOKEN_FIX_SUMMARY.md
-  - MIGRATION_ROADMAP.md
-  - MIGRATION_SUMMARY.md
-  - MULTI_CRITIC_APPROACH.md
-  - OPSVI_LIBS_GAP_ANALYSIS.md
-  - OPSVI_MCP_ANALYSIS_REPORT.md
-  - ORCHESTRATION_MODULE_PLAN.md
-  - PARALLEL_SPAWNING_STRATEGY.md
-  - PEER_CODEBASE_ANALYSIS.md
-  - PERPLEXITY_INTEGRATION_SUCCESS.md
-  - PERPLEXITY_INTEGRATION_SUMMARY.md
-  - PROJECT_INTELLIGENCE_INTEGRATION_STRATEGY.md
+  - PATTERN_ENGINE_EXTRACTION_SUMMARY.md
   - QUICK_START.md
   - README.md
-  - TEST_AUTO_MCP_LIVE.md
-  - TEST_CLAUDE_INTEGRATION.md
-  - TIMING_ANALYSIS_DOCUMENTATION.md
-  - TOURNAMENT_APPROACH_SUMMARY.md
-  - V1_LANGGRAPH_ORCHESTRATION_DESIGN.md
-  - V1_PARALLEL_RECURSIVE_ENHANCEMENT.md
-  - V3_ACTUAL_BEHAVIOR.md
-  - V3_PARALLEL_BEHAVIOR_ANALYSIS.md
-  - V3_TEST_REPORT.md
+  - START_AUTONOMOUS.sh
   - agents/integration_architect_agent.md
   - agents/sdlc_agent_implementation_guide.md
   - agents/sdlc_agent_usage_example.py
   - agents/sdlc_team_prompts.md
-  - analyze_all_custom_projects.py
-  - analyze_log_reality.py
-  - autonomous_research_assistant.py
+  - autonomous_claude_agent/ARCHITECTURE.md
+  - autonomous_claude_agent/CODE_VALUE_ASSESSMENT_REPORT.md
+  - autonomous_claude_agent/Dockerfile
+  - autonomous_claude_agent/IMPLEMENTATION_SUMMARY.md
+  - autonomous_claude_agent/Makefile
+  - autonomous_claude_agent/README.md
+  - autonomous_claude_agent/config/limits.yaml
+  - autonomous_claude_agent/config/settings.yaml
+  - autonomous_claude_agent/demo_self_improvement.py
+  - autonomous_claude_agent/demo_simple.py
+  - autonomous_claude_agent/docker-compose.yml
+  - autonomous_claude_agent/launch.py
+  - autonomous_claude_agent/pyproject.toml
+  - autonomous_claude_agent/pytest.ini
+  - autonomous_claude_agent/requirements.txt
+  - autonomous_claude_agent/run_demo.py
+  - autonomous_claude_agent/scripts/bootstrap.sh
+  - autonomous_claude_agent/src/__init__.py
+  - autonomous_claude_agent/src/capabilities/__init__.py
+  - autonomous_claude_agent/src/capabilities/discovery.py
+  - autonomous_claude_agent/src/capabilities/integrator.py
+  - autonomous_claude_agent/src/capabilities/registry.py
+  - autonomous_claude_agent/src/capabilities/validator.py
+  - autonomous_claude_agent/src/core/__init__.py
+  - autonomous_claude_agent/src/core/agent.py
+  - autonomous_claude_agent/src/core/claude_client.py
+  - autonomous_claude_agent/src/core/context_manager.py
+  - autonomous_claude_agent/src/core/error_recovery.py
+  - autonomous_claude_agent/src/core/state_manager.py
+  - autonomous_claude_agent/src/governance/__init__.py
+  - autonomous_claude_agent/src/governance/approval_system.py
+  - autonomous_claude_agent/src/governance/audit_logger.py
+  - autonomous_claude_agent/src/governance/resource_monitor.py
+  - autonomous_claude_agent/src/governance/safety_rules.py
+  - autonomous_claude_agent/src/learning/__init__.py
+  - autonomous_claude_agent/src/learning/experience_replay.py
+  - autonomous_claude_agent/src/learning/knowledge_base.py
+  - autonomous_claude_agent/src/learning/metrics_tracker.py
+  - autonomous_claude_agent/src/learning/pattern_engine.py
+  - autonomous_claude_agent/src/main.py
+  - autonomous_claude_agent/src/modification/__init__.py
+  - autonomous_claude_agent/src/modification/ast_modifier.py
+  - autonomous_claude_agent/src/modification/code_generator.py
+  - autonomous_claude_agent/src/modification/validator.py
+  - autonomous_claude_agent/src/modification/version_control.py
+  - autonomous_claude_agent/src/monitoring/__init__.py
+  - autonomous_claude_agent/src/monitoring/alert_manager.py
+  - autonomous_claude_agent/src/monitoring/dashboard.py
+  - autonomous_claude_agent/src/monitoring/health_checker.py
+  - autonomous_claude_agent/src/monitoring/metrics_exporter.py
+  - autonomous_claude_agent/src/research/__init__.py
+  - autonomous_claude_agent/src/research/cache_manager.py
+  - autonomous_claude_agent/src/research/doc_analyzer.py
+  - autonomous_claude_agent/src/research/solution_finder.py
+  - autonomous_claude_agent/src/research/web_search.py
+  - autonomous_claude_agent/src/utils/__init__.py
+  - autonomous_claude_agent/src/utils/async_helpers.py
+  - autonomous_claude_agent/src/utils/config_loader.py
+  - autonomous_claude_agent/src/utils/decorators.py
+  - autonomous_claude_agent/src/utils/logger.py
+  - autonomous_claude_agent/tests/__init__.py
+  - autonomous_claude_agent/tests/conftest.py
+  - autonomous_coder/IMPLEMENTATION_PLAN.md
+  - autonomous_coder/ITERATIVE_START.py
+  - autonomous_coder/README.md
+  - autonomous_coder/START_HERE.py
+  - autonomous_coder/SYSTEM_DESIGN.md
+  - autonomous_coder/WORKING_AUTONOMOUS.py
+  - autonomous_coder/autonomous_engine.py
+  - autonomous_coder/build_state.json
+  - autonomous_coder/core/__init__.py
+  - autonomous_coder/core/base.py
+  - autonomous_coder/core/config.py
+  - autonomous_coder/main.py
+  - autonomous_coder/mcp_research_autonomous.py
+  - autonomous_coder/mcp_workspace/package.json
+  - autonomous_coder/modules/__init__.py
+  - autonomous_coder/modules/generator.py
+  - autonomous_coder/modules/mcp_enhanced_research_engine.py
+  - autonomous_coder/modules/mcp_research_engine.py
+  - autonomous_coder/modules/orchestrator.py
+  - autonomous_coder/modules/research_engine.py
+  - autonomous_coder/requirements.txt
+  - autonomous_coder/research_enabled_autonomous.py
+  - autonomous_coder/research_module.py
+  - autonomous_coder/state_manager.py
+  - autonomous_coder/test_output/build-a-simple/README.md
+  - autonomous_coder/test_output/build-a-simple/index.html
+  - autonomous_coder/test_output/build-a-simple/package.json
+  - autonomous_coder/test_output/build-a-simple/src/main.ts
+  - autonomous_coder/test_output/build-a-simple/src/styles.css
+  - autonomous_coder/test_output/build-a-simple/tsconfig.json
+  - autonomous_coder/test_output/build-a-simple/vite.config.ts
+  - autonomous_coder/test_output/build_result.json
+  - autonomous_coder/test_output/create-a-rest/README.md
+  - autonomous_coder/test_output/create-a-rest/app/__init__.py
+  - autonomous_coder/test_output/create-a-rest/app/database.py
+  - autonomous_coder/test_output/create-a-rest/app/models.py
+  - autonomous_coder/test_output/create-a-rest/app/routes.py
+  - autonomous_coder/test_output/create-a-rest/main.py
+  - autonomous_coder/test_output/create-a-rest/requirements.txt
+  - autonomous_coder/test_output/example_1/build-a-simple/README.md
+  - autonomous_coder/test_output/example_1/build-a-simple/index.html
+  - autonomous_coder/test_output/example_1/build-a-simple/package.json
+  - autonomous_coder/test_output/example_1/build-a-simple/src/main.ts
+  - autonomous_coder/test_output/example_1/build-a-simple/src/styles.css
+  - autonomous_coder/test_output/example_1/build-a-simple/tsconfig.json
+  - autonomous_coder/test_output/example_1/build-a-simple/vite.config.ts
+  - autonomous_coder/test_output/example_1/build_result.json
+  - autonomous_coder/test_output/example_2/build_result.json
+  - autonomous_coder/test_output/example_2/create-a-rest/README.md
+  - autonomous_coder/test_output/example_2/create-a-rest/app/__init__.py
+  - autonomous_coder/test_output/example_2/create-a-rest/app/database.py
+  - autonomous_coder/test_output/example_2/create-a-rest/app/models.py
+  - autonomous_coder/test_output/example_2/create-a-rest/app/routes.py
+  - autonomous_coder/test_output/example_2/create-a-rest/main.py
+  - autonomous_coder/test_output/example_2/create-a-rest/requirements.txt
+  - autonomous_coder/test_output/example_3/build-a-cli/README.md
+  - autonomous_coder/test_output/example_3/build-a-cli/cli.py
+  - autonomous_coder/test_output/example_3/build-a-cli/requirements.txt
+  - autonomous_coder/test_output/example_3/build-a-cli/setup.py
+  - autonomous_coder/test_output/example_3/build_result.json
+  - autonomous_coder/test_output/example_4/build_result.json
+  - autonomous_coder/test_output/example_4/create-a-dashboard/README.md
+  - autonomous_coder/test_output/example_4/create-a-dashboard/index.js
+  - autonomous_coder/test_output/example_4/create-a-dashboard/package.json
+  - autonomous_coder/validator.py
+  - autonomous_coder/working_autonomous/index.html
+  - autonomous_coder/working_autonomous/package.json
+  - autonomous_coder/working_autonomous/src/main.ts
+  - autonomous_coder/working_autonomous/src/style.css
+  - autonomous_coder/working_autonomous/tsconfig.json
+  - autonomous_coder/working_autonomous/vite.config.ts
   - backup.mcp.json
-  - baseline_analysis.py
-  - claude_code_architecture_diagrams.md
-  - claude_code_log_analysis.md
-  - claude_code_mcp_technical_report.md
-  - clean_log.py
-  - comprehensive_optimization_analysis.py
-  - consult_agent_optimization_strategy.md
-  - demo_ecosystem.py
-  - discovery_agent_enhanced_prompt.md
   - docker-compose.yml
   - docs/ADR-001-initial-architecture.md
   - docs/ADR-002-scraper.md
@@ -78,10 +155,94 @@ files:
   - docs/agent_ide_integration_architecture.md
   - docs/agent_ide_integration_roadmap.md
   - docs/ai_populate_openai_responses_knowledge.md
+  - docs/analysis/2025-01-15_autonomous_agent_development_plan.md
+  - docs/analysis/2025-01-15_autonomous_agent_v2_refined.md
+  - docs/analysis/2025-01-15_autonomous_agent_v3_final.md
+  - docs/analysis/2025-01-15_coder_agent_refactoring_plan.md
+  - docs/analysis/2025-08-15_autonomous_agent_architecture_improvements.md
+  - docs/analysis/2025-08-15_mcp_research_integration_architecture.md
+  - docs/analysis/CLAUDE_CODE_MIGRATION_STATUS.md
+  - docs/analysis/DESIGN_SPEC_FIXES_SUMMARY.md
+  - docs/analysis/DETAILED_MIGRATION_ANALYSIS.md
+  - docs/analysis/FINAL_OPTIMIZATION_SUMMARY.md
+  - docs/analysis/FINAL_STATUS_REPORT.md
+  - docs/analysis/GAP_ANALYSIS.md
+  - docs/analysis/MCP_SERVERS_TRUTH_REPORT.md
+  - docs/analysis/MCP_TOKEN_FIX_SUMMARY.md
+  - docs/analysis/MIGRATION_SUMMARY.md
+  - docs/analysis/OPSVI_LIBS_GAP_ANALYSIS.md
+  - docs/analysis/OPSVI_MCP_ANALYSIS_REPORT.md
+  - docs/analysis/PEER_CODEBASE_ANALYSIS.md
+  - docs/analysis/PERPLEXITY_INTEGRATION_SUMMARY.md
+  - docs/analysis/TIMING_ANALYSIS_DOCUMENTATION.md
+  - docs/analysis/TOURNAMENT_APPROACH_SUMMARY.md
+  - docs/analysis/V3_PARALLEL_BEHAVIOR_ANALYSIS.md
+  - docs/analysis/V3_TEST_REPORT.md
+  - docs/analysis/enhanced_research_reports_research_20250810_192054.json
+  - docs/analysis/enhanced_research_reports_research_20250810_192253.json
+  - docs/analysis/enhanced_research_reports_research_20250810_192458.json
+  - docs/analysis/enhanced_research_reports_research_20250810_192809.json
+  - docs/analysis/enhanced_research_reports_research_20250810_193315.json
+  - docs/analysis/enhanced_research_reports_research_20250810_193510.json
+  - docs/analysis/real_research_reports_research_20250810_191416.json
+  - docs/analysis/real_research_reports_research_20250810_191438.json
+  - docs/analysis/real_research_reports_research_20250810_191449.json
+  - docs/analysis/real_research_reports_research_20250810_191515.json
+  - docs/analysis/real_research_reports_research_20250810_191722.json
+  - docs/analysis/research_reports_research_20250810_190708.json
+  - docs/architecture/AGENTS.md
+  - docs/architecture/AGENT_CORE_IMPLEMENTATION_PROPOSAL.md
+  - docs/architecture/AGENT_WORLD_TO_OPSVI_MAPPING.md
+  - docs/architecture/AI_CAPABILITY_IMPLEMENTATION_PLAN.md
+  - docs/architecture/ARCHITECTURE_REFACTOR_PLAN.md
+  - docs/architecture/CONSULT_AGENT_CONTEXT_PACKAGE.md
+  - docs/architecture/CONSULT_AGENT_OPTIMIZATION_DESIGN_SPEC.md
+  - docs/architecture/CORE_AGENT_ARCHITECTURE.md
+  - docs/architecture/DYNAMIC_INTELLIGENCE_STRATEGY.md
+  - docs/architecture/FINAL_OPTIMIZATION_IMPLEMENTATION_PLAN.md
+  - docs/architecture/MULTI_CRITIC_APPROACH.md
+  - docs/architecture/ORCHESTRATION_MODULE_PLAN.md
+  - docs/architecture/PARALLEL_SPAWNING_STRATEGY.md
+  - docs/architecture/consult_agent_optimization_strategy.md
+  - docs/architecture/discovery_agent_enhanced_prompt.md
+  - docs/architecture/enhanced_agent_capabilities.md
+  - docs/architecture/orchestrator_agent_prompt.md
+  - docs/architecture/specialized_discovery_agents.md
+  - docs/architecture/visualization_agent_activation_prompt.md
+  - docs/archive/AGENT_CORE_IMPLEMENTATION_PROPOSAL_V2.md
+  - docs/archive/V1_LANGGRAPH_ORCHESTRATION_DESIGN.md
+  - docs/archive/V1_PARALLEL_RECURSIVE_ENHANCEMENT.md
+  - docs/archive/V3_ACTUAL_BEHAVIOR.md
+  - docs/archive/mermaid_diagram_expert_prompt.md
+  - docs/archive/orchestrator_agent_prompt_v2.md
+  - docs/archive/orchestrator_resume_prompt.md
+  - docs/archive/run_orchestrated_analysis.md
   - docs/auto-attach-script-optimized-spec.md
   - docs/combined-project-intelligence-spec.md
   - docs/decision_log.md
   - docs/full_capabilities_walkthrough.md
+  - docs/guides/ACTIVATE_AUTO_MCP_INSTRUCTIONS.md
+  - docs/guides/AUTO_MCP_INTEGRATION_GUIDE.md
+  - docs/guides/AUTO_MCP_PROJECT_PATHS.md
+  - docs/guides/CLAUDE_CODE_USE_CASES.md
+  - docs/guides/DEPLOYMENT_CHECKLIST.md
+  - docs/guides/DEVELOPER_REQUIREMENTS.md
+  - docs/guides/GEMINI.md
+  - docs/guides/GEMINI_API_KEY_ISSUE.md
+  - docs/guides/GEMINI_SUBSCRIPTION_CLARIFICATION.md
+  - docs/guides/PERPLEXITY_INTEGRATION_SUCCESS.md
+  - docs/guides/PROJECT_INTELLIGENCE_INTEGRATION_STRATEGY.md
+  - docs/guides/TEST_AUTO_MCP_LIVE.md
+  - docs/guides/TEST_CLAUDE_INTEGRATION.md
+  - docs/guides/claude_code_architecture_diagrams.md
+  - docs/guides/claude_code_log_analysis.md
+  - docs/guides/claude_code_mcp_technical_report.md
+  - docs/guides/coder_agent_migration_guide.md
+  - docs/guides/mcp_research_integration_guide.md
+  - docs/guides/mcp_research_migration_guide.md
+  - docs/guides/mcp_server_test_report.md
+  - docs/guides/mcp_server_test_results.md
+  - docs/guides/mcp_server_upgrade_report.md
   - docs/libs/COMPLETE_LIBRARY_STRUCTURE.md
   - docs/libs/COMPLIANCE_VERIFICATION.md
   - docs/libs/DEVELOPMENT_ROADMAP.md
@@ -96,28 +257,26 @@ files:
   - docs/libs/generate_dry_ecosystem.py
   - docs/libs/scaffold_opsvi_libs.sh
   - docs/libs/templates/create_opsvi_library.py
+  - docs/migration/COMPREHENSIVE_MIGRATION_PLAN.md
+  - docs/migration/DETAILED_MIGRATION_PLANS.md
+  - docs/migration/MIGRATION_ROADMAP.md
+  - docs/migration/migration_mapping.json
   - docs/status/workspace_status_2025-08-03_18-44-43.md
   - docs/template_notes.txt
-  - enhanced_agent_capabilities.md
-  - enhanced_critic_accountability.py
-  - enhanced_research_assistant.py
-  - enhanced_research_assistant_with_qdrant.py
-  - enhanced_research_reports_research_20250810_192054.json
-  - enhanced_research_reports_research_20250810_192253.json
-  - enhanced_research_reports_research_20250810_192458.json
-  - enhanced_research_reports_research_20250810_192809.json
-  - enhanced_research_reports_research_20250810_193315.json
-  - enhanced_research_reports_research_20250810_193510.json
-  - factorial_recursive.py
-  - fast_migrate.py
-  - fibonacci.py
+  - examples/autonomous_research_assistant.py
+  - examples/demo_ecosystem.py
+  - examples/enhanced_research_assistant.py
+  - examples/enhanced_research_assistant_with_qdrant.py
+  - examples/factorial_recursive.py
+  - examples/fibonacci.py
+  - examples/hello_mcp.py
+  - examples/real_research_assistant.py
+  - examples/sort_example.py
+  - examples/working_demo.py
   - gemini-settings.json
-  - generate_project_visualizations.py
-  - generate_project_visualizations_fixed.py
-  - hello_mcp.py
-  - invoke_orchestrator.py
   - justfile
   - libs.dir
+  - libs/CLAUDE_CODE_ANALYSIS.md
   - libs/ECOSYSTEM_STATUS.md
   - libs/INTEGRATIONS_DIRECTORY_TREE.md
   - libs/README.md
@@ -158,20 +317,58 @@ files:
   - libs/generate_ecosystem_v2.py
   - libs/opsvi-agents/README.md
   - libs/opsvi-agents/opsvi_agents/__init__.py
+  - libs/opsvi-agents/opsvi_agents/adapters/__init__.py
+  - libs/opsvi-agents/opsvi_agents/adapters/legacy.py
   - libs/opsvi-agents/opsvi_agents/config/__init__.py
   - libs/opsvi-agents/opsvi_agents/config/settings.py
   - libs/opsvi-agents/opsvi_agents/core/__init__.py
   - libs/opsvi-agents/opsvi_agents/core/base.py
+  - libs/opsvi-agents/opsvi_agents/core/base_llm.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/__init__.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/analysis.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/coder.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/coder/__init__.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/coder/analyzers/__init__.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/coder/analyzers/pattern_analyzer.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/coder/generators/python/__init__.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/coder/generators/python/generator.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/coder/templates/__init__.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/coder/templates/template_manager.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/coder/types.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/coder_llm.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/critic.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/executor.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/interface.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/learner.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/monitor.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/optimizer.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/orchestrator.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/planner.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/reporter.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/research.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/test.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/transform.py
+  - libs/opsvi-agents/opsvi_agents/core_agents/validator.py
   - libs/opsvi-agents/opsvi_agents/exceptions/__init__.py
   - libs/opsvi-agents/opsvi_agents/exceptions/base.py
+  - libs/opsvi-agents/opsvi_agents/learning/__init__.py
+  - libs/opsvi-agents/opsvi_agents/learning/error_patterns.py
+  - libs/opsvi-agents/opsvi_agents/migration/__init__.py
+  - libs/opsvi-agents/opsvi_agents/migration/migrator.py
+  - libs/opsvi-agents/opsvi_agents/monitoring/__init__.py
+  - libs/opsvi-agents/opsvi_agents/monitoring/checkpoints.py
+  - libs/opsvi-agents/opsvi_agents/monitoring/telemetry.py
+  - libs/opsvi-agents/opsvi_agents/parallel/__init__.py
+  - libs/opsvi-agents/opsvi_agents/parallel/executor.py
+  - libs/opsvi-agents/opsvi_agents/registry/__init__.py
+  - libs/opsvi-agents/opsvi_agents/registry/agent_registry.py
+  - libs/opsvi-agents/opsvi_agents/templates/__init__.py
+  - libs/opsvi-agents/opsvi_agents/templates/react_agent.py
+  - libs/opsvi-agents/opsvi_agents/templates/supervisor_agent.py
+  - libs/opsvi-agents/opsvi_agents/templates/tool_agent.py
   - libs/opsvi-agents/opsvi_agents/tests/__init__.py
-  - libs/opsvi-agents/opsvi_agents/{{package_name}}/__init__.py
-  - libs/opsvi-agents/opsvi_agents/{{package_name}}/config/__init__.py
-  - libs/opsvi-agents/opsvi_agents/{{package_name}}/coordinators/__init__.py
-  - libs/opsvi-agents/opsvi_agents/{{package_name}}/core/__init__.py
-  - libs/opsvi-agents/opsvi_agents/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-agents/opsvi_agents/{{package_name}}/schedulers/__init__.py
-  - libs/opsvi-agents/opsvi_agents/{{package_name}}/utils/__init__.py
+  - libs/opsvi-agents/opsvi_agents/tools/__init__.py
+  - libs/opsvi-agents/opsvi_agents/tools/registry.py
   - libs/opsvi-agents/pyproject.toml
   - libs/opsvi-agents/tests/__init__.py
   - libs/opsvi-api/README.md
@@ -416,13 +613,6 @@ files:
   - libs/opsvi-auth/opsvi_auth/providers/base.py
   - libs/opsvi-auth/opsvi_auth/providers/jwt_provider.py
   - libs/opsvi-auth/opsvi_auth/tests/__init__.py
-  - libs/opsvi-auth/opsvi_auth/{{package_name}}/__init__.py
-  - libs/opsvi-auth/opsvi_auth/{{package_name}}/config/__init__.py
-  - libs/opsvi-auth/opsvi_auth/{{package_name}}/core/__init__.py
-  - libs/opsvi-auth/opsvi_auth/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-auth/opsvi_auth/{{package_name}}/providers/__init__.py
-  - libs/opsvi-auth/opsvi_auth/{{package_name}}/schemas/__init__.py
-  - libs/opsvi-auth/opsvi_auth/{{package_name}}/utils/__init__.py
   - libs/opsvi-auth/pyproject.toml
   - libs/opsvi-auth/tests/__init__.py
   - libs/opsvi-auto-forge/README.md
@@ -652,13 +842,6 @@ files:
   - libs/opsvi-comm/opsvi_communication/exceptions/__init__.py
   - libs/opsvi-comm/opsvi_communication/exceptions/base.py
   - libs/opsvi-comm/opsvi_communication/tests/__init__.py
-  - libs/opsvi-comm/opsvi_communication/{{package_name}}/__init__.py
-  - libs/opsvi-comm/opsvi_communication/{{package_name}}/config/__init__.py
-  - libs/opsvi-comm/opsvi_communication/{{package_name}}/core/__init__.py
-  - libs/opsvi-comm/opsvi_communication/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-comm/opsvi_communication/{{package_name}}/providers/__init__.py
-  - libs/opsvi-comm/opsvi_communication/{{package_name}}/schemas/__init__.py
-  - libs/opsvi-comm/opsvi_communication/{{package_name}}/utils/__init__.py
   - libs/opsvi-comm/pyproject.toml
   - libs/opsvi-comm/tests/__init__.py
   - libs/opsvi-coord/README.md
@@ -676,12 +859,17 @@ files:
   - libs/opsvi-core/opsvi_core/core/base.py
   - libs/opsvi-core/opsvi_core/exceptions/__init__.py
   - libs/opsvi-core/opsvi_core/exceptions/base.py
+  - libs/opsvi-core/opsvi_core/middleware/__init__.py
+  - libs/opsvi-core/opsvi_core/middleware/auth.py
+  - libs/opsvi-core/opsvi_core/middleware/metrics.py
+  - libs/opsvi-core/opsvi_core/middleware/tracing.py
+  - libs/opsvi-core/opsvi_core/persistence/__init__.py
+  - libs/opsvi-core/opsvi_core/persistence/base.py
+  - libs/opsvi-core/opsvi_core/persistence/json_backend.py
+  - libs/opsvi-core/opsvi_core/persistence/memory_backend.py
+  - libs/opsvi-core/opsvi_core/persistence/redis_backend.py
   - libs/opsvi-core/opsvi_core/tests/__init__.py
-  - libs/opsvi-core/opsvi_core/{{package_name}}/__init__.py
-  - libs/opsvi-core/opsvi_core/{{package_name}}/config/__init__.py
-  - libs/opsvi-core/opsvi_core/{{package_name}}/core/__init__.py
-  - libs/opsvi-core/opsvi_core/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-core/opsvi_core/{{package_name}}/utils/__init__.py
+  - libs/opsvi-core/opsvi_core/utils/rate_limiter.py
   - libs/opsvi-core/pyproject.toml
   - libs/opsvi-core/tests/__init__.py
   - libs/opsvi-data/ENHANCEMENT_SUMMARY.md
@@ -712,13 +900,6 @@ files:
   - libs/opsvi-data/opsvi_data/providers/s3_interface.py
   - libs/opsvi-data/opsvi_data/tests/__init__.py
   - libs/opsvi-data/opsvi_data/vector/chroma_client.py
-  - libs/opsvi-data/opsvi_data/{{package_name}}/__init__.py
-  - libs/opsvi-data/opsvi_data/{{package_name}}/config/__init__.py
-  - libs/opsvi-data/opsvi_data/{{package_name}}/core/__init__.py
-  - libs/opsvi-data/opsvi_data/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-data/opsvi_data/{{package_name}}/providers/__init__.py
-  - libs/opsvi-data/opsvi_data/{{package_name}}/schemas/__init__.py
-  - libs/opsvi-data/opsvi_data/{{package_name}}/utils/__init__.py
   - libs/opsvi-data/pyproject.toml
   - libs/opsvi-data/tests/__init__.py
   - libs/opsvi-deploy/README.md
@@ -730,13 +911,6 @@ files:
   - libs/opsvi-deploy/opsvi_deploy/exceptions/__init__.py
   - libs/opsvi-deploy/opsvi_deploy/exceptions/base.py
   - libs/opsvi-deploy/opsvi_deploy/tests/__init__.py
-  - libs/opsvi-deploy/opsvi_deploy/{{package_name}}/__init__.py
-  - libs/opsvi-deploy/opsvi_deploy/{{package_name}}/config/__init__.py
-  - libs/opsvi-deploy/opsvi_deploy/{{package_name}}/coordinators/__init__.py
-  - libs/opsvi-deploy/opsvi_deploy/{{package_name}}/core/__init__.py
-  - libs/opsvi-deploy/opsvi_deploy/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-deploy/opsvi_deploy/{{package_name}}/schedulers/__init__.py
-  - libs/opsvi-deploy/opsvi_deploy/{{package_name}}/utils/__init__.py
   - libs/opsvi-deploy/pyproject.toml
   - libs/opsvi-deploy/tests/__init__.py
   - libs/opsvi-docker/demo_comprehensive_docker.py
@@ -1740,12 +1914,21 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-foundation/opsvi_foundation/core/base.py
   - libs/opsvi-foundation/opsvi_foundation/exceptions/__init__.py
   - libs/opsvi-foundation/opsvi_foundation/exceptions/base.py
+  - libs/opsvi-foundation/opsvi_foundation/helpers/__init__.py
+  - libs/opsvi-foundation/opsvi_foundation/helpers/collections.py
+  - libs/opsvi-foundation/opsvi_foundation/helpers/datetime.py
+  - libs/opsvi-foundation/opsvi_foundation/helpers/string.py
+  - libs/opsvi-foundation/opsvi_foundation/middleware/__init__.py
+  - libs/opsvi-foundation/opsvi_foundation/middleware/base.py
+  - libs/opsvi-foundation/opsvi_foundation/middleware/error.py
+  - libs/opsvi-foundation/opsvi_foundation/middleware/logging.py
   - libs/opsvi-foundation/opsvi_foundation/tests/__init__.py
-  - libs/opsvi-foundation/opsvi_foundation/{{package_name}}/__init__.py
-  - libs/opsvi-foundation/opsvi_foundation/{{package_name}}/config/__init__.py
-  - libs/opsvi-foundation/opsvi_foundation/{{package_name}}/core/__init__.py
-  - libs/opsvi-foundation/opsvi_foundation/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-foundation/opsvi_foundation/{{package_name}}/utils/__init__.py
+  - libs/opsvi-foundation/opsvi_foundation/utils/circuit_breaker.py
+  - libs/opsvi-foundation/opsvi_foundation/utils/retry.py
+  - libs/opsvi-foundation/opsvi_foundation/validators/__init__.py
+  - libs/opsvi-foundation/opsvi_foundation/validators/data.py
+  - libs/opsvi-foundation/opsvi_foundation/validators/input.py
+  - libs/opsvi-foundation/opsvi_foundation/validators/schema.py
   - libs/opsvi-foundation/pyproject.toml
   - libs/opsvi-foundation/tests/__init__.py
   - libs/opsvi-fs/MANIFEST.in
@@ -1766,13 +1949,6 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-fs/opsvi_fs/schemas/models.py
   - libs/opsvi-fs/opsvi_fs/tests/__init__.py
   - libs/opsvi-fs/opsvi_fs/utils/path_utils.py
-  - libs/opsvi-fs/opsvi_fs/{{package_name}}/__init__.py
-  - libs/opsvi-fs/opsvi_fs/{{package_name}}/config/__init__.py
-  - libs/opsvi-fs/opsvi_fs/{{package_name}}/core/__init__.py
-  - libs/opsvi-fs/opsvi_fs/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-fs/opsvi_fs/{{package_name}}/providers/__init__.py
-  - libs/opsvi-fs/opsvi_fs/{{package_name}}/schemas/__init__.py
-  - libs/opsvi-fs/opsvi_fs/{{package_name}}/utils/__init__.py
   - libs/opsvi-fs/pyproject.toml
   - libs/opsvi-fs/tests/__init__.py
   - libs/opsvi-gateway/README.md
@@ -1784,13 +1960,6 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-gateway/opsvi_gateway/exceptions/__init__.py
   - libs/opsvi-gateway/opsvi_gateway/exceptions/base.py
   - libs/opsvi-gateway/opsvi_gateway/tests/__init__.py
-  - libs/opsvi-gateway/opsvi_gateway/{{package_name}}/__init__.py
-  - libs/opsvi-gateway/opsvi_gateway/{{package_name}}/config/__init__.py
-  - libs/opsvi-gateway/opsvi_gateway/{{package_name}}/coordinators/__init__.py
-  - libs/opsvi-gateway/opsvi_gateway/{{package_name}}/core/__init__.py
-  - libs/opsvi-gateway/opsvi_gateway/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-gateway/opsvi_gateway/{{package_name}}/schedulers/__init__.py
-  - libs/opsvi-gateway/opsvi_gateway/{{package_name}}/utils/__init__.py
   - libs/opsvi-gateway/pyproject.toml
   - libs/opsvi-gateway/tests/__init__.py
   - libs/opsvi-http/README.md
@@ -1807,13 +1976,6 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-http/opsvi_http/providers/__init__.py
   - libs/opsvi-http/opsvi_http/providers/http_client_interface.py
   - libs/opsvi-http/opsvi_http/tests/__init__.py
-  - libs/opsvi-http/opsvi_http/{{package_name}}/__init__.py
-  - libs/opsvi-http/opsvi_http/{{package_name}}/config/__init__.py
-  - libs/opsvi-http/opsvi_http/{{package_name}}/core/__init__.py
-  - libs/opsvi-http/opsvi_http/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-http/opsvi_http/{{package_name}}/providers/__init__.py
-  - libs/opsvi-http/opsvi_http/{{package_name}}/schemas/__init__.py
-  - libs/opsvi-http/opsvi_http/{{package_name}}/utils/__init__.py
   - libs/opsvi-http/pyproject.toml
   - libs/opsvi-http/tests/__init__.py
   - libs/opsvi-llm/ENHANCEMENT_SUMMARY.md
@@ -1832,18 +1994,13 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-llm/opsvi_llm/providers/openai_agents_interface.py
   - libs/opsvi-llm/opsvi_llm/providers/openai_batch_interface.py
   - libs/opsvi-llm/opsvi_llm/providers/openai_embeddings_interface.py
+  - libs/opsvi-llm/opsvi_llm/providers/openai_model_validator.py
   - libs/opsvi-llm/opsvi_llm/providers/openai_models_interface.py
   - libs/opsvi-llm/opsvi_llm/providers/openai_provider.py
   - libs/opsvi-llm/opsvi_llm/providers/openai_responses_interface.py
+  - libs/opsvi-llm/opsvi_llm/providers/openai_security.py
   - libs/opsvi-llm/opsvi_llm/providers/perplexity_provider.py
   - libs/opsvi-llm/opsvi_llm/tests/__init__.py
-  - libs/opsvi-llm/opsvi_llm/{{package_name}}/__init__.py
-  - libs/opsvi-llm/opsvi_llm/{{package_name}}/config/__init__.py
-  - libs/opsvi-llm/opsvi_llm/{{package_name}}/core/__init__.py
-  - libs/opsvi-llm/opsvi_llm/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-llm/opsvi_llm/{{package_name}}/providers/__init__.py
-  - libs/opsvi-llm/opsvi_llm/{{package_name}}/schemas/__init__.py
-  - libs/opsvi-llm/opsvi_llm/{{package_name}}/utils/__init__.py
   - libs/opsvi-llm/pyproject.toml
   - libs/opsvi-llm/tests/__init__.py
   - libs/opsvi-master/README.md
@@ -1880,6 +2037,8 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-master/pyproject.toml
   - libs/opsvi-mcp/AGENT_PROFILE.md
   - libs/opsvi-mcp/AUDIT_REPORT.md
+  - libs/opsvi-mcp/AUTONOMOUS_CODING_ENHANCEMENT.md
+  - libs/opsvi-mcp/BOOTSTRAP_AUTONOMOUS.py
   - libs/opsvi-mcp/CLAUDE.md
   - libs/opsvi-mcp/CLAUDE_CODE_AGENT_GUIDANCE.md
   - libs/opsvi-mcp/CLAUDE_CODE_SCENARIOS.md
@@ -1904,10 +2063,26 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/README.md
   - libs/opsvi-mcp/RECOMMENDATION-GEMINI-UPDATE.md
   - libs/opsvi-mcp/RECOMMENDATION.md
+  - libs/opsvi-mcp/RESEARCH_AUTONOMOUS.py
   - libs/opsvi-mcp/SESSION_PRESERVATION.md
   - libs/opsvi-mcp/SYSTEM_PROMPT.md
+  - libs/opsvi-mcp/ULTIMATE_AUTONOMOUS.md
   - libs/opsvi-mcp/V2_PARAMETER_FIX_REPORT.md
   - libs/opsvi-mcp/V2_V3_FIX_SUMMARY.md
+  - libs/opsvi-mcp/autonomous_builder.py
+  - libs/opsvi-mcp/autonomous_workspace/research_cache/2024-2025_software_development_best_practices.json
+  - libs/opsvi-mcp/autonomous_workspace/research_cache/Build_a_simple_TODO_app_with_modern_2025_web_technologies.json
+  - libs/opsvi-mcp/autonomous_workspace/state_78bdd7e8.json
+  - libs/opsvi-mcp/autonomous_workspace/state_fec77f70.json
+  - libs/opsvi-mcp/autonomous_workspace/todo-app/index.html
+  - libs/opsvi-mcp/autonomous_workspace/todo-app/package-lock.json
+  - libs/opsvi-mcp/autonomous_workspace/todo-app/package.json
+  - libs/opsvi-mcp/autonomous_workspace/todo-app/src/app.js
+  - libs/opsvi-mcp/autonomous_workspace/todo-app/src/error-handler.js
+  - libs/opsvi-mcp/autonomous_workspace/todo-app/src/performance-monitor.js
+  - libs/opsvi-mcp/autonomous_workspace/todo-app/src/styles.css
+  - libs/opsvi-mcp/autonomous_workspace/todo-app/vite.config.js
+  - libs/opsvi-mcp/bootstrap.py
   - libs/opsvi-mcp/docs/CLAUDE_CODE_DIRECTORY_CONFIG.md
   - libs/opsvi-mcp/docs/CLAUDE_CODE_MIGRATION.md
   - libs/opsvi-mcp/docs/CLAUDE_CODE_ORCHESTRATION_DESIGN.md
@@ -2068,13 +2243,6 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-memory/opsvi_memory/graph/queries.py
   - libs/opsvi-memory/opsvi_memory/graph/schema.cypher
   - libs/opsvi-memory/opsvi_memory/tests/__init__.py
-  - libs/opsvi-memory/opsvi_memory/{{package_name}}/__init__.py
-  - libs/opsvi-memory/opsvi_memory/{{package_name}}/config/__init__.py
-  - libs/opsvi-memory/opsvi_memory/{{package_name}}/core/__init__.py
-  - libs/opsvi-memory/opsvi_memory/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-memory/opsvi_memory/{{package_name}}/providers/__init__.py
-  - libs/opsvi-memory/opsvi_memory/{{package_name}}/schemas/__init__.py
-  - libs/opsvi-memory/opsvi_memory/{{package_name}}/utils/__init__.py
   - libs/opsvi-memory/pyproject.toml
   - libs/opsvi-memory/tests/__init__.py
   - libs/opsvi-monitoring/README.md
@@ -2086,13 +2254,6 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-monitoring/opsvi_monitoring/exceptions/__init__.py
   - libs/opsvi-monitoring/opsvi_monitoring/exceptions/base.py
   - libs/opsvi-monitoring/opsvi_monitoring/tests/__init__.py
-  - libs/opsvi-monitoring/opsvi_monitoring/{{package_name}}/__init__.py
-  - libs/opsvi-monitoring/opsvi_monitoring/{{package_name}}/config/__init__.py
-  - libs/opsvi-monitoring/opsvi_monitoring/{{package_name}}/core/__init__.py
-  - libs/opsvi-monitoring/opsvi_monitoring/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-monitoring/opsvi_monitoring/{{package_name}}/providers/__init__.py
-  - libs/opsvi-monitoring/opsvi_monitoring/{{package_name}}/schemas/__init__.py
-  - libs/opsvi-monitoring/opsvi_monitoring/{{package_name}}/utils/__init__.py
   - libs/opsvi-monitoring/pyproject.toml
   - libs/opsvi-monitoring/tests/__init__.py
   - libs/opsvi-orch/AUDIT_REPORT.md
@@ -2144,13 +2305,6 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-pipeline/opsvi_pipeline/tests/__init__.py
   - libs/opsvi-pipeline/opsvi_pipeline/tools
   - libs/opsvi-pipeline/opsvi_pipeline/tools.py
-  - libs/opsvi-pipeline/opsvi_pipeline/{{package_name}}/__init__.py
-  - libs/opsvi-pipeline/opsvi_pipeline/{{package_name}}/config/__init__.py
-  - libs/opsvi-pipeline/opsvi_pipeline/{{package_name}}/coordinators/__init__.py
-  - libs/opsvi-pipeline/opsvi_pipeline/{{package_name}}/core/__init__.py
-  - libs/opsvi-pipeline/opsvi_pipeline/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-pipeline/opsvi_pipeline/{{package_name}}/schedulers/__init__.py
-  - libs/opsvi-pipeline/opsvi_pipeline/{{package_name}}/utils/__init__.py
   - libs/opsvi-pipeline/pyproject.toml
   - libs/opsvi-pipeline/tests/__init__.py
   - libs/opsvi-rag/README.md
@@ -2164,15 +2318,6 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-rag/opsvi_rag/exceptions/__init__.py
   - libs/opsvi-rag/opsvi_rag/exceptions/base.py
   - libs/opsvi-rag/opsvi_rag/tests/__init__.py
-  - libs/opsvi-rag/opsvi_rag/{{package_name}}/__init__.py
-  - libs/opsvi-rag/opsvi_rag/{{package_name}}/config/__init__.py
-  - libs/opsvi-rag/opsvi_rag/{{package_name}}/core/__init__.py
-  - libs/opsvi-rag/opsvi_rag/{{package_name}}/datastores/__init__.py
-  - libs/opsvi-rag/opsvi_rag/{{package_name}}/datastores/qdrant_store.py
-  - libs/opsvi-rag/opsvi_rag/{{package_name}}/embeddings/__init__.py
-  - libs/opsvi-rag/opsvi_rag/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-rag/opsvi_rag/{{package_name}}/processors/__init__.py
-  - libs/opsvi-rag/opsvi_rag/{{package_name}}/utils/__init__.py
   - libs/opsvi-rag/pyproject.toml
   - libs/opsvi-rag/tests/__init__.py
   - libs/opsvi-security/README.md
@@ -2184,13 +2329,6 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-security/opsvi_security/exceptions/__init__.py
   - libs/opsvi-security/opsvi_security/exceptions/base.py
   - libs/opsvi-security/opsvi_security/tests/__init__.py
-  - libs/opsvi-security/opsvi_security/{{package_name}}/__init__.py
-  - libs/opsvi-security/opsvi_security/{{package_name}}/config/__init__.py
-  - libs/opsvi-security/opsvi_security/{{package_name}}/core/__init__.py
-  - libs/opsvi-security/opsvi_security/{{package_name}}/exceptions/__init__.py
-  - libs/opsvi-security/opsvi_security/{{package_name}}/providers/__init__.py
-  - libs/opsvi-security/opsvi_security/{{package_name}}/schemas/__init__.py
-  - libs/opsvi-security/opsvi_security/{{package_name}}/utils/__init__.py
   - libs/opsvi-security/pyproject.toml
   - libs/opsvi-security/tests/__init__.py
   - libs/opsvi-shared/README.md
@@ -2450,1191 +2588,43 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/recommended_structure.yaml
   - libs/templates.yaml
   - libs/variable_schema.yaml
-  - mcp_server_test_report.md
-  - mcp_server_test_results.md
-  - mcp_server_upgrade_report.md
-  - mermaid_diagram_expert_prompt.md
-  - migration_mapping.json
-  - migration_reports/any_by_file_20250811_183802.txt
-  - migration_reports/any_by_file_20250811_183901.txt
-  - migration_reports/auto_forge_broad_scan_and_tests_20250811_183901.md
-  - migration_reports/final_migration_validation_20250811_164633.md
-  - migration_reports/finalize_cleanup_20250811_164900.md
-  - migration_reports/git_delta_20250811_183901.diff
-  - migration_reports/git_delta_opsvi_opsvi_20250811_183802.diff
-  - migration_reports/import_any_20250811_184155.txt
-  - migration_reports/import_files_20250811_183645.txt
-  - migration_reports/import_normalization_20250811_164452.md
-  - migration_reports/import_scan_20250811_183645.txt
-  - migration_reports/import_scan_any_20250811_183802.txt
-  - migration_reports/import_scan_any_20250811_183901.txt
-  - migration_reports/import_scan_strict_20250811_183802.txt
-  - migration_reports/import_scan_strict_20250811_183901.txt
-  - migration_reports/import_strict_20250811_184155.txt
-  - migration_reports/misplaced_packages_20250811_123028.md
-  - migration_reports/post_migration_validation_20250811_124314.md
-  - migration_reports/post_migration_validation_20250811_164730.md
-  - migration_reports/state_analysis_20250811_183901.txt
-  - migration_reports/strict_by_file_20250811_183802.txt
-  - migration_reports/strict_by_file_20250811_183901.txt
-  - multi_candidate_tournament.py
-  - multi_critic_integration.py
-  - multi_critic_system.py
   - mypy.ini
-  - opsvi/opsvi_opsvi/__init__.py
-  - opsvi/opsvi_opsvi/agent_boot.py
-  - opsvi/opsvi_opsvi/api/__init__.py
-  - opsvi/opsvi_opsvi/api/app.py
-  - opsvi/opsvi_opsvi/applications/__init__.py
-  - opsvi/opsvi_opsvi/applications/agent_hub/__init__.py
-  - opsvi/opsvi_opsvi/applications/agent_hub/agent_discovery.py
-  - opsvi/opsvi_opsvi/applications/agent_hub/db_client.py
-  - opsvi/opsvi_opsvi/applications/agent_hub/example_external_agent.py
-  - opsvi/opsvi_opsvi/applications/agent_hub/logging_config.py
-  - opsvi/opsvi_opsvi/applications/agent_hub/openai_helper.py
-  - opsvi/opsvi_opsvi/applications/agent_hub/server.py
-  - opsvi/opsvi_opsvi/applications/agent_hub/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/agentic_app_dev/__init__.py
-  - opsvi/opsvi_opsvi/applications/agentic_app_dev/generate_app.py
-  - opsvi/opsvi_opsvi/applications/agentic_app_dev/prompt_schema.py
-  - opsvi/opsvi_opsvi/applications/agentic_code_doc_gen/__init__.py
-  - opsvi/opsvi_opsvi/applications/agentic_code_doc_gen/generate_content.py
-  - opsvi/opsvi_opsvi/applications/agentic_code_doc_gen/prompt_schema.py
-  - opsvi/opsvi_opsvi/applications/agentic_code_doc_gen/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/agentic_doc_manager/__init__.py
-  - opsvi/opsvi_opsvi/applications/agentic_doc_manager/agent_utils.py
-  - opsvi/opsvi_opsvi/applications/agentic_doc_manager/agent_workflows.py
-  - opsvi/opsvi_opsvi/applications/agentic_doc_manager/agentic_doc_update.py
-  - opsvi/opsvi_opsvi/applications/agentic_doc_manager/agentic_drift_detection.py
-  - opsvi/opsvi_opsvi/applications/agentic_doc_manager/agentic_workflow_runner.py
-  - opsvi/opsvi_opsvi/applications/agentic_doc_manager/analytics.py
-  - opsvi/opsvi_opsvi/applications/agentic_doc_manager/artifact_ingest.py
-  - opsvi/opsvi_opsvi/applications/agentic_doc_manager/embedding.py
-  - opsvi/opsvi_opsvi/applications/agentic_doc_manager/graph_manager.py
-  - opsvi/opsvi_opsvi/applications/agentic_doc_manager/ingestion.py
-  - opsvi/opsvi_opsvi/applications/agentic_doc_manager/main.py
-  - opsvi/opsvi_opsvi/applications/agentic_doc_manager/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/ai_agents.py
-  - opsvi/opsvi_opsvi/applications/code_gen/ai_code_generator.py
-  - opsvi/opsvi_opsvi/applications/code_gen/ai_documentation_generator.py
-  - opsvi/opsvi_opsvi/applications/code_gen/ai_test_generator.py
-  - opsvi/opsvi_opsvi/applications/code_gen/api.py
-  - opsvi/opsvi_opsvi/applications/code_gen/audit_logger.py
-  - opsvi/opsvi_opsvi/applications/code_gen/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/critic_agent.py
-  - opsvi/opsvi_opsvi/applications/code_gen/database.py
-  - opsvi/opsvi_opsvi/applications/code_gen/dependency_manager.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/proj1/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/proj1/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/proj1/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/proj2/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/proj2/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/proj2/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/proj3/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/proj3/src/app.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/proj3/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/src/app/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/src/app/routes.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/src/app/weather.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/src/run.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/generated/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/033cc6a1-cbd8-4307-8c5e-78a68ca940b6/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/033cc6a1-cbd8-4307-8c5e-78a68ca940b6/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/033cc6a1-cbd8-4307-8c5e-78a68ca940b6/src/app/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/033cc6a1-cbd8-4307-8c5e-78a68ca940b6/src/app/errors.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/033cc6a1-cbd8-4307-8c5e-78a68ca940b6/src/app/views.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/033cc6a1-cbd8-4307-8c5e-78a68ca940b6/src/app/weather_client.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/033cc6a1-cbd8-4307-8c5e-78a68ca940b6/src/run.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/033cc6a1-cbd8-4307-8c5e-78a68ca940b6/src/wsgi.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/033cc6a1-cbd8-4307-8c5e-78a68ca940b6/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/033cc6a1-cbd8-4307-8c5e-78a68ca940b6/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/08bb2702-61ca-459f-8cb5-ad4300dd8f68/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/08bb2702-61ca-459f-8cb5-ad4300dd8f68/src/app/crud.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/08bb2702-61ca-459f-8cb5-ad4300dd8f68/src/app/database.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/08bb2702-61ca-459f-8cb5-ad4300dd8f68/src/app/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/08bb2702-61ca-459f-8cb5-ad4300dd8f68/src/app/middleware.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/08bb2702-61ca-459f-8cb5-ad4300dd8f68/src/app/models.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/08bb2702-61ca-459f-8cb5-ad4300dd8f68/src/app/routers/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/08bb2702-61ca-459f-8cb5-ad4300dd8f68/src/app/routers/health.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/08bb2702-61ca-459f-8cb5-ad4300dd8f68/src/app/routers/tasks.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/08bb2702-61ca-459f-8cb5-ad4300dd8f68/src/app/schemas.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/08bb2702-61ca-459f-8cb5-ad4300dd8f68/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/09d6eb75-7e9d-4934-8b6a-e624cda9821a/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/09d6eb75-7e9d-4934-8b6a-e624cda9821a/src/script.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/09d6eb75-7e9d-4934-8b6a-e624cda9821a/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/0fa64961-24af-4503-b98e-9179615df2f4/src/csv_reporter/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/0fa64961-24af-4503-b98e-9179615df2f4/src/csv_reporter/cli.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/0fa64961-24af-4503-b98e-9179615df2f4/src/csv_reporter/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/0fa64961-24af-4503-b98e-9179615df2f4/src/csv_reporter/csv_parser.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/0fa64961-24af-4503-b98e-9179615df2f4/src/csv_reporter/data_processor.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/0fa64961-24af-4503-b98e-9179615df2f4/src/csv_reporter/logger.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/0fa64961-24af-4503-b98e-9179615df2f4/src/csv_reporter/report_generator.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/0fa64961-24af-4503-b98e-9179615df2f4/src/csv_reporter/utils.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/0fa64961-24af-4503-b98e-9179615df2f4/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/0fa64961-24af-4503-b98e-9179615df2f4/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/10c26259-1f75-40a9-8600-d7166c21a267/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/10c26259-1f75-40a9-8600-d7166c21a267/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/10c26259-1f75-40a9-8600-d7166c21a267/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/135499ae-4bd0-4403-810b-22c14d610b5c/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/135499ae-4bd0-4403-810b-22c14d610b5c/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/135499ae-4bd0-4403-810b-22c14d610b5c/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/ai.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/api.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/audit.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/auth.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/calendar.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/database.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/files.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/graphql_app.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/graphql_schema.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/models.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/notifications.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/utils.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/src/backend/ws.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/tests/backend/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/139e9110-7dab-43ff-b06e-b5263583b015/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1c80d3f1-0fdc-4186-8956-377fde5e5b1a/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1c80d3f1-0fdc-4186-8956-377fde5e5b1a/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1c80d3f1-0fdc-4186-8956-377fde5e5b1a/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1ec13414-9177-4fcd-ad4c-8af9b7b834cf/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1ec13414-9177-4fcd-ad4c-8af9b7b834cf/src/eval_exec_demo.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1ec13414-9177-4fcd-ad4c-8af9b7b834cf/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1f30cdfa-d9a6-452e-9b12-a3be371c7c28/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1f30cdfa-d9a6-452e-9b12-a3be371c7c28/src/app/crud.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1f30cdfa-d9a6-452e-9b12-a3be371c7c28/src/app/database.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1f30cdfa-d9a6-452e-9b12-a3be371c7c28/src/app/exceptions.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1f30cdfa-d9a6-452e-9b12-a3be371c7c28/src/app/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1f30cdfa-d9a6-452e-9b12-a3be371c7c28/src/app/models.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1f30cdfa-d9a6-452e-9b12-a3be371c7c28/src/app/schemas.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1f30cdfa-d9a6-452e-9b12-a3be371c7c28/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/1f30cdfa-d9a6-452e-9b12-a3be371c7c28/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/2234da6f-c68e-4152-8229-ab6a815edc48/src/ai_service/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/2234da6f-c68e-4152-8229-ab6a815edc48/src/ai_service/app.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/2234da6f-c68e-4152-8229-ab6a815edc48/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/2234da6f-c68e-4152-8229-ab6a815edc48/tests/ai_service/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/2234da6f-c68e-4152-8229-ab6a815edc48/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/core/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/core/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/crud/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/crud/todo.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/db/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/db/base.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/db/init_db.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/db/session.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/models/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/models/todo.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/routers/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/routers/todos.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/schemas/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/src/app/schemas/todo.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/24ccee40-8a7e-4f42-a100-4849ebc57dac/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26b07131-afee-438c-bafe-44492cc7bd8e/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26b07131-afee-438c-bafe-44492cc7bd8e/src/script.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26b07131-afee-438c-bafe-44492cc7bd8e/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26c03d58-1457-494d-95bb-72adc6bbee3a/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26c03d58-1457-494d-95bb-72adc6bbee3a/src/app/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26c03d58-1457-494d-95bb-72adc6bbee3a/src/app/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26c03d58-1457-494d-95bb-72adc6bbee3a/src/app/middleware/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26c03d58-1457-494d-95bb-72adc6bbee3a/src/app/middleware/error_handling.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26c03d58-1457-494d-95bb-72adc6bbee3a/src/app/models/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26c03d58-1457-494d-95bb-72adc6bbee3a/src/app/models/todo.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26c03d58-1457-494d-95bb-72adc6bbee3a/src/app/routers/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26c03d58-1457-494d-95bb-72adc6bbee3a/src/app/routers/todo.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26c03d58-1457-494d-95bb-72adc6bbee3a/src/app/services/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26c03d58-1457-494d-95bb-72adc6bbee3a/src/app/services/todo_service.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26c03d58-1457-494d-95bb-72adc6bbee3a/src/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26c03d58-1457-494d-95bb-72adc6bbee3a/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/26c03d58-1457-494d-95bb-72adc6bbee3a/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/2dd176ba-5b6e-4b3b-92d4-dd70b40d032c/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/2dd176ba-5b6e-4b3b-92d4-dd70b40d032c/src/script.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/2dd176ba-5b6e-4b3b-92d4-dd70b40d032c/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/36b5693a-bf53-4b23-927e-454760c0b547/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/36b5693a-bf53-4b23-927e-454760c0b547/src/script.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/36b5693a-bf53-4b23-927e-454760c0b547/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/370a8f15-e117-490f-a507-51f472703cef/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/370a8f15-e117-490f-a507-51f472703cef/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/370a8f15-e117-490f-a507-51f472703cef/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/384edd76-69b8-4f09-b7d1-9d78c6d793c7/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/384edd76-69b8-4f09-b7d1-9d78c6d793c7/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/384edd76-69b8-4f09-b7d1-9d78c6d793c7/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/3eddbc32-5638-4ddd-8b5b-fba0275a030e/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/3eddbc32-5638-4ddd-8b5b-fba0275a030e/src/script.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/3eddbc32-5638-4ddd-8b5b-fba0275a030e/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/401bb133-f457-42ec-9b28-65309ada9fd0/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/401bb133-f457-42ec-9b28-65309ada9fd0/src/app.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/401bb133-f457-42ec-9b28-65309ada9fd0/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/446e63b7-7108-4871-baf4-37c86f6d2006/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/446e63b7-7108-4871-baf4-37c86f6d2006/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/446e63b7-7108-4871-baf4-37c86f6d2006/src/app/api.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/446e63b7-7108-4871-baf4-37c86f6d2006/src/app/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/446e63b7-7108-4871-baf4-37c86f6d2006/src/app/views.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/446e63b7-7108-4871-baf4-37c86f6d2006/src/app/weather.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/446e63b7-7108-4871-baf4-37c86f6d2006/src/run.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/446e63b7-7108-4871-baf4-37c86f6d2006/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/446e63b7-7108-4871-baf4-37c86f6d2006/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/49676a98-259c-43ee-8e63-a1d19170629b/src/ai_service/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/49676a98-259c-43ee-8e63-a1d19170629b/src/ai_service/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/49676a98-259c-43ee-8e63-a1d19170629b/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/49676a98-259c-43ee-8e63-a1d19170629b/tests/ai_service/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/4a6e5a9b-56b8-4c5a-ba5b-504811f90a4b/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/4a6e5a9b-56b8-4c5a-ba5b-504811f90a4b/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/4a6e5a9b-56b8-4c5a-ba5b-504811f90a4b/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/src/app/api.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/src/app/auth.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/src/app/code_analysis.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/src/app/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/src/app/db.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/src/app/github.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/src/app/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/src/app/models.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/src/app/report_generation.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/src/app/schemas.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/src/app/storage.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/src/app/tasks.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/src/app/views.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/52fcf000-4d5e-4f4d-ac14-e290f2df6599/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/5ac10d3a-2287-4030-b787-454c497bac54/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/5ac10d3a-2287-4030-b787-454c497bac54/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/5ac10d3a-2287-4030-b787-454c497bac54/src/app/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/5ac10d3a-2287-4030-b787-454c497bac54/src/app/routes.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/5ac10d3a-2287-4030-b787-454c497bac54/src/app/weather.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/5ac10d3a-2287-4030-b787-454c497bac54/src/run.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/5ac10d3a-2287-4030-b787-454c497bac54/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/5ac10d3a-2287-4030-b787-454c497bac54/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/5f5d3e07-ca4d-4d90-8724-245f0ed7f6e2/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/5f5d3e07-ca4d-4d90-8724-245f0ed7f6e2/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/5f5d3e07-ca4d-4d90-8724-245f0ed7f6e2/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/src/app/core/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/src/app/core/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/src/app/db/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/src/app/db/init_db.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/src/app/db/models.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/src/app/db/session.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/src/app/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/src/app/routes/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/src/app/routes/tasks.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/src/app/schemas/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/src/app/schemas/task.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/src/app/services/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/src/app/services/task_service.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/64bc31af-4c39-4fd9-9258-50c5bc656d72/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/67c03363-57dd-4bdd-8f2a-c960b1e22de6/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/67c03363-57dd-4bdd-8f2a-c960b1e22de6/src/script.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/67c03363-57dd-4bdd-8f2a-c960b1e22de6/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/69f35508-1f3f-4772-9ea1-1fbc66b4da91/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/69f35508-1f3f-4772-9ea1-1fbc66b4da91/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/69f35508-1f3f-4772-9ea1-1fbc66b4da91/src/app/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/69f35508-1f3f-4772-9ea1-1fbc66b4da91/src/app/error_handlers.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/69f35508-1f3f-4772-9ea1-1fbc66b4da91/src/app/forms.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/69f35508-1f3f-4772-9ea1-1fbc66b4da91/src/app/routes.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/69f35508-1f3f-4772-9ea1-1fbc66b4da91/src/app/weather_client.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/69f35508-1f3f-4772-9ea1-1fbc66b4da91/src/run.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/69f35508-1f3f-4772-9ea1-1fbc66b4da91/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/6a582fa7-d098-4190-ad07-2253a11e198d/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/6a582fa7-d098-4190-ad07-2253a11e198d/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/6a582fa7-d098-4190-ad07-2253a11e198d/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/6fb38520-c8f7-401f-9e0c-332931a32d25/src/backend/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/6fb38520-c8f7-401f-9e0c-332931a32d25/src/backend/app.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/6fb38520-c8f7-401f-9e0c-332931a32d25/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/6fb38520-c8f7-401f-9e0c-332931a32d25/tests/backend/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/6fb38520-c8f7-401f-9e0c-332931a32d25/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/70ccb857-6c59-4c05-bc1c-c0a04cae65a1/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/70ccb857-6c59-4c05-bc1c-c0a04cae65a1/src/script.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/70ccb857-6c59-4c05-bc1c-c0a04cae65a1/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/72fabbe3-b71f-4888-9754-3937b9a1e758/src/backend/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/72fabbe3-b71f-4888-9754-3937b9a1e758/src/backend/alerts.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/72fabbe3-b71f-4888-9754-3937b9a1e758/src/backend/auth.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/72fabbe3-b71f-4888-9754-3937b9a1e758/src/backend/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/72fabbe3-b71f-4888-9754-3937b9a1e758/src/backend/db.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/72fabbe3-b71f-4888-9754-3937b9a1e758/src/backend/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/72fabbe3-b71f-4888-9754-3937b9a1e758/src/backend/metrics.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/72fabbe3-b71f-4888-9754-3937b9a1e758/src/backend/models.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/72fabbe3-b71f-4888-9754-3937b9a1e758/src/backend/schemas.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/72fabbe3-b71f-4888-9754-3937b9a1e758/src/backend/websocket_manager.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/72fabbe3-b71f-4888-9754-3937b9a1e758/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/72fabbe3-b71f-4888-9754-3937b9a1e758/tests/backend/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/828fe4e1-2285-4721-861d-51adf8ff2864/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/828fe4e1-2285-4721-861d-51adf8ff2864/src/script.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/828fe4e1-2285-4721-861d-51adf8ff2864/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/86af23a5-d2e0-42ad-964c-813f30fc5791/src/scraper/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/86af23a5-d2e0-42ad-964c-813f30fc5791/src/scraper/__main__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/86af23a5-d2e0-42ad-964c-813f30fc5791/src/scraper/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/86af23a5-d2e0-42ad-964c-813f30fc5791/src/scraper/downloader.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/86af23a5-d2e0-42ad-964c-813f30fc5791/src/scraper/output_writer.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/86af23a5-d2e0-42ad-964c-813f30fc5791/src/scraper/parser.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/86af23a5-d2e0-42ad-964c-813f30fc5791/src/scraper/robots_checker.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/86af23a5-d2e0-42ad-964c-813f30fc5791/src/scraper/url_handler.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/86af23a5-d2e0-42ad-964c-813f30fc5791/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/898c0628-92fb-4014-a8d8-0f535d9de828/src/json_data_processor/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/898c0628-92fb-4014-a8d8-0f535d9de828/src/json_data_processor/__main__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/898c0628-92fb-4014-a8d8-0f535d9de828/src/json_data_processor/api.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/898c0628-92fb-4014-a8d8-0f535d9de828/src/json_data_processor/converter.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/898c0628-92fb-4014-a8d8-0f535d9de828/src/json_data_processor/logger.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/898c0628-92fb-4014-a8d8-0f535d9de828/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/898c0628-92fb-4014-a8d8-0f535d9de828/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/8f89d481-76dc-4f8e-ab14-b9fa4d69b56d/src/ai_service/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/8f89d481-76dc-4f8e-ab14-b9fa4d69b56d/src/ai_service/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/8f89d481-76dc-4f8e-ab14-b9fa4d69b56d/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/8f89d481-76dc-4f8e-ab14-b9fa4d69b56d/tests/ai_service/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/918edee4-8b27-461b-b6b4-510eb26d3bee/src/simple_news_scraper/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/918edee4-8b27-461b-b6b4-510eb26d3bee/src/simple_news_scraper/__main__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/918edee4-8b27-461b-b6b4-510eb26d3bee/src/simple_news_scraper/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/918edee4-8b27-461b-b6b4-510eb26d3bee/src/simple_news_scraper/output.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/918edee4-8b27-461b-b6b4-510eb26d3bee/src/simple_news_scraper/parser.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/918edee4-8b27-461b-b6b4-510eb26d3bee/src/simple_news_scraper/scraper.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/918edee4-8b27-461b-b6b4-510eb26d3bee/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/918edee4-8b27-461b-b6b4-510eb26d3bee/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/admin_views.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/api_schemas.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/forms.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/models.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/routes/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/routes/admin.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/routes/ai.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/routes/analytics.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/routes/api.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/routes/auth.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/routes/errors.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/routes/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/routes/posts.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/tasks.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/src/app/uploads.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/9e6a5019-a354-400f-ab9e-436b13047833/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a1e16ac0-8b4f-4e4c-bb1d-f18042b5e871/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a1e16ac0-8b4f-4e4c-bb1d-f18042b5e871/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a1e16ac0-8b4f-4e4c-bb1d-f18042b5e871/src/app/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a1e16ac0-8b4f-4e4c-bb1d-f18042b5e871/src/app/errors.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a1e16ac0-8b4f-4e4c-bb1d-f18042b5e871/src/app/routes.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a1e16ac0-8b4f-4e4c-bb1d-f18042b5e871/src/app/weather_service.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a1e16ac0-8b4f-4e4c-bb1d-f18042b5e871/src/run.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a1e16ac0-8b4f-4e4c-bb1d-f18042b5e871/src/wsgi.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a1e16ac0-8b4f-4e4c-bb1d-f18042b5e871/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a1e16ac0-8b4f-4e4c-bb1d-f18042b5e871/tests/tests/conftest.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a94b5271-a7f6-42cd-88ed-390f5f0d56c5/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a94b5271-a7f6-42cd-88ed-390f5f0d56c5/src/app/ai.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a94b5271-a7f6-42cd-88ed-390f5f0d56c5/src/app/auth.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a94b5271-a7f6-42cd-88ed-390f5f0d56c5/src/app/collab.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a94b5271-a7f6-42cd-88ed-390f5f0d56c5/src/app/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a94b5271-a7f6-42cd-88ed-390f5f0d56c5/src/app/crud.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a94b5271-a7f6-42cd-88ed-390f5f0d56c5/src/app/file.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a94b5271-a7f6-42cd-88ed-390f5f0d56c5/src/app/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a94b5271-a7f6-42cd-88ed-390f5f0d56c5/src/app/models.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a94b5271-a7f6-42cd-88ed-390f5f0d56c5/src/app/search.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/a94b5271-a7f6-42cd-88ed-390f5f0d56c5/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/b4d7e8fb-9c9b-4e4f-b48d-36d13a508533/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/b4d7e8fb-9c9b-4e4f-b48d-36d13a508533/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/b4d7e8fb-9c9b-4e4f-b48d-36d13a508533/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/b92341fc-3d87-4b58-a4b3-5a0bd808afee/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/b92341fc-3d87-4b58-a4b3-5a0bd808afee/src/app/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/b92341fc-3d87-4b58-a4b3-5a0bd808afee/src/app/models.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/b92341fc-3d87-4b58-a4b3-5a0bd808afee/src/app/storage.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/b92341fc-3d87-4b58-a4b3-5a0bd808afee/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/baeec9d1-3c19-45fe-a9d0-8ae310ba1487/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/baeec9d1-3c19-45fe-a9d0-8ae310ba1487/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/baeec9d1-3c19-45fe-a9d0-8ae310ba1487/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/bb2392e8-3253-46ba-9791-301a06e4e3b5/src/multiagent_cli/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/bb2392e8-3253-46ba-9791-301a06e4e3b5/src/multiagent_cli/agent_manager.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/bb2392e8-3253-46ba-9791-301a06e4e3b5/src/multiagent_cli/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/bb2392e8-3253-46ba-9791-301a06e4e3b5/src/multiagent_cli/input_parser.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/bb2392e8-3253-46ba-9791-301a06e4e3b5/src/multiagent_cli/logs.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/bb2392e8-3253-46ba-9791-301a06e4e3b5/src/multiagent_cli/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/bb2392e8-3253-46ba-9791-301a06e4e3b5/src/multiagent_cli/openai_interface.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/bb2392e8-3253-46ba-9791-301a06e4e3b5/src/multiagent_cli/orchestrator.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/bb2392e8-3253-46ba-9791-301a06e4e3b5/src/multiagent_cli/response_aggregator.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/bb2392e8-3253-46ba-9791-301a06e4e3b5/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/bb2392e8-3253-46ba-9791-301a06e4e3b5/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/c0b3f10c-6528-45f3-aeac-3a377787c62a/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/c0b3f10c-6528-45f3-aeac-3a377787c62a/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/c0b3f10c-6528-45f3-aeac-3a377787c62a/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ce0e80c4-cc77-4cb8-b7f6-b0ef0ec2bea7/src/app/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ce0e80c4-cc77-4cb8-b7f6-b0ef0ec2bea7/src/app/database.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ce0e80c4-cc77-4cb8-b7f6-b0ef0ec2bea7/src/app/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ce0e80c4-cc77-4cb8-b7f6-b0ef0ec2bea7/src/app/models.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ce0e80c4-cc77-4cb8-b7f6-b0ef0ec2bea7/src/app/routers/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ce0e80c4-cc77-4cb8-b7f6-b0ef0ec2bea7/src/app/routers/todo.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ce0e80c4-cc77-4cb8-b7f6-b0ef0ec2bea7/src/app/schemas.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ce0e80c4-cc77-4cb8-b7f6-b0ef0ec2bea7/src/app/services/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ce0e80c4-cc77-4cb8-b7f6-b0ef0ec2bea7/src/app/services/todo_service.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ce0e80c4-cc77-4cb8-b7f6-b0ef0ec2bea7/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ce0e80c4-cc77-4cb8-b7f6-b0ef0ec2bea7/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ce0e80c4-cc77-4cb8-b7f6-b0ef0ec2bea7/tests/tests/test_routers/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ce0e80c4-cc77-4cb8-b7f6-b0ef0ec2bea7/tests/tests/test_services/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/debe5c5e-474d-4171-a9a7-9ebed2dc8243/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/debe5c5e-474d-4171-a9a7-9ebed2dc8243/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/debe5c5e-474d-4171-a9a7-9ebed2dc8243/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/df6e6a3b-a77c-4654-bc35-4da48af13dda/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/df6e6a3b-a77c-4654-bc35-4da48af13dda/src/script.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/df6e6a3b-a77c-4654-bc35-4da48af13dda/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/df7d7d68-7402-4b21-a010-4d476ba4138f/src/ai_service/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/df7d7d68-7402-4b21-a010-4d476ba4138f/src/ai_service/app.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/df7d7d68-7402-4b21-a010-4d476ba4138f/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/df7d7d68-7402-4b21-a010-4d476ba4138f/tests/ai_service/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/df7d7d68-7402-4b21-a010-4d476ba4138f/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/e8a3a1ba-77d5-4ffd-bbbf-28384f826b05/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/e8a3a1ba-77d5-4ffd-bbbf-28384f826b05/src/eval_exec_demo.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/e8a3a1ba-77d5-4ffd-bbbf-28384f826b05/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ed3fee95-9e77-4547-bada-98bf1cb8bdf0/src/ai_collab_task_manager/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ed3fee95-9e77-4547-bada-98bf1cb8bdf0/src/ai_collab_task_manager/ai_service.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ed3fee95-9e77-4547-bada-98bf1cb8bdf0/src/ai_collab_task_manager/app.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ed3fee95-9e77-4547-bada-98bf1cb8bdf0/src/ai_collab_task_manager/audit_log.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ed3fee95-9e77-4547-bada-98bf1cb8bdf0/src/ai_collab_task_manager/calendar.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ed3fee95-9e77-4547-bada-98bf1cb8bdf0/src/ai_collab_task_manager/config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ed3fee95-9e77-4547-bada-98bf1cb8bdf0/src/ai_collab_task_manager/forms.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ed3fee95-9e77-4547-bada-98bf1cb8bdf0/src/ai_collab_task_manager/models.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ed3fee95-9e77-4547-bada-98bf1cb8bdf0/src/ai_collab_task_manager/reporting.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ed3fee95-9e77-4547-bada-98bf1cb8bdf0/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ed3fee95-9e77-4547-bada-98bf1cb8bdf0/tests/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ed3fee95-9e77-4547-bada-98bf1cb8bdf0/tests/tests/conftest.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ee83f39d-24a4-4a92-96fa-6d581128c714/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ee83f39d-24a4-4a92-96fa-6d581128c714/src/script.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/ee83f39d-24a4-4a92-96fa-6d581128c714/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/fa8a8e95-3de1-494a-b2b0-cc65e9be0bdc/src/ai_service/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/fa8a8e95-3de1-494a-b2b0-cc65e9be0bdc/src/ai_service/__main__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/fa8a8e95-3de1-494a-b2b0-cc65e9be0bdc/src/ai_service/ai_logic.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/fa8a8e95-3de1-494a-b2b0-cc65e9be0bdc/src/ai_service/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/fa8a8e95-3de1-494a-b2b0-cc65e9be0bdc/src/ai_service/models.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/fa8a8e95-3de1-494a-b2b0-cc65e9be0bdc/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/fa8a8e95-3de1-494a-b2b0-cc65e9be0bdc/tests/ai_service/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/fb95cf8c-cecd-4fcf-8aea-d8da8cd0b78d/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/fb95cf8c-cecd-4fcf-8aea-d8da8cd0b78d/src/script.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/fb95cf8c-cecd-4fcf-8aea-d8da8cd0b78d/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/fc85f27e-8331-4d62-a76a-02b7ee4c994d/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/fc85f27e-8331-4d62-a76a-02b7ee4c994d/src/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/jobs/fc85f27e-8331-4d62-a76a-02b7ee4c994d/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/local_shared/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/local_shared/openai_interfaces/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/local_shared/openai_interfaces/model_selector.py
-  - opsvi/opsvi_opsvi/applications/code_gen/local_shared/openai_interfaces/responses_interface.py
-  - opsvi/opsvi_opsvi/applications/code_gen/logging_config.py
-  - opsvi/opsvi_opsvi/applications/code_gen/main.py
-  - opsvi/opsvi_opsvi/applications/code_gen/pipeline.py
-  - opsvi/opsvi_opsvi/applications/code_gen/project_templates.py
-  - opsvi/opsvi_opsvi/applications/code_gen/rate_limiting.py
-  - opsvi/opsvi_opsvi/applications/code_gen/research_service.py
-  - opsvi/opsvi_opsvi/applications/code_gen/research_workflow.py
-  - opsvi/opsvi_opsvi/applications/code_gen/schemas.py
-  - opsvi/opsvi_opsvi/applications/code_gen/start_with_logs.py
-  - opsvi/opsvi_opsvi/applications/code_gen/stop_all.py
-  - opsvi/opsvi_opsvi/applications/code_gen/task_queue.py
-  - opsvi/opsvi_opsvi/applications/code_gen/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/code_gen/validate_system.py
-  - opsvi/opsvi_opsvi/applications/code_gen/validation.py
-  - opsvi/opsvi_opsvi/applications/code_gen/worker.py
-  - opsvi/opsvi_opsvi/applications/code_gen/ws_router.py
-  - opsvi/opsvi_opsvi/applications/cognitive_interface/__init__.py
-  - opsvi/opsvi_opsvi/applications/cognitive_interface/conftest.py
-  - opsvi/opsvi_opsvi/applications/cognitive_interface/core/__init__.py
-  - opsvi/opsvi_opsvi/applications/cognitive_interface/core/cognitive_database.py
-  - opsvi/opsvi_opsvi/applications/cognitive_interface/core/consolidated_arango.py
-  - opsvi/opsvi_opsvi/applications/cognitive_interface/core/mcp_server.py
-  - opsvi/opsvi_opsvi/applications/cognitive_interface/mcp_cog_tools_server.py
-  - opsvi/opsvi_opsvi/applications/doc_cleanup/__init__.py
-  - opsvi/opsvi_opsvi/applications/doc_cleanup/agent_utils.py
-  - opsvi/opsvi_opsvi/applications/doc_cleanup/agent_workflows.py
-  - opsvi/opsvi_opsvi/applications/doc_cleanup/analytics.py
-  - opsvi/opsvi_opsvi/applications/doc_cleanup/cleanup_doc_update.py
-  - opsvi/opsvi_opsvi/applications/doc_cleanup/cleanup_drift_detection.py
-  - opsvi/opsvi_opsvi/applications/doc_cleanup/cleanup_workflow_runner.py
-  - opsvi/opsvi_opsvi/applications/doc_cleanup/embedding.py
-  - opsvi/opsvi_opsvi/applications/doc_cleanup/graph_manager.py
-  - opsvi/opsvi_opsvi/applications/doc_cleanup/ingestion.py
-  - opsvi/opsvi_opsvi/applications/doc_cleanup/main.py
-  - opsvi/opsvi_opsvi/applications/doc_cleanup/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/__init__.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/agents/__init__.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/agents/expert_agent.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/agents/expert_assigner.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/agents/expert_panel.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/agents/researcher_agent.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/agents/synthesis_agent.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/agents/system_message_generator.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/db/__init__.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/db/db_writer.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/expert_panel_workflow.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/logging/__init__.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/logging/research_logger.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/tools/__init__.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/tools/mcp_client.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/tools/mcp_context7_tool.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/tools/mcp_firecrawl_tool.py
-  - opsvi/opsvi_opsvi/applications/expert_panel/tools/mcp_search_tool.py
-  - opsvi/opsvi_opsvi/applications/graphrag_ai/__init__.py
-  - opsvi/opsvi_opsvi/applications/graphrag_ai/graph_loader.py
-  - opsvi/opsvi_opsvi/applications/graphrag_ai/graph_query.py
-  - opsvi/opsvi_opsvi/applications/graphrag_ai/llm_augment.py
-  - opsvi/opsvi_opsvi/applications/graphrag_ai/main.py
-  - opsvi/opsvi_opsvi/applications/graphrag_ai/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/__init__.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/agents/__init__.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/agents/base_agent.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/agents/research_agent.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/agents/task_agent.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/common/__init__.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/common/types.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/communication/__init__.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/communication/message_broker.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/examples/__init__.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/examples/demo_application.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/main.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/orchestrator/__init__.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/tools/__init__.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/tools/base_tool.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/tools/data_processor_tool.py
-  - opsvi/opsvi_opsvi/applications/multi_agent_orchestration/tools/web_search_tool.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/__main__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/automate_compliance_fixes.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/debug_schema.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/docs/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/docs/enhanced_logging_implementation.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/examples/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/examples/logging_demo.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/fix_config_references.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/fix_import_errors.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/fix_remaining_syntax_errors.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/main.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/oamat_sd_cli.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/quick_fix_script.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/scripts/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/scripts/performance_baseline.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/scripts/validate_dynamic_config.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/scripts/validate_quality_gates.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/smart_decomposition_agent.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/agents/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/agents/agent_creation.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/agents/agent_factory.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/agents/complexity_model.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/agents/complexity_model_original.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/agents/gap_analysis.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/agents/information_completion.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/agents/o3_master_agent.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/agents/o3_master_agent_original.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/agents/request_validation.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/agents/request_validation_original.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/agents/subdivision_agent_factory.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/analysis/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/analysis/ai_reasoning.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/analysis/complexity_analyzer.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/analysis/factor_analyzer.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/analysis/scoring_engine.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/config/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/config/config_manager.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/config/dynamic_config_generator.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/education/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/education/o3_framework_educator.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/enforcement/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/enforcement/implementation_guards.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/execution/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/execution/execution_engine.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/execution/subdivision_executor.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/interfaces/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/interfaces/agent_interfaces.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/interfaces/orchestration_interfaces.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/interfaces/system_interfaces.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/models/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/models/agent_response_models.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/models/agent_specification_schemas.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/models/complexity_models.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/models/data_models.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/models/o3_analysis_models.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/models/tool_models.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/models/validation_models.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/monitoring/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/operations/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/operations/file_manager.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/operations/subdivision_integrator.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/operations/subdivision_state_manager.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/preprocessing/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/preprocessing/request_standardizer.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/preprocessing/schemas.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/pydantic_configs.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/reasoning/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/reasoning/ai_reasoning_utils.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/reasoning/o3_pipeline.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/reasoning/structured_output_enforcer.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/reasoning/subdivision_analyzer.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/sd_logging/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/sd_logging/console_interface.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/sd_logging/correlation.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/sd_logging/log_config.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/sd_logging/logger_factory.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/strategy/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/strategy/strategy_generator.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/synthesis/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/synthesis/solution_synthesis.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/tools/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/tools/core/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/tools/core/execution_engine.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/tools/core/health_monitor.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/tools/core/mcp_integration.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/tools/core/tool_manager.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/tools/file_system_tools.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/tools/mcp_tool_registry.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/tools/mcp_tool_registry_original.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/tools/mcp_tool_registry_reference.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/tools/mocks/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/tools/mocks/mock_tools.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/utils/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/utils/project_context.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/validation/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/validation/clarification_interface.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/validation/completion_engine.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/validation/gap_analyzer.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/validation/schema_registry.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/validation/validation_engine.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/src/workflows/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/testing_scripts/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/tests/conftest.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/tests/error_handling/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/tests/fixtures/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/tests/fixtures/mcp_mocks.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/tests/integration/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/tests/integration/conftest.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/tests/performance/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/tests/unit/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/tools/__init__.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/tools/code_mapper.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/tools/dev_agent_validator.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/validate_contract_compliance.py
-  - opsvi/opsvi_opsvi/applications/oamat_sd/validate_sophistication.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/__init__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/__main__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/__init__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/__init__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/factory.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/__init__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/analysis.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/automation.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/code_generation.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/database.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/deployment.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/design.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/diagramming.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/file_system.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/monitoring.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/planning.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/quality.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/research.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/research_archived.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/rules.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/security.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/state_management.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/testing.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools/web_scraping.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/agent_factory/tools_manager.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/enhanced_manager_agent.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/llm_base_agent.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/manager/__init__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/manager/request_analyzer.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/manager/utilities.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/models.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/registry.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/agents/utilities.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/api/__init__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/config.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/config/__init__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/config/prompts.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/context_abstraction.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/context_alignment_system.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/core/__init__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/core/o3_reasoning_engine.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/db/__init__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/db/neo4j_client.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/economic_incentive_system.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/file_generation_orchestrator.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/fractal_integration_example.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/main.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/main.py
-src/applications/oamat/workflows/orchestrator/__init__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/main.py
-src/applications/oamat/workflows/orchestrator/graph_builder.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/monitoring/__init__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/oamat_logging.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/parallel_executor.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/prompt_engineering.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/task_decomposer.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/utils/__init__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/utils/chunking_embedding.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/utils/mcp_tool_registry.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/utils/project_context.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/utils/rule_loader.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/utils/rules_integration.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/workflows/__init__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/workflows/orchestrator/__init__.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/workflows/orchestrator/agent_wrapper.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/workflows/orchestrator/execution.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/workflows/orchestrator/graph_builder.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/workflows/orchestrator/sdlc_integration.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/workflows/orchestrator/state.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/workflows/orchestrator/utilities.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/workflows/parallel_executor.py
-  - opsvi/opsvi_opsvi/applications/old.ignore.oamat/workflows/sdlc_phase_manager.py
-  - opsvi/opsvi_opsvi/applications/research_team/__init__.py
-  - opsvi/opsvi_opsvi/applications/research_team/agents/__init__.py
-  - opsvi/opsvi_opsvi/applications/research_team/agents/research_agent.py
-  - opsvi/opsvi_opsvi/applications/research_team/agents/synthesis_agent.py
-  - opsvi/opsvi_opsvi/applications/research_team/db/__init__.py
-  - opsvi/opsvi_opsvi/applications/research_team/db/db_writer.py
-  - opsvi/opsvi_opsvi/applications/research_team/logging/__init__.py
-  - opsvi/opsvi_opsvi/applications/research_team/logging/research_logger.py
-  - opsvi/opsvi_opsvi/applications/research_team/research_workflow.py
-  - opsvi/opsvi_opsvi/applications/research_team/tools/__init__.py
-  - opsvi/opsvi_opsvi/applications/research_team/tools/mcp_arxiv_tool.py
-  - opsvi/opsvi_opsvi/applications/research_team/tools/mcp_client.py
-  - opsvi/opsvi_opsvi/applications/research_team/tools/mcp_context7_tool.py
-  - opsvi/opsvi_opsvi/applications/research_team/tools/mcp_firecrawl_tool.py
-  - opsvi/opsvi_opsvi/applications/research_team/tools/mcp_search_tool.py
-  - opsvi/opsvi_opsvi/applications/smart_decomposition_poc/__init__.py
-  - opsvi/opsvi_opsvi/applications/smart_decomposition_poc/core/__init__.py
-  - opsvi/opsvi_opsvi/applications/smart_decomposition_poc/core/agent_factory.py
-  - opsvi/opsvi_opsvi/applications/smart_decomposition_poc/core/config.py
-  - opsvi/opsvi_opsvi/applications/smart_decomposition_poc/core/dependency_manager.py
-  - opsvi/opsvi_opsvi/applications/smart_decomposition_poc/core/parallel_execution_engine.py
-  - opsvi/opsvi_opsvi/applications/smart_decomposition_poc/core/schemas.py
-  - opsvi/opsvi_opsvi/applications/smart_decomposition_poc/core/system_controller.py
-  - opsvi/opsvi_opsvi/applications/smart_decomposition_poc/demo.py
-  - opsvi/opsvi_opsvi/applications/smart_decomposition_poc/demo_end_to_end.py
-  - opsvi/opsvi_opsvi/applications/smart_decomposition_poc/demo_parallel.py
-  - opsvi/opsvi_opsvi/applications/smart_decomposition_poc/demo_simple_parallel.py
-  - opsvi/opsvi_opsvi/applications/smart_decomposition_poc/demo_timeout_safe.py
-  - opsvi/opsvi_opsvi/applications/smart_decomposition_poc/tests/__init__.py
-  - opsvi/opsvi_opsvi/applications/specstory_auto_loader/__init__.py
-  - opsvi/opsvi_opsvi/applications/specstory_auto_loader/database_storage.py
-  - opsvi/opsvi_opsvi/applications/specstory_auto_loader/server.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/__init__.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/agentic_review_demo.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/agentic_review_schema.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/agentic_review_workflow.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/analytics/__init__.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/analytics/ai_self_assessment.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/analytics/context_compression_engine.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/analytics/continuous_learning_engine.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/analytics/conversation_analyzer.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/analytics/meta_thinking_engine.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/analytics/predictive_intelligence_engine.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/analytics/session_consolidator.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/atomic_parser.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/__init__.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/aggregate_improvement_themes.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/code_chunker.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/codebase_graph_sampler.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/create_specstory_graph.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/database_storage.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/delete_specstory_relationships.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/explore_specstory_graph.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/generate_semantic_relationships.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/graph_demo_centrality.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/graph_demo_errors.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/graph_demo_path_analysis.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/graph_demo_session_summary.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/graph_demo_subgraph.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/hybrid_search_demo.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/link_codeblocks_to_codebase.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/review_codeblock_links.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/sample_codeblocks_and_modules.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/sample_sessions_no_tools.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/server.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/auto_loader/session_summary_analytics.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/batch_annotate_atomic_outputs.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/conceptual_analysis_agent.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/conceptual_synthesis_agent.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/conversation_intelligence.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/conversation_intelligence_backup.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/database_storage.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/integrated_pipeline.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/intelligence_agent.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/legacy/__init__.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/legacy/file_monitor.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/meta_conceptual_synthesis_agent.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/pipeline.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/review_connect_agent.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/run_atomic_parser_batch.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/simple_file_monitor.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/start_specstory_auto_loader.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/utilities/__init__.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/utilities/log_cleaner.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/validate_atomic_outputs.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/web_graph_viewer/__init__.py
-  - opsvi/opsvi_opsvi/applications/specstory_intelligence/web_graph_viewer/app.py
-  - opsvi/opsvi_opsvi/applications/storyforge/ai_service/__init__.py
-  - opsvi/opsvi_opsvi/applications/storyforge/ai_service/main.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/__init__.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/__init__.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/base.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/capability_discovery.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/coach.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/collaboration.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/data_steward.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/explainability.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/factory.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/generalist.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/human_override.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/interfaces.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/marketplace.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/multi_tenancy.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/policy.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/redundancy.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/reflexion.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/registry.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/scaling.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/security.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/self_improvement.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/specialist.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/synthesizer.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/agents/user_proxy.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/interface/__init__.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/interface/api_gateway.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/interface/authentication.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/interface/dashboard.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/interface/external_integrations.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/interface/feedback_ui.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/interface/notifications.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/interface/user_interface.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/orchestration/__init__.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/orchestration/base.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/orchestration/consensus_engine.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/orchestration/event_bus.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/orchestration/explainability_ai.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/orchestration/guardrails.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/orchestration/health_monitor.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/orchestration/interfaces.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/orchestration/optimizer.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/orchestration/policy_ai.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/orchestration/redundancy.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/orchestration/router.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/orchestration/scaling.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/orchestration/scheduler.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/__init__.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/automated_testing.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/base.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/code_generation.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/communication_tools.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/database_access.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/deployment_automation.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/documentation_automation.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/explainability_tools.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/interfaces.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/monitoring.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/policy_enforcement.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/research_tools.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/security_automation.py
-  - opsvi/opsvi_opsvi/applications/ultimate_agents/tooling/self_improvement_automation.py
-  - opsvi/opsvi_opsvi/applications/workflow_mcp/__init__.py
-  - opsvi/opsvi_opsvi/applications/workflow_mcp/agent_runner.py
-  - opsvi/opsvi_opsvi/applications/workflow_mcp/db.py
-  - opsvi/opsvi_opsvi/applications/workflow_mcp/mcp_server.py
-  - opsvi/opsvi_opsvi/applications/workflow_mcp/mcp_workflow_server.py
-  - opsvi/opsvi_opsvi/applications/workflow_mcp/old,mcp_workflow_server.py
-  - opsvi/opsvi_opsvi/applications/workflow_mcp/schemas.py
-  - opsvi/opsvi_opsvi/applications/workflow_runner/__init__.py
-  - opsvi/opsvi_opsvi/applications/workflow_runner/config.py
-  - opsvi/opsvi_opsvi/applications/workflow_runner/prompt_parser.py
-  - opsvi/opsvi_opsvi/memory/graph/__init__.py
-  - opsvi/opsvi_opsvi/memory/graph/neo4j_client.py
-  - opsvi/opsvi_opsvi/memory/graph/queries.py
-  - opsvi/opsvi_opsvi/orchestrator/__init__.py
-  - opsvi/opsvi_opsvi/orchestrator/dag_loader.py
-  - opsvi/opsvi_opsvi/orchestrator/meta_orchestrator.py
-  - opsvi/opsvi_opsvi/orchestrator/registry.py
-  - opsvi/opsvi_opsvi/orchestrator/task_models.py
-  - opsvi/opsvi_opsvi/shared/__init__.py
-  - opsvi/opsvi_opsvi/shared/collaboration_framework.py
-  - opsvi/opsvi_opsvi/shared/database/__init__.py
-  - opsvi/opsvi_opsvi/shared/database/core/__init__.py
-  - opsvi/opsvi_opsvi/shared/database/core/cognitive_database.py
-  - opsvi/opsvi_opsvi/shared/database/core/mcp_server.py
-  - opsvi/opsvi_opsvi/shared/database/cql_query_engine.py
-  - opsvi/opsvi_opsvi/shared/database/mcp_consolidated_server.py
-  - opsvi/opsvi_opsvi/shared/database/mcp_server.py
-  - opsvi/opsvi_opsvi/shared/database/real_mcp_interface.py
-  - opsvi/opsvi_opsvi/shared/intelligence/__init__.py
-  - opsvi/opsvi_opsvi/shared/intelligence/analytics/__init__.py
-  - opsvi/opsvi_opsvi/shared/interfaces/__init__.py
-  - opsvi/opsvi_opsvi/shared/interfaces/auth/__init__.py
-  - opsvi/opsvi_opsvi/shared/interfaces/auth/auth_interface.py
-  - opsvi/opsvi_opsvi/shared/interfaces/database/__init__.py
-  - opsvi/opsvi_opsvi/shared/interfaces/database/arango_interface.py
-  - opsvi/opsvi_opsvi/shared/interfaces/database/consolidated_arango.py
-  - opsvi/opsvi_opsvi/shared/interfaces/database/elasticsearch_interface.py
-  - opsvi/opsvi_opsvi/shared/interfaces/database/mysql_interface.py
-  - opsvi/opsvi_opsvi/shared/interfaces/database/postgresql_interface.py
-  - opsvi/opsvi_opsvi/shared/interfaces/database/redis_interface.py
-  - opsvi/opsvi_opsvi/shared/interfaces/database/s3_interface.py
-  - opsvi/opsvi_opsvi/shared/interfaces/http/__init__.py
-  - opsvi/opsvi_opsvi/shared/interfaces/http/http_client_interface.py
-  - opsvi/opsvi_opsvi/shared/interfaces/llm/__init__.py
-  - opsvi/opsvi_opsvi/shared/interfaces/llm/llm_embedding_interface.py
-  - opsvi/opsvi_opsvi/shared/interfaces/llm/openai_agents_interface.py
-  - opsvi/opsvi_opsvi/shared/interfaces/llm/openai_responses_interface.py
-  - opsvi/opsvi_opsvi/shared/interfaces/messaging/__init__.py
-  - opsvi/opsvi_opsvi/shared/interfaces/messaging/notification_interface.py
-  - opsvi/opsvi_opsvi/shared/interfaces/messaging/task_queue_interface.py
-  - opsvi/opsvi_opsvi/shared/interfaces/orchestration/__init__.py
-  - opsvi/opsvi_opsvi/shared/interfaces/orchestration/crewai_interface.py
-  - opsvi/opsvi_opsvi/shared/interfaces/orchestration/langgraph_interface.py
-  - opsvi/opsvi_opsvi/shared/live_collaboration_integration.py
-  - opsvi/opsvi_opsvi/shared/logging/__init__.py
-  - opsvi/opsvi_opsvi/shared/logging/shared_logger.py
-  - opsvi/opsvi_opsvi/shared/mcp/__init__.py
-  - opsvi/opsvi_opsvi/shared/mcp/arxiv_mcp_client.py
-  - opsvi/opsvi_opsvi/shared/mcp/brave_mcp_search.py
-  - opsvi/opsvi_opsvi/shared/mcp/context7_mcp_client.py
-  - opsvi/opsvi_opsvi/shared/mcp/context7_mcp_client_strict.py
-  - opsvi/opsvi_opsvi/shared/mcp/firecrawl_mcp_client.py
-  - opsvi/opsvi_opsvi/shared/mcp/intelligent_relevance_scorer.py
-  - opsvi/opsvi_opsvi/shared/mcp/mcp_integration_template.py
-  - opsvi/opsvi_opsvi/shared/mcp/mcp_server_template.py
-  - opsvi/opsvi_opsvi/shared/mcp/neo4j_mcp_client.py
-  - opsvi/opsvi_opsvi/shared/mcp/prefect_workflow_generation.py
-  - opsvi/opsvi_opsvi/shared/mcp/research_workflow_tool.py
-  - opsvi/opsvi_opsvi/shared/mcp/sequential_thinking_mcp_client.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/__init__.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/api_keys_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/assistants_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/audio_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/base.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/batch_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/chat_completions_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/completions_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/embeddings_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/files_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/fine_tuning_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/images_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/models_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/moderations_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/openai_responses_client.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/organizations_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/responses_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/types.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/usage_interface.py
-  - opsvi/opsvi_opsvi/shared/openai_interfaces/vector_stores_interface.py
-  - opsvi/opsvi_opsvi/shared/parsers/__init__.py
-  - opsvi/opsvi_opsvi/tools/__init__.py
-  - opsvi/opsvi_opsvi/tools/automation/__init__.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/__init__.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/alignment_scanner.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/analysis_utils.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/api_doc_generator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/api_spec_generator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/architecture_designer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/architecture_validator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/arxiv_mcp_client.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_align.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_align_demo.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/__init__.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/ast_analyzer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/ast_patcher.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/auto_rules_generator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/bulletproofing_cli.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/bulletproofing_config.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/bulletproofing_orchestrator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/bulletproofing_validation.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/codebase_scanner.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/demo.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/error_recovery.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/pattern_extractor.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/performance_monitor.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/rule_generator_engine.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/auto_rules_generation/rule_validator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/autonomous_workflow.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/batch_auto_align.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/brainstorming_tool.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/cicd_pipeline_generator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/code_reviewer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/component_designer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/__init__.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/core/__init__.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/core/config_manager.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/core/defaults.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/performance_module.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/prompt_builder.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/self_improvement/__init__.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/self_improvement/run_batch_regeneration.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/self_improvement/run_self_improvement.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/self_improvement/validation_framework.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/simple_function.backup_20250724_180641.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/simple_function.backup_20250724_185250.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/simple_function.backup_20250724_185348.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/simple_function.backup_20250724_185412.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/simple_function.backup_20250724_185503.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/simple_function.backup_20250724_190249.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/simple_function.backup_20250724_202246.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/simple_function.backup_20250725_081518.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/config/simple_function.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/data_flow_designer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/database_schema_generator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/dependency_analyzer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/docker_orchestrator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/dynamic_alignment_scanner.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/enhanced_auto_align.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/enhanced_intelligent_file_analyzer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/enhanced_prompt_expansion_generator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/feasibility_assessor.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/fix_all_imports.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/fix_imports_only.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/fresh_test_proof.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/git_hooks/__init__.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/git_hooks/post-commit-auto-align.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/git_hooks/pre-commit-auto-rules.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/idea_formation_analyzer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/import_fix_script.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/integrated_o3_analyzer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/integration_spec_generator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/intelligent_o3_analyzer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/interface_designer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/main.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/market_research_integrator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/modern_api_prompt_expansion.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/natural_language_enhancement_generator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/o3_code_generator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/o3_logger/__init__.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/o3_logger/logger.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/performance_optimizer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/performance_spec_generator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/project_initializer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/prompt_expansion_script.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/prompts/__init__.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/prompts/api_doc_prompts.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/prompts/architecture_prompts.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/prompts/docker_prompts.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/prompts/idea_formation_prompts.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/prompts/requirements_prompts.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/prompts/security_prompts.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/prompts/system_prompt.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/prompts/technical_spec_prompts.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/real_demo_file.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/requirements_analyzer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/research_script.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/rule_engine.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/rule_parser.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/__init__.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/api_doc_generator_input_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/api_doc_generator_output_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/api_doc_schemas.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/api_spec_output_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/architecture_schemas.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/base_output_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/cicd_pipeline_generator_input_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/cicd_pipeline_generator_output_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/code_reviewer_input_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/code_reviewer_output_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/dependency_analyzer_input_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/dependency_analyzer_output_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/docker_orchestrator_input_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/docker_orchestrator_output_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/docker_schemas.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/file_analysis_output.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/idea_formation_schemas.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/input_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/output_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/performance_optimizer_input_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/performance_optimizer_output_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/project_initializer_input_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/project_initializer_output_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/requirements_analyzer_input_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/requirements_analyzer_output_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/requirements_schemas.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/security_scanner_input_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/security_scanner_output_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/security_schemas.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/technical_spec_schemas.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/testing_framework_generator_input_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/schemas/testing_framework_generator_output_schema.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/security_scanner.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/simple_research_script.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/technical_spec_generator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/testing_framework_generator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/tests/__init__.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/tests/conftest.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/utils/__init__.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/utils/assistants_api_manager.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/utils/base_processor.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/utils/demo_shared_utils.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/utils/directory_manager.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/utils/file_generator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/utils/input_loader.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/utils/interactive.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/utils/o3_model_generator.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/utils/output_formatter.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/utils/prompt_builder.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/validate_with_analyzer.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/validation_framework.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/version_utils.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/workflow/__init__.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/workflow/autonomous_workflow.py
-  - opsvi/opsvi_opsvi/tools/code_generation/o3_code_generator/workflow/idea_selector.py
-  - opsvi/opsvi_opsvi/tools/config.py
-  - opsvi/opsvi_opsvi/tools/extract_chatlog_blocks.py
-  - opsvi/opsvi_opsvi/tools/extract_specstory_summary.py
-  - opsvi/opsvi_opsvi/tools/extract_top_level_code_blocks.py
-  - opsvi/opsvi_opsvi/tools/log_cleaner.py
-  - opsvi/opsvi_opsvi/tools/migration/__init__.py
-  - opsvi/opsvi_opsvi/tools/migration/execute_organizational_migration.py
-  - opsvi/opsvi_opsvi/tools/organization/__init__.py
-  - opsvi/opsvi_opsvi/tools/organization/check_compliance.py
-  - opsvi/opsvi_opsvi/tools/organization/cleanup_root_violations.py
-  - opsvi/opsvi_opsvi/tools/organization/project_compliance_checker.py
-  - opsvi/opsvi_opsvi/tools/progressive_specstory_summary.py
-  - opsvi/opsvi_opsvi/tools/testing/__init__.py
-  - opsvi/opsvi_opsvi/tools/testing/database_validation_script.py
-  - opsvi/opsvi_opsvi/tools/testing/show_agent_outputs.py
-  - opsvi/opsvi_opsvi/workers/__init__.py
-  - opsvi/opsvi_opsvi/workers/celery_app.py
-  - opsvi/opsvi_opsvi/workers/tasks.py
-  - optimized_critic_implementation.py
-  - optimized_main_agent.py
-  - optimized_nano_instructions.py
-  - opus_task_1.txt
-  - opus_task_2.txt
-  - orchestrator_agent_prompt.md
-  - orchestrator_agent_prompt_v2.md
-  - orchestrator_resume_prompt.md
+  - pattern-engine-service/Dockerfile
+  - pattern-engine-service/README.md
+  - pattern-engine-service/demo_distributed.py
+  - pattern-engine-service/demo_local.py
+  - pattern-engine-service/demo_quick.py
+  - pattern-engine-service/docker-compose.yml
+  - pattern-engine-service/nginx.conf
+  - pattern-engine-service/patterns_export.json
+  - pattern-engine-service/requirements.txt
+  - pattern-engine-service/src/api_server.py
+  - pattern-engine-service/src/pattern_engine_core.py
+  - pattern-engine-service/start.sh
   - platform/mcp/registry.json
   - platform/observability/config/grafana/provisioning/datasources/tempo.yaml
   - platform/observability/config/otel-collector-config.yaml
   - platform/observability/config/tempo.yaml
   - platform/observability/docker-compose.yml
   - platform/rag/docker-compose.yml
-  - proj_intel_wrapper.py
   - pyproject.toml
   - pytest.ini
-  - real_research_assistant.py
-  - real_research_reports_research_20250810_191416.json
-  - real_research_reports_research_20250810_191438.json
-  - real_research_reports_research_20250810_191449.json
-  - real_research_reports_research_20250810_191515.json
-  - real_research_reports_research_20250810_191722.json
-  - requirements-ai.txt
   - requirements.txt
-  - research_reports_research_20250810_190708.json
   - ruff.toml
-  - run_orchestrated_analysis.md
   - scripts/README_auto_attach.md
   - scripts/agents/gatekeeper_summarize_projects.py
+  - scripts/analysis/analyze_all_custom_projects.py
+  - scripts/analysis/analyze_log_reality.py
+  - scripts/analysis/baseline_analysis.py
+  - scripts/analysis/comprehensive_optimization_analysis.py
+  - scripts/analysis/timing_analysis_system.py
+  - scripts/analysis/unified_optimization_system.py
   - scripts/auto_attach.py
   - scripts/auto_attach_generator.py
+  - scripts/auto_cleanup.py
   - scripts/deploy_ecosystem.sh
   - scripts/diff_libs.sh
+  - scripts/enhanced_critic_accountability.py
   - scripts/fix_agent_syntax.py
   - scripts/full_demo.sh
   - scripts/generate_agents_components.py
@@ -3642,15 +2632,29 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - scripts/generate_libs.sh
   - scripts/generate_rag_components.py
   - scripts/generate_remaining_rag.py
+  - scripts/intelligence_aware_wrapper.py
+  - scripts/invoke_orchestrator.py
+  - scripts/multi_candidate_tournament.py
+  - scripts/multi_critic_integration.py
+  - scripts/multi_critic_system.py
   - scripts/new_agent_worktree.sh
+  - scripts/optimized_critic_implementation.py
+  - scripts/optimized_main_agent.py
+  - scripts/optimized_nano_instructions.py
+  - scripts/proj_intel_wrapper.py
+  - scripts/refactor_coder_agent.py
   - scripts/scaffold_libs_codegen.py
   - scripts/smoke_test.sh
+  - scripts/utilities/clean_log.py
+  - scripts/utilities/fast_migrate.py
+  - scripts/utilities/generate_project_visualizations.py
+  - scripts/utilities/generate_project_visualizations_fixed.py
+  - scripts/utilities/validate_email.py
   - scripts/validate_libs.sh
+  - scripts/validate_refactoring.py
   - scripts/verify_ai_setup.py
   - scripts/wave1_data_extraction.sh
   - scripts/wave1_data_extraction_copy.sh
-  - sort_example.py
-  - specialized_discovery_agents.md
   - src/__init__.py
   - src/adapters/__init__.py
   - src/adapters/playwright_scraper.py
@@ -3676,8 +2680,6 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - systemd/autosave@.timer
   - systemd/snapshot@.service
   - systemd/snapshot@.timer
-  - temp.txt
-  - timing_analysis_system.py
   - tools/ai_populate.py
   - tools/autosave.sh
   - tools/libs_check.py
@@ -3685,8 +2687,4 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - tools/rag_init.py
   - tools/snapshot.sh
   - tools/template_vars_check.py
-  - unified_optimization_system.py
   - uv.lock
-  - validate_email.py
-  - visualization_agent_activation_prompt.md
-  - working_demo.py

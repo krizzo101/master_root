@@ -15,6 +15,7 @@ import hashlib
 @dataclass
 class AIDecision:
     """Container for AI-driven decisions with full reasoning"""
+
     decision_type: str
     decision: str
     reasoning: str
@@ -25,20 +26,20 @@ class AIDecision:
     opportunities: List[str] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.now)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization"""
         return {
-            'decision_type': self.decision_type,
-            'decision': self.decision,
-            'reasoning': self.reasoning,
-            'confidence': self.confidence,
-            'action_plan': self.action_plan,
-            'alternatives': self.alternatives,
-            'risks': self.risks,
-            'opportunities': self.opportunities,
-            'metadata': self.metadata,
-            'timestamp': self.timestamp.isoformat()
+            "decision_type": self.decision_type,
+            "decision": self.decision,
+            "reasoning": self.reasoning,
+            "confidence": self.confidence,
+            "action_plan": self.action_plan,
+            "alternatives": self.alternatives,
+            "risks": self.risks,
+            "opportunities": self.opportunities,
+            "metadata": self.metadata,
+            "timestamp": self.timestamp.isoformat(),
         }
 
 
@@ -47,7 +48,7 @@ class AIDecisionEngine:
     Central AI brain that makes ALL non-trivial decisions
     Replaces hardcoded logic with Claude's intelligence
     """
-    
+
     def __init__(self, claude_client=None):
         """Initialize with Claude MCP client"""
         self.claude = claude_client
@@ -55,53 +56,55 @@ class AIDecisionEngine:
         self.decision_history = []
         self.context_memory = {}
         self.learning_insights = []
-        
+
         # Decision type templates for optimal prompting
         self.decision_templates = {
-            'pattern_recognition': self._pattern_recognition_prompt,
-            'error_analysis': self._error_analysis_prompt,
-            'code_generation': self._code_generation_prompt,
-            'strategy_selection': self._strategy_selection_prompt,
-            'learning_extraction': self._learning_extraction_prompt,
-            'optimization_opportunity': self._optimization_prompt
+            "pattern_recognition": self._pattern_recognition_prompt,
+            "error_analysis": self._error_analysis_prompt,
+            "code_generation": self._code_generation_prompt,
+            "strategy_selection": self._strategy_selection_prompt,
+            "learning_extraction": self._learning_extraction_prompt,
+            "optimization_opportunity": self._optimization_prompt,
         }
-        
-    async def make_decision(self, 
-                          context: Dict[str, Any],
-                          decision_type: str,
-                          options: Optional[List[str]] = None,
-                          constraints: Optional[Dict[str, Any]] = None,
-                          use_batch: bool = False) -> AIDecision:
+
+    async def make_decision(
+        self,
+        context: Dict[str, Any],
+        decision_type: str,
+        options: Optional[List[str]] = None,
+        constraints: Optional[Dict[str, Any]] = None,
+        use_batch: bool = False,
+    ) -> AIDecision:
         """
         Route ALL decisions through Claude AI
-        
+
         Args:
             context: Full context for decision
             decision_type: Type of decision to make
             options: Available options (optional, AI can determine)
             constraints: Any constraints to consider
             use_batch: Use batch processing for parallel decisions
-            
+
         Returns:
             AIDecision with full reasoning and action plan
         """
-        
+
         # Check cache for recent similar decisions
         cache_key = self._generate_cache_key(context, decision_type)
         if cache_key in self.decision_cache:
             cached = self.decision_cache[cache_key]
             if (datetime.now() - cached.timestamp).seconds < 300:  # 5 min cache
                 return cached
-        
+
         # Build prompt using template
         if decision_type in self.decision_templates:
             prompt = self.decision_templates[decision_type](context, options, constraints)
         else:
             prompt = self._generic_decision_prompt(context, decision_type, options, constraints)
-        
+
         # Add historical context for better decisions
         prompt = self._enrich_with_history(prompt, decision_type)
-        
+
         try:
             # Execute through Claude MCP
             if use_batch and self.claude:
@@ -110,32 +113,31 @@ class AIDecisionEngine:
             else:
                 # Direct Claude execution
                 result = await self._execute_claude_decision(prompt)
-            
+
             # Parse and validate AI response
             decision = self._parse_ai_response(result, decision_type)
-            
+
             # Cache the decision
             self.decision_cache[cache_key] = decision
             self.decision_history.append(decision)
-            
+
             # Extract learning insights
-            if 'insights' in result:
-                self.learning_insights.extend(result['insights'])
-            
+            if "insights" in result:
+                self.learning_insights.extend(result["insights"])
+
             return decision
-            
+
         except Exception as e:
             # Fallback to best-effort decision
             return self._fallback_decision(context, decision_type, str(e))
-    
-    async def make_parallel_decisions(self, 
-                                    decisions: List[Tuple[Dict, str]]) -> List[AIDecision]:
+
+    async def make_parallel_decisions(self, decisions: List[Tuple[Dict, str]]) -> List[AIDecision]:
         """
         Make multiple decisions in parallel using Claude batch processing
-        
+
         Args:
             decisions: List of (context, decision_type) tuples
-            
+
         Returns:
             List of AIDecisions
         """
@@ -145,7 +147,7 @@ class AIDecisionEngine:
             for context, dtype in decisions:
                 results.append(await self.make_decision(context, dtype))
             return results
-        
+
         # Create batch tasks for Claude
         tasks = []
         for context, dtype in decisions:
@@ -154,24 +156,24 @@ class AIDecisionEngine:
             else:
                 prompt = self._generic_decision_prompt(context, dtype, None, None)
             tasks.append(prompt)
-        
+
         # Execute batch through Claude MCP
         try:
             # Use claude_run_batch for parallel execution
             batch_results = await self.claude.execute_batch(tasks)
-            
+
             # Parse all results
             decisions = []
             for i, result in enumerate(batch_results):
                 decision = self._parse_ai_response(result, decisions[i][1])
                 decisions.append(decision)
-                
+
             return decisions
-            
+
         except Exception as e:
             # Fallback to sequential
             return await self._sequential_fallback(decisions)
-    
+
     def _pattern_recognition_prompt(self, context: Dict, options: Any, constraints: Any) -> str:
         """Generate prompt for pattern recognition decisions"""
         return f"""
@@ -217,7 +219,7 @@ class AIDecisionEngine:
             "opportunities": ["new_optimization_path", "predictive_capability"]
         }}
         """
-    
+
     def _error_analysis_prompt(self, context: Dict, options: Any, constraints: Any) -> str:
         """Generate prompt for error analysis and recovery"""
         return f"""
@@ -274,7 +276,7 @@ class AIDecisionEngine:
             "opportunities": ["improve_error_handling", "add_resilience"]
         }}
         """
-    
+
     def _code_generation_prompt(self, context: Dict, options: Any, constraints: Any) -> str:
         """Generate prompt for AI code generation"""
         return f"""
@@ -324,7 +326,7 @@ class AIDecisionEngine:
             "opportunities": ["further_optimization", "reusability"]
         }}
         """
-    
+
     def _strategy_selection_prompt(self, context: Dict, options: Any, constraints: Any) -> str:
         """Generate prompt for strategic planning decisions"""
         return f"""
@@ -375,7 +377,7 @@ class AIDecisionEngine:
             "opportunities": ["early_completion", "bonus_objectives"]
         }}
         """
-    
+
     def _learning_extraction_prompt(self, context: Dict, options: Any, constraints: Any) -> str:
         """Generate prompt for deep learning extraction"""
         return f"""
@@ -430,7 +432,7 @@ class AIDecisionEngine:
             "opportunities": ["new_capability", "performance_improvement"]
         }}
         """
-    
+
     def _optimization_prompt(self, context: Dict, options: Any, constraints: Any) -> str:
         """Generate prompt for optimization decisions"""
         return f"""
@@ -457,9 +459,10 @@ class AIDecisionEngine:
         
         Return JSON with specific optimization plan...
         """
-    
-    def _generic_decision_prompt(self, context: Dict, decision_type: str, 
-                                options: Any, constraints: Any) -> str:
+
+    def _generic_decision_prompt(
+        self, context: Dict, decision_type: str, options: Any, constraints: Any
+    ) -> str:
         """Generic prompt for any decision type"""
         return f"""
         You are an expert AI making a {decision_type} decision.
@@ -486,43 +489,44 @@ class AIDecisionEngine:
             "opportunities": [...]
         }}
         """
-    
+
     def _enrich_with_history(self, prompt: str, decision_type: str) -> str:
         """Add historical context to improve decision quality"""
-        recent_decisions = [d for d in self.decision_history[-10:] 
-                          if d.decision_type == decision_type]
-        
+        recent_decisions = [
+            d for d in self.decision_history[-10:] if d.decision_type == decision_type
+        ]
+
         if recent_decisions:
             history_context = "\n\nRecent similar decisions:\n"
             for d in recent_decisions[-3:]:
                 history_context += f"- {d.decision}: {d.confidence:.2f} confidence\n"
-            
+
             prompt += history_context
-        
+
         if self.learning_insights:
             insights_context = "\n\nLearned insights:\n"
             for insight in self.learning_insights[-5:]:
                 insights_context += f"- {insight}\n"
-            
+
             prompt += insights_context
-        
+
         return prompt
-    
+
     async def _execute_claude_decision(self, prompt: str) -> Dict[str, Any]:
         """Execute decision through Claude MCP"""
         if self.claude:
             try:
                 # Use claude_run for synchronous decision
                 result = await self.claude.execute(prompt, mode="sync")
-                
+
                 # Parse JSON response
                 if isinstance(result, str):
                     return json.loads(result)
                 return result
-                
+
             except Exception as e:
                 print(f"Claude execution failed: {e}")
-                
+
         # Fallback response structure
         return {
             "decision": "fallback_action",
@@ -531,28 +535,28 @@ class AIDecisionEngine:
             "action_plan": {"immediate_steps": ["proceed_with_caution"]},
             "alternatives": [],
             "risks": ["limited_intelligence"],
-            "opportunities": []
+            "opportunities": [],
         }
-    
+
     def _parse_ai_response(self, response: Dict[str, Any], decision_type: str) -> AIDecision:
         """Parse Claude's response into AIDecision object"""
         return AIDecision(
             decision_type=decision_type,
-            decision=response.get('decision', 'unknown'),
-            reasoning=response.get('reasoning', 'No reasoning provided'),
-            confidence=float(response.get('confidence', 0.5)),
-            action_plan=response.get('action_plan', {}),
-            alternatives=response.get('alternatives', []),
-            risks=response.get('risks', []),
-            opportunities=response.get('opportunities', []),
-            metadata=response
+            decision=response.get("decision", "unknown"),
+            reasoning=response.get("reasoning", "No reasoning provided"),
+            confidence=float(response.get("confidence", 0.5)),
+            action_plan=response.get("action_plan", {}),
+            alternatives=response.get("alternatives", []),
+            risks=response.get("risks", []),
+            opportunities=response.get("opportunities", []),
+            metadata=response,
         )
-    
+
     def _generate_cache_key(self, context: Dict, decision_type: str) -> str:
         """Generate cache key for decision"""
         context_str = json.dumps(context, sort_keys=True)
         return hashlib.md5(f"{decision_type}:{context_str}".encode()).hexdigest()
-    
+
     def _fallback_decision(self, context: Dict, decision_type: str, error: str) -> AIDecision:
         """Create fallback decision when AI is unavailable"""
         return AIDecision(
@@ -563,9 +567,9 @@ class AIDecisionEngine:
             action_plan={"immediate_steps": ["proceed_cautiously", "retry_later"]},
             alternatives=[],
             risks=["operating_without_full_intelligence"],
-            opportunities=[]
+            opportunities=[],
         )
-    
+
     async def explain_decision(self, decision: AIDecision) -> str:
         """Get detailed explanation of a decision from AI"""
         prompt = f"""
@@ -585,23 +589,23 @@ class AIDecisionEngine:
         
         Make it clear and actionable.
         """
-        
+
         if self.claude:
             explanation = await self.claude.execute(prompt, mode="sync")
             return explanation
-        
+
         return f"Decision: {decision.decision}\nReasoning: {decision.reasoning}"
-    
+
     def get_decision_history(self, decision_type: Optional[str] = None) -> List[AIDecision]:
         """Get history of decisions, optionally filtered by type"""
         if decision_type:
             return [d for d in self.decision_history if d.decision_type == decision_type]
         return self.decision_history
-    
+
     def get_learning_insights(self) -> List[str]:
         """Get accumulated learning insights"""
         return self.learning_insights
-    
+
     def clear_cache(self):
         """Clear decision cache"""
         self.decision_cache.clear()

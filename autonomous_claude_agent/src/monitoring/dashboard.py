@@ -26,6 +26,7 @@ logger = get_logger(__name__)
 
 class DashboardConfig(BaseModel):
     """Dashboard configuration."""
+
     host: str = "0.0.0.0"
     port: int = 8080
     update_interval: float = 1.0
@@ -35,32 +36,32 @@ class DashboardConfig(BaseModel):
 
 class ConnectionManager:
     """Manages WebSocket connections."""
-    
+
     def __init__(self):
         self.active_connections: Set[WebSocket] = set()
         self.lock = asyncio.Lock()
-    
+
     async def connect(self, websocket: WebSocket):
         """Accept and register a new connection."""
         await websocket.accept()
         async with self.lock:
             self.active_connections.add(websocket)
         logger.info(f"WebSocket client connected. Total: {len(self.active_connections)}")
-    
+
     async def disconnect(self, websocket: WebSocket):
         """Remove a connection."""
         async with self.lock:
             self.active_connections.discard(websocket)
         logger.info(f"WebSocket client disconnected. Total: {len(self.active_connections)}")
-    
+
     async def broadcast(self, message: dict):
         """Send message to all connected clients."""
         if not self.active_connections:
             return
-        
+
         message_str = json.dumps(message)
         disconnected = set()
-        
+
         async with self.lock:
             for connection in self.active_connections:
                 try:
@@ -68,7 +69,7 @@ class ConnectionManager:
                 except Exception as e:
                     logger.warning(f"Failed to send to client: {e}")
                     disconnected.add(connection)
-        
+
         # Remove disconnected clients
         if disconnected:
             async with self.lock:
@@ -77,32 +78,34 @@ class ConnectionManager:
 
 class MonitoringDashboard:
     """Real-time monitoring dashboard."""
-    
-    def __init__(self,
-                 metrics_exporter: MetricsExporter,
-                 alert_manager: AlertManager,
-                 health_checker: HealthChecker,
-                 config: Optional[DashboardConfig] = None):
+
+    def __init__(
+        self,
+        metrics_exporter: MetricsExporter,
+        alert_manager: AlertManager,
+        health_checker: HealthChecker,
+        config: Optional[DashboardConfig] = None,
+    ):
         self.metrics_exporter = metrics_exporter
         self.alert_manager = alert_manager
         self.health_checker = health_checker
         self.config = config or DashboardConfig()
-        
+
         self.app = FastAPI(title="Autonomous Agent Monitor")
         self.connection_manager = ConnectionManager()
-        
+
         # Data storage
         self.metrics_history: List[Dict[str, Any]] = []
         self.system_stats: Dict[str, Any] = {}
         self.agent_states: Dict[str, Any] = {}
-        
+
         self._setup_middleware()
         self._setup_routes()
         self._setup_websockets()
-        
+
         # Background tasks
         self.update_task: Optional[asyncio.Task] = None
-    
+
     def _setup_middleware(self):
         """Set up FastAPI middleware."""
         if self.config.enable_cors:
@@ -113,65 +116,69 @@ class MonitoringDashboard:
                 allow_methods=["*"],
                 allow_headers=["*"],
             )
-    
+
     def _setup_routes(self):
         """Set up HTTP routes."""
-        
+
         @self.app.get("/", response_class=HTMLResponse)
         async def root():
             """Serve the dashboard HTML."""
             return self._generate_dashboard_html()
-        
+
         @self.app.get("/api/metrics")
         async def get_metrics():
             """Get current metrics."""
             metrics = await self.metrics_exporter.get_all_metrics()
             return JSONResponse(content=metrics)
-        
+
         @self.app.get("/api/alerts")
         async def get_alerts():
             """Get active alerts."""
             alerts = self.alert_manager.get_active_alerts()
-            return JSONResponse(content=[
-                {
-                    "id": alert.id,
-                    "severity": alert.severity.value,
-                    "title": alert.title,
-                    "message": alert.message,
-                    "timestamp": alert.timestamp.isoformat(),
-                    "metadata": alert.metadata
-                }
-                for alert in alerts
-            ])
-        
+            return JSONResponse(
+                content=[
+                    {
+                        "id": alert.id,
+                        "severity": alert.severity.value,
+                        "title": alert.title,
+                        "message": alert.message,
+                        "timestamp": alert.timestamp.isoformat(),
+                        "metadata": alert.metadata,
+                    }
+                    for alert in alerts
+                ]
+            )
+
         @self.app.get("/api/health")
         async def get_health():
             """Get system health status."""
             health = await self.health_checker.check_all()
-            return JSONResponse(content={
-                "status": health.status.value,
-                "components": {
-                    name: {
-                        "status": comp.status.value,
-                        "message": comp.message,
-                        "last_check": comp.last_check.isoformat() if comp.last_check else None,
-                        "metadata": comp.metadata
-                    }
-                    for name, comp in health.components.items()
-                },
-                "timestamp": health.timestamp.isoformat()
-            })
-        
+            return JSONResponse(
+                content={
+                    "status": health.status.value,
+                    "components": {
+                        name: {
+                            "status": comp.status.value,
+                            "message": comp.message,
+                            "last_check": comp.last_check.isoformat() if comp.last_check else None,
+                            "metadata": comp.metadata,
+                        }
+                        for name, comp in health.components.items()
+                    },
+                    "timestamp": health.timestamp.isoformat(),
+                }
+            )
+
         @self.app.get("/api/history")
         async def get_history(limit: int = 100):
             """Get metrics history."""
             return JSONResponse(content=self.metrics_history[-limit:])
-        
+
         @self.app.get("/api/agents")
         async def get_agents():
             """Get agent states."""
             return JSONResponse(content=self.agent_states)
-        
+
         @self.app.post("/api/alerts/acknowledge/{alert_id}")
         async def acknowledge_alert(alert_id: str):
             """Acknowledge an alert."""
@@ -179,40 +186,42 @@ class MonitoringDashboard:
             if not success:
                 raise HTTPException(status_code=404, detail="Alert not found")
             return {"status": "acknowledged"}
-    
+
     def _setup_websockets(self):
         """Set up WebSocket endpoints."""
-        
+
         @self.app.websocket("/ws")
         async def websocket_endpoint(websocket: WebSocket):
             """WebSocket endpoint for real-time updates."""
             await self.connection_manager.connect(websocket)
-            
+
             try:
                 # Send initial data
-                await websocket.send_json({
-                    "type": "initial",
-                    "data": {
-                        "metrics": await self.metrics_exporter.get_all_metrics(),
-                        "health": await self._get_health_data(),
-                        "alerts": self._get_alerts_data(),
-                        "agents": self.agent_states
+                await websocket.send_json(
+                    {
+                        "type": "initial",
+                        "data": {
+                            "metrics": await self.metrics_exporter.get_all_metrics(),
+                            "health": await self._get_health_data(),
+                            "alerts": self._get_alerts_data(),
+                            "agents": self.agent_states,
+                        },
                     }
-                })
-                
+                )
+
                 # Keep connection alive
                 while True:
                     # Wait for any message (ping/pong)
                     data = await websocket.receive_text()
                     if data == "ping":
                         await websocket.send_text("pong")
-                    
+
             except WebSocketDisconnect:
                 await self.connection_manager.disconnect(websocket)
             except Exception as e:
                 logger.error(f"WebSocket error: {e}")
                 await self.connection_manager.disconnect(websocket)
-    
+
     async def _update_loop(self):
         """Background task to broadcast updates."""
         while True:
@@ -221,49 +230,47 @@ class MonitoringDashboard:
                 metrics = await self.metrics_exporter.get_all_metrics()
                 health = await self._get_health_data()
                 alerts = self._get_alerts_data()
-                
+
                 # Update history
-                self.metrics_history.append({
-                    "timestamp": datetime.utcnow().isoformat(),
-                    "metrics": metrics
-                })
-                
+                self.metrics_history.append(
+                    {"timestamp": datetime.utcnow().isoformat(), "metrics": metrics}
+                )
+
                 # Trim history
                 if len(self.metrics_history) > self.config.history_size:
-                    self.metrics_history = self.metrics_history[-self.config.history_size:]
-                
+                    self.metrics_history = self.metrics_history[-self.config.history_size :]
+
                 # Broadcast update
-                await self.connection_manager.broadcast({
-                    "type": "update",
-                    "data": {
-                        "metrics": metrics,
-                        "health": health,
-                        "alerts": alerts,
-                        "agents": self.agent_states,
-                        "timestamp": datetime.utcnow().isoformat()
+                await self.connection_manager.broadcast(
+                    {
+                        "type": "update",
+                        "data": {
+                            "metrics": metrics,
+                            "health": health,
+                            "alerts": alerts,
+                            "agents": self.agent_states,
+                            "timestamp": datetime.utcnow().isoformat(),
+                        },
                     }
-                })
-                
+                )
+
                 await asyncio.sleep(self.config.update_interval)
-                
+
             except Exception as e:
                 logger.error(f"Update loop error: {e}")
                 await asyncio.sleep(5)
-    
+
     async def _get_health_data(self) -> Dict[str, Any]:
         """Get formatted health data."""
         health = await self.health_checker.check_all()
         return {
             "status": health.status.value,
             "components": {
-                name: {
-                    "status": comp.status.value,
-                    "message": comp.message
-                }
+                name: {"status": comp.status.value, "message": comp.message}
                 for name, comp in health.components.items()
-            }
+            },
         }
-    
+
     def _get_alerts_data(self) -> List[Dict[str, Any]]:
         """Get formatted alerts data."""
         return [
@@ -272,33 +279,27 @@ class MonitoringDashboard:
                 "severity": alert.severity.value,
                 "title": alert.title,
                 "message": alert.message,
-                "timestamp": alert.timestamp.isoformat()
+                "timestamp": alert.timestamp.isoformat(),
             }
             for alert in self.alert_manager.get_active_alerts()
         ]
-    
+
     def update_agent_state(self, agent_id: str, state: Dict[str, Any]):
         """Update agent state information."""
-        self.agent_states[agent_id] = {
-            **state,
-            "last_update": datetime.utcnow().isoformat()
-        }
-    
+        self.agent_states[agent_id] = {**state, "last_update": datetime.utcnow().isoformat()}
+
     async def start(self):
         """Start the dashboard server."""
         # Start update loop
         self.update_task = asyncio.create_task(self._update_loop())
-        
+
         # Start server
         config = uvicorn.Config(
-            app=self.app,
-            host=self.config.host,
-            port=self.config.port,
-            log_level="info"
+            app=self.app, host=self.config.host, port=self.config.port, log_level="info"
         )
         server = uvicorn.Server(config)
         await server.serve()
-    
+
     async def stop(self):
         """Stop the dashboard server."""
         if self.update_task:
@@ -307,10 +308,10 @@ class MonitoringDashboard:
                 await self.update_task
             except asyncio.CancelledError:
                 pass
-    
+
     def _generate_dashboard_html(self) -> str:
         """Generate the dashboard HTML page."""
-        return '''
+        return """
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -679,23 +680,21 @@ class MonitoringDashboard:
     </script>
 </body>
 </html>
-        '''
+        """
 
 
 class DashboardServer:
     """Standalone dashboard server."""
-    
-    def __init__(self,
-                 dashboard: MonitoringDashboard,
-                 config: Optional[DashboardConfig] = None):
+
+    def __init__(self, dashboard: MonitoringDashboard, config: Optional[DashboardConfig] = None):
         self.dashboard = dashboard
         self.config = config or DashboardConfig()
-    
+
     async def start(self):
         """Start the dashboard server."""
         logger.info(f"Starting dashboard server on {self.config.host}:{self.config.port}")
         await self.dashboard.start()
-    
+
     async def stop(self):
         """Stop the dashboard server."""
         logger.info("Stopping dashboard server")
@@ -704,21 +703,22 @@ class DashboardServer:
 
 # Example usage
 if __name__ == "__main__":
+
     async def main():
         # Create components
         metrics_exporter = MetricsExporter()
         alert_manager = AlertManager()
         health_checker = HealthChecker()
-        
+
         # Create dashboard
         dashboard = MonitoringDashboard(
             metrics_exporter=metrics_exporter,
             alert_manager=alert_manager,
-            health_checker=health_checker
+            health_checker=health_checker,
         )
-        
+
         # Start server
         server = DashboardServer(dashboard)
         await server.start()
-    
+
     asyncio.run(main())

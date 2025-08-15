@@ -1,0 +1,12 @@
+{
+  "goal": "\n    Build a modern web application using current 2024-2025 best practices.\n    \n    Requirements:\n    1. Research and use the latest stable versions of all packages\n    2. Implement current security best practices\n    3. Use modern performance optimization techniques\n    4. Follow current accessibility standards\n    5. Implement with proper error handling and monitoring\n    \n    The app should be a task management system with:\n    - User authentication\n    - Real-time updates\n    - Mobile responsive design\n    - API backend\n    - Database persistence\n    \n    Research everything first, make informed decisions, then build.\n    ",
+  "completed": false,
+  "current_task": null,
+  "completed_tasks": [],
+  "research_findings": {},
+  "technology_decisions": {},
+  "package_versions": {},
+  "errors": [],
+  "test_results": [],
+  "files_created": []
+}

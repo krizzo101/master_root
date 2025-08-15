@@ -8,10 +8,4 @@ from src.core.state_manager import StateManager
 from src.core.error_recovery import ErrorRecovery
 from src.core.context_manager import ContextManager
 
-__all__ = [
-    "AutonomousAgent",
-    "ClaudeClient", 
-    "StateManager",
-    "ErrorRecovery",
-    "ContextManager"
-]
+__all__ = ["AutonomousAgent", "ClaudeClient", "StateManager", "ErrorRecovery", "ContextManager"]

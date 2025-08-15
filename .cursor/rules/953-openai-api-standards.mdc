@@ -9,12 +9,17 @@ alwaysApply: false
 
 **BEFORE ANY OPENAI API INTEGRATION**:
 
-### 1. **TIME AND DATE CHECK**
+### 1. **TIME AND DATE CHECK (ABSOLUTELY MANDATORY)**
 ```python
 # MANDATORY: Check current time/date at response start
-from mcp_time_current_time import current_time
-current_time = current_time(format="YYYY-MM-DD HH:mm:ss")
+# THIS MUST BE YOUR FIRST ACTION IN ANY CONVERSATION
+from mcp__time__current_time import current_time
+current_datetime = current_time(format="YYYY-MM-DD HH:mm:ss")
+# Log the time for audit purposes
+print(f"Session started at: {current_datetime}")
 ```
+
+**ENFORCEMENT**: Failure to check time FIRST = immediate task rejection
 
 ### 2. **ONLINE RESEARCH REQUIREMENT**
 - **RESEARCH CURRENT API VERSIONS**: OpenAI API changes frequently (2025 updates)
