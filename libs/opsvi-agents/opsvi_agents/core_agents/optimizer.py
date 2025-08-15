@@ -1,691 +1,803 @@
-"""OptimizerAgent - Production-ready optimization and performance enhancement agent."""
+"""OptimizerAgent - Performance optimization."""
 
-import json
-import time
 from typing import Any, Dict, List, Optional, Tuple, Union
-from datetime import datetime
-from pathlib import Path
 from dataclasses import dataclass, field
 from enum import Enum
-import hashlib
-
+import time
 import structlog
 
-from ..core.base import (
-    BaseAgent,
-    AgentConfig,
-    AgentCapability,
-    AgentResult
-)
-from ..exceptions.base import AgentExecutionError
+from ..core import BaseAgent, AgentConfig, AgentContext, AgentResult
 
-logger = structlog.get_logger(__name__)
+
+logger = structlog.get_logger()
 
 
 class OptimizationType(Enum):
-    """Types of optimization strategies."""
+    """Types of optimization."""
     PERFORMANCE = "performance"
     MEMORY = "memory"
     COST = "cost"
+    QUALITY = "quality"
+    THROUGHPUT = "throughput"
+    LATENCY = "latency"
     RESOURCE = "resource"
     ALGORITHM = "algorithm"
-    ARCHITECTURE = "architecture"
-    WORKFLOW = "workflow"
-    ENERGY = "energy"
+
+
+class OptimizationStrategy(Enum):
+    """Optimization strategies."""
+    GREEDY = "greedy"
+    GRADIENT = "gradient"
+    GENETIC = "genetic"
+    SIMULATED_ANNEALING = "simulated_annealing"
+    HILL_CLIMBING = "hill_climbing"
+    CONSTRAINT = "constraint"
 
 
 @dataclass
 class OptimizationTarget:
-    """Optimization target definition."""
-    name: str
-    type: OptimizationType
+    """Optimization target."""
+    metric: str
     current_value: float
     target_value: float
-    metric: str
-    constraints: Dict[str, Any] = field(default_factory=dict)
-    priority: int = 5  # 1-10, 1 being highest
+    weight: float = 1.0
+    constraint: Optional[str] = None
+    
+    def improvement_ratio(self) -> float:
+        """Calculate improvement ratio."""
+        if self.current_value == 0:
+            return 0
+        return (self.target_value - self.current_value) / self.current_value
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return {
+            "metric": self.metric,
+            "current_value": self.current_value,
+            "target_value": self.target_value,
+            "weight": self.weight,
+            "constraint": self.constraint,
+            "improvement_ratio": self.improvement_ratio()
+        }
 
 
 @dataclass
-class OptimizationStrategy:
-    """Optimization strategy definition."""
+class OptimizationResult:
+    """Optimization result."""
+    id: str
+    type: OptimizationType
+    strategy: OptimizationStrategy
+    original_state: Dict[str, Any]
+    optimized_state: Dict[str, Any]
+    improvements: Dict[str, float] = field(default_factory=dict)
+    iterations: int = 0
+    converged: bool = False
+    duration: float = 0.0
+    
+    def get_improvement_summary(self) -> str:
+        """Get improvement summary."""
+        if not self.improvements:
+            return "No improvements"
+        
+        parts = []
+        for metric, improvement in self.improvements.items():
+            if improvement > 0:
+                parts.append(f"{metric}: +{improvement:.1f}%")
+            else:
+                parts.append(f"{metric}: {improvement:.1f}%")
+        
+        return ", ".join(parts)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return {
+            "id": self.id,
+            "type": self.type.value,
+            "strategy": self.strategy.value,
+            "improvements": self.improvements,
+            "iterations": self.iterations,
+            "converged": self.converged,
+            "duration": self.duration,
+            "summary": self.get_improvement_summary()
+        }
+
+
+@dataclass
+class OptimizationProfile:
+    """Optimization profile/configuration."""
     name: str
-    description: str
-    applicable_to: List[OptimizationType]
-    expected_improvement: float  # percentage
-    risk_level: str  # low, medium, high
-    implementation_steps: List[str] = field(default_factory=list)
-    rollback_plan: Optional[str] = None
+    targets: List[OptimizationTarget]
+    strategy: OptimizationStrategy
+    max_iterations: int = 100
+    convergence_threshold: float = 0.01
+    constraints: Dict[str, Any] = field(default_factory=dict)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return {
+            "name": self.name,
+            "targets": [t.to_dict() for t in self.targets],
+            "strategy": self.strategy.value,
+            "max_iterations": self.max_iterations,
+            "convergence_threshold": self.convergence_threshold,
+            "constraints": self.constraints
+        }
 
 
 class OptimizerAgent(BaseAgent):
-    """Agent specialized in optimization and performance enhancement.
-    
-    Capabilities:
-    - Performance optimization and tuning
-    - Resource utilization optimization
-    - Algorithm and data structure optimization
-    - Cost optimization strategies
-    - Workflow and process optimization
-    - Architecture improvements
-    - Continuous optimization monitoring
-    """
+    """Optimizes performance and resource usage."""
     
     def __init__(self, config: Optional[AgentConfig] = None):
-        """Initialize OptimizerAgent with optimization capabilities."""
-        if config is None:
-            config = AgentConfig(
-                name="OptimizerAgent",
-                model="gpt-4o",
-                temperature=0.3,  # Balanced for creative optimization
-                max_tokens=8192,
-                capabilities=[
-                    AgentCapability.REASONING,
-                    AgentCapability.PLANNING,
-                    AgentCapability.LEARNING
-                ],
-                system_prompt=self._get_system_prompt()
-            )
-        super().__init__(config)
-        
-        # Optimization state
-        self.optimization_history = []
-        self.active_optimizations = {}
-        self.strategy_library = self._load_optimization_strategies()
-        self.benchmark_results = {}
-        self.optimization_cache = {}
-        
-    def _get_system_prompt(self) -> str:
-        """Get specialized system prompt for optimization."""
-        return """You are an expert optimization specialist focused on improving system performance and efficiency.
-        
-        Your responsibilities:
-        1. Analyze systems for optimization opportunities
-        2. Design and implement optimization strategies
-        3. Measure and validate optimization results
-        4. Balance trade-offs between different optimization goals
-        5. Ensure optimizations maintain system stability
-        6. Document optimization processes and results
-        7. Continuously monitor and refine optimizations
-        8. Provide rollback strategies for risky optimizations
-        
-        Always prioritize measurable improvements, system stability, and maintainability."""
+        """Initialize optimizer agent."""
+        super().__init__(config or AgentConfig(
+            name="OptimizerAgent",
+            description="Performance optimization",
+            capabilities=["optimize", "tune", "improve", "analyze", "profile"],
+            max_retries=3,
+            timeout=180
+        ))
+        self.profiles: Dict[str, OptimizationProfile] = {}
+        self.results: Dict[str, OptimizationResult] = {}
+        self.benchmarks: Dict[str, Dict[str, float]] = {}
+        self._result_counter = 0
+        self._profile_counter = 0
+        self._register_default_profiles()
     
-    def _load_optimization_strategies(self) -> Dict[str, OptimizationStrategy]:
-        """Load predefined optimization strategies."""
+    def initialize(self) -> bool:
+        """Initialize the optimizer agent."""
+        logger.info("optimizer_agent_initialized", agent=self.config.name)
+        return True
+    
+    def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute optimization task."""
+        action = task.get("action", "optimize")
+        
+        if action == "optimize":
+            return self._optimize(task)
+        elif action == "tune":
+            return self._tune_parameters(task)
+        elif action == "profile":
+            return self._create_profile(task)
+        elif action == "analyze":
+            return self._analyze_performance(task)
+        elif action == "benchmark":
+            return self._run_benchmark(task)
+        elif action == "recommend":
+            return self._recommend_optimizations(task)
+        elif action == "apply_profile":
+            return self._apply_profile(task)
+        elif action == "compare":
+            return self._compare_configurations(task)
+        else:
+            return {"error": f"Unknown action: {action}"}
+    
+    def optimize(self,
+                target: Any,
+                optimization_type: OptimizationType = OptimizationType.PERFORMANCE,
+                strategy: OptimizationStrategy = OptimizationStrategy.GRADIENT) -> OptimizationResult:
+        """Optimize a target."""
+        result = self.execute({
+            "action": "optimize",
+            "target": target,
+            "type": optimization_type.value,
+            "strategy": strategy.value
+        })
+        
+        if "error" in result:
+            raise RuntimeError(result["error"])
+        
+        return result["result"]
+    
+    def _register_default_profiles(self):
+        """Register default optimization profiles."""
+        # Performance profile
+        perf_targets = [
+            OptimizationTarget("response_time", 1000, 100, weight=2.0),
+            OptimizationTarget("throughput", 100, 1000, weight=1.5),
+            OptimizationTarget("cpu_usage", 80, 50, weight=1.0)
+        ]
+        
+        self.profiles["performance"] = OptimizationProfile(
+            name="performance",
+            targets=perf_targets,
+            strategy=OptimizationStrategy.GRADIENT
+        )
+        
+        # Memory profile
+        mem_targets = [
+            OptimizationTarget("memory_usage", 1024, 512, weight=2.0),
+            OptimizationTarget("cache_hit_rate", 0.7, 0.95, weight=1.0)
+        ]
+        
+        self.profiles["memory"] = OptimizationProfile(
+            name="memory",
+            targets=mem_targets,
+            strategy=OptimizationStrategy.CONSTRAINT
+        )
+        
+        # Cost profile
+        cost_targets = [
+            OptimizationTarget("resource_cost", 100, 50, weight=2.0),
+            OptimizationTarget("efficiency", 0.7, 0.9, weight=1.5)
+        ]
+        
+        self.profiles["cost"] = OptimizationProfile(
+            name="cost",
+            targets=cost_targets,
+            strategy=OptimizationStrategy.GREEDY
+        )
+    
+    def _optimize(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Perform optimization."""
+        target = task.get("target")
+        opt_type = task.get("type", "performance")
+        strategy = task.get("strategy", "gradient")
+        max_iterations = task.get("max_iterations", 100)
+        
+        if target is None:
+            return {"error": "Target is required"}
+        
+        start_time = time.time()
+        
+        type_enum = OptimizationType[opt_type.upper()]
+        strategy_enum = OptimizationStrategy[strategy.upper()]
+        
+        # Get initial state
+        original_state = self._get_state(target)
+        
+        # Create optimization result
+        self._result_counter += 1
+        result = OptimizationResult(
+            id=f"result_{self._result_counter}",
+            type=type_enum,
+            strategy=strategy_enum,
+            original_state=original_state,
+            optimized_state=original_state.copy()
+        )
+        
+        # Run optimization based on strategy
+        if strategy_enum == OptimizationStrategy.GRADIENT:
+            self._gradient_optimization(target, result, max_iterations)
+        elif strategy_enum == OptimizationStrategy.GREEDY:
+            self._greedy_optimization(target, result, max_iterations)
+        elif strategy_enum == OptimizationStrategy.GENETIC:
+            self._genetic_optimization(target, result, max_iterations)
+        elif strategy_enum == OptimizationStrategy.SIMULATED_ANNEALING:
+            self._simulated_annealing(target, result, max_iterations)
+        else:
+            self._default_optimization(target, result, max_iterations)
+        
+        result.duration = time.time() - start_time
+        
+        # Calculate improvements
+        result.improvements = self._calculate_improvements(
+            result.original_state,
+            result.optimized_state
+        )
+        
+        # Store result
+        self.results[result.id] = result
+        
+        logger.info("optimization_completed",
+                   result_id=result.id,
+                   type=opt_type,
+                   strategy=strategy,
+                   iterations=result.iterations,
+                   improvements=result.get_improvement_summary())
+        
         return {
-            "caching": OptimizationStrategy(
-                name="Caching Strategy",
-                description="Implement strategic caching to reduce computation",
-                applicable_to=[OptimizationType.PERFORMANCE, OptimizationType.RESOURCE],
-                expected_improvement=40.0,
-                risk_level="low",
-                implementation_steps=[
-                    "Identify frequently accessed data",
-                    "Implement cache layer",
-                    "Set cache invalidation strategy",
-                    "Monitor cache hit rates"
-                ]
-            ),
-            "parallel_processing": OptimizationStrategy(
-                name="Parallel Processing",
-                description="Parallelize independent operations",
-                applicable_to=[OptimizationType.PERFORMANCE],
-                expected_improvement=60.0,
-                risk_level="medium",
-                implementation_steps=[
-                    "Identify parallelizable operations",
-                    "Implement thread/process pools",
-                    "Handle synchronization",
-                    "Test for race conditions"
-                ]
-            ),
-            "algorithm_optimization": OptimizationStrategy(
-                name="Algorithm Optimization",
-                description="Replace inefficient algorithms with optimized versions",
-                applicable_to=[OptimizationType.ALGORITHM, OptimizationType.PERFORMANCE],
-                expected_improvement=70.0,
-                risk_level="medium",
-                implementation_steps=[
-                    "Analyze algorithmic complexity",
-                    "Research optimal algorithms",
-                    "Implement new algorithm",
-                    "Validate correctness",
-                    "Benchmark performance"
-                ]
-            ),
-            "memory_pooling": OptimizationStrategy(
-                name="Memory Pooling",
-                description="Implement memory pools to reduce allocation overhead",
-                applicable_to=[OptimizationType.MEMORY, OptimizationType.PERFORMANCE],
-                expected_improvement=30.0,
-                risk_level="medium",
-                implementation_steps=[
-                    "Profile memory allocation patterns",
-                    "Design memory pool structure",
-                    "Implement pool management",
-                    "Monitor memory usage"
-                ]
-            ),
-            "lazy_loading": OptimizationStrategy(
-                name="Lazy Loading",
-                description="Defer expensive operations until necessary",
-                applicable_to=[OptimizationType.PERFORMANCE, OptimizationType.RESOURCE],
-                expected_improvement=25.0,
-                risk_level="low",
-                implementation_steps=[
-                    "Identify deferrable operations",
-                    "Implement lazy initialization",
-                    "Add demand-based loading",
-                    "Test edge cases"
-                ]
-            )
+            "result": result,
+            "improvements": result.improvements,
+            "summary": result.get_improvement_summary()
         }
     
-    def _execute(self, prompt: str, **kwargs) -> Dict[str, Any]:
-        """Execute optimization task."""
-        self._logger.info("Executing optimization", task=prompt[:100])
+    def _tune_parameters(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Tune parameters for optimization."""
+        parameters = task.get("parameters", {})
+        target_metric = task.get("target_metric", "performance")
+        method = task.get("method", "grid_search")
         
-        # Parse optimization parameters
-        target_type = kwargs.get("type", OptimizationType.PERFORMANCE)
-        target_system = kwargs.get("target")
-        constraints = kwargs.get("constraints", {})
-        benchmark = kwargs.get("benchmark", True)
+        tuned_params = parameters.copy()
+        best_score = float('-inf')
         
-        try:
-            # Analyze current state
-            current_state = self._analyze_current_state(target_system)
+        if method == "grid_search":
+            # Simple grid search
+            param_ranges = task.get("param_ranges", {})
             
-            # Identify optimization opportunities
-            opportunities = self._identify_opportunities(current_state, target_type)
+            for param, range_values in param_ranges.items():
+                best_value = parameters.get(param)
+                
+                for value in range_values:
+                    test_params = tuned_params.copy()
+                    test_params[param] = value
+                    
+                    # Evaluate parameters
+                    score = self._evaluate_parameters(test_params, target_metric)
+                    
+                    if score > best_score:
+                        best_score = score
+                        best_value = value
+                
+                tuned_params[param] = best_value
+        
+        elif method == "random_search":
+            # Random search
+            iterations = task.get("iterations", 10)
+            import random
             
-            # Select optimization strategies
-            strategies = self._select_strategies(opportunities, constraints)
-            
-            # Create optimization plan
-            plan = self._create_optimization_plan(strategies, current_state)
-            
-            # Execute optimization
-            results = self._execute_optimization_plan(plan, target_system, benchmark)
-            
-            # Validate results
-            validation = self._validate_optimization(results, current_state)
-            
-            # Store in history
-            self.optimization_history.append({
-                "timestamp": datetime.now().isoformat(),
-                "target": target_system,
-                "type": target_type.value if isinstance(target_type, Enum) else target_type,
-                "results": results,
-                "validation": validation
-            })
-            
-            # Update metrics
-            self.context.metrics.update({
-                "optimizations_performed": len(self.optimization_history),
-                "improvement_percentage": results.get("improvement", 0),
-                "strategies_applied": len(strategies),
-                "success": validation.get("success", False)
-            })
-            
-            return {
-                "current_state": current_state,
-                "opportunities": opportunities,
-                "strategies": strategies,
-                "plan": plan,
-                "results": results,
-                "validation": validation,
-                "recommendations": self._generate_recommendations(results, validation)
-            }
-            
-        except Exception as e:
-            self._logger.error("Optimization failed", error=str(e))
-            raise AgentExecutionError(f"Optimization failed: {e}")
+            for _ in range(iterations):
+                test_params = parameters.copy()
+                
+                # Randomly modify parameters
+                for param in test_params:
+                    if isinstance(test_params[param], (int, float)):
+                        test_params[param] *= random.uniform(0.8, 1.2)
+                
+                score = self._evaluate_parameters(test_params, target_metric)
+                
+                if score > best_score:
+                    best_score = score
+                    tuned_params = test_params
+        
+        return {
+            "original_parameters": parameters,
+            "tuned_parameters": tuned_params,
+            "improvement": best_score,
+            "method": method
+        }
     
-    def _analyze_current_state(self, target: str) -> Dict[str, Any]:
-        """Analyze current state of target system."""
-        self._logger.info("Analyzing current state", target=target)
+    def _create_profile(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Create optimization profile."""
+        name = task.get("name", "custom")
+        targets_data = task.get("targets", [])
+        strategy = task.get("strategy", "gradient")
+        max_iterations = task.get("max_iterations", 100)
+        
+        # Create targets
+        targets = []
+        for target_data in targets_data:
+            target = OptimizationTarget(
+                metric=target_data.get("metric", "performance"),
+                current_value=target_data.get("current", 0),
+                target_value=target_data.get("target", 100),
+                weight=target_data.get("weight", 1.0)
+            )
+            targets.append(target)
+        
+        # Create profile
+        self._profile_counter += 1
+        profile = OptimizationProfile(
+            name=name,
+            targets=targets,
+            strategy=OptimizationStrategy[strategy.upper()],
+            max_iterations=max_iterations
+        )
+        
+        # Store profile
+        self.profiles[name] = profile
+        
+        return {
+            "profile": profile.to_dict(),
+            "profile_name": name
+        }
+    
+    def _analyze_performance(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze performance for optimization opportunities."""
+        target = task.get("target")
+        metrics = task.get("metrics", ["response_time", "throughput", "resource_usage"])
+        
+        if target is None:
+            return {"error": "Target is required"}
         
         analysis = {
-            "target": target,
-            "timestamp": datetime.now().isoformat(),
+            "target": str(target),
+            "metrics": {},
+            "bottlenecks": [],
+            "opportunities": []
+        }
+        
+        # Analyze each metric
+        for metric in metrics:
+            value = self._measure_metric(target, metric)
+            analysis["metrics"][metric] = value
+            
+            # Identify bottlenecks
+            if metric == "response_time" and value > 1000:
+                analysis["bottlenecks"].append(f"High {metric}: {value}ms")
+            elif metric == "throughput" and value < 100:
+                analysis["bottlenecks"].append(f"Low {metric}: {value} ops/sec")
+            elif metric == "resource_usage" and value > 80:
+                analysis["bottlenecks"].append(f"High {metric}: {value}%")
+        
+        # Identify optimization opportunities
+        if analysis["bottlenecks"]:
+            analysis["opportunities"].append("Performance tuning recommended")
+            
+            if "response_time" in [b.split(":")[0].replace("High ", "").replace("Low ", "") 
+                                  for b in analysis["bottlenecks"]]:
+                analysis["opportunities"].append("Consider caching or algorithm optimization")
+            
+            if "resource_usage" in [b.split(":")[0].replace("High ", "") 
+                                   for b in analysis["bottlenecks"]]:
+                analysis["opportunities"].append("Resource optimization needed")
+        
+        return {"analysis": analysis}
+    
+    def _run_benchmark(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Run performance benchmark."""
+        target = task.get("target")
+        iterations = task.get("iterations", 100)
+        metrics = task.get("metrics", ["time", "memory"])
+        
+        if target is None:
+            return {"error": "Target is required"}
+        
+        benchmark_results = {
+            "target": str(target),
+            "iterations": iterations,
             "metrics": {}
         }
         
-        # Performance metrics
-        perf_metrics = self._collect_performance_metrics(target)
-        analysis["metrics"]["performance"] = perf_metrics
-        
-        # Resource utilization
-        resource_metrics = self._collect_resource_metrics(target)
-        analysis["metrics"]["resources"] = resource_metrics
-        
-        # Complexity analysis
-        complexity = self._analyze_complexity(target)
-        analysis["complexity"] = complexity
-        
-        # Bottleneck identification
-        bottlenecks = self._identify_bottlenecks(perf_metrics, resource_metrics)
-        analysis["bottlenecks"] = bottlenecks
-        
-        # Historical performance
-        historical = self._get_historical_data(target)
-        analysis["historical"] = historical
-        
-        return analysis
-    
-    def _identify_opportunities(self, state: Dict, opt_type: OptimizationType) -> List[Dict]:
-        """Identify optimization opportunities."""
-        self._logger.info("Identifying opportunities", type=opt_type)
-        
-        opportunities = []
-        
-        # Check performance opportunities
-        if opt_type in [OptimizationType.PERFORMANCE, OptimizationType.ALGORITHM]:
-            perf_opps = self._identify_performance_opportunities(state)
-            opportunities.extend(perf_opps)
-        
-        # Check memory opportunities
-        if opt_type in [OptimizationType.MEMORY, OptimizationType.RESOURCE]:
-            mem_opps = self._identify_memory_opportunities(state)
-            opportunities.extend(mem_opps)
-        
-        # Check architectural opportunities
-        if opt_type == OptimizationType.ARCHITECTURE:
-            arch_opps = self._identify_architecture_opportunities(state)
-            opportunities.extend(arch_opps)
-        
-        # Check workflow opportunities
-        if opt_type == OptimizationType.WORKFLOW:
-            workflow_opps = self._identify_workflow_opportunities(state)
-            opportunities.extend(workflow_opps)
-        
-        # Rank opportunities by impact
-        opportunities = self._rank_opportunities(opportunities)
-        
-        return opportunities
-    
-    def _select_strategies(self, opportunities: List[Dict], 
-                          constraints: Dict) -> List[OptimizationStrategy]:
-        """Select appropriate optimization strategies."""
-        self._logger.info("Selecting strategies", opportunities=len(opportunities))
-        
-        selected = []
-        
-        for opportunity in opportunities:
-            # Find applicable strategies
-            applicable = self._find_applicable_strategies(opportunity)
+        # Run benchmark
+        for metric in metrics:
+            results = []
             
-            # Filter by constraints
-            filtered = self._filter_by_constraints(applicable, constraints)
+            for _ in range(iterations):
+                value = self._measure_metric(target, metric)
+                results.append(value)
             
-            # Select best strategy
-            if filtered:
-                best_strategy = self._select_best_strategy(filtered, opportunity)
-                selected.append(best_strategy)
-        
-        # Check for strategy conflicts
-        selected = self._resolve_strategy_conflicts(selected)
-        
-        return selected
-    
-    def _create_optimization_plan(self, strategies: List[OptimizationStrategy], 
-                                 state: Dict) -> Dict[str, Any]:
-        """Create detailed optimization plan."""
-        self._logger.info("Creating optimization plan", strategies=len(strategies))
-        
-        plan = {
-            "id": str(hashlib.md5(str(datetime.now()).encode()).hexdigest()[:8]),
-            "created": datetime.now().isoformat(),
-            "phases": [],
-            "estimated_improvement": 0,
-            "total_risk": "low",
-            "rollback_enabled": True
-        }
-        
-        # Create phases from strategies
-        for i, strategy in enumerate(strategies):
-            phase = {
-                "number": i + 1,
-                "strategy": strategy.name,
-                "steps": strategy.implementation_steps,
-                "expected_improvement": strategy.expected_improvement,
-                "risk_level": strategy.risk_level,
-                "dependencies": self._identify_dependencies(strategy, strategies[:i]),
-                "validation_criteria": self._define_validation_criteria(strategy),
-                "rollback_plan": strategy.rollback_plan
+            # Calculate statistics
+            benchmark_results["metrics"][metric] = {
+                "mean": sum(results) / len(results),
+                "min": min(results),
+                "max": max(results),
+                "samples": results[:10]  # First 10 samples
             }
-            plan["phases"].append(phase)
         
-        # Calculate total expected improvement
-        plan["estimated_improvement"] = self._calculate_total_improvement(strategies)
+        # Store benchmark
+        target_key = str(target)[:50]  # Limit key length
+        self.benchmarks[target_key] = benchmark_results["metrics"]
         
-        # Assess total risk
-        plan["total_risk"] = self._assess_total_risk(strategies)
-        
-        # Add monitoring points
-        plan["monitoring"] = self._define_monitoring_points(strategies)
-        
-        return plan
+        return {"benchmark": benchmark_results}
     
-    def _execute_optimization_plan(self, plan: Dict, target: str, 
-                                  benchmark: bool) -> Dict[str, Any]:
-        """Execute the optimization plan."""
-        self._logger.info("Executing optimization plan", plan_id=plan["id"])
+    def _recommend_optimizations(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Recommend optimizations based on analysis."""
+        analysis = task.get("analysis", {})
+        constraints = task.get("constraints", {})
         
-        results = {
-            "plan_id": plan["id"],
-            "target": target,
-            "phases_completed": [],
-            "improvements": {},
-            "issues": [],
-            "benchmarks": {}
-        }
+        recommendations = []
+        priority_map = {"high": 3, "medium": 2, "low": 1}
         
-        # Baseline benchmark
-        if benchmark:
-            baseline = self._run_benchmark(target, "baseline")
-            results["benchmarks"]["baseline"] = baseline
+        # Analyze metrics
+        metrics = analysis.get("metrics", {})
         
-        # Execute each phase
-        for phase in plan["phases"]:
-            try:
-                # Check dependencies
-                if self._check_dependencies(phase, results["phases_completed"]):
-                    # Execute phase
-                    phase_result = self._execute_phase(phase, target)
-                    
-                    # Validate phase results
-                    if self._validate_phase(phase_result, phase["validation_criteria"]):
-                        results["phases_completed"].append(phase["number"])
-                        results["improvements"][phase["strategy"]] = phase_result["improvement"]
-                        
-                        # Run intermediate benchmark
-                        if benchmark:
-                            interim = self._run_benchmark(target, f"phase_{phase['number']}")
-                            results["benchmarks"][f"phase_{phase['number']}"] = interim
-                    else:
-                        # Rollback if validation fails
-                        if phase.get("rollback_plan"):
-                            self._execute_rollback(phase["rollback_plan"], target)
-                        results["issues"].append(f"Phase {phase['number']} validation failed")
-                        
-                else:
-                    results["issues"].append(f"Phase {phase['number']} dependencies not met")
-                    
-            except Exception as e:
-                self._logger.error("Phase execution failed", phase=phase["number"], error=str(e))
-                results["issues"].append(f"Phase {phase['number']}: {str(e)}")
-                
-                # Attempt rollback
-                if phase.get("rollback_plan"):
-                    self._execute_rollback(phase["rollback_plan"], target)
-        
-        # Final benchmark
-        if benchmark:
-            final = self._run_benchmark(target, "final")
-            results["benchmarks"]["final"] = final
+        for metric, value in metrics.items():
+            if metric == "response_time" and value > 500:
+                recommendations.append({
+                    "type": "performance",
+                    "action": "Implement caching layer",
+                    "priority": "high" if value > 1000 else "medium",
+                    "expected_improvement": "30-50% reduction"
+                })
             
-            # Calculate improvement
-            if "baseline" in results["benchmarks"]:
-                results["improvement"] = self._calculate_improvement(
-                    results["benchmarks"]["baseline"],
-                    results["benchmarks"]["final"]
-                )
+            if metric == "memory_usage" and value > 1024:
+                recommendations.append({
+                    "type": "memory",
+                    "action": "Optimize data structures",
+                    "priority": "high" if value > 2048 else "medium",
+                    "expected_improvement": "20-40% reduction"
+                })
+            
+            if metric == "throughput" and value < 100:
+                recommendations.append({
+                    "type": "throughput",
+                    "action": "Implement parallel processing",
+                    "priority": "medium",
+                    "expected_improvement": "2-3x increase"
+                })
         
-        return results
+        # Sort by priority
+        recommendations.sort(key=lambda x: priority_map.get(x["priority"], 0), reverse=True)
+        
+        return {
+            "recommendations": recommendations,
+            "total": len(recommendations)
+        }
     
-    def _validate_optimization(self, results: Dict, initial_state: Dict) -> Dict[str, Any]:
-        """Validate optimization results."""
-        self._logger.info("Validating optimization results")
+    def _apply_profile(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply optimization profile."""
+        profile_name = task.get("profile")
+        target = task.get("target")
         
-        validation = {
-            "success": False,
-            "criteria_met": [],
-            "criteria_failed": [],
-            "warnings": [],
-            "summary": ""
+        if not profile_name or profile_name not in self.profiles:
+            return {"error": f"Profile {profile_name} not found"}
+        
+        if target is None:
+            return {"error": "Target is required"}
+        
+        profile = self.profiles[profile_name]
+        
+        # Apply optimization with profile
+        result = self._optimize({
+            "target": target,
+            "type": "custom",
+            "strategy": profile.strategy.value,
+            "max_iterations": profile.max_iterations
+        })
+        
+        return {
+            "profile_applied": profile_name,
+            "result": result
+        }
+    
+    def _compare_configurations(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Compare different configurations."""
+        configs = task.get("configurations", [])
+        metric = task.get("metric", "performance")
+        
+        if len(configs) < 2:
+            return {"error": "At least 2 configurations required"}
+        
+        comparison = {
+            "metric": metric,
+            "configurations": []
         }
         
-        # Check if improvements were achieved
-        if results.get("improvement", 0) > 0:
-            validation["criteria_met"].append("Positive improvement achieved")
-        else:
-            validation["criteria_failed"].append("No improvement achieved")
+        best_score = float('-inf')
+        best_config = None
         
-        # Check for regressions
-        regressions = self._check_for_regressions(results, initial_state)
-        if regressions:
-            validation["warnings"].extend(regressions)
+        for i, config in enumerate(configs):
+            # Evaluate configuration
+            score = self._evaluate_configuration(config, metric)
+            
+            comparison["configurations"].append({
+                "index": i,
+                "config": config,
+                "score": score
+            })
+            
+            if score > best_score:
+                best_score = score
+                best_config = i
         
-        # Validate stability
-        stability = self._validate_stability(results)
-        if stability["stable"]:
-            validation["criteria_met"].append("System stability maintained")
-        else:
-            validation["criteria_failed"].append("Stability issues detected")
-            validation["warnings"].extend(stability["issues"])
+        comparison["best_configuration"] = best_config
+        comparison["best_score"] = best_score
         
-        # Check resource usage
-        resource_check = self._validate_resource_usage(results)
-        if resource_check["acceptable"]:
-            validation["criteria_met"].append("Resource usage acceptable")
-        else:
-            validation["warnings"].append(f"High resource usage: {resource_check['details']}")
+        return {"comparison": comparison}
+    
+    # Optimization algorithms
+    def _gradient_optimization(self, target: Any, result: OptimizationResult, max_iterations: int):
+        """Gradient-based optimization."""
+        learning_rate = 0.1
         
-        # Determine overall success
-        validation["success"] = (
-            len(validation["criteria_failed"]) == 0 and
-            len(validation["warnings"]) < 3 and
-            results.get("improvement", 0) > 5  # At least 5% improvement
-        )
+        for i in range(max_iterations):
+            result.iterations = i + 1
+            
+            # Calculate gradient (simplified)
+            current_score = self._evaluate_target(target, result.optimized_state)
+            
+            # Update state
+            for key in result.optimized_state:
+                if isinstance(result.optimized_state[key], (int, float)):
+                    # Numerical optimization
+                    gradient = self._calculate_gradient(target, key, result.optimized_state)
+                    result.optimized_state[key] -= learning_rate * gradient
+            
+            # Check convergence
+            new_score = self._evaluate_target(target, result.optimized_state)
+            if abs(new_score - current_score) < 0.01:
+                result.converged = True
+                break
+    
+    def _greedy_optimization(self, target: Any, result: OptimizationResult, max_iterations: int):
+        """Greedy optimization."""
+        for i in range(max_iterations):
+            result.iterations = i + 1
+            
+            best_change = None
+            best_score = self._evaluate_target(target, result.optimized_state)
+            
+            # Try each possible change
+            for key in result.optimized_state:
+                if isinstance(result.optimized_state[key], (int, float)):
+                    # Try increasing and decreasing
+                    for delta in [-0.1, 0.1]:
+                        test_state = result.optimized_state.copy()
+                        test_state[key] = result.optimized_state[key] * (1 + delta)
+                        
+                        score = self._evaluate_target(target, test_state)
+                        if score > best_score:
+                            best_score = score
+                            best_change = (key, test_state[key])
+            
+            if best_change:
+                key, value = best_change
+                result.optimized_state[key] = value
+            else:
+                result.converged = True
+                break
+    
+    def _genetic_optimization(self, target: Any, result: OptimizationResult, max_iterations: int):
+        """Genetic algorithm optimization."""
+        population_size = 10
+        mutation_rate = 0.1
         
-        # Generate summary
-        validation["summary"] = self._generate_validation_summary(validation, results)
+        # Initialize population
+        population = [result.optimized_state.copy() for _ in range(population_size)]
         
-        return validation
+        for i in range(max_iterations):
+            result.iterations = i + 1
+            
+            # Evaluate fitness
+            fitness = [self._evaluate_target(target, individual) for individual in population]
+            
+            # Select best individuals
+            sorted_pop = sorted(zip(fitness, population), key=lambda x: x[0], reverse=True)
+            population = [ind for _, ind in sorted_pop[:population_size//2]]
+            
+            # Crossover and mutation
+            import random
+            while len(population) < population_size:
+                parent1 = random.choice(population)
+                parent2 = random.choice(population)
+                
+                # Crossover
+                child = {}
+                for key in parent1:
+                    child[key] = parent1[key] if random.random() > 0.5 else parent2.get(key, parent1[key])
+                
+                # Mutation
+                if random.random() < mutation_rate:
+                    key = random.choice(list(child.keys()))
+                    if isinstance(child[key], (int, float)):
+                        child[key] *= random.uniform(0.9, 1.1)
+                
+                population.append(child)
+            
+            # Update best solution
+            best_fitness = max(fitness)
+            best_index = fitness.index(best_fitness)
+            result.optimized_state = population[best_index]
+    
+    def _simulated_annealing(self, target: Any, result: OptimizationResult, max_iterations: int):
+        """Simulated annealing optimization."""
+        import random
+        import math
+        
+        temperature = 100.0
+        cooling_rate = 0.95
+        
+        current_state = result.optimized_state.copy()
+        current_score = self._evaluate_target(target, current_state)
+        
+        for i in range(max_iterations):
+            result.iterations = i + 1
+            
+            # Generate neighbor
+            neighbor = current_state.copy()
+            key = random.choice(list(neighbor.keys()))
+            if isinstance(neighbor[key], (int, float)):
+                neighbor[key] *= random.uniform(0.9, 1.1)
+            
+            # Evaluate neighbor
+            neighbor_score = self._evaluate_target(target, neighbor)
+            
+            # Accept or reject
+            if neighbor_score > current_score:
+                current_state = neighbor
+                current_score = neighbor_score
+            else:
+                # Accept with probability
+                delta = neighbor_score - current_score
+                probability = math.exp(delta / temperature)
+                if random.random() < probability:
+                    current_state = neighbor
+                    current_score = neighbor_score
+            
+            # Cool down
+            temperature *= cooling_rate
+            
+            if temperature < 0.01:
+                result.converged = True
+                break
+        
+        result.optimized_state = current_state
+    
+    def _default_optimization(self, target: Any, result: OptimizationResult, max_iterations: int):
+        """Default optimization strategy."""
+        self._greedy_optimization(target, result, max_iterations)
     
     # Helper methods
-    def _collect_performance_metrics(self, target: str) -> Dict:
-        """Collect performance metrics for target."""
-        # Simulated - would use actual profiling tools
+    def _get_state(self, target: Any) -> Dict[str, Any]:
+        """Get current state of target."""
+        # Simplified state extraction
         return {
-            "response_time": 150,  # ms
-            "throughput": 1000,  # req/s
-            "latency_p50": 100,
-            "latency_p95": 200,
-            "latency_p99": 500
+            "performance": 70.0,
+            "memory": 1024.0,
+            "throughput": 100.0,
+            "latency": 500.0
         }
     
-    def _collect_resource_metrics(self, target: str) -> Dict:
-        """Collect resource utilization metrics."""
-        return {
-            "cpu_usage": 65,  # %
-            "memory_usage": 70,  # %
-            "disk_io": 100,  # MB/s
-            "network_io": 50  # MB/s
-        }
+    def _evaluate_target(self, target: Any, state: Dict[str, Any]) -> float:
+        """Evaluate target with given state."""
+        # Simplified evaluation
+        score = 0
+        for key, value in state.items():
+            if key == "performance":
+                score += value
+            elif key == "memory":
+                score -= value / 100
+            elif key == "throughput":
+                score += value / 10
+            elif key == "latency":
+                score -= value / 100
+        
+        return score
     
-    def _analyze_complexity(self, target: str) -> Dict:
-        """Analyze algorithmic and structural complexity."""
-        return {
-            "cyclomatic_complexity": 15,
-            "cognitive_complexity": 20,
-            "dependencies": 10,
-            "coupling": "medium"
-        }
+    def _calculate_gradient(self, target: Any, parameter: str, state: Dict[str, Any]) -> float:
+        """Calculate gradient for parameter."""
+        epsilon = 0.001
+        
+        # Numerical gradient
+        state_plus = state.copy()
+        state_plus[parameter] += epsilon
+        score_plus = self._evaluate_target(target, state_plus)
+        
+        state_minus = state.copy()
+        state_minus[parameter] -= epsilon
+        score_minus = self._evaluate_target(target, state_minus)
+        
+        return (score_plus - score_minus) / (2 * epsilon)
     
-    def _identify_bottlenecks(self, perf_metrics: Dict, resource_metrics: Dict) -> List[Dict]:
-        """Identify system bottlenecks."""
-        bottlenecks = []
+    def _calculate_improvements(self, original: Dict[str, Any], optimized: Dict[str, Any]) -> Dict[str, float]:
+        """Calculate improvements between states."""
+        improvements = {}
         
-        if perf_metrics.get("latency_p99", 0) > 400:
-            bottlenecks.append({
-                "type": "latency",
-                "severity": "high",
-                "details": "P99 latency exceeds threshold"
-            })
+        for key in original:
+            if key in optimized and isinstance(original[key], (int, float)):
+                original_val = original[key]
+                optimized_val = optimized[key]
+                
+                if original_val != 0:
+                    improvement = ((optimized_val - original_val) / original_val) * 100
+                    improvements[key] = improvement
         
-        if resource_metrics.get("cpu_usage", 0) > 80:
-            bottlenecks.append({
-                "type": "cpu",
-                "severity": "high",
-                "details": "High CPU utilization"
-            })
-        
-        return bottlenecks
+        return improvements
     
-    def _get_historical_data(self, target: str) -> Dict:
-        """Get historical performance data."""
-        # Simulated - would query time-series database
-        return {
-            "avg_response_time_7d": 140,
-            "avg_throughput_7d": 950,
-            "trend": "stable"
-        }
+    def _evaluate_parameters(self, parameters: Dict[str, Any], metric: str) -> float:
+        """Evaluate parameters for given metric."""
+        # Simplified evaluation
+        import random
+        return random.uniform(0, 100)
     
-    def _identify_performance_opportunities(self, state: Dict) -> List[Dict]:
-        """Identify performance optimization opportunities."""
-        opportunities = []
+    def _measure_metric(self, target: Any, metric: str) -> float:
+        """Measure metric for target."""
+        # Simplified measurement
+        import random
         
-        # Check for caching opportunities
-        if state.get("metrics", {}).get("performance", {}).get("response_time", 0) > 100:
-            opportunities.append({
-                "type": "caching",
-                "impact": "high",
-                "effort": "low",
-                "description": "Implement response caching"
-            })
-        
-        # Check for parallelization opportunities
-        if state.get("complexity", {}).get("dependencies", 0) < 5:
-            opportunities.append({
-                "type": "parallelization",
-                "impact": "medium",
-                "effort": "medium",
-                "description": "Parallelize independent operations"
-            })
-        
-        return opportunities
-    
-    def _identify_memory_opportunities(self, state: Dict) -> List[Dict]:
-        """Identify memory optimization opportunities."""
-        opportunities = []
-        
-        if state.get("metrics", {}).get("resources", {}).get("memory_usage", 0) > 60:
-            opportunities.append({
-                "type": "memory_pooling",
-                "impact": "medium",
-                "effort": "medium",
-                "description": "Implement memory pooling"
-            })
-        
-        return opportunities
-    
-    def _identify_architecture_opportunities(self, state: Dict) -> List[Dict]:
-        """Identify architectural optimization opportunities."""
-        return [{
-            "type": "microservices",
-            "impact": "high",
-            "effort": "high",
-            "description": "Consider microservices architecture"
-        }]
-    
-    def _identify_workflow_opportunities(self, state: Dict) -> List[Dict]:
-        """Identify workflow optimization opportunities."""
-        return [{
-            "type": "async_processing",
-            "impact": "medium",
-            "effort": "low",
-            "description": "Implement asynchronous processing"
-        }]
-    
-    def _rank_opportunities(self, opportunities: List[Dict]) -> List[Dict]:
-        """Rank opportunities by impact/effort ratio."""
-        impact_scores = {"high": 3, "medium": 2, "low": 1}
-        effort_scores = {"low": 3, "medium": 2, "high": 1}
-        
-        for opp in opportunities:
-            impact = impact_scores.get(opp.get("impact", "low"), 1)
-            effort = effort_scores.get(opp.get("effort", "high"), 1)
-            opp["score"] = impact * effort
-        
-        return sorted(opportunities, key=lambda x: x.get("score", 0), reverse=True)
-    
-    def _find_applicable_strategies(self, opportunity: Dict) -> List[OptimizationStrategy]:
-        """Find strategies applicable to opportunity."""
-        applicable = []
-        opp_type = opportunity.get("type", "")
-        
-        for strategy in self.strategy_library.values():
-            if opp_type in strategy.name.lower() or opp_type in strategy.description.lower():
-                applicable.append(strategy)
-        
-        return applicable
-    
-    def _filter_by_constraints(self, strategies: List[OptimizationStrategy], 
-                              constraints: Dict) -> List[OptimizationStrategy]:
-        """Filter strategies by constraints."""
-        filtered = []
-        max_risk = constraints.get("max_risk", "high")
-        risk_levels = {"low": 1, "medium": 2, "high": 3}
-        
-        for strategy in strategies:
-            if risk_levels.get(strategy.risk_level, 3) <= risk_levels.get(max_risk, 3):
-                filtered.append(strategy)
-        
-        return filtered
-    
-    def _select_best_strategy(self, strategies: List[OptimizationStrategy], 
-                             opportunity: Dict) -> OptimizationStrategy:
-        """Select best strategy for opportunity."""
-        # Simple selection - choose highest expected improvement
-        return max(strategies, key=lambda s: s.expected_improvement)
-    
-    def _resolve_strategy_conflicts(self, strategies: List[OptimizationStrategy]) -> List[OptimizationStrategy]:
-        """Resolve conflicts between selected strategies."""
-        # Simple conflict resolution - remove duplicates
-        seen = set()
-        unique = []
-        for strategy in strategies:
-            if strategy.name not in seen:
-                seen.add(strategy.name)
-                unique.append(strategy)
-        return unique
-    
-    def _run_benchmark(self, target: str, label: str) -> Dict:
-        """Run performance benchmark."""
-        # Simulated benchmark
-        return {
-            "label": label,
-            "timestamp": datetime.now().isoformat(),
-            "metrics": {
-                "response_time": 100 + (hash(label) % 50),
-                "throughput": 1000 + (hash(label) % 200),
-                "error_rate": 0.01
-            }
-        }
-    
-    def _calculate_improvement(self, baseline: Dict, final: Dict) -> float:
-        """Calculate percentage improvement."""
-        baseline_score = baseline["metrics"]["throughput"] / baseline["metrics"]["response_time"]
-        final_score = final["metrics"]["throughput"] / final["metrics"]["response_time"]
-        
-        if baseline_score > 0:
-            return ((final_score - baseline_score) / baseline_score) * 100
-        return 0
-    
-    def _generate_recommendations(self, results: Dict, validation: Dict) -> List[str]:
-        """Generate optimization recommendations."""
-        recommendations = []
-        
-        if validation.get("success"):
-            recommendations.append("Continue monitoring for sustained improvements")
-            if results.get("improvement", 0) > 20:
-                recommendations.append("Consider applying similar optimizations to related systems")
+        if metric == "response_time":
+            return random.uniform(100, 2000)
+        elif metric == "throughput":
+            return random.uniform(50, 500)
+        elif metric == "memory_usage":
+            return random.uniform(512, 2048)
+        elif metric == "resource_usage":
+            return random.uniform(20, 95)
         else:
-            recommendations.append("Review and adjust optimization strategies")
-            if validation.get("warnings"):
-                recommendations.append("Address warnings before next optimization cycle")
-        
-        return recommendations
+            return random.uniform(0, 100)
+    
+    def _evaluate_configuration(self, config: Dict[str, Any], metric: str) -> float:
+        """Evaluate configuration for metric."""
+        # Simplified evaluation
+        import random
+        return random.uniform(0, 100)
+    
+    def shutdown(self) -> bool:
+        """Shutdown the optimizer agent."""
+        logger.info("optimizer_agent_shutdown",
+                   profiles_count=len(self.profiles),
+                   results_count=len(self.results))
+        self.profiles.clear()
+        self.results.clear()
+        self.benchmarks.clear()
+        return True

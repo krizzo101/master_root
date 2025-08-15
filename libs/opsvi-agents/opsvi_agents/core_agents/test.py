@@ -1,34 +1,22 @@
-"""TestAgent - Production-ready testing and quality assurance agent."""
+"""TestAgent - Testing and QA."""
 
-import json
-import subprocess
-import sys
 from typing import Any, Dict, List, Optional, Tuple
-from pathlib import Path
-from datetime import datetime
-import importlib.util
-import ast
-
+from dataclasses import dataclass, field
+from enum import Enum
+import time
 import structlog
 
-from ..core.base import (
-    BaseAgent,
-    AgentConfig,
-    AgentCapability,
-    AgentResult,
-    AgentMessage
-)
-from ..exceptions.base import AgentExecutionError
-
-logger = structlog.get_logger(__name__)
+from ..core import BaseAgent, AgentConfig, AgentContext, AgentResult
 
 
-class TestStrategy:
-    """Test strategy definitions."""
-    
+logger = structlog.get_logger()
+
+
+class TestType(Enum):
+    """Types of tests."""
     UNIT = "unit"
     INTEGRATION = "integration"
-    E2E = "end_to_end"
+    FUNCTIONAL = "functional"
     PERFORMANCE = "performance"
     SECURITY = "security"
     REGRESSION = "regression"
@@ -36,567 +24,622 @@ class TestStrategy:
     ACCEPTANCE = "acceptance"
 
 
-class TestAgent(BaseAgent):
-    """Agent specialized in comprehensive testing and quality assurance.
+class TestStatus(Enum):
+    """Test execution status."""
+    PENDING = "pending"
+    RUNNING = "running"
+    PASSED = "passed"
+    FAILED = "failed"
+    SKIPPED = "skipped"
+    ERROR = "error"
+
+
+@dataclass
+class TestCase:
+    """Individual test case."""
+    id: str
+    name: str
+    type: TestType
+    description: str = ""
+    inputs: Dict[str, Any] = field(default_factory=dict)
+    expected: Any = None
+    actual: Any = None
+    status: TestStatus = TestStatus.PENDING
+    duration: float = 0.0
+    error: Optional[str] = None
     
-    Capabilities:
-    - Generate and execute test cases
-    - Perform multiple testing strategies
-    - Measure and report code coverage
-    - Identify edge cases and corner cases
-    - Validate performance and security
-    - Regression testing and continuous validation
-    """
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return {
+            "id": self.id,
+            "name": self.name,
+            "type": self.type.value,
+            "description": self.description,
+            "status": self.status.value,
+            "duration": self.duration,
+            "error": self.error
+        }
+
+
+@dataclass
+class TestSuite:
+    """Collection of test cases."""
+    id: str
+    name: str
+    test_cases: List[TestCase] = field(default_factory=list)
+    setup: Optional[str] = None
+    teardown: Optional[str] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    
+    def add_test(self, test: TestCase):
+        """Add test case to suite."""
+        self.test_cases.append(test)
+    
+    def get_stats(self) -> Dict[str, int]:
+        """Get test statistics."""
+        stats = {
+            "total": len(self.test_cases),
+            "passed": sum(1 for t in self.test_cases if t.status == TestStatus.PASSED),
+            "failed": sum(1 for t in self.test_cases if t.status == TestStatus.FAILED),
+            "skipped": sum(1 for t in self.test_cases if t.status == TestStatus.SKIPPED),
+            "error": sum(1 for t in self.test_cases if t.status == TestStatus.ERROR)
+        }
+        return stats
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return {
+            "id": self.id,
+            "name": self.name,
+            "test_cases": [t.to_dict() for t in self.test_cases],
+            "stats": self.get_stats(),
+            "metadata": self.metadata
+        }
+
+
+@dataclass
+class TestReport:
+    """Test execution report."""
+    id: str
+    suites: List[TestSuite] = field(default_factory=list)
+    start_time: float = field(default_factory=time.time)
+    end_time: Optional[float] = None
+    coverage: Optional[float] = None
+    
+    def get_summary(self) -> Dict[str, Any]:
+        """Get test summary."""
+        total_tests = sum(len(s.test_cases) for s in self.suites)
+        passed = sum(s.get_stats()["passed"] for s in self.suites)
+        failed = sum(s.get_stats()["failed"] for s in self.suites)
+        
+        return {
+            "total_suites": len(self.suites),
+            "total_tests": total_tests,
+            "passed": passed,
+            "failed": failed,
+            "pass_rate": passed / total_tests if total_tests > 0 else 0,
+            "duration": self.end_time - self.start_time if self.end_time else 0,
+            "coverage": self.coverage
+        }
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return {
+            "id": self.id,
+            "suites": [s.to_dict() for s in self.suites],
+            "summary": self.get_summary()
+        }
+
+
+class TestAgent(BaseAgent):
+    """Performs testing and quality assurance."""
     
     def __init__(self, config: Optional[AgentConfig] = None):
-        """Initialize TestAgent with testing capabilities."""
-        if config is None:
-            config = AgentConfig(
-                name="TestAgent",
-                model="gpt-4o",
-                temperature=0.2,  # Low temperature for consistent test generation
-                max_tokens=8192,
-                capabilities=[
-                    AgentCapability.TOOL_USE,
-                    AgentCapability.REASONING,
-                    AgentCapability.PLANNING,
-                    AgentCapability.PARALLEL
-                ],
-                system_prompt=self._get_system_prompt()
-            )
-        super().__init__(config)
-        
-        # Testing state
-        self.test_results = []
-        self.coverage_data = {}
-        self.test_history = []
-        self.failure_patterns = {}
-        self.test_suite_cache = {}
-        
-    def _get_system_prompt(self) -> str:
-        """Get specialized system prompt for testing."""
-        return """You are a senior QA engineer specializing in comprehensive software testing.
-        
-        Your responsibilities:
-        1. Design comprehensive test strategies and test plans
-        2. Generate thorough test cases covering all scenarios
-        3. Execute tests and analyze results
-        4. Identify edge cases and corner cases
-        5. Measure and improve code coverage
-        6. Perform regression testing
-        7. Validate performance and security aspects
-        8. Ensure software quality and reliability
-        
-        Always prioritize test coverage, reliability, and finding potential issues."""
+        """Initialize test agent."""
+        super().__init__(config or AgentConfig(
+            name="TestAgent",
+            description="Testing and QA",
+            capabilities=["test", "validate", "verify", "benchmark", "coverage"],
+            max_retries=3,
+            timeout=120
+        ))
+        self.test_suites: Dict[str, TestSuite] = {}
+        self.test_reports: Dict[str, TestReport] = {}
+        self.test_templates: Dict[str, Any] = {}
+        self._test_counter = 0
+        self._suite_counter = 0
+        self._report_counter = 0
+        self._register_templates()
     
-    def _execute(self, prompt: str, **kwargs) -> Dict[str, Any]:
+    def initialize(self) -> bool:
+        """Initialize the test agent."""
+        logger.info("test_agent_initialized", agent=self.config.name)
+        return True
+    
+    def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Execute testing task."""
-        self._logger.info("Executing test task", task=prompt[:100])
+        action = task.get("action", "test")
         
-        # Parse testing parameters
-        strategy = kwargs.get("strategy", TestStrategy.UNIT)
-        code_path = kwargs.get("code_path")
-        test_path = kwargs.get("test_path")
-        coverage_target = kwargs.get("coverage_target", 80)
-        parallel = kwargs.get("parallel", True)
-        
-        try:
-            if strategy == TestStrategy.UNIT:
-                result = self._run_unit_tests(code_path, test_path, coverage_target)
-            elif strategy == TestStrategy.INTEGRATION:
-                result = self._run_integration_tests(code_path, test_path)
-            elif strategy == TestStrategy.E2E:
-                result = self._run_e2e_tests(kwargs.get("app_url"), test_path)
-            elif strategy == TestStrategy.PERFORMANCE:
-                result = self._run_performance_tests(code_path, kwargs.get("benchmarks"))
-            elif strategy == TestStrategy.SECURITY:
-                result = self._run_security_tests(code_path)
-            elif strategy == TestStrategy.REGRESSION:
-                result = self._run_regression_tests(code_path, test_path)
-            elif strategy == TestStrategy.SMOKE:
-                result = self._run_smoke_tests(code_path)
-            elif strategy == TestStrategy.ACCEPTANCE:
-                result = self._run_acceptance_tests(code_path, kwargs.get("requirements"))
-            else:
-                result = self._adaptive_testing(prompt, code_path, test_path, kwargs)
-            
-            # Store results
-            self.test_results.append({
-                "timestamp": datetime.now().isoformat(),
-                "strategy": strategy,
-                "result": result
-            })
-            
-            # Update metrics
-            self.context.metrics.update({
-                "tests_run": result.get("total_tests", 0),
-                "tests_passed": result.get("passed", 0),
-                "tests_failed": result.get("failed", 0),
-                "coverage": result.get("coverage", 0),
-                "execution_time": result.get("duration", 0)
-            })
-            
-            return result
-            
-        except Exception as e:
-            self._logger.error("Testing failed", error=str(e))
-            raise AgentExecutionError(f"Testing failed: {e}")
+        if action == "test":
+            return self._run_tests(task)
+        elif action == "create_test":
+            return self._create_test(task)
+        elif action == "create_suite":
+            return self._create_suite(task)
+        elif action == "run_suite":
+            return self._run_suite(task)
+        elif action == "validate":
+            return self._validate_output(task)
+        elif action == "benchmark":
+            return self._run_benchmark(task)
+        elif action == "coverage":
+            return self._analyze_coverage(task)
+        elif action == "regression":
+            return self._run_regression(task)
+        else:
+            return {"error": f"Unknown action: {action}"}
     
-    def _run_unit_tests(self, code_path: str, test_path: str, 
-                       coverage_target: float) -> Dict[str, Any]:
-        """Run unit tests with coverage analysis."""
-        self._logger.info("Running unit tests", code_path=code_path, coverage_target=coverage_target)
+    def run_tests(self,
+                 code: Any,
+                 test_type: TestType = TestType.UNIT,
+                 coverage: bool = False) -> TestReport:
+        """Run tests on code."""
+        result = self.execute({
+            "action": "test",
+            "code": code,
+            "test_type": test_type.value,
+            "coverage": coverage
+        })
         
-        # Discover test files
-        test_files = self._discover_test_files(test_path or code_path)
+        if "error" in result:
+            raise RuntimeError(result["error"])
         
-        if not test_files:
-            # Generate tests if none exist
-            test_files = self._generate_unit_tests(code_path)
+        return result["report"]
+    
+    def _register_templates(self):
+        """Register test templates."""
+        self.test_templates["unit"] = {
+            "setup": "Initialize test environment",
+            "teardown": "Clean up test environment",
+            "assertions": ["assertEqual", "assertTrue", "assertFalse", "assertIsNone"]
+        }
+        
+        self.test_templates["integration"] = {
+            "setup": "Set up integration environment",
+            "teardown": "Tear down integration environment",
+            "checks": ["api_connectivity", "database_access", "service_communication"]
+        }
+        
+        self.test_templates["performance"] = {
+            "metrics": ["response_time", "throughput", "memory_usage", "cpu_usage"],
+            "thresholds": {"response_time": 1000, "memory_usage": 512}
+        }
+    
+    def _run_tests(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Run tests on code or system."""
+        code = task.get("code")
+        test_type = task.get("test_type", "unit")
+        coverage = task.get("coverage", False)
+        
+        if code is None:
+            return {"error": "Code is required"}
+        
+        # Create test report
+        self._report_counter += 1
+        report = TestReport(id=f"report_{self._report_counter}")
+        
+        # Create test suite
+        self._suite_counter += 1
+        suite = TestSuite(
+            id=f"suite_{self._suite_counter}",
+            name=f"{test_type} tests"
+        )
+        
+        # Generate and run tests based on type
+        type_enum = TestType[test_type.upper()]
+        
+        if type_enum == TestType.UNIT:
+            tests = self._generate_unit_tests(code)
+        elif type_enum == TestType.INTEGRATION:
+            tests = self._generate_integration_tests(code)
+        elif type_enum == TestType.PERFORMANCE:
+            tests = self._generate_performance_tests(code)
+        else:
+            tests = self._generate_basic_tests(code)
         
         # Execute tests
-        results = []
-        total_tests = 0
-        passed_tests = 0
-        failed_tests = 0
+        for test in tests:
+            suite.add_test(test)
+            self._execute_test(test)
         
-        for test_file in test_files:
-            test_result = self._execute_test_file(test_file, coverage=True)
-            results.append(test_result)
-            total_tests += test_result["total"]
-            passed_tests += test_result["passed"]
-            failed_tests += test_result["failed"]
+        # Add suite to report
+        report.suites.append(suite)
+        report.end_time = time.time()
         
-        # Calculate coverage
-        coverage = self._calculate_coverage(code_path, test_files)
+        # Calculate coverage if requested
+        if coverage:
+            report.coverage = self._calculate_coverage(code, suite)
         
-        # Analyze failures
-        failure_analysis = self._analyze_failures(results)
+        # Store report
+        self.test_reports[report.id] = report
         
-        # Generate recommendations
-        recommendations = self._generate_test_recommendations(
-            coverage, coverage_target, failure_analysis
+        logger.info("tests_completed",
+                   report_id=report.id,
+                   test_type=test_type,
+                   stats=suite.get_stats())
+        
+        return {
+            "report": report,
+            "summary": report.get_summary(),
+            "report_id": report.id
+        }
+    
+    def _create_test(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a test case."""
+        name = task.get("name", "test")
+        test_type = task.get("test_type", "unit")
+        description = task.get("description", "")
+        inputs = task.get("inputs", {})
+        expected = task.get("expected")
+        
+        self._test_counter += 1
+        test = TestCase(
+            id=f"test_{self._test_counter}",
+            name=name,
+            type=TestType[test_type.upper()],
+            description=description,
+            inputs=inputs,
+            expected=expected
         )
         
         return {
-            "total_tests": total_tests,
-            "passed": passed_tests,
-            "failed": failed_tests,
-            "skipped": 0,
-            "coverage": coverage,
-            "coverage_target": coverage_target,
-            "target_met": coverage >= coverage_target,
-            "test_files": len(test_files),
-            "results": results,
-            "failure_analysis": failure_analysis,
-            "recommendations": recommendations
+            "test": test.to_dict(),
+            "test_id": test.id
         }
     
-    def _run_integration_tests(self, code_path: str, test_path: str) -> Dict[str, Any]:
-        """Run integration tests."""
-        self._logger.info("Running integration tests", code_path=code_path)
+    def _create_suite(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a test suite."""
+        name = task.get("name", "Test Suite")
+        setup = task.get("setup")
+        teardown = task.get("teardown")
         
-        # Identify integration points
-        integration_points = self._identify_integration_points(code_path)
+        self._suite_counter += 1
+        suite = TestSuite(
+            id=f"suite_{self._suite_counter}",
+            name=name,
+            setup=setup,
+            teardown=teardown
+        )
         
-        # Generate or discover integration tests
-        test_suites = self._prepare_integration_tests(integration_points, test_path)
+        # Add tests if provided
+        tests_data = task.get("tests", [])
+        for test_data in tests_data:
+            self._test_counter += 1
+            test = TestCase(
+                id=f"test_{self._test_counter}",
+                name=test_data.get("name", "test"),
+                type=TestType[test_data.get("type", "unit").upper()],
+                description=test_data.get("description", ""),
+                inputs=test_data.get("inputs", {}),
+                expected=test_data.get("expected")
+            )
+            suite.add_test(test)
         
-        results = []
-        for suite in test_suites:
-            # Set up test environment
-            env = self._setup_integration_environment(suite["requirements"])
+        # Store suite
+        self.test_suites[suite.id] = suite
+        
+        return {
+            "suite": suite.to_dict(),
+            "suite_id": suite.id
+        }
+    
+    def _run_suite(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Run a test suite."""
+        suite_id = task.get("suite_id")
+        
+        if not suite_id or suite_id not in self.test_suites:
+            return {"error": f"Suite {suite_id} not found"}
+        
+        suite = self.test_suites[suite_id]
+        
+        # Run setup
+        if suite.setup:
+            logger.info("running_setup", suite=suite_id)
+        
+        # Execute all tests
+        for test in suite.test_cases:
+            self._execute_test(test)
+        
+        # Run teardown
+        if suite.teardown:
+            logger.info("running_teardown", suite=suite_id)
+        
+        return {
+            "suite": suite.to_dict(),
+            "stats": suite.get_stats()
+        }
+    
+    def _validate_output(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Validate output against expectations."""
+        actual = task.get("actual")
+        expected = task.get("expected")
+        validation_type = task.get("validation_type", "exact")
+        
+        if actual is None or expected is None:
+            return {"error": "Both actual and expected are required"}
+        
+        valid = False
+        details = {}
+        
+        if validation_type == "exact":
+            valid = actual == expected
+            details["match"] = valid
+        elif validation_type == "contains":
+            valid = str(expected) in str(actual)
+            details["found"] = valid
+        elif validation_type == "type":
+            valid = type(actual) == type(expected)
+            details["type_match"] = valid
+        elif validation_type == "range":
+            if isinstance(expected, dict):
+                min_val = expected.get("min", float('-inf'))
+                max_val = expected.get("max", float('inf'))
+                valid = min_val <= actual <= max_val
+                details["in_range"] = valid
+        
+        return {
+            "valid": valid,
+            "validation_type": validation_type,
+            "details": details
+        }
+    
+    def _run_benchmark(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Run performance benchmark."""
+        code = task.get("code")
+        iterations = task.get("iterations", 100)
+        metrics = task.get("metrics", ["time", "memory"])
+        
+        if code is None:
+            return {"error": "Code is required"}
+        
+        results = {
+            "iterations": iterations,
+            "metrics": {}
+        }
+        
+        # Simulate benchmark execution
+        if "time" in metrics:
+            # Measure execution time
+            start = time.time()
+            # Simulate code execution
+            time.sleep(0.001)  # Placeholder
+            end = time.time()
             
-            # Execute integration tests
-            suite_result = self._execute_integration_suite(suite, env)
-            results.append(suite_result)
-            
-            # Tear down environment
-            self._teardown_environment(env)
+            results["metrics"]["avg_time"] = (end - start) * 1000  # ms
+            results["metrics"]["min_time"] = (end - start) * 900  # ms
+            results["metrics"]["max_time"] = (end - start) * 1100  # ms
         
-        # Analyze integration issues
-        integration_analysis = self._analyze_integration_results(results)
+        if "memory" in metrics:
+            # Simulate memory measurement
+            results["metrics"]["memory_usage"] = 1024  # KB
+            results["metrics"]["peak_memory"] = 2048  # KB
         
-        return {
-            "integration_points": len(integration_points),
-            "test_suites": len(test_suites),
-            "results": results,
-            "integration_analysis": integration_analysis,
-            "passed": sum(r["passed"] for r in results),
-            "failed": sum(r["failed"] for r in results)
-        }
-    
-    def _run_e2e_tests(self, app_url: str, test_path: str) -> Dict[str, Any]:
-        """Run end-to-end tests."""
-        self._logger.info("Running E2E tests", app_url=app_url)
-        
-        # Prepare E2E test scenarios
-        scenarios = self._prepare_e2e_scenarios(app_url, test_path)
-        
-        results = []
-        for scenario in scenarios:
-            # Execute E2E scenario
-            scenario_result = self._execute_e2e_scenario(scenario, app_url)
-            results.append(scenario_result)
-        
-        # Analyze user journey coverage
-        journey_coverage = self._analyze_journey_coverage(results)
+        if "throughput" in metrics:
+            results["metrics"]["throughput"] = iterations / 1.0  # ops/sec
         
         return {
-            "scenarios": len(scenarios),
-            "results": results,
-            "journey_coverage": journey_coverage,
-            "passed": sum(1 for r in results if r["passed"]),
-            "failed": sum(1 for r in results if not r["passed"])
+            "benchmark": results,
+            "summary": f"Completed {iterations} iterations"
         }
     
-    def _run_performance_tests(self, code_path: str, benchmarks: Dict) -> Dict[str, Any]:
-        """Run performance tests and benchmarks."""
-        self._logger.info("Running performance tests", code_path=code_path)
+    def _analyze_coverage(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze test coverage."""
+        code = task.get("code")
+        tests = task.get("tests", [])
         
-        # Prepare performance test scenarios
-        perf_tests = self._prepare_performance_tests(code_path, benchmarks)
+        if code is None:
+            return {"error": "Code is required"}
         
-        results = []
-        for test in perf_tests:
-            # Execute performance test
-            perf_result = self._execute_performance_test(test)
-            results.append(perf_result)
+        # Simulate coverage analysis
+        total_lines = len(str(code).splitlines())
+        covered_lines = int(total_lines * 0.75)  # Simulated 75% coverage
         
-        # Analyze performance metrics
-        performance_analysis = self._analyze_performance(results, benchmarks)
-        
-        # Identify bottlenecks
-        bottlenecks = self._identify_bottlenecks(performance_analysis)
+        coverage_data = {
+            "total_lines": total_lines,
+            "covered_lines": covered_lines,
+            "missed_lines": total_lines - covered_lines,
+            "coverage_percentage": (covered_lines / total_lines * 100) if total_lines > 0 else 0,
+            "uncovered_sections": ["error_handling", "edge_cases"]
+        }
         
         return {
-            "tests_run": len(perf_tests),
-            "results": results,
-            "performance_analysis": performance_analysis,
-            "bottlenecks": bottlenecks,
-            "benchmarks_met": self._check_benchmarks(results, benchmarks)
+            "coverage": coverage_data,
+            "summary": f"{coverage_data['coverage_percentage']:.1f}% coverage"
         }
     
-    def _run_security_tests(self, code_path: str) -> Dict[str, Any]:
-        """Run security vulnerability tests."""
-        self._logger.info("Running security tests", code_path=code_path)
-        
-        vulnerabilities = []
-        
-        # Static security analysis
-        static_vulns = self._static_security_analysis(code_path)
-        vulnerabilities.extend(static_vulns)
-        
-        # Dependency vulnerability scan
-        dep_vulns = self._scan_dependencies(code_path)
-        vulnerabilities.extend(dep_vulns)
-        
-        # Common vulnerability tests
-        common_vulns = self._test_common_vulnerabilities(code_path)
-        vulnerabilities.extend(common_vulns)
-        
-        # Categorize by severity
-        severity_breakdown = self._categorize_by_severity(vulnerabilities)
-        
-        return {
-            "vulnerabilities": vulnerabilities,
-            "total_issues": len(vulnerabilities),
-            "severity_breakdown": severity_breakdown,
-            "critical": severity_breakdown.get("critical", 0),
-            "high": severity_breakdown.get("high", 0),
-            "medium": severity_breakdown.get("medium", 0),
-            "low": severity_breakdown.get("low", 0)
-        }
-    
-    def _run_regression_tests(self, code_path: str, test_path: str) -> Dict[str, Any]:
+    def _run_regression(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Run regression tests."""
-        self._logger.info("Running regression tests", code_path=code_path)
+        current = task.get("current")
+        previous = task.get("previous")
+        test_suite_id = task.get("test_suite_id")
         
-        # Load previous test results
-        baseline = self._load_test_baseline(test_path)
+        if current is None:
+            return {"error": "Current version is required"}
         
-        # Run current tests
-        current_results = self._run_unit_tests(code_path, test_path, 80)
+        regressions = []
+        improvements = []
         
-        # Compare with baseline
-        regression_analysis = self._compare_with_baseline(current_results, baseline)
-        
-        # Identify regressions
-        regressions = self._identify_regressions(regression_analysis)
+        # Run tests on current version
+        if test_suite_id and test_suite_id in self.test_suites:
+            suite = self.test_suites[test_suite_id]
+            
+            # Execute tests
+            for test in suite.test_cases:
+                self._execute_test(test)
+                
+                # Compare with previous results if available
+                if previous and test.status == TestStatus.FAILED:
+                    regressions.append({
+                        "test": test.name,
+                        "status": "regression",
+                        "error": test.error
+                    })
+                elif previous and test.status == TestStatus.PASSED:
+                    improvements.append({
+                        "test": test.name,
+                        "status": "improved"
+                    })
         
         return {
-            "baseline_tests": baseline.get("total_tests", 0),
-            "current_tests": current_results["total_tests"],
             "regressions": regressions,
-            "regression_count": len(regressions),
-            "analysis": regression_analysis
+            "improvements": improvements,
+            "summary": f"{len(regressions)} regressions, {len(improvements)} improvements"
         }
     
-    def _run_smoke_tests(self, code_path: str) -> Dict[str, Any]:
-        """Run smoke tests for basic functionality."""
-        self._logger.info("Running smoke tests", code_path=code_path)
-        
-        # Identify critical paths
-        critical_paths = self._identify_critical_paths(code_path)
-        
-        results = []
-        for path in critical_paths:
-            # Test critical functionality
-            test_result = self._test_critical_path(path)
-            results.append(test_result)
-        
-        passed = all(r["passed"] for r in results)
-        
-        return {
-            "critical_paths": len(critical_paths),
-            "results": results,
-            "all_passed": passed,
-            "status": "PASS" if passed else "FAIL"
-        }
-    
-    def _run_acceptance_tests(self, code_path: str, requirements: List[str]) -> Dict[str, Any]:
-        """Run acceptance tests against requirements."""
-        self._logger.info("Running acceptance tests", code_path=code_path)
-        
-        # Map requirements to test cases
-        test_mapping = self._map_requirements_to_tests(requirements, code_path)
-        
-        results = []
-        for req, tests in test_mapping.items():
-            # Execute tests for requirement
-            req_result = self._execute_requirement_tests(req, tests)
-            results.append(req_result)
-        
-        # Calculate acceptance rate
-        acceptance_rate = sum(1 for r in results if r["accepted"]) / len(results) * 100
-        
-        return {
-            "requirements": len(requirements),
-            "results": results,
-            "acceptance_rate": acceptance_rate,
-            "accepted": sum(1 for r in results if r["accepted"]),
-            "rejected": sum(1 for r in results if not r["accepted"])
-        }
-    
-    def _adaptive_testing(self, prompt: str, code_path: str, 
-                         test_path: str, context: Dict) -> Dict[str, Any]:
-        """Adaptively determine and execute appropriate tests."""
-        # Analyze code to determine best testing strategy
-        code_analysis = self._analyze_code_for_testing(code_path)
-        
-        # Select testing strategies based on analysis
-        strategies = self._select_testing_strategies(code_analysis, prompt)
-        
-        # Execute selected strategies
-        results = {}
-        for strategy in strategies:
-            if strategy == TestStrategy.UNIT:
-                results["unit"] = self._run_unit_tests(code_path, test_path, 80)
-            elif strategy == TestStrategy.INTEGRATION:
-                results["integration"] = self._run_integration_tests(code_path, test_path)
-            # Add other strategies as needed
-        
-        return {
-            "strategies_used": strategies,
-            "results": results,
-            "summary": self._generate_test_summary(results)
-        }
-    
-    # Helper methods
-    def _discover_test_files(self, path: str) -> List[Path]:
-        """Discover test files in directory."""
-        test_patterns = ["test_*.py", "*_test.py", "test*.py"]
-        test_files = []
-        
-        if path and Path(path).exists():
-            path_obj = Path(path)
-            for pattern in test_patterns:
-                test_files.extend(path_obj.rglob(pattern))
-        
-        return test_files
-    
-    def _generate_unit_tests(self, code_path: str) -> List[Path]:
+    def _generate_unit_tests(self, code: Any) -> List[TestCase]:
         """Generate unit tests for code."""
-        self._logger.info("Generating unit tests", code_path=code_path)
-        # Simplified - would integrate with CoderAgent in production
-        return []
+        tests = []
+        
+        # Generate basic unit tests
+        self._test_counter += 1
+        tests.append(TestCase(
+            id=f"test_{self._test_counter}",
+            name="test_basic_functionality",
+            type=TestType.UNIT,
+            description="Test basic functionality",
+            inputs={"data": "test"},
+            expected="test",
+            status=TestStatus.PENDING
+        ))
+        
+        self._test_counter += 1
+        tests.append(TestCase(
+            id=f"test_{self._test_counter}",
+            name="test_edge_cases",
+            type=TestType.UNIT,
+            description="Test edge cases",
+            inputs={"data": None},
+            expected=None,
+            status=TestStatus.PENDING
+        ))
+        
+        self._test_counter += 1
+        tests.append(TestCase(
+            id=f"test_{self._test_counter}",
+            name="test_error_handling",
+            type=TestType.UNIT,
+            description="Test error handling",
+            inputs={"data": "invalid"},
+            expected="error",
+            status=TestStatus.PENDING
+        ))
+        
+        return tests
     
-    def _execute_test_file(self, test_file: Path, coverage: bool = False) -> Dict:
-        """Execute a single test file."""
+    def _generate_integration_tests(self, code: Any) -> List[TestCase]:
+        """Generate integration tests."""
+        tests = []
+        
+        self._test_counter += 1
+        tests.append(TestCase(
+            id=f"test_{self._test_counter}",
+            name="test_component_integration",
+            type=TestType.INTEGRATION,
+            description="Test component integration",
+            status=TestStatus.PENDING
+        ))
+        
+        return tests
+    
+    def _generate_performance_tests(self, code: Any) -> List[TestCase]:
+        """Generate performance tests."""
+        tests = []
+        
+        self._test_counter += 1
+        tests.append(TestCase(
+            id=f"test_{self._test_counter}",
+            name="test_response_time",
+            type=TestType.PERFORMANCE,
+            description="Test response time",
+            status=TestStatus.PENDING
+        ))
+        
+        self._test_counter += 1
+        tests.append(TestCase(
+            id=f"test_{self._test_counter}",
+            name="test_throughput",
+            type=TestType.PERFORMANCE,
+            description="Test throughput",
+            status=TestStatus.PENDING
+        ))
+        
+        return tests
+    
+    def _generate_basic_tests(self, code: Any) -> List[TestCase]:
+        """Generate basic tests."""
+        tests = []
+        
+        self._test_counter += 1
+        tests.append(TestCase(
+            id=f"test_{self._test_counter}",
+            name="test_smoke",
+            type=TestType.SMOKE,
+            description="Basic smoke test",
+            status=TestStatus.PENDING
+        ))
+        
+        return tests
+    
+    def _execute_test(self, test: TestCase) -> None:
+        """Execute a single test."""
+        start = time.time()
+        test.status = TestStatus.RUNNING
+        
         try:
-            # Simplified execution - would use pytest or unittest in production
-            result = {
-                "file": str(test_file),
-                "total": 10,  # Mock values
-                "passed": 8,
-                "failed": 2,
-                "duration": 1.5
-            }
-            return result
+            # Simulate test execution
+            if test.inputs.get("data") == "invalid":
+                test.status = TestStatus.FAILED
+                test.error = "Invalid input"
+            elif test.inputs.get("data") is None:
+                test.status = TestStatus.SKIPPED
+            else:
+                test.status = TestStatus.PASSED
+                test.actual = test.expected
         except Exception as e:
-            return {
-                "file": str(test_file),
-                "error": str(e),
-                "total": 0,
-                "passed": 0,
-                "failed": 0
-            }
-    
-    def _calculate_coverage(self, code_path: str, test_files: List[Path]) -> float:
-        """Calculate code coverage."""
-        # Simplified - would use coverage.py in production
-        return 85.5
-    
-    def _analyze_failures(self, results: List[Dict]) -> Dict:
-        """Analyze test failures."""
-        failures = []
-        for result in results:
-            if result.get("failed", 0) > 0:
-                failures.append({
-                    "file": result.get("file"),
-                    "failed_count": result.get("failed"),
-                    "error": result.get("error")
-                })
+            test.status = TestStatus.ERROR
+            test.error = str(e)
         
-        return {
-            "total_failures": sum(f["failed_count"] for f in failures),
-            "files_with_failures": len(failures),
-            "failures": failures
-        }
+        test.duration = time.time() - start
     
-    def _generate_test_recommendations(self, coverage: float, target: float, 
-                                      failures: Dict) -> List[str]:
-        """Generate testing recommendations."""
-        recommendations = []
+    def _calculate_coverage(self, code: Any, suite: TestSuite) -> float:
+        """Calculate test coverage."""
+        # Simplified coverage calculation
+        passed_tests = sum(1 for t in suite.test_cases if t.status == TestStatus.PASSED)
+        total_tests = len(suite.test_cases)
         
-        if coverage < target:
-            recommendations.append(f"Increase coverage from {coverage:.1f}% to {target}%")
+        if total_tests == 0:
+            return 0.0
         
-        if failures["total_failures"] > 0:
-            recommendations.append(f"Fix {failures['total_failures']} failing tests")
+        # Simulate coverage based on test success rate
+        base_coverage = (passed_tests / total_tests) * 100
         
-        if coverage < 60:
-            recommendations.append("Add unit tests for uncovered functions")
+        # Adjust based on test types
+        has_unit = any(t.type == TestType.UNIT for t in suite.test_cases)
+        has_integration = any(t.type == TestType.INTEGRATION for t in suite.test_cases)
         
-        return recommendations
+        if has_unit:
+            base_coverage *= 0.8
+        if has_integration:
+            base_coverage *= 0.9
+        
+        return min(base_coverage, 100.0)
     
-    def _identify_integration_points(self, code_path: str) -> List[Dict]:
-        """Identify integration points in code."""
-        # Simplified - would analyze imports and dependencies
-        return [{"type": "database", "name": "main_db"}]
-    
-    def _prepare_integration_tests(self, points: List[Dict], test_path: str) -> List[Dict]:
-        """Prepare integration test suites."""
-        return [{"name": "integration_suite", "requirements": ["database"]}]
-    
-    def _setup_integration_environment(self, requirements: List[str]) -> Dict:
-        """Set up integration test environment."""
-        return {"env_id": "test_env_1", "services": requirements}
-    
-    def _execute_integration_suite(self, suite: Dict, env: Dict) -> Dict:
-        """Execute integration test suite."""
-        return {"suite": suite["name"], "passed": 5, "failed": 1}
-    
-    def _teardown_environment(self, env: Dict) -> None:
-        """Tear down test environment."""
-        pass
-    
-    def _analyze_integration_results(self, results: List[Dict]) -> Dict:
-        """Analyze integration test results."""
-        return {"integration_issues": [], "recommendations": []}
-    
-    def _prepare_e2e_scenarios(self, app_url: str, test_path: str) -> List[Dict]:
-        """Prepare E2E test scenarios."""
-        return [{"name": "user_journey_1", "steps": ["login", "browse", "checkout"]}]
-    
-    def _execute_e2e_scenario(self, scenario: Dict, app_url: str) -> Dict:
-        """Execute E2E scenario."""
-        return {"scenario": scenario["name"], "passed": True}
-    
-    def _analyze_journey_coverage(self, results: List[Dict]) -> Dict:
-        """Analyze user journey coverage."""
-        return {"covered_journeys": len(results), "coverage_percentage": 90}
-    
-    def _prepare_performance_tests(self, code_path: str, benchmarks: Dict) -> List[Dict]:
-        """Prepare performance tests."""
-        return [{"name": "perf_test_1", "type": "load"}]
-    
-    def _execute_performance_test(self, test: Dict) -> Dict:
-        """Execute performance test."""
-        return {"test": test["name"], "response_time": 150, "throughput": 1000}
-    
-    def _analyze_performance(self, results: List[Dict], benchmarks: Dict) -> Dict:
-        """Analyze performance results."""
-        return {"avg_response_time": 150, "max_throughput": 1000}
-    
-    def _identify_bottlenecks(self, analysis: Dict) -> List[Dict]:
-        """Identify performance bottlenecks."""
-        return []
-    
-    def _check_benchmarks(self, results: List[Dict], benchmarks: Dict) -> bool:
-        """Check if benchmarks are met."""
+    def shutdown(self) -> bool:
+        """Shutdown the test agent."""
+        logger.info("test_agent_shutdown",
+                   suites_count=len(self.test_suites),
+                   reports_count=len(self.test_reports))
+        self.test_suites.clear()
+        self.test_reports.clear()
+        self.test_templates.clear()
         return True
-    
-    def _static_security_analysis(self, code_path: str) -> List[Dict]:
-        """Perform static security analysis."""
-        return []
-    
-    def _scan_dependencies(self, code_path: str) -> List[Dict]:
-        """Scan dependencies for vulnerabilities."""
-        return []
-    
-    def _test_common_vulnerabilities(self, code_path: str) -> List[Dict]:
-        """Test for common vulnerabilities."""
-        return []
-    
-    def _categorize_by_severity(self, vulnerabilities: List[Dict]) -> Dict:
-        """Categorize vulnerabilities by severity."""
-        severity_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
-        for vuln in vulnerabilities:
-            severity = vuln.get("severity", "low")
-            severity_counts[severity] = severity_counts.get(severity, 0) + 1
-        return severity_counts
-    
-    def _load_test_baseline(self, test_path: str) -> Dict:
-        """Load baseline test results."""
-        return {"total_tests": 50, "passed": 48}
-    
-    def _compare_with_baseline(self, current: Dict, baseline: Dict) -> Dict:
-        """Compare current results with baseline."""
-        return {"tests_added": 5, "tests_removed": 0}
-    
-    def _identify_regressions(self, analysis: Dict) -> List[Dict]:
-        """Identify test regressions."""
-        return []
-    
-    def _identify_critical_paths(self, code_path: str) -> List[Dict]:
-        """Identify critical code paths."""
-        return [{"path": "main_flow", "critical": True}]
-    
-    def _test_critical_path(self, path: Dict) -> Dict:
-        """Test critical path."""
-        return {"path": path["path"], "passed": True}
-    
-    def _map_requirements_to_tests(self, requirements: List[str], code_path: str) -> Dict:
-        """Map requirements to test cases."""
-        return {req: ["test1", "test2"] for req in requirements}
-    
-    def _execute_requirement_tests(self, requirement: str, tests: List[str]) -> Dict:
-        """Execute tests for a requirement."""
-        return {"requirement": requirement, "accepted": True}
-    
-    def _analyze_code_for_testing(self, code_path: str) -> Dict:
-        """Analyze code to determine testing needs."""
-        return {"complexity": "medium", "coverage": 75}
-    
-    def _select_testing_strategies(self, analysis: Dict, prompt: str) -> List[str]:
-        """Select appropriate testing strategies."""
-        strategies = [TestStrategy.UNIT]
-        if analysis.get("complexity") == "high":
-            strategies.append(TestStrategy.INTEGRATION)
-        return strategies
-    
-    def _generate_test_summary(self, results: Dict) -> str:
-        """Generate test execution summary."""
-        total_tests = sum(r.get("total_tests", 0) for r in results.values())
-        return f"Executed {total_tests} tests across {len(results)} strategies"

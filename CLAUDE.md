@@ -1,5 +1,43 @@
 # PROJECT DIRECTIVES
 
+## OUTPUT MANAGEMENT & TOKEN LIMITS (CRITICAL - PREVENTS SESSION CORRUPTION)
+
+### CHUNKED OUTPUT STRATEGY (MANDATORY)
+**NEVER generate more than 500 lines of code/text in a single response**
+- Break large updates into multiple smaller edits
+- Use MultiEdit for multiple file changes
+- Write to files instead of outputting large content
+- Summarize rather than show full content when possible
+
+### TOKEN LIMIT AWARENESS
+**Current limits for Opus 4.1:**
+- Maximum output: 32,000 tokens (~24,000 words)
+- Safe target: 20,000 tokens per response
+- If approaching limit: STOP and continue in next response
+
+### PREVENTING SESSION CORRUPTION
+1. **NEVER attempt operations that might exceed token limits**
+2. **SPLIT large tasks**: "Update 50 files" → "Update 10 files at a time"
+3. **USE FILE OPERATIONS**: Write large outputs to files, don't display them
+4. **FREQUENT COMMITS**: Commit after each logical chunk of work
+5. **WARN when output will be large**: "This will generate ~X lines, shall I write to file?"
+
+### SAFE OUTPUT PATTERNS
+```python
+# WRONG - May exceed token limit
+print(entire_file_content)  # 5000 lines
+
+# CORRECT - Chunked approach
+# Write to file
+with open('output.txt', 'w') as f:
+    f.write(entire_file_content)
+print("Wrote 5000 lines to output.txt")
+
+# CORRECT - Show excerpt
+print(f"First 50 lines of {len(lines)} total:")
+print('\n'.join(lines[:50]))
+```
+
 ## PROJECT ORGANIZATION & CHAOS PREVENTION (ZERO TOLERANCE)
 
 ### FILE CREATION DECISION TREE (MANDATORY - CHECK BEFORE EVERY FILE OPERATION)

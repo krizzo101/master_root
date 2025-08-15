@@ -1,595 +1,598 @@
-"""OrchestratorAgent - Production-ready workflow orchestration and coordination agent."""
+"""OrchestratorAgent - Multi-agent coordination."""
 
-import json
-import asyncio
-from typing import Any, Dict, List, Optional, Tuple, Union
-from datetime import datetime
-from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
+import time
 import uuid
-
+from concurrent.futures import ThreadPoolExecutor, Future
 import structlog
 
-from ..core.base import (
-    BaseAgent,
-    AgentConfig,
-    AgentCapability,
-    AgentResult,
-    AgentState,
-    AgentContext
-)
-from ..exceptions.base import AgentExecutionError
-
-logger = structlog.get_logger(__name__)
+from ..core import BaseAgent, AgentConfig, AgentContext, AgentResult
 
 
-class WorkflowState(Enum):
-    """Workflow execution states."""
-    PENDING = "pending"
-    RUNNING = "running"
-    PAUSED = "paused"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
+logger = structlog.get_logger()
 
 
-class TaskPriority(Enum):
-    """Task priority levels."""
-    CRITICAL = 1
-    HIGH = 2
-    MEDIUM = 3
-    LOW = 4
-    BACKGROUND = 5
+class CoordinationStrategy(Enum):
+    """Agent coordination strategies."""
+    SEQUENTIAL = "sequential"
+    PARALLEL = "parallel"
+    PIPELINE = "pipeline"
+    HIERARCHICAL = "hierarchical"
+    CONSENSUS = "consensus"
+    ROUND_ROBIN = "round_robin"
+
+
+class AgentRole(Enum):
+    """Roles in orchestration."""
+    LEADER = "leader"
+    WORKER = "worker"
+    VALIDATOR = "validator"
+    AGGREGATOR = "aggregator"
+    MONITOR = "monitor"
 
 
 @dataclass
-class WorkflowTask:
-    """Individual task in a workflow."""
-    id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    name: str = ""
-    agent_type: str = ""
-    prompt: str = ""
+class AgentTask:
+    """Task assigned to an agent."""
+    id: str
+    agent_id: str
+    task: Dict[str, Any]
+    priority: int = 0
     dependencies: List[str] = field(default_factory=list)
-    priority: TaskPriority = TaskPriority.MEDIUM
-    context: Dict[str, Any] = field(default_factory=dict)
+    status: str = "pending"
     result: Optional[Any] = None
-    state: WorkflowState = WorkflowState.PENDING
     error: Optional[str] = None
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
-    retry_count: int = 0
-    max_retries: int = 3
+    start_time: Optional[float] = None
+    end_time: Optional[float] = None
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return {
+            "id": self.id,
+            "agent_id": self.agent_id,
+            "task": self.task,
+            "priority": self.priority,
+            "dependencies": self.dependencies,
+            "status": self.status,
+            "error": self.error,
+            "duration": self.end_time - self.start_time if self.end_time and self.start_time else None
+        }
 
 
 @dataclass
 class Workflow:
-    """Workflow definition and state."""
-    id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    name: str = ""
-    tasks: List[WorkflowTask] = field(default_factory=list)
-    state: WorkflowState = WorkflowState.PENDING
-    context: Dict[str, Any] = field(default_factory=dict)
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
-    parallelism: int = 4
-    timeout: int = 3600
-    error_strategy: str = "fail_fast"  # fail_fast, continue, retry
+    """Orchestrated workflow."""
+    id: str
+    name: str
+    strategy: CoordinationStrategy
+    tasks: List[AgentTask] = field(default_factory=list)
+    agents: Dict[str, AgentRole] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    status: str = "pending"
+    start_time: Optional[float] = None
+    end_time: Optional[float] = None
+    
+    def add_task(self, task: AgentTask):
+        """Add task to workflow."""
+        self.tasks.append(task)
+    
+    def get_ready_tasks(self) -> List[AgentTask]:
+        """Get tasks ready for execution."""
+        ready = []
+        completed_ids = {t.id for t in self.tasks if t.status == "completed"}
+        
+        for task in self.tasks:
+            if task.status == "pending":
+                if all(dep in completed_ids for dep in task.dependencies):
+                    ready.append(task)
+        
+        return ready
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return {
+            "id": self.id,
+            "name": self.name,
+            "strategy": self.strategy.value,
+            "tasks": [t.to_dict() for t in self.tasks],
+            "agents": {k: v.value for k, v in self.agents.items()},
+            "status": self.status,
+            "duration": self.end_time - self.start_time if self.end_time and self.start_time else None
+        }
+
+
+@dataclass
+class OrchestrationResult:
+    """Result of orchestration."""
+    workflow_id: str
+    success: bool
+    results: Dict[str, Any] = field(default_factory=dict)
+    errors: List[str] = field(default_factory=list)
+    metrics: Dict[str, Any] = field(default_factory=dict)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return {
+            "workflow_id": self.workflow_id,
+            "success": self.success,
+            "results": self.results,
+            "errors": self.errors,
+            "metrics": self.metrics
+        }
 
 
 class OrchestratorAgent(BaseAgent):
-    """Agent specialized in orchestrating complex multi-agent workflows.
-    
-    Capabilities:
-    - Design and execute complex workflows
-    - Coordinate multiple agents in parallel
-    - Manage dependencies and task sequencing
-    - Handle errors and retries gracefully
-    - Optimize workflow execution
-    - Monitor and report workflow progress
-    """
+    """Coordinates multiple agents to achieve complex goals."""
     
     def __init__(self, config: Optional[AgentConfig] = None):
-        """Initialize OrchestratorAgent with coordination capabilities."""
-        if config is None:
-            config = AgentConfig(
-                name="OrchestratorAgent",
-                model="gpt-4o",
-                temperature=0.4,
-                max_tokens=8192,
-                capabilities=[
-                    AgentCapability.PLANNING,
-                    AgentCapability.PARALLEL,
-                    AgentCapability.REASONING,
-                    AgentCapability.MEMORY
-                ],
-                system_prompt=self._get_system_prompt()
-            )
-        super().__init__(config)
-        
-        # Orchestration state
-        self.workflows = {}
-        self.agent_pool = {}
-        self.task_queue = []
-        self.execution_history = []
-        self.workflow_templates = self._load_workflow_templates()
-        
-    def _get_system_prompt(self) -> str:
-        """Get specialized system prompt for orchestration."""
-        return """You are a master orchestrator specializing in coordinating complex multi-agent workflows.
-        
-        Your responsibilities:
-        1. Design optimal workflow structures for complex tasks
-        2. Coordinate multiple agents efficiently in parallel
-        3. Manage task dependencies and sequencing
-        4. Handle errors and implement retry strategies
-        5. Optimize workflow execution for speed and resource usage
-        6. Monitor progress and provide real-time updates
-        7. Adapt workflows based on runtime conditions
-        8. Ensure successful completion of all tasks
-        
-        Always prioritize efficiency, reliability, and successful task completion."""
+        """Initialize orchestrator agent."""
+        super().__init__(config or AgentConfig(
+            name="OrchestratorAgent",
+            description="Multi-agent coordination",
+            capabilities=["orchestrate", "coordinate", "delegate", "aggregate", "monitor"],
+            max_retries=3,
+            timeout=300
+        ))
+        self.workflows: Dict[str, Workflow] = {}
+        self.agent_registry: Dict[str, BaseAgent] = {}
+        self.executor = ThreadPoolExecutor(max_workers=5)
+        self._workflow_counter = 0
+        self._task_counter = 0
     
-    def _load_workflow_templates(self) -> Dict[str, Dict]:
-        """Load predefined workflow templates."""
-        return {
-            "development": {
-                "name": "Development Workflow",
-                "tasks": [
-                    {"agent": "analyzer", "action": "analyze_requirements"},
-                    {"agent": "coder", "action": "implement_solution"},
-                    {"agent": "test", "action": "validate_implementation"},
-                    {"agent": "reviewer", "action": "review_code"}
-                ],
-                "parallelism": 2
-            },
-            "debugging": {
-                "name": "Debugging Workflow",
-                "tasks": [
-                    {"agent": "analyzer", "action": "identify_issue"},
-                    {"agent": "debugger", "action": "diagnose_problem"},
-                    {"agent": "coder", "action": "implement_fix"},
-                    {"agent": "test", "action": "verify_fix"}
-                ],
-                "parallelism": 1
-            },
-            "optimization": {
-                "name": "Optimization Workflow",
-                "tasks": [
-                    {"agent": "profiler", "action": "analyze_performance"},
-                    {"agent": "optimizer", "action": "identify_improvements"},
-                    {"agent": "coder", "action": "implement_optimizations"},
-                    {"agent": "test", "action": "benchmark_results"}
-                ],
-                "parallelism": 3
-            }
-        }
-    
-    def _execute(self, prompt: str, **kwargs) -> Dict[str, Any]:
-        """Execute orchestration task."""
-        self._logger.info("Executing orchestration", task=prompt[:100])
-        
-        # Parse orchestration parameters
-        workflow_type = kwargs.get("workflow_type", "adaptive")
-        tasks = kwargs.get("tasks", [])
-        parallelism = kwargs.get("parallelism", 4)
-        timeout = kwargs.get("timeout", 3600)
-        
-        try:
-            if workflow_type in self.workflow_templates:
-                # Use predefined template
-                workflow = self._create_workflow_from_template(
-                    workflow_type, prompt, kwargs
-                )
-            elif tasks:
-                # Create custom workflow
-                workflow = self._create_custom_workflow(tasks, prompt, kwargs)
-            else:
-                # Analyze and create adaptive workflow
-                workflow = self._create_adaptive_workflow(prompt, kwargs)
-            
-            # Execute workflow
-            result = self._execute_workflow(workflow)
-            
-            # Store execution history
-            self.execution_history.append({
-                "workflow_id": workflow.id,
-                "timestamp": datetime.now().isoformat(),
-                "result": result
-            })
-            
-            # Update metrics
-            self.context.metrics.update({
-                "workflows_executed": len(self.execution_history),
-                "tasks_completed": len([t for t in workflow.tasks if t.state == WorkflowState.COMPLETED]),
-                "total_duration": (workflow.end_time - workflow.start_time).total_seconds() if workflow.end_time else 0,
-                "success_rate": self._calculate_success_rate()
-            })
-            
-            return result
-            
-        except Exception as e:
-            self._logger.error("Orchestration failed", error=str(e))
-            raise AgentExecutionError(f"Orchestration failed: {e}")
-    
-    def _create_workflow_from_template(self, template_name: str, 
-                                      prompt: str, context: Dict) -> Workflow:
-        """Create workflow from template."""
-        template = self.workflow_templates[template_name]
-        
-        workflow = Workflow(
-            name=template["name"],
-            parallelism=template.get("parallelism", 4),
-            context={"prompt": prompt, **context}
-        )
-        
-        # Create tasks from template
-        for task_def in template["tasks"]:
-            task = WorkflowTask(
-                name=f"{task_def['agent']}_{task_def['action']}",
-                agent_type=task_def["agent"],
-                prompt=self._generate_task_prompt(task_def, prompt),
-                priority=self._determine_priority(task_def),
-                context=context
-            )
-            workflow.tasks.append(task)
-        
-        # Set up dependencies
-        self._setup_dependencies(workflow)
-        
-        return workflow
-    
-    def _create_custom_workflow(self, tasks: List[Dict], 
-                               prompt: str, context: Dict) -> Workflow:
-        """Create custom workflow from task definitions."""
-        workflow = Workflow(
-            name="Custom Workflow",
-            context={"prompt": prompt, **context}
-        )
-        
-        for task_def in tasks:
-            task = WorkflowTask(
-                name=task_def.get("name", "task"),
-                agent_type=task_def.get("agent", "generic"),
-                prompt=task_def.get("prompt", prompt),
-                dependencies=task_def.get("dependencies", []),
-                priority=TaskPriority[task_def.get("priority", "MEDIUM").upper()],
-                context={**context, **task_def.get("context", {})}
-            )
-            workflow.tasks.append(task)
-        
-        return workflow
-    
-    def _create_adaptive_workflow(self, prompt: str, context: Dict) -> Workflow:
-        """Analyze prompt and create optimal workflow."""
-        self._logger.info("Creating adaptive workflow", prompt=prompt[:100])
-        
-        # Analyze task requirements
-        analysis = self._analyze_task_requirements(prompt)
-        
-        workflow = Workflow(
-            name="Adaptive Workflow",
-            parallelism=self._determine_optimal_parallelism(analysis),
-            context={"prompt": prompt, **context}
-        )
-        
-        # Generate task sequence
-        task_sequence = self._generate_task_sequence(analysis, prompt)
-        
-        for i, task_def in enumerate(task_sequence):
-            task = WorkflowTask(
-                name=task_def["name"],
-                agent_type=task_def["agent"],
-                prompt=task_def["prompt"],
-                dependencies=task_def.get("dependencies", []),
-                priority=self._calculate_task_priority(task_def, i, len(task_sequence)),
-                context=context
-            )
-            workflow.tasks.append(task)
-        
-        # Optimize task order
-        self._optimize_task_order(workflow)
-        
-        return workflow
-    
-    def _execute_workflow(self, workflow: Workflow) -> Dict[str, Any]:
-        """Execute a workflow with parallel task execution."""
-        self._logger.info("Executing workflow", workflow_id=workflow.id, tasks=len(workflow.tasks))
-        
-        workflow.state = WorkflowState.RUNNING
-        workflow.start_time = datetime.now()
-        
-        # Initialize execution context
-        execution_context = {
-            "workflow_id": workflow.id,
-            "results": {},
-            "errors": []
-        }
-        
-        try:
-            # Build task dependency graph
-            task_graph = self._build_dependency_graph(workflow)
-            
-            # Execute tasks in optimal order
-            while self._has_pending_tasks(workflow):
-                # Get executable tasks (no pending dependencies)
-                executable_tasks = self._get_executable_tasks(workflow, task_graph)
-                
-                if not executable_tasks:
-                    # Check for deadlock
-                    if self._detect_deadlock(workflow):
-                        raise AgentExecutionError("Workflow deadlock detected")
-                    continue
-                
-                # Execute tasks in parallel (up to parallelism limit)
-                batch_size = min(len(executable_tasks), workflow.parallelism)
-                task_batch = executable_tasks[:batch_size]
-                
-                # Execute batch
-                batch_results = self._execute_task_batch(task_batch, execution_context)
-                
-                # Update task states and results
-                for task, result in zip(task_batch, batch_results):
-                    if result["success"]:
-                        task.state = WorkflowState.COMPLETED
-                        task.result = result["output"]
-                        execution_context["results"][task.id] = result["output"]
-                    else:
-                        self._handle_task_failure(task, result["error"], workflow)
-            
-            # Finalize workflow
-            workflow.state = WorkflowState.COMPLETED
-            workflow.end_time = datetime.now()
-            
-            return {
-                "workflow_id": workflow.id,
-                "state": workflow.state.value,
-                "duration": (workflow.end_time - workflow.start_time).total_seconds(),
-                "tasks_completed": len([t for t in workflow.tasks if t.state == WorkflowState.COMPLETED]),
-                "results": execution_context["results"],
-                "errors": execution_context["errors"]
-            }
-            
-        except Exception as e:
-            workflow.state = WorkflowState.FAILED
-            workflow.end_time = datetime.now()
-            raise AgentExecutionError(f"Workflow execution failed: {e}")
-    
-    def _execute_task_batch(self, tasks: List[WorkflowTask], 
-                           context: Dict) -> List[Dict]:
-        """Execute a batch of tasks in parallel."""
-        results = []
-        
-        for task in tasks:
-            try:
-                task.state = WorkflowState.RUNNING
-                task.start_time = datetime.now()
-                
-                # Execute task with appropriate agent
-                result = self._execute_single_task(task, context)
-                
-                task.end_time = datetime.now()
-                results.append({
-                    "success": True,
-                    "output": result,
-                    "duration": (task.end_time - task.start_time).total_seconds()
-                })
-                
-            except Exception as e:
-                task.end_time = datetime.now()
-                task.error = str(e)
-                results.append({
-                    "success": False,
-                    "error": str(e),
-                    "duration": (task.end_time - task.start_time).total_seconds()
-                })
-        
-        return results
-    
-    def _execute_single_task(self, task: WorkflowTask, context: Dict) -> Any:
-        """Execute a single task with the appropriate agent."""
-        self._logger.info("Executing task", task_id=task.id, agent=task.agent_type)
-        
-        # Get or create agent instance
-        agent = self._get_agent(task.agent_type)
-        
-        # Prepare task context
-        task_context = {
-            **task.context,
-            "workflow_context": context,
-            "dependencies": {dep: context["results"].get(dep) for dep in task.dependencies}
-        }
-        
-        # Execute task
-        result = agent.execute(task.prompt, **task_context)
-        
-        return result.output if result.success else None
-    
-    def _handle_task_failure(self, task: WorkflowTask, error: str, workflow: Workflow):
-        """Handle task failure based on error strategy."""
-        task.retry_count += 1
-        
-        if workflow.error_strategy == "fail_fast":
-            workflow.state = WorkflowState.FAILED
-            raise AgentExecutionError(f"Task {task.id} failed: {error}")
-        
-        elif workflow.error_strategy == "retry" and task.retry_count < task.max_retries:
-            # Retry task
-            task.state = WorkflowState.PENDING
-            self._logger.info("Retrying task", task_id=task.id, attempt=task.retry_count)
-        
-        elif workflow.error_strategy == "continue":
-            # Mark as failed but continue
-            task.state = WorkflowState.FAILED
-            self._logger.warning("Task failed, continuing", task_id=task.id, error=error)
-        
-        else:
-            task.state = WorkflowState.FAILED
-    
-    # Helper methods
-    def _generate_task_prompt(self, task_def: Dict, main_prompt: str) -> str:
-        """Generate specific prompt for a task."""
-        return f"{task_def['action']}: {main_prompt}"
-    
-    def _determine_priority(self, task_def: Dict) -> TaskPriority:
-        """Determine task priority."""
-        priority_map = {
-            "critical": TaskPriority.CRITICAL,
-            "high": TaskPriority.HIGH,
-            "medium": TaskPriority.MEDIUM,
-            "low": TaskPriority.LOW,
-            "background": TaskPriority.BACKGROUND
-        }
-        return priority_map.get(task_def.get("priority", "medium"), TaskPriority.MEDIUM)
-    
-    def _setup_dependencies(self, workflow: Workflow):
-        """Set up task dependencies based on workflow type."""
-        # Simple sequential dependencies for now
-        for i in range(1, len(workflow.tasks)):
-            workflow.tasks[i].dependencies.append(workflow.tasks[i-1].id)
-    
-    def _analyze_task_requirements(self, prompt: str) -> Dict:
-        """Analyze task requirements from prompt."""
-        # Simplified analysis
-        requirements = {
-            "complexity": "medium",
-            "requires_testing": "test" in prompt.lower(),
-            "requires_analysis": "analyze" in prompt.lower(),
-            "requires_optimization": "optimize" in prompt.lower()
-        }
-        return requirements
-    
-    def _determine_optimal_parallelism(self, analysis: Dict) -> int:
-        """Determine optimal parallelism level."""
-        if analysis.get("complexity") == "high":
-            return 2
-        elif analysis.get("complexity") == "low":
-            return 8
-        return 4
-    
-    def _generate_task_sequence(self, analysis: Dict, prompt: str) -> List[Dict]:
-        """Generate optimal task sequence."""
-        sequence = []
-        
-        if analysis.get("requires_analysis"):
-            sequence.append({
-                "name": "analysis",
-                "agent": "analyzer",
-                "prompt": f"Analyze: {prompt}"
-            })
-        
-        sequence.append({
-            "name": "implementation",
-            "agent": "coder",
-            "prompt": f"Implement: {prompt}",
-            "dependencies": ["analysis"] if analysis.get("requires_analysis") else []
-        })
-        
-        if analysis.get("requires_testing"):
-            sequence.append({
-                "name": "testing",
-                "agent": "test",
-                "prompt": f"Test implementation for: {prompt}",
-                "dependencies": ["implementation"]
-            })
-        
-        if analysis.get("requires_optimization"):
-            sequence.append({
-                "name": "optimization",
-                "agent": "optimizer",
-                "prompt": f"Optimize: {prompt}",
-                "dependencies": ["testing"] if analysis.get("requires_testing") else ["implementation"]
-            })
-        
-        return sequence
-    
-    def _calculate_task_priority(self, task_def: Dict, index: int, total: int) -> TaskPriority:
-        """Calculate task priority based on position and type."""
-        if index == 0:
-            return TaskPriority.HIGH
-        elif index == total - 1:
-            return TaskPriority.MEDIUM
-        return TaskPriority.MEDIUM
-    
-    def _optimize_task_order(self, workflow: Workflow):
-        """Optimize task execution order."""
-        # Sort by priority and dependencies
-        # Simplified - would use topological sort in production
-        workflow.tasks.sort(key=lambda t: (t.priority.value, len(t.dependencies)))
-    
-    def _build_dependency_graph(self, workflow: Workflow) -> Dict[str, List[str]]:
-        """Build task dependency graph."""
-        graph = {}
-        for task in workflow.tasks:
-            graph[task.id] = task.dependencies
-        return graph
-    
-    def _has_pending_tasks(self, workflow: Workflow) -> bool:
-        """Check if workflow has pending tasks."""
-        return any(t.state == WorkflowState.PENDING for t in workflow.tasks)
-    
-    def _get_executable_tasks(self, workflow: Workflow, graph: Dict) -> List[WorkflowTask]:
-        """Get tasks that can be executed now."""
-        executable = []
-        
-        for task in workflow.tasks:
-            if task.state != WorkflowState.PENDING:
-                continue
-            
-            # Check if all dependencies are completed
-            deps_completed = all(
-                self._get_task_by_id(workflow, dep_id).state == WorkflowState.COMPLETED
-                for dep_id in task.dependencies
-            )
-            
-            if deps_completed:
-                executable.append(task)
-        
-        return executable
-    
-    def _detect_deadlock(self, workflow: Workflow) -> bool:
-        """Detect if workflow is in deadlock."""
-        pending_tasks = [t for t in workflow.tasks if t.state == WorkflowState.PENDING]
-        
-        if not pending_tasks:
-            return False
-        
-        # Check if any pending task has all dependencies completed or failed
-        for task in pending_tasks:
-            deps_finished = all(
-                self._get_task_by_id(workflow, dep_id).state in [WorkflowState.COMPLETED, WorkflowState.FAILED]
-                for dep_id in task.dependencies
-            )
-            if deps_finished:
-                return False
-        
+    def initialize(self) -> bool:
+        """Initialize the orchestrator agent."""
+        logger.info("orchestrator_agent_initialized", agent=self.config.name)
         return True
     
-    def _get_task_by_id(self, workflow: Workflow, task_id: str) -> Optional[WorkflowTask]:
-        """Get task by ID."""
-        for task in workflow.tasks:
-            if task.id == task_id:
-                return task
-        return None
-    
-    def _get_agent(self, agent_type: str) -> BaseAgent:
-        """Get or create agent instance."""
-        if agent_type not in self.agent_pool:
-            # Create new agent instance
-            # In production, would dynamically load agent class
-            config = AgentConfig(name=f"{agent_type}_agent")
-            self.agent_pool[agent_type] = BaseAgent(config)
+    def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute orchestration task."""
+        action = task.get("action", "orchestrate")
         
-        return self.agent_pool[agent_type]
+        if action == "orchestrate":
+            return self._orchestrate_workflow(task)
+        elif action == "coordinate":
+            return self._coordinate_agents(task)
+        elif action == "delegate":
+            return self._delegate_task(task)
+        elif action == "aggregate":
+            return self._aggregate_results(task)
+        elif action == "monitor":
+            return self._monitor_workflow(task)
+        elif action == "create_workflow":
+            return self._create_workflow(task)
+        elif action == "execute_workflow":
+            return self._execute_workflow(task)
+        elif action == "register_agent":
+            return self._register_agent(task)
+        else:
+            return {"error": f"Unknown action: {action}"}
     
-    def _calculate_success_rate(self) -> float:
-        """Calculate workflow success rate."""
-        if not self.execution_history:
-            return 100.0
+    def orchestrate(self,
+                   goal: str,
+                   agents: List[BaseAgent],
+                   strategy: CoordinationStrategy = CoordinationStrategy.PARALLEL) -> OrchestrationResult:
+        """Orchestrate agents to achieve goal."""
+        result = self.execute({
+            "action": "orchestrate",
+            "goal": goal,
+            "agents": agents,
+            "strategy": strategy.value
+        })
         
-        successful = sum(
-            1 for h in self.execution_history 
-            if h["result"].get("state") == WorkflowState.COMPLETED.value
+        if "error" in result:
+            raise RuntimeError(result["error"])
+        
+        return result["result"]
+    
+    def _orchestrate_workflow(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Orchestrate a complete workflow."""
+        goal = task.get("goal", "")
+        agents = task.get("agents", [])
+        strategy = task.get("strategy", "parallel")
+        
+        if not goal:
+            return {"error": "Goal is required"}
+        
+        # Create workflow
+        self._workflow_counter += 1
+        workflow = Workflow(
+            id=f"workflow_{self._workflow_counter}",
+            name=goal,
+            strategy=CoordinationStrategy[strategy.upper()]
         )
         
-        return (successful / len(self.execution_history)) * 100
+        # Register agents
+        for i, agent in enumerate(agents):
+            agent_id = f"agent_{i}"
+            if isinstance(agent, BaseAgent):
+                self.agent_registry[agent_id] = agent
+                workflow.agents[agent_id] = AgentRole.WORKER
+        
+        # Decompose goal into tasks
+        tasks = self._decompose_goal(goal, len(agents))
+        
+        # Create agent tasks
+        for i, task_data in enumerate(tasks):
+            self._task_counter += 1
+            agent_task = AgentTask(
+                id=f"task_{self._task_counter}",
+                agent_id=f"agent_{i % len(agents)}",
+                task=task_data,
+                priority=i
+            )
+            workflow.add_task(agent_task)
+        
+        # Store workflow
+        self.workflows[workflow.id] = workflow
+        
+        # Execute workflow
+        result = self._execute_workflow_internal(workflow)
+        
+        logger.info("workflow_orchestrated",
+                   workflow_id=workflow.id,
+                   strategy=strategy,
+                   tasks_count=len(tasks))
+        
+        return {
+            "result": result,
+            "workflow_id": workflow.id
+        }
+    
+    def _coordinate_agents(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Coordinate agent activities."""
+        agents = task.get("agents", [])
+        coordination_type = task.get("coordination_type", "sync")
+        
+        if not agents:
+            return {"error": "Agents are required"}
+        
+        coordination_result = {
+            "coordinated_agents": len(agents),
+            "type": coordination_type,
+            "status": "success"
+        }
+        
+        if coordination_type == "sync":
+            # Synchronous coordination
+            for agent_id in agents:
+                if agent_id in self.agent_registry:
+                    # Coordinate agent
+                    pass
+        elif coordination_type == "async":
+            # Asynchronous coordination
+            futures = []
+            for agent_id in agents:
+                if agent_id in self.agent_registry:
+                    # Submit async task
+                    future = self.executor.submit(self._coordinate_single_agent, agent_id)
+                    futures.append(future)
+            
+            # Wait for completion
+            for future in futures:
+                future.result()
+        
+        return coordination_result
+    
+    def _delegate_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Delegate task to appropriate agent."""
+        task_data = task.get("task")
+        agent_id = task.get("agent_id")
+        auto_select = task.get("auto_select", True)
+        
+        if not task_data:
+            return {"error": "Task is required"}
+        
+        # Auto-select agent if needed
+        if auto_select and not agent_id:
+            agent_id = self._select_best_agent(task_data)
+        
+        if not agent_id or agent_id not in self.agent_registry:
+            return {"error": f"Agent {agent_id} not found"}
+        
+        # Delegate to agent
+        agent = self.agent_registry[agent_id]
+        result = agent.execute(task_data)
+        
+        return {
+            "delegated_to": agent_id,
+            "result": result
+        }
+    
+    def _aggregate_results(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Aggregate results from multiple agents."""
+        results = task.get("results", [])
+        aggregation_type = task.get("aggregation_type", "merge")
+        
+        if not results:
+            return {"error": "Results are required"}
+        
+        aggregated = {}
+        
+        if aggregation_type == "merge":
+            # Merge all results
+            for result in results:
+                if isinstance(result, dict):
+                    aggregated.update(result)
+        elif aggregation_type == "vote":
+            # Voting/consensus
+            votes = {}
+            for result in results:
+                key = str(result)
+                votes[key] = votes.get(key, 0) + 1
+            aggregated = {"consensus": max(votes, key=votes.get)}
+        elif aggregation_type == "average":
+            # Average numerical results
+            if all(isinstance(r, (int, float)) for r in results):
+                aggregated = {"average": sum(results) / len(results)}
+        elif aggregation_type == "collect":
+            # Collect all results
+            aggregated = {"all_results": results}
+        
+        return {
+            "aggregated": aggregated,
+            "aggregation_type": aggregation_type,
+            "input_count": len(results)
+        }
+    
+    def _monitor_workflow(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Monitor workflow execution."""
+        workflow_id = task.get("workflow_id")
+        
+        if not workflow_id or workflow_id not in self.workflows:
+            return {"error": f"Workflow {workflow_id} not found"}
+        
+        workflow = self.workflows[workflow_id]
+        
+        # Get workflow status
+        status = {
+            "workflow_id": workflow_id,
+            "name": workflow.name,
+            "status": workflow.status,
+            "strategy": workflow.strategy.value,
+            "progress": {
+                "total_tasks": len(workflow.tasks),
+                "completed": sum(1 for t in workflow.tasks if t.status == "completed"),
+                "failed": sum(1 for t in workflow.tasks if t.status == "failed"),
+                "pending": sum(1 for t in workflow.tasks if t.status == "pending"),
+                "running": sum(1 for t in workflow.tasks if t.status == "running")
+            },
+            "agents": len(workflow.agents)
+        }
+        
+        # Get running tasks
+        running_tasks = [t.to_dict() for t in workflow.tasks if t.status == "running"]
+        status["running_tasks"] = running_tasks
+        
+        return status
+    
+    def _create_workflow(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a new workflow."""
+        name = task.get("name", "Workflow")
+        strategy = task.get("strategy", "parallel")
+        tasks_data = task.get("tasks", [])
+        
+        self._workflow_counter += 1
+        workflow = Workflow(
+            id=f"workflow_{self._workflow_counter}",
+            name=name,
+            strategy=CoordinationStrategy[strategy.upper()]
+        )
+        
+        # Add tasks
+        for task_data in tasks_data:
+            self._task_counter += 1
+            agent_task = AgentTask(
+                id=f"task_{self._task_counter}",
+                agent_id=task_data.get("agent_id", "default"),
+                task=task_data.get("task", {}),
+                priority=task_data.get("priority", 0),
+                dependencies=task_data.get("dependencies", [])
+            )
+            workflow.add_task(agent_task)
+        
+        # Store workflow
+        self.workflows[workflow.id] = workflow
+        
+        return {
+            "workflow": workflow.to_dict(),
+            "workflow_id": workflow.id
+        }
+    
+    def _execute_workflow(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute a workflow."""
+        workflow_id = task.get("workflow_id")
+        
+        if not workflow_id or workflow_id not in self.workflows:
+            return {"error": f"Workflow {workflow_id} not found"}
+        
+        workflow = self.workflows[workflow_id]
+        result = self._execute_workflow_internal(workflow)
+        
+        return {
+            "result": result.to_dict(),
+            "workflow_id": workflow_id
+        }
+    
+    def _register_agent(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Register an agent."""
+        agent_id = task.get("agent_id")
+        agent = task.get("agent")
+        role = task.get("role", "worker")
+        
+        if not agent_id:
+            return {"error": "Agent ID is required"}
+        
+        if isinstance(agent, BaseAgent):
+            self.agent_registry[agent_id] = agent
+            
+            return {
+                "registered": True,
+                "agent_id": agent_id,
+                "role": role
+            }
+        
+        return {"error": "Invalid agent"}
+    
+    def _execute_workflow_internal(self, workflow: Workflow) -> OrchestrationResult:
+        """Execute workflow internally."""
+        workflow.start_time = time.time()
+        workflow.status = "running"
+        
+        result = OrchestrationResult(
+            workflow_id=workflow.id,
+            success=True
+        )
+        
+        try:
+            if workflow.strategy == CoordinationStrategy.SEQUENTIAL:
+                self._execute_sequential(workflow, result)
+            elif workflow.strategy == CoordinationStrategy.PARALLEL:
+                self._execute_parallel(workflow, result)
+            elif workflow.strategy == CoordinationStrategy.PIPELINE:
+                self._execute_pipeline(workflow, result)
+            else:
+                self._execute_default(workflow, result)
+        except Exception as e:
+            result.success = False
+            result.errors.append(str(e))
+            workflow.status = "failed"
+        
+        workflow.end_time = time.time()
+        workflow.status = "completed" if result.success else "failed"
+        
+        # Calculate metrics
+        result.metrics["duration"] = workflow.end_time - workflow.start_time
+        result.metrics["tasks_completed"] = sum(1 for t in workflow.tasks if t.status == "completed")
+        result.metrics["tasks_failed"] = sum(1 for t in workflow.tasks if t.status == "failed")
+        
+        return result
+    
+    def _execute_sequential(self, workflow: Workflow, result: OrchestrationResult):
+        """Execute tasks sequentially."""
+        for task in workflow.tasks:
+            task.start_time = time.time()
+            task.status = "running"
+            
+            try:
+                if task.agent_id in self.agent_registry:
+                    agent = self.agent_registry[task.agent_id]
+                    task.result = agent.execute(task.task)
+                    task.status = "completed"
+                    result.results[task.id] = task.result
+                else:
+                    task.status = "failed"
+                    task.error = f"Agent {task.agent_id} not found"
+            except Exception as e:
+                task.status = "failed"
+                task.error = str(e)
+                result.errors.append(f"Task {task.id}: {e}")
+            
+            task.end_time = time.time()
+    
+    def _execute_parallel(self, workflow: Workflow, result: OrchestrationResult):
+        """Execute tasks in parallel."""
+        futures = []
+        
+        for task in workflow.tasks:
+            if task.agent_id in self.agent_registry:
+                agent = self.agent_registry[task.agent_id]
+                future = self.executor.submit(self._execute_single_task, task, agent)
+                futures.append((task, future))
+        
+        # Wait for all tasks
+        for task, future in futures:
+            try:
+                task.result = future.result(timeout=30)
+                task.status = "completed"
+                result.results[task.id] = task.result
+            except Exception as e:
+                task.status = "failed"
+                task.error = str(e)
+                result.errors.append(f"Task {task.id}: {e}")
+    
+    def _execute_pipeline(self, workflow: Workflow, result: OrchestrationResult):
+        """Execute tasks in pipeline fashion."""
+        previous_result = None
+        
+        for task in workflow.tasks:
+            task.start_time = time.time()
+            task.status = "running"
+            
+            # Pass previous result as input
+            if previous_result:
+                task.task["input"] = previous_result
+            
+            try:
+                if task.agent_id in self.agent_registry:
+                    agent = self.agent_registry[task.agent_id]
+                    task.result = agent.execute(task.task)
+                    task.status = "completed"
+                    result.results[task.id] = task.result
+                    previous_result = task.result
+                else:
+                    task.status = "failed"
+                    task.error = f"Agent {task.agent_id} not found"
+                    break
+            except Exception as e:
+                task.status = "failed"
+                task.error = str(e)
+                result.errors.append(f"Task {task.id}: {e}")
+                break
+            
+            task.end_time = time.time()
+    
+    def _execute_default(self, workflow: Workflow, result: OrchestrationResult):
+        """Execute with default strategy."""
+        self._execute_sequential(workflow, result)
+    
+    def _execute_single_task(self, task: AgentTask, agent: BaseAgent) -> Any:
+        """Execute a single task."""
+        task.start_time = time.time()
+        task.status = "running"
+        
+        try:
+            result = agent.execute(task.task)
+            task.end_time = time.time()
+            return result
+        except Exception as e:
+            task.end_time = time.time()
+            raise e
+    
+    def _decompose_goal(self, goal: str, num_agents: int) -> List[Dict[str, Any]]:
+        """Decompose goal into tasks."""
+        tasks = []
+        
+        # Simple decomposition
+        base_task = {"action": "process", "goal": goal}
+        
+        for i in range(min(num_agents, 3)):  # Limit to 3 tasks for simplicity
+            task = base_task.copy()
+            task["part"] = i + 1
+            tasks.append(task)
+        
+        return tasks
+    
+    def _select_best_agent(self, task_data: Dict[str, Any]) -> Optional[str]:
+        """Select best agent for task."""
+        # Simple selection - return first available agent
+        if self.agent_registry:
+            return list(self.agent_registry.keys())[0]
+        return None
+    
+    def _coordinate_single_agent(self, agent_id: str) -> None:
+        """Coordinate a single agent."""
+        if agent_id in self.agent_registry:
+            # Coordination logic
+            pass
+    
+    def shutdown(self) -> bool:
+        """Shutdown the orchestrator agent."""
+        self.executor.shutdown(wait=True)
+        logger.info("orchestrator_agent_shutdown",
+                   workflows_count=len(self.workflows),
+                   agents_count=len(self.agent_registry))
+        self.workflows.clear()
+        self.agent_registry.clear()
+        return True
