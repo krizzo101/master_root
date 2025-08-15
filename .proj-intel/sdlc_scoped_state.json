@@ -55,5 +55,102 @@
       "validation_results": {},
       "knowledge_queries": []
     }
+  },
+  "b8191e17": {
+    "project_id": "b8191e17",
+    "project_name": "AI Assistant Framework",
+    "description": "Multi-agent AI assistant with tool orchestration",
+    "scope": {
+      "project_id": "b8191e17",
+      "project_name": "AI Assistant Framework",
+      "root_path": "/home/opsvi/master_root/projects/ai_assistant_framework",
+      "subdirs": [
+        "discovery",
+        "design",
+        "planning",
+        "development",
+        "testing",
+        "deployment",
+        "production",
+        "docs",
+        "src",
+        "tests",
+        "configs"
+      ],
+      "enforcement_level": "strict",
+      "allowed_external_paths": [
+        "/home/opsvi/master_root/docs",
+        "/home/opsvi/master_root/.proj-intel",
+        "/tmp"
+      ],
+      "phase_overrides": {
+        "discovery": [
+          "docs",
+          "discovery"
+        ],
+        "design": [
+          "docs",
+          "discovery",
+          "design"
+        ],
+        "planning": [
+          "docs",
+          "discovery",
+          "design",
+          "planning"
+        ],
+        "development": []
+      }
+    },
+    "current_phase": "development",
+    "completed_phases": [
+      "discovery",
+      "design",
+      "planning"
+    ],
+    "created_at": "2025-08-15T16:03:52.852439",
+    "last_updated": "2025-08-15T16:06:17.260173",
+    "is_active": true,
+    "metadata": {
+      "creator": "opsvi",
+      "enforcement_enabled": true,
+      "validation_results": {
+        "discovery": {
+          "timestamp": "2025-08-15T16:05:27.655888",
+          "passed": true,
+          "checks": [
+            {
+              "check": "Requirements Complete",
+              "passed": true,
+              "message": "Requirements complete"
+            },
+            {
+              "check": "Knowledge System Queried",
+              "passed": true,
+              "message": "Knowledge queried"
+            }
+          ]
+        },
+        "design": {
+          "timestamp": "2025-08-15T16:06:12.324738",
+          "passed": true,
+          "checks": [
+            {
+              "check": "Architecture Design",
+              "passed": true,
+              "message": "Found"
+            }
+          ]
+        }
+      },
+      "knowledge_queries": [
+        {
+          "timestamp": "2025-08-15T16:04:40.775643",
+          "query": "AI assistant framework multi-agent orchestration",
+          "results_count": 0,
+          "phase": "discovery"
+        }
+      ]
+    }
   }
 }
