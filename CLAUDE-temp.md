@@ -19,9 +19,59 @@ current_datetime = current_time(format="YYYY-MM-DD HH:mm:ss")
 - **File Dating**: Accurate timestamps for logs, reports, and analysis
 - **Audit Compliance**: Proper temporal tracking for all operations
 
+### MANDATORY: USE MCP TOOLS TO BRIDGE KNOWLEDGE GAPS
+**When you identify a knowledge gap, you MUST use the available MCP tools to get current information:**
+
+#### Research & Information Gathering
+- **`mcp_web_search`** (Brave Search): Search for current API versions, documentation, best practices
+- **`tech_docs`** (Context7): Get up-to-date technical documentation for libraries and frameworks
+- **`research_papers`** (ArXiv): Find latest research papers on technologies and methodologies
+- **`firecrawl`**: Extract current content from specific websites, documentation sites, GitHub repos
+
+#### When to Use These Tools
+```python
+# BEFORE making any technical decisions, research current state:
+
+# 1. Check API versions and syntax changes
+mcp_web_search(query="OpenAI API latest version 2025 changes")
+mcp_tech_docs(context7CompatibleLibraryID="/openai/openai-python")
+
+# 2. Research best practices for frameworks
+mcp_web_search(query="FastAPI latest best practices 2025 security")
+mcp_firecrawl_scrape(url="https://fastapi.tiangolo.com/")
+
+# 3. Find current solutions to common problems
+mcp_web_search(query="Python async database connection pooling 2025")
+mcp_research_papers(query="microservices architecture patterns")
+
+# 4. Verify library compatibility and versions
+mcp_web_search(query="pydantic v2 vs v1 migration guide 2025")
+```
+
+#### Available MCP Tools for Knowledge Updates
+
+| Tool | Purpose | When to Use | Example Queries |
+|------|---------|-------------|-----------------|
+| **`mcp_web_search`** | Brave Search API | Current versions, breaking changes, new features | "Python 3.12 new features", "Docker latest security best practices 2025" |
+| **`tech_docs`** | Context7 docs | Library documentation, API references | "/fastapi/fastapi", "/openai/openai-python" |
+| **`research_papers`** | ArXiv papers | Latest research, methodologies, algorithms | "transformer architecture improvements", "microservices patterns" |
+| **`firecrawl`** | Web scraping | Official docs, changelogs, GitHub releases | "https://docs.python.org/3/whatsnew/", "https://github.com/openai/openai-python/releases" |
+| **`consult_suite_enhanced`** | Expert AI agents | Complex architecture decisions, code reviews | Complex system design, production-ready implementations |
+
+#### MANDATORY Research Protocol
+**BEFORE making technical decisions, you MUST:**
+1. **Search for current information** using `mcp_web_search`
+2. **Verify with official documentation** using `tech_docs` or `firecrawl`
+3. **Check for recent changes** in APIs, libraries, best practices
+4. **Research latest methodologies** if implementing new patterns
+5. **Only THEN proceed** with informed implementation
+
 ### Enforcement
 - ❌ **VIOLATION**: Starting work without checking time
+- ❌ **VIOLATION**: Making technical decisions without researching current state
+- ❌ **VIOLATION**: Using outdated information from training data
 - ✅ **COMPLIANT**: First action is always `mcp__time__current_time`
+- ✅ **COMPLIANT**: Research current information before implementation
 
 ## 🔄 MANDATORY: GIT COMMITS (DEFAULT BEHAVIOR - CANNOT BE IGNORED)
 
@@ -189,6 +239,10 @@ master_root/
 # Time check (FIRST ACTION)
 mcp__time__current_time(format="YYYY-MM-DD HH:mm:ss")
 
+# Research current information (BEFORE TECHNICAL DECISIONS)
+mcp_web_search(query="technology latest version 2025")
+mcp_tech_docs(context7CompatibleLibraryID="/library/name")
+
 # Commit workflow (AFTER EVERY CHANGE)
 git add -A && git commit --no-verify -m "chore: autosave ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
 
@@ -200,10 +254,12 @@ ls -la target_file.ext || echo "File does not exist, safe to write"
 ```
 
 ### Tool Priority
-1. **Project Intelligence** → Fast, indexed, accurate
-2. **MultiEdit** → Efficient for multiple changes
-3. **Parallel Operations** → Always when possible
-4. **Batch Processing** → Default behavior for all work
+1. **Time Check** → MANDATORY first action every session
+2. **Research Tools** → MANDATORY before technical decisions (web_search, tech_docs, firecrawl)
+3. **Project Intelligence** → Fast, indexed, accurate for existing codebase
+4. **MultiEdit** → Efficient for multiple changes
+5. **Parallel Operations** → Always when possible
+6. **Batch Processing** → Default behavior for all work
 
 ---
 
