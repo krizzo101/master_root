@@ -1,0 +1,6 @@
+{
+  "file_write_hook": "<bound method SDLCEnforcerStrict._intercept_file_write of <sdlc_enforcer_strict.SDLCEnforcerStrict object at 0x71c212d77080>>",
+  "file_edit_hook": "<bound method SDLCEnforcerStrict._intercept_file_edit of <sdlc_enforcer_strict.SDLCEnforcerStrict object at 0x71c212d77080>>",
+  "bash_command_hook": "<bound method SDLCEnforcerStrict._intercept_bash_command of <sdlc_enforcer_strict.SDLCEnforcerStrict object at 0x71c212d77080>>",
+  "git_commit_hook": "<bound method SDLCEnforcerStrict._intercept_git_commit of <sdlc_enforcer_strict.SDLCEnforcerStrict object at 0x71c212d77080>>"
+}
