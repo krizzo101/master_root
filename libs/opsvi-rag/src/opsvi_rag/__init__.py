@@ -4,12 +4,12 @@ __version__ = "0.1.0"
 __author__ = "OPSVI Team"
 __email__ = "team@opsvi.ai"
 
-from .client import QdrantClient
-from .embeddings import EmbeddingModel
-from .search import SearchEngine
+from .client import RAGClient
+from .embeddings import get_embeddings
+from .search import search_documents
 
 __all__ = [
-    "QdrantClient",
-    "EmbeddingModel",
-    "SearchEngine",
+    "RAGClient",
+    "get_embeddings",
+    "search_documents",
 ]

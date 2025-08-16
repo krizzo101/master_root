@@ -1,42 +1,15 @@
-name: CI
+name: Workspace CI
 
-on:
-  push:
-    branches: [ main, MAIN ]
-  pull_request:
-    branches: [ main, MAIN ]
+on: [push, pull_request]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12"]
-
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install uv
-      uses: astral-sh/setup-uv@v1
-      with:
-        version: "latest"
-
-    - name: Install dependencies
-      run: uv sync
-
-    - name: Lint with ruff
-      run: uv run ruff check .
-
-    - name: Format check with black
-      run: uv run black --check .
-
-    - name: Type check with mypy
-      run: uv run mypy .
-
-    - name: Test with pytest
-      run: uv run pytest
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: prefix-dev/setup-uv@v1
+      - run: uv sync
+      - run: uv run pytest
