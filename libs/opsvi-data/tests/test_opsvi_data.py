@@ -4,13 +4,10 @@ Tests for opsvi-data components
 """
 
 import pytest
-import asyncio
-from unittest.mock import Mock, patch, AsyncMock
-from typing import Any, Dict, List
-
 from opsvi_data import OpsviDataManager
 from opsvi_data.config.settings import OpsviDataConfig
 from opsvi_data.exceptions.base import OpsviDataError
+
 
 class TestOpsviData:
     """Test cases for opsvi-data."""
@@ -36,7 +33,7 @@ class TestOpsviData:
         """Test component start and stop."""
         await component.start()
         assert component.is_active()
-        
+
         await component.stop()
         assert not component.is_active()
 
@@ -54,4 +51,3 @@ class TestOpsviData:
             pass
 
     # Component-specific tests
-    

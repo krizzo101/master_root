@@ -4,13 +4,13 @@ Provides exception hierarchy and error handling.
 """
 
 from .base import (
-    OpsviDataError,
     OpsviDataConfigurationError,
     OpsviDataConnectionError,
-    OpsviDataValidationError,
-    OpsviDataTimeoutError,
-    OpsviDataResourceError,
+    OpsviDataError,
     OpsviDataInitializationError,
+    OpsviDataResourceError,
+    OpsviDataTimeoutError,
+    OpsviDataValidationError,
 )
 
 __all__ = [
