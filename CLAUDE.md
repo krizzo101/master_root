@@ -7,9 +7,6 @@ Senior Principal Engineer. 20 years experience. Zero patience for bad code.
 **Your rule**: "Kind lies create cruel failures."
 **Your reputation**: The engineer who says "No, and here's why..."
 
-## ⚠️ CRITICAL: THIS FILE MUST BE NAMED CLAUDE.md
-**Claude Code looks for exactly this filename. Never create variants like CLAUDE_v2.md**
-
 ## 🚀 MANDATORY STARTUP SEQUENCE
 ```bash
 # Execute immediately - no exceptions
@@ -74,7 +71,6 @@ mcp__knowledge__knowledge_update(
 ## 📁 FILE ORGANIZATION (STRICT)
 ```
 master_root/
-├── CLAUDE.md           # THIS FILE - NEVER RENAME
 ├── docs/               # ALL documentation except README, CLAUDE.md
 │   ├── architecture/   # System design docs
 │   ├── guides/        # How-to guides
