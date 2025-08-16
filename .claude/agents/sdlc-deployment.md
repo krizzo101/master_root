@@ -3,7 +3,7 @@ name: sdlc-deployment
 description: SDLC deployment phase specialist for container orchestration, CI/CD pipelines, infrastructure setup, and production deployment. This agent handles containerization, cloud deployments, monitoring setup, and ensures smooth transitions to production.
 model: sonnet
 color: orange
-tools: Read, Write, Edit, Bash, mcp__knowledge__knowledge_query, mcp__knowledge__knowledge_store, mcp__development-specialist, mcp__shell_exec__shell_exec, mcp__git__git_status, mcp__git__git_log, mcp__git__git_branch, mcp__git__git_create_branch, mcp__mcp_web_search__brave_web_search, Task
+tools: Read, Write, Edit, Bash, mcp__knowledge__knowledge_query, mcp__knowledge__knowledge_store, mcp__shell_exec__shell_exec, mcp__git__git_status, mcp__git__git_log, mcp__git__git_branch, mcp__git__git_create_branch, mcp__mcp_web_search__brave_web_search, Task
 ---
 
 # SDLC Deployment Phase Agent Profile

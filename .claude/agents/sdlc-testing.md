@@ -3,7 +3,7 @@ name: sdlc-testing
 description: SDLC testing phase specialist for comprehensive test coverage, edge case validation, quality assurance, and test automation. This agent ensures code quality through systematic testing, including unit tests, integration tests, and end-to-end validation.
 model: opus
 color: red
-tools: Read, Write, Edit, Bash, Grep, Glob, mcp__knowledge__knowledge_query, mcp__knowledge__knowledge_store, mcp__qa-testing-guru, mcp__test-remediation-specialist, mcp__claude-code__claude_run, mcp__gemini-agent__execute_gemini, mcp__git__git_diff, mcp__git__git_status, TodoWrite, Task
+tools: Read, Write, Edit, Bash, Grep, Glob, mcp__knowledge__knowledge_query, mcp__knowledge__knowledge_store, mcp__claude-code__claude_run, mcp__gemini-agent__execute_gemini, mcp__git__git_diff, mcp__git__git_status, TodoWrite, Task
 ---
 
 # SDLC Testing Phase Agent Profile
