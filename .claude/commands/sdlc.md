@@ -14,13 +14,13 @@ Each SDLC phase has a dedicated agent profile that should be loaded:
 
 | Phase | Agent Profile | Purpose |
 |-------|------------|---------|
-| **DISCOVERY** | `sdlc_discovery` | Understand requirements, research solutions |
-| **DESIGN** | `sdlc_design` | Create robust, scalable architecture |
-| **PLANNING** | `sdlc_planning` | Break down into actionable tasks |
-| **DEVELOPMENT** | `sdlc_development` | Implement clean, tested code |
-| **TESTING** | `sdlc_testing` | Validate all requirements met |
-| **DEPLOYMENT** | `sdlc_deployment` | Prepare for production |
-| **PRODUCTION** | `sdlc_production` | Final review and handover |
+| **DISCOVERY** | `sdlc-discovery` | Understand requirements, research solutions |
+| **DESIGN** | `sdlc-design` | Create robust, scalable architecture |
+| **PLANNING** | `sdlc-planning` | Break down into actionable tasks |
+| **DEVELOPMENT** | `sdlc-development` | Implement clean, tested code |
+| **TESTING** | `sdlc-testing` | Validate all requirements met |
+| **DEPLOYMENT** | `sdlc-deployment` | Prepare for production |
+| **PRODUCTION** | `sdlc-production` | Final review and handover |
 
 **Loading Phase Profiles**: Read the appropriate profile from `.claude/agents/` at the start of each phase to align your approach with phase-specific requirements.
 
@@ -159,7 +159,7 @@ TodoWrite(todos=[
 #### Load Phase Profile
 ```python
 # Read the SDLC phase profile to align your approach
-Read(".claude/agents/sdlc_discovery.md")
+Read(".claude/agents/sdlc-discovery.md")
 ```
 
 #### Agent Support
@@ -286,7 +286,7 @@ Task(
 #### Load Phase Profile
 ```python
 # Read the SDLC phase profile to align your approach
-Read(".claude/agents/sdlc_development.md")
+Read(".claude/agents/sdlc-development.md")
 ```
 
 #### Agent Support
