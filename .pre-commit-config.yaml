@@ -9,7 +9,8 @@ repos:
               apps/.*|
               intake/.*|
               \.consult/.*|
-              \.cursor/project_intelligence_cache/.*
+              \.cursor/project_intelligence_cache/.*|
+              model_testing/.*
           )$
   - repo: https://github.com/psf/black
     rev: 23.12.1
@@ -21,12 +22,15 @@ repos:
               apps/.*|
               intake/.*|
               \.consult/.*|
-              \.cursor/project_intelligence_cache/.*
+              \.cursor/project_intelligence_cache/.*|
+              model_testing/.*
           )$
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.9.0
     hooks:
       - id: mypy
+        additional_dependencies:
+          - types-requests
         exclude: |
           (?x)^(
               \.archive/.*|
@@ -34,5 +38,6 @@ repos:
               intake/.*|
               \.consult/.*|
               \.cursor/project_intelligence_cache/.*|
-              libs/.*
+              libs/.*|
+              model_testing/.*
           )$

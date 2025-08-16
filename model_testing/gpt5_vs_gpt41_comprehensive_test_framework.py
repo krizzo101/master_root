@@ -21,15 +21,201 @@ import os
 import re
 import statistics
 import time
-from dataclasses import dataclass
+import logging
+from logging import Logger
+from dataclasses import dataclass, asdict
 from datetime import datetime
 from enum import Enum
-from typing import Any, IO
-from openai import OpenAI
+from typing import Any, IO, Dict
+from openai import OpenAI, AsyncOpenAI
 
 # =============================================================================
 # TEST CONFIGURATION
 # =============================================================================
+
+# Centralized debug logger setup
+BASE_DIR = os.path.dirname(__file__)
+RESULTS_DIR = os.path.join(BASE_DIR, "results")
+LOG_FILE_PATH = os.path.join(RESULTS_DIR, "test_run.log")
+
+
+def _setup_logger() -> Logger:
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+    logger = logging.getLogger("model_testing")
+    if not logger.handlers:
+        logger.setLevel(logging.DEBUG)
+        file_handler = logging.FileHandler(LOG_FILE_PATH, encoding="utf-8")
+        file_handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(
+            fmt="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+    return logger
+
+
+LOGGER: Logger = _setup_logger()
+
+
+def get_log_file_path() -> str:
+    """Expose the absolute path of the debug log file for callers (e.g., runner)."""
+    return LOG_FILE_PATH
+
+
+def set_log_file_path(path: str) -> str:
+    """Reconfigure the module logger to write to a new log file path.
+
+    - If `path` is relative, it will be resolved relative to `RESULTS_DIR`.
+    - Ensures parent directory exists.
+    - Replaces the existing file handler with one pointing to the new path.
+    Returns the absolute path used.
+    """
+    global LOG_FILE_PATH, LOGGER
+
+    # Resolve path
+    resolved = path
+    if not os.path.isabs(resolved):
+        os.makedirs(RESULTS_DIR, exist_ok=True)
+        resolved = os.path.join(RESULTS_DIR, resolved)
+    parent_dir = os.path.dirname(resolved)
+    os.makedirs(parent_dir or ".", exist_ok=True)
+
+    # Reconfigure handlers
+    for h in list(LOGGER.handlers):
+        try:
+            h.flush()
+        except Exception:
+            pass
+        LOGGER.removeHandler(h)
+
+    file_handler = logging.FileHandler(resolved, encoding="utf-8")
+    file_handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+        fmt="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    file_handler.setFormatter(formatter)
+    LOGGER.addHandler(file_handler)
+
+    LOG_FILE_PATH = resolved
+    LOGGER.debug("Logger reconfigured to new file: %s", LOG_FILE_PATH)
+    return LOG_FILE_PATH
+
+
+def _preview(text: str, limit: int = 800) -> str:
+    """Return a safe, truncated preview of large text blobs for logging."""
+    if text is None:
+        return ""
+    text = str(text)
+    if len(text) <= limit:
+        return text
+    return text[:limit] + f"... [truncated {len(text) - limit} chars]"
+
+
+def _sanitize_create_kwargs(kwargs: dict[str, Any]) -> dict[str, Any]:
+    """Remove large or sensitive fields and keep a compact view for logs."""
+    sanitized: dict[str, Any] = {
+        "model": kwargs.get("model"),
+        "max_output_tokens": kwargs.get("max_output_tokens"),
+        "has_temperature": "temperature" in kwargs,
+        "has_reasoning": "reasoning" in kwargs,
+    }
+    if "reasoning" in kwargs and isinstance(kwargs["reasoning"], dict):
+        sanitized["reasoning_effort"] = kwargs["reasoning"].get("effort")
+    return sanitized
+
+
+_QUOTED_FIELD_PATTERN = re.compile(r"\{\s*(['\"])?(?P<key>[A-Za-z0-9_]+)(['\"])??\s*\}")
+
+
+def _normalize_placeholders(prompt_text: str) -> str:
+    """Normalize placeholders like {'key'} or {"key"} to {key} for str.format.
+
+    This prevents KeyError: "'key'" when prompts include quoted placeholders.
+    """
+
+    def _repl(match: re.Match) -> str:
+        key = match.group("key") or ""
+        return "{" + key + "}"
+
+    return _QUOTED_FIELD_PATTERN.sub(_repl, prompt_text)
+
+
+def _extract_text_from_response(resp: Any) -> str:
+    """Robustly extract text from a Responses API result.
+
+    Falls back to traversing the output structure if output_text is empty.
+    """
+    text = getattr(resp, "output_text", None)
+    if text:
+        return text
+    # Fallback: traverse dict representation
+    try:
+        data = resp.model_dump()
+    except Exception:
+        try:
+            # As a last resort, to_dict style
+            data = getattr(resp, "to_dict", lambda: {})()
+        except Exception:
+            data = {}
+    pieces: list[str] = []
+    output = data.get("output") or []
+    for item in output:
+        if item.get("type") == "message":
+            for c in item.get("content") or []:
+                ctype = c.get("type")
+                if ctype in ("output_text", "text"):
+                    # Some SDKs use {"text": {"value": "..."}}
+                    if isinstance(c.get("text"), dict):
+                        val = c.get("text", {}).get("value")
+                    else:
+                        val = c.get("text")
+                    if val:
+                        pieces.append(str(val))
+    return "\n".join(pieces)
+
+
+_FIELD_PATTERN = re.compile(r"\{\s*([A-Za-z0-9_]+)\s*\}")
+
+
+def _safe_format(template: str, data: dict[str, Any]) -> str:
+    """Safely substitute {key} placeholders with values from data without KeyError."""
+    def repl(match: re.Match) -> str:
+        key = match.group(1)
+        val = data.get(key)
+        return str(val) if val is not None else match.group(0)
+
+    return _FIELD_PATTERN.sub(repl, template)
+
+
+def _build_fallback_prompt(category: TestCategory, dataset: dict[str, Any]) -> str:
+    """Construct a minimal fallback prompt when the provided prompt is invalid/corrupted."""
+    if category == TestCategory.REASONING:
+        if "problem" in dataset:
+            return f"Solve this problem step by step and provide the final answer.\n\nProblem: {dataset.get('problem')}"
+        if "scenario" in dataset and "question" in dataset:
+            return (
+                f"Analyze the scenario and answer the question.\n\nScenario: {dataset.get('scenario')}\nQuestion: {dataset.get('question')}"
+            )
+    elif category == TestCategory.AGENTIC_TASKS:
+        if "task" in dataset:
+            return f"Plan and execute the following task. Provide a clear plan and steps.\n\nTask: {dataset.get('task')}"
+    elif category == TestCategory.LONG_CONTEXT:
+        if "document" in dataset and "question" in dataset:
+            return (
+                f"Read the document and answer the question with citations.\n\nDocument: {dataset.get('document')}\nQuestion: {dataset.get('question')}"
+            )
+    elif category == TestCategory.FACTUALITY:
+        if "query" in dataset:
+            return f"Answer factually and cite sources.\n\nQuery: {dataset.get('query')}"
+    else:  # CODE_GENERATION and coding-focused categories
+        if "requirements" in dataset:
+            return f"Implement code that satisfies these requirements.\n\nRequirements: {dataset.get('requirements')}"
+        if "problem" in dataset:
+            return f"Write code to solve the following problem.\n\nProblem: {dataset.get('problem')}"
+    # Generic fallback
+    return "Please complete the task using the provided context."
 
 
 class TestCategory(Enum):
@@ -1762,8 +1948,19 @@ class ModelEvaluator:
     def __init__(self) -> None:
         self.results: dict[str, Any] = {}
         self.comparison_data: dict[str, Any] = {}
-        # OpenAI client (expects OPENAI_API_KEY in environment)
-        self.client: OpenAI = OpenAI()
+        # OpenAI async client (expects OPENAI_API_KEY in environment)
+        self.client: AsyncOpenAI = AsyncOpenAI()
+        # Bounded concurrency for API calls
+        self.semaphore: asyncio.Semaphore = asyncio.Semaphore(
+            int(os.environ.get("MODEL_TEST_CONCURRENCY", "8"))
+        )
+        LOGGER.debug(
+            "Initialized ModelEvaluator (async) with concurrency=%s. Env set: OPENAI_API_KEY=%s, ORG=%s, PROJECT=%s",
+            self.semaphore._value,
+            bool(os.environ.get("OPENAI_API_KEY")),
+            os.environ.get("OPENAI_ORG_ID"),
+            os.environ.get("OPENAI_PROJECT_ID"),
+        )
 
     @staticmethod
     def _is_gpt5_model(model: str) -> bool:
@@ -1794,10 +1991,31 @@ class ModelEvaluator:
                     prompt = json.dumps(prompt)
                 else:
                     prompt = str(prompt)
-            formatted_prompt = prompt.format(**dataset)
+            # Normalize quoted placeholders before formatting to avoid KeyError: "'key'"
+            normalized_prompt = _normalize_placeholders(prompt)
+            try:
+                formatted_prompt = normalized_prompt.format(**dataset)
+            except KeyError as ke:
+                LOGGER.warning("Missing placeholder during format for test=%s model=%s: %s. Falling back to safe_format.", test_name, model, ke)
+                formatted_prompt = _safe_format(normalized_prompt, dataset)
+            # If still unchanged and contains placeholders, build a fallback prompt
+            if _FIELD_PATTERN.search(formatted_prompt):
+                LOGGER.warning("Unresolved placeholders remain for test=%s model=%s. Using constructed fallback prompt.", test_name, model)
+                formatted_prompt = _build_fallback_prompt(category, dataset)
+
+            api_cfg = GPT5_CONFIG if model.startswith("gpt-5") else GPT41_CONFIG
+            LOGGER.debug(
+                "Evaluating model=%s | category=%s | test=%s | prompt_chars=%d | api_type=%s",
+                model,
+                category.value,
+                test_name,
+                len(formatted_prompt),
+                api_cfg.get("api_type"),
+            )
+            LOGGER.debug("Prompt preview: %s", _preview(formatted_prompt))
+            LOGGER.debug("Dataset keys: %s", sorted(list(dataset.keys())))
 
             # Execute using OpenAI Responses API
-            api_cfg = GPT5_CONFIG if model.startswith("gpt-5") else GPT41_CONFIG
             create_kwargs: dict[str, Any] = {
                 "model": model,
                 "input": formatted_prompt,
@@ -1805,18 +2023,59 @@ class ModelEvaluator:
             }
             if self._supports_temperature(model):
                 create_kwargs["temperature"] = api_cfg.get("temperature", 0.1)
-            resp = self.client.responses.create(**create_kwargs)
+            else:
+                LOGGER.debug(
+                    "Omitting temperature for model=%s due to API support.", model
+                )
+            # Add reasoning for GPT-5 if available
+            if self._is_gpt5_model(model):
+                reasoning_effort = api_cfg.get("reasoning_effort")
+                if reasoning_effort:
+                    create_kwargs["reasoning"] = {"effort": reasoning_effort}
+                LOGGER.debug("GPT-5 params set | reasoning_effort=%s", reasoning_effort)
+
+            LOGGER.debug(
+                "Create kwargs: %s", json.dumps(_sanitize_create_kwargs(create_kwargs))
+            )
+
+            try:
+                async with self.semaphore:
+                    resp = await self.client.responses.create(**create_kwargs)
+            except Exception:
+                # Retry stripping potentially unsupported params
+                LOGGER.warning(
+                    "Initial call rejected for model=%s, retrying without temperature/reasoning...",
+                    model,
+                )
+                create_kwargs.pop("temperature", None)
+                create_kwargs.pop("reasoning", None)
+                create_kwargs.pop("verbosity", None)
+                LOGGER.debug(
+                    "Create kwargs (retry): %s",
+                    json.dumps(_sanitize_create_kwargs(create_kwargs)),
+                )
+                async with self.semaphore:
+                    resp = await self.client.responses.create(**create_kwargs)
 
             execution_time = time.time() - start_time
 
             # Extract response text and usage
-            response_text = getattr(resp, "output_text", "") or ""
+            response_text = _extract_text_from_response(resp)
             usage = getattr(resp, "usage", None)
+            resp_id = getattr(resp, "id", None)
+            LOGGER.debug("Response preview: %s", _preview(response_text))
             token_count = 0
             if usage is not None:
                 token_count = int(getattr(usage, "input_tokens", 0)) + int(
                     getattr(usage, "output_tokens", 0)
                 )
+            LOGGER.debug(
+                "Model=%s completed | exec_time=%.2fs | tokens=%s | response_id=%s",
+                model,
+                execution_time,
+                token_count,
+                resp_id,
+            )
 
             # Calculate metrics
             metrics = self._calculate_metrics(
@@ -1824,11 +2083,18 @@ class ModelEvaluator:
             )
             # Overwrite token_count if available
             metrics.token_count = token_count
+            LOGGER.debug("Metrics: %s", json.dumps(asdict(metrics)))
 
             return metrics
 
         except Exception as e:
-            print(f"Error evaluating {model} on {test_name}: {e}")
+            LOGGER.exception(
+                "Error evaluating model=%s | test=%s: %s | prompt_preview=%s",
+                model,
+                test_name,
+                e,
+                _preview(prompt),
+            )
             return EvaluationMetrics(
                 execution_time=time.time() - start_time,
                 token_count=0,
@@ -1863,10 +2129,28 @@ class ModelEvaluator:
                     prompt = json.dumps(prompt)
                 else:
                     prompt = str(prompt)
-            formatted_prompt = prompt.format(**dataset)
+            normalized_prompt = _normalize_placeholders(prompt)
+            try:
+                formatted_prompt = normalized_prompt.format(**dataset)
+            except KeyError as ke:
+                LOGGER.warning("Missing placeholder during format (reasoning) test=%s model=%s: %s. Falling back to safe_format.", test_name, model, ke)
+                formatted_prompt = _safe_format(normalized_prompt, dataset)
+            if _FIELD_PATTERN.search(formatted_prompt):
+                LOGGER.warning("Unresolved placeholders remain (reasoning) test=%s model=%s. Using constructed fallback prompt.", test_name, model)
+                formatted_prompt = _build_fallback_prompt(category, dataset)
 
             # Get reasoning effort configuration
             reasoning_config = GPT5_REASONING_CONFIGS[effort_level]
+            LOGGER.debug(
+                "Evaluating GPT-5 with reasoning | model=%s | effort=%s | category=%s | test=%s | prompt_chars=%d",
+                model,
+                effort_level.value,
+                category.value,
+                test_name,
+                len(formatted_prompt),
+            )
+            LOGGER.debug("Prompt preview: %s", _preview(formatted_prompt))
+            LOGGER.debug("Dataset keys: %s", sorted(list(dataset.keys())))
 
             # Execute using OpenAI Responses API with reasoning config
             create_kwargs: dict[str, Any] = {
@@ -1881,36 +2165,68 @@ class ModelEvaluator:
                 }
             if self._supports_temperature(model):
                 create_kwargs["temperature"] = reasoning_config.get("temperature", 0.1)
+            else:
+                LOGGER.debug(
+                    "Omitting temperature for model=%s due to API support.", model
+                )
+            LOGGER.debug(
+                "Create kwargs: %s", json.dumps(_sanitize_create_kwargs(create_kwargs))
+            )
             try:
-                resp = self.client.responses.create(**create_kwargs)
+                async with self.semaphore:
+                    resp = await self.client.responses.create(**create_kwargs)
             except Exception:
                 # Retry without temperature/reasoning if rejected
+                LOGGER.warning(
+                    "Initial call rejected for model=%s, retrying without temperature/reasoning...",
+                    model,
+                )
                 create_kwargs.pop("temperature", None)
                 create_kwargs.pop("reasoning", None)
-                resp = self.client.responses.create(**create_kwargs)
+                LOGGER.debug(
+                    "Create kwargs (retry): %s",
+                    json.dumps(_sanitize_create_kwargs(create_kwargs)),
+                )
+                async with self.semaphore:
+                    resp = await self.client.responses.create(**create_kwargs)
 
             execution_time = time.time() - start_time
 
             # Extract response text and usage
-            response_text = getattr(resp, "output_text", "") or ""
+            response_text = _extract_text_from_response(resp)
             usage = getattr(resp, "usage", None)
+            resp_id = getattr(resp, "id", None)
+            LOGGER.debug("Response preview: %s", _preview(response_text))
             token_count = 0
             if usage is not None:
                 token_count = int(getattr(usage, "input_tokens", 0)) + int(
                     getattr(usage, "output_tokens", 0)
                 )
+            LOGGER.debug(
+                "Model=%s effort=%s completed | exec_time=%.2fs | tokens=%s | response_id=%s",
+                model,
+                effort_level.value,
+                execution_time,
+                token_count,
+                resp_id,
+            )
 
             # Calculate metrics
             metrics = self._calculate_metrics(
                 response_text, dataset, category, execution_time
             )
             metrics.token_count = token_count
+            LOGGER.debug("Metrics: %s", json.dumps(asdict(metrics)))
 
             return metrics
 
         except Exception as e:
-            print(
-                f"Error evaluating {model} on {test_name} with {effort_level.value} reasoning: {e}"
+            LOGGER.exception(
+                "Error in reasoning-effort eval | model=%s | effort=%s | test=%s: %s",
+                model,
+                effort_level.value,
+                test_name,
+                e,
             )
             return EvaluationMetrics(
                 execution_time=time.time() - start_time,
@@ -2335,29 +2651,26 @@ class ComprehensiveTestRunner:
             TestCategory.CODE_OPTIMIZATION,
         ]
 
-        for effort_level in ReasoningEffort:
-            print(f"    🧪 Testing {effort_level.value} reasoning effort")
-
-            effort_results: dict[str, Any] = {
-                "effort_level": effort_level.value,
+        async def run_effort_and_categories(effort: ReasoningEffort):
+            print(f"    🧪 Testing {effort.value} reasoning effort")
+            effort_result: dict[str, Any] = {
+                "effort_level": effort.value,
                 "categories": {},
                 "summary": {},
             }
+            async def run_one_category(cat: TestCategory):
+                print(f"      📋 Testing {cat.value}")
+                res = await self._test_category_with_reasoning_effort("gpt-5", cat, effort)
+                return cat.value, res
+            pairs = await asyncio.gather(*(run_one_category(c) for c in coding_categories))
+            for cat_value, res in pairs:
+                effort_result["categories"][cat_value] = res
+            effort_result["summary"] = self._calculate_reasoning_effort_summary(effort_result["categories"])
+            return effort.value, effort_result
 
-            for category in coding_categories:
-                print(f"      📋 Testing {category.value}")
-
-                category_results = await self._test_category_with_reasoning_effort(
-                    "gpt-5", category, effort_level
-                )
-                effort_results["categories"][category.value] = category_results
-
-            # Calculate effort level summary
-            effort_results["summary"] = self._calculate_reasoning_effort_summary(
-                effort_results["categories"]
-            )
-
-            reasoning_results["reasoning_efforts"][effort_level.value] = effort_results
+        gathered = await asyncio.gather(*(run_effort_and_categories(e) for e in ReasoningEffort))
+        for effort_value, effort_result in gathered:
+            reasoning_results["reasoning_efforts"][effort_value] = effort_result
 
         # Analyze coding performance across reasoning efforts
         reasoning_results[
@@ -2557,12 +2870,14 @@ class ComprehensiveTestRunner:
             "categories": {},
         }
 
-        for category in TestCategory:
-            print(f"  📝 Testing {category.value}")
-            category_results = await self._test_category(
-                gpt41_model, gpt5_model, category
-            )
-            pair_results["categories"][category.value] = category_results
+        async def run_one_category(cat: TestCategory):
+            print(f"  📝 Testing {cat.value}")
+            res = await self._test_category(gpt41_model, gpt5_model, cat)
+            return cat.value, res
+
+        tasks = [run_one_category(cat) for cat in TestCategory]
+        for cat_value, res in await asyncio.gather(*tasks):
+            pair_results["categories"][cat_value] = res
 
         return pair_results
 
@@ -2577,36 +2892,33 @@ class ComprehensiveTestRunner:
         gpt5_tests = GPT5_OPTIMIZED_PROMPTS.get(category) or {}
         datasets = TEST_DATASETS.get(category) or {}
 
-        for test_name in gpt41_tests.keys():
-            if test_name in datasets and test_name in gpt5_tests:
-                print(f"    🧪 Running {test_name}")
+        async def run_one_test(name: str):
+            print(f"    🧪 Running {name}")
+            LOGGER.debug(
+                "Running category=%s test=%s | dataset_keys=%s",
+                category.value,
+                name,
+                list(datasets[name][0].keys()) if datasets.get(name) else [],
+            )
+            gpt41_task = self.evaluator.evaluate_model(
+                gpt41_model, category, name, gpt41_tests[name], datasets[name][0]
+            )
+            gpt5_task = self.evaluator.evaluate_model(
+                gpt5_model, category, name, gpt5_tests[name], datasets[name][0]
+            )
+            gpt41_metrics, gpt5_metrics = await asyncio.gather(gpt41_task, gpt5_task)
+            comparison = self._compare_metrics(gpt41_metrics, gpt5_metrics)
+            return name, {
+                "gpt41_metrics": self._metrics_to_dict(gpt41_metrics),
+                "gpt5_metrics": self._metrics_to_dict(gpt5_metrics),
+                "comparison": comparison,
+            }
 
-                # Test GPT-4.1 model with GPT-4.1 optimized prompt
-                gpt41_metrics = await self.evaluator.evaluate_model(
-                    gpt41_model,
-                    category,
-                    test_name,
-                    gpt41_tests[test_name],
-                    datasets[test_name][0],
-                )
-
-                # Test GPT-5 model with GPT-5 optimized prompt
-                gpt5_metrics = await self.evaluator.evaluate_model(
-                    gpt5_model,
-                    category,
-                    test_name,
-                    gpt5_tests[test_name],
-                    datasets[test_name][0],
-                )
-
-                # Compare results
-                comparison = self._compare_metrics(gpt41_metrics, gpt5_metrics)
-
-                category_results["tests"][test_name] = {
-                    "gpt41_metrics": self._metrics_to_dict(gpt41_metrics),
-                    "gpt5_metrics": self._metrics_to_dict(gpt5_metrics),
-                    "comparison": comparison,
-                }
+        names = [n for n in gpt41_tests.keys() if n in datasets and n in gpt5_tests]
+        if names:
+            results = await asyncio.gather(*(run_one_test(n) for n in names))
+            for name, data in results:
+                category_results["tests"][name] = data
 
         # Calculate category summary
         category_results["summary"] = self._calculate_category_summary(
@@ -2725,6 +3037,8 @@ class ComprehensiveTestRunner:
                 "average_improvement": 0.0,
                 "median_improvement": 0.0,
                 "std_improvement": 0.0,
+                "best_improvement": 0.0,
+                "worst_improvement": 0.0,
             }
 
         return {
@@ -2748,11 +3062,16 @@ class ComprehensiveTestRunner:
             "average_improvement": 0.0,
             "median_improvement": 0.0,
             "std_improvement": 0.0,
+            "best_improvement": 0.0,
+            "worst_improvement": 0.0,
         }
 
     def _generate_comprehensive_report(self, total_time: float) -> dict[str, Any]:
         """Generate comprehensive comparison report."""
         print("\n📊 Generating comprehensive report...")
+        LOGGER.debug(
+            "Generating comprehensive report with total_time=%.2fs", total_time
+        )
 
         # Calculate overall statistics
         all_improvements = []
@@ -2817,25 +3136,28 @@ class ComprehensiveTestRunner:
         os.makedirs(results_dir, exist_ok=True)
 
         # Save detailed JSON results
-        with open(
-            os.path.join(results_dir, "comprehensive_gpt5_vs_gpt41_results.json"), "w"
-        ) as f:
+        json_path = os.path.join(
+            results_dir, "comprehensive_gpt5_vs_gpt41_results.json"
+        )
+        with open(json_path, "w") as f:
             json.dump(report, f, indent=2, default=str)
+        LOGGER.debug("Updated file: %s", json_path)
 
         # Save markdown report
-        with open(
-            os.path.join(results_dir, "comprehensive_gpt5_vs_gpt41_report.md"), "w"
-        ) as f:
+        md_report_path = os.path.join(
+            results_dir, "comprehensive_gpt5_vs_gpt41_report.md"
+        )
+        with open(md_report_path, "w") as f:
             self._generate_markdown_report(report, f)
+        LOGGER.debug("Updated file: %s", md_report_path)
 
         # Save executive summary
-        with open(
-            os.path.join(
-                results_dir, "comprehensive_gpt5_vs_gpt41_executive_summary.md"
-            ),
-            "w",
-        ) as f:
+        summary_path = os.path.join(
+            results_dir, "comprehensive_gpt5_vs_gpt41_executive_summary.md"
+        )
+        with open(summary_path, "w") as f:
             self._generate_executive_summary(report, f)
+        LOGGER.debug("Updated file: %s", summary_path)
 
         print("✅ Results saved to:")
         print(
