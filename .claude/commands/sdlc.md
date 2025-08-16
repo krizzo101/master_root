@@ -2,6 +2,15 @@
 
 This command initiates a new project following strict SDLC phases with appropriate agent support.
 
+## 🎯 Core Principles
+
+### Mandatory Requirements
+1. **Check for existing implementations first** - Always use libs/ packages when available
+2. **Build reusable components** - Everything goes in libs/ or apps/ with proper structure
+3. **Follow current best practices** - Research 2025 patterns, not outdated approaches
+4. **Complete each phase fully** - No skipping or partial deliverables
+5. **Test everything thoroughly** - Components must actually work, not "mostly work"
+
 ## Usage
 ```
 /sdlc <project description>
@@ -35,10 +44,10 @@ Each SDLC phase has a dedicated agent profile that should be loaded:
 ## 📚 Required Reading
 First, familiarize yourself with these critical documents:
 1. `/home/opsvi/master_root/CLAUDE.md` - Your behavioral directives (BE THE EXPERT)
-2. `/docs/guidelines/AGENT_SDLC_GUIDELINES.md` - SDLC phases to follow
-3. `/docs/standards/MONOREPO_PROJECT_STANDARDS.md` - Project structure standards
-4. `/docs/standards/AGENT_INVOCATION_STANDARDS.md` - You are Claude Code, handle everything
-5. `/docs/standards/GIT_WORKFLOW_STANDARDS.md` - Git branching and commit standards
+2. `/home/opsvi/master_root/docs/guidelines/AGENT_SDLC_GUIDELINES.md` - SDLC phases to follow
+3. `/home/opsvi/master_root/docs/standards/MONOREPO_PROJECT_STANDARDS.md` - Project structure standards
+4. `/home/opsvi/master_root/docs/standards/AGENT_INVOCATION_STANDARDS.md` - You are Claude Code, handle everything
+5. `/home/opsvi/master_root/docs/standards/GIT_WORKFLOW_STANDARDS.md` - Git branching and commit standards
 
 ## 🌿 Git Setup (MANDATORY FIRST STEP)
 ```bash
@@ -53,7 +62,7 @@ git checkout -b feature/<project-name>
 git branch --show-current
 ```
 
-## 🔍 Pre-Development Checks
+## 🔍 MANDATORY Pre-Development Checks (CANNOT SKIP)
 
 ### 1. Knowledge System Query
 ```python
@@ -70,28 +79,31 @@ result = mcp__knowledge__knowledge_query(
 **IMPORTANT**: The resource discovery MCP server must be configured in your MCP settings to use these tools.
 
 ```python
-# Search for existing functionality in libs/
-result = search_resources(
+# MANDATORY: Search for existing functionality in libs/
+result = mcp__resource_discovery__search_resources(
     functionality="description of what you need",
-    search_depth=3,
+    search_depth=2,
     include_tests=False
 )
-# Returns packages, modules, and similar patterns
-
-# List all available packages
-packages = list_packages()
-# Returns all packages with descriptions and modules
+# IF FOUND: You MUST use it or document why it won't work
 
 # Check if specific package exists
-package_info = check_package_exists("opsvi-llm")
-# Returns package details and dependencies
+package_info = mcp__resource_discovery__check_package_exists("opsvi-llm")
+# IF EXISTS: You MUST use this package
 
 # Find similar code patterns
-similar = find_similar_functionality(
+similar = mcp__resource_discovery__find_similar_functionality(
     code_snippet="def authenticate_user(username, password):",
     language="python"
 )
-# Returns files with similar implementations
+# IF SIMILAR EXISTS: You MUST extend/compose, not duplicate
+
+### ⛔ STOP GATE: Duplication Check
+If similar functionality exists:
+1. You MUST use the existing implementation
+2. OR extend it to add missing features
+3. OR explicitly document why it cannot be used
+4. NEVER create a parallel implementation
 ```
 
 **Note**: These are MCP tools provided by the resource_discovery server. Do NOT try to import Python modules directly.
@@ -123,7 +135,7 @@ Task(
     prompt="Find current best practices for JWT authentication in 2025"
 )
 
-# For production work, use our Claude Code MCP tool
+# For production work
 mcp__claude-code__claude_run(
     task="Create JWT authentication with refresh tokens",
     outputFormat="json",
@@ -156,6 +168,12 @@ TodoWrite(todos=[
 
 ### 1️⃣ DISCOVERY (Research & Requirements)
 
+#### Phase Entry Checklist
+- [ ] Git feature branch created
+- [ ] Knowledge system queried
+- [ ] Resource discovery completed
+- [ ] Current best practices researched
+
 #### Load Phase Profile
 ```python
 # Read the SDLC phase profile to align your approach
@@ -187,13 +205,17 @@ Task(
   - `mcp__tech_docs__get-library-docs()` - Get library documentation
   - `mcp__firecrawl__firecrawl_scrape()` - Scrape official docs
 
-#### Deliverable
-Requirements document with:
-- Problem statement
-- User stories/use cases
-- Functional requirements
-- Non-functional requirements (performance, security)
-- Success criteria (measurable)
+#### Required Deliverables (MUST complete all)
+- [ ] `docs/requirements/<project>.md` created with:
+  - Problem statement
+  - User stories/use cases
+  - Functional requirements
+  - Non-functional requirements
+  - Interface specifications
+  - Success criteria
+- [ ] Existing solutions documented (if found)
+- [ ] Decision to reuse or build new justified
+- [ ] 2025 best practices researched and documented
 
 #### Git Commit
 ```bash
@@ -206,6 +228,11 @@ git commit -m "docs: add requirements for <project>
 ```
 
 ### 2️⃣ DESIGN (Architecture)
+
+#### Phase Gate: Cannot proceed unless
+- [ ] Requirements document exists and is complete
+- [ ] Existing solutions have been evaluated
+- [ ] Decision to build new or extend existing is documented
 
 #### Agent Support
 ```python
@@ -230,13 +257,16 @@ Task(
 - Design component boundaries
 - Define interfaces
 
-#### Deliverable
-Design document with:
-- Architecture diagram
-- Component descriptions
-- Data flow diagrams
-- API specifications
-- Technology choices with justification
+#### Required Deliverables (MUST complete all)
+- [ ] `docs/design/<project>.md` created with:
+  - Architecture diagram (mermaid or similar)
+  - Public API specifications
+  - Component descriptions
+  - Data flow diagrams
+  - Integration examples (min 2)
+  - Technology stack with justification
+- [ ] Design reviewed (use reviewer-critic agent)
+- [ ] Interfaces validated for reusability
 
 #### Git Commit
 ```bash
@@ -274,6 +304,11 @@ Task(
 - Set success metrics
 
 ### 4️⃣ DEVELOPMENT (Implementation)
+
+#### Phase Gate: Cannot proceed unless
+- [ ] Design document complete and reviewed
+- [ ] Task breakdown complete (<2 hour tasks)
+- [ ] Test strategy defined
 
 #### 🚨 IMPORTANT: For AI-Powered Applications
 **When building applications that need AI/agent capabilities:**
@@ -323,6 +358,12 @@ mcp__claude-code__claude_run(
 
 ### 5️⃣ TESTING (Validation)
 
+#### Phase Gate: Cannot proceed unless
+- [ ] All code implemented
+- [ ] Unit tests written (>80% coverage)
+- [ ] Integration tests written
+- [ ] All tests passing
+
 #### Agent Support
 ```python
 Task(
@@ -343,9 +384,11 @@ Task(
 
 #### Activities
 - Unit tests (>80% coverage)
-- Integration tests
-- Performance tests
+- Integration tests (component interactions)
+- End-to-end tests (complete workflows)
+- Performance benchmarks
 - Security validation
+- Build sample integration to validate usability
 
 ### 6️⃣ DEPLOYMENT (Release Prep)
 
@@ -395,8 +438,9 @@ Task(
 ```
 
 #### Activities
-- Monitor actively
-- Document lessons
+- Monitor performance
+- Document lessons learned
+- Create integration guide for future users
 - Update knowledge system:
   ```python
   result = mcp__knowledge__knowledge_store(
@@ -483,12 +527,23 @@ Task(
 6. **Commit Often**: After each logical unit of work
 7. **Use Agents**: Leverage specialized agents for each phase
 
-## 🎯 Remember
-- **You are Claude Code** - You handle the entire workflow
-- **Be the Expert** - Push back on suboptimal suggestions
-- **Follow Standards** - They exist for good reasons
-- **Knowledge System** - Query it, use it, update it
-- **Use Task Tool** - Leverage specialized agents when appropriate
+## 🛑 Definition of "Done"
+
+### Each phase must be complete before proceeding:
+1. **All deliverables created** - No missing documents or code
+2. **Tests pass** - All unit, integration, and e2e tests green
+3. **Documentation complete** - README, API docs, examples included
+4. **Code follows standards** - Linting, type hints, proper structure
+5. **Peer review passed** - Use reviewer-critic agent if needed
+6. **Integration verified** - Can be imported and used by other projects
+7. **Knowledge captured** - Lessons learned documented in knowledge system
+
+## Next Steps
+After reading this document:
+1. Begin with Phase 1: DISCOVERY
+2. Complete ALL activities and deliverables for each phase
+3. Do not proceed to next phase until current phase is complete
+4. Use the specified MCP tools and agents for each phase
 
 ## Common Issues and Solutions
 

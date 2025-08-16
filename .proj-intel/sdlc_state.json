@@ -1,8 +1,8 @@
 {
   "active_project": {
-    "project_id": "ctx_intel_001",
-    "project_name": "Context Intelligence System",
-    "locked_at": "2025-08-15T15:47:00.339518",
+    "project_id": "cfe37ca3",
+    "project_name": "test_project",
+    "locked_at": "2025-08-16T03:17:49.998404",
     "current_phase": "discovery",
     "completed_phases": [],
     "phase_requirements": {}
