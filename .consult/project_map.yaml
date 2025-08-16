@@ -442,6 +442,7 @@ files:
   - _gen_sandbox/opsvi-security/tests/test_opsvi_security.py
   - _gen_sandbox/recommended_structure.yaml
   - _gen_sandbox/templates.yaml
+  - analyze_all_custom_projects.py
   - analyze_log_reality.py
   - baseline_analysis.py
   - clean_log.py
@@ -450,6 +451,7 @@ files:
   - consult_agent_optimization_strategy.md
   - docs/DEVELOPMENT.md
   - docs/WORKSPACE_OPTIMIZATION.md
+  - docs/ai_populate_openai_responses_knowledge.md
   - docs/auto-attach-script-optimized-spec.md
   - docs/combined-project-intelligence-spec.md
   - docs/libs/COMPLETE_LIBRARY_STRUCTURE.md
@@ -469,7 +471,11 @@ files:
   - docs/status/workspace_status_2025-08-03_18-44-43.md
   - docs/template_notes.txt
   - enhanced_critic_accountability.py
+  - generate_project_visualizations.py
+  - generate_project_visualizations_fixed.py
   - justfile
+  - libs.dir
+  - libs/INTEGRATIONS_DIRECTORY_TREE.md
   - libs/README.md
   - libs/STRUCTURE.md
   - libs/TEMPLATES.md
@@ -588,7 +594,13 @@ files:
   - libs/opsvi-data/opsvi_data/core/base.py
   - libs/opsvi-data/opsvi_data/exceptions/__init__.py
   - libs/opsvi-data/opsvi_data/exceptions/base.py
+  - libs/opsvi-data/opsvi_data/graph/client.py
+  - libs/opsvi-data/opsvi_data/graph/driver.py
+  - libs/opsvi-data/opsvi_data/graph/json_storage.py
+  - libs/opsvi-data/opsvi_data/graph/queries.py
   - libs/opsvi-data/opsvi_data/tests/__init__.py
+  - libs/opsvi-data/opsvi_data/tests/test_imports.py
+  - libs/opsvi-data/opsvi_data/vector/chroma_client.py
   - libs/opsvi-data/opsvi_data/{{package_name}}/__init__.py
   - libs/opsvi-data/opsvi_data/{{package_name}}/config/__init__.py
   - libs/opsvi-data/opsvi_data/{{package_name}}/core/__init__.py
@@ -635,15 +647,24 @@ files:
   - libs/opsvi-foundation/pyproject.toml
   - libs/opsvi-foundation/tests/__init__.py
   - libs/opsvi-foundation/tests/test_opsvi_foundation.py
+  - libs/opsvi-fs/MANIFEST.in
   - libs/opsvi-fs/README.md
   - libs/opsvi-fs/opsvi_fs/__init__.py
+  - libs/opsvi-fs/opsvi_fs/cli/fs_cli.py
   - libs/opsvi-fs/opsvi_fs/config/__init__.py
   - libs/opsvi-fs/opsvi_fs/config/settings.py
   - libs/opsvi-fs/opsvi_fs/core/__init__.py
   - libs/opsvi-fs/opsvi_fs/core/base.py
   - libs/opsvi-fs/opsvi_fs/exceptions/__init__.py
   - libs/opsvi-fs/opsvi_fs/exceptions/base.py
+  - libs/opsvi-fs/opsvi_fs/providers/factory.py
+  - libs/opsvi-fs/opsvi_fs/providers/fsspec_adapter.py
+  - libs/opsvi-fs/opsvi_fs/providers/interfaces.py
+  - libs/opsvi-fs/opsvi_fs/providers/local_adapter.py
+  - libs/opsvi-fs/opsvi_fs/py.typed
+  - libs/opsvi-fs/opsvi_fs/schemas/models.py
   - libs/opsvi-fs/opsvi_fs/tests/__init__.py
+  - libs/opsvi-fs/opsvi_fs/utils/path_utils.py
   - libs/opsvi-fs/opsvi_fs/{{package_name}}/__init__.py
   - libs/opsvi-fs/opsvi_fs/{{package_name}}/config/__init__.py
   - libs/opsvi-fs/opsvi_fs/{{package_name}}/core/__init__.py
@@ -859,6 +880,7 @@ files:
   - real_world_test.py
   - ruff.toml
   - scripts/README_auto_attach.md
+  - scripts/agents/gatekeeper_summarize_projects.py
   - scripts/auto_attach.py
   - scripts/auto_attach_generator.py
   - scripts/diff_libs.sh
@@ -868,17 +890,22 @@ files:
   - scripts/generate_rag_components.py
   - scripts/generate_remaining_rag.py
   - scripts/new_agent_worktree.sh
+  - scripts/scaffold_libs_codegen.py
   - scripts/test_auto_attach.py
   - scripts/validate_libs.sh
+  - scripts/wave1_data_extraction.sh
+  - scripts/wave1_data_extraction_copy.sh
   - systemd/autosave@.service
   - systemd/autosave@.timer
   - systemd/snapshot@.service
   - systemd/snapshot@.timer
   - test_optimized_critic.py
   - tests/opsvi_core/test_logging.py
+  - tests/smoke/test_smoke.py
   - tools/ai_populate.py
   - tools/autosave.sh
   - tools/libs_check.py
+  - tools/monitor_logs.py
   - tools/rag_init.py
   - tools/snapshot.sh
   - tools/template_vars_check.py

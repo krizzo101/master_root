@@ -1,40 +1,62 @@
-"""opsvi-http - HTTP client and server functionality.
+"""OPSVI HTTP Library.
 
-Comprehensive opsvi-http library for the OPSVI ecosystem
+Comprehensive HTTP client and server functionality for the OPSVI ecosystem.
 """
 
 __version__ = "0.1.0"
 __author__ = "OPSVI Team"
-__email__ = "team@opsvi.com"
+__description__ = "HTTP client and server functionality for OPSVI"
 
 # Core exports
-from .core.base import BaseComponent, ComponentError
-from .config.settings import LibraryConfig, LibrarySettings
-from .exceptions.base import LibraryError, LibraryConfigurationError
+from .client.base import (
+    BaseHTTPClient,
+    HTTPConfig,
+    HTTPRequest,
+    HTTPResponse,
+    HTTPMethod,
+    HTTPStatus,
+    HTTPError,
+    HTTPClientError,
+    HTTPRequestError,
+    HTTPResponseError,
+    HTTPTimeoutError,
+)
 
-# Service-specific exports
-from .providers.base import True
-from .schemas.models import 
+from .client.httpx_client import (
+    HTTPXClient,
+    HTTPXConfig,
+)
 
-# RAG-specific exports
-
-# Manager-specific exports
-
+# Convenience exports
 __all__ = [
     # Core
-    BaseComponent, ComponentError,
-    LibraryConfig, LibrarySettings,
-    LibraryError, LibraryConfigurationError,
-    # Service
-    True,
-    ,
+    "BaseHTTPClient",
+    "HTTPConfig",
+    "HTTPRequest",
+    "HTTPResponse",
+    "HTTPMethod",
+    "HTTPStatus",
+    "HTTPError",
+    "HTTPClientError",
+    "HTTPRequestError",
+    "HTTPResponseError",
+    "HTTPTimeoutError",
+    # HTTPX implementation
+    "HTTPXClient",
+    "HTTPXConfig",
 ]
 
-# Version info
+
 def get_version() -> str:
     """Get the library version."""
     return __version__
 
+
 def get_author() -> str:
     """Get the library author."""
     return __author__
+
+
+def get_description() -> str:
+    """Get the library description."""
+    return __description__

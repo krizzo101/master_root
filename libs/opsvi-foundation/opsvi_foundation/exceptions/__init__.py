@@ -1,24 +1,32 @@
-"""Exceptions module for opsvi-foundation.
+"""Exception classes for opsvi-foundation.
 
-Provides exception hierarchy and error handling.
+Comprehensive exception handling for the OPSVI ecosystem
 """
 
 from .base import (
-    OpsviFoundationError,
-    OpsviFoundationConfigurationError,
-    OpsviFoundationConnectionError,
-    OpsviFoundationValidationError,
-    OpsviFoundationTimeoutError,
-    OpsviFoundationResourceError,
-    OpsviFoundationInitializationError,
+    LibraryError,
+    LibraryConfigurationError,
+    LibraryInitializationError,
+    LibraryValidationError,
+    LibraryConnectionError,
+    LibraryTimeoutError,
+    LibraryAuthenticationError,
+    LibraryAuthorizationError,
+    LibraryResourceError,
+    LibraryStateError,
+    LibraryOperationError,
 )
 
 __all__ = [
-    "OpsviFoundationError",
-    "OpsviFoundationConfigurationError",
-    "OpsviFoundationConnectionError",
-    "OpsviFoundationValidationError",
-    "OpsviFoundationTimeoutError",
-    "OpsviFoundationResourceError",
-    "OpsviFoundationInitializationError",
+    "LibraryError",
+    "LibraryConfigurationError",
+    "LibraryInitializationError",
+    "LibraryValidationError",
+    "LibraryConnectionError",
+    "LibraryTimeoutError",
+    "LibraryAuthenticationError",
+    "LibraryAuthorizationError",
+    "LibraryResourceError",
+    "LibraryStateError",
+    "LibraryOperationError",
 ]

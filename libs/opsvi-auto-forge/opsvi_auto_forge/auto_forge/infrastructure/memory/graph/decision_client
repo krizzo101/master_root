@@ -1,0 +1,644 @@
+"""
+Neo4j decision client for evidence graph persistence.
+
+Cited in AUDIT_action_plan.md: A4 steps & acceptance.
+"""
+
+from __future__ import annotations
+import logging
+from typing import List, Dict, Any, Optional
+from datetime import datetime
+from uuid import UUID
+from neo4j import GraphDatabase, Session
+from auto_forge.core.decision_kernel.evidence import Claim, Evidence
+from auto_forge.core.decision_kernel.models import DecisionRecord, RouteDecision, Verification
+from memory.graph.queries_decision import (
+    create_decision_evidence_query,
+    read_decision_graph_query,
+    read_decision_evidence_query,
+    update_decision_confidence_query,
+    create_verification_query
+)
+from monitoring.metrics.decision_metrics import (
+    ro_evidence_retrieval_success_total,
+    ro_evidence_retrieval_failure_total,
+    decision_success,
+    decision_failure
+)
+
+logger = logging.getLogger(__name__)
+
+
+def get_decision_client() -> DecisionClient:
+    """
+    Get a decision client instance.
+
+    Returns:
+        DecisionClient instance
+    """
+    from memory.graph.neo4j_client import get_neo4j_driver
+    driver = get_neo4j_driver()
+    return DecisionClient(driver)
+
+
+class DecisionClient:
+    """Client for persisting and retrieving decision evidence from Neo4j."""
+
+    def __init__(self, driver: GraphDatabase.driver):
+        """
+        Initialize decision client.
+
+        Args:
+            driver: Neo4j driver instance
+        """
+        self.driver = driver
+
+    def _get_session(self) -> Session:
+        """Get Neo4j session."""
+        return self.driver.session()
+
+    def persist_decision_record(self, record: DecisionRecord) -> bool:
+        """
+        Persist a complete decision record to Neo4j.
+
+        Args:
+            record: Decision record to persist
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            cypher = """
+            MERGE (d:Decision {task_id: $task_id})
+            SET d += $decision_props
+            SET d.created_at = datetime($created_at)
+            SET d.updated_at = datetime($updated_at)
+            RETURN d
+            """
+
+            props = record.to_neo4j_props()
+
+            with self._get_session() as session:
+                result = session.run(cypher,
+                    task_id=props["task_id"],
+                    decision_props=props,
+                    created_at=props["created_at"],
+                    updated_at=props["updated_at"]
+                )
+
+                if result.single():
+                    # Emit metrics
+                    if record.decision.success:
+                        decision_success.labels(
+                            strategy=record.decision.strategy,
+                            model=record.decision.model
+                        ).inc()
+                    else:
+                        decision_failure.labels(
+                            strategy=record.decision.strategy,
+                            model=record.decision.model
+                        ).inc()
+
+                    logger.info(f"Persisted decision record for task {record.decision.task_id}")
+                    return True
+                else:
+                    logger.error(f"Failed to persist decision record for task {record.decision.task_id}")
+                    return False
+
+        except Exception as e:
+            logger.error(f"Error persisting decision record: {e}")
+            return False
+
+    def get_decision_record(self, task_id: str) -> Optional[DecisionRecord]:
+        """
+        Retrieve a decision record from Neo4j.
+
+        Args:
+            task_id: Task identifier
+
+        Returns:
+            DecisionRecord if found, None otherwise
+        """
+        try:
+            cypher = """
+            MATCH (d:Decision {task_id: $task_id})
+            RETURN d
+            """
+
+            with self._get_session() as session:
+                result = session.run(cypher, task_id=task_id)
+                record = result.single()
+
+                if record:
+                    props = dict(record["d"])
+                    return DecisionRecord.from_neo4j_props(props)
+                else:
+                    return None
+
+        except Exception as e:
+            logger.error(f"Error retrieving decision record for task {task_id}: {e}")
+            return None
+
+    def update_decision_execution(
+        self,
+        task_id: str,
+        success: bool,
+        cost_usd: float = 0.0,
+        latency_ms: int = 0,
+        tokens_used: int = 0,
+        error_message: Optional[str] = None
+    ) -> bool:
+        """
+        Update decision execution results.
+
+        Args:
+            task_id: Task identifier
+            success: Whether execution was successful
+            cost_usd: Actual cost in USD
+            latency_ms: Actual latency in milliseconds
+            tokens_used: Number of tokens used
+            error_message: Error message if failed
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            cypher = """
+            MATCH (d:Decision {task_id: $task_id})
+            SET d.success = $success
+            SET d.cost_actual_usd = $cost_usd
+            SET d.latency_actual_ms = $latency_ms
+            SET d.tokens_used = $tokens_used
+            SET d.error_message = $error_message
+            SET d.end_time = datetime()
+            SET d.updated_at = datetime()
+            RETURN d
+            """
+
+            with self._get_session() as session:
+                result = session.run(cypher,
+                    task_id=task_id,
+                    success=success,
+                    cost_usd=cost_usd,
+                    latency_ms=latency_ms,
+                    tokens_used=tokens_used,
+                    error_message=error_message
+                )
+
+                if result.single():
+                    # Emit metrics
+                    if success:
+                        decision_success.labels(strategy="unknown", model="unknown").inc()
+                    else:
+                        decision_failure.labels(strategy="unknown", model="unknown").inc()
+
+                    logger.info(f"Updated decision execution for task {task_id}")
+                    return True
+                else:
+                    logger.error(f"Failed to update decision execution for task {task_id}")
+                    return False
+
+        except Exception as e:
+            logger.error(f"Error updating decision execution for task {task_id}: {e}")
+            return False
+
+    def add_escalation_event(
+        self,
+        task_id: str,
+        from_model: str,
+        to_model: str,
+        reason: str
+    ) -> bool:
+        """
+        Record an escalation event.
+
+        Args:
+            task_id: Task identifier
+            from_model: Model being escalated from
+            to_model: Model being escalated to
+            reason: Reason for escalation
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            cypher = """
+            MATCH (d:Decision {task_id: $task_id})
+            SET d.escalation_count = d.escalation_count + 1
+            SET d.escalation_path = d.escalation_path + [$escalation_path]
+            SET d.updated_at = datetime()
+
+            CREATE (e:Escalation {
+                task_id: $task_id,
+                from_model: $from_model,
+                to_model: $to_model,
+                reason: $reason,
+                created_at: datetime()
+            })
+            CREATE (d)-[:ESCALATED_TO]->(e)
+            RETURN d, e
+            """
+
+            escalation_path = f"{from_model}->{to_model}"
+
+            with self._get_session() as session:
+                result = session.run(cypher,
+                    task_id=task_id,
+                    from_model=from_model,
+                    to_model=to_model,
+                    reason=reason,
+                    escalation_path=escalation_path
+                )
+
+                if result.single():
+                    logger.info(f"Recorded escalation for task {task_id}: {from_model} -> {to_model}")
+                    return True
+                else:
+                    logger.error(f"Failed to record escalation for task {task_id}")
+                    return False
+
+        except Exception as e:
+            logger.error(f"Error recording escalation for task {task_id}: {e}")
+            return False
+
+    def get_decision_performance_stats(
+        self,
+        time_period: str = "7d",
+        limit: int = 100
+    ) -> Dict[str, Any]:
+        """
+        Get decision performance statistics.
+
+        Args:
+            time_period: Time period for stats (e.g., "7d", "30d")
+            limit: Maximum number of records to return
+
+        Returns:
+            Performance statistics
+        """
+        try:
+            cypher = """
+            MATCH (d:Decision)
+            WHERE d.created_at > datetime() - duration($time_period)
+            RETURN
+                d.strategy as strategy,
+                d.model as model,
+                count(*) as total_decisions,
+                sum(CASE WHEN d.success THEN 1 ELSE 0 END) as successful_decisions,
+                avg(d.cost_actual_usd) as avg_cost,
+                avg(d.latency_actual_ms) as avg_latency,
+                avg(d.confidence) as avg_confidence,
+                avg(d.complexity) as avg_complexity,
+                avg(d.risk) as avg_risk
+            ORDER BY total_decisions DESC
+            LIMIT $limit
+            """
+
+            with self._get_session() as session:
+                result = session.run(cypher, time_period=time_period, limit=limit)
+                records = list(result)
+
+                return {
+                    "time_period": time_period,
+                    "total_decisions": sum(r["total_decisions"] for r in records),
+                    "success_rate": sum(r["successful_decisions"] for r in records) / max(sum(r["total_decisions"] for r in records), 1),
+                    "strategies": [
+                        {
+                            "strategy": r["strategy"],
+                            "model": r["model"],
+                            "total": r["total_decisions"],
+                            "successful": r["successful_decisions"],
+                            "success_rate": r["successful_decisions"] / max(r["total_decisions"], 1),
+                            "avg_cost": r["avg_cost"],
+                            "avg_latency": r["avg_latency"],
+                            "avg_confidence": r["avg_confidence"],
+                            "avg_complexity": r["avg_complexity"],
+                            "avg_risk": r["avg_risk"],
+                        }
+                        for r in records
+                    ]
+                }
+
+        except Exception as e:
+            logger.error(f"Error getting decision performance stats: {e}")
+            return {}
+
+    def persist_decision_evidence(
+        self,
+        task_id: str,
+        decision_id: str,
+        claim_id: str,
+        claim_text: str,
+        evidence_list: List[Evidence]
+    ) -> Dict[str, Any]:
+        """
+        Persist Decision→Claim→Evidence graph to Neo4j.
+
+        Args:
+            task_id: Task identifier
+            decision_id: Decision identifier
+            claim_id: Claim identifier
+            claim_text: Claim text
+            evidence_list: List of evidence items
+
+        Returns:
+            Dictionary with decision, claim, and evidence count
+        """
+        try:
+            cypher, parameters = create_decision_evidence_query(
+                task_id, decision_id, claim_id, claim_text, evidence_list
+            )
+
+            with self._get_session() as session:
+                result = session.run(cypher, **parameters)
+                record = result.single()
+
+                if not record:
+                    raise ValueError(f"No result returned for decision evidence persistence: {decision_id}")
+
+                # Emit metrics for evidence retrieval success
+                for evidence in evidence_list:
+                    ro_evidence_retrieval_success_total.labels(source_type=evidence.source_type).inc()
+
+                return {
+                    'decision': record['decision'],
+                    'claim': record['claim'],
+                    'evidence_count': record['evidence_count']
+                }
+
+        except Exception as e:
+            logger.error(f"Error persisting decision evidence {decision_id}: {e}")
+            # Emit metrics for evidence retrieval failure
+            for evidence in evidence_list:
+                ro_evidence_retrieval_failure_total.labels(source_type=evidence.source_type).inc()
+            raise
+
+    def read_decision_graph(self, task_id: str) -> Dict[str, Any]:
+        """
+        Read complete decision graph for a task.
+
+        Args:
+            task_id: Task identifier
+
+        Returns:
+            Dictionary with decision, claims, and evidence
+        """
+        try:
+            cypher, parameters = read_decision_graph_query(task_id)
+
+            with self._get_session() as session:
+                result = session.run(cypher, **parameters)
+                records = list(result)
+
+                if not records:
+                    return {
+                        'decision': None,
+                        'claims': [],
+                        'evidence': []
+                    }
+
+                # Group by decision
+                decision_data = {}
+                for record in records:
+                    decision_id = record['decision_id']
+                    if decision_id not in decision_data:
+                        decision_data[decision_id] = {
+                            'decision': record['decision'],
+                            'claims': [],
+                            'evidence': []
+                        }
+
+                    # Add claim if present
+                    if record['claim_id']:
+                        claim = {
+                            'id': record['claim_id'],
+                            'text': record['claim_text'],
+                            'hash': record['claim_hash']
+                        }
+                        if claim not in decision_data[decision_id]['claims']:
+                            decision_data[decision_id]['claims'].append(claim)
+
+                    # Add evidence if present
+                    if record['evidence_id']:
+                        evidence = {
+                            'id': record['evidence_id'],
+                            'source_type': record['evidence_source_type'],
+                            'uri': record['evidence_uri'],
+                            'sha256': record['evidence_sha256'],
+                            'span_start': record['evidence_span_start'],
+                            'span_end': record['evidence_span_end'],
+                            'score': record['evidence_score'],
+                            'retrieved_at': record['evidence_retrieved_at']
+                        }
+                        if evidence not in decision_data[decision_id]['evidence']:
+                            decision_data[decision_id]['evidence'].append(evidence)
+
+                return list(decision_data.values())[0]  # Return first decision
+
+        except Exception as e:
+            logger.error(f"Error reading decision graph for task {task_id}: {e}")
+            return {
+                'decision': None,
+                'claims': [],
+                'evidence': []
+            }
+
+    def read_decision_evidence(self, decision_id: str) -> Dict[str, Any]:
+        """
+        Read evidence for a specific decision.
+
+        Args:
+            decision_id: Decision identifier
+
+        Returns:
+            Dictionary with decision and evidence
+        """
+        try:
+            cypher, parameters = read_decision_evidence_query(decision_id)
+
+            with self._get_session() as session:
+                result = session.run(cypher, **parameters)
+                records = list(result)
+
+                if not records:
+                    return {
+                        'decision': None,
+                        'evidence': []
+                    }
+
+                decision = records[0]['decision']
+                evidence = []
+
+                for record in records:
+                    if record['evidence_id']:
+                        evidence_item = {
+                            'id': record['evidence_id'],
+                            'source_type': record['evidence_source_type'],
+                            'uri': record['evidence_uri'],
+                            'sha256': record['evidence_sha256'],
+                            'span_start': record['evidence_span_start'],
+                            'span_end': record['evidence_span_end'],
+                            'score': record['evidence_score'],
+                            'retrieved_at': record['evidence_retrieved_at']
+                        }
+                        evidence.append(evidence_item)
+
+                return {
+                    'decision': decision,
+                    'evidence': evidence
+                }
+
+        except Exception as e:
+            logger.error(f"Error reading decision evidence for {decision_id}: {e}")
+            return {
+                'decision': None,
+                'evidence': []
+            }
+
+    def update_decision_confidence(
+        self,
+        decision_id: str,
+        confidence: float,
+        cost_actual: Optional[float] = None,
+        latency_ms: Optional[int] = None
+    ) -> bool:
+        """
+        Update decision confidence and performance metrics.
+
+        Args:
+            decision_id: Decision identifier
+            confidence: New confidence value
+            cost_actual: Actual cost in USD
+            latency_ms: Actual latency in milliseconds
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            cypher, parameters = update_decision_confidence_query(
+                decision_id, confidence, cost_actual, latency_ms
+            )
+
+            with self._get_session() as session:
+                result = session.run(cypher, **parameters)
+                record = result.single()
+
+                if record:
+                    logger.info(f"Updated decision confidence for {decision_id}: {confidence}")
+                    return True
+                else:
+                    logger.error(f"Failed to update decision confidence for {decision_id}")
+                    return False
+
+        except Exception as e:
+            logger.error(f"Error updating decision confidence for {decision_id}: {e}")
+            return False
+
+    def persist_verification(
+        self,
+        decision_id: str,
+        verification_id: str,
+        passed: bool,
+        score: float,
+        rationale: str,
+        agreement_rate: Optional[float] = None
+    ) -> bool:
+        """
+        Persist verification result to Neo4j.
+
+        Args:
+            decision_id: Decision identifier
+            verification_id: Verification identifier
+            passed: Whether verification passed
+            score: Verification score
+            rationale: Verification rationale
+            agreement_rate: Agreement rate with verifier
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            cypher, parameters = create_verification_query(
+                decision_id, verification_id, passed, score, rationale, agreement_rate
+            )
+
+            with self._get_session() as session:
+                result = session.run(cypher, **parameters)
+                record = result.single()
+
+                if record:
+                    logger.info(f"Persisted verification for decision {decision_id}")
+                    return True
+                else:
+                    logger.error(f"Failed to persist verification for decision {decision_id}")
+                    return False
+
+        except Exception as e:
+            logger.error(f"Error persisting verification for decision {decision_id}: {e}")
+            return False
+
+    def get_evidence_by_sha256(self, sha256: str) -> List[Dict[str, Any]]:
+        """
+        Get evidence by SHA-256 hash.
+
+        Args:
+            sha256: SHA-256 hash to search for
+
+        Returns:
+            List of evidence items with matching hash
+        """
+        try:
+            cypher = """
+            MATCH (e:Evidence {sha256: $sha256})
+            RETURN e
+            ORDER BY e.retrieved_at DESC
+            """
+
+            with self._get_session() as session:
+                result = session.run(cypher, sha256=sha256)
+                records = list(result)
+
+                evidence_list = []
+                for record in records:
+                    evidence = dict(record['e'])
+                    evidence_list.append(evidence)
+
+                return evidence_list
+
+        except Exception as e:
+            logger.error(f"Error getting evidence by SHA-256 {sha256}: {e}")
+            return []
+
+    def get_evidence_by_source_type(self, source_type: str, limit: int = 100) -> List[Dict[str, Any]]:
+        """
+        Get evidence by source type.
+
+        Args:
+            source_type: Source type to filter by
+            limit: Maximum number of results
+
+        Returns:
+            List of evidence items with matching source type
+        """
+        try:
+            cypher = """
+            MATCH (e:Evidence {source_type: $source_type})
+            RETURN e
+            ORDER BY e.retrieved_at DESC
+            LIMIT $limit
+            """
+
+            with self._get_session() as session:
+                result = session.run(cypher, source_type=source_type, limit=limit)
+                records = list(result)
+
+                evidence_list = []
+                for record in records:
+                    evidence = dict(record['e'])
+                    evidence_list.append(evidence)
+
+                return evidence_list
+
+        except Exception as e:
+            logger.error(f"Error getting evidence by source type {source_type}: {e}")
+            return []

@@ -1,0 +1,246 @@
+"""API routes for decisions and evidence."""
+
+import logging
+from typing import Dict, Any, List, Optional
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Header
+from pydantic import BaseModel
+
+from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
+from opsvi_auto_forge.config.settings import settings
+from opsvi_auto_forge.api.auth.dependencies import get_current_user
+from opsvi_auto_forge.api.auth.jwt_handler import User
+
+logger = logging.getLogger(__name__)
+
+
+async def get_neo4j_client() -> Neo4jClient:
+    """Get Neo4j client."""
+    from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
+    from opsvi_auto_forge.config.settings import settings
+
+    return Neo4jClient(
+        uri=settings.neo4j_uri,
+        username=settings.neo4j_username,
+        password=settings.neo4j_password,
+    )
+
+
+router = APIRouter(prefix="/decisions", tags=["decisions"])
+
+
+class DecisionSummary(BaseModel):
+    id: str
+    task_id: str
+    strategy: str
+    model: str
+    confidence: float
+    p_pass: float
+    cost_actual: float | None = None
+    latency_ms: int | None = None
+    created_at: str | None = None
+    completed_at: str | None = None
+
+
+class PaginatedResponse(BaseModel):
+    items: List[DecisionSummary]
+    total: int
+    page: int
+    size: int
+    has_next: bool
+    has_prev: bool
+
+
+@router.get("/run/{run_id}", response_model=PaginatedResponse)
+async def list_decisions_for_run(
+    run_id: str,
+    page: int = Query(1, ge=1, description="Page number"),
+    size: int = Query(20, ge=1, le=100, description="Page size"),
+    client: Neo4jClient = Depends(get_neo4j_client),
+    current_user: User = Depends(get_current_user),
+):
+    """Return paginated decisions linked to tasks within the run."""
+    try:
+        # Get total count
+        count_query = """
+        MATCH (:Run {id:$run_id})-[:HAS_TASK]->(t:Task)-[:HAS_DECISION]->(d:Decision)
+        RETURN count(d) as total
+        """
+        count_result = await client.execute_query(count_query, {"run_id": run_id})
+        total = count_result[0]["total"] if count_result else 0
+
+        # Calculate pagination
+        offset = (page - 1) * size
+        has_next = offset + size < total
+        has_prev = page > 1
+
+        # Get paginated results
+        query = """
+        MATCH (:Run {id:$run_id})-[:HAS_TASK]->(t:Task)-[:HAS_DECISION]->(d:Decision)
+        RETURN d
+        ORDER BY d.created_at DESC
+        SKIP $offset LIMIT $size
+        """
+        result = await client.execute_query(
+            query, {"run_id": run_id, "offset": offset, "size": size}
+        )
+
+        items = []
+        for record in result:
+            d = record["d"]
+            items.append(
+                DecisionSummary(
+                    id=d.get("id"),
+                    task_id=d.get("task_id"),
+                    strategy=d.get("strategy"),
+                    model=d.get("model"),
+                    confidence=d.get("confidence", 0.0),
+                    p_pass=d.get("p_pass", 0.0),
+                    cost_actual=d.get("cost_actual"),
+                    latency_ms=d.get("latency_ms"),
+                    created_at=d.get("created_at"),
+                    completed_at=d.get("completed_at"),
+                )
+            )
+
+        return PaginatedResponse(
+            items=items,
+            total=total,
+            page=page,
+            size=size,
+            has_next=has_next,
+            has_prev=has_prev,
+        )
+    except Exception as e:
+        logger.error(f"Error listing decisions for run {run_id}: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/task/{task_id}/graph")
+async def get_decision_graph(
+    task_id: str,
+    client: Neo4jClient = Depends(get_neo4j_client),
+    current_user: User = Depends(get_current_user),
+):
+    """Get the complete decision graph for a task."""
+    try:
+        from opsvi_auto_forge.infrastructure.memory.graph.queries import (
+            QueryExecutor,
+            LineageQueries,
+        )
+
+        query_executor = QueryExecutor(client)
+        data = await query_executor.get_decision_graph(task_id)
+
+        if not data["decision"]:
+            raise HTTPException(status_code=404, detail="No decision found for task")
+        return data
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting decision graph for task {task_id}: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+class EvidenceResponse(BaseModel):
+    id: str
+    source_type: str
+    uri: str | None = None
+    sha256: str | None = None
+    score: float | None = None
+    retrieved_at: str | None = None
+    span_start: int | None = None
+    span_end: int | None = None
+
+
+@router.get("/evidence/item/{evidence_id}", response_model=EvidenceResponse)
+async def get_evidence(
+    evidence_id: str,
+    client: Neo4jClient = Depends(get_neo4j_client),
+    current_user: User = Depends(get_current_user),
+):
+    """Get evidence by ID."""
+    try:
+        query = """
+        MATCH (e:Evidence {id:$id})
+        RETURN e
+        """
+        result = await client.execute_query(query, {"id": evidence_id})
+
+        if not result:
+            raise HTTPException(status_code=404, detail="Evidence not found")
+
+        e = result[0]["e"]
+        return EvidenceResponse(
+            **{
+                k: e.get(k)
+                for k in [
+                    "id",
+                    "source_type",
+                    "uri",
+                    "sha256",
+                    "score",
+                    "retrieved_at",
+                    "span_start",
+                    "span_end",
+                ]
+            }
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting evidence {evidence_id}: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+class DecisionEvidenceResponse(BaseModel):
+    decision: Dict[str, Any] | None = None
+    claims: List[Dict[str, Any]] = []
+    evidence: List[Dict[str, Any]] = []
+
+
+@router.get("/evidence/{decision_id}", response_model=DecisionEvidenceResponse)
+async def get_decision_evidence(
+    decision_id: str,
+    client: Neo4jClient = Depends(get_neo4j_client),
+    current_user: User = Depends(get_current_user),
+):
+    """Get evidence for a specific decision."""
+    try:
+        # Use the existing async client to query Neo4j
+        query = """
+        MATCH (d:Decision {id:$decision_id})
+        OPTIONAL MATCH (d)-[:ASSERTS]->(c:Claim)
+        OPTIONAL MATCH (c)-[:SUPPORTED_BY]->(e:Evidence)
+        
+        WITH d, c, e
+        ORDER BY c.created_at ASC, e.created_at ASC
+        
+        WITH d, collect(DISTINCT c) AS claims, collect(DISTINCT e) AS evidence
+        
+        RETURN d, claims, evidence
+        """
+
+        result = await client.execute_query(query, {"decision_id": decision_id})
+
+        if not result:
+            raise HTTPException(status_code=404, detail="Decision not found")
+
+        record = result[0]
+        decision = dict(record["d"]) if record["d"] else None
+        claims = [dict(c) for c in record["claims"] if c]
+        evidence = [dict(e) for e in record["evidence"] if e]
+
+        if not decision:
+            raise HTTPException(status_code=404, detail="Decision not found")
+
+        return DecisionEvidenceResponse(
+            decision=decision, claims=claims, evidence=evidence
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting decision evidence {decision_id}: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")

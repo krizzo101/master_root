@@ -1,12 +1,30 @@
-"""Core module for opsvi-core.
+"""Core opsvi-core functionality.
 
-Provides base classes and core functionality.
+Comprehensive opsvi-core library for the OPSVI ecosystem
 """
 
-from .base import Error, ConfigurationError, InitializationError
+from .base import (
+    ServiceRegistry,
+    EventBus,
+    StateManager,
+    ServiceInfo,
+    ServiceStatus,
+    CoreConfig,
+    CoreError,
+    ServiceRegistryError,
+    EventBusError,
+    StateManagerError,
+)
 
 __all__ = [
-    "Error",
-    "ConfigurationError",
-    "InitializationError",
+    "ServiceRegistry",
+    "EventBus",
+    "StateManager",
+    "ServiceInfo",
+    "ServiceStatus",
+    "CoreConfig",
+    "CoreError",
+    "ServiceRegistryError",
+    "EventBusError",
+    "StateManagerError",
 ]

@@ -1,0 +1,253 @@
+groups:
+  - name: system_alerts
+    rules:
+      # System Health Alerts
+      - alert: SystemDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "System {{ $labels.instance }} is down"
+          description: "System {{ $labels.instance }} has been down for more than 1 minute"
+
+      - alert: HighCPUUsage
+        expr: cpu_usage_percent > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value }}% on {{ $labels.instance }}"
+
+      - alert: CriticalCPUUsage
+        expr: cpu_usage_percent > 95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value }}% on {{ $labels.instance }}"
+
+      - alert: HighMemoryUsage
+        expr: memory_usage_percent > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is {{ $value }}% on {{ $labels.instance }}"
+
+      - alert: CriticalMemoryUsage
+        expr: memory_usage_percent > 95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical memory usage on {{ $labels.instance }}"
+          description: "Memory usage is {{ $value }}% on {{ $labels.instance }}"
+
+      - alert: HighDiskUsage
+        expr: disk_usage_percent > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High disk usage on {{ $labels.mount_point }}"
+          description: "Disk usage is {{ $value }}% on {{ $labels.mount_point }}"
+
+      - alert: CriticalDiskUsage
+        expr: disk_usage_percent > 95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical disk usage on {{ $labels.mount_point }}"
+          description: "Disk usage is {{ $value }}% on {{ $labels.mount_point }}"
+
+  - name: application_alerts
+    rules:
+      # API Health Alerts
+      - alert: APIHighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API error rate"
+          description: "API error rate is {{ $value | humanizePercentage }}"
+
+      - alert: APICriticalErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical API error rate"
+          description: "API error rate is {{ $value | humanizePercentage }}"
+
+      - alert: APIHighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API latency"
+          description: "95th percentile API latency is {{ $value }}s"
+
+      - alert: APICriticalLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical API latency"
+          description: "95th percentile API latency is {{ $value }}s"
+
+      # Task Processing Alerts
+      - alert: TaskQueueBacklog
+        expr: task_queue_size > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Task queue backlog detected"
+          description: "Queue {{ $labels.queue_name }} has {{ $value }} tasks pending"
+
+      - alert: TaskQueueCritical
+        expr: task_queue_size > 500
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical task queue backlog"
+          description: "Queue {{ $labels.queue_name }} has {{ $value }} tasks pending"
+
+      - alert: TaskFailureRate
+        expr: rate(task_processing_total{status="failed"}[5m]) / rate(task_processing_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High task failure rate"
+          description: "Task failure rate is {{ $value | humanizePercentage }}"
+
+      - alert: TaskTimeoutRate
+        expr: rate(task_processing_total{status="timeout"}[5m]) / rate(task_processing_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High task timeout rate"
+          description: "Task timeout rate is {{ $value | humanizePercentage }}"
+
+  - name: database_alerts
+    rules:
+      # Database Health Alerts
+      - alert: DatabaseConnectionPoolExhausted
+        expr: db_connection_pool_active / db_connection_pool_size > 0.9
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "{{ $value | humanizePercentage }} of connection pool is in use"
+
+      - alert: DatabaseHighErrorRate
+        expr: rate(db_query_errors_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database error rate"
+          description: "Database error rate is {{ $value }} errors per second"
+
+      - alert: DatabaseHighLatency
+        expr: histogram_quantile(0.95, rate(db_query_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database query latency"
+          description: "95th percentile database query latency is {{ $value }}s"
+
+  - name: cache_alerts
+    rules:
+      # Cache Performance Alerts
+      - alert: CacheLowHitRatio
+        expr: cache_hit_ratio < 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low cache hit ratio"
+          description: "Cache hit ratio is {{ $value | humanizePercentage }}"
+
+      - alert: CacheHighEvictionRate
+        expr: rate(cache_evictions_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High cache eviction rate"
+          description: "Cache eviction rate is {{ $value }} evictions per second"
+
+  - name: security_alerts
+    rules:
+      # Security Alerts
+      - alert: HighAuthenticationFailures
+        expr: rate(authentication_attempts_total{status="failed"}[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High authentication failure rate"
+          description: "Authentication failure rate is {{ $value }} failures per second"
+
+      - alert: HighAuthorizationFailures
+        expr: rate(authorization_failures_total[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High authorization failure rate"
+          description: "Authorization failure rate is {{ $value }} failures per second"
+
+      - alert: RateLimitExceeded
+        expr: rate(rate_limit_exceeded_total[5m]) > 1
+        for: 1m
+        labels:
+          severity: info
+        annotations:
+          summary: "Rate limit exceeded"
+          description: "Rate limit exceeded on {{ $labels.endpoint }}"
+
+  - name: business_alerts
+    rules:
+      # Business Logic Alerts
+      - alert: LowTaskSuccessRate
+        expr: task_success_rate < 0.9
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low task success rate"
+          description: "Task success rate is {{ $value | humanizePercentage }}"
+
+      - alert: CriticalTaskSuccessRate
+        expr: task_success_rate < 0.8
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical task success rate"
+          description: "Task success rate is {{ $value | humanizePercentage }}"
+
+      - alert: HighExceptionRate
+        expr: rate(exceptions_total[5m]) > 1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High exception rate"
+          description: "Exception rate is {{ $value }} exceptions per second"

@@ -1,0 +1,407 @@
+---
+description: AI rules derived by SpecStory from the project AI interaction history
+globs: *
+---
+
+## Headers
+
+This document outlines the rules, guidelines, and best practices for the AI coding assistant to effectively assist with software development projects. It covers various aspects, including coding standards, project structure, workflow, and debugging. This document is a "living" file, updated with each new interaction with the AI to ensure continuous improvement and alignment with project needs.
+
+## TECH STACK
+
+*   Python 3.x
+*   [List any other relevant technologies]
+
+## PROJECT DOCUMENTATION & CONTEXT SYSTEM
+
+*   All project-related documentation should be stored in the appropriate directories, with clear and concise naming conventions.
+*   The AI should maintain an understanding of the project's context, including its goals, architecture, and dependencies.
+*   [Add any specific documentation tools or formats]
+*   The AI should prioritize reading the following files to understand project structure:
+    *   `recommended_structure.yaml`: Complete library ecosystem definition.
+    *   `templates.yaml`: Comprehensive template registry.
+    *   `generate_ecosystem_v2.py`: Advanced ecosystem generator.
+    *   `.proj-intel/project_analysis.jsonl`: Primary analysis data.
+    *   `.proj-intel/project_analysis.index.json`: Index for selective reads.
+    *   `.proj-intel/reverse_index.json`: O(1) path lookup.
+    *   `.proj-intel/agent_architecture.jsonl`: Agent class definitions.
+    *   `INTEGRATIONS_DIRECTORY_TREE.md`: Detailed integration mapping.
+
+## CODING STANDARDS
+
+*   Adhere to PEP 8 guidelines for Python code.
+*   Write clear, concise, and well-commented code.
+*   Use meaningful variable and function names.
+*   Follow established design patterns and architectural principles.
+*   Ensure code is modular and reusable.
+*   Handle errors gracefully using try-except blocks.
+*   Always include comprehensive docstrings for all functions and classes.
+*   Follow SOLID principles and DRY approach.
+*   Use Async/await throughout for scalability.
+*   Use comprehensive type hints with MyPy.
+*   Use Pydantic for configuration validation.
+*   Use structured logging with correlation IDs.
+*   Design components with BaseComponent inheritance.
+*   Use dependency injection for loose coupling.
+*   Implement event-driven communication between components.
+*   Design for configuration-driven behavior.
+*   Implement input validation and sanitization.
+*   Use authentication and authorization mechanisms.
+*   Implement audit logging and security event tracking.
+*   Integrate vulnerability scanning.
+
+## WORKFLOW & RELEASE RULES
+
+*   Follow a Git-based workflow for version control.
+*   Use feature branches for new development.
+*   Create pull requests for code review.
+*   All code must be reviewed and approved before merging.
+*   Implement automated testing and CI/CD pipelines.
+*   Always use `shell_exec` instead of `run_terminal_cmd` for executing commands.
+
+## DEBUGGING
+
+*   Use logging for debugging purposes.
+*   Include detailed error messages.
+*   Utilize debugging tools and techniques to identify and resolve issues.
+
+## STYLE & FORMATTING
+
+*   Use Markdown for documentation.
+*   Format code blocks with proper syntax highlighting.
+*   Keep lines concise for readability.
+*   When presenting the chat name in the matrix, strip off the date and file extension for cleaner presentation.
+
+## CHAT LOG PROCESSING SCRIPTS
+
+*   Two Python scripts are available for processing chat logs:
+    *   `collapse_chat_log.py`: Collapses tool calls into summary lines with truncation.
+    *   `log_stripper.py`: Completely removes tool calls and thought lines from the output.
+*   The `log_stripper.py` script removes thoughts and tool calls completely from a chat log to create a clean version with only user and assistant messages for better readability.
+*   When using the log processing scripts:
+    *   The `input` argument specifies the input chat log file.
+    *   The `output` argument specifies the output file.
+
+## CHAT LOG ANALYSIS
+
+*   A Python script `chat_log_analyzer.py` is available for analyzing chat logs. It reports:
+    *   Number of lines
+    *   Number of user prompts (detects formats like `_**User**_`, `User:`, `User input:`, `Human:`, `<user>`, `User says:`, etc.)
+    *   Number of assistant responses (detects formats like `_**Assistant**_`, `Assistant:`, `AI:`, `<assistant>`, `Response:`, `Bot:`, etc.)
+    *   Number of tool calls without a preceding `<think>` tag
+    *   Number of thoughts `<think>`
+    *   Tool Calls per Line (Percentage)
+    *   Thoughts per Line (Percentage)
+    *   Assistant/User Ratio
+
+*   A Python script `batch_analyze.py` is available for batch processing of chat logs. It runs the `chat_log_analyzer.py` script on all `.md` files in a specified directory and generates a summary report.
+
+*   A Python script `metrics_matrix.py` is available for displaying chat log metrics in a matrix format for easy comparison.
+    *   The chat name is stripped of the date and file extension for cleaner presentation.
+    *   The matrix is sorted by the number of lines in descending order.
+    *   The Tool % and A/U columns are dropped from the matrix for a more focused view.
+
+*   A Python script `comprehensive_analyzer.py` is available for comprehensive chat log analysis and formatting. It reports:
+    *   Chat: The chat log name.
+    *   Lines (Before): Total lines before formatting.
+    *   Lines (After): Total lines after formatting.
+    *   Chars: Total characters.
+    *   Words: Total words.
+    *   Tokens: Total tokens.
+    *   Tool: Number of tool calls.
+    *   Prompt: Number of user/assistant prompt/response cycles. 1 response to 1 prompt = 1 cycle
+    *   Think: Number of `<think> </think> </think>` pairs
+    *   Blank: Number of blank lines
+    *   Tools Used: Unique list of tools used in the chat file, comma-separated.
+    *   It also creates a formatted copy of each chat log in a sub-folder named `_formatted` with the following rules:
+        *   No more than one consecutive blank line.
+        *   Same for lines that only have `---`.
+        *   Tool calls `<details> </details>` are collapsed into a single line and carriage returns are replaced with `||`.
+        *   Think blocks `<think> </think> </think>` are collapsed into a single line and carriage returns are replaced with `||`.
+    *   Matrix must be presented as a table in the chat response
+    *   The `.csv` output needs to be written to `/tmp`.
+
+*   A Python script `enhanced_analyzer.py` is available for further analysis and formatted reporting of chat logs. It generates multiple views of the data, including:
+    *   Executive Summary
+    *   File Categories Report
+    *   Tool Usage Analysis
+    *   Content Quality Report
+    *   Detailed Data (existing CSV format)
+
+## LIBRARY MIGRATION STRATEGY
+
+### General Strategy
+Leverage existing, proven interfaces and implementations from the `agent_world/src/shared` directory as a foundation for the `libs/` directory. Adapt these implementations to the OPSVI template structure while maintaining compatibility during the transition.
+
+### Priority Implementation Order
+```yaml
+Phase 1 (Immediate):
+  - opsvi-llm: Migrate OpenAI interfaces
+  - opsvi-http: Migrate HTTP client interface
+  - opsvi-data: Migrate database interfaces
+
+Phase 2 (Short-term):
+  - opsvi-rag: Implement vector store adapters
+  - opsvi-orchestration: Migrate CrewAI/LangGraph interfaces
+  - opsvi-memory: Implement caching systems
+
+Phase 3 (Medium-term):
+  - opsvi-agents: Implement multi-agent framework
+  - opsvi-monitoring: Add observability
+  - opsvi-security: Add security layers
+```
+
+### Specific Migration Tasks
+```python
+# OpenAI Interfaces → opsvi-llm
+intake/custom/agent_world/src/shared/openai_interfaces/
+  → libs/opsvi-llm/opsvi_llm/providers/openai_provider.py
+
+# HTTP Client → opsvi-http  
+intake/custom/agent_world/src/shared/interfaces/http/
+  → libs/opsvi-http/opsvi_http/client/base.py
+
+# Database Interfaces → opsvi-data
+intake/custom/agent_world/src/shared/interfaces/database/
+  → libs/opsvi-data/opsvi_data/providers/graph/arangodb_adapter.py
+
+# MCP Integration → opsvi-orchestration
+intake/custom/agent_world/src/shared/mcp/
+  → libs/opsvi-orchestration/opsvi_orchestration/integrations/research_tools/
+```
+
+### Architecture Improvements
+
+Enhance OPSVI with Agent World Patterns:
+*   Collaboration Framework: Integrate into opsvi-agents
+*   Intelligent Relevance Scoring: Add to opsvi-rag
+*   Pattern-based Agent Selection: Implement in opsvi-orchestration
+*   Performance Metrics: Add to opsvi-monitoring
+
+### Agent World Architecture Assessment
+
+The `agent_world` implementation represents a sophisticated, production-ready multi-agent orchestration platform with distinct layers.
+
+#### Core Infrastructure (Fully Implemented)
+
+1.  **API Layer** (`src/api/`):
+    *   FastAPI application with comprehensive REST endpoints.
+    *   WebSocket support for real-time updates.
+    *   Pipeline execution, status tracking, artifact management.
+    *   Health checks and queue monitoring.
+
+2.  **Orchestration Engine** (`src/orchestrator/`):
+    *   Meta-orchestrator for pipeline coordination.
+    *   DAG-based workflow execution.
+    *   Task registry and dependency management.
+    *   Celery integration for distributed task processing.
+
+3.  **Memory System** (`src/memory/`):
+    *   Neo4j graph database for lineage tracking.
+    *   Comprehensive schema for projects, runs, tasks, artifacts.
+    *   Query system for complex graph operations.
+
+4.  **Worker System** (`src/workers/`):
+    *   Celery-based task execution.
+    *   8 specialized task types (plan, spec, research, code, test, validate, document, critic).
+    *   Metrics tracking and performance monitoring.
+
+#### Application Layer (Extensive Implementation)
+
+1.  **Agent Hub** (`src/applications/agent_hub/`):
+    *   Multi-agent system with 10+ specialized agents.
+    *   Agent discovery and service registration.
+    *   MCP (Model Context Protocol) compliance.
+    *   Dashboard and visualization tools.
+
+2.  **SpecStory Intelligence** (`src/applications/specstory_intelligence/`):
+    *   Advanced conversation intelligence.
+    *   Atomic parsing and conceptual analysis.
+    *   Database storage and pipeline integration.
+    *   1,500+ lines of sophisticated analysis code.
+
+3.  **Code Generation** (`src/applications/code_gen/`):
+    *   AI-powered code generation pipeline.
+    *   Test generation and validation.
+    *   Documentation generation.
+    *   Rate limiting and audit logging.
+
+4.  **Multi-Agent Orchestration** (`src/applications/multi_agent_orchestration/`):
+    *   Workflow orchestration system.
+    *   Research and task agents.
+    *   Communication broker.
+    *   Demo and production modes.
+
+#### Shared Infrastructure (Production-Ready)
+
+1.  **OpenAI Interfaces** (20+ files, 1,000+ lines)
+    *   Complete OpenAI API coverage.
+    *   Authentication and error handling.
+    *   Specialized interfaces for each API endpoint.
+
+2.  **MCP Integration** (15+ files, 2,000+ lines)
+    *   Brave Search, Firecrawl, ArXiv, Context7.
+    *   Research workflow tools.
+    *   Neo4j MCP client.
+    *   Intelligent relevance scoring.
+
+3.  **Database Interfaces** (10+ files, 3,000+ lines)
+    *   ArangoDB (1,112 lines - comprehensive).
+    *   PostgreSQL, MySQL, Redis, Elasticsearch.
+    *   S3 and consolidated operations.
+
+4.  **Collaboration Framework** (849 lines)
+    *   SpecStory Intelligence Pipeline integration.
+    *   Agent Hub communication.
+    *   Pattern-based agent selection.
+    *   Performance metrics and learning.
+
+### Key Strengths & Innovations
+
+#### Production-Ready Architecture
+
+*   **Scalable**: Celery-based distributed processing.
+*   **Observable**: Comprehensive logging and metrics.
+*   **Reliable**: Error handling and retry mechanisms.
+*   **Maintainable**: Well-structured codebase with clear separation.
+
+#### Advanced Multi-Agent System
+
+*   **10+ Specialized Agents**: dev_agent, sentinel, kb_updater, graph_analyst, etc.
+*   **Intelligent Routing**: Pattern-based agent selection.
+*   **Collaborative Problem Solving**: Multi-agent orchestration.
+*   **Learning & Adaptation**: Performance tracking and improvement.
+
+#### Comprehensive Integration
+
+*   **MCP Ecosystem**: Full Model Context Protocol implementation.
+*   **Database Support**: Multiple database types with unified interfaces.
+*   **API Coverage**: Complete OpenAI API integration.
+*   **Research Tools**: Advanced web scraping and analysis.
+
+#### Sophisticated Intelligence Pipeline
+
+*   **Conversation Intelligence**: Deep analysis of chat patterns.
+*   **Atomic Parsing**: Granular content analysis.
+*   **Conceptual Synthesis**: High-level pattern recognition.
+*   **Lineage Tracking**: Complete audit trail
+
+### Updated Migration Strategy
+
+The peer codebase analysis reveals **exceptional coverage** for the OPSVI libs/ architecture. With proper migration from the peer codebases, we can achieve **88% coverage** of the required OPSVI libraries. The new peer codebases to investigate are:
+
+*   `/home/opsvi/master_root/intake/custom/asea`
+*   `/home/opsvi/master_root/intake/custom/auto_forge`
+*   `/home/opsvi/master_root/intake/custom/docRuleGen`
+*   `/home/opsvi/master_root/intake/custom/master`
+
+#### Updated Priorities
+
+1.  Focus on building the **Foundation Layer** first, then systematically address the **Service Layer** gaps, using industry best practices and OPSVI architecture patterns.
+
+2.  Start with **Phase 1 (Core Infrastructure)** to establish the foundation, then proceed systematically through the phases. This approach maximizes value while minimizing risk.
+
+### Updated Agent World Architecture Assessment
+
+The peer codebase analysis reveals **exceptional coverage** for the OPSVI libs/ architecture. With proper migration from the peer codebases, we can achieve **88% coverage** of the required OPSVI libraries.
+
+### New Peer Codebases
+
+The new peer codebases to investigate are:
+
+*   `/home/opsvi/master_root/intake/custom/asea`
+*   `/home/opsvi/master_root/intake/custom/auto_forge`
+*   `/home/opsvi/master_root/intake/custom/docRuleGen`
+*   `/home/opsvi/master_root/intake/custom/master`
+*   `/home/opsvi/master_root/intake/custom/graphRAG`
+*   `/home/opsvi/master_root/intake/custom/graphiti`
+*   `/home/opsvi/master_root/intake/custom/graph_rag`
+*   `/home/opsvi/master_root/intake/custom/graph_rag2`
+*   `/home/opsvi/master_root/intake/custom/SKG_Cursor`
+*   `/home/opsvi/master_root/intake/custom/ide_contex_visualization`
+
+## Actionable Migration Guidance
+
+The agent_world is eventually going away, so the following steps need to be taken:
+
+1.  Create a map of agent\_world -&gt; master\_root/libs
+2.  Port into this environment to get things online and ready faster
+3.  Use proven code
+
+## Using Shell Exec
+
+Always use `shell_exec`, not `run_terminal`
+
+## Consult Agent Usage Rules
+
+### Core Purpose
+
+This rule governs how to properly integrate and use consult agents for development tasks requiring expert guidance, complex planning, production-ready code generation, or architectural decision-making.
+
+### Key Requirements
+
+#### 1. Pattern Recognition Triggers
+
+The rule specifies WHEN to use consult agents:
+- Development tasks requiring expert guidance
+- Complex implementation planning
+- Production-ready code generation
+- Architectural decision-making
+
+#### 2. Session Management Strategy
+
+- **Context Preservation**: Use specific, descriptive session IDs for related tasks
+- **Session Tracking**: Maintain session state on requesting agent side
+- **Context Quality**: Same session for iterative development, new session for unrelated tasks
+- **Memory Architecture**: 1-hour timeout, last 3 exchanges preserved, automatic cleanup
+
+#### 3. Parameter Optimization
+
+- **Auto-Selection Trust**: Let intelligent gatekeeper determine optimal parameters
+- **Model Selection**: gpt-5-nano for code, o3 for architecture, gpt-5-mini for documentation
+- **Quality Control**: Enable critic for production code, disable for simple queries
+- **Iteration Strategy**: 1 for simple tasks, 2 for complex, 3 for critical systems
+
+#### 4. Prompt Engineering Patterns
+
+- **Code Generation**: TASK + LANGUAGE/RUNTIME + INPUTS + CONSTRAINTS + OUTPUT_FORMAT
+- **Architecture Planning**: ROLE + OBJECTIVE + CONTEXT + DELIVERABLES + FORMAT + RULES
+- **Documentation**: TARGET_AUDIENCE + DOC_TYPE + PRODUCT_CONTEXT + MUST_INCLUDE + TONE
+
+Always use `shell_exec`, not `run_terminal`
+
+#### New Rule: Parameter Optimization
+- **Auto-Selection Trust**: Let intelligent gatekeeper determine optimal parameters
+- **Model Selection**: gpt-5-nano for code, o3 for architecture, gpt-5-mini for documentation
+- **Quality Control**: Enable critic for production code, disable for simple queries
+- **Iteration Strategy**: 1 for simple tasks, 2 for complex, 3 for critical systems
+
+#### New Rule: Pattern Recognition Triggers
+The rule specifies WHEN to use consult agents:
+- Development tasks requiring expert guidance
+- Complex implementation planning
+- Production-ready code generation
+- Architectural decision-making
+
+#### New Rule: Prompt Engineering Patterns
+- **Code Generation**: TASK + LANGUAGE/RUNTIME + INPUTS + CONSTRAINTS + OUTPUT_FORMAT
+- **Architecture Planning**: ROLE + OBJECTIVE + CONTEXT + DELIVERABLES + FORMAT + RULES
+- **Documentation**: TARGET_AUDIENCE + DOC_TYPE + PRODUCT_CONTEXT + MUST_INCLUDE + TONE
+
+Always use `shell_exec`, not `run_terminal`
+
+### Example Consult Agent Call
+When using a consult agent, ensure the following parameters are included in the request:
+*   Analyze the rule in detail
+*   Follow the instructions
+*   Generate a prompt
+*   Include all relevant files
+*   Response format: dynamic
+*   Iteration: 2
+*   Critic: yes
+*   Set a unique session ID
+*   Project Intel: true
+*   No 3.5 OpenAI models
+*   Use the large embedding model from OpenAI
+*   Ensure a satisfactorily defined DB schema for the vector DB
+*   Ensure an output schema defined for the research packages generated for storage

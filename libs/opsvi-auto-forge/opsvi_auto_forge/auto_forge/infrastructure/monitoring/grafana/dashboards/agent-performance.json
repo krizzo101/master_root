@@ -1,0 +1,371 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Agent Performance",
+    "tags": ["autonomous-factory", "agents", "performance"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Planner Agent Tasks",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"planner\"}[5m])",
+            "legendFormat": "Tasks/sec"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 5},
+                {"color": "red", "value": 20}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Specifier Agent Tasks",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"specifier\"}[5m])",
+            "legendFormat": "Tasks/sec"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 5},
+                {"color": "red", "value": 20}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Architect Agent Tasks",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"architect\"}[5m])",
+            "legendFormat": "Tasks/sec"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 3},
+                {"color": "red", "value": 10}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Coder Agent Tasks",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"coder\"}[5m])",
+            "legendFormat": "Tasks/sec"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 2},
+                {"color": "red", "value": 8}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Tester Agent Tasks",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"tester\"}[5m])",
+            "legendFormat": "Tasks/sec"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 4},
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 3},
+                {"color": "red", "value": 10}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "Critic Agent Tasks",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"critic\"}[5m])",
+            "legendFormat": "Tasks/sec"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 4},
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 3},
+                {"color": "red", "value": 10}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "Agent Task Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{status=\"success\"}[5m]) / rate(autonomous_factory_agent_tasks_total[5m]) * 100",
+            "legendFormat": "Success Rate %"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 4},
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 80},
+                {"color": "green", "value": 95}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "Total Agent Tasks",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "autonomous_factory_agent_tasks_total",
+            "legendFormat": "Total Tasks"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 4},
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 100},
+                {"color": "red", "value": 500}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 9,
+        "title": "Agent Task Timeline",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"planner\"}[5m])",
+            "legendFormat": "Planner"
+          },
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"specifier\"}[5m])",
+            "legendFormat": "Specifier"
+          },
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"architect\"}[5m])",
+            "legendFormat": "Architect"
+          },
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"coder\"}[5m])",
+            "legendFormat": "Coder"
+          },
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"tester\"}[5m])",
+            "legendFormat": "Tester"
+          },
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"critic\"}[5m])",
+            "legendFormat": "Critic"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        }
+      },
+      {
+        "id": 10,
+        "title": "Agent Task Duration (p95)",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(autonomous_factory_task_duration_seconds_bucket{agent_type=\"planner\"}[5m]))",
+            "legendFormat": "Planner (p95)"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(autonomous_factory_task_duration_seconds_bucket{agent_type=\"specifier\"}[5m]))",
+            "legendFormat": "Specifier (p95)"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(autonomous_factory_task_duration_seconds_bucket{agent_type=\"architect\"}[5m]))",
+            "legendFormat": "Architect (p95)"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(autonomous_factory_task_duration_seconds_bucket{agent_type=\"coder\"}[5m]))",
+            "legendFormat": "Coder (p95)"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(autonomous_factory_task_duration_seconds_bucket{agent_type=\"tester\"}[5m]))",
+            "legendFormat": "Tester (p95)"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(autonomous_factory_task_duration_seconds_bucket{agent_type=\"critic\"}[5m]))",
+            "legendFormat": "Critic (p95)"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        }
+      },
+      {
+        "id": 11,
+        "title": "Agent Task Success Rate Timeline",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"planner\",status=\"success\"}[5m]) / rate(autonomous_factory_agent_tasks_total{agent_type=\"planner\"}[5m]) * 100",
+            "legendFormat": "Planner Success %"
+          },
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"specifier\",status=\"success\"}[5m]) / rate(autonomous_factory_agent_tasks_total{agent_type=\"specifier\"}[5m]) * 100",
+            "legendFormat": "Specifier Success %"
+          },
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"architect\",status=\"success\"}[5m]) / rate(autonomous_factory_agent_tasks_total{agent_type=\"architect\"}[5m]) * 100",
+            "legendFormat": "Architect Success %"
+          },
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"coder\",status=\"success\"}[5m]) / rate(autonomous_factory_agent_tasks_total{agent_type=\"coder\"}[5m]) * 100",
+            "legendFormat": "Coder Success %"
+          },
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"tester\",status=\"success\"}[5m]) / rate(autonomous_factory_agent_tasks_total{agent_type=\"tester\"}[5m]) * 100",
+            "legendFormat": "Tester Success %"
+          },
+          {
+            "expr": "rate(autonomous_factory_agent_tasks_total{agent_type=\"critic\",status=\"success\"}[5m]) / rate(autonomous_factory_agent_tasks_total{agent_type=\"critic\"}[5m]) * 100",
+            "legendFormat": "Critic Success %"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16},
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        }
+      },
+      {
+        "id": 12,
+        "title": "Agent Queue Distribution",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "celery_queue_length{queue=\"default\"}",
+            "legendFormat": "Default Queue"
+          },
+          {
+            "expr": "celery_queue_length{queue=\"io\"}",
+            "legendFormat": "IO Queue"
+          },
+          {
+            "expr": "celery_queue_length{queue=\"heavy\"}",
+            "legendFormat": "Heavy Queue"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 24},
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        }
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  }
+}

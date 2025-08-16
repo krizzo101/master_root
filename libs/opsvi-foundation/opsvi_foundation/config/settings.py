@@ -1,44 +1,71 @@
 """Configuration settings for opsvi-foundation.
 
-
+Comprehensive configuration management for the OPSVI ecosystem
 """
 
-from typing import Any, Dict, List, Optional, Union
-from pydantic import BaseSettings, Field, validator
-from pydantic_settings import SettingsConfigDict
+from typing import Optional, Dict, Any
+from pydantic import BaseModel, Field
+from pydantic_settings import BaseSettings
 
-class OpsviFoundationSettings(BaseSettings):
-    """Settings for opsvi-foundation."""
+from ..core.base import BaseSettings as BaseComponentSettings
 
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
-        extra="ignore"
-    )
 
-    # Core settings
-    enabled: bool = Field(default=True, description="Enable opsvi-foundation")
+class LibraryConfig(BaseComponentSettings):
+    """Configuration for OPSVI libraries."""
+
+    # Core configuration
+    enabled: bool = Field(default=True, description="Whether the library is enabled")
     debug: bool = Field(default=False, description="Enable debug mode")
     log_level: str = Field(default="INFO", description="Logging level")
 
-    # Library-specific settings
-    
-
-    @validator("log_level")
-    def validate_log_level(cls, v: str) -> str:
-        """Validate log level."""
-        valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-        if v.upper() not in valid_levels:
-            raise ValueError(f"Invalid log level: {v}")
-        return v.upper()
-
-    
+    # Library-specific configuration
+    library_name: str = Field(description="Name of the library")
+    version: str = Field(description="Library version")
 
     class Config:
-        env_prefix = "OPSVI_OPSVI_FOUNDATION__"
+        env_prefix = "OPSVI_LIBRARY_"
 
-# Convenience function
-def get_settings() -> OpsviFoundationSettings:
-    """Get opsvi-foundation settings."""
-    return OpsviFoundationSettings()
+
+class LibrarySettings(BaseSettings):
+    """Global library settings."""
+
+    # Environment configuration
+    environment: str = Field(default="production", description="Environment name")
+    instance_id: str = Field(default="default", description="Instance identifier")
+
+    # Logging configuration
+    log_format: str = Field(default="json", description="Log format (json, text)")
+    log_file: Optional[str] = Field(default=None, description="Log file path")
+
+    # Performance configuration
+    max_workers: int = Field(default=10, description="Maximum number of workers")
+    timeout: float = Field(default=30.0, description="Default timeout in seconds")
+
+    # Security configuration
+    enable_audit_logging: bool = Field(default=True, description="Enable audit logging")
+    secrets_backend: str = Field(default="env", description="Secrets backend type")
+
+    class Config:
+        env_prefix = "OPSVI_"
+        case_sensitive = False
+
+
+class FoundationConfig(BaseComponentSettings):
+    """Configuration for opsvi-foundation library."""
+
+    # Foundation-specific settings
+    enable_utilities: bool = Field(default=True, description="Enable utility functions")
+    enable_retry: bool = Field(default=True, description="Enable retry mechanisms")
+    enable_backoff: bool = Field(default=True, description="Enable backoff strategies")
+
+    # Retry configuration
+    max_retries: int = Field(default=3, description="Maximum number of retries")
+    retry_delay: float = Field(
+        default=1.0, description="Initial retry delay in seconds"
+    )
+    backoff_factor: float = Field(
+        default=2.0, description="Backoff multiplication factor"
+    )
+
+    class Config:
+        env_prefix = "OPSVI_FOUNDATION_"
