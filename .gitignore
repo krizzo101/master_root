@@ -4,6 +4,15 @@
 
 .reference/
 
+# Large directories to exclude from version control
+intake/
+.archive/
+.specstory/
+
+# Sensitive configuration files
+.cursor/*.json
+.cursor/.env
+
 # Python
 __pycache__/
 *.py[cod]
