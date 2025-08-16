@@ -444,6 +444,8 @@ file_templates:
             # Component-specific methods
             {{component_methods}}
 
+        # TODO(ai): refine implementation details and component methods
+
     config_init_py:
       template: |
         """Configuration module for {{library_name}}.
@@ -845,7 +847,7 @@ file_templates:
 
         class Event:
             """Base event class."""
-            def __init__(self, event_type: str, data: Dict[str, Any] = None):
+            def __init__(self, event_type: str, data: Dict[str, Any] | None = None):
                 self.event_type = event_type
                 self.data = data or {}
                 self.timestamp = asyncio.get_event_loop().time()
@@ -858,21 +860,63 @@ file_templates:
                 self.handlers: Dict[str, List[Callable]] = {}
 
             async def subscribe(self, event_type: str, handler: Callable) -> None:
-                """Subscribe to an event type."""
                 if event_type not in self.handlers:
                     self.handlers[event_type] = []
                 self.handlers[event_type].append(handler)
 
             async def publish(self, event: Event) -> None:
-                """Publish an event."""
                 handlers = self.handlers.get(event.event_type, [])
                 for handler in handlers:
                     try:
                         await handler(event)
                     except Exception as e:
                         logger.error(f"Error in event handler: {e}")
+    state_manager_py:
+      template: |
+        """State manager for {{library_name}}.
 
-    utils_helpers_py:
+        Provides basic state persistence and synchronization.
+        """
+
+        from typing import Any, Dict
+        import asyncio
+        import logging
+
+        from {{package_name}}.core.base import {{main_class_name}}
+        from {{package_name}}.config.settings import {{config_class_name}}
+
+        logger = logging.getLogger(__name__)
+
+        class StateManager({{main_class_name}}):
+            """State management component."""
+
+            def __init__(self, config: {{config_class_name}}):
+                super().__init__(config=config)
+                self._state: Dict[str, Any] = {}
+                self._lock = asyncio.Lock()
+
+            async def get(self, key: str, default: Any = None) -> Any:
+                async with self._lock:
+                    return self._state.get(key, default)
+
+            async def set(self, key: str, value: Any) -> None:
+                async with self._lock:
+                    self._state[key] = value
+                    logger.debug(f"State set: {key}")
+
+            async def delete(self, key: str) -> None:
+                async with self._lock:
+                    self._state.pop(key, None)
+                    logger.debug(f"State deleted: {key}")
+
+            async def snapshot(self) -> Dict[str, Any]:
+                async with self._lock:
+                    return dict(self._state)
+
+        # TODO(ai): extend with persistence/backends and conflict resolution
+
+
+    utils_helpers_py_alt:
       template: |
         """Utility functions for {{library_name}}.
 
@@ -968,6 +1012,8 @@ file_templates:
                 """Check provider health."""
                 pass
 
+        # TODO(ai): add provider-specific lifecycle helpers and metrics hooks
+
     providers_openai_py:
       template: |
         """OpenAI provider for {{library_name}}.
@@ -1016,6 +1062,8 @@ file_templates:
                     logger.error(f"OpenAI health check failed: {e}")
                     return False
 
+        # TODO(ai): implement request/response helpers, retries, and rate limits
+
     # Newly added specialized templates to cover structure references
     client_base_py:
       template: |
@@ -1032,6 +1080,8 @@ file_templates:
             async def request(self, method: str, url: str, **kwargs: Any) -> Any:
                 raise NotImplementedError
 
+        # TODO(ai): implement concrete HTTP client (aiohttp/httpx) adapters
+
     server_base_py:
       template: |
         """HTTP server base for {{library_name}}."""
@@ -1045,6 +1095,42 @@ file_templates:
         class HTTPServer({{main_class_name}}):
             async def start(self) -> None:
                 await self.initialize()
+
+            async def stop(self) -> None:
+                await self.shutdown()
+
+        # TODO(ai): implement routing, middleware pipeline, and handlers
+    middleware_cors_py:
+      template: |
+        """CORS middleware for {{library_name}}."""
+
+        from typing import Any, Callable
+
+        class CORSMiddleware:
+            def __init__(self, allow_origins: list[str] | None = None) -> None:
+                self.allow_origins = allow_origins or ["*"]
+
+            async def __call__(self, request: Any, next_handler: Callable) -> Any:
+                response = await next_handler(request)
+                # Minimal placeholder – implementation depends on framework
+                return response
+
+    middleware_logging_py:
+      template: |
+        """Request logging middleware for {{library_name}}."""
+
+        import logging
+        from typing import Any, Callable
+
+        logger = logging.getLogger(__name__)
+
+        class LoggingMiddleware:
+            async def __call__(self, request: Any, next_handler: Callable) -> Any:
+                logger.info("request.start")
+                response = await next_handler(request)
+                logger.info("request.end")
+                return response
+
 
     auth_base_py:
       template: |
@@ -1065,6 +1151,8 @@ file_templates:
             async def upsert(self, vectors: List[Any]) -> None:
                 raise NotImplementedError
 
+        # TODO(ai): add query, similarity search, and index maintenance
+
     embeddings_providers_py:
       template: |
         """Embeddings providers for {{library_name}}."""
@@ -1073,6 +1161,8 @@ file_templates:
         class EmbeddingsProvider:
             async def embed(self, texts: List[str]) -> List[List[float]]:
                 raise NotImplementedError
+
+        # TODO(ai): add batching, normalization, and caching
 
     processors_base_py:
       template: |
@@ -1083,6 +1173,8 @@ file_templates:
             async def process(self, doc: Any) -> Any:
                 raise NotImplementedError
 
+        # TODO(ai): define pipeline hooks and error recovery
+
     agents_base_py:
       template: |
         """Agent base for {{library_name}}."""
@@ -1091,6 +1183,8 @@ file_templates:
         class Agent({{main_class_name}}):
             async def act(self, input_data: str) -> str:
                 return input_data
+
+        # TODO(ai): implement planning, memory, and tool-use interfaces
 
     coordinators_base_py:
       template: |
@@ -1101,12 +1195,16 @@ file_templates:
             async def coordinate(self) -> None:
                 pass
 
+        # TODO(ai): add scheduling policies and contention resolution
+
     communication_base_py:
       template: |
         """Communication base for {{library_name}}."""
         class Communicator:
             async def send(self, message: str) -> None:
                 pass
+
+        # TODO(ai): add transports, serialization, and backpressure
 
     fs_providers_base_py:
       template: |
@@ -1115,12 +1213,16 @@ file_templates:
             async def save(self, path: str, data: bytes) -> None:
                 raise NotImplementedError
 
+        # TODO(ai): implement backends (local/S3/GCS) and streaming
+
     fs_processors_base_py:
       template: |
         """FS processors base for {{library_name}}."""
         class FileProcessor:
             async def process(self, path: str) -> None:
                 raise NotImplementedError
+
+        # TODO(ai): add fan-out, batching, and error handling
 
     data_providers_base_py:
       template: |
@@ -1129,11 +1231,15 @@ file_templates:
             async def connect(self) -> bool:
                 return True
 
+        # TODO(ai): implement CRUD operations and transaction scopes
+
     orm_base_py:
       template: |
         """ORM base for {{library_name}}."""
         class ORM:
             pass
+
+        # TODO(ai): define model base, session handling, and migrations hooks
 
     auth_providers_base_py:
       template: |
@@ -1141,6 +1247,8 @@ file_templates:
         class AuthProvider:
             async def validate(self, token: str) -> bool:
                 return False
+
+        # TODO(ai): implement token parsing, verification, and role mapping
 
     auth_models_user_py:
       template: |
@@ -1159,6 +1267,8 @@ file_templates:
             async def get(self, key: str):
                 return None
 
+        # TODO(ai): add set/delete/ttl and distributed coordination
+
     cache_manager_py:
       template: |
         """Cache manager for {{library_name}}."""
@@ -1166,12 +1276,16 @@ file_templates:
             async def invalidate(self, key: str) -> None:
                 pass
 
+        # TODO(ai): add eviction strategies and metrics
+
     communication_channels_base_py:
       template: |
         """Comm channel base for {{library_name}}."""
         class Channel:
             async def publish(self, message: str) -> None:
                 pass
+
+        # TODO(ai): add subscribe/ack/retry semantics
 
     messages_base_py:
       template: |
@@ -1183,12 +1297,16 @@ file_templates:
             type: str
             payload: dict
 
+        # TODO(ai): add validation and serialization helpers
+
     pipeline_stages_base_py:
       template: |
         """Pipeline stage base for {{library_name}}."""
         class Stage:
             async def run(self, data):
                 return data
+
+        # TODO(ai): add input/output contracts and error paths
 
     orchestrators_base_py:
       template: |
@@ -1197,12 +1315,16 @@ file_templates:
             async def execute(self):
                 pass
 
+        # TODO(ai): implement DAG execution and recovery
+
     monitoring_metrics_base_py:
       template: |
         """Metrics base for {{library_name}}."""
         class Metrics:
             def record(self, name: str, value: float) -> None:
                 pass
+
+        # TODO(ai): add exporters and labels
 
     tracing_base_py:
       template: |
@@ -1211,12 +1333,16 @@ file_templates:
             def start_span(self, name: str):
                 pass
 
+        # TODO(ai): integrate with OpenTelemetry
+
     security_crypto_base_py:
       template: |
         """Crypto base for {{library_name}}."""
         class Crypto:
             def encrypt(self, data: bytes) -> bytes:
                 return data
+
+        # TODO(ai): add decrypt/sign/verify with proper algorithms
 
     audit_base_py:
       template: |
@@ -1225,12 +1351,16 @@ file_templates:
             def log(self, event: str) -> None:
                 pass
 
+        # TODO(ai): add sinks and retention
+
     orchestration_workflows_base_py:
       template: |
         """Workflow base for {{library_name}}."""
         class Workflow:
             async def run(self):
                 pass
+
+        # TODO(ai): add state persistence and compensation
 
     schedulers_base_py:
       template: |
@@ -1239,12 +1369,16 @@ file_templates:
             async def schedule(self):
                 pass
 
+        # TODO(ai): implement priorities and backoff
+
     deploy_infrastructure_base_py:
       template: |
         """Infrastructure base for {{library_name}}."""
         class Infrastructure:
             async def provision(self):
                 pass
+
+        # TODO(ai): implement declarative resources
 
     environments_base_py:
       template: |
@@ -1253,6 +1387,8 @@ file_templates:
             def current(self) -> str:
                 return "dev"
 
+        # TODO(ai): add environment discovery and overrides
+
     gateway_routers_base_py:
       template: |
         """Gateway router base for {{library_name}}."""
@@ -1260,12 +1396,16 @@ file_templates:
             def route(self, path: str) -> str:
                 return path
 
+        # TODO(ai): add dispatch table and parameter extraction
+
     gateway_middleware_base_py:
       template: |
         """Gateway middleware base for {{library_name}}."""
         class Middleware:
             async def process(self, request):
                 return request
+
+        # TODO(ai): add chain composition and error handling
 
     prompts_manager_py:
       template: |
@@ -1319,8 +1459,34 @@ file_templates:
                     raise {{exception_class_name}}(f"Template not found: {name}")
                 return template.format(**kwargs)
 
+        # TODO(ai): add persistence and versioning
+
     tests_base_py:
       template: |
+    tests_smoke_imports_py:
+      template: |
+        """Smoke import tests for {{library_name}}.
+
+        Ensures public modules can be imported without side effects.
+        """
+
+        import importlib
+        import pytest
+
+        def test_import_root():
+            importlib.import_module("{{package_name}}")
+
+        @pytest.mark.parametrize(
+            "mod",
+            [
+                "{{package_name}}.config.settings",
+                "{{package_name}}.core.base",
+                "{{package_name}}.exceptions.base",
+            ],
+        )
+        def test_import_submodules(mod: str):
+            importlib.import_module(mod)
+
         """Base tests for {{library_name}}.
 
         {{tests_description}}
@@ -1673,6 +1839,65 @@ file_templates:
         ## Changelog
 
         {{changelog}}
+    CONTRIBUTING_md:
+      template: |
+        # Contributing to {{library_name}}
+
+        Thank you for considering contributing! Please follow these guidelines:
+
+        - Fork the repo and create a feature branch
+        - Run tests and linters locally
+        - Write clear commit messages and PR descriptions
+        - Add tests for new functionality
+
+        ## Dev Setup
+
+        ```bash
+        pip install -e ".[dev]"
+        pre-commit install
+        ```
+
+        ## Commands
+
+        ```bash
+        ruff check .
+        black .
+        mypy .
+        pytest -q
+        ```
+
+    CHANGELOG_md:
+      template: |
+        # Changelog — {{library_name}}
+
+        All notable changes to this project will be documented in this file.
+
+        ## [0.1.0] - Initial release
+        - Initial scaffolding and core components
+
+    LICENSE_md:
+      template: |
+        MIT License
+
+        Copyright (c) {{author}}
+
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
 # Template Variables
 template_variables:

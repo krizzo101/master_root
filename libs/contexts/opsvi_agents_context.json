@@ -1,0 +1,36 @@
+{
+  "library_purpose": {
+    "name": "opsvi-agents",
+    "description": "",
+    "primary_use_cases": [],
+    "target_audience": "developers"
+  },
+  "core_capabilities": {
+    "primary_functions": [],
+    "key_features": [],
+    "performance_characteristics": ""
+  },
+  "api_design": {
+    "public_interface": "",
+    "configuration_options": "",
+    "error_handling": "hierarchical exceptions",
+    "async_support": "asyncio"
+  },
+  "performance_requirements": {
+    "response_time": "",
+    "throughput": "",
+    "resource_usage": "",
+    "scalability": ""
+  },
+  "integration_points": {
+    "dependencies": [],
+    "exported_components": [],
+    "extension_points": []
+  },
+  "testing_strategy": {
+    "unit_testing": "pytest",
+    "integration_testing": "pytest-asyncio",
+    "performance_testing": "pytest-benchmark",
+    "coverage_targets": ">=80%"
+  }
+}

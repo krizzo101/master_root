@@ -1,32 +1,45 @@
 #!/usr/bin/env python3
 """
 OPSVI Library Ecosystem Generator v2
-Improved version with proper Jinja2 template processing and variable resolution
+Registry-based template processing using YAML-defined templates only.
 
-Adds support for an optional file manifest to scaffold additional low-level files
-per library type and per specific library. Can optionally create stub files when
-templates are missing so agentic coding can populate them later.
+This generator consumes:
+- recommended_structure.yaml (structure, libraries, categories, anchors)
+- templates.yaml (single source of truth for templates)
+- file_manifest.yaml (optional, additional files per type/library)
+
+Backwards compatibility with .j2 paths has been removed.
+All template references must be registry keys or nested registry paths.
 """
 
 import argparse
-import yaml
 from pathlib import Path
-from typing import Dict, List, Any, Optional
-from jinja2 import Environment, BaseLoader
+from typing import Any, cast
+
+import yaml
+from jinja2 import BaseLoader, Environment
 
 
 class OpsviEcosystemGeneratorV2:
     def __init__(
         self,
         libs_dir: str = ".",
-        file_manifest: Optional[str] = None,
+        file_manifest: str | None = None,
         touch_missing: bool = True,
+        strict: bool = True,
+        only: list[str] | None = None,
+        only_type: list[str] | None = None,
+        update_existing: bool = True,
+        dry_run: bool = False,
+        diff_only: bool = False,
     ):
         self.libs_dir = Path(libs_dir)
         self.structure_file = self.libs_dir / "recommended_structure.yaml"
         self.templates_file = self.libs_dir / "templates.yaml"
         self.file_manifest_file = (
-            Path(file_manifest) if file_manifest else self.libs_dir / "file_manifest.yaml"
+            Path(file_manifest)
+            if file_manifest
+            else self.libs_dir / "file_manifest.yaml"
         )
 
         # Load configuration
@@ -38,13 +51,19 @@ class OpsviEcosystemGeneratorV2:
             else {}
         )
         self.touch_missing = touch_missing
+        self.strict = strict
+        self.only = set(only or [])
+        self.only_type = set(only_type or [])
+        self.update_existing = update_existing
+        self.dry_run = dry_run
+        self.diff_only = diff_only
 
         # Extract libraries and naming conventions
         self.libraries = self.structure.get("libraries", {})
         self.naming_conventions = self.structure.get("naming_conventions", {})
         self.library_types = self.structure.get("library_types", {})
 
-        # Initialize Jinja2 environment
+        # Initialize template environment (Jinja2 rendering over YAML registry)
         self.jinja_env = Environment(
             loader=BaseLoader(),
             trim_blocks=True,
@@ -54,93 +73,118 @@ class OpsviEcosystemGeneratorV2:
 
         print(f"Loaded {len(self.libraries)} libraries from structure definition")
 
-    def _load_yaml(self, file_path: Path) -> Dict:
+    def _load_yaml(self, file_path: Path) -> dict[str, Any]:
         """Load YAML file with error handling"""
         try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                return yaml.safe_load(f)
+            with open(file_path, encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+                if not isinstance(data, dict):
+                    return {}
+                # Cast is safe after isinstance check
+                return cast(dict[str, Any], data)
         except Exception as e:
             print(f"Error loading {file_path}: {e}")
             return {}
 
-    def _normalize_template_key(self, template_path: str) -> Optional[str]:
-        """Normalize legacy template names like 'core_services.py.j2' -> 'core_services_py'."""
-        if not template_path:
-            return None
-        # Extract the trailing file part
-        base = template_path.split("/")[-1]
-        # Handle common legacy forms
-        if base.endswith(".py.j2"):
-            base = base[:-5]  # remove '.py.j2'
-            return f"{base}_py"
-        if base.endswith(".j2"):
-            base = base[:-3]  # remove '.j2'
-            mapping = {
-                "init.py": "init_py",
-                "core_init.py": "core_init_py",
-                "config_init.py": "config_init_py",
-                "exceptions_init.py": "exceptions_init_py",
-                "pyproject.toml": "pyproject_toml",
-                "readme.md": "README_md",
-            }
-            return mapping.get(base, base.replace(".", "_"))
-        return None
+    def _get_template(self, template_path: str) -> str | None:
+        """Get template content from registry.
 
-    def _get_template(self, template_path: str) -> Optional[str]:
-        """Get template content from nested path"""
+        Accepts nested paths (e.g., 'file_templates.python_files.init_py')
+        or short keys (e.g., 'init_py').
+        """
         # Try direct nested lookup
         try:
             keys = template_path.split(".")
-            template = self.templates
+            template: Any = self.templates
             for key in keys:
                 template = template[key]
-
             if isinstance(template, dict):
-                return template.get("template", "")
+                value = template.get("template")
+                if isinstance(value, str):
+                    return value
+                return None
             if isinstance(template, str):
                 return template
         except (KeyError, TypeError):
-            pass
+            template = None
 
-        # Try normalized legacy key
-        candidates: List[str] = []
-        normalized = self._normalize_template_key(template_path)
-        if normalized:
-            candidates.extend(
-                [
-                    f"file_templates.python_files.{normalized}",
-                    f"file_templates.config_files.{normalized}",
-                    f"file_templates.documentation_files.{normalized}",
-                ]
-            )
-        # Try raw path in known namespaces
-        candidates.extend(
-            [
-                f"file_templates.python_files.{template_path}",
-                f"file_templates.config_files.{template_path}",
-                f"file_templates.documentation_files.{template_path}",
-            ]
-        )
+        # Try short key in known namespaces
+        candidates: list[str] = [
+            f"file_templates.python_files.{template_path}",
+            f"file_templates.config_files.{template_path}",
+            f"file_templates.documentation_files.{template_path}",
+        ]
 
         for alt_path in candidates:
             try:
                 keys = alt_path.split(".")
-                template = self.templates
+                node: Any = self.templates
                 for key in keys:
-                    template = template[key]
-                if isinstance(template, dict):
-                    return template.get("template", "")
-                if isinstance(template, str):
-                    return template
+                    node = node[key]
+                if isinstance(node, dict):
+                    value = node.get("template")
+                    if isinstance(value, str):
+                        return value
+                    continue
+                if isinstance(node, str):
+                    return node
             except (KeyError, TypeError):
                 continue
 
         print(f"Template not found: {template_path}")
         return None
 
+    def _validate_template_refs(self) -> None:
+        """Validate that all template references in structure and manifest exist in the registry.
+
+        Raises ValueError if any reference is missing and strict mode is enabled.
+        """
+        missing: list[str] = []
+
+        def check_ref(ref: Any) -> None:
+            if isinstance(ref, str):
+                # Anchors handled later; only validate registry keys and nested paths
+                if ref.startswith("*"):
+                    return
+                if self._get_template(ref) is None:
+                    missing.append(ref)
+            elif isinstance(ref, dict):
+                t = ref.get("template") if "template" in ref else None
+                if (
+                    t
+                    and not str(t).startswith("*")
+                    and self._get_template(str(t)) is None
+                ):
+                    missing.append(str(t))
+
+        # From libraries in structure
+        for _, data in (self.libraries or {}).items():
+            for file_info in data.get("files") or []:
+                check_ref(file_info.get("template"))
+
+        # From manifest by type and library
+        lt = (
+            (self.file_manifest.get("library_types") or {})
+            if self.file_manifest
+            else {}
+        )
+        for _, entry in (lt or {}).items():
+            for fi in entry.get("files") or []:
+                check_ref(fi.get("template"))
+        libs = (self.file_manifest.get("libraries") or {}) if self.file_manifest else {}
+        for _, entry in (libs or {}).items():
+            for fi in entry.get("files") or []:
+                check_ref(fi.get("template"))
+
+        if missing:
+            msg = f"Missing templates in registry: {sorted(set(missing))}"
+            if self.strict:
+                raise ValueError(msg)
+            print(f"WARNING: {msg}")
+
     def _get_library_variables(
-        self, library_name: str, library_data: Dict
-    ) -> Dict[str, Any]:
+        self, library_name: str, library_data: dict
+    ) -> dict[str, Any]:
         """Generate comprehensive variables for a library"""
         # Convert kebab-case to snake_case for package name
         package_name = library_name.replace("-", "_")
@@ -243,7 +287,9 @@ class OpsviEcosystemGeneratorV2:
             "has_manager_exports": bool(manager_exports),
         }
 
-    def _get_manifest_files(self, library_name: str, library_data: Dict) -> List[Dict[str, Any]]:
+    def _get_manifest_files(
+        self, library_name: str, library_data: dict
+    ) -> list[dict[str, Any]]:
         """Return additional files from file_manifest for the given library.
 
         Structure:
@@ -259,7 +305,7 @@ class OpsviEcosystemGeneratorV2:
         manifest = self.file_manifest or {}
         lib_type = library_data.get("type", "service")
 
-        results: List[Dict[str, Any]] = []
+        results: list[dict[str, Any]] = []
         type_entry = (manifest.get("library_types", {}) or {}).get(lib_type, {}) or {}
         results.extend(type_entry.get("files", []) or [])
 
@@ -269,27 +315,18 @@ class OpsviEcosystemGeneratorV2:
         return results
 
     def _process_template(
-        self, template_content: str, variables: Dict[str, Any]
+        self, template_content: str, variables: dict[str, Any]
     ) -> str:
-        """Process template with Jinja2 and variable substitution"""
-        try:
-            # Create Jinja2 template
-            template = self.jinja_env.from_string(template_content)
+        """Render template content strictly via the registry renderer (Jinja2).
 
-            # Render template with variables
-            result = template.render(**variables)
+        No legacy fallbacks. Fail fast on errors.
+        """
+        template = self.jinja_env.from_string(template_content)
+        return template.render(**variables)
 
-            return result
-        except Exception as e:
-            print(f"Error processing template: {e}")
-            # Fallback to simple string replacement
-            result = template_content
-            for key, value in variables.items():
-                placeholder = f"{{{{{key}}}}}"
-                result = result.replace(placeholder, str(value))
-            return result
-
-    def _create_directory_structure(self, library_name: str, library_data: Dict):
+    def _create_directory_structure(
+        self, library_name: str, library_data: dict
+    ) -> None:
         """Create directory structure for a library"""
         library_dir = self.libs_dir / library_name
         package_name = library_name.replace("-", "_")
@@ -314,9 +351,8 @@ class OpsviEcosystemGeneratorV2:
             # Create __init__.py for each subdirectory
             init_file = subdir_path / "__init__.py"
             if not init_file.exists():
-                init_file.write_text(
-                    '"""{} module."""\n\n'.format(subdir.replace("/", "."))
-                )
+                module_name = subdir.replace("/", ".")
+                init_file.write_text(f'"""{module_name} module."""\n\n')
 
         # Create tests directory
         tests_dir = library_dir / "tests"
@@ -325,8 +361,8 @@ class OpsviEcosystemGeneratorV2:
         print(f"Created directory structure for {library_name}")
 
     def _generate_file(
-        self, file_path: Path, template_path: str, variables: Dict[str, Any]
-    ):
+        self, file_path: Path, template_path: str, variables: dict[str, Any]
+    ) -> None:
         """Generate a file from template"""
         template_content = self._get_template(template_path)
         if not template_content:
@@ -337,7 +373,7 @@ class OpsviEcosystemGeneratorV2:
                     '"""AUTO-GENERATED STUB\n'
                     f"Path: {file_path.name}\n"
                     f"Template missing: {template_path}\n"
-                    "This file is intended to be populated by the agentic coder.\n"\
+                    "This file is intended to be populated by the agentic coder.\n"
                     '"""\n\n'
                 )
                 with open(file_path, "w", encoding="utf-8") as f:
@@ -351,13 +387,27 @@ class OpsviEcosystemGeneratorV2:
         # Ensure parent directory exists
         file_path.parent.mkdir(parents=True, exist_ok=True)
 
+        # Dry-run or diff-only behavior
+        if self.dry_run or self.diff_only:
+            status = "NEW"
+            if file_path.exists():
+                old = file_path.read_text(encoding="utf-8")
+                status = "UNCHANGED" if old == content else "CHANGED"
+            print(f"PLAN {status}: {file_path} <- {template_path}")
+            return
+
+        # Respect update_existing flag
+        if file_path.exists() and not self.update_existing:
+            print(f"SKIP (exists): {file_path}")
+            return
+
         # Write file
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
 
         print(f"Generated {file_path}")
 
-    def _generate_standard_files(self, library_name: str, library_data: Dict):
+    def _generate_standard_files(self, library_name: str, library_data: dict) -> None:
         """Generate standard files that every library should have"""
         library_dir = self.libs_dir / library_name
         package_name = library_name.replace("-", "_")
@@ -410,12 +460,12 @@ class OpsviEcosystemGeneratorV2:
         tests_dir.mkdir(exist_ok=True)
 
         tests_init_path = tests_dir / "__init__.py"
-        tests_init_path.write_text('"""Tests for {}."""\n\n'.format(library_name))
+        tests_init_path.write_text(f'"""Tests for {library_name}."""\n\n')
 
         test_file_path = tests_dir / f"test_{package_name}.py"
         self._generate_file(test_file_path, "test_base_py", variables)
 
-    def _generate_library_files(self, library_name: str, library_data: Dict):
+    def _generate_library_files(self, library_name: str, library_data: dict) -> None:
         """Generate library-specific files"""
         library_dir = self.libs_dir / library_name
         variables = self._get_library_variables(library_name, library_data)
@@ -433,7 +483,7 @@ class OpsviEcosystemGeneratorV2:
             file_path_str = self._process_template(file_path_str, variables)
             file_path = library_dir / file_path_str
 
-            # Handle template references
+            # Handle template references (anchors or registry keys)
             if isinstance(template_ref, str) and template_ref.startswith("*"):
                 # YAML anchor reference - extract the anchor name and map to template
                 anchor_name = template_ref[1:]  # Remove the *
@@ -450,10 +500,15 @@ class OpsviEcosystemGeneratorV2:
                 elif anchor_name == "base_readme":
                     template_path = "README_md"
                 else:
-                    template_path = "init_py"  # Default fallback
+                    raise ValueError(f"Unknown YAML anchor reference: {anchor_name}")
             elif isinstance(template_ref, dict):
                 # YAML anchor resolved as dict - extract template field
-                template_path = template_ref.get("template", "init_py")
+                template_value = template_ref.get("template")
+                if not isinstance(template_value, str):
+                    raise ValueError(
+                        f"Missing or invalid 'template' in dict for {file_path}"
+                    )
+                template_path = template_value
                 if template_path.startswith("*"):
                     # Handle nested anchor reference
                     anchor_name = template_path[1:]
@@ -470,7 +525,9 @@ class OpsviEcosystemGeneratorV2:
                     elif anchor_name == "base_readme":
                         template_path = "README_md"
                     else:
-                        template_path = "init_py"  # Default fallback
+                        raise ValueError(
+                            f"Unknown YAML anchor reference: {anchor_name}"
+                        )
             elif isinstance(template_ref, str):
                 template_path = template_ref
             else:
@@ -481,12 +538,21 @@ class OpsviEcosystemGeneratorV2:
 
             self._generate_file(file_path, template_path, variables)
 
-    def generate_ecosystem(self):
+    def generate_ecosystem(self) -> None:
         """Generate the complete library ecosystem"""
         print("Generating OPSVI Library Ecosystem v2...")
         print("=" * 50)
 
+        # Validate template references up front
+        self._validate_template_refs()
+
         for library_name, library_data in self.libraries.items():
+            if self.only and library_name not in self.only:
+                continue
+            if self.only_type:
+                lib_type = library_data.get("type", "service")
+                if lib_type not in self.only_type:
+                    continue
             print(f"\nProcessing {library_name}...")
 
             # Create directory structure
@@ -500,9 +566,9 @@ class OpsviEcosystemGeneratorV2:
 
         print("\n" + "=" * 50)
         print("Ecosystem generation complete!")
-        print(f"Generated {len(self.libraries)} libraries")
+        print(f"Processed {len(self.libraries)} libraries (filters may apply)")
 
-    def validate_generation(self):
+    def validate_generation(self) -> None:
         """Validate that all libraries were generated correctly"""
         print("\nValidating generation...")
 
@@ -545,7 +611,7 @@ class OpsviEcosystemGeneratorV2:
                 print(f"✅ {library_name}: All files present")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="OPSVI Ecosystem Generator v2")
     parser.add_argument(
         "--libs-dir",
@@ -565,12 +631,56 @@ def main():
         action="store_false",
         help="Do not create stub files when templates are missing",
     )
+    parser.add_argument(
+        "--no-strict",
+        dest="strict",
+        action="store_false",
+        help="Do not fail on missing template references (prints warnings instead)",
+    )
+    parser.add_argument(
+        "--only",
+        dest="only",
+        nargs="*",
+        default=None,
+        help="Only process these libraries by name",
+    )
+    parser.add_argument(
+        "--type",
+        dest="only_type",
+        nargs="*",
+        default=None,
+        help="Only process libraries of these types (core, service, rag, manager)",
+    )
+    parser.add_argument(
+        "--no-update-existing",
+        dest="update_existing",
+        action="store_false",
+        help="Do not overwrite existing files",
+    )
+    parser.add_argument(
+        "--dry-run",
+        dest="dry_run",
+        action="store_true",
+        help="Plan-only: print actions without writing files",
+    )
+    parser.add_argument(
+        "--diff",
+        dest="diff_only",
+        action="store_true",
+        help="Print summary of files that would change",
+    )
     args = parser.parse_args()
 
     generator = OpsviEcosystemGeneratorV2(
         libs_dir=args.libs_dir,
         file_manifest=args.file_manifest,
         touch_missing=args.touch_missing,
+        strict=args.strict,
+        only=args.only,
+        only_type=args.only_type,
+        update_existing=args.update_existing,
+        dry_run=args.dry_run,
+        diff_only=args.diff_only,
     )
     generator.generate_ecosystem()
     generator.validate_generation()

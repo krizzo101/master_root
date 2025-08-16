@@ -1,0 +1,25 @@
+name: Security and Compliance
+
+on:
+  pull_request:
+    paths:
+      - 'libs/**'
+  push:
+    branches: [ feature/**, bugfix/**, hotfix/**, agent/** ]
+    paths:
+      - 'libs/**'
+
+jobs:
+  scan-secrets-and-models:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          args: detect --source . --no-git -v
+      - name: Prohibited model string scan
+        run: |
+          if grep -R --line-number -E '\bgpt-4(\w*)\b' libs; then
+            echo 'Error: prohibited model references found under libs/'; exit 1; fi
+

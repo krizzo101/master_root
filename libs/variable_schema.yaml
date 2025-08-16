@@ -1,0 +1,68 @@
+version: 0.1.0
+title: OPSVI Template Variable Schema
+description: Centralized schema for template variables with defaults and requirements.
+
+variables:
+  library_name:
+    type: string
+    required: true
+    description: Kebab-case library name (e.g., opsvi-core)
+  package_name:
+    type: string
+    required: true
+    description: Snake_case package name (e.g., opsvi_core)
+  library_description:
+    type: string
+    required: false
+    default: "OPSVI library"
+    description: One-line description used in README and headers
+  version:
+    type: string
+    required: false
+    default: "0.1.0"
+  author:
+    type: string
+    required: false
+    default: "OPSVI Team"
+  email:
+    type: string
+    required: false
+    default: "team@opsvi.com"
+  env_prefix:
+    type: string
+    required: false
+    description: Environment variable prefix; computed from package name if not provided
+  library_class_name:
+    type: string
+    required: false
+    description: PascalCase library class base; computed if missing
+  main_class_name:
+    type: string
+    required: false
+    description: Main component class; computed if missing
+  config_class_name:
+    type: string
+    required: false
+    description: Pydantic settings class; computed if missing
+  exception_class_name:
+    type: string
+    required: false
+    description: Root exception class name; computed if missing
+  homepage_url:
+    type: string
+    required: false
+    default: "https://github.com/opsvi/${library_name}"
+  repository_url:
+    type: string
+    required: false
+    default: "https://github.com/opsvi/${library_name}"
+  documentation_url:
+    type: string
+    required: false
+    default: "https://docs.opsvi.com/${library_name}"
+  bug_tracker_url:
+    type: string
+    required: false
+    default: "https://github.com/opsvi/${library_name}/issues"
+
+

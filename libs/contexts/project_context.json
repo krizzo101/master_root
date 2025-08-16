@@ -1,0 +1,38 @@
+{
+  "project_overview": {
+    "name": "OPSVI Master Workspace",
+    "scope": "AI/ML Operations monorepo",
+    "vision": "Unified, modular, and observable AI ecosystem",
+    "architecture_principles": ["SRP", "Config-as-code", "Async-first"]
+  },
+  "architecture_decisions": {
+    "monorepo_structure": "libs + apps with shared tooling",
+    "library_organization": "core/service/rag/manager types",
+    "integration_patterns": "event-driven + DI",
+    "technology_stack": "Python 3.12, Pydantic v2, pytest, Ruff, MyPy"
+  },
+  "coding_standards": {
+    "style_guide": "Black + Ruff",
+    "naming_conventions": "kebab-case dirs, snake_case pkgs, PascalCase classes",
+    "documentation_requirements": "Google-style docstrings + READMEs",
+    "testing_requirements": "pytest with async support"
+  },
+  "integration_patterns": {
+    "component_interaction": "interfaces + DI",
+    "service_integration": "providers with health checks",
+    "data_flow": "pipelines with stages",
+    "error_handling": "hierarchical exceptions"
+  },
+  "performance_requirements": {
+    "response_times": "sub-100ms for core ops",
+    "throughput": "scalable via async",
+    "resource_usage": "low baseline CPU/mem",
+    "scalability": "horizontal"
+  },
+  "security_considerations": {
+    "authentication": "token-based",
+    "authorization": "role-based",
+    "data_protection": "encryption at rest/in transit",
+    "vulnerability_management": "CI scanning"
+  }
+}

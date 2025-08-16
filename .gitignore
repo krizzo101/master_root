@@ -354,3 +354,15 @@ apps
 
 # genFileMap directories
 .genfilemap/
+libs_backup_20250807_112624
+temp
+test_gpt5
+generated_app
+model_testing
+results_gpt5
+.reference
+intake
+apps
+results_gpt5
+knowledge
+backups

@@ -65,7 +65,7 @@ Each level is processed by specialized AI agents:
   - YAML anchor system for reusable template patterns
 
 ### Template System
-- **`templates.yaml`** - Comprehensive template system
+- **`templates.yaml`** - Comprehensive template registry (YAML-driven). See `libs/TEMPLATES.md` for key map.
   - Project, category, library, component, and file-level templates
   - Python, configuration, and documentation templates
   - Variable substitution and conditional processing
@@ -77,12 +77,13 @@ Each level is processed by specialized AI agents:
 
 ### Scaffolding Scripts
 - **`generate_ecosystem_v2.py`** - **CURRENT** - Advanced ecosystem generator
-  - Jinja2 template processing with fallback to string replacement
+  - YAML-driven template registry; string substitution with optional conditional blocks
   - YAML anchor resolution (handles both string and dictionary references)
+  - Strict upfront validation of all template references (can disable via `--no-strict`)
   - Comprehensive variable generation for all library types
-  - Template path resolution with multiple fallback strategies
+  - Template key resolution against `templates.yaml`
   - Error handling and validation
-  - Support for all 16 libraries with specialized templates
+  - Support for all 16+ libraries with specialized templates
 
 ### Legacy Scripts (Archived)
 - **`scaffold_shared_libs.py`** - Individual library scaffolding with DRY analysis
@@ -97,21 +98,21 @@ Each level is processed by specialized AI agents:
 - **Decision Rationale**: Changed generator instead of YAML to preserve template system design
 
 ### ✅ Template System Enhancements
-- **Added Specialized Templates**: `core_services_py`, `events_base_py`, `utils_helpers_py`
+- **Added Specialized Templates**: `core_services_py`, `events_base_py`, `server_base_py`, `utils_helpers_py`, `state_manager_py`, `middleware_cors_py`, `middleware_logging_py`
 - **Provider Templates**: `providers_base_py`, `providers_openai_py`
 - **Prompt Management**: `prompts_manager_py`
 - **Enhanced Test Templates**: Comprehensive test patterns with async support
 
 ### ✅ Template Reference Standardization
-- **Updated**: All library-specific file references to use template names instead of `.j2` files
+- **Updated**: All library-specific file references use registry keys (no `.j2` file suffixes)
 - **Standardized**: Template naming convention (e.g., `core_base_py` instead of `core_base.py.j2`)
-- **Improved**: Template path resolution with multiple fallback strategies
+- **Improved**: Template key resolution with multiple fallback strategies
 
 ### ✅ Generator Improvements
 - **Enhanced Variable Generation**: More comprehensive variables for all library types
 - **Better Error Handling**: Graceful fallbacks and informative error messages
 - **Template Validation**: Ensures all required templates are available
-- **Jinja2 Integration**: Proper template rendering with variable substitution
+- **YAML Template Registry**: Rendering via registry-defined templates
 
 ## Design Principles
 
@@ -221,7 +222,7 @@ Templates are processed with:
 - **Conditional Processing** - Include/exclude based on library type
 - **Validation** - Ensure all required variables are provided
 - **Customization** - Library-specific template overrides
-- **Jinja2 Rendering** - Advanced template processing with fallbacks
+- **Registry-Based Rendering** - Keys resolved from `templates.yaml`
 
 ### 3. Code Generation
 AI agents generate code using:
@@ -330,7 +331,7 @@ mypy .
 ### ✅ Completed
 - **Structure Definition** - Complete YAML definition with 16 libraries
 - **Template System** - Comprehensive templates for all file types
-- **Generator Script** - `generate_ecosystem_v2.py` with Jinja2 support
+- **Generator Script** - `generate_ecosystem_v2.py` using the YAML template registry
 - **YAML Anchor Resolution** - Handles both string and dictionary references
 - **Template Standardization** - Consistent naming and reference system
 - **Specialized Templates** - Provider, event, and utility templates
