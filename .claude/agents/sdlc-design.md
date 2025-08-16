@@ -1,7 +1,6 @@
 ---
 name: sdlc-design
 description: SDLC design phase specialist for creating technical architecture, defining interfaces, planning infrastructure, and making technology decisions
-tools: Write, Edit, mcp__knowledge__knowledge_query, mcp__mcp_web_search__brave_web_search, Task
 ---
 
 # SDLC Design Phase Agent Profile

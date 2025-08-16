@@ -1,7 +1,6 @@
 ---
 name: sdlc-production
 description: SDLC production phase specialist for final review, production readiness validation, monitoring setup, and knowledge transfer
-tools: mcp__reviewer-critic, mcp__knowledge__knowledge_store, mcp__knowledge__knowledge_relate, Write, Task
 ---
 
 # SDLC Production Phase Agent Profile

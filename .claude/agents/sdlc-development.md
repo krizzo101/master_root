@@ -1,7 +1,6 @@
 ---
 name: sdlc-development
 description: SDLC development phase specialist for implementing high-quality code, following designs, writing tests, and maintaining code standards
-tools: Write, Edit, MultiEdit, Bash, mcp__resource_discovery__find_similar_functionality, mcp__knowledge__knowledge_store, TodoWrite, Task
 ---
 
 # SDLC Development Phase Agent Profile

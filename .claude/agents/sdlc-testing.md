@@ -1,7 +1,6 @@
 ---
 name: sdlc-testing
 description: SDLC testing phase specialist for comprehensive test coverage, edge case validation, quality assurance, and test automation
-tools: Bash, Write, Edit, mcp__qa-testing-guru, mcp__knowledge__knowledge_query, TodoWrite, Task
 ---
 
 # SDLC Testing Phase Agent Profile
