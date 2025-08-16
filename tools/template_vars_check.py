@@ -21,7 +21,6 @@ from typing import Any
 
 import yaml
 
-
 VAR_PATTERN = re.compile(r"\{\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\}\}")
 IF_PATTERN = re.compile(r"\{%\s*if\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*%\}")
 
@@ -159,10 +158,14 @@ def main() -> int:
         print("ERROR: Undeclared variables used in templates:")
         for v in missing:
             print(f"  - {v}")
-        print("\nHint: Add entries under 'variables:' in libs/variable_schema.yaml or adjust templates.")
+        print(
+            "\nHint: Add entries under 'variables:' in libs/variable_schema.yaml or adjust templates."
+        )
         return 2
 
-    print("OK: All template variables are declared in variable_schema.yaml or generator baseline.")
+    print(
+        "OK: All template variables are declared in variable_schema.yaml or generator baseline."
+    )
     return 0
 
 

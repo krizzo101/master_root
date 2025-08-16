@@ -10,12 +10,13 @@ import os
 import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
+
 import pytest
 
-from src.tools.code_generation.o3_code_generator.main import main
 from src.tools.code_generation.o3_code_generator.dependency_analyzer import (
     DependencyAnalyzer,
 )
+from src.tools.code_generation.o3_code_generator.main import main
 from src.tools.code_generation.o3_code_generator.schemas.dependency_analyzer_input_schema import (
     DependencyAnalysisInput,
 )
@@ -271,11 +272,11 @@ dependencies = [
 
     def test_validation_framework_integration(self):
         """Test that validation framework is integrated across components."""
-        from src.tools.code_generation.o3_code_generator.schemas.base_output_schema import (
-            BaseGeneratorOutput,
-        )
         from src.tools.code_generation.o3_code_generator.schemas.api_spec_output_schema import (
             APISpecOutput,
+        )
+        from src.tools.code_generation.o3_code_generator.schemas.base_output_schema import (
+            BaseGeneratorOutput,
         )
 
         # Test base validation schema
@@ -335,7 +336,6 @@ dependencies = [
         """Test complete CLI workflow end-to-end."""
         # This would test the main CLI entry point
         # For now, we verify the main function exists and is callable
-        from src.tools.code_generation.o3_code_generator.main import main
 
         assert callable(main)
 

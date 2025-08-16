@@ -1,7 +1,7 @@
 """Dependency injection container for orchestrator components."""
 
 import logging
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict
 from functools import wraps
 import redis.asyncio as redis
 

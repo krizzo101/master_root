@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from shared.openai_interfaces.base import OpenAIBaseInterface
 
@@ -9,7 +9,7 @@ class OpenAIUsageInterface(OpenAIBaseInterface):
     Reference: https://platform.openai.com/docs/api-reference/usage
     """
 
-    def retrieve_usage(self, **kwargs) -> Dict[str, Any]:
+    def retrieve_usage(self, **kwargs) -> dict[str, Any]:
         """
         Retrieve usage statistics.
         GET /v1/dashboard/billing/usage
@@ -20,7 +20,7 @@ class OpenAIUsageInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def retrieve_subscription(self, **kwargs) -> Dict[str, Any]:
+    def retrieve_subscription(self, **kwargs) -> dict[str, Any]:
         """
         Retrieve subscription information.
         GET /v1/dashboard/billing/subscription
@@ -31,7 +31,7 @@ class OpenAIUsageInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def aretrieve_usage(self, **kwargs) -> Dict[str, Any]:
+    async def aretrieve_usage(self, **kwargs) -> dict[str, Any]:
         """
         Async: Retrieve usage statistics.
         GET /v1/dashboard/billing/usage
@@ -42,7 +42,7 @@ class OpenAIUsageInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def aretrieve_subscription(self, **kwargs) -> Dict[str, Any]:
+    async def aretrieve_subscription(self, **kwargs) -> dict[str, Any]:
         """
         Async: Retrieve subscription information.
         GET /v1/dashboard/billing/subscription

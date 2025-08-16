@@ -1,8 +1,8 @@
 from __future__ import annotations
 import asyncio
 import logging
-from typing import Any, Dict, Optional
-from .models import RouteDecision, Verification
+from typing import Any, Dict
+from .models import RouteDecision
 from uuid import UUID
 
 logger = logging.getLogger(__name__)

@@ -1,2 +1,1 @@
-"""{{package_name}}.config. module."""
-
+""".config. module."""

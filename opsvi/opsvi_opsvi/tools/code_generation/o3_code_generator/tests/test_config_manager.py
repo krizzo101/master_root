@@ -1,9 +1,10 @@
 """Tests for ConfigManager."""
 
 import os
-import pytest
-from pathlib import Path
 import tempfile
+from pathlib import Path
+
+import pytest
 import yaml
 
 from src.tools.code_generation.o3_code_generator.config.core.config_manager import (

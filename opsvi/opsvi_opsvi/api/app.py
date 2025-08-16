@@ -2,15 +2,15 @@
 
 import asyncio
 import logging
-from typing import Any, Dict, List, Optional
-from uuid import UUID
 from datetime import datetime
 from pathlib import Path
+from typing import Any
+from uuid import UUID
 
 from fastapi import (
+    BackgroundTasks,
     FastAPI,
     HTTPException,
-    BackgroundTasks,
     WebSocket,
     WebSocketDisconnect,
 )
@@ -18,16 +18,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from ..orchestrator.meta_orchestrator import execute_software_factory_pipeline
-from ..orchestrator.task_models import (
-    Project,
-    Run,
-    TaskRecord,
-    Artifact,
-    Result,
-    Critique,
-)
 from ..memory.graph.neo4j_client import get_neo4j_client
+from ..orchestrator.meta_orchestrator import execute_software_factory_pipeline
 from ..workers.celery_app import get_queue_stats, get_worker_status
 
 logger = logging.getLogger(__name__)
@@ -57,20 +49,20 @@ class PipelineRequest(BaseModel):
     project_name: str
     project_description: str = ""
     pipeline_name: str = "software_factory_v1"
-    config: Optional[Dict[str, Any]] = None
+    config: dict[str, Any] | None = None
 
 
 class PipelineResponse(BaseModel):
     """Response from pipeline execution."""
 
     success: bool
-    project_id: Optional[str] = None
-    run_id: Optional[str] = None
-    error: Optional[str] = None
-    completed_tasks: List[str] = []
-    failed_tasks: List[str] = []
+    project_id: str | None = None
+    run_id: str | None = None
+    error: str | None = None
+    completed_tasks: list[str] = []
+    failed_tasks: list[str] = []
     total_loops: int = 0
-    task_results: Dict[str, Any] = {}
+    task_results: dict[str, Any] = {}
 
 
 class RunStatus(BaseModel):
@@ -79,14 +71,14 @@ class RunStatus(BaseModel):
     run_id: str
     project_id: str
     status: str
-    current_task: Optional[str] = None
+    current_task: str | None = None
     completed_tasks: int = 0
     failed_tasks: int = 0
     total_tasks: int = 0
     total_tokens: int = 0
     total_cost_usd: float = 0.0
     started_at: str
-    completed_at: Optional[str] = None
+    completed_at: str | None = None
 
 
 class TaskStatus(BaseModel):
@@ -96,11 +88,11 @@ class TaskStatus(BaseModel):
     name: str
     status: str
     task_type: str
-    started_at: Optional[str] = None
-    completed_at: Optional[str] = None
+    started_at: str | None = None
+    completed_at: str | None = None
     tokens_used: int = 0
     cost_usd: float = 0.0
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
 
 class ArtifactInfo(BaseModel):
@@ -120,13 +112,13 @@ class CritiqueInfo(BaseModel):
     critique_id: str
     overall_score: float
     pass_threshold: bool
-    policy_scores: Dict[str, float]
-    reasons: List[str]
+    policy_scores: dict[str, float]
+    reasons: list[str]
     created_at: str
 
 
 # Background task storage
-background_tasks: Dict[str, asyncio.Task] = {}
+background_tasks: dict[str, asyncio.Task] = {}
 
 
 async def execute_pipeline_background(request: PipelineRequest, task_id: str) -> None:
@@ -206,8 +198,8 @@ async def get_run_status(run_id: str) -> RunStatus:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/runs/{run_id}/tasks", response_model=List[TaskStatus])
-async def get_run_tasks(run_id: str) -> List[TaskStatus]:
+@app.get("/api/runs/{run_id}/tasks", response_model=list[TaskStatus])
+async def get_run_tasks(run_id: str) -> list[TaskStatus]:
     """Get all tasks for a specific run."""
     try:
         neo4j = get_neo4j_client()
@@ -245,8 +237,8 @@ async def get_run_tasks(run_id: str) -> List[TaskStatus]:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/runs/{run_id}/artifacts", response_model=List[ArtifactInfo])
-async def get_run_artifacts(run_id: str) -> List[ArtifactInfo]:
+@app.get("/api/runs/{run_id}/artifacts", response_model=list[ArtifactInfo])
+async def get_run_artifacts(run_id: str) -> list[ArtifactInfo]:
     """Get all artifacts for a specific run."""
     try:
         neo4j = get_neo4j_client()
@@ -281,8 +273,8 @@ async def get_run_artifacts(run_id: str) -> List[ArtifactInfo]:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/runs/{run_id}/critiques", response_model=List[CritiqueInfo])
-async def get_run_critiques(run_id: str) -> List[CritiqueInfo]:
+@app.get("/api/runs/{run_id}/critiques", response_model=list[CritiqueInfo])
+async def get_run_critiques(run_id: str) -> list[CritiqueInfo]:
     """Get all critiques for a specific run."""
     try:
         neo4j = get_neo4j_client()
@@ -352,7 +344,7 @@ async def download_artifact(artifact_id: str):
 
 
 @app.get("/api/projects/{project_id}/lineage")
-async def get_project_lineage(project_id: str) -> Dict[str, Any]:
+async def get_project_lineage(project_id: str) -> dict[str, Any]:
     """Get the complete lineage for a project."""
     try:
         neo4j = get_neo4j_client()
@@ -365,7 +357,7 @@ async def get_project_lineage(project_id: str) -> Dict[str, Any]:
 
 
 @app.get("/api/queue/stats")
-async def get_queue_stats() -> Dict[str, Any]:
+async def get_queue_stats() -> dict[str, Any]:
     """Get queue statistics."""
     try:
         stats = get_queue_stats()
@@ -377,7 +369,7 @@ async def get_queue_stats() -> Dict[str, Any]:
 
 
 @app.get("/api/workers/status")
-async def get_workers_status() -> Dict[str, Any]:
+async def get_workers_status() -> dict[str, Any]:
     """Get worker status information."""
     try:
         status = get_worker_status()
@@ -389,7 +381,7 @@ async def get_workers_status() -> Dict[str, Any]:
 
 
 @app.get("/api/pipelines")
-async def list_pipelines() -> List[str]:
+async def list_pipelines() -> list[str]:
     """List available pipelines."""
     try:
         from ..orchestrator.dag_loader import dag_loader
@@ -403,7 +395,7 @@ async def list_pipelines() -> List[str]:
 
 
 @app.get("/api/health")
-async def health_check() -> Dict[str, Any]:
+async def health_check() -> dict[str, Any]:
     """Health check endpoint."""
     try:
         # Check Neo4j connection

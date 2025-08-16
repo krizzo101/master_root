@@ -21,10 +21,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Callable
 import tracemalloc
 
-from src.agents.enhanced_base_agent import EnhancedBaseAgent
 from src.agents.integration_test_suite import TestAgent, MockTool
-from src.agents.base_agent import AgentCapabilityType, AgentCapability
-from src.coordination.enhanced_message_bus import EnhancedMessageBus, MessagePriority
+from src.coordination.enhanced_message_bus import EnhancedMessageBus
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.shared.openai_interfaces.base import OpenAIBaseInterface
 
@@ -113,7 +113,7 @@ class OpenAIResponsesInterface(OpenAIBaseInterface):
             self._handle_error(e)
 
     @staticmethod
-    def parse_json_output(output_text: str) -> Optional[Any]:
+    def parse_json_output(output_text: str) -> Any | None:
         """
         Try to parse output_text as JSON. Returns dict/list or None if parsing fails.
         """
@@ -124,7 +124,7 @@ class OpenAIResponsesInterface(OpenAIBaseInterface):
         except Exception:
             return None
 
-    def retrieve_response(self, response_id: str, **kwargs) -> Optional[Dict[str, Any]]:
+    def retrieve_response(self, response_id: str, **kwargs) -> dict[str, Any] | None:
         """Retrieve a response by ID (GET /responses/{response_id})"""
         try:
             logger.debug(
@@ -146,7 +146,7 @@ class OpenAIResponsesInterface(OpenAIBaseInterface):
 
     def list_input_items(
         self, response_id: str, **kwargs
-    ) -> Optional[List[Dict[str, Any]]]:
+    ) -> list[dict[str, Any]] | None:
         """List input items for a response (GET /responses/{response_id}/input_items)"""
         try:
             logger.debug(
@@ -165,7 +165,7 @@ class OpenAIResponsesInterface(OpenAIBaseInterface):
             self._handle_error(e)
             return None
 
-    def delete_response(self, response_id: str) -> Optional[Dict[str, Any]]:
+    def delete_response(self, response_id: str) -> dict[str, Any] | None:
         """Delete a response by ID (DELETE /responses/{response_id})"""
         try:
             logger.debug(
@@ -181,7 +181,7 @@ class OpenAIResponsesInterface(OpenAIBaseInterface):
             self._handle_error(e)
             return None
 
-    def cancel_response(self, response_id: str) -> Optional[Dict[str, Any]]:
+    def cancel_response(self, response_id: str) -> dict[str, Any] | None:
         """Cancel a response (POST /responses/{response_id}/cancel)"""
         try:
             logger.debug(
@@ -200,7 +200,7 @@ class OpenAIResponsesInterface(OpenAIBaseInterface):
             return None
 
     # Async methods (optional, for completeness)
-    async def acreate_response(self, **kwargs) -> Optional[Dict[str, Any]]:
+    async def acreate_response(self, **kwargs) -> dict[str, Any] | None:
         try:
             logger.debug(
                 f"[OpenAIResponsesInterface] [async] Creating response with params: {kwargs}"
@@ -223,7 +223,7 @@ class OpenAIResponsesInterface(OpenAIBaseInterface):
 
     async def aretrieve_response(
         self, response_id: str, **kwargs
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         try:
             logger.debug(
                 f"[OpenAIResponsesInterface] [async] Retrieving response_id: {response_id}"
@@ -246,7 +246,7 @@ class OpenAIResponsesInterface(OpenAIBaseInterface):
 
     async def alist_input_items(
         self, response_id: str, **kwargs
-    ) -> Optional[List[Dict[str, Any]]]:
+    ) -> list[dict[str, Any]] | None:
         try:
             logger.debug(
                 f"[OpenAIResponsesInterface] [async] Listing input items for response_id: {response_id}"
@@ -264,7 +264,7 @@ class OpenAIResponsesInterface(OpenAIBaseInterface):
             self._handle_error(e)
             return None
 
-    async def adelete_response(self, response_id: str) -> Optional[Dict[str, Any]]:
+    async def adelete_response(self, response_id: str) -> dict[str, Any] | None:
         try:
             logger.debug(
                 f"[OpenAIResponsesInterface] [async] Deleting response_id: {response_id}"
@@ -283,7 +283,7 @@ class OpenAIResponsesInterface(OpenAIBaseInterface):
             self._handle_error(e)
             return None
 
-    async def acancel_response(self, response_id: str) -> Optional[Dict[str, Any]]:
+    async def acancel_response(self, response_id: str) -> dict[str, Any] | None:
         try:
             logger.debug(
                 f"[OpenAIResponsesInterface] [async] Cancelling response_id: {response_id}"

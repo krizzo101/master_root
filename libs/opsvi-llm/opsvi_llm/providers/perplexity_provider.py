@@ -4,7 +4,7 @@ Comprehensive Perplexity integration for the OPSVI ecosystem
 """
 
 import logging
-from typing import Any, List, Optional, Dict
+from typing import Any, List, Optional
 
 import aiohttp
 from pydantic import Field

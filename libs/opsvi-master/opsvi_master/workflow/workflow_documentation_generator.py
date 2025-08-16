@@ -488,11 +488,11 @@ class WorkflowDocumentationGenerator:
             except Exception as e:
                 self.logger.warning(f"Failed to analyze {workflow_path}: {e}")
 
-        content += f"## Common Phases\n\n"
+        content += "## Common Phases\n\n"
         for phase in sorted(all_phases):
             content += f"- {phase}\n"
 
-        content += f"\n## Available Tools\n\n"
+        content += "\n## Available Tools\n\n"
         for tool in sorted(all_tools):
             content += f"- {tool}\n"
 

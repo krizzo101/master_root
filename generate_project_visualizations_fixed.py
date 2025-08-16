@@ -4,10 +4,8 @@ Generate comprehensive visualizations for all analyzed custom projects
 Fixed to handle actual project intelligence data structure
 """
 import json
-import os
-from pathlib import Path
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from pathlib import Path
 
 
 @dataclass
@@ -15,13 +13,13 @@ class ProjectInfo:
     name: str
     purpose: str
     total_files: int
-    main_technologies: List[str]
+    main_technologies: list[str]
     architecture_type: str
-    key_components: List[str]
+    key_components: list[str]
     complexity_score: int
 
 
-def read_project_intelligence(project_path: Path) -> Optional[Dict]:
+def read_project_intelligence(project_path: Path) -> dict | None:
     """Read project intelligence data from a project directory"""
     intel_file = project_path / ".proj-intel" / "project_analysis.pretty.json"
 
@@ -30,14 +28,14 @@ def read_project_intelligence(project_path: Path) -> Optional[Dict]:
         return None
 
     try:
-        with open(intel_file, "r") as f:
+        with open(intel_file) as f:
             return json.load(f)
     except Exception as e:
         print(f"❌ Error reading {project_path.name}: {e}")
         return None
 
 
-def extract_collector_data(data: Dict, collector_name: str) -> Optional[Dict]:
+def extract_collector_data(data: dict, collector_name: str) -> dict | None:
     """Extract data from a specific collector"""
     collectors = data.get("collectors", [])
     for collector in collectors:
@@ -46,7 +44,7 @@ def extract_collector_data(data: Dict, collector_name: str) -> Optional[Dict]:
     return None
 
 
-def analyze_project(project_path: Path, data: Dict) -> ProjectInfo:
+def analyze_project(project_path: Path, data: dict) -> ProjectInfo:
     """Extract key information from project intelligence data"""
 
     # Extract purpose from ProjectPurposeCollector

@@ -13,11 +13,10 @@ import asyncio
 import logging
 import random
 import time
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, TypeVar
 from functools import wraps
 
 logger = logging.getLogger(__name__)
@@ -111,7 +110,7 @@ class CircuitBreaker:
             self._on_success()
             return result
 
-        except self.expected_exception as e:
+        except self.expected_exception:
             self._on_failure()
             raise
 
@@ -470,7 +469,6 @@ class ErrorHandler:
 
             # Store alert in knowledge graph if available
             try:
-                import asyncio
                 from datetime import datetime, timezone
 
                 # Create alert entity in knowledge graph

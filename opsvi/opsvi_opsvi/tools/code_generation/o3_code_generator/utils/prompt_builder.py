@@ -15,7 +15,7 @@ Version: 1.2.0
 
 import json
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import get_logger
 from src.tools.code_generation.o3_code_generator.utils.input_loader import (
@@ -173,7 +173,7 @@ class PromptBuilder:
         input_data: Any,
         analysis_data: dict[str, Any],
         system_prompt: str,
-        instructions: Optional[str] = None,
+        instructions: str | None = None,
     ) -> str:
         """
         Build comprehensive prompt for analysis with prepended rules.
@@ -206,9 +206,9 @@ class PromptBuilder:
     def build_generation_prompt(
         self,
         input_data: Any,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
         system_prompt: str = "",
-        format_instructions: Optional[str] = None,
+        format_instructions: str | None = None,
     ) -> str:
         """
         Build prompt for code generation with prepended rules.
@@ -235,7 +235,7 @@ class PromptBuilder:
         )
 
     def validate_prompt_length(
-        self, prompt: str, max_length: Optional[int] = None
+        self, prompt: str, max_length: int | None = None
     ) -> bool:
         """
         Validate prompt length for model limits.

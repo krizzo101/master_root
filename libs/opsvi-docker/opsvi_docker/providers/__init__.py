@@ -4,19 +4,19 @@ Docker Management Providers
 Core Docker management components for the OPSVI ecosystem.
 """
 
-from .docker_provider import DockerProvider, DockerConfig, DockerError
+from .compose_manager import ComposeConfig, ComposeManager, ComposeService
 from .container_manager import (
-    ContainerManager,
     ContainerConfig,
     ContainerInfo,
+    ContainerManager,
     ContainerStats,
 )
-from .image_manager import ImageManager, ImageConfig, ImageInfo
-from .network_manager import NetworkManager, NetworkConfig, NetworkInfo
-from .volume_manager import VolumeManager, VolumeConfig, VolumeInfo
-from .compose_manager import ComposeManager, ComposeConfig, ComposeService
-from .registry_manager import RegistryManager, RegistryConfig, RegistryInfo
+from .docker_provider import DockerConfig, DockerError, DockerProvider
+from .image_manager import ImageConfig, ImageInfo, ImageManager
 from .monitoring import DockerMonitor, HealthChecker, ResourceMonitor
+from .network_manager import NetworkConfig, NetworkInfo, NetworkManager
+from .registry_manager import RegistryConfig, RegistryInfo, RegistryManager
+from .volume_manager import VolumeConfig, VolumeInfo, VolumeManager
 
 __all__ = [
     # Core provider

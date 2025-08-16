@@ -1,19 +1,17 @@
 """Base agent class for the autonomous software factory."""
 
-import asyncio
 import hashlib
-import json
 import logging
 import time
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, TypeVar
-from uuid import UUID, uuid4
+from typing import Any, Dict, List, Optional, TypeVar
+from uuid import uuid4
 
 from pydantic import BaseModel, Field
 
-from opsvi_auto_forge.config.models import AgentRole, Artifact, Result, TaskStatus
+from opsvi_auto_forge.config.models import AgentRole, Artifact, Result
 from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
 from opsvi_auto_forge.application.orchestrator.task_models import TaskExecution
 from opsvi_auto_forge.core.prompting.gateway import PromptGateway

@@ -10,13 +10,13 @@ Implements a disciplined multi-critic pattern with:
 """
 
 import asyncio
-import json
-from typing import Dict, List, Any, Optional, Set
-from dataclasses import dataclass, field
-from collections import defaultdict
-from enum import Enum
-from openai import OpenAI
 import os
+from collections import defaultdict
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any
+
+from openai import OpenAI
 
 
 class CriticType(Enum):
@@ -57,9 +57,9 @@ class CriticResult:
 
     critic_type: CriticType
     verdict: str  # "accept" | "revise"
-    scores: Dict[str, float]  # correctness, consistency, safety, efficiency, clarity
-    failures: List[Dict[str, str]]  # category, evidence, location, minimal_fix_hint
-    next_actions: List[str]
+    scores: dict[str, float]  # correctness, consistency, safety, efficiency, clarity
+    failures: list[dict[str, str]]  # category, evidence, location, minimal_fix_hint
+    next_actions: list[str]
     confidence: float = 1.0
     reasoning_items_count: int = 0
 
@@ -69,11 +69,11 @@ class ConsolidatedResult:
     """Merged result from all critics."""
 
     verdict: str  # "accept" | "revise"
-    scores: Dict[str, float]
-    failures: List[Dict[str, str]]
-    next_actions: List[str]
-    blocking_failures: List[Dict[str, str]]
-    summary_scores: Dict[str, float]
+    scores: dict[str, float]
+    failures: list[dict[str, str]]
+    next_actions: list[str]
+    blocking_failures: list[dict[str, str]]
+    summary_scores: dict[str, float]
     iteration_count: int = 0
     total_critics: int = 0
 
@@ -83,7 +83,7 @@ class MultiCriticSystem:
     Disciplined multi-critic system with parallel execution and consolidation.
     """
 
-    def __init__(self, configs: Optional[List[CriticConfig]] = None):
+    def __init__(self, configs: list[CriticConfig] | None = None):
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.critic_configs = configs or self._get_default_configs()
         self.sessions = {}  # Track critic sessions for threading
@@ -93,7 +93,7 @@ class MultiCriticSystem:
         # Standardized schema for all critics
         self.critique_schema = self._get_critique_schema()
 
-    def _get_default_configs(self) -> List[CriticConfig]:
+    def _get_default_configs(self) -> list[CriticConfig]:
         """Get default critic configurations."""
         return [
             CriticConfig(CriticType.CONTRACTS, max_output_tokens=800),
@@ -104,7 +104,7 @@ class MultiCriticSystem:
             CriticConfig(CriticType.DOCS, max_output_tokens=500),
         ]
 
-    def _get_critique_schema(self) -> Dict[str, Any]:
+    def _get_critique_schema(self) -> dict[str, Any]:
         """Get standardized schema for all critics."""
         return {
             "name": "critic_result",
@@ -247,7 +247,7 @@ class MultiCriticSystem:
         spec: str,
         session_id: str,
         iteration: int,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Run a single critic with threading support."""
 
         session = self.sessions[session_id]
@@ -418,7 +418,7 @@ OUTPUT: Return structured JSON with verdict, scores, failures, and next_actions.
         return base_prompt
 
     def _parse_critic_result(
-        self, result: Dict[str, Any], critic_type: CriticType
+        self, result: dict[str, Any], critic_type: CriticType
     ) -> CriticResult:
         """Parse API result into CriticResult object."""
         data = result["data"]
@@ -447,7 +447,7 @@ class CriticConsolidator:
             CriticType.DOCS: 5,
         }
 
-    def consolidate(self, critic_results: List[CriticResult]) -> ConsolidatedResult:
+    def consolidate(self, critic_results: list[CriticResult]) -> ConsolidatedResult:
         """Consolidate multiple critic results into single verdict."""
 
         if not critic_results:

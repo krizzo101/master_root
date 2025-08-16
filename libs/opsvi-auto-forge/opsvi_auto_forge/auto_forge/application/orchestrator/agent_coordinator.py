@@ -5,7 +5,6 @@ import logging
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from enum import Enum
-from uuid import UUID, uuid4
 
 from .task_execution_bridge import TaskExecutionBridge
 

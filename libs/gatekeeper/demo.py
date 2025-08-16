@@ -6,7 +6,6 @@ Demonstrates the gatekeeper functionality with various scenarios.
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add the gatekeeper module to the path
@@ -47,9 +46,11 @@ def demo_bug_fix_scenario():
     print(f"Files: {files}")
     print()
 
-    result = gatekeeper.process_request(request, files, max_files=15, min_confidence=0.1)
+    result = gatekeeper.process_request(
+        request, files, max_files=15, min_confidence=0.1
+    )
 
-    print(f"📊 Results:")
+    print("📊 Results:")
     print(f"  Original files: {len(result.original_files)}")
     print(f"  Recommended files: {len(result.recommended_files)}")
     print(f"  Final files: {len(result.final_files)}")
@@ -80,9 +81,11 @@ def demo_feature_development_scenario():
     print(f"Files: {files}")
     print()
 
-    result = gatekeeper.process_request(request, files, max_files=12, min_confidence=0.1)
+    result = gatekeeper.process_request(
+        request, files, max_files=12, min_confidence=0.1
+    )
 
-    print(f"📊 Results:")
+    print("📊 Results:")
     print(f"  Original files: {len(result.original_files)}")
     print(f"  Recommended files: {len(result.recommended_files)}")
     print(f"  Final files: {len(result.final_files)}")
@@ -113,9 +116,11 @@ def demo_testing_scenario():
     print(f"Files: {files}")
     print()
 
-    result = gatekeeper.process_request(request, files, max_files=10, min_confidence=0.1)
+    result = gatekeeper.process_request(
+        request, files, max_files=10, min_confidence=0.1
+    )
 
-    print(f"📊 Results:")
+    print("📊 Results:")
     print(f"  Original files: {len(result.original_files)}")
     print(f"  Recommended files: {len(result.recommended_files)}")
     print(f"  Final files: {len(result.final_files)}")
@@ -142,16 +147,18 @@ def demo_complex_scenario():
     request = "Refactor the security module to improve performance and add better error handling"
     files = [
         "libs/opsvi-security/opsvi_security/core.py",
-        "libs/opsvi-security/opsvi_security/logging.py"
+        "libs/opsvi-security/opsvi_security/logging.py",
     ]
 
     print(f"Request: {request}")
     print(f"Files: {files}")
     print()
 
-    result = gatekeeper.process_request(request, files, max_files=20, min_confidence=0.1)
+    result = gatekeeper.process_request(
+        request, files, max_files=20, min_confidence=0.1
+    )
 
-    print(f"📊 Results:")
+    print("📊 Results:")
     print(f"  Original files: {len(result.original_files)}")
     print(f"  Recommended files: {len(result.recommended_files)}")
     print(f"  Final files: {len(result.final_files)}")
@@ -195,7 +202,7 @@ def demo_context_analysis():
         "Write unit tests for the logging module",
         "Update the documentation",
         "Optimize performance of the database queries",
-        "Add security validation to the API endpoints"
+        "Add security validation to the API endpoints",
     ]
 
     for request in test_requests:

@@ -45,14 +45,13 @@ Add to mcp.json:
 """
 
 import asyncio
-from contextlib import asynccontextmanager
-from dataclasses import dataclass
 import json
 import logging
 import os
-from pathlib import Path
 import sys
-from typing import List, Optional
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
+from pathlib import Path
 
 # MCP imports
 try:
@@ -105,7 +104,7 @@ class Context7MCPClient:
     retrieving up-to-date technical documentation.
     """
 
-    def __init__(self, mcp_config_path: Optional[str] = None, debug: bool = False):
+    def __init__(self, mcp_config_path: str | None = None, debug: bool = False):
         """
         Initialize the Context7 MCP client.
 
@@ -178,7 +177,7 @@ class Context7MCPClient:
                 self.logger.error(f"Subprocess stdout: {e.stdout}")
             raise Context7Error(f"Failed to connect to Context7 MCP server: {e}")
 
-    def _parse_library_results(self, tool_result: CallToolResult) -> List[LibraryInfo]:
+    def _parse_library_results(self, tool_result: CallToolResult) -> list[LibraryInfo]:
         """Parse library resolution results."""
         libraries = []
 
@@ -314,7 +313,7 @@ Return ONLY the JSON array, with no extra text or explanation.
 
         return libraries
 
-    async def resolve_library_id(self, library_name: str) -> List[LibraryInfo]:
+    async def resolve_library_id(self, library_name: str) -> list[LibraryInfo]:
         """
         Resolve a library name to Context7-compatible library IDs.
 
@@ -494,7 +493,7 @@ async def quick_docs(library_name: str, topic: str = None, tokens: int = 10000) 
     return result.content if result.success else f"Error: {result.error}"
 
 
-async def quick_resolve(library_name: str) -> List[LibraryInfo]:
+async def quick_resolve(library_name: str) -> list[LibraryInfo]:
     """Quick library ID resolution."""
     client = Context7MCPClient()
     return await client.resolve_library_id(library_name)

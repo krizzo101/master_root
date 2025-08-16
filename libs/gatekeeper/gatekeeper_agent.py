@@ -7,22 +7,22 @@ Can be integrated into any agent that needs intelligent context management.
 """
 
 import json
-import os
-from typing import List, Dict, Any, Optional, Tuple
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
+from typing import Any
 
 from auto_attach import AutoAttach
-from context_analyzer import ContextAnalyzer, ContextAnalysis, ContextRecommendation
+from context_analyzer import ContextAnalysis, ContextAnalyzer
 
 
 @dataclass
 class GatekeeperResult:
     """Result of gatekeeper processing."""
-    original_files: List[str]
-    recommended_files: List[str]
-    final_files: List[str]
+
+    original_files: list[str]
+    recommended_files: list[str]
+    final_files: list[str]
     context_analysis: ContextAnalysis
-    auto_attach_results: Dict[str, Any]
+    auto_attach_results: dict[str, Any]
     processing_summary: str
     confidence_score: float
 
@@ -39,8 +39,13 @@ class GatekeeperAgent:
         """Set verbose mode for detailed logging."""
         self.verbose = verbose
 
-    def process_request(self, user_request: str, user_files: List[str] = None,
-                       max_files: int = 50, min_confidence: float = 0.5) -> GatekeeperResult:
+    def process_request(
+        self,
+        user_request: str,
+        user_files: list[str] = None,
+        max_files: int = 50,
+        min_confidence: float = 0.5,
+    ) -> GatekeeperResult:
         """
         Process a user request to determine optimal context.
 
@@ -60,7 +65,9 @@ class GatekeeperAgent:
             print(f"📁 User files: {user_files}")
 
         # Step 1: Analyze the request context
-        context_analysis = self.context_analyzer.analyze_request(user_request, user_files)
+        context_analysis = self.context_analyzer.analyze_request(
+            user_request, user_files
+        )
 
         if self.verbose:
             print(f"📊 Context analysis: {context_analysis.analysis_summary}")
@@ -86,7 +93,11 @@ class GatekeeperAgent:
 
         # Step 5: Create processing summary
         processing_summary = self._create_processing_summary(
-            user_files, recommended_files, final_files, context_analysis, auto_attach_results
+            user_files,
+            recommended_files,
+            final_files,
+            context_analysis,
+            auto_attach_results,
         )
 
         # Step 6: Calculate final confidence
@@ -101,15 +112,17 @@ class GatekeeperAgent:
             context_analysis=context_analysis,
             auto_attach_results=auto_attach_results,
             processing_summary=processing_summary,
-            confidence_score=final_confidence
+            confidence_score=final_confidence,
         )
 
-    def _perform_auto_attach(self, user_files: List[str]) -> Dict[str, Any]:
+    def _perform_auto_attach(self, user_files: list[str]) -> dict[str, Any]:
         """Perform auto-attach analysis on user files."""
         if not self.auto_attach.is_loaded():
             return {"error": "Dependencies not loaded"}
 
-        related_files = self.auto_attach.find_related_files(user_files, verbose=self.verbose)
+        related_files = self.auto_attach.find_related_files(
+            user_files, verbose=self.verbose
+        )
 
         # Analyze each file for detailed information
         file_analyses = {}
@@ -122,16 +135,21 @@ class GatekeeperAgent:
             "related_files": related_files,
             "file_analyses": file_analyses,
             "total_related": len(related_files),
-            "original_count": len(user_files)
+            "original_count": len(user_files),
         }
 
-    def _apply_context_recommendations(self, current_files: List[str],
-                                     context_analysis: ContextAnalysis,
-                                     min_confidence: float) -> List[str]:
+    def _apply_context_recommendations(
+        self,
+        current_files: list[str],
+        context_analysis: ContextAnalysis,
+        min_confidence: float,
+    ) -> list[str]:
         """Apply context analysis recommendations to file list."""
         # Filter recommendations by confidence
-        filtered_recommendations = self.context_analyzer.filter_recommendations_by_confidence(
-            context_analysis.recommended_context, min_confidence
+        filtered_recommendations = (
+            self.context_analyzer.filter_recommendations_by_confidence(
+                context_analysis.recommended_context, min_confidence
+            )
         )
 
         # Get high-priority recommendations
@@ -168,8 +186,9 @@ class GatekeeperAgent:
 
         return unique_files
 
-    def _filter_and_limit_files(self, files: List[str], max_files: int,
-                               context_analysis: ContextAnalysis) -> List[str]:
+    def _filter_and_limit_files(
+        self, files: list[str], max_files: int, context_analysis: ContextAnalysis
+    ) -> list[str]:
         """Filter and limit files based on context analysis."""
         if len(files) <= max_files:
             return files
@@ -180,7 +199,9 @@ class GatekeeperAgent:
         # Take the top files up to the limit
         return prioritized_files[:max_files]
 
-    def _prioritize_files(self, files: List[str], context_analysis: ContextAnalysis) -> List[str]:
+    def _prioritize_files(
+        self, files: list[str], context_analysis: ContextAnalysis
+    ) -> list[str]:
         """Prioritize files based on context analysis."""
         # Simple prioritization: user files first, then by type
         user_files = set(context_analysis.user_files)
@@ -195,18 +216,13 @@ class GatekeeperAgent:
             file_type = file_info.get("file_type", "unknown")
 
             # Priority order: source > config > test > documentation
-            type_priority = {
-                "source": 1,
-                "config": 2,
-                "test": 3,
-                "documentation": 4
-            }
+            type_priority = {"source": 1, "config": 2, "test": 3, "documentation": 4}
 
             return (type_priority.get(file_type, 5), file_path)
 
         return sorted(files, key=priority_key)
 
-    def _find_test_files(self, current_files: List[str]) -> List[str]:
+    def _find_test_files(self, current_files: list[str]) -> list[str]:
         """Find test files related to current files."""
         if not self.auto_attach.is_loaded():
             return []
@@ -219,7 +235,7 @@ class GatekeeperAgent:
 
         return test_files
 
-    def _find_config_files(self, current_files: List[str]) -> List[str]:
+    def _find_config_files(self, current_files: list[str]) -> list[str]:
         """Find config files related to current files."""
         if not self.auto_attach.is_loaded():
             return []
@@ -232,7 +248,7 @@ class GatekeeperAgent:
 
         return config_files
 
-    def _find_documentation_files(self, current_files: List[str]) -> List[str]:
+    def _find_documentation_files(self, current_files: list[str]) -> list[str]:
         """Find documentation files related to current files."""
         if not self.auto_attach.is_loaded():
             return []
@@ -245,23 +261,35 @@ class GatekeeperAgent:
 
         return doc_files
 
-    def _create_processing_summary(self, user_files: List[str], recommended_files: List[str],
-                                 final_files: List[str], context_analysis: ContextAnalysis,
-                                 auto_attach_results: Dict[str, Any]) -> str:
+    def _create_processing_summary(
+        self,
+        user_files: list[str],
+        recommended_files: list[str],
+        final_files: list[str],
+        context_analysis: ContextAnalysis,
+        auto_attach_results: dict[str, Any],
+    ) -> str:
         """Create a summary of the processing."""
         summary_parts = []
 
         summary_parts.append(f"User provided {len(user_files)} files")
-        auto_attach_count = auto_attach_results.get("total_related", 0) - len(user_files)
-        summary_parts.append(f"Auto-attach found {max(0, auto_attach_count)} related files")
+        auto_attach_count = auto_attach_results.get("total_related", 0) - len(
+            user_files
+        )
+        summary_parts.append(
+            f"Auto-attach found {max(0, auto_attach_count)} related files"
+        )
         summary_parts.append(f"Final selection: {len(final_files)} files")
         summary_parts.append(f"Context analysis: {context_analysis.analysis_summary}")
 
         return "; ".join(summary_parts)
 
-    def _calculate_final_confidence(self, context_analysis: ContextAnalysis,
-                                  auto_attach_results: Dict[str, Any],
-                                  final_file_count: int) -> float:
+    def _calculate_final_confidence(
+        self,
+        context_analysis: ContextAnalysis,
+        auto_attach_results: dict[str, Any],
+        final_file_count: int,
+    ) -> float:
         """Calculate final confidence score."""
         # Start with context analysis confidence
         confidence = context_analysis.confidence_score
@@ -280,7 +308,7 @@ class GatekeeperAgent:
 
         return max(0.0, min(1.0, confidence))
 
-    def get_file_analysis(self, file_path: str) -> Dict[str, Any]:
+    def get_file_analysis(self, file_path: str) -> dict[str, Any]:
         """Get detailed analysis for a specific file."""
         if not self.auto_attach.is_loaded():
             return {}
@@ -293,7 +321,7 @@ class GatekeeperAgent:
             # Convert dataclass to dict for JSON serialization
             result_dict = asdict(result)
 
-            with open(output_file, 'w') as f:
+            with open(output_file, "w") as f:
                 json.dump(result_dict, f, indent=2)
 
             if self.verbose:

@@ -4,7 +4,8 @@ Configuration for opsvi-fs, read from environment.
 """
 from __future__ import annotations
 
-from pydantic import BaseSettings, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
 class LibrarySettings(BaseSettings):
@@ -14,7 +15,9 @@ class LibrarySettings(BaseSettings):
         default="local",
         description="Default provider: local|s3|gcs|azure|minio|fsspec",
     )
-    fs_root: str = Field(default=".", description="Default root path or bucket/container")
+    fs_root: str = Field(
+        default=".", description="Default root path or bucket/container"
+    )
     request_timeout_secs: int = Field(default=30, ge=1)
     max_retries: int = Field(default=3, ge=0)
     backoff_secs: float = Field(default=0.5, ge=0)

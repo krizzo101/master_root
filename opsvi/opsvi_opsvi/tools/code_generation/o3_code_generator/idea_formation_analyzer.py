@@ -13,10 +13,10 @@ from src.tools.code_generation.o3_code_generator.o3_logger.logger import (
 
 setup_logger(LogConfig())
 import argparse
-from pathlib import Path
 import sys
 import time
-from typing import Any, Dict, List
+from pathlib import Path
+from typing import Any
 
 from src.tools.code_generation.o3_code_generator.analysis_utils import (
     extract_ideas_from_brainstorm_results,
@@ -336,7 +336,7 @@ class IdeaFormationAnalyzer:
 
     def analyze_concept(
         self, concept_description: str, target_market: str | None = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Analyze a concept for clarity, completeness, and potential.
 
@@ -348,7 +348,7 @@ class IdeaFormationAnalyzer:
             Dictionary containing concept analysis results
         """
         self.logger.log_info("Starting concept analysis")
-        analysis_results: Dict[str, Any] = {
+        analysis_results: dict[str, Any] = {
             "concept_summary": "",
             "clarity_score": 0.0,
             "completeness_score": 0.0,
@@ -380,7 +380,7 @@ class IdeaFormationAnalyzer:
 
     def validate_idea(
         self, concept_description: str, target_market: str | None = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Validate an idea for market fit and viability.
 
@@ -392,7 +392,7 @@ class IdeaFormationAnalyzer:
             Dictionary containing validation results
         """
         self.logger.log_info("Starting idea validation")
-        validation_results: Dict[str, Any] = {
+        validation_results: dict[str, Any] = {
             "market_fit_score": 0.0,
             "viability_score": 0.0,
             "uniqueness_score": 0.0,
@@ -420,7 +420,7 @@ class IdeaFormationAnalyzer:
 
     def refine_concept(
         self, concept_description: str, feedback: str | None = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Refine a concept based on analysis and feedback.
 
@@ -432,7 +432,7 @@ class IdeaFormationAnalyzer:
             Dictionary containing refined concept and improvements
         """
         self.logger.log_info("Starting concept refinement")
-        refinement_results: Dict[str, Any] = {
+        refinement_results: dict[str, Any] = {
             "original_concept": concept_description,
             "refined_concept": "",
             "improvements_made": [],
@@ -454,7 +454,7 @@ class IdeaFormationAnalyzer:
         finally:
             pass
 
-    def assess_feasibility(self, concept_description: str) -> Dict[str, Any]:
+    def assess_feasibility(self, concept_description: str) -> dict[str, Any]:
         """
         Assess the feasibility of implementing a concept.
 
@@ -465,7 +465,7 @@ class IdeaFormationAnalyzer:
             Dictionary containing feasibility assessment
         """
         self.logger.log_info("Starting feasibility assessment")
-        feasibility_results: Dict[str, Any] = {
+        feasibility_results: dict[str, Any] = {
             "technical_feasibility": {},
             "economic_feasibility": {},
             "operational_feasibility": {},
@@ -489,13 +489,13 @@ class IdeaFormationAnalyzer:
         finally:
             pass
 
-    def _analyze_concept_clarity(self, concept_description: str) -> Dict[str, Any]:
+    def _analyze_concept_clarity(self, concept_description: str) -> dict[str, Any]:
         return {
             "clarity_score": 0.8,
             "clarity_analysis": "Concept is generally clear but could benefit from more specific details",
         }
 
-    def _analyze_concept_completeness(self, concept_description: str) -> Dict[str, Any]:
+    def _analyze_concept_completeness(self, concept_description: str) -> dict[str, Any]:
         return {
             "completeness_score": 0.7,
             "missing_elements": [
@@ -507,7 +507,7 @@ class IdeaFormationAnalyzer:
 
     def _analyze_concept_potential(
         self, concept_description: str, target_market: str | None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         return {
             "potential_score": 0.75,
             "potential_analysis": "Concept shows good potential with proper execution",
@@ -515,19 +515,19 @@ class IdeaFormationAnalyzer:
 
     def _validate_market_fit(
         self, concept_description: str, target_market: str | None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         return {
             "market_fit_score": 0.8,
             "market_validation": "Good market fit identified",
         }
 
-    def _assess_viability(self, concept_description: str) -> Dict[str, Any]:
+    def _assess_viability(self, concept_description: str) -> dict[str, Any]:
         return {
             "viability_score": 0.7,
             "viability_assessment": "Concept is viable with some modifications",
         }
 
-    def _analyze_uniqueness(self, concept_description: str) -> Dict[str, Any]:
+    def _analyze_uniqueness(self, concept_description: str) -> dict[str, Any]:
         return {
             "uniqueness_score": 0.6,
             "uniqueness_analysis": "Concept has some unique elements but faces competition",
@@ -538,20 +538,20 @@ class IdeaFormationAnalyzer:
     ) -> str:
         return f"Refined: {concept_description}"
 
-    def _identify_improvements(self, original: str, refined: str) -> List[str]:
+    def _identify_improvements(self, original: str, refined: str) -> list[str]:
         return [
             "Added specific target audience",
             "Clarified value proposition",
             "Included success metrics",
         ]
 
-    def _assess_technical_feasibility(self, concept_description: str) -> Dict[str, Any]:
+    def _assess_technical_feasibility(self, concept_description: str) -> dict[str, Any]:
         return {
             "technical_score": 0.8,
             "technical_assessment": "Technically feasible with current technology",
         }
 
-    def _assess_economic_feasibility(self, concept_description: str) -> Dict[str, Any]:
+    def _assess_economic_feasibility(self, concept_description: str) -> dict[str, Any]:
         return {
             "economic_score": 0.7,
             "economic_assessment": "Economically viable with proper funding",
@@ -559,7 +559,7 @@ class IdeaFormationAnalyzer:
 
     def _assess_operational_feasibility(
         self, concept_description: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         return {
             "operational_score": 0.75,
             "operational_assessment": "Operationally feasible with proper planning",
@@ -636,7 +636,7 @@ class IdeaFormationProcessor:
         start_time = time.time()
         self.logger.log_info("Starting idea formation analysis")
         try:
-            data: Dict[str, Any] = {}
+            data: dict[str, Any] = {}
             data["concept_analysis"] = self.analyzer.analyze_concept(
                 input_data.concept_description, input_data.target_market
             )
@@ -692,8 +692,8 @@ class IdeaFormationProcessor:
             pass
 
     def _generate_with_o3_model(
-        self, input_data: IdeaFormationInput, idea_analysis: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, input_data: IdeaFormationInput, idea_analysis: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Generate enhanced analysis using O3 model.
 
@@ -734,7 +734,7 @@ class IdeaFormationProcessor:
 
     def _perform_market_research(
         self, input_data: IdeaFormationInput
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Perform market research analysis.
 

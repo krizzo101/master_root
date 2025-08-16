@@ -1,9 +1,7 @@
 """Tests for OPSVI Auth provider functionality."""
 
 import pytest
-import asyncio
 from typing import Dict, Any, Optional
-from unittest.mock import AsyncMock, MagicMock
 from datetime import datetime, timedelta
 
 from opsvi_auth import (

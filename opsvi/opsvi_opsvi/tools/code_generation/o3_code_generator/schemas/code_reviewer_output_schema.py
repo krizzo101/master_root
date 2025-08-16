@@ -4,7 +4,6 @@ Output schema for code review.
 This module defines the Pydantic models for code review output data.
 """
 
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -34,7 +33,7 @@ class CodeReviewOutput(BaseModel):
 
     report_path: str = Field(..., description="Path to the generated review report")
 
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Error message if review failed"
     )
 

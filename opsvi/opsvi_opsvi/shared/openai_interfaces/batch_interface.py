@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 import openai
 
@@ -11,7 +11,7 @@ class OpenAIBatchInterface(OpenAIBaseInterface):
     Reference: https://platform.openai.com/docs/api-reference/batch
     """
 
-    def create_batch(self, **kwargs) -> Dict[str, Any]:
+    def create_batch(self, **kwargs) -> dict[str, Any]:
         """
         Create a batch.
         POST /v1/batches
@@ -22,7 +22,7 @@ class OpenAIBatchInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def retrieve_batch(self, batch_id: str) -> Dict[str, Any]:
+    def retrieve_batch(self, batch_id: str) -> dict[str, Any]:
         """
         Retrieve a batch by ID.
         GET /v1/batches/{batch_id}
@@ -33,7 +33,7 @@ class OpenAIBatchInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def list_batches(self) -> List[Dict[str, Any]]:
+    def list_batches(self) -> list[dict[str, Any]]:
         """
         List all batches.
         GET /v1/batches
@@ -44,7 +44,7 @@ class OpenAIBatchInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def cancel_batch(self, batch_id: str) -> Dict[str, Any]:
+    def cancel_batch(self, batch_id: str) -> dict[str, Any]:
         """
         Cancel a batch.
         POST /v1/batches/{batch_id}/cancel
@@ -55,7 +55,7 @@ class OpenAIBatchInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def acreate_batch(self, **kwargs) -> Dict[str, Any]:
+    async def acreate_batch(self, **kwargs) -> dict[str, Any]:
         """
         Async: Create a batch.
         POST /v1/batches
@@ -66,7 +66,7 @@ class OpenAIBatchInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def aretrieve_batch(self, batch_id: str) -> Dict[str, Any]:
+    async def aretrieve_batch(self, batch_id: str) -> dict[str, Any]:
         """
         Async: Retrieve a batch by ID.
         GET /v1/batches/{batch_id}
@@ -77,7 +77,7 @@ class OpenAIBatchInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def alist_batches(self) -> List[Dict[str, Any]]:
+    async def alist_batches(self) -> list[dict[str, Any]]:
         """
         Async: List all batches.
         GET /v1/batches
@@ -88,7 +88,7 @@ class OpenAIBatchInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def acancel_batch(self, batch_id: str) -> Dict[str, Any]:
+    async def acancel_batch(self, batch_id: str) -> dict[str, Any]:
         """
         Async: Cancel a batch.
         POST /v1/batches/{batch_id}/cancel

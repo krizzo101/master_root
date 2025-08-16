@@ -1,16 +1,15 @@
 import pytest
-import asyncio
 
 
 def test_ecosystem_imports():
     """Test that all major ecosystem components can be imported."""
     try:
-        from opsvi_foundation import BaseComponent, ComponentError
-        from opsvi_core import ServiceRegistry, EventBus
-        from opsvi_llm import BaseLLMProvider
-        from opsvi_http import BaseHTTPClient
-        from opsvi_data import BaseDatabaseProvider
         from opsvi_auth import BaseAuthProvider
+        from opsvi_core import EventBus, ServiceRegistry
+        from opsvi_data import BaseDatabaseProvider
+        from opsvi_foundation import BaseComponent, ComponentError
+        from opsvi_http import BaseHTTPClient
+        from opsvi_llm import BaseLLMProvider
 
         assert True
     except ImportError as e:

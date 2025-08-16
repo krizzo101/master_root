@@ -1,9 +1,6 @@
 """Coder agent for the autonomous software factory."""
 
-import json
 import logging
-import os
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field

@@ -1,11 +1,9 @@
 """WebSocket connection manager for real-time updates."""
 
 import json
-import logging
-from typing import Dict, List, Optional, Any
-from uuid import UUID
+from typing import Dict, List, Any
 
-from fastapi import WebSocket, WebSocketDisconnect
+from fastapi import WebSocket
 import structlog
 
 logger = structlog.get_logger()

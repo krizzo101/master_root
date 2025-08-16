@@ -6,13 +6,11 @@ Provides comprehensive volume operations and data persistence.
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Union
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any
 
 from docker import DockerClient
-from docker.errors import DockerException, APIError, NotFound
-
 from opsvi_foundation import BaseComponent, ComponentError
 
 logger = logging.getLogger(__name__)
@@ -33,13 +31,13 @@ class VolumeConfig:
     driver: str = "local"
 
     # Driver options
-    driver_opts: Dict[str, str] = field(default_factory=dict)
+    driver_opts: dict[str, str] = field(default_factory=dict)
 
     # Labels and metadata
-    labels: Dict[str, str] = field(default_factory=dict)
+    labels: dict[str, str] = field(default_factory=dict)
 
     # Mount options
-    mount_point: Optional[str] = None
+    mount_point: str | None = None
     read_only: bool = False
 
     # Advanced settings
@@ -55,14 +53,14 @@ class VolumeInfo:
     driver: str
     mountpoint: str
     created: datetime
-    status: Dict[str, Any]
-    labels: Dict[str, str]
+    status: dict[str, Any]
+    labels: dict[str, str]
     scope: str
-    options: Dict[str, str]
+    options: dict[str, str]
 
     # Additional metadata
-    size: Optional[int] = None
-    usage_data: Optional[Dict[str, Any]] = None
+    size: int | None = None
+    usage_data: dict[str, Any] | None = None
 
 
 class VolumeManager(BaseComponent):
@@ -89,7 +87,7 @@ class VolumeManager(BaseComponent):
 
         self.client = client
         self.config = config
-        self._volumes: Dict[str, Any] = {}
+        self._volumes: dict[str, Any] = {}
 
         logger.debug("VolumeManager initialized")
 
@@ -200,8 +198,8 @@ class VolumeManager(BaseComponent):
             raise VolumeError(f"Failed to get volume info: {e}")
 
     async def list_volumes(
-        self, filters: Optional[Dict[str, Any]] = None
-    ) -> List[VolumeInfo]:
+        self, filters: dict[str, Any] | None = None
+    ) -> list[VolumeInfo]:
         """List volumes.
 
         Args:
@@ -227,7 +225,7 @@ class VolumeManager(BaseComponent):
             logger.error(f"Failed to list volumes: {e}")
             raise VolumeError(f"Failed to list volumes: {e}")
 
-    async def inspect_volume(self, volume_name: str) -> Dict[str, Any]:
+    async def inspect_volume(self, volume_name: str) -> dict[str, Any]:
         """Inspect volume details.
 
         Args:
@@ -245,8 +243,8 @@ class VolumeManager(BaseComponent):
             raise VolumeError(f"Volume inspection failed: {e}")
 
     async def prune_volumes(
-        self, filters: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        self, filters: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Remove unused volumes.
 
         Args:
@@ -348,7 +346,7 @@ class VolumeManager(BaseComponent):
             )
             raise VolumeError(f"Volume unmounting failed: {e}")
 
-    async def get_volume_usage(self, volume_name: str) -> Dict[str, Any]:
+    async def get_volume_usage(self, volume_name: str) -> dict[str, Any]:
         """Get volume usage statistics.
 
         Args:
@@ -386,7 +384,7 @@ class VolumeManager(BaseComponent):
             # Create a temporary container to backup the volume
             container = self.client.containers.run(
                 image="alpine:latest",
-                command=f"tar -czf /backup/volume_backup.tar.gz -C /data .",
+                command="tar -czf /backup/volume_backup.tar.gz -C /data .",
                 volumes={
                     volume_name: {"bind": "/data", "mode": "ro"},
                     backup_path: {"bind": "/backup", "mode": "rw"},
@@ -424,7 +422,7 @@ class VolumeManager(BaseComponent):
             # Create a temporary container to restore the volume
             container = self.client.containers.run(
                 image="alpine:latest",
-                command=f"tar -xzf /backup/volume_backup.tar.gz -C /data",
+                command="tar -xzf /backup/volume_backup.tar.gz -C /data",
                 volumes={
                     volume_name: {"bind": "/data", "mode": "rw"},
                     backup_path: {"bind": "/backup", "mode": "ro"},

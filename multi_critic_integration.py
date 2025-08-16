@@ -7,10 +7,11 @@ in a complete development workflow with anti-loop mechanisms.
 """
 
 import asyncio
-from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
-from multi_critic_system import MultiCriticSystem, ConsolidatedResult
-from optimized_main_agent import OptimizedMainAgent, AgentConfig
+from typing import Any
+
+from multi_critic_system import ConsolidatedResult, MultiCriticSystem
+from optimized_main_agent import OptimizedMainAgent
 
 
 @dataclass
@@ -23,7 +24,7 @@ class DevelopmentSession:
     iteration_count: int = 0
     max_iterations: int = 3
     current_code: str = ""
-    consolidated_results: List[ConsolidatedResult] = None
+    consolidated_results: list[ConsolidatedResult] = None
 
     def __post_init__(self):
         if self.consolidated_results is None:
@@ -62,7 +63,7 @@ class MultiCriticWorkflow:
 
     async def develop_with_critics(
         self, session_id: str, task: str, spec: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Complete development workflow with multi-critic feedback loop.
 
@@ -139,7 +140,7 @@ class MultiCriticWorkflow:
         # Return final result
         return self._build_final_result(session)
 
-    async def _apply_critic_fixes(self, current_code: str, actions: List[str]) -> str:
+    async def _apply_critic_fixes(self, current_code: str, actions: list[str]) -> str:
         """
         Apply critic-suggested fixes to the code.
 
@@ -166,7 +167,7 @@ Apply these fixes systematically and return the updated code."""
 
         return result["code"]
 
-    def _build_final_result(self, session: DevelopmentSession) -> Dict[str, Any]:
+    def _build_final_result(self, session: DevelopmentSession) -> dict[str, Any]:
         """Build final result from development session."""
 
         final_critic_result = (
@@ -208,7 +209,7 @@ class AntiLoopMechanisms:
     """Anti-loop mechanisms to prevent infinite development cycles."""
 
     @staticmethod
-    def check_for_oscillation(history: List[Dict[str, Any]]) -> bool:
+    def check_for_oscillation(history: list[dict[str, Any]]) -> bool:
         """Check if the development is oscillating between states."""
         if len(history) < 3:
             return False
@@ -291,11 +292,11 @@ async def main():
     print(f"Total Critics Used: {result['total_critics_used']}")
 
     if result["final_scores"]:
-        print(f"\nFinal Scores:")
+        print("\nFinal Scores:")
         for dimension, score in result["final_scores"].items():
             print(f"  {dimension}: {score:.2f}")
 
-    print(f"\nDevelopment History:")
+    print("\nDevelopment History:")
     for entry in result["development_history"]:
         status = "✅" if entry["verdict"] == "accept" else "🔄"
         print(

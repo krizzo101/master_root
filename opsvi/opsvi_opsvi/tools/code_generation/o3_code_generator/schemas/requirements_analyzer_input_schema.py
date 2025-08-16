@@ -4,7 +4,6 @@ Input schema for Requirements Analyzer.
 This module defines the Pydantic schema for requirements analyzer input configuration.
 """
 
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -46,9 +45,7 @@ class RequirementsAnalyzerInput(BaseModel):
     )
 
     # Output options
-    output_file: Optional[str] = Field(
-        default=None, description="Output file for results"
-    )
+    output_file: str | None = Field(default=None, description="Output file for results")
     output_format: str = Field(
         default="json", description="Output format: json, html, markdown"
     )

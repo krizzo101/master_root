@@ -6,15 +6,16 @@ This module provides comprehensive error recovery and rollback capabilities
 for the auto rules generation system to handle failures gracefully.
 """
 
-from contextlib import contextmanager
-from dataclasses import dataclass
-from datetime import datetime
 import json
-from pathlib import Path
 import shutil
 import threading
 import time
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
+from contextlib import contextmanager
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import (
     LogConfig,
@@ -30,9 +31,9 @@ class BackupPoint:
     id: str
     timestamp: datetime
     description: str
-    file_paths: List[Path]
+    file_paths: list[Path]
     backup_dir: Path
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
 
 
 @dataclass
@@ -42,7 +43,7 @@ class RecoveryAction:
     action_type: str  # 'rollback', 'retry', 'fallback', 'cleanup'
     description: str
     target: Any
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
     priority: int  # Higher number = higher priority
 
 
@@ -54,15 +55,15 @@ class ErrorContext:
     error_message: str
     timestamp: datetime
     operation_name: str
-    file_paths: List[Path]
-    backup_points: List[BackupPoint]
-    recovery_actions: List[RecoveryAction]
+    file_paths: list[Path]
+    backup_points: list[BackupPoint]
+    recovery_actions: list[RecoveryAction]
 
 
 class ErrorRecoverySystem:
     """Comprehensive error recovery and rollback system."""
 
-    def __init__(self, backup_dir: Optional[Path] = None):
+    def __init__(self, backup_dir: Path | None = None):
         """Initialize the error recovery system."""
         setup_logger(LogConfig())
         self.logger = get_logger()
@@ -70,8 +71,8 @@ class ErrorRecoverySystem:
         self.backup_dir = backup_dir or Path("backups")
         self.backup_dir.mkdir(exist_ok=True)
 
-        self.backup_points: List[BackupPoint] = []
-        self.recovery_strategies: Dict[str, List[RecoveryAction]] = {}
+        self.backup_points: list[BackupPoint] = []
+        self.recovery_strategies: dict[str, list[RecoveryAction]] = {}
         self.max_backups = 10
         self.retry_attempts = 3
         self.retry_delay = 1.0  # seconds
@@ -84,8 +85,8 @@ class ErrorRecoverySystem:
     def create_backup_point(
         self,
         description: str,
-        file_paths: List[Path],
-        metadata: Optional[Dict[str, Any]] = None,
+        file_paths: list[Path],
+        metadata: dict[str, Any] | None = None,
     ) -> BackupPoint:
         """Create a backup point for potential rollback."""
         with self._lock:
@@ -155,7 +156,7 @@ class ErrorRecoverySystem:
             )
             return False
 
-    def rollback_latest(self) -> Optional[BackupPoint]:
+    def rollback_latest(self) -> BackupPoint | None:
         """Rollback to the latest backup point."""
         if not self.backup_points:
             self.logger.log_warning("No backup points available for rollback")
@@ -169,7 +170,7 @@ class ErrorRecoverySystem:
         else:
             return None
 
-    def add_recovery_strategy(self, error_type: str, actions: List[RecoveryAction]):
+    def add_recovery_strategy(self, error_type: str, actions: list[RecoveryAction]):
         """Add a recovery strategy for a specific error type."""
         self.recovery_strategies[error_type] = sorted(
             actions, key=lambda x: x.priority, reverse=True
@@ -306,8 +307,8 @@ class ErrorRecoverySystem:
     def error_recovery_context(
         self,
         operation_name: str,
-        file_paths: List[Path],
-        metadata: Optional[Dict[str, Any]] = None,
+        file_paths: list[Path],
+        metadata: dict[str, Any] | None = None,
     ):
         """Context manager for error recovery."""
         backup_point = None
@@ -346,7 +347,7 @@ class ErrorRecoverySystem:
                     f"Error recovery succeeded for operation: {operation_name}"
                 )
 
-    def get_backup_points(self) -> List[BackupPoint]:
+    def get_backup_points(self) -> list[BackupPoint]:
         """Get all backup points."""
         with self._lock:
             return self.backup_points.copy()
@@ -426,7 +427,7 @@ class ErrorRecoverySystem:
 
 
 # Global error recovery system instance
-_global_recovery_system: Optional[ErrorRecoverySystem] = None
+_global_recovery_system: ErrorRecoverySystem | None = None
 
 
 def get_error_recovery_system() -> ErrorRecoverySystem:
@@ -439,8 +440,8 @@ def get_error_recovery_system() -> ErrorRecoverySystem:
 
 def with_error_recovery(
     operation_name: str,
-    file_paths: List[Path],
-    metadata: Optional[Dict[str, Any]] = None,
+    file_paths: list[Path],
+    metadata: dict[str, Any] | None = None,
 ):
     """Decorator for adding error recovery to functions."""
 

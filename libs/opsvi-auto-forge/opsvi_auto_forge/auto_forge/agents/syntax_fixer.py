@@ -379,7 +379,6 @@ Fix the code and return the response in the specified format.
         self, original_artifact: Artifact, fixed_code: str
     ) -> Artifact:
         """Create a new artifact with the fixed code."""
-        from uuid import uuid4
 
         # Create new metadata with fixed content
         metadata = original_artifact.metadata.copy()

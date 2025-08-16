@@ -1,13 +1,12 @@
 """Base repair agent for fixing issues identified by critic evaluation."""
 
-import asyncio
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, ConfigDict
 
-from opsvi_auto_forge.config.models import Artifact, Result, AgentRole
+from opsvi_auto_forge.config.models import Artifact, AgentRole
 from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
 from opsvi_auto_forge.agents.base_agent import BaseAgent, AgentResponse
 
@@ -172,7 +171,6 @@ class BaseRepairAgent(BaseAgent):
         This method adapts the repair agent to the standard agent interface.
         It expects inputs to contain a RepairRequest or equivalent data.
         """
-        from opsvi_auto_forge.application.orchestrator.task_models import TaskExecution
         from opsvi_auto_forge.agents.base_agent import AgentResponse
 
         try:

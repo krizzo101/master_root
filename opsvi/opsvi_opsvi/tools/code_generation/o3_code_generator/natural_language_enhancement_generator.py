@@ -7,13 +7,12 @@ from src.tools.code_generation.o3_code_generator.o3_logger.logger import (
 
 setup_logger(LogConfig())
 import argparse
+import sys
 from datetime import datetime
 from pathlib import Path
-import sys
 from typing import Any
 
 from schemas.input_schema import CodeGenerationInput
-
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import get_logger
 from src.tools.code_generation.o3_code_generator.utils.directory_manager import (
     DirectoryManager,

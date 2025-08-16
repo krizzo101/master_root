@@ -1,6 +1,5 @@
 import logging
 import os
-from typing import Dict, Optional
 
 import openai
 
@@ -11,9 +10,7 @@ class OpenAIBaseInterface:
     Handles authentication, error handling, and SDK/raw HTTP selection.
     """
 
-    def __init__(
-        self, api_key: Optional[str] = None, organization: Optional[str] = None
-    ):
+    def __init__(self, api_key: str | None = None, organization: str | None = None):
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         self.organization = organization or os.getenv("OPENAI_ORG_ID")
         if not self.api_key:
@@ -34,7 +31,7 @@ class OpenAIBaseInterface:
         # Standardized error handling for all interfaces
         raise error
 
-    def _get_headers(self) -> Dict[str, str]:
+    def _get_headers(self) -> dict[str, str]:
         headers = {"Authorization": f"Bearer {self.api_key}"}
         if self.organization:
             headers["OpenAI-Organization"] = self.organization

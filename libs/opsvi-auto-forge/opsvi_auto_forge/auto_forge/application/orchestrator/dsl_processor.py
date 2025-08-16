@@ -3,10 +3,9 @@
 import logging
 import yaml
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field, field_validator
 
-from opsvi_auto_forge.config.models import Artifact, Result
 from opsvi_auto_forge.infrastructure.monitoring.metrics.decision_metrics import (
     dsl_config_loaded_total,
     dsl_knobs_applied_total,

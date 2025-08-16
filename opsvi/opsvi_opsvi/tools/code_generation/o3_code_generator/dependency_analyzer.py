@@ -8,9 +8,9 @@ unused dependencies, and provides intelligent recommendations for optimization.
 import argparse
 import json
 import os
-from pathlib import Path
 import sys
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -177,7 +177,7 @@ class DependencyParser:
         finally:
             pass
 
-    def _parse_python_dependency(self, dep_string: str) -> Optional[dict[str, Any]]:
+    def _parse_python_dependency(self, dep_string: str) -> dict[str, Any] | None:
         """
         Parse a Python dependency string.
 
@@ -278,7 +278,7 @@ class SecurityScanner:
 
     def _analyze_dependency_vulnerability(
         self, dep: dict[str, Any]
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """
         Analyze a single dependency for vulnerabilities using O3 model.
 
@@ -568,7 +568,7 @@ class DependencyOptimizer:
 class DependencyAnalyzer:
     """Main class for dependency analysis."""
 
-    def __init__(self, config_path: Optional[str] = None) -> None:
+    def __init__(self, config_path: str | None = None) -> None:
         """Initialize with configuration."""
         self.config_manager = ConfigManager(config_path)
         try:

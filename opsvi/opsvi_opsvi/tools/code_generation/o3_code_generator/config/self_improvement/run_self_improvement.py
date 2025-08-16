@@ -7,8 +7,8 @@ to improve itself through iterative enhancement generation.
 """
 
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 from typing import Any
 
 # Add the parent directory to the path to import the O3 code generator

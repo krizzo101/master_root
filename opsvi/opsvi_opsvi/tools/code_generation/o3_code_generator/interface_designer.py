@@ -8,10 +8,10 @@ including API specifications, protocol definitions, authentication schemes, and 
 import argparse
 import json
 import os
-from pathlib import Path
 import sys
 import time
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
 
 from openai import OpenAI
 
@@ -293,7 +293,7 @@ title Interface Design
 class InterfaceDesigner:
     """Main interface designer class."""
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: str | None = None):
         """Initialize the interface designer.
 
         Args:

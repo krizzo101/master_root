@@ -1,6 +1,7 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
-from app.weather import kelvin_to_celsius, fetch_weather, WeatherAPIError
+from app.weather import WeatherAPIError, fetch_weather, kelvin_to_celsius
 
 
 @pytest.mark.parametrize(

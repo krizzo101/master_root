@@ -1,10 +1,7 @@
 """Prompt Generation Agent (PGA) for Dynamic Prompt Generation."""
 
-import hashlib
-import json
 import logging
 from typing import Any, Dict, List, Optional, Tuple
-from datetime import datetime
 
 from opsvi_pipeline.infrastructure.memory.graph.client import Neo4jClient
 from opsvi_pipeline.infrastructure.memory.vector.context_store import ContextStore
@@ -16,7 +13,6 @@ from opsvi_pipeline.core.prompting.models import (
     Controls,
     SafetyConfig,
 )
-from opsvi_pipeline.config.models import AgentRole
 
 logger = logging.getLogger(__name__)
 

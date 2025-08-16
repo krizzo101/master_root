@@ -1,7 +1,6 @@
-from typing import Any, Dict, List
+from typing import Any
 
 import openai
-
 from shared.openai_interfaces.base import OpenAIBaseInterface
 
 
@@ -11,7 +10,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
     Reference: https://platform.openai.com/docs/api-reference/vector-stores
     """
 
-    def create_vector_store(self, **kwargs) -> Dict[str, Any]:
+    def create_vector_store(self, **kwargs) -> dict[str, Any]:
         """
         Create a vector store.
         POST /v1/vector_stores
@@ -22,7 +21,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def retrieve_vector_store(self, vector_store_id: str) -> Dict[str, Any]:
+    def retrieve_vector_store(self, vector_store_id: str) -> dict[str, Any]:
         """
         Retrieve a vector store by ID.
         GET /v1/vector_stores/{vector_store_id}
@@ -33,7 +32,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def list_vector_stores(self) -> List[Dict[str, Any]]:
+    def list_vector_stores(self) -> list[dict[str, Any]]:
         """
         List all vector stores.
         GET /v1/vector_stores
@@ -44,7 +43,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def update_vector_store(self, vector_store_id: str, **kwargs) -> Dict[str, Any]:
+    def update_vector_store(self, vector_store_id: str, **kwargs) -> dict[str, Any]:
         """
         Update a vector store.
         POST /v1/vector_stores/{vector_store_id}
@@ -55,7 +54,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def delete_vector_store(self, vector_store_id: str) -> Dict[str, Any]:
+    def delete_vector_store(self, vector_store_id: str) -> dict[str, Any]:
         """
         Delete a vector store.
         DELETE /v1/vector_stores/{vector_store_id}
@@ -66,7 +65,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def list_files(self, vector_store_id: str) -> List[Dict[str, Any]]:
+    def list_files(self, vector_store_id: str) -> list[dict[str, Any]]:
         """
         List files in a vector store.
         GET /v1/vector_stores/{vector_store_id}/files
@@ -77,7 +76,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def add_file(self, vector_store_id: str, file_id: str) -> Dict[str, Any]:
+    def add_file(self, vector_store_id: str, file_id: str) -> dict[str, Any]:
         """
         Add a file to a vector store.
         POST /v1/vector_stores/{vector_store_id}/files
@@ -88,7 +87,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def remove_file(self, vector_store_id: str, file_id: str) -> Dict[str, Any]:
+    def remove_file(self, vector_store_id: str, file_id: str) -> dict[str, Any]:
         """
         Remove a file from a vector store.
         DELETE /v1/vector_stores/{vector_store_id}/files/{file_id}
@@ -99,7 +98,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def list_file_batches(self, vector_store_id: str) -> List[Dict[str, Any]]:
+    def list_file_batches(self, vector_store_id: str) -> list[dict[str, Any]]:
         """
         List file batches in a vector store.
         GET /v1/vector_stores/{vector_store_id}/file_batches
@@ -112,7 +111,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
 
     def retrieve_file_batch(
         self, vector_store_id: str, batch_id: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Retrieve a file batch by ID.
         GET /v1/vector_stores/{vector_store_id}/file_batches/{batch_id}
@@ -123,7 +122,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def acreate_vector_store(self, **kwargs) -> Dict[str, Any]:
+    async def acreate_vector_store(self, **kwargs) -> dict[str, Any]:
         """
         Async: Create a vector store.
         POST /v1/vector_stores
@@ -134,7 +133,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def aretrieve_vector_store(self, vector_store_id: str) -> Dict[str, Any]:
+    async def aretrieve_vector_store(self, vector_store_id: str) -> dict[str, Any]:
         """
         Async: Retrieve a vector store by ID.
         GET /v1/vector_stores/{vector_store_id}
@@ -145,7 +144,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def alist_vector_stores(self) -> List[Dict[str, Any]]:
+    async def alist_vector_stores(self) -> list[dict[str, Any]]:
         """
         Async: List all vector stores.
         GET /v1/vector_stores
@@ -158,7 +157,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
 
     async def aupdate_vector_store(
         self, vector_store_id: str, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Async: Update a vector store.
         POST /v1/vector_stores/{vector_store_id}
@@ -169,7 +168,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def adelete_vector_store(self, vector_store_id: str) -> Dict[str, Any]:
+    async def adelete_vector_store(self, vector_store_id: str) -> dict[str, Any]:
         """
         Async: Delete a vector store.
         DELETE /v1/vector_stores/{vector_store_id}
@@ -180,7 +179,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def alist_files(self, vector_store_id: str) -> List[Dict[str, Any]]:
+    async def alist_files(self, vector_store_id: str) -> list[dict[str, Any]]:
         """
         Async: List files in a vector store.
         GET /v1/vector_stores/{vector_store_id}/files
@@ -191,7 +190,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def aadd_file(self, vector_store_id: str, file_id: str) -> Dict[str, Any]:
+    async def aadd_file(self, vector_store_id: str, file_id: str) -> dict[str, Any]:
         """
         Async: Add a file to a vector store.
         POST /v1/vector_stores/{vector_store_id}/files
@@ -204,7 +203,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def aremove_file(self, vector_store_id: str, file_id: str) -> Dict[str, Any]:
+    async def aremove_file(self, vector_store_id: str, file_id: str) -> dict[str, Any]:
         """
         Async: Remove a file from a vector store.
         DELETE /v1/vector_stores/{vector_store_id}/files/{file_id}
@@ -217,7 +216,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def alist_file_batches(self, vector_store_id: str) -> List[Dict[str, Any]]:
+    async def alist_file_batches(self, vector_store_id: str) -> list[dict[str, Any]]:
         """
         Async: List file batches in a vector store.
         GET /v1/vector_stores/{vector_store_id}/file_batches
@@ -230,7 +229,7 @@ class OpenAIVectorStoresInterface(OpenAIBaseInterface):
 
     async def aretrieve_file_batch(
         self, vector_store_id: str, batch_id: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Async: Retrieve a file batch by ID.
         GET /v1/vector_stores/{vector_store_id}/file_batches/{batch_id}

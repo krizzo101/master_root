@@ -8,10 +8,10 @@ of concepts and projects using OpenAI's O3 models.
 import argparse
 import json
 import os
-from pathlib import Path
 import sys
 import time
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 if script_dir not in sys.path:
@@ -62,6 +62,7 @@ try:
         FEASIBILITY_ASSESSMENT_PROMPT_TEMPLATE,
         FEASIBILITY_ASSESSMENT_SYSTEM_PROMPT,
     )
+
     from schemas.idea_formation_schemas import (
         FeasibilityInput,
         FeasibilityLevel,
@@ -203,7 +204,7 @@ class FeasibilityAssessor:
         return technical_feasibility
 
     def assesseconomic_feasibility(
-        self, concept_description: str, budget_constraints: Optional[str] = None
+        self, concept_description: str, budget_constraints: str | None = None
     ) -> dict[str, Any]:
         """
         Assess economic feasibility of a concept.
@@ -300,7 +301,7 @@ class FeasibilityAssessor:
         }
 
     def _analyze_development_costs(
-        self, concept_description: str, budget_constraints: Optional[str]
+        self, concept_description: str, budget_constraints: str | None
     ) -> dict[str, Any]:
         """Analyze development costs for the concept."""
         return {
@@ -390,7 +391,7 @@ class FeasibilityAssessor:
 class FeasibilityProcessor:
     """Main processor for feasibility assessment using O3 models."""
 
-    def __init__(self, config_path: Optional[str] = None) -> None:
+    def __init__(self, config_path: str | None = None) -> None:
         """
         Initialize the FeasibilityProcessor with configuration and utilities.
 

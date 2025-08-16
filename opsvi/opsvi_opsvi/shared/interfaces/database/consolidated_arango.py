@@ -3,10 +3,10 @@ Consolidated ArangoDB Interface - Core Implementation
 Eliminates AQL complexity with agent-friendly parameter-based routing
 """
 
-from datetime import datetime, timedelta
 import logging
 import os
-from typing import Any, Dict, List, Optional
+from datetime import datetime, timedelta
+from typing import Any
 
 from arango import ArangoClient
 from arango.exceptions import ArangoError
@@ -87,7 +87,7 @@ class ConsolidatedArangoDB:
 
     # ==================== SEARCH OPERATIONS ====================
 
-    def search(self, search_type: str, collection: str, **kwargs) -> Dict[str, Any]:
+    def search(self, search_type: str, collection: str, **kwargs) -> dict[str, Any]:
         logger.info(
             f"ConsolidatedArangoDB.search called with search_type={search_type}, collection={collection}, kwargs={kwargs}"
         )
@@ -138,9 +138,9 @@ class ConsolidatedArangoDB:
         self,
         collection: str,
         content: str,
-        fields: Optional[List[str]] = None,
+        fields: list[str] | None = None,
         limit: int = 20,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Search for content across document fields"""
 
         if not content or len(content) < 2:
@@ -173,8 +173,8 @@ class ConsolidatedArangoDB:
         return self._execute_query(query, bind_vars, "content_search")
 
     def _search_tags(
-        self, collection: str, tags: List[str], match_all: bool = False, limit: int = 20
-    ) -> Dict[str, Any]:
+        self, collection: str, tags: list[str], match_all: bool = False, limit: int = 20
+    ) -> dict[str, Any]:
         """Search documents by tags with AND/OR logic"""
 
         if not tags:
@@ -210,7 +210,7 @@ class ConsolidatedArangoDB:
         end_date: str,
         date_field: str = "created",
         limit: int = 50,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Search documents within date range"""
 
         query = f"""
@@ -227,7 +227,7 @@ class ConsolidatedArangoDB:
 
     def _search_type(
         self, collection: str, document_type: str, limit: int = 30
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Search documents by type field"""
 
         query = f"""
@@ -243,7 +243,7 @@ class ConsolidatedArangoDB:
 
     def _search_recent(
         self, collection: str, limit: int = 20, hours: int = 24
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Get recent documents within time window"""
 
         cutoff_time = (datetime.now() - timedelta(hours=hours)).isoformat()
@@ -262,7 +262,7 @@ class ConsolidatedArangoDB:
     # Quality and related search methods removed - not needed for Agent-IDE schema
     # Agent-IDE uses simple confidence scores in documents and tags for relationships
 
-    def _search_by_id(self, collection: str, document_id: str) -> Dict[str, Any]:
+    def _search_by_id(self, collection: str, document_id: str) -> dict[str, Any]:
         """Direct document lookup by ID"""
 
         query = f"""
@@ -276,7 +276,7 @@ class ConsolidatedArangoDB:
 
     # ==================== MODIFY OPERATIONS ====================
 
-    def modify(self, operation: str, collection: str, **kwargs) -> Dict[str, Any]:
+    def modify(self, operation: str, collection: str, **kwargs) -> dict[str, Any]:
         """
         Unified modification interface with operation-based routing
 
@@ -308,8 +308,8 @@ class ConsolidatedArangoDB:
             return self._error_response(f"Modify failed: {str(e)}")
 
     def _modify_insert(
-        self, collection: str, document: Dict[str, Any], validate_schema: bool = True
-    ) -> Dict[str, Any]:
+        self, collection: str, document: dict[str, Any], validate_schema: bool = True
+    ) -> dict[str, Any]:
         """Insert new document with optional validation"""
 
         if not document:
@@ -344,11 +344,11 @@ class ConsolidatedArangoDB:
     def _modify_update(
         self,
         collection: str,
-        key: Optional[str] = None,
-        criteria: Optional[Dict] = None,
-        updates: Dict[str, Any] = None,
+        key: str | None = None,
+        criteria: dict | None = None,
+        updates: dict[str, Any] = None,
         upsert: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Update documents by key or criteria"""
 
         if not updates:
@@ -406,10 +406,10 @@ class ConsolidatedArangoDB:
     def _modify_delete(
         self,
         collection: str,
-        key: Optional[str] = None,
-        criteria: Optional[Dict] = None,
+        key: str | None = None,
+        criteria: dict | None = None,
         confirm: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Delete documents by key or criteria with confirmation"""
 
         if not confirm:
@@ -461,8 +461,8 @@ class ConsolidatedArangoDB:
             return self._error_response(f"Delete failed: {str(e)}")
 
     def _modify_upsert(
-        self, collection: str, document: Dict[str, Any], match_fields: List[str]
-    ) -> Dict[str, Any]:
+        self, collection: str, document: dict[str, Any], match_fields: list[str]
+    ) -> dict[str, Any]:
         """Insert or update based on matching fields"""
 
         if not document or not match_fields:
@@ -497,8 +497,8 @@ class ConsolidatedArangoDB:
             return self._error_response(f"Upsert failed: {str(e)}")
 
     def _search_by_criteria(
-        self, collection: str, criteria: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, collection: str, criteria: dict[str, Any]
+    ) -> dict[str, Any]:
         """Helper: Search documents by exact criteria match"""
 
         query = f"""
@@ -512,7 +512,7 @@ class ConsolidatedArangoDB:
 
     # ==================== MANAGE OPERATIONS ====================
 
-    def manage(self, action: str, **kwargs) -> Dict[str, Any]:
+    def manage(self, action: str, **kwargs) -> dict[str, Any]:
         """
         Unified management interface with action-based routing
 
@@ -541,7 +541,7 @@ class ConsolidatedArangoDB:
             logger.error(f"Manage operation failed: {e}")
             return self._error_response(f"Manage failed: {str(e)}")
 
-    def _manage_collection_info(self, collection: str) -> Dict[str, Any]:
+    def _manage_collection_info(self, collection: str) -> dict[str, Any]:
         """Get detailed collection information and statistics"""
 
         if not self.db.has_collection(collection):
@@ -572,8 +572,8 @@ class ConsolidatedArangoDB:
             return self._error_response(f"Collection info failed: {str(e)}")
 
     def _manage_backup(
-        self, collections: Optional[List[str]] = None, output_dir: str = "./backup"
-    ) -> Dict[str, Any]:
+        self, collections: list[str] | None = None, output_dir: str = "./backup"
+    ) -> dict[str, Any]:
         """Backup collections to specified directory"""
 
         try:
@@ -609,7 +609,7 @@ class ConsolidatedArangoDB:
         except Exception as e:
             return self._error_response(f"Backup failed: {str(e)}")
 
-    def _manage_health(self) -> Dict[str, Any]:
+    def _manage_health(self) -> dict[str, Any]:
         """Agent-IDE database health assessment"""
 
         try:
@@ -659,8 +659,8 @@ class ConsolidatedArangoDB:
             return self._error_response(f"Health check failed: {str(e)}")
 
     def _manage_count(
-        self, collection: str, criteria: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, collection: str, criteria: dict | None = None
+    ) -> dict[str, Any]:
         """Count documents in collection with optional criteria"""
 
         if not self.db.has_collection(collection):
@@ -697,8 +697,8 @@ class ConsolidatedArangoDB:
             return self._error_response(f"Count failed: {str(e)}")
 
     def _manage_exists(
-        self, collection: str, criteria: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, collection: str, criteria: dict[str, Any]
+    ) -> dict[str, Any]:
         """Check if documents matching criteria exist"""
 
         if not self.db.has_collection(collection):
@@ -731,7 +731,7 @@ class ConsolidatedArangoDB:
 
     def _manage_create_collection(
         self, name: str, collection_type: str = "document"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create new collection"""
 
         if self.db.has_collection(name):
@@ -756,7 +756,7 @@ class ConsolidatedArangoDB:
 
     # ==================== HELPER METHODS ====================
 
-    def _build_filter_conditions(self, criteria: Dict[str, Any]) -> str:
+    def _build_filter_conditions(self, criteria: dict[str, Any]) -> str:
         """Build AQL filter conditions from criteria dictionary"""
 
         conditions = []
@@ -771,8 +771,8 @@ class ConsolidatedArangoDB:
         return " AND ".join(conditions)
 
     def _execute_query(
-        self, query: str, bind_vars: Dict[str, Any], operation_name: str
-    ) -> Dict[str, Any]:
+        self, query: str, bind_vars: dict[str, Any], operation_name: str
+    ) -> dict[str, Any]:
         """Execute AQL query with comprehensive error handling"""
 
         try:
@@ -800,7 +800,7 @@ class ConsolidatedArangoDB:
             logger.error(f"Unexpected error in {operation_name}: {e}")
             return self._error_response(f"Query execution failed: {str(e)}")
 
-    def _error_response(self, message: str) -> Dict[str, Any]:
+    def _error_response(self, message: str) -> dict[str, Any]:
         """Standardized error response format"""
 
         return {

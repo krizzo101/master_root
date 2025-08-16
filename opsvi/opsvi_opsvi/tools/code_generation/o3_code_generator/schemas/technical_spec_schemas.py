@@ -5,7 +5,7 @@ This module defines the Pydantic models for technical specification generation i
 """
 
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -36,15 +36,15 @@ class TechnologyStack(BaseModel):
     """Technology stack configuration."""
 
     language: str = Field(..., description="Primary programming language")
-    framework: Optional[str] = Field(None, description="Primary framework")
-    database: Optional[str] = Field(None, description="Database technology")
-    cache: Optional[str] = Field(None, description="Caching technology")
-    message_queue: Optional[str] = Field(None, description="Message queue technology")
-    containerization: Optional[str] = Field(
+    framework: str | None = Field(None, description="Primary framework")
+    database: str | None = Field(None, description="Database technology")
+    cache: str | None = Field(None, description="Caching technology")
+    message_queue: str | None = Field(None, description="Message queue technology")
+    containerization: str | None = Field(
         None, description="Containerization technology"
     )
-    cloud_platform: Optional[str] = Field(None, description="Cloud platform")
-    monitoring: Optional[str] = Field(None, description="Monitoring technology")
+    cloud_platform: str | None = Field(None, description="Cloud platform")
+    monitoring: str | None = Field(None, description="Monitoring technology")
 
 
 class APISpecification(BaseModel):
@@ -175,26 +175,26 @@ class TechnicalSpecInput(BaseModel):
         ..., description="Technology stack configuration"
     )
 
-    api_specs: Optional[APISpecification] = Field(
+    api_specs: APISpecification | None = Field(
         default_factory=APISpecification, description="API specification configuration"
     )
 
-    database_specs: Optional[DatabaseSpecification] = Field(
+    database_specs: DatabaseSpecification | None = Field(
         default_factory=DatabaseSpecification,
         description="Database specification configuration",
     )
 
-    integration_specs: Optional[IntegrationSpecification] = Field(
+    integration_specs: IntegrationSpecification | None = Field(
         default_factory=IntegrationSpecification,
         description="Integration specification configuration",
     )
 
-    performance_specs: Optional[PerformanceSpecification] = Field(
+    performance_specs: PerformanceSpecification | None = Field(
         default_factory=PerformanceSpecification,
         description="Performance specification configuration",
     )
 
-    security_specs: Optional[SecuritySpecification] = Field(
+    security_specs: SecuritySpecification | None = Field(
         default_factory=SecuritySpecification,
         description="Security specification configuration",
     )
@@ -209,15 +209,15 @@ class TechnicalSpecInput(BaseModel):
         default=8000, ge=1000, le=32000, description="Maximum tokens for generation"
     )
 
-    additional_requirements: Optional[str] = Field(
+    additional_requirements: str | None = Field(
         None, description="Additional requirements or constraints", max_length=2000
     )
 
-    context_files: Optional[list[str]] = Field(
+    context_files: list[str] | None = Field(
         None, description="List of context file paths"
     )
 
-    variables: Optional[dict[str, Any]] = Field(
+    variables: dict[str, Any] | None = Field(
         None, description="Variables for template substitution"
     )
 
@@ -375,23 +375,23 @@ class TechnicalSpecOutput(BaseModel):
 
     system_overview: str = Field(..., description="System overview and architecture")
 
-    api_specifications: Optional[APISpecOutput] = Field(
+    api_specifications: APISpecOutput | None = Field(
         None, description="API specifications"
     )
 
-    database_schemas: Optional[DatabaseSpecOutput] = Field(
+    database_schemas: DatabaseSpecOutput | None = Field(
         None, description="Database schema specifications"
     )
 
-    integration_specifications: Optional[IntegrationSpecOutput] = Field(
+    integration_specifications: IntegrationSpecOutput | None = Field(
         None, description="Integration specifications"
     )
 
-    performance_specifications: Optional[PerformanceSpecOutput] = Field(
+    performance_specifications: PerformanceSpecOutput | None = Field(
         None, description="Performance specifications"
     )
 
-    security_specifications: Optional[SecuritySpecOutput] = Field(
+    security_specifications: SecuritySpecOutput | None = Field(
         None, description="Security specifications"
     )
 
@@ -407,7 +407,7 @@ class TechnicalSpecOutput(BaseModel):
 
     model_used: str = Field(..., description="O3 model used for generation")
 
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Error message if generation failed"
     )
 
@@ -424,10 +424,10 @@ class APISpecInput(BaseModel):
 
     interface_design: str = Field(..., description="Interface design description")
     api_requirements: dict[str, Any] = Field(..., description="API requirements")
-    authentication_requirements: Optional[dict[str, Any]] = Field(
+    authentication_requirements: dict[str, Any] | None = Field(
         None, description="Authentication requirements"
     )
-    rate_limiting_requirements: Optional[dict[str, Any]] = Field(
+    rate_limiting_requirements: dict[str, Any] | None = Field(
         None, description="Rate limiting requirements"
     )
     output_format: OutputFormat = Field(
@@ -499,8 +499,8 @@ class PerformanceSpecInput(BaseModel):
         ..., description="Performance requirements"
     )
     constraints: dict[str, Any] = Field(..., description="Performance constraints")
-    load_patterns: Optional[dict[str, Any]] = Field(None, description="Load patterns")
-    scalability_requirements: Optional[dict[str, Any]] = Field(
+    load_patterns: dict[str, Any] | None = Field(None, description="Load patterns")
+    scalability_requirements: dict[str, Any] | None = Field(
         None, description="Scalability requirements"
     )
     output_format: OutputFormat = Field(

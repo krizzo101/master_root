@@ -7,7 +7,6 @@ from typing import Any, Dict, Optional
 from uuid import uuid4
 
 from celery import current_task
-from pydantic import ValidationError
 
 from ..orchestrator.registry import registry
 from ..orchestrator.task_models import TaskRecord, TaskStatus, Result, Metrics

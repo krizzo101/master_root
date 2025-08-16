@@ -9,7 +9,8 @@ Version: Referenced as of July 2024
 """
 
 import logging
-from typing import Any, Callable, Dict, List, Optional, Union
+from collections.abc import Callable
+from typing import Any
 
 try:
     from crewai import Agent, Crew, Task
@@ -26,9 +27,9 @@ class CrewAIInterface:
     """
 
     def __init__(self):
-        self.agents: Dict[str, Agent] = {}
-        self.tasks: Dict[str, Task] = {}
-        self.crews: Dict[str, Crew] = {}
+        self.agents: dict[str, Agent] = {}
+        self.tasks: dict[str, Task] = {}
+        self.crews: dict[str, Crew] = {}
         logger.info("CrewAIInterface initialized.")
 
     def create_agent(
@@ -36,7 +37,7 @@ class CrewAIInterface:
         name: str,
         role: str,
         goal: str,
-        tools: Optional[List[Callable]] = None,
+        tools: list[Callable] | None = None,
         **kwargs,
     ) -> Agent:
         agent = Agent(name=name, role=role, goal=goal, tools=tools or [], **kwargs)
@@ -48,8 +49,8 @@ class CrewAIInterface:
         self,
         name: str,
         description: str,
-        agent: Union[str, Agent],
-        tools: Optional[List[Callable]] = None,
+        agent: str | Agent,
+        tools: list[Callable] | None = None,
         **kwargs,
     ) -> Task:
         agent_obj = self.agents.get(agent) if isinstance(agent, str) else agent
@@ -69,8 +70,8 @@ class CrewAIInterface:
     def create_crew(
         self,
         name: str,
-        agents: List[Union[str, Agent]],
-        tasks: List[Union[str, Task]],
+        agents: list[str | Agent],
+        tasks: list[str | Task],
         **kwargs,
     ) -> Crew:
         agent_objs = [self.agents[a] if isinstance(a, str) else a for a in agents]

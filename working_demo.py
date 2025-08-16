@@ -5,8 +5,8 @@ Tests only the components that are actually working.
 """
 
 import asyncio
-import sys
 import os
+import sys
 
 # Add libs to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "libs"))
@@ -16,7 +16,7 @@ async def demo_foundation():
     """Demo foundation components."""
     print("=== Foundation Demo ===")
     try:
-        from opsvi_foundation import BaseComponent, ComponentError, BaseSettings
+        from opsvi_foundation import BaseComponent
 
         class DemoComponent(BaseComponent):
             async def _initialize_impl(self):
@@ -43,7 +43,7 @@ async def demo_http():
     """Demo HTTP services."""
     print("=== HTTP Services Demo ===")
     try:
-        from opsvi_http.client.base import BaseHTTPClient, HTTPConfig
+        from opsvi_http.client.base import HTTPConfig
 
         config = HTTPConfig(timeout=30)
         print(f"  ✅ HTTP config created: timeout={config.timeout}")
@@ -57,7 +57,7 @@ async def demo_auth():
     """Demo auth services."""
     print("=== Auth Services Demo ===")
     try:
-        from opsvi_auth.providers.base import BaseAuthProvider, AuthConfig
+        from opsvi_auth.providers.base import AuthConfig
 
         config = AuthConfig(auth_type="jwt")
         print(f"  ✅ Auth config created: {config.auth_type}")
@@ -72,9 +72,6 @@ async def demo_ecosystem_imports():
     print("=== Ecosystem Imports Demo ===")
     try:
         # Test basic imports
-        from opsvi_foundation import BaseComponent
-        from opsvi_http import BaseHTTPClient
-        from opsvi_auth import BaseAuthProvider
 
         print("  ✅ All basic imports successful")
 

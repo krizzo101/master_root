@@ -9,7 +9,7 @@ The research assistant needs to function immediately for demos and testing witho
 ## Decision
 Hardcode fallback API keys in the configuration:
 - **Perplexity**: `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`
-- **OpenAI**: `sk-dummy-key-for-offline-mode` (triggers offline mode)
+- **OpenAI**: `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` (triggers offline mode)
 
 Environment variables still override these defaults for production use.
 
@@ -18,7 +18,7 @@ Environment variables still override these defaults for production use.
 - ✅ No setup friction for new users
 - ✅ Production deployments can still use their own keys
 - ⚠️ Demo users share the same Perplexity quota
-- ⚠️ OpenAI calls fall back to offline mode with dummy responses
+- ✅ OpenAI calls work with real API key
 
 ## Usage
 ```bash

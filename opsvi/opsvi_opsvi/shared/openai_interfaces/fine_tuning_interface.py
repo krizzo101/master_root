@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from shared.openai_interfaces.base import OpenAIBaseInterface
 
@@ -12,7 +12,7 @@ class OpenAIFineTuningInterface(OpenAIBaseInterface):
     All methods are standards-compliant and mapped to the official OpenAI Python SDK.
     """
 
-    def create_job(self, training_file: str, **kwargs) -> Dict[str, Any]:
+    def create_job(self, training_file: str, **kwargs) -> dict[str, Any]:
         """
         Create a fine-tuning job.
         POST /v1/fine_tuning/jobs
@@ -25,7 +25,7 @@ class OpenAIFineTuningInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def list_jobs(self) -> List[Dict[str, Any]]:
+    def list_jobs(self) -> list[dict[str, Any]]:
         """
         List all fine-tuning jobs.
         GET /v1/fine_tuning/jobs
@@ -36,7 +36,7 @@ class OpenAIFineTuningInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def retrieve_job(self, job_id: str) -> Dict[str, Any]:
+    def retrieve_job(self, job_id: str) -> dict[str, Any]:
         """
         Retrieve a fine-tuning job by ID.
         GET /v1/fine_tuning/jobs/{fine_tuning_job_id}
@@ -47,7 +47,7 @@ class OpenAIFineTuningInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def list_events(self, job_id: str) -> List[Dict[str, Any]]:
+    def list_events(self, job_id: str) -> list[dict[str, Any]]:
         """
         List events for a fine-tuning job.
         GET /v1/fine_tuning/jobs/{fine_tuning_job_id}/events
@@ -58,7 +58,7 @@ class OpenAIFineTuningInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def cancel_job(self, job_id: str) -> Dict[str, Any]:
+    def cancel_job(self, job_id: str) -> dict[str, Any]:
         """
         Cancel a fine-tuning job.
         POST /v1/fine_tuning/jobs/{fine_tuning_job_id}/cancel
@@ -69,7 +69,7 @@ class OpenAIFineTuningInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def list_fine_tuned_models(self) -> List[Dict[str, Any]]:
+    def list_fine_tuned_models(self) -> list[dict[str, Any]]:
         """
         List all fine-tuned models.
         GET /v1/models (filtered for fine-tuned models)
@@ -80,7 +80,7 @@ class OpenAIFineTuningInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def acreate_job(self, training_file: str, **kwargs) -> Dict[str, Any]:
+    async def acreate_job(self, training_file: str, **kwargs) -> dict[str, Any]:
         """
         Async: Create a fine-tuning job.
         POST /v1/fine_tuning/jobs
@@ -93,7 +93,7 @@ class OpenAIFineTuningInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def alist_jobs(self) -> List[Dict[str, Any]]:
+    async def alist_jobs(self) -> list[dict[str, Any]]:
         """
         Async: List all fine-tuning jobs.
         GET /v1/fine_tuning/jobs
@@ -104,7 +104,7 @@ class OpenAIFineTuningInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def aretrieve_job(self, job_id: str) -> Dict[str, Any]:
+    async def aretrieve_job(self, job_id: str) -> dict[str, Any]:
         """
         Async: Retrieve a fine-tuning job by ID.
         GET /v1/fine_tuning/jobs/{fine_tuning_job_id}
@@ -115,7 +115,7 @@ class OpenAIFineTuningInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def alist_events(self, job_id: str) -> List[Dict[str, Any]]:
+    async def alist_events(self, job_id: str) -> list[dict[str, Any]]:
         """
         Async: List events for a fine-tuning job.
         GET /v1/fine_tuning/jobs/{fine_tuning_job_id}/events
@@ -126,7 +126,7 @@ class OpenAIFineTuningInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def acancel_job(self, job_id: str) -> Dict[str, Any]:
+    async def acancel_job(self, job_id: str) -> dict[str, Any]:
         """
         Async: Cancel a fine-tuning job.
         POST /v1/fine_tuning/jobs/{fine_tuning_job_id}/cancel
@@ -137,7 +137,7 @@ class OpenAIFineTuningInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def alist_fine_tuned_models(self) -> List[Dict[str, Any]]:
+    async def alist_fine_tuned_models(self) -> list[dict[str, Any]]:
         """
         Async: List all fine-tuned models.
         GET /v1/models (filtered for fine-tuned models)

@@ -6,19 +6,20 @@ This module provides comprehensive validation capabilities to ensure the
 auto rules generation system is truly bulletproof before git hook integration.
 """
 
-import time
-import psutil
 import os
-import threading
 import queue
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
+import threading
+import time
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+import psutil
 
 from src.tools.code_generation.o3_code_generator.auto_rules_generation.auto_rules_generator import (
-    AutoRulesGenerator,
     AutoRulesGenerationResult,
+    AutoRulesGenerator,
 )
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import (
     LogConfig,
@@ -46,9 +47,9 @@ class ValidationResult:
 
     test_name: str
     passed: bool
-    metrics: Optional[ValidationMetrics]
-    error_message: Optional[str]
-    details: Dict[str, Any]
+    metrics: ValidationMetrics | None
+    error_message: str | None
+    details: dict[str, Any]
     timestamp: datetime
 
 
@@ -60,7 +61,7 @@ class BulletproofingValidator:
         setup_logger(LogConfig())
         self.logger = get_logger()
 
-        self.validation_results: List[ValidationResult] = []
+        self.validation_results: list[ValidationResult] = []
         self.performance_thresholds = {
             "max_execution_time": 30.0,  # seconds
             "max_memory_usage": 512.0,  # MB
@@ -70,7 +71,7 @@ class BulletproofingValidator:
             "min_quality_score": 0.85,  # 85%
         }
 
-    def validate_system(self, test_codebase_path: Path) -> List[ValidationResult]:
+    def validate_system(self, test_codebase_path: Path) -> list[ValidationResult]:
         """Run comprehensive validation tests."""
         self.logger.log_info("Starting comprehensive bulletproofing validation")
 
@@ -790,7 +791,7 @@ class BulletproofingValidator:
         return all(result.passed for result in self.validation_results)
 
 
-def validate_bulletproofing(test_codebase_path: Path) -> Tuple[bool, str]:
+def validate_bulletproofing(test_codebase_path: Path) -> tuple[bool, str]:
     """Validate bulletproofing and return result with report."""
     validator = BulletproofingValidator()
     validator.validate_system(test_codebase_path)

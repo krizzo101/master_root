@@ -3,7 +3,7 @@
 import asyncio
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Optional, TypeVar, Awaitable
+from typing import Any, Optional, Awaitable
 
 from ..errors import ClientError
 from ..models import ClientConfig, SearchResult, SourceType

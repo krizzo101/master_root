@@ -1,9 +1,7 @@
 """Celery application configuration for the autonomous software factory."""
 
 import logging
-import os
 import time
-from typing import Dict, Any
 from celery import Celery
 from celery.signals import (
     task_prerun,
@@ -19,7 +17,6 @@ from opsvi_auto_forge.infrastructure.monitoring.logging_config import (
     get_logger,
     log_task_start,
     log_task_end,
-    log_debug,
     log_error,
     set_pipeline_context,
 )

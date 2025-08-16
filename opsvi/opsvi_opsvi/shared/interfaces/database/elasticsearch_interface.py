@@ -8,7 +8,7 @@ Version: Referenced as of July 2024
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 try:
     from elasticsearch import Elasticsearch, ElasticsearchException
@@ -27,9 +27,7 @@ class ElasticsearchInterface:
     See: https://elasticsearch-py.readthedocs.io/en/latest/
     """
 
-    def __init__(
-        self, hosts: Optional[List[str]] = None, http_auth: Optional[Any] = None
-    ):
+    def __init__(self, hosts: list[str] | None = None, http_auth: Any | None = None):
         """
         Initialize an ElasticsearchInterface.
         Args:
@@ -44,7 +42,7 @@ class ElasticsearchInterface:
             raise
 
     def index_document(
-        self, index: str, document: Dict[str, Any], id: Optional[str] = None
+        self, index: str, document: dict[str, Any], id: str | None = None
     ) -> str:
         """
         Index a document.
@@ -62,7 +60,7 @@ class ElasticsearchInterface:
             logger.error(f"Index document failed: {e}")
             raise
 
-    def get_document(self, index: str, id: str) -> Dict[str, Any]:
+    def get_document(self, index: str, id: str) -> dict[str, Any]:
         try:
             resp = self.client.get(index=index, id=id)
             return resp["_source"]
@@ -70,7 +68,7 @@ class ElasticsearchInterface:
             logger.error(f"Get document failed: {e}")
             raise
 
-    def search(self, index: str, query: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def search(self, index: str, query: dict[str, Any]) -> list[dict[str, Any]]:
         """
         Search an index.
         Args:
@@ -86,7 +84,7 @@ class ElasticsearchInterface:
             logger.error(f"Search failed: {e}")
             raise
 
-    def bulk(self, actions: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def bulk(self, actions: list[dict[str, Any]]) -> dict[str, Any]:
         """
         Perform bulk operations.
         Args:

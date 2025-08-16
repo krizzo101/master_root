@@ -4,7 +4,7 @@ Output schema for Security Scanner.
 This module defines the Pydantic schema for security scanner output results.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -48,10 +48,10 @@ class SecurityScannerOutput(BaseModel):
     message: str = Field(..., description="Status message")
 
     # Metadata
-    scan_time: Optional[float] = Field(
+    scan_time: float | None = Field(
         _default=None, description="Time taken for scan (seconds)"
     )
-    files_scanned: Optional[int] = Field(
+    files_scanned: int | None = Field(
         _default=None, description="Number of files scanned"
     )
     model_used: str = Field(default="o3-mini", description="AI model used for analysis")

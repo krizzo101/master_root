@@ -10,11 +10,11 @@ Incorporates GPT-5 new parameters and tools for better performance:
 - Previous response threading for stateful conversations
 """
 
-import json
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass
-from openai import OpenAI
 import os
+from dataclasses import dataclass
+from typing import Any
+
+from openai import OpenAI
 
 
 @dataclass
@@ -189,7 +189,7 @@ REFACTORING GUIDELINES:
         context: str = "",
         task_type: str = "code_generation",
         complexity: str = "medium",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Continue a conversation thread using previous_response_id for stateful context.
 
@@ -285,8 +285,8 @@ REFACTORING GUIDELINES:
         context: str = "",
         task_type: str = "code_generation",
         complexity: str = "medium",
-        session_id: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        session_id: str | None = None,
+    ) -> dict[str, Any]:
         """
         Generate code using optimized GPT-5 parameters.
 
@@ -316,7 +316,7 @@ REFACTORING GUIDELINES:
         context: str = "",
         task_type: str = "code_generation",
         complexity: str = "medium",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate code in a single shot without threading."""
 
         # Build optimized prompt
@@ -383,7 +383,7 @@ REFACTORING GUIDELINES:
         model_cost = cost_per_1k_tokens.get(self.config.model, 0.0003)
         return (total_tokens / 1000) * model_cost
 
-    def validate_code_syntax(self, code: str) -> Dict[str, Any]:
+    def validate_code_syntax(self, code: str) -> dict[str, Any]:
         """Validate code syntax using CFG."""
 
         prompt = f"""Validate the following Python code syntax using the python_grammar tool:
@@ -415,7 +415,7 @@ Ensure the code follows proper Python syntax and is syntactically correct."""
         except Exception as e:
             return {"valid": False, "error": str(e), "status": "error"}
 
-    def execute_code(self, code: str) -> Dict[str, Any]:
+    def execute_code(self, code: str) -> dict[str, Any]:
         """Execute code using free-form function calling."""
 
         prompt = f"""Execute the following Python code using the code_exec tool:

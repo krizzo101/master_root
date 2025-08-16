@@ -1,0 +1,27 @@
+{
+  "model": "gemini-1.5-flash",
+  "contextWindow": 1000000,
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/opsvi/master_root"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  },
+  "tools": {
+    "webSearch": true,
+    "fileOperations": true,
+    "shellCommands": true
+  },
+  "safety": {
+    "allowFileModification": true,
+    "allowShellExecution": true,
+    "workingDirectory": "/home/opsvi/master_root"
+  }
+}

@@ -9,7 +9,7 @@ Version: Referenced as of July 2024
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 
 try:
     import mysql.connector
@@ -80,8 +80,8 @@ class MySQLInterface:
         return self.pool.get_connection()
 
     def execute_query(
-        self, query: str, params: Optional[Union[Tuple, Dict]] = None
-    ) -> List[Dict[str, Any]]:
+        self, query: str, params: tuple | dict | None = None
+    ) -> list[dict[str, Any]]:
         """
         Execute a SELECT query and return results as a list of dicts.
         Args:
@@ -103,9 +103,7 @@ class MySQLInterface:
         finally:
             conn.close()
 
-    def execute_update(
-        self, query: str, params: Optional[Union[Tuple, Dict]] = None
-    ) -> int:
+    def execute_update(self, query: str, params: tuple | dict | None = None) -> int:
         """
         Execute an INSERT/UPDATE/DELETE query.
         Args:
@@ -129,7 +127,7 @@ class MySQLInterface:
         finally:
             conn.close()
 
-    def execute_many(self, query: str, param_list: List[Union[Tuple, Dict]]) -> int:
+    def execute_many(self, query: str, param_list: list[tuple | dict]) -> int:
         """
         Execute a query with multiple parameter sets (bulk insert/update).
         Args:
@@ -181,8 +179,8 @@ class MySQLInterface:
 
     # Optional: Async support using aiomysql
     async def aexecute_query(
-        self, query: str, params: Optional[Union[Tuple, Dict]] = None
-    ) -> List[Dict[str, Any]]:
+        self, query: str, params: tuple | dict | None = None
+    ) -> list[dict[str, Any]]:
         """
         Execute a SELECT query asynchronously (requires aiomysql).
         Args:
@@ -205,7 +203,7 @@ class MySQLInterface:
         return results
 
     async def aexecute_update(
-        self, query: str, params: Optional[Union[Tuple, Dict]] = None
+        self, query: str, params: tuple | dict | None = None
     ) -> int:
         """
         Execute an INSERT/UPDATE/DELETE query asynchronously (requires aiomysql).

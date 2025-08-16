@@ -7,7 +7,7 @@ Compatible with Python's built-in logging module. Follows PEP 8 and industry bes
 
 import logging
 import logging.handlers
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 
 class SharedLogger:
@@ -32,7 +32,7 @@ class SharedLogger:
         log_to_console: bool = True,
         log_to_file: bool = False,
         log_file: str = "app.log",
-        rotation: Optional[Dict[str, Any]] = None,
+        rotation: dict[str, Any] | None = None,
     ) -> None:
         """
         Initialize the shared logger.

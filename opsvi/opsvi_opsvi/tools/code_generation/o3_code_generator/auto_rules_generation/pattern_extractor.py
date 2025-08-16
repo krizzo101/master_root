@@ -5,11 +5,11 @@ calculates frequency and consistency scores, detects rule violations, and
 generates recommendations for new rules.
 """
 
+import statistics
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-import statistics
-from typing import Any, Dict, List
+from typing import Any
 
 from src.tools.code_generation.o3_code_generator.auto_rules_generation.ast_analyzer import (
     FileAnalysis,
@@ -25,8 +25,8 @@ class PatternGroup:
     pattern_signature: str
     frequency: int
     consistency_score: float
-    examples: List[Any]
-    violations: List[Any]
+    examples: list[Any]
+    violations: list[Any]
     total_occurrences: int
 
 
@@ -46,14 +46,14 @@ class ViolationReport:
 class PatternAnalysis:
     """Complete pattern analysis of the codebase."""
 
-    import_patterns: Dict[str, PatternGroup]
-    class_patterns: Dict[str, PatternGroup]
-    method_patterns: Dict[str, PatternGroup]
-    error_handling_patterns: Dict[str, PatternGroup]
-    logging_patterns: Dict[str, PatternGroup]
-    violations: List[ViolationReport]
-    consistency_scores: Dict[str, float]
-    recommendations: List[str]
+    import_patterns: dict[str, PatternGroup]
+    class_patterns: dict[str, PatternGroup]
+    method_patterns: dict[str, PatternGroup]
+    error_handling_patterns: dict[str, PatternGroup]
+    logging_patterns: dict[str, PatternGroup]
+    violations: list[ViolationReport]
+    consistency_scores: dict[str, float]
+    recommendations: list[str]
 
 
 class PatternExtractor:
@@ -73,7 +73,7 @@ class PatternExtractor:
             existing_rules: Mapping of rule names to descriptions for violation detection.
         """
         self.logger = get_logger()
-        self.existing_rules: Dict[str, str] = {
+        self.existing_rules: dict[str, str] = {
             "absolute_imports": "All imports must use absolute paths starting with src.",
             "o3_logger_usage": "All logging must use O3Logger methods.",
             "setup_logger_required": "Main scripts must call setup_logger(LogConfig()).",
@@ -84,7 +84,7 @@ class PatternExtractor:
         }
         self.logger.log_info("Initialized PatternExtractor")
 
-    def extract_patterns(self, file_analyses: List[FileAnalysis]) -> PatternAnalysis:
+    def extract_patterns(self, file_analyses: list[FileAnalysis]) -> PatternAnalysis:
         """
         Extract patterns from file analyses.
 
@@ -130,8 +130,8 @@ class PatternExtractor:
         )
 
     def _extract_import_patterns(
-        self, file_analyses: List[FileAnalysis]
-    ) -> Dict[str, PatternGroup]:
+        self, file_analyses: list[FileAnalysis]
+    ) -> dict[str, PatternGroup]:
         """
         Extract and group import patterns.
 
@@ -141,7 +141,7 @@ class PatternExtractor:
         Returns:
             Mapping from pattern signature to PatternGroup.
         """
-        pattern_groups: Dict[str, Dict[str, Any]] = defaultdict(
+        pattern_groups: dict[str, dict[str, Any]] = defaultdict(
             lambda: {"examples": [], "violations": [], "total_occurrences": 0}
         )
 
@@ -154,7 +154,7 @@ class PatternExtractor:
                 if pattern.import_type == "relative":
                     group["violations"].append(pattern)
 
-        result: Dict[str, PatternGroup] = {}
+        result: dict[str, PatternGroup] = {}
         for signature, data in pattern_groups.items():
             frequency = len(data["examples"])
             consistency_score = self._calculate_pattern_consistency(data["examples"])
@@ -171,8 +171,8 @@ class PatternExtractor:
         return result
 
     def _extract_class_patterns(
-        self, file_analyses: List[FileAnalysis]
-    ) -> Dict[str, PatternGroup]:
+        self, file_analyses: list[FileAnalysis]
+    ) -> dict[str, PatternGroup]:
         """
         Extract and group class patterns.
 
@@ -182,7 +182,7 @@ class PatternExtractor:
         Returns:
             Mapping from pattern signature to PatternGroup.
         """
-        pattern_groups: Dict[str, Dict[str, Any]] = defaultdict(
+        pattern_groups: dict[str, dict[str, Any]] = defaultdict(
             lambda: {"examples": [], "violations": [], "total_occurrences": 0}
         )
 
@@ -195,7 +195,7 @@ class PatternExtractor:
                 if not pattern.has_docstring:
                     group["violations"].append(pattern)
 
-        result: Dict[str, PatternGroup] = {}
+        result: dict[str, PatternGroup] = {}
         for signature, data in pattern_groups.items():
             frequency = len(data["examples"])
             consistency_score = self._calculate_pattern_consistency(data["examples"])
@@ -212,8 +212,8 @@ class PatternExtractor:
         return result
 
     def _extract_method_patterns(
-        self, file_analyses: List[FileAnalysis]
-    ) -> Dict[str, PatternGroup]:
+        self, file_analyses: list[FileAnalysis]
+    ) -> dict[str, PatternGroup]:
         """
         Extract and group method patterns.
 
@@ -223,7 +223,7 @@ class PatternExtractor:
         Returns:
             Mapping from pattern signature to PatternGroup.
         """
-        pattern_groups: Dict[str, Dict[str, Any]] = defaultdict(
+        pattern_groups: dict[str, dict[str, Any]] = defaultdict(
             lambda: {"examples": [], "violations": [], "total_occurrences": 0}
         )
 
@@ -236,7 +236,7 @@ class PatternExtractor:
                 if not pattern.has_docstring:
                     group["violations"].append(pattern)
 
-        result: Dict[str, PatternGroup] = {}
+        result: dict[str, PatternGroup] = {}
         for signature, data in pattern_groups.items():
             frequency = len(data["examples"])
             consistency_score = self._calculate_pattern_consistency(data["examples"])
@@ -253,8 +253,8 @@ class PatternExtractor:
         return result
 
     def _extract_error_handling_patterns(
-        self, file_analyses: List[FileAnalysis]
-    ) -> Dict[str, PatternGroup]:
+        self, file_analyses: list[FileAnalysis]
+    ) -> dict[str, PatternGroup]:
         """
         Extract and group error handling patterns.
 
@@ -264,7 +264,7 @@ class PatternExtractor:
         Returns:
             Mapping from pattern signature to PatternGroup.
         """
-        pattern_groups: Dict[str, Dict[str, Any]] = defaultdict(
+        pattern_groups: dict[str, dict[str, Any]] = defaultdict(
             lambda: {"examples": [], "violations": [], "total_occurrences": 0}
         )
 
@@ -279,7 +279,7 @@ class PatternExtractor:
                 if pattern.pattern_type == "bare_except":
                     group["violations"].append(pattern)
 
-        result: Dict[str, PatternGroup] = {}
+        result: dict[str, PatternGroup] = {}
         for signature, data in pattern_groups.items():
             frequency = len(data["examples"])
             consistency_score = self._calculate_pattern_consistency(data["examples"])
@@ -296,8 +296,8 @@ class PatternExtractor:
         return result
 
     def _extract_logging_patterns(
-        self, file_analyses: List[FileAnalysis]
-    ) -> Dict[str, PatternGroup]:
+        self, file_analyses: list[FileAnalysis]
+    ) -> dict[str, PatternGroup]:
         """
         Extract and group logging patterns.
 
@@ -307,7 +307,7 @@ class PatternExtractor:
         Returns:
             Mapping from pattern signature to PatternGroup.
         """
-        pattern_groups: Dict[str, Dict[str, Any]] = defaultdict(
+        pattern_groups: dict[str, dict[str, Any]] = defaultdict(
             lambda: {"examples": [], "violations": [], "total_occurrences": 0}
         )
 
@@ -320,7 +320,7 @@ class PatternExtractor:
                 if pattern.logger_type == "print":
                     group["violations"].append(pattern)
 
-        result: Dict[str, PatternGroup] = {}
+        result: dict[str, PatternGroup] = {}
         for signature, data in pattern_groups.items():
             frequency = len(data["examples"])
             consistency_score = self._calculate_pattern_consistency(data["examples"])
@@ -337,8 +337,8 @@ class PatternExtractor:
         return result
 
     def _detect_violations(
-        self, file_analyses: List[FileAnalysis]
-    ) -> List[ViolationReport]:
+        self, file_analyses: list[FileAnalysis]
+    ) -> list[ViolationReport]:
         """
         Detect violations of existing rules.
 
@@ -348,7 +348,7 @@ class PatternExtractor:
         Returns:
             List of ViolationReport instances.
         """
-        violations: List[ViolationReport] = []
+        violations: list[ViolationReport] = []
 
         for analysis in file_analyses:
             for pattern in analysis.import_patterns:
@@ -425,7 +425,7 @@ class PatternExtractor:
 
         return violations
 
-    def _calculate_pattern_consistency(self, patterns: List[Any]) -> float:
+    def _calculate_pattern_consistency(self, patterns: list[Any]) -> float:
         """
         Calculate consistency score for a group of patterns.
 
@@ -445,8 +445,8 @@ class PatternExtractor:
         return max(0.0, min(1.0, consistency))
 
     def _calculate_consistency_scores(
-        self, *pattern_dicts: Dict[str, PatternGroup]
-    ) -> Dict[str, float]:
+        self, *pattern_dicts: dict[str, PatternGroup]
+    ) -> dict[str, float]:
         """
         Calculate overall consistency scores for different pattern types.
 
@@ -456,7 +456,7 @@ class PatternExtractor:
         Returns:
             Mapping from metric name to score.
         """
-        scores: Dict[str, float] = {}
+        scores: dict[str, float] = {}
         for pattern_dict in pattern_dicts:
             if not pattern_dict:
                 continue
@@ -471,8 +471,8 @@ class PatternExtractor:
 
     def _generate_recommendations(
         self,
-        *pattern_dicts: Dict[str, PatternGroup],
-        violations: List[ViolationReport],
+        *pattern_dicts: dict[str, PatternGroup],
+        violations: list[ViolationReport],
     ) -> list[str]:
         """
         Generate recommendations for new rules based on patterns and violations.
@@ -484,7 +484,7 @@ class PatternExtractor:
         Returns:
             List of recommendation strings.
         """
-        recommendations: List[str] = []
+        recommendations: list[str] = []
         violation_counts = Counter(v.rule_name for v in violations)
         for rule_name, count in violation_counts.most_common():
             if count > 5:

@@ -2,8 +2,7 @@
 
 import logging
 import re
-from typing import Dict, Any, List
-from uuid import UUID
+from typing import List
 
 from .base_repair_agent import BaseRepairAgent, RepairRequest, RepairResult, Artifact
 
@@ -168,7 +167,7 @@ class ConcreteRepairAgent(BaseRepairAgent):
 
                 fixed_content = fixed_content.replace(match, replacement)
                 changes_made.append(
-                    f"Replaced hardcoded credential with environment variable"
+                    "Replaced hardcoded credential with environment variable"
                 )
 
         # Add import os if needed

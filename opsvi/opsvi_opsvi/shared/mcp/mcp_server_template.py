@@ -16,7 +16,7 @@ Key Features:
 import asyncio
 import logging
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from mcp.server import Server
 from mcp.types import TextContent, Tool
@@ -57,16 +57,16 @@ class BaseTool:
 
     name: str
     description: str
-    input_schema: Dict[str, Any]
+    input_schema: dict[str, Any]
 
     def __init__(
-        self, name: str, description: str, input_schema: Dict[str, Any]
+        self, name: str, description: str, input_schema: dict[str, Any]
     ) -> None:
         self.name = name
         self.description = description
         self.input_schema = input_schema
 
-    async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
+    async def execute(self, arguments: dict[str, Any]) -> list[TextContent]:
         """
         Execute the tool logic. Override in subclasses.
 
@@ -81,7 +81,7 @@ class BaseTool:
         """
         raise NotImplementedError("Tool logic not implemented.")
 
-    def validate_input(self, arguments: Dict[str, Any]) -> None:
+    def validate_input(self, arguments: dict[str, Any]) -> None:
         """
         Validate input arguments against the input schema.
         (Stub for future JSON Schema validation.)
@@ -117,7 +117,7 @@ class EchoTool(BaseTool):
             },
         )
 
-    async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
+    async def execute(self, arguments: dict[str, Any]) -> list[TextContent]:
         self.validate_input(arguments)
         message = arguments.get("message", "")
         return [TextContent(type="text", text=message)]
@@ -140,7 +140,7 @@ class MCPServerTemplate:
     def __init__(
         self,
         name: str,
-        tools: Optional[List[BaseTool]] = None,
+        tools: list[BaseTool] | None = None,
         log_level: int = logging.INFO,
     ) -> None:
         """
@@ -153,7 +153,7 @@ class MCPServerTemplate:
         """
         configure_logging(log_level)
         self.server = Server(name)
-        self.tools: Dict[str, BaseTool] = {}
+        self.tools: dict[str, BaseTool] = {}
         if tools:
             for tool in tools:
                 self.register_tool(tool)
@@ -184,7 +184,7 @@ class MCPServerTemplate:
         else:
             logger.warning("Tool '%s' not found for removal.", tool_name)
 
-    def load_plugins(self, plugin_dir: Optional[str] = None) -> None:
+    def load_plugins(self, plugin_dir: str | None = None) -> None:
         """
         Stub for plugin loading. Extend to support dynamic tool discovery.
 
@@ -200,7 +200,7 @@ class MCPServerTemplate:
         """
 
         @self.server.list_tools()
-        async def list_tools() -> List[Tool]:
+        async def list_tools() -> list[Tool]:
             logger.info("Listing registered tools.")
             return [
                 Tool(
@@ -212,7 +212,7 @@ class MCPServerTemplate:
             ]
 
         @self.server.call_tool()
-        async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
+        async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             logger.info("Tool call requested: %s with arguments: %s", name, arguments)
             tool = self.tools.get(name)
             if not tool:

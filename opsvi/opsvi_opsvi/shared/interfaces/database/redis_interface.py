@@ -9,7 +9,7 @@ Version: Referenced as of July 2024
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 try:
     import redis
@@ -35,7 +35,7 @@ class RedisInterface:
         host: str = "localhost",
         port: int = 6379,
         db: int = 0,
-        password: Optional[str] = None,
+        password: str | None = None,
     ):
         """
         Initialize a RedisInterface.
@@ -58,7 +58,7 @@ class RedisInterface:
             logger.error(f"Redis client initialization failed: {e}")
             raise
 
-    def set(self, key: str, value: Any, ex: Optional[int] = None) -> bool:
+    def set(self, key: str, value: Any, ex: int | None = None) -> bool:
         """
         Set a value for a key with optional expiration.
         Args:
@@ -121,7 +121,7 @@ class RedisInterface:
         return self.client.pipeline()
 
     # Async support using aioredis
-    async def aset(self, key: str, value: Any, ex: Optional[int] = None) -> bool:
+    async def aset(self, key: str, value: Any, ex: int | None = None) -> bool:
         if not aioredis:
             raise ImportError(
                 "aioredis is required for async support. Install with `pip install aioredis`."

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional, List
+from typing import Any
 
 ROOT = Path("/home/opsvi/master_root")
 CUSTOM = ROOT / "intake" / "custom"
 
 
-def load_pi(project_dir: Path) -> Optional[Dict[str, Any]]:
+def load_pi(project_dir: Path) -> dict[str, Any] | None:
     pi = project_dir / ".proj-intel" / "project_analysis.pretty.json"
     if not pi.exists():
         return None
@@ -17,15 +17,15 @@ def load_pi(project_dir: Path) -> Optional[Dict[str, Any]]:
         return None
 
 
-def get_collector(data: Dict[str, Any], name: str) -> Dict[str, Any]:
+def get_collector(data: dict[str, Any], name: str) -> dict[str, Any]:
     for c in data.get("collectors", []):
         if c.get("collector") == name:
             return c.get("data", {})
     return {}
 
 
-def top_techs(deps: Dict[str, Any], limit: int = 20) -> List[str]:
-    techs: List[str] = []
+def top_techs(deps: dict[str, Any], limit: int = 20) -> list[str]:
+    techs: list[str] = []
     for key in ("python_imports", "external_dependencies", "requirements"):
         v = deps.get(key)
         if isinstance(v, list):
@@ -43,7 +43,7 @@ def top_techs(deps: Dict[str, Any], limit: int = 20) -> List[str]:
         if tt:
             norm.append(tt)
     seen = set()
-    ordered: List[str] = []
+    ordered: list[str] = []
     for t in norm:
         tl = t.lower()
         if tl not in seen:
@@ -54,7 +54,7 @@ def top_techs(deps: Dict[str, Any], limit: int = 20) -> List[str]:
     return ordered
 
 
-def synthesize_summary(project_dir: Path, data: Dict[str, Any]) -> str:
+def synthesize_summary(project_dir: Path, data: dict[str, Any]) -> str:
     name = project_dir.name
     purpose = get_collector(data, "ProjectPurposeCollector")
     deps = get_collector(data, "DependenciesCollector")
@@ -68,7 +68,7 @@ def synthesize_summary(project_dir: Path, data: Dict[str, Any]) -> str:
 
     techs = top_techs(deps)
 
-    lines: List[str] = []
+    lines: list[str] = []
     lines.append(f"# {name} — Agent Gatekeeper Summary\n")
     if purpose:
         desc = purpose.get("summary") or purpose.get("description") or ""
@@ -88,7 +88,7 @@ def synthesize_summary(project_dir: Path, data: Dict[str, Any]) -> str:
         lines.append("")
 
     # Suggested actions
-    suggested: List[str] = []
+    suggested: list[str] = []
     joined_techs = ",".join([t.lower() for t in techs])
     if has_agents:
         suggested.append(
@@ -116,7 +116,7 @@ def synthesize_summary(project_dir: Path, data: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def synthesize_diagram(project_dir: Path, data: Dict[str, Any]) -> str:
+def synthesize_diagram(project_dir: Path, data: dict[str, Any]) -> str:
     name = project_dir.name.replace("-", "_")
     deps = get_collector(data, "DependenciesCollector")
     apis = get_collector(data, "ApiEndpointsCollector")
@@ -126,7 +126,7 @@ def synthesize_diagram(project_dir: Path, data: Dict[str, Any]) -> str:
     techs = top_techs(deps, limit=8)
 
     # Build a simple LR diagram
-    lines: List[str] = []
+    lines: list[str] = []
     lines.append("graph LR")
     lines.append(f'  Main["{name}"]')
     if has_agents:
@@ -150,7 +150,7 @@ def main() -> None:
     out_root = CUSTOM / "visualizations"
     out_root.mkdir(exist_ok=True)
 
-    index_lines: List[str] = ["# Agent Gatekeeper Project Summaries\n"]
+    index_lines: list[str] = ["# Agent Gatekeeper Project Summaries\n"]
 
     projects = [
         p

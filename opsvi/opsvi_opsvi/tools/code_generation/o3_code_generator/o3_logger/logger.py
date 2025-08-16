@@ -5,15 +5,15 @@ This module provides comprehensive logging functionality for the O3 Code Generat
 including standard logging, debug logging, and performance tracking.
 """
 
-from dataclasses import dataclass
 import json
 import logging
 import logging.handlers
-from pathlib import Path
 import sys
 import time
-from typing import Any, Optional
 import uuid
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
 
 @dataclass
@@ -193,7 +193,7 @@ class O3Logger:
         self.logger.debug(f"File generation - Correlation ID: {self.correlation_id}")
 
     def log_file_save(
-        self, file_path: str, success: bool, error: Optional[str] = None
+        self, file_path: str, success: bool, error: str | None = None
     ) -> None:
         """Log file save event."""
         if success:
@@ -210,7 +210,7 @@ class O3Logger:
         self.logger.debug(f"Validation error - Correlation ID: {self.correlation_id}")
 
     def log_performance_metric(
-        self, operation: str, duration: float, details: Optional[dict[str, Any]] = None
+        self, operation: str, duration: float, details: dict[str, Any] | None = None
     ):
         """Log performance metrics."""
         self.logger.info(f"Performance - {operation}: {duration:.3f}s")
@@ -220,7 +220,7 @@ class O3Logger:
             )
 
     def log_user_action(
-        self, action: str, parameters: Optional[dict[str, Any]] = None
+        self, action: str, parameters: dict[str, Any] | None = None
     ) -> None:
         """Log user actions."""
         self.logger.info(f"User action: {action}")
@@ -230,14 +230,14 @@ class O3Logger:
             )
 
     def log_system_event(
-        self, event: str, details: Optional[dict[str, Any]] = None
+        self, event: str, details: dict[str, Any] | None = None
     ) -> None:
         """Log system events."""
         self.logger.info(f"System event: {event}")
         if details:
             self.logger.debug(f"System event details: {json.dumps(details, indent=2)}")
 
-    def log_error(self, error: Exception, context: Optional[str] = None) -> None:
+    def log_error(self, error: Exception, context: str | None = None) -> None:
         """Log errors with full stack trace."""
         error_msg = f"Error: {str(error)}"
         if context:
@@ -246,21 +246,19 @@ class O3Logger:
         self.logger.error(error_msg, exc_info=True)
         self.logger.debug(f"Error correlation ID: {self.correlation_id}")
 
-    def log_warning(
-        self, message: str, details: Optional[dict[str, Any]] = None
-    ) -> None:
+    def log_warning(self, message: str, details: dict[str, Any] | None = None) -> None:
         """Log warnings."""
         self.logger.warning(message)
         if details:
             self.logger.debug(f"Warning details: {json.dumps(details, indent=2)}")
 
-    def log_info(self, message: str, details: Optional[dict[str, Any]] = None) -> None:
+    def log_info(self, message: str, details: dict[str, Any] | None = None) -> None:
         """Log informational messages."""
         self.logger.info(message)
         if details:
             self.logger.debug(f"Info details: {json.dumps(details, indent=2)}")
 
-    def log_debug(self, message: str, details: Optional[dict[str, Any]] = None) -> None:
+    def log_debug(self, message: str, details: dict[str, Any] | None = None) -> None:
         """Log debug messages."""
         self.logger.debug(message)
         if details:
@@ -283,7 +281,7 @@ class O3Logger:
 
 
 # Global logger instance
-_global_logger: Optional[O3Logger] = None
+_global_logger: O3Logger | None = None
 
 
 def get_logger() -> O3Logger:

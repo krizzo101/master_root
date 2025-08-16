@@ -15,13 +15,20 @@ class HTTPClient:
         return cls._client
 
     @classmethod
-    async def get_json(cls, url: str, headers: dict[str, str] | None = None, params: dict[str, Any] | None = None) -> Any:
+    async def get_json(
+        cls,
+        url: str,
+        headers: dict[str, str] | None = None,
+        params: dict[str, Any] | None = None,
+    ) -> Any:
         resp = await cls.get_client().get(url, headers=headers, params=params)
         resp.raise_for_status()
         return resp.json()
 
     @classmethod
-    async def post_json(cls, url: str, json: Any, headers: dict[str, str] | None = None) -> Any:
+    async def post_json(
+        cls, url: str, json: Any, headers: dict[str, str] | None = None
+    ) -> Any:
         resp = await cls.get_client().post(url, json=json, headers=headers)
         resp.raise_for_status()
         return resp.json()

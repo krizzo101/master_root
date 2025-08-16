@@ -3,9 +3,7 @@
 import time
 import psutil
 import asyncio
-from typing import Dict, Any
-from prometheus_client import Counter, Histogram, Gauge, Summary, Info
-from prometheus_client.metrics_core import GaugeMetricFamily, CounterMetricFamily
+from prometheus_client import Counter, Histogram, Gauge
 import structlog
 
 logger = structlog.get_logger()

@@ -8,7 +8,6 @@ Version: Referenced as of July 2024
 """
 
 import logging
-from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +43,7 @@ class S3Interface:
             logger.error(f"S3 download_file failed: {e}")
             raise
 
-    def list_files(self, bucket: str, prefix: str = "") -> List[str]:
+    def list_files(self, bucket: str, prefix: str = "") -> list[str]:
         try:
             resp = self.client.list_objects_v2(Bucket=bucket, Prefix=prefix)
             return [obj["Key"] for obj in resp.get("Contents", [])]

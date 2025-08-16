@@ -1,9 +1,9 @@
 import asyncio
-from collections.abc import Awaitable
 import functools
 import logging
 import os
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 from agents import (
     Agent,
@@ -44,11 +44,11 @@ class OpenAIAgentsInterface:
         self,
         name: str,
         instructions: str,
-        tools: Optional[List[Callable]] = None,
-        handoffs: Optional[List[Agent]] = None,
-        guardrails: Optional[List[Any]] = None,
-        output_type: Optional[Any] = None,
-        model: Optional[str] = None,
+        tools: list[Callable] | None = None,
+        handoffs: list[Agent] | None = None,
+        guardrails: list[Any] | None = None,
+        output_type: Any | None = None,
+        model: str | None = None,
         **kwargs,
     ) -> Agent:
         """
@@ -72,7 +72,7 @@ class OpenAIAgentsInterface:
         return function_tool(func)
 
     def create_file_search_tool(
-        self, vector_store_ids: Optional[List[str]] = None, max_num_results: int = 3
+        self, vector_store_ids: list[str] | None = None, max_num_results: int = 3
     ):
         return FileSearchTool(
             max_num_results=max_num_results, vector_store_ids=vector_store_ids or []
@@ -86,7 +86,7 @@ class OpenAIAgentsInterface:
         self,
         agent: Agent,
         input_text: Any,
-        max_turns: Optional[int] = None,
+        max_turns: int | None = None,
         context: Any = None,
     ) -> Any:
         """Run an agent synchronously."""
@@ -101,7 +101,7 @@ class OpenAIAgentsInterface:
         self,
         agent: Agent,
         input_text: Any,
-        max_turns: Optional[int] = None,
+        max_turns: int | None = None,
         context: Any = None,
     ) -> Any:
         """Run an agent asynchronously."""
@@ -121,7 +121,7 @@ class OpenAIAgentsInterface:
             yield event
 
     # --- Batch/Orchestration ---
-    async def batch_run_agents(self, agent_inputs: List[Dict[str, Any]]) -> List[Any]:
+    async def batch_run_agents(self, agent_inputs: list[dict[str, Any]]) -> list[Any]:
         """Run multiple agents asynchronously in batch."""
         tasks = [self.run_agent_async(**params) for params in agent_inputs]
         return await asyncio.gather(*tasks)
@@ -131,7 +131,7 @@ class OpenAIAgentsInterface:
         agent: Agent,
         tool_name: str,
         tool_description: str,
-        custom_output_extractor: Optional[Callable] = None,
+        custom_output_extractor: Callable | None = None,
     ):
         """Expose an agent as a tool for orchestration."""
         return agent.as_tool(

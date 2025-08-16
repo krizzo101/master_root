@@ -1,6 +1,5 @@
 from __future__ import annotations
-from datetime import datetime, timedelta
-from typing import Optional
+from datetime import datetime
 
 
 def calculate_freshness_score(snippet, freshness_days: int = 90) -> float:

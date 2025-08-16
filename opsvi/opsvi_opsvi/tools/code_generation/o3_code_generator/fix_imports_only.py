@@ -7,7 +7,6 @@ without the complexity of AST validation that was causing issues.
 import re
 import sys
 from pathlib import Path
-from typing import List, Dict, Any
 
 
 def fix_imports_in_file(file_path: str) -> bool:
@@ -21,7 +20,7 @@ def fix_imports_in_file(file_path: str) -> bool:
         True if changes were made, False otherwise
     """
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             lines = f.readlines()
         changes_made = False
         import_fixes = [
@@ -59,7 +58,7 @@ def fix_imports_in_file(file_path: str) -> bool:
             return True
         else:
             return False
-    except Exception as e:
+    except Exception:
         return False
     else:
         pass

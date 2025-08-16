@@ -6,13 +6,11 @@ Provides comprehensive network operations and configuration.
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Union
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any
 
 from docker import DockerClient
-from docker.errors import DockerException, APIError, NotFound
-
 from opsvi_foundation import BaseComponent, ComponentError
 
 logger = logging.getLogger(__name__)
@@ -33,10 +31,10 @@ class NetworkConfig:
     driver: str = "bridge"
 
     # Network settings
-    subnet: Optional[str] = None
-    gateway: Optional[str] = None
-    ip_range: Optional[str] = None
-    aux_address: Optional[str] = None
+    subnet: str | None = None
+    gateway: str | None = None
+    ip_range: str | None = None
+    aux_address: str | None = None
 
     # Advanced settings
     internal: bool = False
@@ -45,13 +43,13 @@ class NetworkConfig:
     ingress: bool = False
 
     # Labels and metadata
-    labels: Dict[str, str] = field(default_factory=dict)
+    labels: dict[str, str] = field(default_factory=dict)
 
     # Driver options
-    driver_opts: Dict[str, str] = field(default_factory=dict)
+    driver_opts: dict[str, str] = field(default_factory=dict)
 
     # IPAM configuration
-    ipam_config: List[Dict[str, Any]] = field(default_factory=list)
+    ipam_config: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
@@ -63,10 +61,10 @@ class NetworkInfo:
     driver: str
     scope: str
     created: datetime
-    labels: Dict[str, str]
-    ipam_config: List[Dict[str, Any]]
-    containers: Dict[str, Dict[str, Any]]
-    options: Dict[str, str]
+    labels: dict[str, str]
+    ipam_config: list[dict[str, Any]]
+    containers: dict[str, dict[str, Any]]
+    options: dict[str, str]
 
     # Additional metadata
     internal: bool
@@ -99,7 +97,7 @@ class NetworkManager(BaseComponent):
 
         self.client = client
         self.config = config
-        self._networks: Dict[str, Any] = {}
+        self._networks: dict[str, Any] = {}
 
         logger.debug("NetworkManager initialized")
 
@@ -196,9 +194,9 @@ class NetworkManager(BaseComponent):
         self,
         network_id: str,
         container_id: str,
-        ipv4_address: Optional[str] = None,
-        ipv6_address: Optional[str] = None,
-        aliases: Optional[List[str]] = None,
+        ipv4_address: str | None = None,
+        ipv6_address: str | None = None,
+        aliases: list[str] | None = None,
     ) -> bool:
         """Connect a container to a network.
 
@@ -299,8 +297,8 @@ class NetworkManager(BaseComponent):
             raise NetworkError(f"Failed to get network info: {e}")
 
     async def list_networks(
-        self, filters: Optional[Dict[str, Any]] = None
-    ) -> List[NetworkInfo]:
+        self, filters: dict[str, Any] | None = None
+    ) -> list[NetworkInfo]:
         """List networks.
 
         Args:
@@ -326,7 +324,7 @@ class NetworkManager(BaseComponent):
             logger.error(f"Failed to list networks: {e}")
             raise NetworkError(f"Failed to list networks: {e}")
 
-    async def inspect_network(self, network_id: str) -> Dict[str, Any]:
+    async def inspect_network(self, network_id: str) -> dict[str, Any]:
         """Inspect network details.
 
         Args:
@@ -344,8 +342,8 @@ class NetworkManager(BaseComponent):
             raise NetworkError(f"Network inspection failed: {e}")
 
     async def prune_networks(
-        self, filters: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        self, filters: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Remove unused networks.
 
         Args:
@@ -373,7 +371,7 @@ class NetworkManager(BaseComponent):
 
     async def get_network_containers(
         self, network_id: str
-    ) -> Dict[str, Dict[str, Any]]:
+    ) -> dict[str, dict[str, Any]]:
         """Get containers connected to a network.
 
         Args:

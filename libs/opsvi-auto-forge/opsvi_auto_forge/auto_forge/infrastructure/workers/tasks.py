@@ -1,11 +1,9 @@
 """Celery tasks for the autonomous software factory."""
 
-import logging
 import time
 import uuid
 import random
 from typing import Dict, Any, Optional
-from celery import current_task
 from celery.utils.log import get_task_logger
 from opsvi_auto_forge.infrastructure.workers.celery_app import app
 

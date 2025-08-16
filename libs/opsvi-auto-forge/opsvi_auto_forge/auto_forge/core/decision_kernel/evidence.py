@@ -13,7 +13,6 @@ from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 from opsvi_auto_forge.infrastructure.monitoring.metrics.decision_metrics import (
     ro_evidence_retrieval_success_total,
-    ro_evidence_retrieval_failure_total,
 )
 
 

@@ -6,7 +6,7 @@ multiple scoring criteria including feasibility, impact, and alignment.
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 
 class BestIdeaSelector:
@@ -36,10 +36,10 @@ class BestIdeaSelector:
 
     def select_best_idea(
         self,
-        brainstorm_results: Dict[str, Any],
+        brainstorm_results: dict[str, Any],
         original_problem: str,
-        selection_criteria: Optional[Dict[str, float]] = None,
-    ) -> Tuple[Dict[str, Any], str]:
+        selection_criteria: dict[str, float] | None = None,
+    ) -> tuple[dict[str, Any], str]:
         """
         Select the best idea from brainstorm results.
 
@@ -97,8 +97,8 @@ class BestIdeaSelector:
         return best_idea, rationale
 
     def _score_idea(
-        self, idea: Dict[str, Any], original_problem: str
-    ) -> Dict[str, float]:
+        self, idea: dict[str, Any], original_problem: str
+    ) -> dict[str, float]:
         """
         Score an individual idea across all criteria.
 
@@ -117,7 +117,7 @@ class BestIdeaSelector:
             "clarity": self._score_clarity(idea),
         }
 
-    def _score_feasibility(self, idea: Dict[str, Any]) -> float:
+    def _score_feasibility(self, idea: dict[str, Any]) -> float:
         """
         Score the feasibility of implementing the idea.
 
@@ -196,7 +196,7 @@ class BestIdeaSelector:
 
         return max(0.0, min(1.0, score))
 
-    def _score_impact(self, idea: Dict[str, Any]) -> float:
+    def _score_impact(self, idea: dict[str, Any]) -> float:
         """
         Score the potential impact of the idea.
 
@@ -273,7 +273,7 @@ class BestIdeaSelector:
 
         return max(0.0, min(1.0, score))
 
-    def _score_novelty(self, idea: Dict[str, Any]) -> float:
+    def _score_novelty(self, idea: dict[str, Any]) -> float:
         """
         Score the novelty and innovation of the idea.
 
@@ -348,7 +348,7 @@ class BestIdeaSelector:
 
         return max(0.0, min(1.0, score))
 
-    def _score_alignment(self, idea: Dict[str, Any], original_problem: str) -> float:
+    def _score_alignment(self, idea: dict[str, Any], original_problem: str) -> float:
         """
         Score how well the idea aligns with the original problem.
 
@@ -388,7 +388,7 @@ class BestIdeaSelector:
 
         return max(0.0, min(1.0, score))
 
-    def _score_clarity(self, idea: Dict[str, Any]) -> float:
+    def _score_clarity(self, idea: dict[str, Any]) -> float:
         """
         Score how clearly defined and detailed the idea is.
 
@@ -441,8 +441,8 @@ class BestIdeaSelector:
 
     def _generate_selection_rationale(
         self,
-        best_idea_entry: Dict[str, Any],
-        all_scored_ideas: List[Dict[str, Any]],
+        best_idea_entry: dict[str, Any],
+        all_scored_ideas: list[dict[str, Any]],
         original_problem: str,
     ) -> str:
         """
@@ -478,7 +478,7 @@ class BestIdeaSelector:
 
         rationale_parts = [
             f"Selected '{best_idea.get('title', 'Untitled')}' as the optimal solution for '{original_problem}'.",
-            f"",
+            "",
             f"Selection Score: {best_score:.2f} out of 1.0",
             f"Evaluated against {num_ideas} total ideas"
             + (
@@ -486,8 +486,8 @@ class BestIdeaSelector:
                 if score_margin > 0
                 else "."
             ),
-            f"",
-            f"Key Strengths:",
+            "",
+            "Key Strengths:",
         ]
 
         # Add top scoring criteria
@@ -499,8 +499,8 @@ class BestIdeaSelector:
             )
 
         # Add specific reasons based on top criterion
-        rationale_parts.append(f"")
-        rationale_parts.append(f"Primary Selection Factors:")
+        rationale_parts.append("")
+        rationale_parts.append("Primary Selection Factors:")
 
         if top_criterion == "feasibility":
             rationale_parts.append(
@@ -532,8 +532,8 @@ class BestIdeaSelector:
         if best_idea.get("description"):
             rationale_parts.extend(
                 [
-                    f"",
-                    f"Idea Description:",
+                    "",
+                    "Idea Description:",
                     f"{best_idea['description']}",
                 ]
             )
@@ -541,8 +541,8 @@ class BestIdeaSelector:
         return "\n".join(rationale_parts)
 
     def compare_ideas(
-        self, ideas: List[Dict[str, Any]], original_problem: str
-    ) -> List[Dict[str, Any]]:
+        self, ideas: list[dict[str, Any]], original_problem: str
+    ) -> list[dict[str, Any]]:
         """
         Compare and rank all ideas with detailed scoring.
 

@@ -1,6 +1,5 @@
 """HTTPX-based HTTP client implementation for OPSVI HTTP library."""
 
-import asyncio
 import logging
 from typing import Any, Dict, Optional
 from datetime import datetime

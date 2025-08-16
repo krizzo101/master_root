@@ -1,6 +1,6 @@
 """Critic agent output schemas."""
 
-from typing import List, Optional, Dict, Any
+from typing import List, Dict, Any
 from pydantic import BaseModel, Field
 
 

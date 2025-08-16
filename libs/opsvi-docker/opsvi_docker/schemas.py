@@ -5,9 +5,9 @@ Request and response schemas for Docker operations.
 Provides structured data models for Docker management operations.
 """
 
-from typing import Any, Dict, List, Optional, Union
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any
 
 
 # Container Schemas
@@ -15,16 +15,16 @@ from datetime import datetime
 class ContainerCreateRequest:
     """Request schema for container creation."""
 
-    name: Optional[str] = None
+    name: str | None = None
     image: str = ""
-    command: Optional[Union[str, List[str]]] = None
-    environment: Dict[str, str] = field(default_factory=dict)
-    ports: Dict[str, Union[str, int, None]] = field(default_factory=dict)
-    volumes: Dict[str, Dict[str, str]] = field(default_factory=dict)
-    networks: List[str] = field(default_factory=list)
-    restart_policy: Dict[str, str] = field(default_factory=lambda: {"Name": "no"})
-    labels: Dict[str, str] = field(default_factory=dict)
-    healthcheck: Optional[Dict[str, Any]] = None
+    command: str | list[str] | None = None
+    environment: dict[str, str] = field(default_factory=dict)
+    ports: dict[str, str | int | None] = field(default_factory=dict)
+    volumes: dict[str, dict[str, str]] = field(default_factory=dict)
+    networks: list[str] = field(default_factory=list)
+    restart_policy: dict[str, str] = field(default_factory=lambda: {"Name": "no"})
+    labels: dict[str, str] = field(default_factory=dict)
+    healthcheck: dict[str, Any] | None = None
 
 
 @dataclass
@@ -32,9 +32,9 @@ class ContainerUpdateRequest:
     """Request schema for container updates."""
 
     container_id: str
-    restart_policy: Optional[Dict[str, str]] = None
-    labels: Optional[Dict[str, str]] = None
-    environment: Optional[Dict[str, str]] = None
+    restart_policy: dict[str, str] | None = None
+    labels: dict[str, str] | None = None
+    environment: dict[str, str] | None = None
 
 
 @dataclass
@@ -45,8 +45,8 @@ class ContainerLogsRequest:
     tail: int = 100
     follow: bool = False
     timestamps: bool = False
-    since: Optional[datetime] = None
-    until: Optional[datetime] = None
+    since: datetime | None = None
+    until: datetime | None = None
 
 
 # Image Schemas
@@ -58,10 +58,10 @@ class ImageBuildRequest:
     dockerfile: str = "Dockerfile"
     name: str = ""
     tag: str = "latest"
-    build_args: Dict[str, str] = field(default_factory=dict)
-    labels: Dict[str, str] = field(default_factory=dict)
-    platform: Optional[str] = None
-    target: Optional[str] = None
+    build_args: dict[str, str] = field(default_factory=dict)
+    labels: dict[str, str] = field(default_factory=dict)
+    platform: str | None = None
+    target: str | None = None
     no_cache: bool = False
     pull: bool = False
 
@@ -72,10 +72,10 @@ class ImagePullRequest:
 
     name: str
     tag: str = "latest"
-    registry_url: Optional[str] = None
-    username: Optional[str] = None
-    password: Optional[str] = None
-    platform: Optional[str] = None
+    registry_url: str | None = None
+    username: str | None = None
+    password: str | None = None
+    platform: str | None = None
 
 
 @dataclass
@@ -84,9 +84,9 @@ class ImagePushRequest:
 
     name: str
     tag: str = "latest"
-    registry_url: Optional[str] = None
-    username: Optional[str] = None
-    password: Optional[str] = None
+    registry_url: str | None = None
+    username: str | None = None
+    password: str | None = None
 
 
 # Network Schemas
@@ -96,13 +96,13 @@ class NetworkCreateRequest:
 
     name: str
     driver: str = "bridge"
-    subnet: Optional[str] = None
-    gateway: Optional[str] = None
-    ip_range: Optional[str] = None
+    subnet: str | None = None
+    gateway: str | None = None
+    ip_range: str | None = None
     internal: bool = False
     enable_ipv6: bool = False
     attachable: bool = False
-    labels: Dict[str, str] = field(default_factory=dict)
+    labels: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass
@@ -111,9 +111,9 @@ class NetworkConnectRequest:
 
     network_id: str
     container_id: str
-    ipv4_address: Optional[str] = None
-    ipv6_address: Optional[str] = None
-    aliases: Optional[List[str]] = None
+    ipv4_address: str | None = None
+    ipv6_address: str | None = None
+    aliases: list[str] | None = None
 
 
 # Volume Schemas
@@ -123,8 +123,8 @@ class VolumeCreateRequest:
 
     name: str
     driver: str = "local"
-    driver_opts: Dict[str, str] = field(default_factory=dict)
-    labels: Dict[str, str] = field(default_factory=dict)
+    driver_opts: dict[str, str] = field(default_factory=dict)
+    labels: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass
@@ -144,12 +144,12 @@ class ComposeUpRequest:
 
     project_name: str
     project_directory: str = "."
-    compose_files: List[str] = field(default_factory=lambda: ["docker-compose.yml"])
-    services: List[str] = field(default_factory=list)
+    compose_files: list[str] = field(default_factory=lambda: ["docker-compose.yml"])
+    services: list[str] = field(default_factory=list)
     build: bool = False
     force_recreate: bool = False
     detach: bool = True
-    scale: Dict[str, int] = field(default_factory=dict)
+    scale: dict[str, int] = field(default_factory=dict)
 
 
 @dataclass
@@ -158,7 +158,7 @@ class ComposeDownRequest:
 
     project_name: str
     project_directory: str = "."
-    compose_files: List[str] = field(default_factory=lambda: ["docker-compose.yml"])
+    compose_files: list[str] = field(default_factory=lambda: ["docker-compose.yml"])
     remove_volumes: bool = False
     remove_images: bool = False
     remove_orphans: bool = False
@@ -170,11 +170,11 @@ class ComposeServiceRequest:
 
     project_name: str
     project_directory: str = "."
-    compose_files: List[str] = field(default_factory=lambda: ["docker-compose.yml"])
+    compose_files: list[str] = field(default_factory=lambda: ["docker-compose.yml"])
     service: str
-    command: Optional[List[str]] = None
-    user: Optional[str] = None
-    workdir: Optional[str] = None
+    command: list[str] | None = None
+    user: str | None = None
+    workdir: str | None = None
 
 
 # Registry Schemas
@@ -196,4 +196,4 @@ class RegistrySearchRequest:
     registry_url: str
     query: str
     limit: int = 25
-    filters: Optional[Dict[str, Any]] = None
+    filters: dict[str, Any] | None = None

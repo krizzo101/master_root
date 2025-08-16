@@ -8,12 +8,12 @@ Together: Meta-Agent with combined analytical + execution intelligence
 """
 
 import asyncio
+import logging
+import time
 from dataclasses import dataclass
 from enum import Enum
-import logging
 from pathlib import Path
-import time
-from typing import Any, Dict, List
+from typing import Any
 
 import httpx
 
@@ -26,12 +26,12 @@ class ContextAnalysis:
     """Context analysis from SpecStory Intelligence Pipeline"""
 
     user_request: str
-    conversation_context: Dict[str, Any]
-    success_patterns: List[Dict[str, Any]]
+    conversation_context: dict[str, Any]
+    success_patterns: list[dict[str, Any]]
     predicted_domain: str
     confidence_score: float
-    recommended_agents: List[str]
-    historical_patterns: Dict[str, Any]
+    recommended_agents: list[str]
+    historical_patterns: dict[str, Any]
 
 
 @dataclass
@@ -41,9 +41,9 @@ class AgentHubResponse:
     success: bool
     agent_used: str
     execution_time: float
-    result: Dict[str, Any]
+    result: dict[str, Any]
     confidence: float
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
 
 
 @dataclass
@@ -54,8 +54,8 @@ class CollaborationOutcome:
     context_analysis: ContextAnalysis
     agent_hub_response: AgentHubResponse
     collaboration_success: bool
-    learning_insights: Dict[str, Any]
-    performance_metrics: Dict[str, Any]
+    learning_insights: dict[str, Any]
+    performance_metrics: dict[str, Any]
 
 
 class AgentSelection(Enum):
@@ -81,7 +81,7 @@ class AgentHubClient:
         self.base_url = base_url
         self.client = httpx.AsyncClient(timeout=30.0)
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Check Agent Hub health and available agents"""
         try:
             response = await self.client.get(f"{self.base_url}/health")
@@ -95,7 +95,7 @@ class AgentHubClient:
             pass
 
     async def call_agent(
-        self, agent_endpoint: str, params: Dict[str, Any]
+        self, agent_endpoint: str, params: dict[str, Any]
     ) -> AgentHubResponse:
         """Call specific Agent Hub agent"""
         start_time = time.time()
@@ -135,8 +135,8 @@ class AgentHubClient:
             pass
 
     async def execute_workflow(
-        self, agents: List[str], context: ContextAnalysis, user_request: str
-    ) -> List[AgentHubResponse]:
+        self, agents: list[str], context: ContextAnalysis, user_request: str
+    ) -> list[AgentHubResponse]:
         """Execute multi-agent workflow"""
         responses = []
         for agent in agents:
@@ -153,7 +153,7 @@ class AgentHubClient:
 
     def _prepare_agent_params(
         self, agent: str, context: ContextAnalysis, user_request: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Prepare agent-specific parameters based on context analysis"""
         base_params = {
             "context": context.conversation_context,
@@ -195,7 +195,7 @@ class SpecStoryIntelligenceClient:
         self.success_patterns = {}
 
     async def analyze_context(
-        self, user_request: str, conversation_history: List[str] = None
+        self, user_request: str, conversation_history: list[str] = None
     ) -> ContextAnalysis:
         """Analyze conversation context and predict optimal approach"""
         conversation_context = {
@@ -222,8 +222,8 @@ class SpecStoryIntelligenceClient:
         )
 
     async def get_success_patterns(
-        self, context: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, context: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Retrieve relevant success patterns for given context"""
         domain = context.get("domain", "general")
         request_type = context.get("request_type", "unknown")
@@ -311,7 +311,7 @@ class SpecStoryIntelligenceClient:
         indicator_complexity = min(complexity_indicators / 3.0, 1.0)
         return (base_complexity + indicator_complexity) / 2.0
 
-    def _extract_technical_context(self, request: str) -> Dict[str, Any]:
+    def _extract_technical_context(self, request: str) -> dict[str, Any]:
         """Extract technical context from request"""
         return {
             "languages": [
@@ -333,14 +333,14 @@ class SpecStoryIntelligenceClient:
         }
 
     async def _get_success_patterns(
-        self, context: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, context: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Get success patterns for context"""
         return await self.get_success_patterns(context)
 
     def _predict_optimal_agents(
-        self, context: Dict[str, Any], patterns: List[Dict[str, Any]]
-    ) -> List[str]:
+        self, context: dict[str, Any], patterns: list[dict[str, Any]]
+    ) -> list[str]:
         """Predict optimal Agent Hub agents based on context and patterns"""
         request_type = context.get("request_type", "")
         domain = context.get("domain", "")
@@ -363,7 +363,7 @@ class SpecStoryIntelligenceClient:
         return agent_map.get(request_type, ["kb_updater.digest_research"])
 
     def _calculate_confidence(
-        self, context: Dict[str, Any], patterns: List[Dict[str, Any]]
+        self, context: dict[str, Any], patterns: list[dict[str, Any]]
     ) -> float:
         """Calculate confidence score for predictions"""
         base_confidence = 0.7
@@ -384,7 +384,7 @@ class SpecStoryIntelligenceClient:
             pass
         return min(base_confidence, 1.0)
 
-    def _get_historical_patterns(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    def _get_historical_patterns(self, context: dict[str, Any]) -> dict[str, Any]:
         """Get historical patterns for this context"""
         return {
             "similar_requests": 42,
@@ -418,7 +418,7 @@ class CollaborationInterface:
         }
 
     async def collaborative_solve(
-        self, user_request: str, conversation_history: List[str] = None
+        self, user_request: str, conversation_history: list[str] = None
     ) -> CollaborationOutcome:
         """Main collaborative problem-solving interface"""
         logger.info(f"Starting collaborative solve for: {user_request[:100]}...")
@@ -485,7 +485,7 @@ class CollaborationInterface:
 
     async def intelligence_driven_agent_selection(
         self, user_request: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Workflow 1: Intelligence-Driven Agent Selection"""
         context = await self.specstory_analyzer.analyze_context(user_request)
         patterns = context.success_patterns
@@ -504,7 +504,7 @@ class CollaborationInterface:
 
     async def pattern_enhanced_problem_solving(
         self, user_request: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Workflow 2: Pattern-Enhanced Problem Solving"""
         outcome = await self.collaborative_solve(user_request)
         return {
@@ -516,7 +516,7 @@ class CollaborationInterface:
             ),
         }
 
-    async def continuous_intelligence_improvement(self) -> Dict[str, Any]:
+    async def continuous_intelligence_improvement(self) -> dict[str, Any]:
         """Workflow 3: Continuous Intelligence Improvement"""
         recent_collaborations = self.collaboration_history[-50:]
         improvement_insights = {
@@ -534,8 +534,8 @@ class CollaborationInterface:
         return improvement_insights
 
     async def _extract_collaboration_insights(
-        self, context: ContextAnalysis, responses: List[AgentHubResponse]
-    ) -> Dict[str, Any]:
+        self, context: ContextAnalysis, responses: list[AgentHubResponse]
+    ) -> dict[str, Any]:
         """Extract learning insights from collaboration"""
         return {
             "pattern_effectiveness": self._evaluate_pattern_effectiveness(
@@ -558,8 +558,8 @@ class CollaborationInterface:
         }
 
     def _calculate_performance_metrics(
-        self, context: ContextAnalysis, responses: List[AgentHubResponse]
-    ) -> Dict[str, Any]:
+        self, context: ContextAnalysis, responses: list[AgentHubResponse]
+    ) -> dict[str, Any]:
         """Calculate performance metrics for this collaboration"""
         successful_responses = [r for r in responses if r.success]
         total_time = sum(r.execution_time for r in responses)
@@ -617,8 +617,8 @@ class CollaborationInterface:
             )
 
     def _evaluate_pattern_effectiveness(
-        self, context: ContextAnalysis, responses: List[AgentHubResponse]
-    ) -> Dict[str, Any]:
+        self, context: ContextAnalysis, responses: list[AgentHubResponse]
+    ) -> dict[str, Any]:
         """Evaluate how effective the applied patterns were"""
         return {
             "patterns_applied": len(context.success_patterns),
@@ -633,7 +633,7 @@ class CollaborationInterface:
         }
 
     def _evaluate_context_accuracy(
-        self, context: ContextAnalysis, responses: List[AgentHubResponse]
+        self, context: ContextAnalysis, responses: list[AgentHubResponse]
     ) -> float:
         """Evaluate how accurate the context analysis was"""
         recommended_used = [
@@ -646,8 +646,8 @@ class CollaborationInterface:
         return sum(r.confidence for r in recommended_used) / len(recommended_used)
 
     def _discover_new_patterns(
-        self, context: ContextAnalysis, responses: List[AgentHubResponse]
-    ) -> List[Dict[str, Any]]:
+        self, context: ContextAnalysis, responses: list[AgentHubResponse]
+    ) -> list[dict[str, Any]]:
         """Discover new patterns from this collaboration"""
         new_patterns = []
         if all(r.success for r in responses):
@@ -675,8 +675,8 @@ class CollaborationInterface:
             return 0.0
 
     def _analyze_agent_effectiveness(
-        self, collaborations: List[CollaborationOutcome]
-    ) -> Dict[str, Any]:
+        self, collaborations: list[CollaborationOutcome]
+    ) -> dict[str, Any]:
         """Analyze which agents are most effective"""
         agent_stats = {}
         for collab in collaborations:
@@ -709,8 +709,8 @@ class CollaborationInterface:
         return agent_stats
 
     def _analyze_pattern_accuracy(
-        self, collaborations: List[CollaborationOutcome]
-    ) -> Dict[str, Any]:
+        self, collaborations: list[CollaborationOutcome]
+    ) -> dict[str, Any]:
         """Analyze pattern prediction accuracy"""
         total_predictions = len(collaborations)
         accurate_predictions = sum(
@@ -731,8 +731,8 @@ class CollaborationInterface:
         }
 
     def _identify_optimization_opportunities(
-        self, collaborations: List[CollaborationOutcome]
-    ) -> List[str]:
+        self, collaborations: list[CollaborationOutcome]
+    ) -> list[str]:
         """Identify opportunities for system optimization"""
         opportunities = []
         avg_time = (
@@ -769,8 +769,8 @@ class CollaborationInterface:
         return opportunities
 
     def _generate_system_improvements(
-        self, collaborations: List[CollaborationOutcome]
-    ) -> List[Dict[str, Any]]:
+        self, collaborations: list[CollaborationOutcome]
+    ) -> list[dict[str, Any]]:
         """Generate specific system improvement recommendations"""
         improvements = []
         agent_effectiveness = self._analyze_agent_effectiveness(collaborations)
@@ -791,7 +791,7 @@ class CollaborationInterface:
             pass
         return improvements
 
-    async def get_collaboration_metrics(self) -> Dict[str, Any]:
+    async def get_collaboration_metrics(self) -> dict[str, Any]:
         """Get current collaboration performance metrics"""
         return {
             "performance_metrics": self.performance_metrics,

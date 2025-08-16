@@ -6,8 +6,13 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    openai_api_key: str = Field("sk-dummy-key-for-offline-mode", env="OPENAI_API_KEY")
-    perplexity_api_key: str = Field("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", env="PERPLEXITY_API_KEY")
+    openai_api_key: str = Field(
+        "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", env="OPENAI_API_KEY"
+    )
+    perplexity_api_key: str = Field(
+        "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",
+        env="PERPLEXITY_API_KEY",
+    )
     qdrant_url: str = Field("http://localhost:6333", env="QDRANT_URL")
     qdrant_api_key: str | None = Field(None, env="QDRANT_API_KEY")
     model_embeddings: str = Field("text-embedding-3-large", env="EMBEDDING_MODEL")
@@ -17,6 +22,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+
 
 @lru_cache
 def get_settings() -> Settings:

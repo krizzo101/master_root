@@ -3,7 +3,7 @@
 import json
 import logging
 from datetime import datetime, timezone, timedelta
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from opsvi_auto_forge.config.models import TaskStatus

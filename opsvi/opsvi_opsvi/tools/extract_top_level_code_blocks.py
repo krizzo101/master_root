@@ -5,12 +5,11 @@ Extracts top-level code blocks from a file, where blocks are delimited by triple
 """
 
 import argparse
-from pathlib import Path
 import re
-from typing import List
+from pathlib import Path
 
 
-def parse_blocks(lines: List[str]):
+def parse_blocks(lines: list[str]):
     blocks = []
     in_block = False
     block_type = None
@@ -99,7 +98,7 @@ def print_summary(blocks, type_counts):
         pass
 
 
-def preprocess_lines(lines: List[str]) -> List[str]:
+def preprocess_lines(lines: list[str]) -> list[str]:
     new_lines = []
     for line in lines:
         if line.startswith("``````"):

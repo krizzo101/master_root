@@ -143,7 +143,7 @@ class ASTAnalyzer:
         """
         self.logger.log_debug(f"Analyzing file: {file_path}")
         try:
-            with open(file_path, "r", encoding="utf-8") as f:
+            with open(file_path, encoding="utf-8") as f:
                 content = f.read()
             tree = ast.parse(content, filename=str(file_path))
             import_patterns = self._extract_import_patterns(tree)

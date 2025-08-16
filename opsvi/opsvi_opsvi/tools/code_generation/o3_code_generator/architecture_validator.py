@@ -8,10 +8,10 @@ including architecture validation, consistency checking, scalability assessment,
 import argparse
 import json
 import os
-from pathlib import Path
 import sys
 import time
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
 
 from openai import OpenAI
 
@@ -40,6 +40,7 @@ finally:
     pass
 try:
     from prompts.architecture_prompts import ARCHITECTURE_VALIDATION_SYSTEM_PROMPT
+
     from schemas.architecture_schemas import ValidationInput, ValidationOutput
 except ImportError:
     sys.exit(1)
@@ -52,7 +53,7 @@ finally:
 class ArchitectureValidator:
     """Main architecture validator class."""
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: str | None = None):
         """Initialize the architecture validator."""
         self.config = ConfigManager(config_path)
         from o3_logger.logger import LogConfig

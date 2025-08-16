@@ -6,9 +6,9 @@ This test compares the current consult_agent approach vs our optimized implement
 to measure the improvement in quality, efficiency, and token usage.
 """
 
-import time
 import json
-from typing import Dict, Any
+import time
+
 from optimized_critic_implementation import OptimizedCriticAgent
 from optimized_nano_instructions import get_optimized_nano_prompt
 
@@ -69,10 +69,10 @@ def test_complex_request():
     print(f"Time: {current_time:.2f} seconds")
     print(f"Critic Feedback: {len(current_critic_feedback)} characters")
     print(f"Iteration Guidance: {len(current_iteration_guidance)} characters")
-    print(f"Total Tokens (estimated): ~2,000")
+    print("Total Tokens (estimated): ~2,000")
 
     # Test 2: Optimized Approach
-    print(f"\n\n2. OPTIMIZED APPROACH")
+    print("\n\n2. OPTIMIZED APPROACH")
     print("=" * 50)
 
     start_time = time.time()
@@ -151,36 +151,36 @@ def login(email: str, password: str):
     print(f"Time: {optimized_time:.2f} seconds")
     print(f"Critic Feedback: {len(str(result1))} characters")
     print(f"Optimized Prompt: {len(optimized_prompt)} characters")
-    print(f"Total Tokens (estimated): ~1,500")
+    print("Total Tokens (estimated): ~1,500")
 
     # Display detailed comparison
-    print(f"\n\n3. DETAILED COMPARISON")
+    print("\n\n3. DETAILED COMPARISON")
     print("=" * 50)
 
-    print(f"CRITIC FEEDBACK QUALITY:")
-    print(f"  Current: Vague suggestions, no prioritization")
+    print("CRITIC FEEDBACK QUALITY:")
+    print("  Current: Vague suggestions, no prioritization")
     print(f"  Optimized: {len(result1.failures)} specific issues with concrete fixes")
 
-    print(f"\nITERATION GUIDANCE:")
-    print(f"  Current: Generic improvement instructions")
-    print(f"  Optimized: Structured feedback parsing with clear response strategy")
+    print("\nITERATION GUIDANCE:")
+    print("  Current: Generic improvement instructions")
+    print("  Optimized: Structured feedback parsing with clear response strategy")
 
-    print(f"\nTOKEN EFFICIENCY:")
-    print(f"  Current: ~2,000 tokens per iteration")
-    print(f"  Optimized: ~1,500 tokens per iteration")
-    print(f"  Improvement: 25% reduction")
+    print("\nTOKEN EFFICIENCY:")
+    print("  Current: ~2,000 tokens per iteration")
+    print("  Optimized: ~1,500 tokens per iteration")
+    print("  Improvement: 25% reduction")
 
-    print(f"\nQUALITY IMPROVEMENT:")
-    print(f"  Current: Generic suggestions that may be ignored")
-    print(f"  Optimized: Specific, actionable fixes with evidence")
+    print("\nQUALITY IMPROVEMENT:")
+    print("  Current: Generic suggestions that may be ignored")
+    print("  Optimized: Specific, actionable fixes with evidence")
 
     # Show specific issues found
-    print(f"\nSPECIFIC ISSUES IDENTIFIED:")
+    print("\nSPECIFIC ISSUES IDENTIFIED:")
     for i, failure in enumerate(result1.failures, 1):
         print(f"  {i}. {failure.category.upper()}: {failure.evidence}")
         print(f"     Fix: {failure.minimal_fix_hint}")
 
-    print(f"\nNEXT ACTIONS:")
+    print("\nNEXT ACTIONS:")
     for i, action in enumerate(result1.next_actions, 1):
         print(f"  {i}. {action}")
 
@@ -192,13 +192,13 @@ def test_simple_request():
         "Create a Python function that validates email addresses using regex."
     )
 
-    print(f"\n\n=== SIMPLE REQUEST TEST ===")
+    print("\n\n=== SIMPLE REQUEST TEST ===")
     print(f"Request: {simple_request}")
 
     # Test optimized approach
     critic = OptimizedCriticAgent()
 
-    mock_simple_response = """
+    mock_simple_response = r"""
 import re
 
 def validate_email(email):
@@ -224,7 +224,7 @@ def validate_email(email):
 def generate_implementation_plan():
     """Generate a plan for implementing the optimizations."""
 
-    print(f"\n\n=== IMPLEMENTATION PLAN ===")
+    print("\n\n=== IMPLEMENTATION PLAN ===")
     print("=" * 50)
 
     print("1. UPDATE CRITIC AGENT (apps/ACCF/src/accf/agents/critic_agent.py)")

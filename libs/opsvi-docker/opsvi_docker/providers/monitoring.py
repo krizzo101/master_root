@@ -5,17 +5,15 @@ Comprehensive monitoring and health checking for Docker containers and systems.
 Provides real-time monitoring, health checks, and resource tracking.
 """
 
-import logging
 import asyncio
+import logging
 import time
-from typing import Any, Dict, List, Optional, Union, Callable
-from dataclasses import dataclass, field
+from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import datetime, timedelta
-from collections import defaultdict
+from typing import Any
 
 from docker import DockerClient
-from docker.errors import DockerException, APIError
-
 from opsvi_foundation import BaseComponent, ComponentError
 
 logger = logging.getLogger(__name__)
@@ -42,15 +40,15 @@ class HealthCheck:
     retries: int = 3
 
     # Custom check function
-    check_function: Optional[Callable] = None
+    check_function: Callable | None = None
 
     # Alerting
     alert_on_failure: bool = True
     alert_threshold: int = 1
 
     # Status tracking
-    last_check: Optional[datetime] = None
-    last_status: Optional[str] = None
+    last_check: datetime | None = None
+    last_status: str | None = None
     consecutive_failures: int = 0
 
 
@@ -63,10 +61,10 @@ class HealthStatus:
     status: str  # healthy, unhealthy, unknown
     timestamp: datetime
     message: str
-    details: Dict[str, Any]
+    details: dict[str, Any]
 
     # Metrics
-    response_time: Optional[float] = None
+    response_time: float | None = None
     error_count: int = 0
 
 
@@ -75,16 +73,16 @@ class ResourceMetrics:
     """Resource usage metrics."""
 
     timestamp: datetime
-    container_id: Optional[str] = None
+    container_id: str | None = None
 
     # CPU metrics
     cpu_usage_percent: float
     cpu_usage_nanos: int
-    cpu_limit_nanos: Optional[int] = None
+    cpu_limit_nanos: int | None = None
 
     # Memory metrics
     memory_usage_bytes: int
-    memory_limit_bytes: Optional[int] = None
+    memory_limit_bytes: int | None = None
     memory_usage_percent: float
 
     # Network metrics
@@ -124,10 +122,10 @@ class DockerMonitor(BaseComponent):
 
         self.client = client
         self.config = config
-        self._health_checks: Dict[str, HealthCheck] = {}
-        self._monitoring_tasks: Dict[str, asyncio.Task] = {}
-        self._metrics_history: Dict[str, List[ResourceMetrics]] = {}
-        self._alert_handlers: List[Callable] = []
+        self._health_checks: dict[str, HealthCheck] = {}
+        self._monitoring_tasks: dict[str, asyncio.Task] = {}
+        self._metrics_history: dict[str, list[ResourceMetrics]] = {}
+        self._alert_handlers: list[Callable] = []
 
         logger.debug("DockerMonitor initialized")
 
@@ -190,7 +188,7 @@ class DockerMonitor(BaseComponent):
             logger.error(f"Failed to remove health check {check_name}: {e}")
             raise MonitoringError(f"Failed to remove health check: {e}")
 
-    async def get_health_status(self, check_name: str) -> Optional[HealthStatus]:
+    async def get_health_status(self, check_name: str) -> HealthStatus | None:
         """Get health check status.
 
         Args:
@@ -213,7 +211,7 @@ class DockerMonitor(BaseComponent):
             logger.error(f"Failed to get health status for {check_name}: {e}")
             raise MonitoringError(f"Failed to get health status: {e}")
 
-    async def get_all_health_statuses(self) -> List[HealthStatus]:
+    async def get_all_health_statuses(self) -> list[HealthStatus]:
         """Get all health check statuses.
 
         Returns:
@@ -283,8 +281,8 @@ class DockerMonitor(BaseComponent):
             raise MonitoringError(f"Failed to stop container monitoring: {e}")
 
     async def get_container_metrics(
-        self, container_id: str, limit: Optional[int] = None
-    ) -> List[ResourceMetrics]:
+        self, container_id: str, limit: int | None = None
+    ) -> list[ResourceMetrics]:
         """Get container metrics history.
 
         Args:
@@ -447,7 +445,7 @@ class DockerMonitor(BaseComponent):
                 error_count=1,
             )
 
-    async def _default_health_check(self, health_check: HealthCheck) -> Dict[str, Any]:
+    async def _default_health_check(self, health_check: HealthCheck) -> dict[str, Any]:
         """Perform default health check based on type.
 
         Args:
@@ -553,9 +551,7 @@ class DockerMonitor(BaseComponent):
                 "details": {"error": str(e)},
             }
 
-    async def _get_container_metrics(
-        self, container_id: str
-    ) -> Optional[ResourceMetrics]:
+    async def _get_container_metrics(self, container_id: str) -> ResourceMetrics | None:
         """Get container resource metrics.
 
         Args:
@@ -871,7 +867,7 @@ class ResourceMonitor(BaseComponent):
             logger.error(f"Failed to get container resources for {container_id}: {e}")
             raise MonitoringError(f"Failed to get container resources: {e}")
 
-    async def get_system_resources(self) -> Dict[str, Any]:
+    async def get_system_resources(self) -> dict[str, Any]:
         """Get Docker system resource usage.
 
         Returns:

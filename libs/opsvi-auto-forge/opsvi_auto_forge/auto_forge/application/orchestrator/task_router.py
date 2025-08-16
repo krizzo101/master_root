@@ -1,7 +1,7 @@
 """Task Router - Intelligent task routing to appropriate Celery queues."""
 
 import logging
-from typing import Dict, List, Optional, Any
+from typing import Dict, Optional, Any
 from opsvi_auto_forge.application.orchestrator.task_models import (
     TaskExecution,
     TaskPriority,

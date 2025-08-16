@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from src.shared.openai_interfaces.base import OpenAIBaseInterface
 
@@ -13,8 +13,8 @@ class OpenAIChatCompletionsInterface(OpenAIBaseInterface):
     """
 
     def create_chat_completion(
-        self, messages: List[Dict[str, str]], **kwargs
-    ) -> Dict[str, Any]:
+        self, messages: list[dict[str, str]], **kwargs
+    ) -> dict[str, Any]:
         """
         Create a chat completion for the provided conversation messages and parameters.
         POST /v1/chat/completions
@@ -26,8 +26,8 @@ class OpenAIChatCompletionsInterface(OpenAIBaseInterface):
             self._handle_error(e)
 
     async def acreate_chat_completion(
-        self, messages: List[Dict[str, str]], **kwargs
-    ) -> Dict[str, Any]:
+        self, messages: list[dict[str, str]], **kwargs
+    ) -> dict[str, Any]:
         """
         Async: Create a chat completion for the provided conversation messages and parameters.
         POST /v1/chat/completions

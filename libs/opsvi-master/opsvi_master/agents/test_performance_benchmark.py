@@ -36,7 +36,7 @@ async def test_performance_benchmark():
         )
 
         if result:
-            print(f"✅ Basic benchmark test successful:")
+            print("✅ Basic benchmark test successful:")
             print(f"   - Duration: {result.duration:.3f}s")
             print(f"   - Throughput: {result.throughput:.2f} ops/sec")
             print(f"   - Success: {result.success}")

@@ -4,7 +4,7 @@ Output schema for Performance Optimizer.
 This module defines the Pydantic schema for performance optimizer output results.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -33,10 +33,10 @@ class PerformanceOptimizerOutput(BaseModel):
     message: str = Field(..., description="Status message")
 
     # Metadata
-    optimization_time: Optional[float] = Field(
+    optimization_time: float | None = Field(
         _default=None, description="Time taken for optimization (seconds)"
     )
-    files_analyzed: Optional[int] = Field(
+    files_analyzed: int | None = Field(
         _default=None, description="Number of files analyzed"
     )
     model_used: str = Field(default="o3-mini", description="AI model used for analysis")

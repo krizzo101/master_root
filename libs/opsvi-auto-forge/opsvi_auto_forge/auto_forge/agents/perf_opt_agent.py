@@ -1,11 +1,7 @@
 """Performance optimization agent for the autonomous software factory."""
 
-import asyncio
-import time
-import json
 from typing import Dict, Any, List, Optional, Tuple
 from dataclasses import dataclass
-from uuid import uuid4
 
 from opsvi_auto_forge.agents.base_agent import BaseAgent, AgentResponse
 from opsvi_auto_forge.config.models import AgentRole
@@ -631,7 +627,7 @@ async def process_all(items):
         suggestions = response_data["suggestions"]
         summary = response_data["summary"]
 
-        content = f"""
+        content = """
 # Performance Optimization Analysis
 
 ## Performance Profile
@@ -645,14 +641,14 @@ async def process_all(items):
         else:
             content += "- No major bottlenecks identified\n"
 
-        content += f"""
+        content += """
 ### Resource Usage
 """
 
         for resource, value in profile["resource_usage"].items():
             content += f"- **{resource.replace('_', ' ').title()}**: {value}\n"
 
-        content += f"""
+        content += """
 ### Slow Operations
 """
 

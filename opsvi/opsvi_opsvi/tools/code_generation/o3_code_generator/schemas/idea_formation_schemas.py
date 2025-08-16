@@ -6,7 +6,7 @@ and concept development tools, ensuring consistent and validated data handling.
 """
 
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -53,7 +53,7 @@ class IdeaFormationInput(BaseModel):
     concept_description: str = Field(
         ..., description="Natural language description of the concept or idea"
     )
-    target_market: Optional[str] = Field(
+    target_market: str | None = Field(
         None, description="Target market or audience for the concept"
     )
     analysis_type: AnalysisType = Field(
@@ -72,7 +72,7 @@ class IdeaFormationInput(BaseModel):
     max_tokens: int = Field(
         default=4000, description="Maximum tokens for O3 model response"
     )
-    additional_context: Optional[str] = Field(
+    additional_context: str | None = Field(
         None, description="Additional context or constraints for analysis"
     )
 
@@ -91,7 +91,7 @@ class IdeaFormationOutput(BaseModel):
         ..., description="Time taken for analysis in seconds"
     )
     model_used: str = Field(..., description="O3 model used for analysis")
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Error message if analysis failed"
     )
 
@@ -102,11 +102,11 @@ class BrainstormingInput(BaseModel):
     problem_statement: str = Field(
         ..., description="Problem statement or domain description"
     )
-    target_audience: Optional[str] = Field(
+    target_audience: str | None = Field(
         None, description="Target audience for the brainstorming session"
     )
     idea_count: int = Field(default=10, description="Number of ideas to generate")
-    categories: Optional[list[str]] = Field(
+    categories: list[str] | None = Field(
         None, description="Specific categories to focus on"
     )
     include_prioritization: bool = Field(
@@ -119,15 +119,13 @@ class BrainstormingInput(BaseModel):
     max_tokens: int = Field(
         default=16000, description="Maximum tokens for model response"
     )
-    conversation_history: Optional[list[dict[str, str]]] = Field(
+    conversation_history: list[dict[str, str]] | None = Field(
         None, description="Conversation history for context"
     )
-    conversation_insights: Optional[dict[str, Any]] = Field(
+    conversation_insights: dict[str, Any] | None = Field(
         None, description="Extracted insights from conversation"
     )
-    session_type: Optional[str] = Field(
-        None, description="Type of brainstorming session"
-    )
+    session_type: str | None = Field(None, description="Type of brainstorming session")
 
 
 class BrainstormingOutput(BaseModel):
@@ -150,7 +148,7 @@ class BrainstormingOutput(BaseModel):
         ..., description="Time taken for brainstorming in seconds"
     )
     model_used: str = Field(..., description="O3 model used for brainstorming")
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Error message if brainstorming failed"
     )
 
@@ -205,7 +203,7 @@ class MarketResearchOutput(BaseModel):
         ..., description="Time taken for market research in seconds"
     )
     model_used: str = Field(..., description="O3 model used for market research")
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Error message if market research failed"
     )
 
@@ -225,10 +223,10 @@ class FeasibilityInput(BaseModel):
     include_operational_feasibility: bool = Field(
         default=True, description="Whether to assess operational feasibility"
     )
-    budget_constraints: Optional[str] = Field(
+    budget_constraints: str | None = Field(
         None, description="Budget constraints for the project"
     )
-    timeline_constraints: Optional[str] = Field(
+    timeline_constraints: str | None = Field(
         None, description="Timeline constraints for the project"
     )
     output_format: IdeaFormationOutputFormat = Field(
@@ -273,6 +271,6 @@ class FeasibilityOutput(BaseModel):
         ..., description="Time taken for feasibility assessment in seconds"
     )
     model_used: str = Field(..., description="O3 model used for feasibility assessment")
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Error message if feasibility assessment failed"
     )

@@ -5,8 +5,8 @@ Container-specific utility functions and helpers.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
 from datetime import datetime
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ class ContainerUtils:
     """
 
     @staticmethod
-    def analyze_container_config(container_config: Dict[str, Any]) -> Dict[str, Any]:
+    def analyze_container_config(container_config: dict[str, Any]) -> dict[str, Any]:
         """Analyze container configuration for best practices and issues."""
         analysis = {
             "issues": [],
@@ -70,7 +70,7 @@ class ContainerUtils:
         return analysis
 
     @staticmethod
-    def get_container_usage_stats(container_stats: Dict[str, Any]) -> Dict[str, Any]:
+    def get_container_usage_stats(container_stats: dict[str, Any]) -> dict[str, Any]:
         """Extract and format container usage statistics."""
         try:
             cpu_stats = container_stats.get("cpu_stats", {})
@@ -150,7 +150,7 @@ class ContainerUtils:
         return "\n".join(formatted_lines)
 
     @staticmethod
-    def parse_container_ports(port_bindings: Dict[str, Any]) -> List[Dict[str, str]]:
+    def parse_container_ports(port_bindings: dict[str, Any]) -> list[dict[str, str]]:
         """Parse container port bindings into a structured format."""
         ports = []
 
@@ -177,8 +177,8 @@ class ContainerUtils:
 
     @staticmethod
     def get_container_environment_variables(
-        container_config: Dict[str, Any]
-    ) -> Dict[str, str]:
+        container_config: dict[str, Any]
+    ) -> dict[str, str]:
         """Extract environment variables from container configuration."""
         env_vars = {}
 
@@ -193,7 +193,7 @@ class ContainerUtils:
         return env_vars
 
     @staticmethod
-    def check_container_security(container_config: Dict[str, Any]) -> Dict[str, Any]:
+    def check_container_security(container_config: dict[str, Any]) -> dict[str, Any]:
         """Perform security analysis of container configuration."""
         security_analysis = {
             "score": 100,
@@ -250,7 +250,7 @@ class ContainerUtils:
         return security_analysis
 
     @staticmethod
-    def optimize_container_config(container_config: Dict[str, Any]) -> Dict[str, Any]:
+    def optimize_container_config(container_config: dict[str, Any]) -> dict[str, Any]:
         """Suggest optimizations for container configuration."""
         optimizations = {
             "memory_optimizations": [],

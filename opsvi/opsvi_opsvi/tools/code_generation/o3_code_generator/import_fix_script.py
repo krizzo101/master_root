@@ -6,10 +6,9 @@ This script runs before auto-align to resolve critical import issues that preven
 successful code generation.
 """
 
-from pathlib import Path
 import re
 import sys
-from typing import Dict, List
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent))
 try:
@@ -63,7 +62,7 @@ class ImportFixer:
         }
         self.logger.log_info("Initialized ImportFixer with common import patterns")
 
-    def fix_file_imports(self, file_path: str) -> Dict[str, any]:
+    def fix_file_imports(self, file_path: str) -> dict[str, any]:
         """
         Fix imports in a single file.
 
@@ -133,7 +132,7 @@ class ImportFixer:
         finally:
             pass
 
-    def fix_directory_imports(self, directory_path: str) -> Dict[str, any]:
+    def fix_directory_imports(self, directory_path: str) -> dict[str, any]:
         """
         Fix imports in all Python files in a directory.
 
@@ -180,7 +179,7 @@ class ImportFixer:
         )
         return results
 
-    def get_import_issues(self, file_path: str) -> List[str]:
+    def get_import_issues(self, file_path: str) -> list[str]:
         """
         Get list of import issues in a file without fixing them.
 

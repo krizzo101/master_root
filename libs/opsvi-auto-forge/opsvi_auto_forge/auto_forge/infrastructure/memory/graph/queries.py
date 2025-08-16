@@ -5,7 +5,6 @@ from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from opsvi_auto_forge.config.models import (
-    AgentRole,
     TaskStatus,
     Project,
     Run,

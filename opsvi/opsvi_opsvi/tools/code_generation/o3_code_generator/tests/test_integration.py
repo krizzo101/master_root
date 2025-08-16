@@ -3,8 +3,9 @@
 import json
 import tempfile
 from pathlib import Path
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
 
 from src.tools.code_generation.o3_code_generator.main import run_analyze
 from src.tools.code_generation.o3_code_generator.utils.directory_manager import (
@@ -77,7 +78,7 @@ class TestIntegration:
                 assert Path(output_path).exists()
 
                 # Verify the content
-                with open(output_path, "r") as f:
+                with open(output_path) as f:
                     result = json.load(f)
 
                 assert result["success"] is True

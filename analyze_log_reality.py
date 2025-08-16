@@ -8,7 +8,6 @@ unique content, and session patterns.
 
 import re
 from collections import Counter
-from pathlib import Path
 
 
 def analyze_log_reality(log_file_path: str = "knowledge/nano.txt"):
@@ -17,7 +16,7 @@ def analyze_log_reality(log_file_path: str = "knowledge/nano.txt"):
     print("=== LOG REALITY ANALYSIS ===\n")
 
     try:
-        with open(log_file_path, "r", encoding="utf-8") as f:
+        with open(log_file_path, encoding="utf-8") as f:
             lines = f.readlines()
 
         total_lines = len(lines)
@@ -41,7 +40,7 @@ def analyze_log_reality(log_file_path: str = "knowledge/nano.txt"):
                 line_patterns[pattern] += 1
 
         # Find most common patterns
-        print(f"\nMost common line patterns:")
+        print("\nMost common line patterns:")
         for pattern, count in line_patterns.most_common(5):
             print(f"  {count:4d}x: {pattern}")
 
@@ -141,7 +140,7 @@ def estimate_optimized_log_size(current_stats: dict) -> dict:
 
     reduction_percentage = (current_size - optimized_size) / current_size * 100
 
-    print(f"\n=== OPTIMIZATION ESTIMATES ===")
+    print("\n=== OPTIMIZATION ESTIMATES ===")
     print(f"Current log size: {current_size:,} lines")
     print(f"Estimated optimized size: {optimized_size:,.0f} lines")
     print(f"Estimated reduction: {reduction_percentage:.1f}%")
@@ -161,7 +160,7 @@ if __name__ == "__main__":
         # Estimate optimization impact
         optimization = estimate_optimized_log_size(stats)
 
-        print(f"\n=== SUMMARY ===")
+        print("\n=== SUMMARY ===")
         print(f"Real log size: {stats['total_lines']:,} lines")
         print(f"Actual duplication: {stats['duplication_rate']:.1f}%")
         print(f"Meaningful content: {stats['meaningful_unique']:,} lines")

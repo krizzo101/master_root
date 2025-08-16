@@ -9,20 +9,20 @@ for comprehensive research capabilities including web search and academic resear
 import asyncio
 import json
 import os
-import time
 from datetime import datetime
-from typing import Dict, List, Any, Optional
+from typing import Any
+
+from opsvi_http import HTTPXClient, HTTPXConfig
 
 # OPSVI imports
 from opsvi_llm import (
-    OpenAIProvider,
-    OpenAIConfig,
-    PerplexityProvider,
-    PerplexityConfig,
     ChatRequest,
     Message,
+    OpenAIConfig,
+    OpenAIProvider,
+    PerplexityConfig,
+    PerplexityProvider,
 )
-from opsvi_http import HTTPXClient, HTTPXConfig
 
 
 class EnhancedResearchAssistant:
@@ -88,9 +88,7 @@ class EnhancedResearchAssistant:
                 await self.perplexity_provider.initialize()
                 print("  ✅ Perplexity provider initialized")
             else:
-                print(
-                    "  ⚠️  Perplexity API key not found, skipping Perplexity provider"
-                )
+                print("  ⚠️  Perplexity API key not found, skipping Perplexity provider")
 
             if not self.openai_provider and not self.perplexity_provider:
                 raise Exception(
@@ -117,7 +115,7 @@ class EnhancedResearchAssistant:
 
         print("✅ All components shut down successfully")
 
-    async def fetch_research_data(self, topic: str) -> List[Dict[str, Any]]:
+    async def fetch_research_data(self, topic: str) -> list[dict[str, Any]]:
         """Fetch research data from multiple sources."""
         research_data = []
 
@@ -170,7 +168,7 @@ class EnhancedResearchAssistant:
 
     def _parse_arxiv_response(
         self, response_text: str, topic: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Parse ArXiv XML response."""
         try:
             import xml.etree.ElementTree as ET
@@ -202,7 +200,7 @@ class EnhancedResearchAssistant:
 
     def _parse_pubmed_response(
         self, response_text: str, topic: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Parse PubMed JSON response."""
         try:
             if isinstance(response_text, str):
@@ -234,10 +232,10 @@ class EnhancedResearchAssistant:
 
     async def analyze_with_llm(
         self,
-        research_data: List[Dict[str, Any]],
+        research_data: list[dict[str, Any]],
         topic: str,
         provider_name: str = "auto",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Analyze research data with LLM provider."""
         if not research_data:
             return {"error": "No research data to analyze"}
@@ -342,7 +340,7 @@ class EnhancedResearchAssistant:
 
     async def conduct_research(
         self, topic: str, use_perplexity: bool = True, use_openai: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Conduct comprehensive research on a topic."""
         print(f"\n🚀 Starting ENHANCED research on: {topic}")
         print("=" * 60)

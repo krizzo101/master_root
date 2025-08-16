@@ -6,9 +6,6 @@ This test uses the actual consult_agent tool to compare the current approach
 with what our optimized implementation would provide.
 """
 
-import time
-import json
-
 
 def test_current_consult_agent():
     """Test the current consult_agent with a complex request."""
@@ -62,7 +59,7 @@ def test_current_consult_agent():
 def test_optimized_approach():
     """Test what our optimized approach would provide."""
 
-    print(f"\n\nTESTING OPTIMIZED APPROACH:")
+    print("\n\nTESTING OPTIMIZED APPROACH:")
     print("=" * 50)
 
     print("Expected Optimized Behavior:")
@@ -84,7 +81,7 @@ def test_optimized_approach():
 def compare_approaches():
     """Compare the two approaches side by side."""
 
-    print(f"\n\n=== SIDE-BY-SIDE COMPARISON ===")
+    print("\n\n=== SIDE-BY-SIDE COMPARISON ===")
     print("=" * 50)
 
     comparison = {
@@ -123,7 +120,7 @@ def compare_approaches():
 def generate_test_plan():
     """Generate a plan for testing the optimizations."""
 
-    print(f"\n\n=== TESTING PLAN ===")
+    print("\n\n=== TESTING PLAN ===")
     print("=" * 50)
 
     print("1. BASELINE TEST (Current System)")

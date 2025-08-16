@@ -21,10 +21,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence
-
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 LIBS_DIR = REPO_ROOT / "libs"
@@ -47,7 +46,7 @@ def ensure_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
 
 
-def plan_write(path: Path, content: str, overwrite: bool = False) -> Optional[WritePlan]:
+def plan_write(path: Path, content: str, overwrite: bool = False) -> WritePlan | None:
     if path.exists() and not overwrite:
         return None
     return WritePlan(path=path, content=content, overwrite=overwrite)
@@ -120,8 +119,8 @@ def default_codegen_md(tooling: Sequence[str]) -> str:
     return "".join(lines)
 
 
-def scaffold_http(lib_dir: Path, force: bool) -> List[WritePlan]:
-    plans: List[WritePlan] = []
+def scaffold_http(lib_dir: Path, force: bool) -> list[WritePlan]:
+    plans: list[WritePlan] = []
     # dirs
     for d in [
         lib_dir / "openapi",
@@ -130,13 +129,21 @@ def scaffold_http(lib_dir: Path, force: bool) -> List[WritePlan]:
     ]:
         ensure_dir(d)
     # files
-    openapi_yaml = plan_write(lib_dir / "openapi" / "openapi.yaml", default_openapi_spec(), overwrite=force)
+    openapi_yaml = plan_write(
+        lib_dir / "openapi" / "openapi.yaml", default_openapi_spec(), overwrite=force
+    )
     if openapi_yaml:
         plans.append(openapi_yaml)
-    cfg = plan_write(lib_dir / ".openapi-config.json", default_openapi_config(), overwrite=force)
+    cfg = plan_write(
+        lib_dir / ".openapi-config.json", default_openapi_config(), overwrite=force
+    )
     if cfg:
         plans.append(cfg)
-    readme = plan_write(lib_dir / "CODEGEN.md", default_codegen_md(["OpenAPI (python, ts)"]), overwrite=False)
+    readme = plan_write(
+        lib_dir / "CODEGEN.md",
+        default_codegen_md(["OpenAPI (python, ts)"]),
+        overwrite=False,
+    )
     if readme:
         plans.append(readme)
     # .gitkeep in empty client dirs
@@ -147,13 +154,13 @@ def scaffold_http(lib_dir: Path, force: bool) -> List[WritePlan]:
     return plans
 
 
-def scaffold_gateway(lib_dir: Path, force: bool) -> List[WritePlan]:
+def scaffold_gateway(lib_dir: Path, force: bool) -> list[WritePlan]:
     # same as HTTP; gateway often aggregates OpenAPI
     return scaffold_http(lib_dir, force)
 
 
-def scaffold_communication(lib_dir: Path, force: bool) -> List[WritePlan]:
-    plans: List[WritePlan] = []
+def scaffold_communication(lib_dir: Path, force: bool) -> list[WritePlan]:
+    plans: list[WritePlan] = []
     # dirs
     for d in [
         lib_dir / "proto",
@@ -163,24 +170,34 @@ def scaffold_communication(lib_dir: Path, force: bool) -> List[WritePlan]:
     ]:
         ensure_dir(d)
     # files
-    buf_yaml = plan_write(lib_dir / "buf.yaml", default_buf_yaml(lib_dir.name), overwrite=force)
+    buf_yaml = plan_write(
+        lib_dir / "buf.yaml", default_buf_yaml(lib_dir.name), overwrite=force
+    )
     if buf_yaml:
         plans.append(buf_yaml)
-    buf_gen = plan_write(lib_dir / "buf.gen.yaml", default_buf_gen_yaml(), overwrite=force)
+    buf_gen = plan_write(
+        lib_dir / "buf.gen.yaml", default_buf_gen_yaml(), overwrite=force
+    )
     if buf_gen:
         plans.append(buf_gen)
-    asyncapi_spec = plan_write(lib_dir / "asyncapi" / "spec.yaml", default_asyncapi_spec(), overwrite=force)
+    asyncapi_spec = plan_write(
+        lib_dir / "asyncapi" / "spec.yaml", default_asyncapi_spec(), overwrite=force
+    )
     if asyncapi_spec:
         plans.append(asyncapi_spec)
     # placeholder proto
     proto = plan_write(
         lib_dir / "proto" / "placeholder.proto",
-        "syntax = \"proto3\";\npackage opsvi.communication;\nmessage Placeholder { string id = 1; }\n",
+        'syntax = "proto3";\npackage opsvi.communication;\nmessage Placeholder { string id = 1; }\n',
         overwrite=False,
     )
     if proto:
         plans.append(proto)
-    readme = plan_write(lib_dir / "CODEGEN.md", default_codegen_md(["Buf (protobuf)", "AsyncAPI"]), overwrite=False)
+    readme = plan_write(
+        lib_dir / "CODEGEN.md",
+        default_codegen_md(["Buf (protobuf)", "AsyncAPI"]),
+        overwrite=False,
+    )
     if readme:
         plans.append(readme)
     # .gitkeep for gen dirs
@@ -191,8 +208,10 @@ def scaffold_communication(lib_dir: Path, force: bool) -> List[WritePlan]:
     return plans
 
 
-def scaffold_schema_models(lib_dir: Path, force: bool, include_quicktype_md: bool = False) -> List[WritePlan]:
-    plans: List[WritePlan] = []
+def scaffold_schema_models(
+    lib_dir: Path, force: bool, include_quicktype_md: bool = False
+) -> list[WritePlan]:
+    plans: list[WritePlan] = []
     # dirs
     for d in [lib_dir / "schemas", lib_dir / "gen"]:
         ensure_dir(d)
@@ -202,7 +221,12 @@ def scaffold_schema_models(lib_dir: Path, force: bool, include_quicktype_md: boo
         plans.append(schema)
     readme = plan_write(
         lib_dir / "CODEGEN.md",
-        default_codegen_md(["datamodel-code-generator" + (", quicktype" if include_quicktype_md else "")]),
+        default_codegen_md(
+            [
+                "datamodel-code-generator"
+                + (", quicktype" if include_quicktype_md else "")
+            ]
+        ),
         overwrite=False,
     )
     if readme:
@@ -213,26 +237,32 @@ def scaffold_schema_models(lib_dir: Path, force: bool, include_quicktype_md: boo
     return plans
 
 
-def make_plans(target_libs: Sequence[str], force: bool) -> Dict[Path, List[WritePlan]]:
-    plans_by_lib: Dict[Path, List[WritePlan]] = {}
+def make_plans(target_libs: Sequence[str], force: bool) -> dict[Path, list[WritePlan]]:
+    plans_by_lib: dict[Path, list[WritePlan]] = {}
     for name in target_libs:
         lib_dir = LIBS_DIR / name
         if not lib_dir.exists():
             _print(f"[WARN] Skipping '{name}': {lib_dir} does not exist")
             continue
-        lib_plans: List[WritePlan] = []
+        lib_plans: list[WritePlan] = []
         if name in {"opsvi-http", "opsvi-gateway"}:
             lib_plans.extend(scaffold_http(lib_dir, force))
         if name == "opsvi-communication":
             lib_plans.extend(scaffold_communication(lib_dir, force))
         if name in {"opsvi-data", "opsvi-rag", "opsvi-llm"}:
-            lib_plans.extend(scaffold_schema_models(lib_dir, force, include_quicktype_md=(name in {"opsvi-rag", "opsvi-llm"})))
+            lib_plans.extend(
+                scaffold_schema_models(
+                    lib_dir,
+                    force,
+                    include_quicktype_md=(name in {"opsvi-rag", "opsvi-llm"}),
+                )
+            )
         # Always ensure presence of top-level gen/ and schemas/ if applicable
         plans_by_lib[lib_dir] = lib_plans
     return plans_by_lib
 
 
-def apply_plans(plans_by_lib: Dict[Path, List[WritePlan]], dry_run: bool) -> None:
+def apply_plans(plans_by_lib: dict[Path, list[WritePlan]], dry_run: bool) -> None:
     total_files = 0
     for lib_dir, plans in plans_by_lib.items():
         if not plans:
@@ -251,7 +281,7 @@ def apply_plans(plans_by_lib: Dict[Path, List[WritePlan]], dry_run: bool) -> Non
     _print(f"[DONE] {'planned' if dry_run else 'created'} {total_files} file(s)")
 
 
-def detect_default_libs() -> List[str]:
+def detect_default_libs() -> list[str]:
     # Limit to known libraries where codegen makes sense
     candidates = [
         "opsvi-http",
@@ -264,20 +294,31 @@ def detect_default_libs() -> List[str]:
     return [c for c in candidates if (LIBS_DIR / c).exists()]
 
 
-def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Scaffold libs/ for code generation toolchains")
+def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Scaffold libs/ for code generation toolchains"
+    )
     parser.add_argument(
         "--libs",
         nargs="*",
         help="Subset of libs to scaffold (default: autodetect opsvi-*)",
     )
-    parser.add_argument("--yes", action="store_true", help="Apply changes (default: dry-run)")
-    parser.add_argument("--force", action="store_true", help="Overwrite existing template files")
-    parser.add_argument("--root", type=str, default=str(REPO_ROOT), help="Repository root (auto-detected)")
+    parser.add_argument(
+        "--yes", action="store_true", help="Apply changes (default: dry-run)"
+    )
+    parser.add_argument(
+        "--force", action="store_true", help="Overwrite existing template files"
+    )
+    parser.add_argument(
+        "--root",
+        type=str,
+        default=str(REPO_ROOT),
+        help="Repository root (auto-detected)",
+    )
     return parser.parse_args(argv)
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
     root = Path(args.root).resolve()
     if root != REPO_ROOT:

@@ -9,8 +9,8 @@ from src.tools.code_generation.o3_code_generator.o3_logger.logger import (
 
 setup_logger(LogConfig())
 import argparse
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import get_logger
 from src.tools.code_generation.o3_code_generator.utils.directory_manager import (

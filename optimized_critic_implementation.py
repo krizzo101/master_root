@@ -7,10 +7,11 @@ Incorporates GPT-5 best practices for systematic issue resolution.
 """
 
 import json
-from typing import Dict, List, Any, Optional
-from dataclasses import dataclass
-from openai import OpenAI
 import os
+from dataclasses import dataclass
+from typing import Any
+
+from openai import OpenAI
 
 
 @dataclass
@@ -57,8 +58,8 @@ class OptimizedCriticAgent:
         code: str,
         session_id: str,
         iteration: int = 1,
-        previous_feedback: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        previous_feedback: str | None = None,
+    ) -> dict[str, Any]:
         """
         Analyze code with structured JSON feedback using o3 model.
 
@@ -157,7 +158,7 @@ class OptimizedCriticAgent:
             }
 
     def _build_iteration_prompt(
-        self, code: str, iteration: int, previous_feedback: Optional[str] = None
+        self, code: str, iteration: int, previous_feedback: str | None = None
     ) -> str:
         """Build iteration-specific prompt for systematic analysis."""
 
@@ -249,7 +250,7 @@ IMPORTANT:
 
         return base_prompt
 
-    def get_session_summary(self, session_id: str) -> Dict[str, Any]:
+    def get_session_summary(self, session_id: str) -> dict[str, Any]:
         """Get summary of critic session performance."""
         if session_id not in self.critic_sessions:
             return {"error": "Session not found"}
@@ -276,7 +277,7 @@ IMPORTANT:
             "performance_rating": self._calculate_performance_rating(session),
         }
 
-    def _calculate_performance_rating(self, session: Dict) -> str:
+    def _calculate_performance_rating(self, session: dict) -> str:
         """Calculate critic performance rating."""
         total_issues = len(session["issues_found"])
         total_fixes = len(session["fixes_provided"])
@@ -292,7 +293,7 @@ IMPORTANT:
         else:
             return "EXCELLENT - Comprehensive fix coverage"
 
-    def validate_fixes(self, fixes: List[Dict], original_code: str) -> Dict[str, Any]:
+    def validate_fixes(self, fixes: list[dict], original_code: str) -> dict[str, Any]:
         """Validate that provided fixes are implementable."""
         valid_fixes = []
         invalid_fixes = []
@@ -311,7 +312,7 @@ IMPORTANT:
             "total_fixes": len(fixes),
         }
 
-    def _is_fix_valid(self, fix: Dict, original_code: str) -> bool:
+    def _is_fix_valid(self, fix: dict, original_code: str) -> bool:
         """Check if a fix is valid and implementable."""
         # Basic validation checks
         required_fields = ["current_code", "fixed_code", "atomic_fix"]

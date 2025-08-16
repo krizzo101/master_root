@@ -9,10 +9,9 @@ Usage:
 """
 
 import argparse
-from datetime import datetime
 import json
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
 
 
 class OrganizationComplianceChecker:
@@ -21,7 +20,7 @@ class OrganizationComplianceChecker:
         self.violations = []
         self.suggestions = []
 
-    def check_root_directory(self) -> Dict:
+    def check_root_directory(self) -> dict:
         """Check root directory for violations."""
         allowed_in_root = {
             "README.md",
@@ -112,7 +111,7 @@ class OrganizationComplianceChecker:
         else:
             return "misc_file_in_root"
 
-    def _suggest_file_location(self, file_path: Path) -> Dict:
+    def _suggest_file_location(self, file_path: Path) -> dict:
         """Suggest proper location for misplaced file."""
         suffix = file_path.suffix.lower()
         name = file_path.name.lower()
@@ -153,7 +152,7 @@ class OrganizationComplianceChecker:
             "reason": f"{suffix} files should not be in root directory",
         }
 
-    def check_directory_structure(self) -> Dict:
+    def check_directory_structure(self) -> dict:
         """Check if required directories exist."""
         required_dirs = [
             "src/applications",
@@ -186,7 +185,7 @@ class OrganizationComplianceChecker:
             "compliance_percentage": len(existing_dirs) / len(required_dirs) * 100,
         }
 
-    def generate_report(self) -> Dict:
+    def generate_report(self) -> dict:
         """Generate comprehensive compliance report."""
         root_check = self.check_root_directory()
         structure_check = self.check_directory_structure()
@@ -203,7 +202,7 @@ class OrganizationComplianceChecker:
         return report
 
     def _calculate_overall_score(
-        self, root_check: Dict, structure_check: Dict
+        self, root_check: dict, structure_check: dict
     ) -> float:
         """Calculate overall compliance score."""
         root_violations = len(root_check["violations"])
@@ -213,8 +212,8 @@ class OrganizationComplianceChecker:
         return round(overall_score, 1)
 
     def _generate_action_items(
-        self, root_check: Dict, structure_check: Dict
-    ) -> List[str]:
+        self, root_check: dict, structure_check: dict
+    ) -> list[str]:
         """Generate prioritized action items."""
         actions = []
         if root_check["violations"]:
@@ -240,7 +239,7 @@ class OrganizationComplianceChecker:
             pass
         return actions
 
-    def fix_violations(self, dry_run: bool = True) -> Dict:
+    def fix_violations(self, dry_run: bool = True) -> dict:
         """Attempt to fix violations automatically."""
         root_check = self.check_root_directory()
         structure_check = self.check_directory_structure()

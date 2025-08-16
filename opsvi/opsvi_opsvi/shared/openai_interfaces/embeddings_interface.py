@@ -1,7 +1,6 @@
-from typing import Any, Dict
+from typing import Any
 
 from openai import OpenAI
-
 from shared.openai_interfaces.base import OpenAIBaseInterface
 
 
@@ -18,7 +17,7 @@ class OpenAIEmbeddingsInterface(OpenAIBaseInterface):
         super().__init__(*args, **kwargs)
         self.client = OpenAI()
 
-    def create_embedding(self, input_text: str, **kwargs) -> Dict[str, Any]:
+    def create_embedding(self, input_text: str, **kwargs) -> dict[str, Any]:
         """
         Generate an embedding vector for the input text.
         POST /v1/embeddings
@@ -33,7 +32,7 @@ class OpenAIEmbeddingsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def acreate_embedding(self, input_text: str, **kwargs) -> Dict[str, Any]:
+    async def acreate_embedding(self, input_text: str, **kwargs) -> dict[str, Any]:
         """
         Async: Generate an embedding vector for the input text.
         POST /v1/embeddings

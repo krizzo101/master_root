@@ -4,7 +4,7 @@ Output schema for CI/CD Pipeline Generator.
 This module defines the Pydantic schema for CI/CD pipeline generator output results.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -34,10 +34,10 @@ class CICDPipelineGeneratorOutput(BaseModel):
     message: str = Field(..., description="Status message")
 
     # Metadata
-    generation_time: Optional[float] = Field(
+    generation_time: float | None = Field(
         _default=None, description="Time taken for generation (seconds)"
     )
-    platforms_generated: Optional[int] = Field(
+    platforms_generated: int | None = Field(
         _default=None, description="Number of platforms generated"
     )
     model_used: str = Field(

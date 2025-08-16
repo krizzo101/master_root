@@ -6,11 +6,11 @@ for context-aware, intelligent prompt transformation.
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
 import os
 import sys
 import time
-from typing import Any, Optional
+from dataclasses import dataclass
+from typing import Any
 
 import openai
 from openai import OpenAIError
@@ -36,7 +36,7 @@ class OpenAIConfig:
 class PromptExpander:
     """Service for expanding prompts using OpenAI's O3 model."""
 
-    def __init__(self, config: Optional[OpenAIConfig] = None) -> None:
+    def __init__(self, config: OpenAIConfig | None = None) -> None:
         self.config = config or OpenAIConfig()
         self._validate_api_key()
 
@@ -131,7 +131,7 @@ def _read_context_file(path: str) -> str:
         pass
 
 
-def _write_output(output: str, path: Optional[str] = None) -> None:
+def _write_output(output: str, path: str | None = None) -> None:
     """Write expanded prompt to stdout or a file."""
     if path:
         try:
@@ -165,7 +165,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(argv: Optional[list[str]] = None) -> None:
+def main(argv: list[str] | None = None) -> None:
     """Entry point for the prompt expansion CLI."""
     args = parse_args(argv or sys.argv[1:])
     raw_prompt: str

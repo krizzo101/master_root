@@ -1,0 +1,84 @@
+"""Claude Code V3 MCP Server Implementation"""
+
+from fastmcp import FastMCP
+from .config import config
+from .task_decomposer import TaskDecomposer
+from .timeout_manager import TimeoutManager
+from .agents import ModeDetector, MultiAgentOrchestrator
+
+# Initialize server
+server = FastMCP("Claude Code V3 - Enhanced")
+
+# Initialize components
+task_decomposer = TaskDecomposer(config)
+timeout_manager = TimeoutManager(config)
+mode_detector = ModeDetector(config)
+
+# Placeholder for orchestrator (would need full implementation)
+# orchestrator = MultiAgentOrchestrator(config)
+
+@server.tool()
+async def claude_run_v3(
+    task: str,
+    mode: str = None,
+    auto_detect: bool = True,
+    quality_level: str = "normal"
+) -> dict:
+    """Enhanced Claude Code V3 with multi-agent support"""
+    
+    # Detect mode
+    execution_mode = mode_detector.detect_mode(task, explicit_mode=mode)
+    mode_config = mode_detector.get_mode_config(execution_mode)
+    
+    # Decompose task if enabled
+    subtasks = []
+    if config.decomposition.enable_decomposition:
+        subtasks = task_decomposer.decompose(task)
+    
+    # Calculate timeout
+    complexity = task_decomposer.estimate_complexity(task)
+    file_count = task_decomposer.estimate_file_count(task)
+    timeout = timeout_manager.calculate_timeout(
+        task, "unknown", complexity, 0, file_count
+    )
+    
+    # Return plan (actual execution would require full implementation)
+    return {
+        "task": task,
+        "mode": execution_mode.name,
+        "config": {
+            "quality_threshold": mode_config.quality_threshold,
+            "review_iterations": mode_config.review_iterations,
+            "enable_critic": mode_config.enable_critic,
+            "enable_tester": mode_config.enable_tester,
+            "enable_documenter": mode_config.enable_documenter
+        },
+        "subtasks": len(subtasks),
+        "timeout_ms": timeout,
+        "complexity": complexity,
+        "status": "ready"
+    }
+
+@server.tool()
+async def get_v3_status() -> dict:
+    """Get Claude Code V3 server status"""
+    return {
+        "version": "3.0.0",
+        "multi_agent": True,
+        "max_recursion_depth": config.recursion.max_depth,
+        "modes_available": [
+            "CODE", "ANALYSIS", "REVIEW", "TESTING", 
+            "DOCUMENTATION", "FULL_CYCLE", "QUALITY", "RAPID"
+        ],
+        "agents": ["critic", "tester", "documenter", "security"],
+        "features": {
+            "task_decomposition": config.decomposition.enable_decomposition,
+            "adaptive_timeout": config.timeout.enable_adaptive,
+            "checkpointing": config.recursion.enable_checkpointing,
+            "priority_queue": config.recursion.enable_priority_queue,
+            "recovery": config.recovery.enable_recovery
+        }
+    }
+
+# Export
+__all__ = ["server"]

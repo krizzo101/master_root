@@ -4,7 +4,6 @@ Output schema for API documentation generation.
 This module defines the Pydantic models for API documentation generation output data.
 """
 
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -35,7 +34,7 @@ class ApiDocGeneratorOutput(BaseModel):
         _default_factory=list, description="List of generated output files"
     )
 
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Error message if generation failed"
     )
 

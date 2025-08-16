@@ -2,6 +2,7 @@
 Module-level docstring for test_structured_output.py: defines utility functions, classes, and associated unit tests.
 """
 import pytest
+
 from src.tools.code_generation.o3_code_generator.utils.logging_utils import O3Logger
 
 
@@ -62,7 +63,7 @@ class DataProcessor:
                 raise ValueError("Data list cannot be empty")
             else:
                 pass
-            total = sum((item["value"] for item in data))
+            total = sum(item["value"] for item in data)
             return total / len(data)
         except Exception as e:
             self.logger.log_error(f"Error in DataProcessor.process: {e}")

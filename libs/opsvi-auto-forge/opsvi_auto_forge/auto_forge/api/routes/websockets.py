@@ -4,7 +4,7 @@ import json
 import uuid
 from typing import Dict, Any, Optional
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query, Depends
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 from pydantic import BaseModel
 import structlog
 

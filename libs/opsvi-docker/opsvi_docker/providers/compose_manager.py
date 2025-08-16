@@ -5,17 +5,14 @@ Docker Compose management for the OPSVI ecosystem.
 Provides comprehensive orchestration and service management.
 """
 
+import asyncio
 import logging
 import os
-import subprocess
-import asyncio
-from typing import Any, Dict, List, Optional, Union
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any
 
 from docker import DockerClient
-from docker.errors import DockerException, APIError
-
 from opsvi_foundation import BaseComponent, ComponentError
 
 logger = logging.getLogger(__name__)
@@ -36,15 +33,15 @@ class ComposeConfig:
     project_directory: str = "."
 
     # Compose files
-    compose_files: List[str] = field(default_factory=lambda: ["docker-compose.yml"])
+    compose_files: list[str] = field(default_factory=lambda: ["docker-compose.yml"])
 
     # Environment settings
-    environment: Dict[str, str] = field(default_factory=dict)
-    env_file: Optional[str] = None
+    environment: dict[str, str] = field(default_factory=dict)
+    env_file: str | None = None
 
     # Service settings
-    services: List[str] = field(default_factory=list)
-    scale: Dict[str, int] = field(default_factory=dict)
+    services: list[str] = field(default_factory=list)
+    scale: dict[str, int] = field(default_factory=dict)
 
     # Build settings
     build: bool = False
@@ -53,11 +50,11 @@ class ComposeConfig:
     no_recreate: bool = False
 
     # Network settings
-    network_mode: Optional[str] = None
-    networks: List[str] = field(default_factory=list)
+    network_mode: str | None = None
+    networks: list[str] = field(default_factory=list)
 
     # Volume settings
-    volumes: List[str] = field(default_factory=list)
+    volumes: list[str] = field(default_factory=list)
 
     # Logging settings
     log_level: str = "INFO"
@@ -72,19 +69,19 @@ class ComposeService:
     name: str
     image: str
     status: str
-    ports: List[str]
-    volumes: List[str]
-    networks: List[str]
-    environment: Dict[str, str]
-    depends_on: List[str]
+    ports: list[str]
+    volumes: list[str]
+    networks: list[str]
+    environment: dict[str, str]
+    depends_on: list[str]
     restart_policy: str
-    health_check: Optional[Dict[str, Any]]
+    health_check: dict[str, Any] | None
 
     # Runtime information
-    container_id: Optional[str] = None
-    container_name: Optional[str] = None
-    created: Optional[datetime] = None
-    state: Optional[str] = None
+    container_id: str | None = None
+    container_name: str | None = None
+    created: datetime | None = None
+    state: str | None = None
 
 
 class ComposeManager(BaseComponent):
@@ -111,7 +108,7 @@ class ComposeManager(BaseComponent):
 
         self.client = client
         self.config = config
-        self._projects: Dict[str, Any] = {}
+        self._projects: dict[str, Any] = {}
 
         logger.debug("ComposeManager initialized")
 
@@ -124,7 +121,7 @@ class ComposeManager(BaseComponent):
             logger.error(f"ComposeManager initialization failed: {e}")
             raise ComposeError(f"Failed to initialize ComposeManager: {e}")
 
-    async def up_project(self, config: ComposeConfig) -> Dict[str, Any]:
+    async def up_project(self, config: ComposeConfig) -> dict[str, Any]:
         """Start a compose project.
 
         Args:
@@ -170,7 +167,7 @@ class ComposeManager(BaseComponent):
         remove_volumes: bool = False,
         remove_images: bool = False,
         remove_orphans: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Stop a compose project.
 
         Args:
@@ -205,8 +202,8 @@ class ComposeManager(BaseComponent):
             raise ComposeError(f"Compose project shutdown failed: {e}")
 
     async def restart_project(
-        self, config: ComposeConfig, services: Optional[List[str]] = None
-    ) -> Dict[str, Any]:
+        self, config: ComposeConfig, services: list[str] | None = None
+    ) -> dict[str, Any]:
         """Restart a compose project.
 
         Args:
@@ -234,7 +231,7 @@ class ComposeManager(BaseComponent):
             logger.error(f"Failed to restart compose project: {e}")
             raise ComposeError(f"Compose project restart failed: {e}")
 
-    async def ps_project(self, config: ComposeConfig) -> List[ComposeService]:
+    async def ps_project(self, config: ComposeConfig) -> list[ComposeService]:
         """Get compose project status.
 
         Args:
@@ -262,10 +259,10 @@ class ComposeManager(BaseComponent):
     async def logs_project(
         self,
         config: ComposeConfig,
-        services: Optional[List[str]] = None,
+        services: list[str] | None = None,
         follow: bool = False,
-        tail: Optional[int] = None,
-    ) -> Dict[str, Any]:
+        tail: int | None = None,
+    ) -> dict[str, Any]:
         """Get compose project logs.
 
         Args:
@@ -303,10 +300,10 @@ class ComposeManager(BaseComponent):
     async def build_project(
         self,
         config: ComposeConfig,
-        services: Optional[List[str]] = None,
+        services: list[str] | None = None,
         no_cache: bool = False,
         pull: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Build compose project images.
 
         Args:
@@ -343,8 +340,8 @@ class ComposeManager(BaseComponent):
             raise ComposeError(f"Compose project build failed: {e}")
 
     async def pull_project(
-        self, config: ComposeConfig, services: Optional[List[str]] = None
-    ) -> Dict[str, Any]:
+        self, config: ComposeConfig, services: list[str] | None = None
+    ) -> dict[str, Any]:
         """Pull compose project images.
 
         Args:
@@ -373,8 +370,8 @@ class ComposeManager(BaseComponent):
             raise ComposeError(f"Compose project pull failed: {e}")
 
     async def scale_project(
-        self, config: ComposeConfig, scale_config: Dict[str, int]
-    ) -> Dict[str, Any]:
+        self, config: ComposeConfig, scale_config: dict[str, int]
+    ) -> dict[str, Any]:
         """Scale compose project services.
 
         Args:
@@ -407,10 +404,10 @@ class ComposeManager(BaseComponent):
         self,
         config: ComposeConfig,
         service: str,
-        command: List[str],
-        user: Optional[str] = None,
-        workdir: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        command: list[str],
+        user: str | None = None,
+        workdir: str | None = None,
+    ) -> dict[str, Any]:
         """Execute command in a compose service.
 
         Args:
@@ -448,7 +445,7 @@ class ComposeManager(BaseComponent):
 
     def _build_compose_command(
         self, config: ComposeConfig, subcommand: str
-    ) -> List[str]:
+    ) -> list[str]:
         """Build docker-compose command.
 
         Args:
@@ -478,8 +475,8 @@ class ComposeManager(BaseComponent):
         return cmd
 
     async def _execute_compose_command(
-        self, cmd: List[str], workdir: str
-    ) -> Dict[str, Any]:
+        self, cmd: list[str], workdir: str
+    ) -> dict[str, Any]:
         """Execute docker-compose command.
 
         Args:
@@ -516,7 +513,7 @@ class ComposeManager(BaseComponent):
             logger.error(f"Failed to execute compose command: {e}")
             raise ComposeError(f"Compose command execution failed: {e}")
 
-    def _parse_ps_output(self, output: str) -> List[ComposeService]:
+    def _parse_ps_output(self, output: str) -> list[ComposeService]:
         """Parse docker-compose ps output.
 
         Args:

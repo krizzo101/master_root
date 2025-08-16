@@ -3,8 +3,8 @@
 import json
 import logging
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Union
-from uuid import UUID, uuid4
+from typing import Any, Dict, List, Optional
+from uuid import UUID
 
 from opsvi_auto_forge.config.models import TaskStatus
 from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient

@@ -7,11 +7,12 @@ through all generation phases with intelligent context management.
 
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import get_logger
-from .workflow_context import WorkflowContext
+
 from .idea_selector import BestIdeaSelector
+from .workflow_context import WorkflowContext
 
 
 class AutonomousWorkflow:
@@ -35,7 +36,7 @@ class AutonomousWorkflow:
         "testing-strategy",  # Test plans and validation
     ]
 
-    def __init__(self, output_base_dir: Optional[Path] = None):
+    def __init__(self, output_base_dir: Path | None = None):
         """
         Initialize the autonomous workflow orchestrator.
 
@@ -47,15 +48,24 @@ class AutonomousWorkflow:
         self.output_base_dir = output_base_dir or Path("output/workflow_runs")
 
         # Step execution mapping - will be populated with actual generators
-        self.step_executors: Dict[str, Any] = {}
+        self.step_executors: dict[str, Any] = {}
         self._initialize_step_executors()
 
     def _initialize_step_executors(self):
         """Initialize step executors for each workflow phase."""
         # Import generators dynamically to avoid circular imports
         try:
+            from src.tools.code_generation.o3_code_generator.api_spec_generator import (
+                APISpecGenerator,
+            )
             from src.tools.code_generation.o3_code_generator.brainstorming_tool import (
                 BrainstormingProcessor,
+            )
+            from src.tools.code_generation.o3_code_generator.database_schema_generator import (
+                DatabaseSchemaGenerator,
+            )
+            from src.tools.code_generation.o3_code_generator.feasibility_assessor import (
+                FeasibilityProcessor,
             )
             from src.tools.code_generation.o3_code_generator.idea_formation_analyzer import (
                 IdeaFormationAnalyzer,
@@ -63,20 +73,11 @@ class AutonomousWorkflow:
             from src.tools.code_generation.o3_code_generator.market_research_integrator import (
                 MarketResearchProcessor,
             )
-            from src.tools.code_generation.o3_code_generator.feasibility_assessor import (
-                FeasibilityProcessor,
-            )
             from src.tools.code_generation.o3_code_generator.requirements_analyzer import (
                 RequirementsProcessor,
             )
             from src.tools.code_generation.o3_code_generator.technical_spec_generator import (
                 TechnicalSpecGenerator,
-            )
-            from src.tools.code_generation.o3_code_generator.api_spec_generator import (
-                APISpecGenerator,
-            )
-            from src.tools.code_generation.o3_code_generator.database_schema_generator import (
-                DatabaseSchemaGenerator,
             )
 
             # Pure SDLC step executors - all with real AI generation
@@ -102,8 +103,8 @@ class AutonomousWorkflow:
     def execute_workflow(
         self,
         problem_statement: str,
-        enabled_steps: Optional[List[str]] = None,
-        workflow_config: Optional[Dict[str, Any]] = None,
+        enabled_steps: list[str] | None = None,
+        workflow_config: dict[str, Any] | None = None,
     ) -> WorkflowContext:
         """
         Execute the complete autonomous workflow.
@@ -222,8 +223,8 @@ class AutonomousWorkflow:
         return executor(step_context, context)
 
     def _execute_brainstorm(
-        self, step_context: Dict[str, Any], workflow_context: WorkflowContext
-    ) -> Dict[str, Any]:
+        self, step_context: dict[str, Any], workflow_context: WorkflowContext
+    ) -> dict[str, Any]:
         """Execute brainstorm step with workflow context."""
         from src.tools.code_generation.o3_code_generator.brainstorming_tool import (
             BrainstormingProcessor,
@@ -262,8 +263,8 @@ class AutonomousWorkflow:
         }
 
     def _execute_idea_analyze(
-        self, step_context: Dict[str, Any], workflow_context: WorkflowContext
-    ) -> Dict[str, Any]:
+        self, step_context: dict[str, Any], workflow_context: WorkflowContext
+    ) -> dict[str, Any]:
         """Execute idea analysis step with automatic best idea selection."""
         # Get brainstorm results from context
         brainstorm_output = step_context.get("brainstorm")
@@ -297,14 +298,11 @@ class AutonomousWorkflow:
         }
 
     def _execute_market_research(
-        self, step_context: Dict[str, Any], workflow_context: WorkflowContext
-    ) -> Dict[str, Any]:
+        self, step_context: dict[str, Any], workflow_context: WorkflowContext
+    ) -> dict[str, Any]:
         """Execute market research step with workflow context."""
         from src.tools.code_generation.o3_code_generator.schemas.idea_formation_schemas import (
             MarketResearchInput,
-        )
-        from src.tools.code_generation.o3_code_generator.market_research_integrator import (
-            MarketResearchProcessor,
         )
 
         # Extract relevant information from context
@@ -328,9 +326,6 @@ class AutonomousWorkflow:
             # Import the components directly to avoid logger initialization conflicts
             from src.tools.code_generation.o3_code_generator.market_research_integrator import (
                 MarketResearchIntegrator,
-            )
-            from src.tools.code_generation.o3_code_generator.utils.o3_model_generator import (
-                O3ModelGenerator,
             )
 
             # Create market research integrator directly without processor wrapper
@@ -398,14 +393,14 @@ class AutonomousWorkflow:
             return self._create_placeholder_market_research_result(selected_idea)
 
     def _execute_feasibility_assess(
-        self, step_context: Dict[str, Any], workflow_context: WorkflowContext
-    ) -> Dict[str, Any]:
+        self, step_context: dict[str, Any], workflow_context: WorkflowContext
+    ) -> dict[str, Any]:
         """Execute feasibility assessment step with workflow context."""
-        from src.tools.code_generation.o3_code_generator.schemas.idea_formation_schemas import (
-            FeasibilityInput,
-        )
         from src.tools.code_generation.o3_code_generator.feasibility_assessor import (
             FeasibilityProcessor,
+        )
+        from src.tools.code_generation.o3_code_generator.schemas.idea_formation_schemas import (
+            FeasibilityInput,
         )
 
         # Extract relevant information from context
@@ -478,14 +473,14 @@ class AutonomousWorkflow:
         }
 
     def _execute_requirements_analyze(
-        self, step_context: Dict[str, Any], workflow_context: WorkflowContext
-    ) -> Dict[str, Any]:
+        self, step_context: dict[str, Any], workflow_context: WorkflowContext
+    ) -> dict[str, Any]:
         """Execute requirements analysis step - SDLC focused, no market research."""
-        from src.tools.code_generation.o3_code_generator.schemas.requirements_schemas import (
-            RequirementsInput,
-        )
         from src.tools.code_generation.o3_code_generator.requirements_analyzer import (
             RequirementsProcessor,
+        )
+        from src.tools.code_generation.o3_code_generator.schemas.requirements_schemas import (
+            RequirementsInput,
         )
 
         # Extract problem statement for pure technical requirements analysis
@@ -553,7 +548,7 @@ class AutonomousWorkflow:
             "output_files": result.output_files,
         }
 
-    def _format_competitor_info(self, competitors: List[Dict[str, Any]]) -> str:
+    def _format_competitor_info(self, competitors: list[dict[str, Any]]) -> str:
         """Format competitor information for requirements context."""
         if not competitors:
             return "No competitor analysis available"
@@ -569,7 +564,7 @@ class AutonomousWorkflow:
 
         return "\n".join(formatted)
 
-    def _extract_technical_reqs(self, result) -> List[str]:
+    def _extract_technical_reqs(self, result) -> list[str]:
         """Extract technical requirements from requirements analysis result."""
         tech_reqs = []
         for req in result.functional_requirements:
@@ -580,7 +575,7 @@ class AutonomousWorkflow:
                 tech_reqs.append(req)
         return tech_reqs
 
-    def _extract_performance_reqs(self, result) -> List[str]:
+    def _extract_performance_reqs(self, result) -> list[str]:
         """Extract performance requirements."""
         perf_reqs = []
         for req in result.non_functional_requirements:
@@ -597,7 +592,7 @@ class AutonomousWorkflow:
                 perf_reqs.append(req)
         return perf_reqs
 
-    def _extract_security_reqs(self, result) -> List[str]:
+    def _extract_security_reqs(self, result) -> list[str]:
         """Extract security requirements."""
         sec_reqs = []
         for req in result.non_functional_requirements:
@@ -614,7 +609,7 @@ class AutonomousWorkflow:
                 sec_reqs.append(req)
         return sec_reqs
 
-    def _extract_scalability_reqs(self, result) -> List[str]:
+    def _extract_scalability_reqs(self, result) -> list[str]:
         """Extract scalability requirements."""
         scale_reqs = []
         for req in result.non_functional_requirements:
@@ -625,7 +620,7 @@ class AutonomousWorkflow:
                 scale_reqs.append(req)
         return scale_reqs
 
-    def _extract_usability_reqs(self, result) -> List[str]:
+    def _extract_usability_reqs(self, result) -> list[str]:
         """Extract usability requirements."""
         usability_reqs = []
         for req in result.non_functional_requirements:
@@ -642,7 +637,7 @@ class AutonomousWorkflow:
                 usability_reqs.append(req)
         return usability_reqs
 
-    def _extract_reliability_reqs(self, result) -> List[str]:
+    def _extract_reliability_reqs(self, result) -> list[str]:
         """Extract reliability requirements."""
         reliability_reqs = []
         for req in result.non_functional_requirements:
@@ -659,7 +654,7 @@ class AutonomousWorkflow:
                 reliability_reqs.append(req)
         return reliability_reqs
 
-    def _generate_use_cases(self, result) -> List[Dict[str, Any]]:
+    def _generate_use_cases(self, result) -> list[dict[str, Any]]:
         """Generate use cases from user stories."""
         use_cases = []
         for story in result.user_stories:
@@ -677,13 +672,13 @@ class AutonomousWorkflow:
         return use_cases
 
     def _execute_tech_spec_generate(
-        self, step_context: Dict[str, Any], workflow_context: WorkflowContext
-    ) -> Dict[str, Any]:
+        self, step_context: dict[str, Any], workflow_context: WorkflowContext
+    ) -> dict[str, Any]:
         """Generate technical specifications with real AI (replacing broken generator)."""
+
         from src.tools.code_generation.o3_code_generator.utils.o3_model_generator import (
             O3ModelGenerator,
         )
-        from datetime import datetime
 
         requirements = step_context.get("requirements-analyze", {})
         system_design = step_context.get("system-design", {})
@@ -749,8 +744,8 @@ class AutonomousWorkflow:
             )
 
     def _execute_api_spec_generate(
-        self, step_context: Dict[str, Any], workflow_context: WorkflowContext
-    ) -> Dict[str, Any]:
+        self, step_context: dict[str, Any], workflow_context: WorkflowContext
+    ) -> dict[str, Any]:
         """Generate API specification using O3 model (removes logger issues)."""
         from src.tools.code_generation.o3_code_generator.utils.o3_model_generator import (
             O3ModelGenerator,
@@ -812,8 +807,8 @@ class AutonomousWorkflow:
             )
 
     def _execute_database_generate(
-        self, step_context: Dict[str, Any], workflow_context: WorkflowContext
-    ) -> Dict[str, Any]:
+        self, step_context: dict[str, Any], workflow_context: WorkflowContext
+    ) -> dict[str, Any]:
         """Execute database schema generation step with workflow context."""
         from src.tools.code_generation.o3_code_generator.database_schema_generator import (
             DatabaseSchemaGenerator,
@@ -871,8 +866,8 @@ class AutonomousWorkflow:
             )
 
     def _create_placeholder_market_research_result(
-        self, selected_idea: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, selected_idea: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create a placeholder market research result when the actual processor fails."""
         idea_title = selected_idea.get("title", "Unknown Product")
 
@@ -953,8 +948,8 @@ class AutonomousWorkflow:
         }
 
     def _extract_opportunities(
-        self, market_analysis: Dict[str, Any], demand_assessment: Dict[str, Any]
-    ) -> List[str]:
+        self, market_analysis: dict[str, Any], demand_assessment: dict[str, Any]
+    ) -> list[str]:
         """Extract market opportunities from analysis."""
         opportunities = []
 
@@ -981,8 +976,8 @@ class AutonomousWorkflow:
         return opportunities[:5]  # Top 5 opportunities
 
     def _extract_threats(
-        self, market_analysis: Dict[str, Any], competitors: List[Dict[str, Any]]
-    ) -> List[str]:
+        self, market_analysis: dict[str, Any], competitors: list[dict[str, Any]]
+    ) -> list[str]:
         """Extract market threats from analysis."""
         threats = []
 
@@ -1013,8 +1008,8 @@ class AutonomousWorkflow:
         return threats[:5]  # Top 5 threats
 
     def _execute_system_design(
-        self, step_context: Dict[str, Any], workflow_context: WorkflowContext
-    ) -> Dict[str, Any]:
+        self, step_context: dict[str, Any], workflow_context: WorkflowContext
+    ) -> dict[str, Any]:
         """Execute system design step with real AI generation."""
         from src.tools.code_generation.o3_code_generator.utils.o3_model_generator import (
             O3ModelGenerator,
@@ -1139,7 +1134,7 @@ class AutonomousWorkflow:
                 "output_files": [],
             }
 
-    def _format_requirements_list(self, requirements: List[Any]) -> str:
+    def _format_requirements_list(self, requirements: list[Any]) -> str:
         """Format requirements list for prompts."""
         if not requirements:
             return "No requirements specified"
@@ -1155,7 +1150,7 @@ class AutonomousWorkflow:
 
         return "\n".join(formatted)
 
-    def _format_system_components(self, components: List[Dict[str, Any]]) -> str:
+    def _format_system_components(self, components: list[dict[str, Any]]) -> str:
         """Format system components for prompts."""
         if not components:
             return "No system components specified"
@@ -1176,7 +1171,7 @@ class AutonomousWorkflow:
 
         return "\n".join(formatted)
 
-    def _extract_components_from_text(self, text: str) -> List[Dict[str, str]]:
+    def _extract_components_from_text(self, text: str) -> list[dict[str, str]]:
         """Extract system components from text response."""
         components = []
 
@@ -1217,7 +1212,7 @@ class AutonomousWorkflow:
 
         return components
 
-    def _extract_tech_stack_from_text(self, text: str) -> Dict[str, str]:
+    def _extract_tech_stack_from_text(self, text: str) -> dict[str, str]:
         """Extract technology stack from text response."""
         tech_stack = {}
         text_lower = text.lower()
@@ -1257,7 +1252,7 @@ class AutonomousWorkflow:
 
         return tech_stack
 
-    def _extract_components_from_design_text(self, text: str) -> List[Dict[str, Any]]:
+    def _extract_components_from_design_text(self, text: str) -> list[dict[str, Any]]:
         """Extract detailed components from design text response."""
         components = []
 
@@ -1332,7 +1327,7 @@ class AutonomousWorkflow:
 
         return "Component handles specific functionality"
 
-    def _extract_responsibilities(self, text: str) -> List[str]:
+    def _extract_responsibilities(self, text: str) -> list[str]:
         """Extract component responsibilities from text."""
         responsibilities = []
 
@@ -1350,7 +1345,7 @@ class AutonomousWorkflow:
 
         return responsibilities[:4]  # Max 4 responsibilities
 
-    def _extract_interfaces(self, text: str) -> List[str]:
+    def _extract_interfaces(self, text: str) -> list[str]:
         """Extract component interfaces from text."""
         import re
 
@@ -1362,7 +1357,7 @@ class AutonomousWorkflow:
 
         return list(set(interfaces))[:3]  # Max 3 unique interfaces
 
-    def _extract_relationships_from_text(self, text: str) -> List[Dict[str, str]]:
+    def _extract_relationships_from_text(self, text: str) -> list[dict[str, str]]:
         """Extract component relationships from text."""
         relationships = []
 
@@ -1384,12 +1379,11 @@ class AutonomousWorkflow:
 
         return relationships[:5]  # Max 5 relationships
 
-    def _extract_user_interfaces_from_text(self, text: str) -> List[Dict[str, Any]]:
+    def _extract_user_interfaces_from_text(self, text: str) -> list[dict[str, Any]]:
         """Extract user interface specifications from text."""
         interfaces = []
 
         # Look for UI patterns
-        import re
 
         ui_keywords = [
             "dashboard",
@@ -1434,7 +1428,7 @@ class AutonomousWorkflow:
 
         return interfaces[:5]  # Max 5 interfaces
 
-    def _extract_api_interfaces_from_text(self, text: str) -> List[Dict[str, Any]]:
+    def _extract_api_interfaces_from_text(self, text: str) -> list[dict[str, Any]]:
         """Extract API interface specifications from text."""
         interfaces = []
 
@@ -1467,7 +1461,7 @@ class AutonomousWorkflow:
 
     def _extract_integration_patterns_from_text(
         self, text: str
-    ) -> List[Dict[str, str]]:
+    ) -> list[dict[str, str]]:
         """Extract integration patterns from text."""
         patterns = []
 
@@ -1506,7 +1500,7 @@ class AutonomousWorkflow:
 
         return keyword.title()
 
-    def _extract_ui_components(self, line: str) -> List[str]:
+    def _extract_ui_components(self, line: str) -> list[str]:
         """Extract UI components from line."""
         # Look for common UI component names
         ui_components = [
@@ -1540,8 +1534,8 @@ class AutonomousWorkflow:
         return protocol_map.get(keyword.lower(), "HTTP/HTTPS")
 
     def _execute_component_design(
-        self, step_context: Dict[str, Any], workflow_context: WorkflowContext
-    ) -> Dict[str, Any]:
+        self, step_context: dict[str, Any], workflow_context: WorkflowContext
+    ) -> dict[str, Any]:
         """Execute component design step with real AI generation."""
         from src.tools.code_generation.o3_code_generator.utils.o3_model_generator import (
             O3ModelGenerator,
@@ -1689,8 +1683,8 @@ class AutonomousWorkflow:
             }
 
     def _execute_interface_design(
-        self, step_context: Dict[str, Any], workflow_context: WorkflowContext
-    ) -> Dict[str, Any]:
+        self, step_context: dict[str, Any], workflow_context: WorkflowContext
+    ) -> dict[str, Any]:
         """Execute interface design step with real AI generation."""
         from src.tools.code_generation.o3_code_generator.utils.o3_model_generator import (
             O3ModelGenerator,
@@ -1850,8 +1844,8 @@ class AutonomousWorkflow:
             }
 
     def _execute_implementation_plan(
-        self, step_context: Dict[str, Any], workflow_context: WorkflowContext
-    ) -> Dict[str, Any]:
+        self, step_context: dict[str, Any], workflow_context: WorkflowContext
+    ) -> dict[str, Any]:
         """Generate a detailed implementation roadmap using an O3 model."""
         from src.tools.code_generation.o3_code_generator.utils.o3_model_generator import (
             O3ModelGenerator,
@@ -1958,8 +1952,8 @@ class AutonomousWorkflow:
             }
 
     def _execute_testing_strategy(
-        self, step_context: Dict[str, Any], workflow_context: WorkflowContext
-    ) -> Dict[str, Any]:
+        self, step_context: dict[str, Any], workflow_context: WorkflowContext
+    ) -> dict[str, Any]:
         """Generate a comprehensive testing strategy using an O3 model."""
         from src.tools.code_generation.o3_code_generator.utils.o3_model_generator import (
             O3ModelGenerator,
@@ -2045,7 +2039,7 @@ class AutonomousWorkflow:
                 "output_files": [],
             }
 
-    def _format_user_stories(self, user_stories: List[Dict[str, Any]]) -> str:
+    def _format_user_stories(self, user_stories: list[dict[str, Any]]) -> str:
         """Format user stories for technical specification context."""
         if not user_stories:
             return "No user stories available"
@@ -2059,8 +2053,8 @@ class AutonomousWorkflow:
         return "\n".join(formatted)
 
     def _generate_api_endpoints(
-        self, functional_requirements: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        self, functional_requirements: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Generate API endpoints based on functional requirements."""
         endpoints = []
 
@@ -2114,8 +2108,8 @@ class AutonomousWorkflow:
         return endpoints
 
     def _generate_api_models(
-        self, data_models: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        self, data_models: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Generate API models based on data models."""
         models = [
             {
@@ -2144,8 +2138,8 @@ class AutonomousWorkflow:
         return models
 
     def _generate_database_tables(
-        self, api_models: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        self, api_models: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Generate database tables based on API models."""
         tables = []
 
@@ -2175,8 +2169,8 @@ class AutonomousWorkflow:
         return tables
 
     def _generate_database_relationships(
-        self, api_models: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        self, api_models: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Generate database relationships."""
         relationships = [
             {
@@ -2189,8 +2183,8 @@ class AutonomousWorkflow:
         return relationships
 
     def _generate_database_indexes(
-        self, api_models: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        self, api_models: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Generate database indexes."""
         indexes = [
             {"table": "users", "columns": ["email"], "unique": True},
@@ -2211,8 +2205,8 @@ class AutonomousWorkflow:
         return type_mapping.get(api_type, "VARCHAR(255)")
 
     def _create_placeholder_tech_spec_result(
-        self, requirements: Dict[str, Any], selected_idea: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, requirements: dict[str, Any], selected_idea: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create placeholder technical specification result."""
         return {
             "step_name": "tech-spec-generate",
@@ -2265,8 +2259,8 @@ class AutonomousWorkflow:
         }
 
     def _create_placeholder_api_spec_result(
-        self, tech_specs: Dict[str, Any], selected_idea: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, tech_specs: dict[str, Any], selected_idea: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create placeholder API specification result."""
         return {
             "step_name": "api-spec-generate",
@@ -2319,8 +2313,8 @@ class AutonomousWorkflow:
         }
 
     def _create_placeholder_database_result(
-        self, api_specs: Dict[str, Any], selected_idea: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, api_specs: dict[str, Any], selected_idea: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create placeholder database schema result."""
         return {
             "step_name": "database-generate",
@@ -2384,8 +2378,8 @@ class AutonomousWorkflow:
         }
 
     def _placeholder_executor(
-        self, step_context: Dict[str, Any], workflow_context: WorkflowContext
-    ) -> Dict[str, Any]:
+        self, step_context: dict[str, Any], workflow_context: WorkflowContext
+    ) -> dict[str, Any]:
         """Placeholder executor for steps not yet implemented."""
         step_name = workflow_context.current_step
         self.logger.log_info(f"Placeholder execution for {step_name}")
@@ -2408,15 +2402,15 @@ class AutonomousWorkflow:
         progress = context.get_workflow_progress()
 
         summary_content = [
-            f"# Autonomous Workflow Summary",
-            f"",
+            "# Autonomous Workflow Summary",
+            "",
             f"**Workflow ID:** {context.workflow_id}",
             f"**Problem Statement:** {context.initial_problem}",
             f"**Execution Time:** {total_duration:.2f} seconds",
             f"**Completion:** {progress['completed_steps']}/{progress['total_steps']} steps ({progress['progress_percent']:.1f}%)",
-            f"",
-            f"## Selected Solution",
-            f"",
+            "",
+            "## Selected Solution",
+            "",
         ]
 
         if context.selected_idea:
@@ -2425,17 +2419,17 @@ class AutonomousWorkflow:
                     f"**Title:** {context.selected_idea.get('title', 'Untitled')}",
                     f"**Description:** {context.selected_idea.get('description', 'No description')}",
                     f"**Category:** {context.selected_idea.get('category', 'General')}",
-                    f"",
-                    f"### Selection Rationale",
+                    "",
+                    "### Selection Rationale",
                     f"{context.idea_selection_rationale}",
-                    f"",
+                    "",
                 ]
             )
 
         summary_content.extend(
             [
-                f"## Execution Timeline",
-                f"",
+                "## Execution Timeline",
+                "",
             ]
         )
 
@@ -2450,9 +2444,9 @@ class AutonomousWorkflow:
 
         summary_content.extend(
             [
-                f"",
-                f"## Generated Outputs",
-                f"",
+                "",
+                "## Generated Outputs",
+                "",
             ]
         )
 
@@ -2479,24 +2473,24 @@ class AutonomousWorkflow:
                     )
 
                 else:
-                    summary_content.append(f"- Completed successfully")
+                    summary_content.append("- Completed successfully")
 
                 summary_content.append("")
 
         summary_content.extend(
             [
-                f"## Workflow Configuration",
-                f"",
+                "## Workflow Configuration",
+                "",
                 f"- **Enabled Steps:** {', '.join(context.enabled_steps)}",
                 f"- **Output Directory:** `{context.output_directory}`",
-                f"- **Context File:** `workflow_context.json`",
-                f"",
-                f"## Next Steps",
-                f"",
-                f"1. Review generated outputs in step-specific directories",
-                f"2. Validate technical specifications against requirements",
-                f"3. Use architecture outputs for implementation planning",
-                f"4. Consider iterating on specific steps if needed",
+                "- **Context File:** `workflow_context.json`",
+                "",
+                "## Next Steps",
+                "",
+                "1. Review generated outputs in step-specific directories",
+                "2. Validate technical specifications against requirements",
+                "3. Use architecture outputs for implementation planning",
+                "4. Consider iterating on specific steps if needed",
             ]
         )
 
@@ -2507,7 +2501,7 @@ class AutonomousWorkflow:
         self.logger.log_info(f"Workflow summary generated: {summary_file}")
 
     def resume_workflow(
-        self, context_file: Path, from_step: Optional[str] = None
+        self, context_file: Path, from_step: str | None = None
     ) -> WorkflowContext:
         """
         Resume a workflow from a saved context.
@@ -2583,11 +2577,11 @@ class AutonomousWorkflow:
             context.save_context()  # Save progress
             raise
 
-    def get_available_steps(self) -> List[str]:
+    def get_available_steps(self) -> list[str]:
         """Get list of all available workflow steps."""
         return self.DEFAULT_WORKFLOW_STEPS.copy()
 
-    def validate_step_sequence(self, steps: List[str]) -> List[str]:
+    def validate_step_sequence(self, steps: list[str]) -> list[str]:
         """
         Validate and reorder steps according to dependencies.
 

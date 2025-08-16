@@ -4,9 +4,9 @@ Validates all components and demonstrates the complete pipeline
 """
 
 import asyncio
+import tempfile
 from datetime import datetime
 from pathlib import Path
-import tempfile
 
 from src.applications.specstory_intelligence import (
     AtomicSpecStoryParser,

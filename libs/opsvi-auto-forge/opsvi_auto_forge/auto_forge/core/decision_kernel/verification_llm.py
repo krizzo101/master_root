@@ -1,7 +1,6 @@
 from __future__ import annotations
-from typing import Any, Dict, Tuple, Optional
+from typing import Any, Dict, Optional
 from pydantic import BaseModel, Field
-import math
 import os
 
 # Expect project to provide this client; keep import light to avoid circulars.

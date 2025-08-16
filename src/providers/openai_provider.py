@@ -31,6 +31,10 @@ class OpenAIProvider:
         if OFFLINE:
             dim = 3072
             rng = random.Random(42)
-            return EmbeddingResponse(embeddings=[[rng.random() for _ in range(dim)] for _ in texts])
-        resp = await self.client.embeddings.create(model=self.embedding_model, input=texts)
+            return EmbeddingResponse(
+                embeddings=[[rng.random() for _ in range(dim)] for _ in texts]
+            )
+        resp = await self.client.embeddings.create(
+            model=self.embedding_model, input=texts
+        )
         return EmbeddingResponse(embeddings=[d.embedding for d in resp.data])

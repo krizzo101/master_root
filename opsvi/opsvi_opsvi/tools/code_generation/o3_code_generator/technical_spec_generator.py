@@ -9,10 +9,10 @@ using OpenAI's latest O3 and O3-mini models with structured input/output schemas
 import argparse
 import json
 import os
-from pathlib import Path
 import sys
 import time
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 if script_dir not in sys.path:
@@ -376,7 +376,7 @@ class OutputFileManager:
 class TechnicalSpecGenerator:
     """Main technical specification generator using OpenAI O3 models."""
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: str | None = None):
         """
         Initialize the TechnicalSpecGenerator.
 

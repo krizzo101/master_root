@@ -7,8 +7,8 @@ and managing the auto rules generation system.
 """
 
 import argparse
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import (
     LogConfig,

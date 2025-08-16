@@ -4,13 +4,11 @@ Tests for opsvi-llm components
 """
 
 import pytest
-import asyncio
-from unittest.mock import Mock, patch, AsyncMock
-from typing import Any, Dict, List
 
 from opsvi_llm import OpsviLlmManager
 from opsvi_llm.config.settings import OpsviLlmConfig
 from opsvi_llm.exceptions.base import OpsviLlmError
+
 
 class TestOpsviLlm:
     """Test cases for opsvi-llm."""
@@ -36,7 +34,7 @@ class TestOpsviLlm:
         """Test component start and stop."""
         await component.start()
         assert component.is_active()
-        
+
         await component.stop()
         assert not component.is_active()
 
@@ -54,4 +52,3 @@ class TestOpsviLlm:
             pass
 
     # Component-specific tests
-    

@@ -2,13 +2,9 @@ from __future__ import annotations
 import json
 import logging
 import time
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from typing import Any, Dict, Optional
 from uuid import UUID
 
-from opsvi_auto_forge.infrastructure.monitoring.metrics.decision_metrics import (
-    decision_success,
-    decision_failure,
-)
 from .interfaces import IPromptGateway
 
 logger = logging.getLogger(__name__)

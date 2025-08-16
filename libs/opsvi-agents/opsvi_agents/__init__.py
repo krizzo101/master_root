@@ -17,18 +17,18 @@ from .exceptions.base import LibraryError, LibraryConfigurationError
 # RAG-specific exports
 
 # Manager-specific exports
-from .coordinators.base import True
-from .schedulers.base import 
+# TODO: Implement coordinators and schedulers
+# from .coordinators.base import Coordinator
+# from .schedulers.base import Scheduler
 
 __all__ = [
     # Core
-    BaseComponent, ComponentError,
-    LibraryConfig, LibrarySettings,
-    LibraryError, LibraryConfigurationError,
-    # Manager
-    True,
-    ,
-]
+    "BaseComponent", "ComponentError",
+    "LibraryConfig", "LibrarySettings", 
+    "LibraryError", "LibraryConfigurationError",
+    # Manager - to be implemented
+    # "Coordinator",
+    # "Scheduler"]
 
 # Version info
 def get_version() -> str:

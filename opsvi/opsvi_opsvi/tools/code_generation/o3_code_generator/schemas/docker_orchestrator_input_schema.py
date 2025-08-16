@@ -4,7 +4,6 @@ Input schema for Docker Orchestrator.
 This module defines the Pydantic schema for Docker orchestrator input configuration.
 """
 
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -29,14 +28,14 @@ class KubernetesConfig(BaseModel):
     include_ingress: bool = Field(
         default=False, description="Include ingress configuration"
     )
-    domain: Optional[str] = Field(default=None, description="Domain for ingress")
+    domain: str | None = Field(default=None, description="Domain for ingress")
     resource_limits: dict[str, str] = Field(
         default={"memory": "512Mi", "cpu": "500m"}, description="Resource limits"
     )
     resource_requests: dict[str, str] = Field(
         default={"memory": "256Mi", "cpu": "250m"}, description="Resource requests"
     )
-    storage_class: Optional[str] = Field(
+    storage_class: str | None = Field(
         default=None, description="Storage class for volumes"
     )
 
@@ -60,9 +59,7 @@ class DockerOrchestratorInput(BaseModel):
     write_files: bool = Field(
         default=True, description="Write configuration files to project directory"
     )
-    output_file: Optional[str] = Field(
-        default=None, description="Output file for results"
-    )
+    output_file: str | None = Field(default=None, description="Output file for results")
 
     # Additional options
     include_monitoring: bool = Field(

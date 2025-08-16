@@ -9,7 +9,8 @@ Version: Referenced as of July 2024
 """
 
 import logging
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -43,8 +44,8 @@ class TaskQueueInterface:
                 raise ImportError("celery required. Install with `pip install celery`.")
         elif self.provider == "rq":
             try:
-                from redis import Redis
                 import rq
+                from redis import Redis
 
                 self.redis_conn = Redis(**self.kwargs)
                 self.client = rq.Queue(connection=self.redis_conn)

@@ -3,15 +3,14 @@
 import logging
 import time
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any
 from uuid import uuid4
 
 from celery import current_task
-from pydantic import ValidationError
 
-from ..orchestrator.registry import registry
-from ..orchestrator.task_models import TaskRecord, TaskStatus, Result, Metrics
 from ..memory.graph.neo4j_client import get_neo4j_client
+from ..orchestrator.registry import registry
+from ..orchestrator.task_models import Metrics, Result, TaskRecord, TaskStatus
 
 logger = logging.getLogger(__name__)
 
@@ -21,9 +20,9 @@ def _create_task_record(
     task_type: str,
     project_id: str,
     run_id: str,
-    input_data: Dict[str, Any],
+    input_data: dict[str, Any],
     agent_path: str,
-    agent_config: Dict[str, Any],
+    agent_config: dict[str, Any],
 ) -> TaskRecord:
     """Create a task record for tracking."""
     return TaskRecord(
@@ -70,8 +69,8 @@ def _log_task_completion(
     task_record: TaskRecord,
     result: Any,
     success: bool,
-    error: Optional[str] = None,
-    metrics: Optional[Metrics] = None,
+    error: str | None = None,
+    metrics: Metrics | None = None,
 ) -> None:
     """Log task completion to Neo4j."""
     try:
@@ -116,7 +115,7 @@ def _log_task_completion(
 
 
 def _execute_agent_with_metrics(
-    agent_name: str, input_data: Dict[str, Any], agent_config: Dict[str, Any]
+    agent_name: str, input_data: dict[str, Any], agent_config: dict[str, Any]
 ) -> tuple[Any, Metrics]:
     """Execute an agent and collect metrics."""
     start_time = time.time()
@@ -165,7 +164,7 @@ def _execute_agent_with_metrics(
 
 
 @current_task.task(bind=True)
-def execute_plan_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
+def execute_plan_task(self, task_data: dict[str, Any]) -> dict[str, Any]:
     """Execute a planning task."""
     task_record = _create_task_record(
         task_name=task_data.get("name", "plan_task"),
@@ -202,7 +201,7 @@ def execute_plan_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @current_task.task(bind=True)
-def execute_spec_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
+def execute_spec_task(self, task_data: dict[str, Any]) -> dict[str, Any]:
     """Execute a specification task."""
     task_record = _create_task_record(
         task_name=task_data.get("name", "spec_task"),
@@ -237,7 +236,7 @@ def execute_spec_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @current_task.task(bind=True)
-def execute_research_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
+def execute_research_task(self, task_data: dict[str, Any]) -> dict[str, Any]:
     """Execute a research task."""
     task_record = _create_task_record(
         task_name=task_data.get("name", "research_task"),
@@ -272,7 +271,7 @@ def execute_research_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @current_task.task(bind=True)
-def execute_code_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
+def execute_code_task(self, task_data: dict[str, Any]) -> dict[str, Any]:
     """Execute a code generation task."""
     task_record = _create_task_record(
         task_name=task_data.get("name", "code_task"),
@@ -307,7 +306,7 @@ def execute_code_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @current_task.task(bind=True)
-def execute_test_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
+def execute_test_task(self, task_data: dict[str, Any]) -> dict[str, Any]:
     """Execute a test generation task."""
     task_record = _create_task_record(
         task_name=task_data.get("name", "test_task"),
@@ -342,7 +341,7 @@ def execute_test_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @current_task.task(bind=True)
-def execute_validate_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
+def execute_validate_task(self, task_data: dict[str, Any]) -> dict[str, Any]:
     """Execute a validation task."""
     task_record = _create_task_record(
         task_name=task_data.get("name", "validate_task"),
@@ -377,7 +376,7 @@ def execute_validate_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @current_task.task(bind=True)
-def execute_document_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
+def execute_document_task(self, task_data: dict[str, Any]) -> dict[str, Any]:
     """Execute a documentation task."""
     task_record = _create_task_record(
         task_name=task_data.get("name", "document_task"),
@@ -412,7 +411,7 @@ def execute_document_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @current_task.task(bind=True)
-def execute_critic_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
+def execute_critic_task(self, task_data: dict[str, Any]) -> dict[str, Any]:
     """Execute a critic evaluation task."""
     task_record = _create_task_record(
         task_name=task_data.get("name", "critic_task"),
@@ -447,7 +446,7 @@ def execute_critic_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @current_task.task
-def cleanup_old_results() -> Dict[str, Any]:
+def cleanup_old_results() -> dict[str, Any]:
     """Clean up old task results."""
     try:
         # This would implement cleanup logic for old results
@@ -460,7 +459,7 @@ def cleanup_old_results() -> Dict[str, Any]:
 
 
 @current_task.task
-def health_check() -> Dict[str, Any]:
+def health_check() -> dict[str, Any]:
     """Health check task."""
     try:
         # Check Neo4j connection

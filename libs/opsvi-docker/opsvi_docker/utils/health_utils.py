@@ -7,10 +7,9 @@ Provides health assessment and diagnostic capabilities.
 
 import logging
 import time
-import asyncio
-from typing import Any, Dict, List, Optional, Callable
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +23,7 @@ class HealthCheckResult:
     message: str
     timestamp: datetime
     duration_ms: float
-    details: Dict[str, Any]
+    details: dict[str, Any]
 
 
 class HealthUtils:
@@ -40,7 +39,7 @@ class HealthUtils:
 
     @staticmethod
     def check_container_health(
-        container_info: Dict[str, Any], timeout: int = 30
+        container_info: dict[str, Any], timeout: int = 30
     ) -> HealthCheckResult:
         """Check container health status."""
         start_time = time.time()
@@ -213,7 +212,7 @@ class HealthUtils:
             )
 
     @staticmethod
-    def aggregate_health_results(results: List[HealthCheckResult]) -> Dict[str, Any]:
+    def aggregate_health_results(results: list[HealthCheckResult]) -> dict[str, Any]:
         """Aggregate multiple health check results."""
         if not results:
             return {
@@ -282,7 +281,7 @@ class HealthUtils:
             return "unknown"
 
     @staticmethod
-    def create_health_report(health_results: List[HealthCheckResult]) -> str:
+    def create_health_report(health_results: list[HealthCheckResult]) -> str:
         """Create a formatted health report."""
         if not health_results:
             return "No health checks performed."

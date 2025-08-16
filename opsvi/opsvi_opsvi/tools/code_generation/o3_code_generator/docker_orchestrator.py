@@ -8,10 +8,10 @@ following security best practices and performance optimization techniques.
 import argparse
 import json
 import os
-from pathlib import Path
 import sys
 import time
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -48,6 +48,7 @@ finally:
     pass
 try:
     from prompts.docker_prompts import DOCKER_SYSTEM_PROMPT
+
     from schemas.docker_schemas import DockerInput, DockerOutput
 except ImportError:
     sys.exit(1)
@@ -449,7 +450,7 @@ class InputLoader:
 class DockerOrchestrator:
     """Generate comprehensive Docker configuration using OpenAI's O3 models."""
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: str | None = None):
         """
         Initialize the Docker orchestrator.
 

@@ -4,7 +4,7 @@ Input schema for Testing Framework Generator.
 This module defines the Pydantic schema for testing framework generator input configuration.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -82,9 +82,7 @@ class TestingFrameworkGeneratorInput(BaseModel):
     write_files: bool = Field(
         default=True, description="Write test files to project directory"
     )
-    output_file: Optional[str] = Field(
-        default=None, description="Output file for results"
-    )
+    output_file: str | None = Field(default=None, description="Output file for results")
 
     # Additional options
     include_examples: bool = Field(default=True, description="Include example tests")

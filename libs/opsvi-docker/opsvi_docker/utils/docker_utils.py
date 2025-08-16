@@ -7,8 +7,8 @@ Common Docker operations and utility functions.
 import logging
 import os
 import subprocess
-from typing import Any, Dict, List, Optional, Union
 from datetime import datetime
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class DockerUtils:
     """
 
     @staticmethod
-    def check_docker_installation() -> Dict[str, Any]:
+    def check_docker_installation() -> dict[str, Any]:
         """Check if Docker is installed and accessible."""
         try:
             result = subprocess.run(
@@ -40,7 +40,7 @@ class DockerUtils:
             return {"installed": False, "version": None, "error": str(e)}
 
     @staticmethod
-    def check_docker_compose_installation() -> Dict[str, Any]:
+    def check_docker_compose_installation() -> dict[str, Any]:
         """Check if Docker Compose is installed and accessible."""
         try:
             result = subprocess.run(
@@ -59,8 +59,8 @@ class DockerUtils:
 
     @staticmethod
     def execute_docker_command(
-        command: List[str], capture_output: bool = True
-    ) -> Dict[str, Any]:
+        command: list[str], capture_output: bool = True
+    ) -> dict[str, Any]:
         """Execute a Docker command and return results."""
         try:
             result = subprocess.run(
@@ -88,7 +88,7 @@ class DockerUtils:
             }
 
     @staticmethod
-    def get_docker_system_info() -> Dict[str, Any]:
+    def get_docker_system_info() -> dict[str, Any]:
         """Get comprehensive Docker system information."""
         try:
             # Get Docker info
@@ -129,7 +129,7 @@ class DockerUtils:
             }
 
     @staticmethod
-    def validate_dockerfile(dockerfile_path: str) -> Dict[str, Any]:
+    def validate_dockerfile(dockerfile_path: str) -> dict[str, Any]:
         """Validate a Dockerfile for syntax and best practices."""
         if not os.path.exists(dockerfile_path):
             return {
@@ -141,7 +141,7 @@ class DockerUtils:
         warnings = []
 
         try:
-            with open(dockerfile_path, "r") as f:
+            with open(dockerfile_path) as f:
                 lines = f.readlines()
 
             for i, line in enumerate(lines, 1):
@@ -174,7 +174,7 @@ class DockerUtils:
             return {"valid": False, "errors": [f"Error reading Dockerfile: {str(e)}"]}
 
     @staticmethod
-    def get_docker_environment() -> Dict[str, str]:
+    def get_docker_environment() -> dict[str, str]:
         """Get Docker-related environment variables."""
         docker_env = {}
         for key, value in os.environ.items():
@@ -209,7 +209,7 @@ class DockerUtils:
             return f"{hours}h {remaining_minutes}m"
 
     @staticmethod
-    def parse_docker_image_name(image_name: str) -> Dict[str, str]:
+    def parse_docker_image_name(image_name: str) -> dict[str, str]:
         """Parse a Docker image name into components."""
         parts = image_name.split("/")
 
@@ -249,7 +249,7 @@ class DockerUtils:
 
     @staticmethod
     def build_docker_image_name(
-        name: str, tag: str = "latest", registry: Optional[str] = None
+        name: str, tag: str = "latest", registry: str | None = None
     ) -> str:
         """Build a Docker image name from components."""
         if registry:
@@ -270,7 +270,7 @@ class DockerUtils:
         return result.stdout if result.returncode == 0 else result.stderr
 
     @staticmethod
-    def get_container_stats(container_id: str) -> Dict[str, Any]:
+    def get_container_stats(container_id: str) -> dict[str, Any]:
         """Get container statistics."""
         result = subprocess.run(
             ["docker", "stats", "--no-stream", "--format", "json", container_id],

@@ -1,27 +1,26 @@
 """Neo4j client for graph logging and lineage tracking."""
 
 import logging
-from typing import Any, Dict, List, Optional, Union
-from uuid import UUID
+from typing import Any
 
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable
 
 from .queries import (
+    CREATE_ARTIFACT,
+    CREATE_CRITIQUE,
     CREATE_PROJECT,
+    CREATE_RESULT,
     CREATE_RUN,
     CREATE_TASK,
-    CREATE_ARTIFACT,
-    CREATE_RESULT,
-    CREATE_CRITIQUE,
-    LINK_TASK_TO_RUN,
-    LINK_TASK_TO_PROJECT,
+    LINK_AGENT_PERFORMS_TASK,
+    LINK_ARTIFACT_DERIVED_FROM,
+    LINK_ARTIFACT_TASK,
+    LINK_TASK_CRITIQUE,
     LINK_TASK_DEPENDENCY,
     LINK_TASK_RESULT,
-    LINK_TASK_CRITIQUE,
-    LINK_ARTIFACT_TASK,
-    LINK_ARTIFACT_DERIVED_FROM,
-    LINK_AGENT_PERFORMS_TASK,
+    LINK_TASK_TO_PROJECT,
+    LINK_TASK_TO_RUN,
 )
 
 logger = logging.getLogger(__name__)
@@ -70,8 +69,8 @@ class Neo4jClient:
         self.close()
 
     def _execute_query(
-        self, query: str, parameters: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, query: str, parameters: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Execute a Cypher query."""
         if not self._driver:
             raise RuntimeError("Neo4j client not connected")
@@ -84,7 +83,7 @@ class Neo4jClient:
             logger.error(f"Failed to execute query: {e}")
             raise
 
-    def create_project(self, project_data: Dict[str, Any]) -> str:
+    def create_project(self, project_data: dict[str, Any]) -> str:
         """Create a project node."""
         try:
             result = self._execute_query(CREATE_PROJECT, project_data)
@@ -95,7 +94,7 @@ class Neo4jClient:
             logger.error(f"Failed to create project: {e}")
             raise
 
-    def create_run(self, run_data: Dict[str, Any]) -> str:
+    def create_run(self, run_data: dict[str, Any]) -> str:
         """Create a run node."""
         try:
             result = self._execute_query(CREATE_RUN, run_data)
@@ -106,7 +105,7 @@ class Neo4jClient:
             logger.error(f"Failed to create run: {e}")
             raise
 
-    def create_task(self, task_data: Dict[str, Any]) -> str:
+    def create_task(self, task_data: dict[str, Any]) -> str:
         """Create a task node."""
         try:
             result = self._execute_query(CREATE_TASK, task_data)
@@ -117,7 +116,7 @@ class Neo4jClient:
             logger.error(f"Failed to create task: {e}")
             raise
 
-    def create_artifact(self, artifact_data: Dict[str, Any]) -> str:
+    def create_artifact(self, artifact_data: dict[str, Any]) -> str:
         """Create an artifact node."""
         try:
             result = self._execute_query(CREATE_ARTIFACT, artifact_data)
@@ -128,7 +127,7 @@ class Neo4jClient:
             logger.error(f"Failed to create artifact: {e}")
             raise
 
-    def create_result(self, result_data: Dict[str, Any]) -> str:
+    def create_result(self, result_data: dict[str, Any]) -> str:
         """Create a result node."""
         try:
             result = self._execute_query(CREATE_RESULT, result_data)
@@ -139,7 +138,7 @@ class Neo4jClient:
             logger.error(f"Failed to create result: {e}")
             raise
 
-    def create_critique(self, critique_data: Dict[str, Any]) -> str:
+    def create_critique(self, critique_data: dict[str, Any]) -> str:
         """Create a critique node."""
         try:
             result = self._execute_query(CREATE_CRITIQUE, critique_data)
@@ -244,7 +243,7 @@ class Neo4jClient:
             logger.error(f"Failed to link agent performs task: {e}")
             raise
 
-    def get_project_lineage(self, project_id: str) -> Dict[str, Any]:
+    def get_project_lineage(self, project_id: str) -> dict[str, Any]:
         """Get the complete lineage for a project."""
         query = """
         MATCH (p:Project {id: $project_id})
@@ -266,7 +265,7 @@ class Neo4jClient:
             logger.error(f"Failed to get project lineage: {e}")
             raise
 
-    def get_run_status(self, run_id: str) -> Dict[str, Any]:
+    def get_run_status(self, run_id: str) -> dict[str, Any]:
         """Get the current status of a run."""
         query = """
         MATCH (r:Run {id: $run_id})
@@ -285,7 +284,7 @@ class Neo4jClient:
             logger.error(f"Failed to get run status: {e}")
             raise
 
-    def _process_lineage_result(self, result: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _process_lineage_result(self, result: list[dict[str, Any]]) -> dict[str, Any]:
         """Process lineage query result into structured format."""
         # This is a simplified implementation
         # In practice, you'd want more sophisticated processing
@@ -300,7 +299,7 @@ class Neo4jClient:
 
 
 # Global client instance (will be configured by settings)
-neo4j_client: Optional[Neo4jClient] = None
+neo4j_client: Neo4jClient | None = None
 
 
 def get_neo4j_client() -> Neo4jClient:

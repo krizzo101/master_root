@@ -3,14 +3,12 @@
 Comprehensive opsvi-core library for the OPSVI ecosystem
 """
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Union, Callable, Awaitable
+from typing import Any, Dict, List, Optional, Callable, Awaitable
 import asyncio
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel
 
 from opsvi_foundation import BaseComponent, ComponentError, BaseSettings
 

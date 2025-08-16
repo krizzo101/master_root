@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
@@ -66,31 +66,31 @@ class TaskRecord(BaseModel):
     # Execution context
     project_id: UUID
     run_id: UUID
-    parent_task_id: Optional[UUID] = None
+    parent_task_id: UUID | None = None
 
     # Input/Output
-    input_data: Dict[str, Any] = Field(default_factory=dict)
-    output_data: Optional[Dict[str, Any]] = None
-    error_message: Optional[str] = None
+    input_data: dict[str, Any] = Field(default_factory=dict)
+    output_data: dict[str, Any] | None = None
+    error_message: str | None = None
 
     # Timing
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
 
     # Metrics
     metrics: Metrics = Field(default_factory=Metrics)
 
     # Dependencies and flow control
-    depends_on: List[UUID] = Field(default_factory=list)
-    gate_policies: List[str] = Field(default_factory=list)
+    depends_on: list[UUID] = Field(default_factory=list)
+    gate_policies: list[str] = Field(default_factory=list)
     max_loops: int = 1
     current_loop: int = 0
-    fallback_task: Optional[str] = None
+    fallback_task: str | None = None
 
     # Agent information
     agent_path: str
-    agent_config: Dict[str, Any] = Field(default_factory=dict)
+    agent_config: dict[str, Any] = Field(default_factory=dict)
 
 
 class Artifact(BaseModel):
@@ -111,10 +111,10 @@ class Artifact(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     # Content (for small artifacts)
-    content: Optional[str] = None
+    content: str | None = None
 
     # Derived from
-    derived_from: List[UUID] = Field(default_factory=list)
+    derived_from: list[UUID] = Field(default_factory=list)
 
 
 class Result(BaseModel):
@@ -123,9 +123,9 @@ class Result(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     task_id: UUID
     success: bool
-    data: Dict[str, Any] = Field(default_factory=dict)
-    error: Optional[str] = None
-    warnings: List[str] = Field(default_factory=list)
+    data: dict[str, Any] = Field(default_factory=dict)
+    error: str | None = None
+    warnings: list[str] = Field(default_factory=list)
 
     # Metrics
     metrics: Metrics = Field(default_factory=Metrics)
@@ -140,18 +140,18 @@ class Critique(BaseModel):
 
     id: UUID = Field(default_factory=uuid4)
     task_id: UUID
-    artifact_id: Optional[UUID] = None
+    artifact_id: UUID | None = None
 
     # Evaluation scores
     overall_score: float = Field(ge=0.0, le=1.0)
-    policy_scores: Dict[str, float] = Field(default_factory=dict)
+    policy_scores: dict[str, float] = Field(default_factory=dict)
 
     # Results
     pass_threshold: bool = False
-    reasons: List[str] = Field(default_factory=list)
+    reasons: list[str] = Field(default_factory=list)
 
     # Patch plan for failures
-    patch_plan: List[Dict[str, Any]] = Field(default_factory=list)
+    patch_plan: list[dict[str, Any]] = Field(default_factory=list)
 
     # Metadata
     critic_agent: str
@@ -167,7 +167,7 @@ class Project(BaseModel):
     request: str
 
     # Configuration
-    config: Dict[str, Any] = Field(default_factory=dict)
+    config: dict[str, Any] = Field(default_factory=dict)
 
     # Status
     status: str = "active"
@@ -184,14 +184,14 @@ class Run(BaseModel):
 
     # Status
     status: str = "running"
-    current_task: Optional[str] = None
+    current_task: str | None = None
 
     # Timing
     started_at: datetime = Field(default_factory=datetime.utcnow)
-    completed_at: Optional[datetime] = None
+    completed_at: datetime | None = None
 
     # Configuration
-    config: Dict[str, Any] = Field(default_factory=dict)
+    config: dict[str, Any] = Field(default_factory=dict)
 
     # Results
     total_tasks: int = 0

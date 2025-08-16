@@ -9,11 +9,12 @@ Parameter-driven system that selects the right optimization level:
 """
 
 import asyncio
-from typing import Dict, List, Any, Optional, Tuple
+import os
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any
+
 from openai import OpenAI
-import os
 
 
 class OptimizationLevel(Enum):
@@ -29,8 +30,8 @@ class OptimizationRequest:
     task: str
     spec: str = ""
     optimization_level: str = "auto"  # "fast", "standard", "tournament", "auto"
-    max_time: Optional[int] = None  # seconds
-    max_cost: Optional[float] = None  # dollars
+    max_time: int | None = None  # seconds
+    max_cost: float | None = None  # dollars
     quality_priority: str = "balanced"  # "speed", "balanced", "quality"
 
 
@@ -55,7 +56,7 @@ class StandardModeConfig:
     max_output_tokens: int = 4000
     temperature: float = 0.0
     enable_critic: bool = True
-    critic_types: List[str] = field(
+    critic_types: list[str] = field(
         default_factory=lambda: ["contracts", "tests", "security"]
     )
     max_iterations: int = 3
@@ -68,11 +69,11 @@ class TournamentModeConfig:
 
     num_candidates: int = 3
     max_file_lines: int = 200
-    temperature_range: Tuple[float, float] = (0.1, 0.2)
+    temperature_range: tuple[float, float] = (0.1, 0.2)
     enable_pre_gating: bool = True
     enable_synthesis: bool = True
     max_iterations: int = 3
-    critic_types: List[str] = field(
+    critic_types: list[str] = field(
         default_factory=lambda: [
             "contracts",
             "tests",
@@ -95,8 +96,8 @@ class UnifiedOptimizationSystem:
 
         # Import optimization systems
         try:
-            from multi_critic_system import MultiCriticSystem
             from multi_candidate_tournament import MultiCandidateTournament
+            from multi_critic_system import MultiCriticSystem
 
             self.multi_critic = MultiCriticSystem()
             self.tournament = MultiCandidateTournament()
@@ -188,7 +189,7 @@ class UnifiedOptimizationSystem:
 
         return min(score, 10)
 
-    async def optimize(self, request: OptimizationRequest) -> Dict[str, Any]:
+    async def optimize(self, request: OptimizationRequest) -> dict[str, Any]:
         """
         Main entry point - selects and executes appropriate optimization level.
 
@@ -213,7 +214,7 @@ class UnifiedOptimizationSystem:
         else:
             raise ValueError(f"Unknown optimization level: {level}")
 
-    async def _execute_fast_mode(self, request: OptimizationRequest) -> Dict[str, Any]:
+    async def _execute_fast_mode(self, request: OptimizationRequest) -> dict[str, Any]:
         """Execute fast mode optimization (single-shot GPT-5)."""
 
         config = FastModeConfig()
@@ -269,7 +270,7 @@ class UnifiedOptimizationSystem:
 
     async def _execute_standard_mode(
         self, request: OptimizationRequest
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Execute standard mode optimization (multi-critic)."""
 
         if not self.multi_critic:
@@ -336,7 +337,7 @@ class UnifiedOptimizationSystem:
 
     async def _execute_tournament_mode(
         self, request: OptimizationRequest
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Execute tournament mode optimization (K-candidates + critics)."""
 
         if not self.tournament:
@@ -438,7 +439,7 @@ OUTPUT FORMAT:
 
 IMPORTANT: Return ONLY valid JSON. No explanations or markdown."""
 
-    def _get_fast_mode_schema(self) -> Dict[str, Any]:
+    def _get_fast_mode_schema(self) -> dict[str, Any]:
         """Get structured output schema for fast mode."""
         return {
             "name": "fast_mode_result",
@@ -476,7 +477,7 @@ IMPORTANT: Return ONLY valid JSON. No explanations or markdown."""
             "strict": True,
         }
 
-    def _validate_fast_mode_result(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def _validate_fast_mode_result(self, data: dict[str, Any]) -> dict[str, Any]:
         """Validate fast mode result."""
         validation = {
             "syntax_valid": True,
@@ -534,7 +535,7 @@ Return the main code file content only (no JSON wrapper)."""
         except Exception as e:
             return f"# Error generating code: {e}\n\ndef placeholder():\n    pass"
 
-    async def _apply_critic_fixes(self, code: str, actions: List[str]) -> str:
+    async def _apply_critic_fixes(self, code: str, actions: list[str]) -> str:
         """Apply critic-suggested fixes to code."""
 
         prompt = f"""Apply the following fixes to the code:
@@ -557,7 +558,7 @@ Return the improved code only (no JSON wrapper)."""
 
             return response.output_text
 
-        except Exception as e:
+        except Exception:
             return code  # Return original code if fixes fail
 
 

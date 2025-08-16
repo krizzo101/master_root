@@ -5,11 +5,11 @@ import sys
 import uuid
 import time
 from datetime import datetime, timezone
-from typing import Dict, Any, Optional
+from typing import Optional
 from contextvars import ContextVar
 import structlog
 from structlog.stdlib import LoggerFactory
-from structlog.processors import JSONRenderer, TimeStamper, add_log_level
+from structlog.processors import JSONRenderer, TimeStamper
 from structlog.contextvars import merge_contextvars
 
 # Context variables for correlation tracking

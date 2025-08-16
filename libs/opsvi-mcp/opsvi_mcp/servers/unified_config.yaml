@@ -1,0 +1,160 @@
+# Unified MCP Server Configuration
+# Integrates Claude Code, OpenAI Codex, and Cursor Agent servers
+
+servers:
+  claude_code:
+    enabled: true
+    version: v2  # Use v2 with fire-and-forget pattern
+    config:
+      claude_token: ${CLAUDE_CODE_TOKEN}
+      default_results_dir: /tmp/claude_results
+      max_concurrent_first_level: 10
+      max_recursion_depth: 3
+      default_timeout: 600
+      enable_child_management: true
+      child_timeout_ratio: 0.5
+    
+  openai_codex:
+    enabled: true
+    config:
+      openai_api_key: ${OPENAI_API_KEY}
+      model: gpt-4  # or gpt-4-turbo-preview
+      max_tokens: 2000
+      temperature: 0.7
+      streaming: false
+      enable_cache: true
+      cache_dir: /tmp/codex_cache
+      cache_ttl: 3600
+      context_window: 8000
+      include_file_context: true
+    
+  cursor_agent:
+    enabled: true
+    config:
+      cursor_executable: cursor
+      cursor_workspace: ${CURSOR_WORKSPACE}
+      communication_method: websocket  # websocket, file, pipe, cli
+      websocket_host: localhost
+      websocket_port: 7070
+      file_watch_dir: .cursor/agent_requests
+      output_dir: .cursor/agent_outputs
+      custom_agents_dir: .cursor/prompts
+      agent_timeout: 60
+      diagram_theme: high-contrast
+      diagram_format: mermaid
+      diagram_auto_render: true
+      require_confirmation: false
+      # Note: allowed_agents and blocked_agents are set via environment variables
+
+# Integration patterns between servers
+integrations:
+  
+  # Claude Code + OpenAI Codex
+  claude_codex_chain:
+    description: "Use Claude for analysis, Codex for code generation"
+    pattern: |
+      1. Claude analyzes requirements
+      2. Codex generates implementation
+      3. Claude reviews and refines
+    
+  # Claude Code + Cursor Agents
+  claude_cursor_visualization:
+    description: "Use Claude for data analysis, Cursor for visualization"
+    pattern: |
+      1. Claude processes and analyzes data
+      2. Cursor @diagram creates visualizations
+      3. Results combined in final output
+    
+  # OpenAI Codex + Cursor Review
+  codex_cursor_review:
+    description: "Generate code with Codex, review with Cursor"
+    pattern: |
+      1. Codex generates code from description
+      2. Cursor @code_review provides feedback
+      3. Codex refactors based on feedback
+    
+  # Full Pipeline
+  full_development_pipeline:
+    description: "Complete development workflow"
+    stages:
+      - name: requirements
+        server: claude_code
+        action: analyze_requirements
+      - name: design
+        server: cursor_agent
+        agent: "@diagram"
+        action: create_architecture_diagram
+      - name: implementation
+        server: openai_codex
+        action: generate_code
+      - name: documentation
+        server: cursor_agent
+        agent: "@documentation"
+        action: generate_docs
+      - name: testing
+        server: openai_codex
+        action: generate_tests
+      - name: review
+        server: cursor_agent
+        agent: "@code_review"
+        action: review_all
+
+# Shared resources
+shared:
+  cache_dir: /tmp/mcp_cache
+  logs_dir: /tmp/mcp_logs
+  results_dir: /tmp/mcp_results
+  
+  # Shared context for all servers
+  context:
+    workspace: ${PWD}
+    max_file_size: 100000  # bytes
+    included_extensions:
+      - .py
+      - .js
+      - .ts
+      - .jsx
+      - .tsx
+      - .java
+      - .go
+      - .rs
+      - .cpp
+      - .c
+      - .h
+    excluded_patterns:
+      - node_modules
+      - .git
+      - __pycache__
+      - "*.pyc"
+      - .env
+
+# Environment variables required
+environment:
+  required:
+    - CLAUDE_CODE_TOKEN
+    - OPENAI_API_KEY
+  optional:
+    - CURSOR_WORKSPACE
+    - CURSOR_PROFILE
+    - CLAUDE_RESULTS_DIR
+    - CODEX_MODEL
+    - CURSOR_WS_PORT
+
+# Monitoring and logging
+monitoring:
+  metrics:
+    enabled: true
+    export_interval: 60  # seconds
+    exporters:
+      - console
+      - file
+  logging:
+    level: INFO
+    format: json
+    outputs:
+      - console
+      - file: /tmp/mcp_logs/unified.log
+  tracing:
+    enabled: false
+    exporter: otlp
+    endpoint: http://localhost:4317

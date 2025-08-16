@@ -1,7 +1,7 @@
 """Tests for Perplexity provider."""
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 import aiohttp
 
 from opsvi_llm import PerplexityProvider, PerplexityConfig, ChatRequest, Message

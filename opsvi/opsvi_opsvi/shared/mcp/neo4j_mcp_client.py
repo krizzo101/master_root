@@ -32,14 +32,14 @@ Connection details are read from .cursor/mcp.json:
 """
 
 import asyncio
-from contextlib import asynccontextmanager
-from dataclasses import dataclass
 import json
 import logging
 import os
-from pathlib import Path
 import sys
-from typing import Any, Dict, List, Optional
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
 # MCP imports
 try:
@@ -65,7 +65,7 @@ class QueryResult:
 
     query: str
     success: bool = True
-    data: List[Dict[str, Any]] = None
+    data: list[dict[str, Any]] = None
     error: str = ""
     count: int = 0
 
@@ -86,7 +86,7 @@ class Neo4jMCPClient:
     using Neo4j through MCP.
     """
 
-    def __init__(self, mcp_config_path: Optional[str] = None, debug: bool = False):
+    def __init__(self, mcp_config_path: str | None = None, debug: bool = False):
         """
         Initialize the Neo4j MCP client.
 
@@ -183,7 +183,7 @@ class Neo4jMCPClient:
                 return QueryResult(query="SCHEMA", success=False, error=str(e))
 
     async def read_query(
-        self, query: str, params: Optional[Dict[str, Any]] = None
+        self, query: str, params: dict[str, Any] | None = None
     ) -> QueryResult:
         """Execute a read-only Cypher query."""
         if not query.strip():
@@ -279,7 +279,7 @@ class Neo4jMCPClient:
         return await self.read_query(query, params)
 
     async def search_by_text(
-        self, search_text: str, properties: List[str] = None, limit: int = 10
+        self, search_text: str, properties: list[str] = None, limit: int = 10
     ) -> QueryResult:
         """Search nodes by text content in specified properties."""
         if not properties:

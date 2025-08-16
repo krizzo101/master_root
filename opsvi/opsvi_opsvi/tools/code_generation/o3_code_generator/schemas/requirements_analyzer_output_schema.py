@@ -4,7 +4,7 @@ Output schema for Requirements Analyzer.
 This module defines the Pydantic schema for requirements analyzer output results.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -45,10 +45,10 @@ class RequirementsAnalyzerOutput(BaseModel):
     message: str = Field(..., description="Status message")
 
     # Metadata
-    analysis_time: Optional[float] = Field(
+    analysis_time: float | None = Field(
         _default=None, description="Time taken for analysis (seconds)"
     )
-    dependencies_analyzed: Optional[int] = Field(
+    dependencies_analyzed: int | None = Field(
         _default=None, description="Number of dependencies analyzed"
     )
     model_used: str = Field(

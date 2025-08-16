@@ -2,7 +2,7 @@
 
 import logging
 import os
-from typing import Any, Dict
+from typing import Any
 
 from celery import Celery
 from celery.schedules import crontab
@@ -162,7 +162,7 @@ def get_celery_app() -> Celery:
     return celery_app
 
 
-def get_queue_stats() -> Dict[str, Any]:
+def get_queue_stats() -> dict[str, Any]:
     """Get queue statistics."""
     try:
         inspect = celery_app.control.inspect()
@@ -191,7 +191,7 @@ def purge_queue(queue_name: str) -> bool:
         return False
 
 
-def get_worker_status() -> Dict[str, Any]:
+def get_worker_status() -> dict[str, Any]:
     """Get worker status information."""
     try:
         inspect = celery_app.control.inspect()

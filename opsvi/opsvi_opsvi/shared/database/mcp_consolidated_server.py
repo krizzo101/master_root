@@ -13,7 +13,7 @@ import os
 
 # Import our consolidated database class
 import sys
-from typing import Any, Dict, List
+from typing import Any
 
 from mcp.server import Server
 from mcp.types import TextContent, Tool
@@ -41,7 +41,7 @@ def get_db():
 
 
 @server.list_tools()
-async def list_tools() -> List[Tool]:
+async def list_tools() -> list[Tool]:
     """List the 3 consolidated ArangoDB tools"""
     return [
         Tool(
@@ -268,7 +268,7 @@ async def list_tools() -> List[Tool]:
 
 
 @server.call_tool()
-async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
+async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     """Handle consolidated tool calls"""
 
     # Filter out agent-added parameters that our tools don't support

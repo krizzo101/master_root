@@ -2,8 +2,8 @@
 """Test Perplexity chat completion with different models."""
 
 import asyncio
+
 import aiohttp
-import json
 
 
 async def test_perplexity_chat():

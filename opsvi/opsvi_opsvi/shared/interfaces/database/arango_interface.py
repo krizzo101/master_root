@@ -20,7 +20,7 @@ Usage:
 
 import logging
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from arango import ArangoClient, ArangoError
 
@@ -77,11 +77,11 @@ class DirectArangoDB:
     def execute_aql(
         self,
         query: str,
-        bind_vars: Optional[Dict[str, Any]] = None,
-        batch_size: Optional[int] = None,
+        bind_vars: dict[str, Any] | None = None,
+        batch_size: int | None = None,
         full_count: bool = False,
         profile: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Execute raw AQL query with full control"""
         try:
             bind_vars = bind_vars or {}
@@ -128,12 +128,12 @@ class DirectArangoDB:
     def batch_insert(
         self,
         collection: str,
-        documents: List[Dict[str, Any]],
+        documents: list[dict[str, Any]],
         overwrite: bool = False,
         return_new: bool = False,
         sync: bool = False,
         silent: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Bulk insert documents"""
         try:
             if not self.db.has_collection(collection):
@@ -171,8 +171,8 @@ class DirectArangoDB:
     # ==================== COLLECTION MANAGEMENT ====================
 
     def create_collection(
-        self, name: str, edge: bool = False, schema: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, name: str, edge: bool = False, schema: dict | None = None
+    ) -> dict[str, Any]:
         """Create collection"""
         try:
             result = self.db.create_collection(name=name, edge=edge, schema=schema)
@@ -183,7 +183,7 @@ class DirectArangoDB:
             logger.error(f"Collection creation failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def list_collections(self) -> List[str]:
+    def list_collections(self) -> list[str]:
         """List collection names"""
         try:
             collections = self.db.collections()
@@ -201,11 +201,11 @@ class DirectArangoDB:
     def create_persistent_index(
         self,
         collection: str,
-        fields: List[str],
+        fields: list[str],
         unique: bool = False,
         sparse: bool = False,
-        name: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        name: str | None = None,
+    ) -> dict[str, Any]:
         """Create persistent index"""
         try:
             if not self.db.has_collection(collection):
@@ -227,7 +227,7 @@ class DirectArangoDB:
 
     # ==================== UTILITY METHODS ====================
 
-    def get_database_info(self) -> Dict[str, Any]:
+    def get_database_info(self) -> dict[str, Any]:
         """Get database information"""
         try:
             return {
@@ -244,7 +244,7 @@ class DirectArangoDB:
 
     # ==================== DATABASE MANAGEMENT ====================
 
-    def list_databases(self) -> List[str]:
+    def list_databases(self) -> list[str]:
         """List all databases on the server."""
         try:
             sys_db = self.client.db(
@@ -256,8 +256,8 @@ class DirectArangoDB:
             return []
 
     def create_database(
-        self, name: str, users: Optional[List[Dict[str, Any]]] = None
-    ) -> Dict[str, Any]:
+        self, name: str, users: list[dict[str, Any]] | None = None
+    ) -> dict[str, Any]:
         """Create a new database with optional users."""
         try:
             sys_db = self.client.db(
@@ -269,7 +269,7 @@ class DirectArangoDB:
             logger.error(f"Create database failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def delete_database(self, name: str) -> Dict[str, Any]:
+    def delete_database(self, name: str) -> dict[str, Any]:
         """Delete a database."""
         try:
             sys_db = self.client.db(
@@ -281,7 +281,7 @@ class DirectArangoDB:
             logger.error(f"Delete database failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def get_server_info(self) -> Dict[str, Any]:
+    def get_server_info(self) -> dict[str, Any]:
         """Get server version, status, engine, details."""
         try:
             return {
@@ -297,7 +297,7 @@ class DirectArangoDB:
 
     # ==================== USER & PERMISSION MANAGEMENT ====================
 
-    def list_users(self) -> List[Dict[str, Any]]:
+    def list_users(self) -> list[dict[str, Any]]:
         """List all users."""
         try:
             sys_db = self.client.db(
@@ -313,8 +313,8 @@ class DirectArangoDB:
         username: str,
         password: str,
         active: bool = True,
-        extra: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        extra: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Create a new user."""
         try:
             sys_db = self.client.db(
@@ -331,10 +331,10 @@ class DirectArangoDB:
     def update_user(
         self,
         username: str,
-        password: Optional[str] = None,
-        active: Optional[bool] = None,
-        extra: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        password: str | None = None,
+        active: bool | None = None,
+        extra: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Update an existing user."""
         try:
             sys_db = self.client.db(
@@ -348,7 +348,7 @@ class DirectArangoDB:
             logger.error(f"Update user failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def delete_user(self, username: str) -> Dict[str, Any]:
+    def delete_user(self, username: str) -> dict[str, Any]:
         """Delete a user."""
         try:
             sys_db = self.client.db(
@@ -360,7 +360,7 @@ class DirectArangoDB:
             logger.error(f"Delete user failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def get_user_permissions(self, username: str) -> Dict[str, Any]:
+    def get_user_permissions(self, username: str) -> dict[str, Any]:
         """Get all permissions for a user."""
         try:
             sys_db = self.client.db(
@@ -373,7 +373,7 @@ class DirectArangoDB:
 
     # ==================== DOCUMENT OPERATIONS (EXTENDED) ====================
 
-    def get_document(self, collection: str, key: str) -> Dict[str, Any]:
+    def get_document(self, collection: str, key: str) -> dict[str, Any]:
         """Get a document by key."""
         try:
             coll = self.db.collection(collection)
@@ -384,8 +384,8 @@ class DirectArangoDB:
             return {"success": False, "error": str(e)}
 
     def update_document(
-        self, collection: str, document: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, collection: str, document: dict[str, Any]
+    ) -> dict[str, Any]:
         """Update a document by key."""
         try:
             coll = self.db.collection(collection)
@@ -395,7 +395,7 @@ class DirectArangoDB:
             logger.error(f"Update document failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def delete_document(self, collection: str, key: str) -> Dict[str, Any]:
+    def delete_document(self, collection: str, key: str) -> dict[str, Any]:
         """Delete a document by key."""
         try:
             coll = self.db.collection(collection)
@@ -406,8 +406,8 @@ class DirectArangoDB:
             return {"success": False, "error": str(e)}
 
     def find_documents(
-        self, collection: str, filters: Dict[str, Any], skip: int = 0, limit: int = 100
-    ) -> Dict[str, Any]:
+        self, collection: str, filters: dict[str, Any], skip: int = 0, limit: int = 100
+    ) -> dict[str, Any]:
         """Find documents by filter."""
         try:
             coll = self.db.collection(collection)
@@ -417,7 +417,7 @@ class DirectArangoDB:
             logger.error(f"Find documents failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def get_random_document(self, collection: str) -> Dict[str, Any]:
+    def get_random_document(self, collection: str) -> dict[str, Any]:
         """Get a random document from a collection."""
         try:
             coll = self.db.collection(collection)
@@ -430,8 +430,8 @@ class DirectArangoDB:
     # ==================== INDEX MANAGEMENT (EXTENDED) ====================
 
     def create_fulltext_index(
-        self, collection: str, fields: List[str]
-    ) -> Dict[str, Any]:
+        self, collection: str, fields: list[str]
+    ) -> dict[str, Any]:
         """Create a fulltext index."""
         try:
             coll = self.db.collection(collection)
@@ -441,7 +441,7 @@ class DirectArangoDB:
             logger.error(f"Create fulltext index failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def create_geo_index(self, collection: str, fields: List[str]) -> Dict[str, Any]:
+    def create_geo_index(self, collection: str, fields: list[str]) -> dict[str, Any]:
         """Create a geo index."""
         try:
             coll = self.db.collection(collection)
@@ -452,8 +452,8 @@ class DirectArangoDB:
             return {"success": False, "error": str(e)}
 
     def create_ttl_index(
-        self, collection: str, fields: List[str], expire_after: int
-    ) -> Dict[str, Any]:
+        self, collection: str, fields: list[str], expire_after: int
+    ) -> dict[str, Any]:
         """Create a TTL index."""
         try:
             coll = self.db.collection(collection)
@@ -465,7 +465,7 @@ class DirectArangoDB:
             logger.error(f"Create TTL index failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def delete_index(self, collection: str, index_id: str) -> Dict[str, Any]:
+    def delete_index(self, collection: str, index_id: str) -> dict[str, Any]:
         """Delete an index by ID."""
         try:
             coll = self.db.collection(collection)
@@ -477,7 +477,7 @@ class DirectArangoDB:
 
     # ==================== GRAPH OPERATIONS (BASIC) ====================
 
-    def list_graphs(self) -> List[str]:
+    def list_graphs(self) -> list[str]:
         """List all graphs in the database."""
         try:
             return [g["name"] for g in self.db.graphs()]
@@ -488,9 +488,9 @@ class DirectArangoDB:
     def create_graph(
         self,
         name: str,
-        edge_definitions: List[Dict[str, Any]],
-        orphan_collections: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
+        edge_definitions: list[dict[str, Any]],
+        orphan_collections: list[str] | None = None,
+    ) -> dict[str, Any]:
         """Create a new graph."""
         try:
             graph = self.db.create_graph(
@@ -503,7 +503,7 @@ class DirectArangoDB:
             logger.error(f"Create graph failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def delete_graph(self, name: str) -> Dict[str, Any]:
+    def delete_graph(self, name: str) -> dict[str, Any]:
         """Delete a graph."""
         try:
             self.db.delete_graph(name)
@@ -514,7 +514,7 @@ class DirectArangoDB:
 
     # ==================== VIEW & SEARCH MANAGEMENT (BASIC) ====================
 
-    def list_views(self) -> List[str]:
+    def list_views(self) -> list[str]:
         """List all views in the database."""
         try:
             return [v["name"] for v in self.db.views()]
@@ -523,8 +523,8 @@ class DirectArangoDB:
             return []
 
     def create_arangosearch_view(
-        self, name: str, properties: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        self, name: str, properties: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Create an ArangoSearch view."""
         try:
             view = self.db.create_arangosearch_view(
@@ -535,7 +535,7 @@ class DirectArangoDB:
             logger.error(f"Create ArangoSearch view failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def delete_view(self, name: str) -> Dict[str, Any]:
+    def delete_view(self, name: str) -> dict[str, Any]:
         """Delete a view."""
         try:
             self.db.delete_view(name)
@@ -546,7 +546,7 @@ class DirectArangoDB:
 
     # ==================== ANALYZER MANAGEMENT (BASIC) ====================
 
-    def list_analyzers(self) -> List[str]:
+    def list_analyzers(self) -> list[str]:
         """List all analyzers in the database."""
         try:
             return [a["name"] for a in self.db.analyzers()]
@@ -558,9 +558,9 @@ class DirectArangoDB:
         self,
         name: str,
         analyzer_type: str,
-        properties: Dict[str, Any],
-        features: List[str],
-    ) -> Dict[str, Any]:
+        properties: dict[str, Any],
+        features: list[str],
+    ) -> dict[str, Any]:
         """Create an analyzer."""
         try:
             self.db.create_analyzer(
@@ -574,7 +574,7 @@ class DirectArangoDB:
             logger.error(f"Create analyzer failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def delete_analyzer(self, name: str) -> Dict[str, Any]:
+    def delete_analyzer(self, name: str) -> dict[str, Any]:
         """Delete an analyzer."""
         try:
             self.db.delete_analyzer(name, ignore_missing=True)
@@ -586,8 +586,8 @@ class DirectArangoDB:
     # ==================== PREGEL GRAPH ANALYTICS (HTTP API) ====================
 
     def run_pregel_job(
-        self, algorithm: str, graph_name: str, params: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        self, algorithm: str, graph_name: str, params: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Run a Pregel job (e.g., PageRank, SSSP) via HTTP API."""
         import requests
 
@@ -609,7 +609,7 @@ class DirectArangoDB:
             logger.error(f"Run Pregel job failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def get_pregel_status(self, job_id: str) -> Dict[str, Any]:
+    def get_pregel_status(self, job_id: str) -> dict[str, Any]:
         """Get Pregel job status via HTTP API."""
         import requests
 
@@ -622,7 +622,7 @@ class DirectArangoDB:
             logger.error(f"Get Pregel status failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def cancel_pregel_job(self, job_id: str) -> Dict[str, Any]:
+    def cancel_pregel_job(self, job_id: str) -> dict[str, Any]:
         """Cancel a Pregel job via HTTP API."""
         import requests
 
@@ -638,8 +638,8 @@ class DirectArangoDB:
     # ==================== DOCUMENT ADVANCED OPERATIONS ====================
 
     def replace_document(
-        self, collection: str, document: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, collection: str, document: dict[str, Any]
+    ) -> dict[str, Any]:
         """Replace a document by key."""
         try:
             coll = self.db.collection(collection)
@@ -650,8 +650,8 @@ class DirectArangoDB:
             return {"success": False, "error": str(e)}
 
     def update_documents_match(
-        self, collection: str, match: Dict[str, Any], updates: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, collection: str, match: dict[str, Any], updates: dict[str, Any]
+    ) -> dict[str, Any]:
         """Update all documents matching filter."""
         try:
             coll = self.db.collection(collection)
@@ -662,8 +662,8 @@ class DirectArangoDB:
             return {"success": False, "error": str(e)}
 
     def replace_documents_match(
-        self, collection: str, match: Dict[str, Any], replacement: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, collection: str, match: dict[str, Any], replacement: dict[str, Any]
+    ) -> dict[str, Any]:
         """Replace all documents matching filter."""
         try:
             coll = self.db.collection(collection)
@@ -674,8 +674,8 @@ class DirectArangoDB:
             return {"success": False, "error": str(e)}
 
     def delete_documents_match(
-        self, collection: str, match: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, collection: str, match: dict[str, Any]
+    ) -> dict[str, Any]:
         """Delete all documents matching filter."""
         try:
             coll = self.db.collection(collection)
@@ -686,8 +686,8 @@ class DirectArangoDB:
             return {"success": False, "error": str(e)}
 
     def import_bulk_documents(
-        self, collection: str, documents: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, collection: str, documents: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Bulk import documents."""
         try:
             coll = self.db.collection(collection)
@@ -700,8 +700,8 @@ class DirectArangoDB:
     # ==================== INDEX MANAGEMENT (ADVANCED) ====================
 
     def create_mdi_index(
-        self, collection: str, fields: List[str], field_value_types: str = "double"
-    ) -> Dict[str, Any]:
+        self, collection: str, fields: list[str], field_value_types: str = "double"
+    ) -> dict[str, Any]:
         """Create a multi-dimensional index (MDI)."""
         try:
             coll = self.db.collection(collection)
@@ -716,11 +716,11 @@ class DirectArangoDB:
     def create_named_index(
         self,
         collection: str,
-        fields: List[str],
+        fields: list[str],
         name: str,
         index_type: str = "persistent",
         **kwargs,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a named index of specified type."""
         try:
             coll = self.db.collection(collection)
@@ -736,7 +736,7 @@ class DirectArangoDB:
 
     def create_vertex_collection(
         self, graph_name: str, collection_name: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a vertex collection in a graph."""
         try:
             graph = self.db.graph(graph_name)
@@ -750,9 +750,9 @@ class DirectArangoDB:
         self,
         graph_name: str,
         edge_collection: str,
-        from_collections: List[str],
-        to_collections: List[str],
-    ) -> Dict[str, Any]:
+        from_collections: list[str],
+        to_collections: list[str],
+    ) -> dict[str, Any]:
         """Create an edge definition in a graph."""
         try:
             graph = self.db.graph(graph_name)
@@ -767,8 +767,8 @@ class DirectArangoDB:
             return {"success": False, "error": str(e)}
 
     def insert_vertex(
-        self, graph_name: str, collection: str, document: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, graph_name: str, collection: str, document: dict[str, Any]
+    ) -> dict[str, Any]:
         """Insert a vertex into a graph."""
         try:
             graph = self.db.graph(graph_name)
@@ -780,8 +780,8 @@ class DirectArangoDB:
             return {"success": False, "error": str(e)}
 
     def insert_edge(
-        self, graph_name: str, edge_collection: str, edge: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, graph_name: str, edge_collection: str, edge: dict[str, Any]
+    ) -> dict[str, Any]:
         """Insert an edge into a graph."""
         try:
             graph = self.db.graph(graph_name)
@@ -794,7 +794,7 @@ class DirectArangoDB:
 
     def list_edges(
         self, graph_name: str, edge_collection: str, vertex: str, direction: str = "any"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """List edges for a vertex in a given direction (in, out, any)."""
         try:
             graph = self.db.graph(graph_name)
@@ -806,14 +806,14 @@ class DirectArangoDB:
             return {"success": False, "error": str(e)}
 
     def traverse_graph(
-        self, query: str, bind_vars: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        self, query: str, bind_vars: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Run a graph traversal using AQL."""
         return self.execute_aql(query, bind_vars)
 
     # ==================== VIEW & SEARCH ADVANCED ====================
 
-    def update_view(self, name: str, properties: Dict[str, Any]) -> Dict[str, Any]:
+    def update_view(self, name: str, properties: dict[str, Any]) -> dict[str, Any]:
         """Update view properties."""
         try:
             self.db.update_view(name=name, properties=properties)
@@ -822,7 +822,7 @@ class DirectArangoDB:
             logger.error(f"Update view failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def replace_view(self, name: str, properties: Dict[str, Any]) -> Dict[str, Any]:
+    def replace_view(self, name: str, properties: dict[str, Any]) -> dict[str, Any]:
         """Replace view properties."""
         try:
             self.db.replace_view(name=name, properties=properties)
@@ -831,7 +831,7 @@ class DirectArangoDB:
             logger.error(f"Replace view failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def rename_view(self, old_name: str, new_name: str) -> Dict[str, Any]:
+    def rename_view(self, old_name: str, new_name: str) -> dict[str, Any]:
         """Rename a view."""
         try:
             self.db.rename_view(old_name, new_name)
@@ -840,7 +840,7 @@ class DirectArangoDB:
             logger.error(f"Rename view failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def get_view_properties(self, name: str) -> Dict[str, Any]:
+    def get_view_properties(self, name: str) -> dict[str, Any]:
         """Retrieve view properties."""
         try:
             view = self.db.view(name)
@@ -871,7 +871,7 @@ class DirectArangoDB:
 
     # ==================== REPLICATION & BACKUP (BASIC) ====================
 
-    def get_replication_inventory(self) -> Dict[str, Any]:
+    def get_replication_inventory(self) -> dict[str, Any]:
         """Get replication inventory."""
         try:
             inventory = self.db.replication.inventory()
@@ -886,7 +886,7 @@ class DirectArangoDB:
         allow_inconsistent: bool = True,
         force: bool = False,
         timeout: int = 1000,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a backup (Enterprise only)."""
         try:
             backup = self.db.backup.create(
@@ -902,7 +902,7 @@ class DirectArangoDB:
 
     # ==================== FOXX MICROSERVICES (BASIC) ====================
 
-    def list_foxx_services(self) -> Dict[str, Any]:
+    def list_foxx_services(self) -> dict[str, Any]:
         """List all Foxx services."""
         try:
             foxx = self.db.foxx
@@ -914,7 +914,7 @@ class DirectArangoDB:
 
     # ==================== TASK & JOB MANAGEMENT (BASIC) ====================
 
-    def list_tasks(self) -> Dict[str, Any]:
+    def list_tasks(self) -> dict[str, Any]:
         """List all tasks."""
         try:
             tasks = self.db.tasks()
@@ -925,7 +925,7 @@ class DirectArangoDB:
 
     # ==================== CLUSTER & DEPLOYMENT (BASIC) ====================
 
-    def get_cluster_inventory(self) -> Dict[str, Any]:
+    def get_cluster_inventory(self) -> dict[str, Any]:
         """Get cluster inventory (if in cluster mode)."""
         try:
             inventory = self.db.replication.cluster_inventory()
@@ -948,7 +948,7 @@ class DirectArangoDB:
 
     # ==================== UTILITY / HEALTH ====================
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         """Basic health check: list collections and graphs."""
         try:
             collections = self.list_collections()
@@ -966,7 +966,7 @@ class DirectArangoDB:
 
     def get_neighbors(
         self, graph_name: str, vertex_id: str, direction: str = "any"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Get neighbors of a vertex in a graph.
         Args:
@@ -995,7 +995,7 @@ class DirectArangoDB:
 
     def get_subgraph(
         self, graph_name: str, start_vertex: str, depth: int = 2, direction: str = "any"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Extract a subgraph up to a given depth from a start vertex.
         Args:
@@ -1033,7 +1033,7 @@ class DirectArangoDB:
         start_vertex: str,
         end_vertex: str,
         direction: str = "out",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Find the shortest path between two vertices in a graph.
         Args:

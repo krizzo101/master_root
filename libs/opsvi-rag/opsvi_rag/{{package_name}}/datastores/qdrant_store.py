@@ -7,7 +7,7 @@ and retrieving embeddings with similarity search capabilities.
 
 import asyncio
 import logging
-from typing import List, Dict, Any, Optional, Union, Tuple
+from typing import List, Dict, Any, Optional
 from uuid import uuid4
 
 import qdrant_client

@@ -8,7 +8,7 @@ and other conversational workflows.
 
 import json
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from openai import OpenAI
 from openai.types.beta import Assistant, Thread
@@ -25,7 +25,7 @@ class AssistantsAPIManager:
     managing threads, and conducting real-time conversations.
     """
 
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1") -> None:
+    def __init__(self, api_key: str | None = None, model: str = "gpt-4.1") -> None:
         """
         Initialize the Assistants API Manager.
 
@@ -36,12 +36,12 @@ class AssistantsAPIManager:
         self.logger = get_logger()
         self.client = OpenAI(api_key=api_key)
         self.model = model
-        self.assistant: Optional[Assistant] = None
-        self.thread: Optional[Thread] = None
-        self.current_run: Optional[Run] = None
+        self.assistant: Assistant | None = None
+        self.thread: Thread | None = None
+        self.current_run: Run | None = None
 
     def create_assistant(
-        self, name: str, instructions: str, tools: Optional[List[Dict[str, Any]]] = None
+        self, name: str, instructions: str, tools: list[dict[str, Any]] | None = None
     ) -> Assistant:
         """
         Create a new assistant with specified configuration.
@@ -134,7 +134,7 @@ class AssistantsAPIManager:
             raise
 
     def wait_for_run_completion(
-        self, run: Optional[Run] = None, timeout: int = 300
+        self, run: Run | None = None, timeout: int = 300
     ) -> Run:
         """
         Wait for a run to complete.
@@ -167,7 +167,7 @@ class AssistantsAPIManager:
         self.logger.log_info(f"Run completed with status: {run.status}")
         return run
 
-    def get_latest_messages(self, limit: int = 10) -> List[Message]:
+    def get_latest_messages(self, limit: int = 10) -> list[Message]:
         """
         Get the latest messages from the thread.
 
@@ -191,7 +191,7 @@ class AssistantsAPIManager:
             self.logger.log_error(f"Failed to retrieve messages: {e}")
             raise
 
-    def get_assistant_response(self) -> Optional[str]:
+    def get_assistant_response(self) -> str | None:
         """
         Get the latest assistant response from the thread.
 

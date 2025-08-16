@@ -3,9 +3,9 @@ Core cognitive database interface that abstracts AQL complexity for agents.
 Uses python-arango library with validated query templates.
 """
 
-from datetime import datetime
 import logging
-from typing import Any, Dict, List
+from datetime import datetime
+from typing import Any
 
 from arango import ArangoClient
 
@@ -50,7 +50,7 @@ class CognitiveDatabase:
 
     def find_memories_about(
         self, topic: str, importance_threshold: float = 0.7, limit: int = 10
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Find memories related to a specific topic"""
 
         if not isinstance(topic, str) or len(topic) < 2:
@@ -71,7 +71,7 @@ class CognitiveDatabase:
 
     def get_foundational_memories(
         self, min_quality: float = 0.8
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Get high-quality foundational memories"""
 
         query = """
@@ -87,7 +87,7 @@ class CognitiveDatabase:
 
     def get_concepts_by_domain(
         self, domain: str, min_quality: float = 0.7
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Get cognitive concepts filtered by domain"""
 
         query = """
@@ -103,7 +103,7 @@ class CognitiveDatabase:
 
     def get_memories_by_type(
         self, memory_type: str, limit: int = 20
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Get memories filtered by type (operational, procedural, etc.)"""
 
         query = """
@@ -117,7 +117,7 @@ class CognitiveDatabase:
         bind_vars = {"memory_type": memory_type, "limit": int(limit)}
         return self._execute_query(query, bind_vars, "get_memories_by_type")
 
-    def get_startup_context(self) -> Dict[str, Any]:
+    def get_startup_context(self) -> dict[str, Any]:
         """Get essential startup context and foundational knowledge"""
 
         foundational = self.get_foundational_memories()
@@ -129,7 +129,7 @@ class CognitiveDatabase:
             "startup_timestamp": datetime.now().isoformat(),
         }
 
-    def assess_system_health(self) -> Dict[str, Any]:
+    def assess_system_health(self) -> dict[str, Any]:
         """Comprehensive system health assessment"""
 
         try:
@@ -155,7 +155,7 @@ class CognitiveDatabase:
             logger.error(f"Health assessment failed: {e}")
             return {"error": str(e), "health_score": 0.0}
 
-    def _calculate_health_score(self, collections: Dict[str, int]) -> float:
+    def _calculate_health_score(self, collections: dict[str, int]) -> float:
         """Calculate overall system health score"""
 
         score = 0.0
@@ -169,8 +169,8 @@ class CognitiveDatabase:
         return score
 
     def _execute_query(
-        self, query: str, bind_vars: Dict[str, Any], operation_name: str
-    ) -> List[Dict[str, Any]]:
+        self, query: str, bind_vars: dict[str, Any], operation_name: str
+    ) -> list[dict[str, Any]]:
         """Execute AQL query with error handling and validation"""
 
         try:

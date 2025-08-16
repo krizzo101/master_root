@@ -4,7 +4,6 @@ Input schema for project initialization.
 This module defines the Pydantic models for project initialization input data.
 """
 
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -22,21 +21,21 @@ class ProjectInitializationInput(BaseModel):
         _pattern="^(python|python-fastapi|nodejs|react)$",
     )
 
-    description: Optional[str] = Field(
+    description: str | None = Field(
         None, description="Project description", max_length=500
     )
 
-    author: Optional[str] = Field(None, description="Project author", max_length=100)
+    author: str | None = Field(None, description="Project author", max_length=100)
 
-    dependencies: Optional[list[str]] = Field(
+    dependencies: list[str] | None = Field(
         None, description="Additional dependencies to include"
     )
 
-    features: Optional[list[str]] = Field(
+    features: list[str] | None = Field(
         None, description="Features to include in the project"
     )
 
-    target_directory: Optional[str] = Field(
+    target_directory: str | None = Field(
         None, description="Target directory for the project"
     )
 

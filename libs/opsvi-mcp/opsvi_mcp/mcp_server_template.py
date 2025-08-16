@@ -8,16 +8,41 @@ Key Features:
 - Detailed, clear docstrings throughout
 - Modular tool system with runtime registration/removal
 - Async best practices and robust error handling
-- Input schema stubs for type safety and future validation
+- JSON Schema validation for tool inputs using jsonschema library
+- Dynamic plugin loading system for extending functionality
 - CLI and environment-based configuration
 - Cursor IDE compatibility (stdio transport, tool schemas)
+- Backward compatible with existing tools
+
+Usage:
+    # Basic usage with built-in tools
+    python -m mcp_server_template
+    
+    # Load plugins from custom directory
+    python -m mcp_server_template --plugin-dir ./my_plugins
+    
+    # Set via environment variables
+    export MCP_SERVER_NAME=my_server
+    export MCP_PLUGIN_DIR=/path/to/plugins
+    export MCP_LOG_LEVEL=DEBUG
+    python -m mcp_server_template
+
+Plugin Development:
+    See plugins/README.md for detailed plugin development guide.
+    Example plugins are provided in the plugins/ directory.
 """
 
 import asyncio
+import importlib.util
+import inspect
 import logging
 import os
-from typing import Any, Dict, List, Optional
+import sys
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Type
 
+import jsonschema
+from jsonschema import ValidationError
 from mcp.server import Server
 from mcp.types import TextContent, Tool
 
@@ -83,8 +108,7 @@ class BaseTool:
 
     def validate_input(self, arguments: Dict[str, Any]) -> None:
         """
-        Validate input arguments against the input schema.
-        (Stub for future JSON Schema validation.)
+        Validate input arguments against the input schema using JSON Schema.
 
         Args:
             arguments: Tool arguments.
@@ -92,8 +116,10 @@ class BaseTool:
         Raises:
             ValueError: If validation fails.
         """
-        # TODO: Implement JSON Schema validation if needed.
-        pass
+        try:
+            jsonschema.validate(instance=arguments, schema=self.input_schema)
+        except ValidationError as e:
+            raise ValueError(f"Input validation failed: {e.message}")
 
 
 # --- Example Tool ---
@@ -186,13 +212,88 @@ class MCPServerTemplate:
 
     def load_plugins(self, plugin_dir: Optional[str] = None) -> None:
         """
-        Stub for plugin loading. Extend to support dynamic tool discovery.
+        Dynamically load plugin tools from a directory.
+
+        Plugins should be Python files containing classes that inherit from BaseTool.
+        The plugin directory structure:
+            plugins/
+                my_tool.py  (contains one or more BaseTool subclasses)
+                another_tool.py
 
         Args:
-            plugin_dir: Directory to load plugins from.
+            plugin_dir: Directory to load plugins from. Defaults to './plugins'.
         """
-        # TODO: Implement plugin loading if needed.
-        pass
+        if plugin_dir is None:
+            plugin_dir = os.getenv("MCP_PLUGIN_DIR", "./plugins")
+
+        plugin_path = Path(plugin_dir)
+        if not plugin_path.exists():
+            logger.info(
+                "Plugin directory '%s' does not exist. Skipping plugin loading.",
+                plugin_dir,
+            )
+            return
+
+        if not plugin_path.is_dir():
+            logger.warning(
+                "Plugin path '%s' is not a directory. Skipping plugin loading.",
+                plugin_dir,
+            )
+            return
+
+        # Add plugin directory to sys.path temporarily
+        original_path = sys.path.copy()
+        sys.path.insert(0, str(plugin_path.absolute()))
+
+        try:
+            for plugin_file in plugin_path.glob("*.py"):
+                if plugin_file.name.startswith("_"):
+                    continue  # Skip private modules
+
+                try:
+                    # Load the module dynamically
+                    module_name = plugin_file.stem
+                    spec = importlib.util.spec_from_file_location(
+                        module_name, plugin_file
+                    )
+                    if spec is None or spec.loader is None:
+                        logger.warning(
+                            "Could not load spec for plugin: %s", plugin_file
+                        )
+                        continue
+
+                    module = importlib.util.module_from_spec(spec)
+                    sys.modules[module_name] = module
+                    spec.loader.exec_module(module)
+
+                    # Find and register all BaseTool subclasses
+                    for name, obj in inspect.getmembers(module):
+                        if (
+                            inspect.isclass(obj)
+                            and issubclass(obj, BaseTool)
+                            and obj is not BaseTool
+                        ):
+                            try:
+                                # Instantiate and register the tool
+                                tool_instance = obj()
+                                self.register_tool(tool_instance)
+                                logger.info(
+                                    "Loaded plugin tool '%s' from %s",
+                                    tool_instance.name,
+                                    plugin_file.name,
+                                )
+                            except Exception as e:
+                                logger.error(
+                                    "Failed to instantiate tool '%s' from %s: %s",
+                                    name,
+                                    plugin_file.name,
+                                    e,
+                                )
+                except Exception as e:
+                    logger.error("Failed to load plugin from %s: %s", plugin_file, e)
+        finally:
+            # Restore original sys.path
+            sys.path = original_path
 
     def _register_server_handlers(self) -> None:
         """
@@ -274,9 +375,21 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    parser.add_argument(
+        "--plugin-dir",
+        type=str,
+        default=os.getenv("MCP_PLUGIN_DIR", "./plugins"),
+        help="Plugin directory path (default: ./plugins or $MCP_PLUGIN_DIR)",
+    )
+    args = parser.parse_args()
+
     log_level = getattr(logging, args.log_level.upper(), logging.INFO)
     tools = [EchoTool()]
     server = MCPServerTemplate(name=args.name, tools=tools, log_level=log_level)
+
+    # Load plugins after server initialization
+    server.load_plugins(args.plugin_dir)
+
     asyncio.run(server.run())
 
 

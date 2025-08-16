@@ -4,8 +4,8 @@ Demo script for the Auto Rules Generation System
 Shows how to use the system to generate rules based on codebase patterns.
 """
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from src.tools.code_generation.o3_code_generator.auto_rules_generation.auto_rules_generator import (
     AutoRulesGenerator,

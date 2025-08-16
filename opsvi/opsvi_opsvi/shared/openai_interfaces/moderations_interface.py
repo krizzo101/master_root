@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from shared.openai_interfaces.base import OpenAIBaseInterface
 
@@ -9,7 +9,7 @@ class OpenAIModerationsInterface(OpenAIBaseInterface):
     Reference: https://platform.openai.com/docs/api-reference/moderations
     """
 
-    def create_moderation(self, input_text: str, **kwargs) -> Dict[str, Any]:
+    def create_moderation(self, input_text: str, **kwargs) -> dict[str, Any]:
         """
         Classify if text violates OpenAI's content policy.
         POST /v1/moderations
@@ -20,7 +20,7 @@ class OpenAIModerationsInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def acreate_moderation(self, input_text: str, **kwargs) -> Dict[str, Any]:
+    async def acreate_moderation(self, input_text: str, **kwargs) -> dict[str, Any]:
         """
         Async: Classify if text violates OpenAI's content policy.
         POST /v1/moderations

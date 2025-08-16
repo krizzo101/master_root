@@ -1,13 +1,11 @@
 """Result processing pipeline for task execution results."""
 
-import asyncio
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 from datetime import datetime, timezone
-from uuid import UUID
 
 from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
-from opsvi_auto_forge.config.models import TaskRecord, Result, Critique
+from opsvi_auto_forge.config.models import Result
 
 logger = logging.getLogger(__name__)
 

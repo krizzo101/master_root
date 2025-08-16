@@ -4,13 +4,11 @@ Tests for opsvi-http components
 """
 
 import pytest
-import asyncio
-from unittest.mock import Mock, patch, AsyncMock
-from typing import Any, Dict, List
 
 from opsvi_http import OpsviHttpManager
 from opsvi_http.config.settings import OpsviHttpConfig
 from opsvi_http.exceptions.base import OpsviHttpError
+
 
 class TestOpsviHttp:
     """Test cases for opsvi-http."""
@@ -36,7 +34,7 @@ class TestOpsviHttp:
         """Test component start and stop."""
         await component.start()
         assert component.is_active()
-        
+
         await component.stop()
         assert not component.is_active()
 
@@ -54,4 +52,3 @@ class TestOpsviHttp:
             pass
 
     # Component-specific tests
-    

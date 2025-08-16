@@ -2,12 +2,12 @@
 
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 import yaml
 from pydantic import BaseModel, Field
 
-from .task_models import TaskType, TaskPriority, TaskStatus
+from .task_models import TaskPriority, TaskType
 
 logger = logging.getLogger(__name__)
 
@@ -21,19 +21,19 @@ class TaskDefinition(BaseModel):
     priority: TaskPriority = TaskPriority.NORMAL
 
     # Dependencies
-    depends_on: List[str] = Field(default_factory=list)
+    depends_on: list[str] = Field(default_factory=list)
 
     # Flow control
-    gate_policies: List[str] = Field(default_factory=list)
+    gate_policies: list[str] = Field(default_factory=list)
     max_loops: int = 1
-    fallback_task: Optional[str] = None
+    fallback_task: str | None = None
 
     # Configuration
-    config: Dict[str, Any] = Field(default_factory=dict)
+    config: dict[str, Any] = Field(default_factory=dict)
 
     # Parallel execution
     parallel: bool = False
-    parallel_group: Optional[str] = None
+    parallel_group: str | None = None
 
 
 class PipelineDefinition(BaseModel):
@@ -44,15 +44,15 @@ class PipelineDefinition(BaseModel):
     description: str = ""
 
     # Tasks
-    tasks: List[TaskDefinition]
+    tasks: list[TaskDefinition]
 
     # Global configuration
-    config: Dict[str, Any] = Field(default_factory=dict)
+    config: dict[str, Any] = Field(default_factory=dict)
 
     # Validation
-    required_agents: List[str] = Field(default_factory=list)
+    required_agents: list[str] = Field(default_factory=list)
 
-    def validate(self) -> List[str]:
+    def validate(self) -> list[str]:
         """Validate the pipeline definition."""
         errors = []
 
@@ -79,7 +79,7 @@ class PipelineDefinition(BaseModel):
     def _has_circular_dependencies(self) -> bool:
         """Check for circular dependencies using DFS."""
 
-        def has_cycle(node: str, visited: Set[str], rec_stack: Set[str]) -> bool:
+        def has_cycle(node: str, visited: set[str], rec_stack: set[str]) -> bool:
             visited.add(node)
             rec_stack.add(node)
 
@@ -105,10 +105,10 @@ class PipelineDefinition(BaseModel):
                     return True
         return False
 
-    def get_task_dependencies(self, task_name: str) -> List[str]:
+    def get_task_dependencies(self, task_name: str) -> list[str]:
         """Get all dependencies for a task (including transitive)."""
 
-        def get_deps(node: str, visited: Set[str]) -> Set[str]:
+        def get_deps(node: str, visited: set[str]) -> set[str]:
             if node in visited:
                 return set()
 
@@ -125,7 +125,7 @@ class PipelineDefinition(BaseModel):
 
         return list(get_deps(task_name, set()))
 
-    def get_execution_order(self) -> List[str]:
+    def get_execution_order(self) -> list[str]:
         """Get the topological sort order for task execution."""
         # Kahn's algorithm for topological sorting
         in_degree = {task.name: 0 for task in self.tasks}
@@ -158,7 +158,7 @@ class PipelineDefinition(BaseModel):
 
         return result
 
-    def get_parallel_groups(self) -> Dict[str, List[str]]:
+    def get_parallel_groups(self) -> dict[str, list[str]]:
         """Get tasks grouped by parallel execution groups."""
         groups = {}
         for task in self.tasks:
@@ -172,10 +172,10 @@ class PipelineDefinition(BaseModel):
 class DAGLoader:
     """Loader for DAG pipeline definitions."""
 
-    def __init__(self, pipeline_dir: Optional[Path] = None) -> None:
+    def __init__(self, pipeline_dir: Path | None = None) -> None:
         """Initialize the DAG loader."""
         self.pipeline_dir = pipeline_dir or Path("pipelines")
-        self._loaded_pipelines: Dict[str, PipelineDefinition] = {}
+        self._loaded_pipelines: dict[str, PipelineDefinition] = {}
 
     def load_pipeline(self, name: str) -> PipelineDefinition:
         """Load a pipeline definition by name."""
@@ -188,7 +188,7 @@ class DAGLoader:
             raise FileNotFoundError(f"Pipeline file not found: {pipeline_file}")
 
         try:
-            with open(pipeline_file, "r") as f:
+            with open(pipeline_file) as f:
                 data = yaml.safe_load(f)
 
             pipeline = PipelineDefinition(**data)
@@ -206,7 +206,7 @@ class DAGLoader:
             logger.error(f"Failed to load pipeline {name}: {e}")
             raise
 
-    def list_pipelines(self) -> List[str]:
+    def list_pipelines(self) -> list[str]:
         """List available pipeline names."""
         if not self.pipeline_dir.exists():
             return []
@@ -221,8 +221,8 @@ class DAGLoader:
         task_def: TaskDefinition,
         project_id: str,
         run_id: str,
-        parent_task_id: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        parent_task_id: str | None = None,
+    ) -> dict[str, Any]:
         """Create a task record from a task definition."""
         from .task_models import TaskRecord
 
@@ -246,8 +246,8 @@ class DAGLoader:
         pipeline_name: str,
         project_id: str,
         run_id: str,
-        input_data: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        input_data: dict[str, Any],
+    ) -> dict[str, Any]:
         """Create an execution plan for a pipeline."""
         pipeline = self.load_pipeline(pipeline_name)
 

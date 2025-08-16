@@ -22,7 +22,7 @@ Version: 1.0.1
 
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import get_logger
 from src.tools.code_generation.o3_code_generator.utils.directory_manager import (
@@ -102,9 +102,9 @@ class BaseProcessor:
         output_schema: Any,
         title: str,
         instructions: str | None = None,
-        context_files: List[str] | None = None,
-        output_formats: List[str] | None = None,
-    ) -> Dict[str, Any]:
+        context_files: list[str] | None = None,
+        output_formats: list[str] | None = None,
+    ) -> dict[str, Any]:
         """
         Process analysis with standardized workflow.
 
@@ -157,7 +157,7 @@ class BaseProcessor:
                 title=title,
                 formats=formats,
             )
-            final_result: Dict[str, Any] = {
+            final_result: dict[str, Any] = {
                 "analysis_result": result,
                 "file_paths": file_paths,
                 "processing_info": {
@@ -182,11 +182,11 @@ class BaseProcessor:
         input_data: Any,
         system_prompt: str,
         title: str,
-        context: Dict[str, Any] | None = None,
+        context: dict[str, Any] | None = None,
         format_instructions: str | None = None,
-        context_files: List[str] | None = None,
-        output_formats: List[str] | None = None,
-    ) -> Dict[str, Any]:
+        context_files: list[str] | None = None,
+        output_formats: list[str] | None = None,
+    ) -> dict[str, Any]:
         """
         Process code generation with standardized workflow.
 
@@ -232,7 +232,7 @@ class BaseProcessor:
             params = (
                 input_data.dict() if hasattr(input_data, "dict") else str(input_data)
             )
-            result_data: Dict[str, Any] = {
+            result_data: dict[str, Any] = {
                 "generated_content": generated_text,
                 "input_parameters": params,
                 "context": context or {},
@@ -245,7 +245,7 @@ class BaseProcessor:
                 title=title,
                 formats=formats,
             )
-            final_result: Dict[str, Any] = {
+            final_result: dict[str, Any] = {
                 "generation_result": result_data,
                 "file_paths": file_paths,
                 "processing_info": {
@@ -266,8 +266,8 @@ class BaseProcessor:
             pass
 
     def load_and_validate_input(
-        self, file_path: str | Path, required_fields: List[str] | None = None
-    ) -> Dict[str, Any]:
+        self, file_path: str | Path, required_fields: list[str] | None = None
+    ) -> dict[str, Any]:
         """
         Load and validate input file.
 
@@ -306,7 +306,7 @@ class BaseProcessor:
         finally:
             pass
 
-    def create_summary_report(self, data: Dict[str, Any], title: str) -> str:
+    def create_summary_report(self, data: dict[str, Any], title: str) -> str:
         """
         Create a summary report in markdown format.
 
@@ -384,7 +384,7 @@ class BaseProcessor:
         finally:
             pass
 
-    def _prepare_analysis_context(self, input_data: Any) -> Dict[str, Any]:
+    def _prepare_analysis_context(self, input_data: Any) -> dict[str, Any]:
         """
         Prepare analysis context from input data.
 
@@ -406,7 +406,7 @@ class BaseProcessor:
                 input_dict = input_data
             else:
                 input_dict = {"data": input_data}
-            context: Dict[str, Any] = {
+            context: dict[str, Any] = {
                 "input_parameters": input_dict,
                 "module_name": self.module_name,
                 "processing_timestamp": datetime.now().isoformat(),
@@ -420,7 +420,7 @@ class BaseProcessor:
         finally:
             pass
 
-    def _load_context_files(self, file_paths: List[str]) -> str:
+    def _load_context_files(self, file_paths: list[str]) -> str:
         """
         Load and concatenate context files for prompt inclusion.
 

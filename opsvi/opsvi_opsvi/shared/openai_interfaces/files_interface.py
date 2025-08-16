@@ -1,5 +1,5 @@
 import io
-from typing import Any, Dict, List
+from typing import Any
 
 import openai
 
@@ -12,7 +12,7 @@ class OpenAIFilesInterface(OpenAIBaseInterface):
     Reference: https://platform.openai.com/docs/api-reference/files
     """
 
-    def list_files(self) -> List[Dict[str, Any]]:
+    def list_files(self) -> list[dict[str, Any]]:
         """
         List all files.
         GET /v1/files
@@ -23,7 +23,7 @@ class OpenAIFilesInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def upload_file(self, file_bytes: bytes, purpose: str, **kwargs) -> Dict[str, Any]:
+    def upload_file(self, file_bytes: bytes, purpose: str, **kwargs) -> dict[str, Any]:
         """
         Upload a file for a specific purpose.
         POST /v1/files
@@ -37,7 +37,7 @@ class OpenAIFilesInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def delete_file(self, file_id: str) -> Dict[str, Any]:
+    def delete_file(self, file_id: str) -> dict[str, Any]:
         """
         Delete a file by ID.
         DELETE /v1/files/{file_id}
@@ -48,7 +48,7 @@ class OpenAIFilesInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    def retrieve_file(self, file_id: str) -> Dict[str, Any]:
+    def retrieve_file(self, file_id: str) -> dict[str, Any]:
         """
         Retrieve file metadata by ID.
         GET /v1/files/{file_id}
@@ -70,7 +70,7 @@ class OpenAIFilesInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def alist_files(self) -> List[Dict[str, Any]]:
+    async def alist_files(self) -> list[dict[str, Any]]:
         """
         Async: List all files.
         GET /v1/files
@@ -83,7 +83,7 @@ class OpenAIFilesInterface(OpenAIBaseInterface):
 
     async def aupload_file(
         self, file_bytes: bytes, purpose: str, **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Async: Upload a file for a specific purpose.
         POST /v1/files
@@ -97,7 +97,7 @@ class OpenAIFilesInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def adelete_file(self, file_id: str) -> Dict[str, Any]:
+    async def adelete_file(self, file_id: str) -> dict[str, Any]:
         """
         Async: Delete a file by ID.
         DELETE /v1/files/{file_id}
@@ -108,7 +108,7 @@ class OpenAIFilesInterface(OpenAIBaseInterface):
         except Exception as e:
             self._handle_error(e)
 
-    async def aretrieve_file(self, file_id: str) -> Dict[str, Any]:
+    async def aretrieve_file(self, file_id: str) -> dict[str, Any]:
         """
         Async: Retrieve file metadata by ID.
         GET /v1/files/{file_id}

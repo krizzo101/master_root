@@ -4,8 +4,7 @@ Workflow Execution Engine for Universal Workflow Templates
 Executes parsed workflow steps, manages state, and integrates with quality gates and step handlers.
 Supports Schema v2.0 features including phases, enhanced error handling, and monitoring.
 """
-from typing import Any, Dict, List, Callable, Optional, Generator
-import sys
+from typing import Any, Dict, List, Callable, Optional
 import time
 import logging
 from enum import Enum

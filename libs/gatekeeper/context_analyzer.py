@@ -7,14 +7,14 @@ Can suggest which files, documentation, or other context should be included.
 """
 
 import re
-from typing import List, Dict, Any, Optional, Set
 from dataclasses import dataclass
 
 
 @dataclass
 class ContextRecommendation:
     """A recommendation for context inclusion."""
-    file_paths: List[str]
+
+    file_paths: list[str]
     context_type: str  # "files", "documentation", "config", "tests"
     priority: int  # 1-5, where 1 is highest priority
     reason: str
@@ -24,9 +24,10 @@ class ContextRecommendation:
 @dataclass
 class ContextAnalysis:
     """Result of context analysis."""
-    user_files: List[str]
-    recommended_files: List[str]
-    recommended_context: List[ContextRecommendation]
+
+    user_files: list[str]
+    recommended_files: list[str]
+    recommended_context: list[ContextRecommendation]
     analysis_summary: str
     confidence_score: float
 
@@ -37,40 +38,91 @@ class ContextAnalyzer:
     def __init__(self):
         self.context_patterns = {
             "bug_fix": [
-                r"bug", r"fix", r"error", r"issue", r"problem", r"broken",
-                r"doesn't work", r"not working", r"failing", r"crash"
+                r"bug",
+                r"fix",
+                r"error",
+                r"issue",
+                r"problem",
+                r"broken",
+                r"doesn't work",
+                r"not working",
+                r"failing",
+                r"crash",
             ],
             "feature_development": [
-                r"add", r"implement", r"create", r"new feature", r"enhancement",
-                r"improve", r"extend", r"build", r"develop"
+                r"add",
+                r"implement",
+                r"create",
+                r"new feature",
+                r"enhancement",
+                r"improve",
+                r"extend",
+                r"build",
+                r"develop",
             ],
             "refactoring": [
-                r"refactor", r"clean up", r"restructure", r"reorganize",
-                r"improve code", r"optimize", r"simplify"
+                r"refactor",
+                r"clean up",
+                r"restructure",
+                r"reorganize",
+                r"improve code",
+                r"optimize",
+                r"simplify",
             ],
             "testing": [
-                r"test", r"unit test", r"integration test", r"coverage",
-                r"test case", r"assertion", r"mock"
+                r"test",
+                r"unit test",
+                r"integration test",
+                r"coverage",
+                r"test case",
+                r"assertion",
+                r"mock",
             ],
             "documentation": [
-                r"document", r"comment", r"readme", r"docs", r"explain",
-                r"describe", r"clarify", r"help"
+                r"document",
+                r"comment",
+                r"readme",
+                r"docs",
+                r"explain",
+                r"describe",
+                r"clarify",
+                r"help",
             ],
             "configuration": [
-                r"config", r"setting", r"environment", r"deploy", r"setup",
-                r"install", r"dependency", r"package"
+                r"config",
+                r"setting",
+                r"environment",
+                r"deploy",
+                r"setup",
+                r"install",
+                r"dependency",
+                r"package",
             ],
             "performance": [
-                r"performance", r"speed", r"slow", r"optimize", r"efficient",
-                r"memory", r"cpu", r"bottleneck"
+                r"performance",
+                r"speed",
+                r"slow",
+                r"optimize",
+                r"efficient",
+                r"memory",
+                r"cpu",
+                r"bottleneck",
             ],
             "security": [
-                r"security", r"vulnerability", r"secure", r"authentication",
-                r"authorization", r"encrypt", r"password", r"token"
-            ]
+                r"security",
+                r"vulnerability",
+                r"secure",
+                r"authentication",
+                r"authorization",
+                r"encrypt",
+                r"password",
+                r"token",
+            ],
         }
 
-    def analyze_request(self, user_request: str, user_files: List[str] = None) -> ContextAnalysis:
+    def analyze_request(
+        self, user_request: str, user_files: list[str] = None
+    ) -> ContextAnalysis:
         """
         Analyze a user request to determine optimal context.
 
@@ -87,7 +139,9 @@ class ContextAnalyzer:
         request_type = self._classify_request(user_request)
 
         # Generate context recommendations
-        recommendations = self._generate_recommendations(user_request, user_files, request_type)
+        recommendations = self._generate_recommendations(
+            user_request, user_files, request_type
+        )
 
         # Extract recommended files
         recommended_files = []
@@ -98,17 +152,19 @@ class ContextAnalyzer:
         summary = self._create_analysis_summary(request_type, recommendations)
 
         # Calculate confidence score
-        confidence = self._calculate_confidence(user_request, request_type, recommendations)
+        confidence = self._calculate_confidence(
+            user_request, request_type, recommendations
+        )
 
         return ContextAnalysis(
             user_files=user_files,
             recommended_files=recommended_files,
             recommended_context=recommendations,
             analysis_summary=summary,
-            confidence_score=confidence
+            confidence_score=confidence,
         )
 
-    def _classify_request(self, user_request: str) -> Dict[str, float]:
+    def _classify_request(self, user_request: str) -> dict[str, float]:
         """Classify the type of request based on keywords."""
         request_lower = user_request.lower()
         scores = {}
@@ -124,14 +180,18 @@ class ContextAnalyzer:
 
         return scores
 
-    def _generate_recommendations(self, user_request: str, user_files: List[str], request_type: Dict[str, float]) -> List[ContextRecommendation]:
+    def _generate_recommendations(
+        self, user_request: str, user_files: list[str], request_type: dict[str, float]
+    ) -> list[ContextRecommendation]:
         """Generate context recommendations based on request type."""
         recommendations = []
 
         # Add recommendations based on request type
         for category, score in request_type.items():
             if score > 0.3:  # Only consider significant matches
-                rec = self._create_recommendation_for_category(category, score, user_files)
+                rec = self._create_recommendation_for_category(
+                    category, score, user_files
+                )
                 if rec:
                     recommendations.append(rec)
 
@@ -144,7 +204,9 @@ class ContextAnalyzer:
 
         return recommendations
 
-    def _create_recommendation_for_category(self, category: str, score: float, user_files: List[str]) -> Optional[ContextRecommendation]:
+    def _create_recommendation_for_category(
+        self, category: str, score: float, user_files: list[str]
+    ) -> ContextRecommendation | None:
         """Create a recommendation for a specific request category."""
         if category == "bug_fix":
             return ContextRecommendation(
@@ -152,7 +214,7 @@ class ContextAnalyzer:
                 context_type="files",
                 priority=1,
                 reason="Bug fixes require understanding the problematic code",
-                confidence=score
+                confidence=score,
             )
 
         elif category == "feature_development":
@@ -161,7 +223,7 @@ class ContextAnalyzer:
                 context_type="files",
                 priority=1,
                 reason="Feature development needs related modules and interfaces",
-                confidence=score
+                confidence=score,
             )
 
         elif category == "refactoring":
@@ -170,7 +232,7 @@ class ContextAnalyzer:
                 context_type="files",
                 priority=1,
                 reason="Refactoring requires understanding dependencies and usage",
-                confidence=score
+                confidence=score,
             )
 
         elif category == "testing":
@@ -179,7 +241,7 @@ class ContextAnalyzer:
                 context_type="tests",
                 priority=2,
                 reason="Testing requests need test files and test configuration",
-                confidence=score
+                confidence=score,
             )
 
         elif category == "documentation":
@@ -188,7 +250,7 @@ class ContextAnalyzer:
                 context_type="documentation",
                 priority=2,
                 reason="Documentation requests need existing docs and examples",
-                confidence=score
+                confidence=score,
             )
 
         elif category == "configuration":
@@ -197,7 +259,7 @@ class ContextAnalyzer:
                 context_type="config",
                 priority=2,
                 reason="Configuration requests need config files and settings",
-                confidence=score
+                confidence=score,
             )
 
         elif category == "performance":
@@ -206,7 +268,7 @@ class ContextAnalyzer:
                 context_type="files",
                 priority=1,
                 reason="Performance analysis needs the code being optimized",
-                confidence=score
+                confidence=score,
             )
 
         elif category == "security":
@@ -215,62 +277,84 @@ class ContextAnalyzer:
                 context_type="files",
                 priority=1,
                 reason="Security analysis needs the code being reviewed",
-                confidence=score
+                confidence=score,
             )
 
         return None
 
-    def _create_general_recommendations(self, user_request: str, user_files: List[str]) -> List[ContextRecommendation]:
+    def _create_general_recommendations(
+        self, user_request: str, user_files: list[str]
+    ) -> list[ContextRecommendation]:
         """Create general recommendations based on the request."""
         recommendations = []
 
         # Always recommend keeping user-provided files
         if user_files:
-            recommendations.append(ContextRecommendation(
-                file_paths=user_files,
-                context_type="files",
-                priority=1,
-                reason="User explicitly provided these files",
-                confidence=1.0
-            ))
+            recommendations.append(
+                ContextRecommendation(
+                    file_paths=user_files,
+                    context_type="files",
+                    priority=1,
+                    reason="User explicitly provided these files",
+                    confidence=1.0,
+                )
+            )
 
         # Recommend related files if user provided files
         if user_files:
-            recommendations.append(ContextRecommendation(
-                file_paths=[],
-                context_type="files",
-                priority=3,
-                reason="Related files (imports, imports-by, same directory) should be included",
-                confidence=0.8
-            ))
+            recommendations.append(
+                ContextRecommendation(
+                    file_paths=[],
+                    context_type="files",
+                    priority=3,
+                    reason="Related files (imports, imports-by, same directory) should be included",
+                    confidence=0.8,
+                )
+            )
 
         # Recommend configuration files for any code changes
-        if any(word in user_request.lower() for word in ["code", "file", "module", "class", "function"]):
-            recommendations.append(ContextRecommendation(
-                file_paths=[],
-                context_type="config",
-                priority=4,
-                reason="Configuration files may be relevant for code changes",
-                confidence=0.6
-            ))
+        if any(
+            word in user_request.lower()
+            for word in ["code", "file", "module", "class", "function"]
+        ):
+            recommendations.append(
+                ContextRecommendation(
+                    file_paths=[],
+                    context_type="config",
+                    priority=4,
+                    reason="Configuration files may be relevant for code changes",
+                    confidence=0.6,
+                )
+            )
 
         return recommendations
 
-    def _create_analysis_summary(self, request_type: Dict[str, float], recommendations: List[ContextRecommendation]) -> str:
+    def _create_analysis_summary(
+        self,
+        request_type: dict[str, float],
+        recommendations: list[ContextRecommendation],
+    ) -> str:
         """Create a summary of the analysis."""
         if not request_type:
             return "General request - recommend user files and related context"
 
         primary_type = max(request_type.items(), key=lambda x: x[1])
 
-        summary_parts = [f"Request classified as: {primary_type[0]} (confidence: {primary_type[1]:.2f})"]
+        summary_parts = [
+            f"Request classified as: {primary_type[0]} (confidence: {primary_type[1]:.2f})"
+        ]
 
         for rec in recommendations[:3]:  # Top 3 recommendations
             summary_parts.append(f"- {rec.context_type}: {rec.reason}")
 
         return "; ".join(summary_parts)
 
-    def _calculate_confidence(self, user_request: str, request_type: Dict[str, float], recommendations: List[ContextRecommendation]) -> float:
+    def _calculate_confidence(
+        self,
+        user_request: str,
+        request_type: dict[str, float],
+        recommendations: list[ContextRecommendation],
+    ) -> float:
         """Calculate confidence in the analysis."""
         if not request_type:
             return 0.3  # Low confidence for unclassified requests
@@ -284,16 +368,22 @@ class ContextAnalyzer:
             base_confidence += 0.2
 
         # Boost confidence if we have multiple strong recommendations
-        strong_recommendations = [rec for rec in recommendations if rec.confidence > 0.7]
+        strong_recommendations = [
+            rec for rec in recommendations if rec.confidence > 0.7
+        ]
         if len(strong_recommendations) > 1:
             base_confidence += 0.1
 
         return min(base_confidence, 1.0)
 
-    def filter_recommendations_by_confidence(self, recommendations: List[ContextRecommendation], min_confidence: float = 0.5) -> List[ContextRecommendation]:
+    def filter_recommendations_by_confidence(
+        self, recommendations: list[ContextRecommendation], min_confidence: float = 0.5
+    ) -> list[ContextRecommendation]:
         """Filter recommendations by confidence threshold."""
         return [rec for rec in recommendations if rec.confidence >= min_confidence]
 
-    def get_priority_recommendations(self, recommendations: List[ContextRecommendation], max_priority: int = 3) -> List[ContextRecommendation]:
+    def get_priority_recommendations(
+        self, recommendations: list[ContextRecommendation], max_priority: int = 3
+    ) -> list[ContextRecommendation]:
         """Get recommendations up to a certain priority level."""
         return [rec for rec in recommendations if rec.priority <= max_priority]

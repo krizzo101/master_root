@@ -4,7 +4,6 @@ Input schema for Security Scanner.
 This module defines the Pydantic schema for security scanner input configuration.
 """
 
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -51,9 +50,7 @@ class SecurityScannerInput(BaseModel):
     )
 
     # Output options
-    output_file: Optional[str] = Field(
-        default=None, description="Output file for results"
-    )
+    output_file: str | None = Field(default=None, description="Output file for results")
     output_format: str = Field(
         default="json", description="Output format: json, html, markdown"
     )

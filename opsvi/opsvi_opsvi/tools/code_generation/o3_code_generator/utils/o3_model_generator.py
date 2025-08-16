@@ -2,7 +2,7 @@
 
 import logging
 import os
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 try:
     from openai import OpenAI
@@ -45,7 +45,7 @@ class O3ModelGenerator:
         model (str): Model name (supports gpt-4.1* and o3* families).
     """
 
-    def __init__(self, api_key: Optional[str] = None, model: str = "o4-mini") -> None:
+    def __init__(self, api_key: str | None = None, model: str = "o4-mini") -> None:
         """
         Initialize the O3ModelGenerator with API key and model name.
 
@@ -79,7 +79,7 @@ class O3ModelGenerator:
     def generate(
         self,
         messages: list[dict[str, str]],
-        response_format: Optional[Dict[str, Any]] = None,
+        response_format: dict[str, Any] | None = None,
     ) -> str:
         """
         Generate a response from the model using the appropriate API.
@@ -180,10 +180,10 @@ class O3ModelGenerator:
 
     def generate_stream(
         self,
-        messages: List[Dict[str, str]],
-        response_format: Optional[Union[str, Dict[str, Any]]] = None,
+        messages: list[dict[str, str]],
+        response_format: str | dict[str, Any] | None = None,
         temperature: float = 1.0,
-        stream_handler: Optional[Any] = None,
+        stream_handler: Any | None = None,
         **kwargs,
     ) -> None:
         """

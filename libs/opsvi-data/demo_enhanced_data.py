@@ -49,7 +49,7 @@ async def demo_arango_provider():
 
         # Initialize provider
         await provider.initialize()
-        print(f"  ✅ Provider initialized")
+        print("  ✅ Provider initialized")
 
         # Test health check
         health = await provider._health_check_impl()
@@ -86,7 +86,7 @@ async def demo_postgresql_provider():
 
         # Initialize provider
         await provider.initialize()
-        print(f"  ✅ Provider initialized")
+        print("  ✅ Provider initialized")
 
         # Test health check
         health = await provider._health_check_impl()
@@ -122,7 +122,7 @@ async def demo_redis_provider():
 
         # Initialize provider
         await provider.initialize()
-        print(f"  ✅ Provider initialized")
+        print("  ✅ Provider initialized")
 
         # Test health check
         health = await provider._health_check_impl()

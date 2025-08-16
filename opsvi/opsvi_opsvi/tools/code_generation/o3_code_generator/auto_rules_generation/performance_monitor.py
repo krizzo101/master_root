@@ -6,14 +6,15 @@ This module provides comprehensive performance monitoring and optimization
 capabilities for the auto rules generation system.
 """
 
+import json
+import os
+import time
+from collections.abc import Callable
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from datetime import datetime
-import json
-import os
 from pathlib import Path
-import time
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 import psutil
 
@@ -53,7 +54,7 @@ class PerformanceThresholds:
 class PerformanceMonitor:
     """Comprehensive performance monitor for auto rules generation."""
 
-    def __init__(self, output_dir: Optional[Path] = None):
+    def __init__(self, output_dir: Path | None = None):
         """Initialize the performance monitor."""
         setup_logger(LogConfig())
         self.logger = get_logger()
@@ -61,15 +62,15 @@ class PerformanceMonitor:
         self.output_dir = output_dir or Path("performance_logs")
         self.output_dir.mkdir(exist_ok=True)
 
-        self.metrics_history: List[PerformanceMetrics] = []
+        self.metrics_history: list[PerformanceMetrics] = []
         self.thresholds = PerformanceThresholds()
         self.monitoring_active = False
         self.cache_stats = {"hits": 0, "misses": 0}
 
         # Performance tracking
-        self.start_time: Optional[float] = None
-        self.start_memory: Optional[float] = None
-        self.start_cpu: Optional[float] = None
+        self.start_time: float | None = None
+        self.start_memory: float | None = None
+        self.start_cpu: float | None = None
 
         self.logger.log_info("Performance monitor initialized")
 
@@ -197,7 +198,7 @@ class PerformanceMonitor:
         if self.monitoring_active and self.metrics_history:
             self.metrics_history[-1].error_count += 1
 
-    def get_performance_summary(self) -> Dict[str, Any]:
+    def get_performance_summary(self) -> dict[str, Any]:
         """Get a summary of performance metrics."""
         if not self.metrics_history:
             return {"message": "No performance data available"}
@@ -282,7 +283,7 @@ Operation {i}:
 
         return report
 
-    def optimize_performance(self) -> List[str]:
+    def optimize_performance(self) -> list[str]:
         """Analyze performance and suggest optimizations."""
         suggestions = []
         summary = self.get_performance_summary()
@@ -344,9 +345,7 @@ Operation {i}:
 class PerformanceDecorator:
     """Decorator for automatically monitoring function performance."""
 
-    def __init__(
-        self, monitor: PerformanceMonitor, operation_name: Optional[str] = None
-    ):
+    def __init__(self, monitor: PerformanceMonitor, operation_name: str | None = None):
         """Initialize the decorator."""
         self.monitor = monitor
         self.operation_name = operation_name
@@ -388,7 +387,7 @@ class PerformanceDecorator:
 
 
 # Global performance monitor instance
-_global_monitor: Optional[PerformanceMonitor] = None
+_global_monitor: PerformanceMonitor | None = None
 
 
 def get_performance_monitor() -> PerformanceMonitor:
@@ -399,7 +398,7 @@ def get_performance_monitor() -> PerformanceMonitor:
     return global_monitor
 
 
-def monitor_performance(operation_name: Optional[str] = None):
+def monitor_performance(operation_name: str | None = None):
     """Decorator for monitoring function performance."""
     monitor = get_performance_monitor()
     return PerformanceDecorator(monitor, operation_name)

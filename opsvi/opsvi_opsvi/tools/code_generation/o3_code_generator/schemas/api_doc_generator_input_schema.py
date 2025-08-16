@@ -4,7 +4,6 @@ Input schema for API documentation generation.
 This module defines the Pydantic models for API documentation generation input data.
 """
 
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -38,7 +37,7 @@ class ApiDocGeneratorInput(BaseModel):
         default=False, description="Whether to generate client SDKs"
     )
 
-    output_directory: Optional[str] = Field(
+    output_directory: str | None = Field(
         None, description="Custom output directory for generated files"
     )
 

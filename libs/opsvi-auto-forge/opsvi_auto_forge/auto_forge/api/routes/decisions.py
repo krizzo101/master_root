@@ -1,10 +1,9 @@
 """API routes for decisions and evidence."""
 
 import logging
-from typing import Dict, Any, List, Optional
-from uuid import UUID
+from typing import Dict, Any, List
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Header
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
@@ -18,7 +17,6 @@ logger = logging.getLogger(__name__)
 async def get_neo4j_client() -> Neo4jClient:
     """Get Neo4j client."""
     from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
-    from opsvi_auto_forge.config.settings import settings
 
     return Neo4jClient(
         uri=settings.neo4j_uri,
@@ -127,7 +125,6 @@ async def get_decision_graph(
     try:
         from opsvi_auto_forge.infrastructure.memory.graph.queries import (
             QueryExecutor,
-            LineageQueries,
         )
 
         query_executor = QueryExecutor(client)

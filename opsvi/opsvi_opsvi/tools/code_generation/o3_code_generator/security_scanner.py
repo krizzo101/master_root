@@ -8,10 +8,10 @@ compliance issues, and best practices using OpenAI's latest O3 and O3-mini model
 import argparse
 import json
 import os
-from pathlib import Path
 import sys
 import time
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 if script_dir not in sys.path:
@@ -41,6 +41,7 @@ finally:
     pass
 try:
     from prompts.security_prompts import SECURITY_SYSTEM_PROMPT
+
     from schemas.security_schemas import SecurityInput, SecurityOutput
 except ImportError:
     sys.exit(1)
@@ -198,9 +199,7 @@ class SecurityAnalyzer:
             pass
         return dependencies
 
-    def _check_dependency_vulnerability(
-        self, dependency: str
-    ) -> Optional[dict[str, Any]]:
+    def _check_dependency_vulnerability(self, dependency: str) -> dict[str, Any] | None:
         """Check if a dependency has known vulnerabilities."""
         known_vulnerable_deps = ["django==1.11.0", "flask==0.12.0", "requests==2.18.0"]
         if dependency in known_vulnerable_deps:
@@ -429,7 +428,7 @@ class SecurityScanner:
     compliance issues, and best practices.
     """
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: str | None = None):
         """
         Initialize the security scanner.
 

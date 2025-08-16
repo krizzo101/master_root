@@ -5,14 +5,11 @@ Docker monitoring and metrics collection utilities.
 Provides performance monitoring and resource tracking capabilities.
 """
 
+import json
 import logging
-import time
-import asyncio
-from typing import Any, Dict, List, Optional, Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from threading import Thread, Event
-import json
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +22,7 @@ class MetricData:
     value: float
     unit: str
     timestamp: datetime
-    labels: Dict[str, str] = field(default_factory=dict)
+    labels: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass
@@ -38,7 +35,7 @@ class AlertRule:
     threshold: float
     duration: int  # seconds
     enabled: bool = True
-    actions: List[str] = field(default_factory=list)
+    actions: list[str] = field(default_factory=list)
 
 
 class MonitoringUtils:
@@ -53,7 +50,7 @@ class MonitoringUtils:
     """
 
     @staticmethod
-    def collect_container_metrics(container_stats: Dict[str, Any]) -> List[MetricData]:
+    def collect_container_metrics(container_stats: dict[str, Any]) -> list[MetricData]:
         """Collect metrics from container stats."""
         metrics = []
         timestamp = datetime.now()
@@ -182,8 +179,8 @@ class MonitoringUtils:
 
     @staticmethod
     def _calculate_cpu_usage(
-        cpu_stats: Dict[str, Any], precpu_stats: Dict[str, Any]
-    ) -> Optional[float]:
+        cpu_stats: dict[str, Any], precpu_stats: dict[str, Any]
+    ) -> float | None:
         """Calculate CPU usage percentage."""
         try:
             cpu_delta = cpu_stats.get("cpu_usage", {}).get(
@@ -207,7 +204,7 @@ class MonitoringUtils:
         return None
 
     @staticmethod
-    def collect_system_metrics() -> List[MetricData]:
+    def collect_system_metrics() -> list[MetricData]:
         """Collect system-level Docker metrics."""
         metrics = []
         timestamp = datetime.now()
@@ -303,10 +300,10 @@ class MonitoringUtils:
 
     @staticmethod
     def evaluate_alert_rules(
-        metrics: List[MetricData],
-        rules: List[AlertRule],
-        history: Dict[str, List[MetricData]] = None,
-    ) -> List[Dict[str, Any]]:
+        metrics: list[MetricData],
+        rules: list[AlertRule],
+        history: dict[str, list[MetricData]] = None,
+    ) -> list[dict[str, Any]]:
         """Evaluate alert rules against metrics."""
         alerts = []
 
@@ -412,10 +409,10 @@ class MonitoringUtils:
 
     @staticmethod
     def aggregate_metrics(
-        metrics: List[MetricData],
+        metrics: list[MetricData],
         time_window: int = 300,  # 5 minutes
         aggregation: str = "avg",  # avg, sum, min, max, count
-    ) -> Dict[str, List[MetricData]]:
+    ) -> dict[str, list[MetricData]]:
         """Aggregate metrics by time window."""
         aggregated = {}
 
@@ -482,7 +479,7 @@ class MonitoringUtils:
         return aggregated
 
     @staticmethod
-    def format_metrics_report(metrics: List[MetricData]) -> str:
+    def format_metrics_report(metrics: list[MetricData]) -> str:
         """Format metrics into a readable report."""
         if not metrics:
             return "No metrics available."

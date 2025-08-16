@@ -9,7 +9,7 @@ cleaning.
 
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import yaml
 
@@ -37,7 +37,7 @@ class UniversalInputLoader:
         self.max_file_size: int = 10 * 1024 * 1024
         self.supported_formats: set[str] = {".json", ".yaml", ".yml"}
 
-    def load_json_file(self, file_path: str | Path) -> Dict[str, Any]:
+    def load_json_file(self, file_path: str | Path) -> dict[str, Any]:
         """
         Load and validate JSON input file.
 
@@ -89,7 +89,7 @@ class UniversalInputLoader:
         finally:
             pass
 
-    def load_yaml_file(self, file_path: str | Path) -> Dict[str, Any]:
+    def load_yaml_file(self, file_path: str | Path) -> dict[str, Any]:
         """
         Load and validate YAML input file.
 
@@ -141,7 +141,7 @@ class UniversalInputLoader:
         finally:
             pass
 
-    def load_file_by_extension(self, file_path: str | Path) -> Dict[str, Any]:
+    def load_file_by_extension(self, file_path: str | Path) -> dict[str, Any]:
         """
         Auto-detect file type by extension and load appropriately.
 
@@ -172,7 +172,7 @@ class UniversalInputLoader:
         raise ValueError(error_msg)
 
     def validate_required_fields(
-        self, data: Dict[str, Any], required_fields: list[str]
+        self, data: dict[str, Any], required_fields: list[str]
     ) -> None:
         """
         Validate that required fields are present in the data.
@@ -206,7 +206,7 @@ class UniversalInputLoader:
             pass
         self.logger.log_debug(f"Validated required fields: {required_fields}")
 
-    def clean_template_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def clean_template_data(self, data: dict[str, Any]) -> dict[str, Any]:
         """
         Remove template comments and metadata from data.
 

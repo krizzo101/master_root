@@ -5,7 +5,7 @@ import json
 import logging
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 from uuid import UUID
 
 from neo4j import AsyncGraphDatabase, Driver
@@ -14,7 +14,6 @@ from neo4j.exceptions import ServiceUnavailable, AuthError, TransientError
 from opsvi_auto_forge.config.settings import settings
 from .safe_serializer import Neo4jSafeSerializer
 from .queries import LineageQueries
-from .driver import get_session, close_driver
 
 logger = logging.getLogger(__name__)
 
@@ -186,7 +185,7 @@ class Neo4jClient:
         for attempt in range(5):
             try:
                 return await self._driver.execute_query(fn, *args, **kwargs)
-            except (ServiceUnavailable, TransientError) as e:
+            except (ServiceUnavailable, TransientError):
                 if attempt == 4:  # Last attempt
                     raise
                 await asyncio.sleep(0.25 * (attempt + 1))
@@ -378,7 +377,7 @@ class Neo4jClient:
 
     async def update_run_status(self, run_id: str, status: str, **updates: Any) -> None:
         """Update run status and other fields."""
-        set_clauses = [f"r.status = $status", "r.updated_at = datetime()"]
+        set_clauses = ["r.status = $status", "r.updated_at = datetime()"]
         parameters = {"run_id": run_id, "status": status}
 
         for key, value in updates.items():
@@ -425,7 +424,7 @@ class Neo4jClient:
         self, task_id: str, status: str, **updates: Any
     ) -> None:
         """Update task status and other fields."""
-        set_clauses = [f"t.status = $status", "t.updated_at = datetime()"]
+        set_clauses = ["t.status = $status", "t.updated_at = datetime()"]
         parameters = {"task_id": task_id, "status": status}
 
         for key, value in updates.items():
@@ -745,7 +744,6 @@ class Neo4jClient:
     async def apply_migration(self, migration_file: str) -> bool:
         """Apply a migration file to the database."""
         try:
-            import os
             from pathlib import Path
 
             # Read migration file

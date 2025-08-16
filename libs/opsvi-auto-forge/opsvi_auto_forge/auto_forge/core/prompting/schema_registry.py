@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import Dict, Type, Any
+from typing import Dict, Any
 
-from .schemas.planner import PlanOutput, PlanRevision
+from .schemas.planner import PlanOutput
 from .schemas.specifier import SpecificationOutput
 from .schemas.coder import CodeOutput
 from .schemas.critic import CriticOutput

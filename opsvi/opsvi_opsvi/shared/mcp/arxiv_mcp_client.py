@@ -7,13 +7,13 @@ to search, download, and read academic papers.
 """
 
 import asyncio
-from contextlib import asynccontextmanager
-from dataclasses import dataclass
 import json
 import logging
 import os
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -25,10 +25,10 @@ class ArXivPaper:
 
     title: str
     summary: str
-    authors: List[str]
-    links: List[str]
+    authors: list[str]
+    links: list[str]
     pdf_url: str
-    paper_id: Optional[str] = None
+    paper_id: str | None = None
 
 
 class ArXivMCPClient:
@@ -88,10 +88,10 @@ class ArXivMCPClient:
         self,
         query: str,
         max_results: int = 10,
-        categories: Optional[List[str]] = None,
-        date_from: Optional[str] = None,
-        date_to: Optional[str] = None,
-    ) -> List[ArXivPaper]:
+        categories: list[str] | None = None,
+        date_from: str | None = None,
+        date_to: str | None = None,
+    ) -> list[ArXivPaper]:
         """Search for papers on ArXiv.
 
         Args:
@@ -149,7 +149,7 @@ class ArXivMCPClient:
             self.logger.error(f"Error searching papers: {e}")
             raise
 
-    async def download_paper(self, paper_id: str) -> Dict[str, Any]:
+    async def download_paper(self, paper_id: str) -> dict[str, Any]:
         """Download a paper by its ArXiv ID.
 
         Args:
@@ -187,7 +187,7 @@ class ArXivMCPClient:
             self.logger.error(f"Error downloading paper {paper_id}: {e}")
             raise
 
-    async def read_paper(self, paper_id: str) -> Dict[str, Any]:
+    async def read_paper(self, paper_id: str) -> dict[str, Any]:
         """Read a downloaded paper by its ArXiv ID.
 
         Args:
@@ -225,7 +225,7 @@ class ArXivMCPClient:
             self.logger.error(f"Error reading paper {paper_id}: {e}")
             raise
 
-    async def list_papers(self) -> Dict[str, Any]:
+    async def list_papers(self) -> dict[str, Any]:
         """List all available papers.
 
         Returns:

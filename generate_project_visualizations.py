@@ -3,10 +3,8 @@
 Generate comprehensive visualizations for all analyzed custom projects
 """
 import json
-import os
-from pathlib import Path
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from pathlib import Path
 
 
 @dataclass
@@ -14,13 +12,13 @@ class ProjectInfo:
     name: str
     purpose: str
     total_files: int
-    main_technologies: List[str]
+    main_technologies: list[str]
     architecture_type: str
-    key_components: List[str]
+    key_components: list[str]
     complexity_score: int
 
 
-def read_project_intelligence(project_path: Path) -> Optional[Dict]:
+def read_project_intelligence(project_path: Path) -> dict | None:
     """Read project intelligence data from a project directory"""
     intel_file = project_path / ".proj-intel" / "project_analysis.pretty.json"
 
@@ -29,14 +27,14 @@ def read_project_intelligence(project_path: Path) -> Optional[Dict]:
         return None
 
     try:
-        with open(intel_file, "r") as f:
+        with open(intel_file) as f:
             return json.load(f)
     except Exception as e:
         print(f"❌ Error reading {project_path.name}: {e}")
         return None
 
 
-def analyze_project(project_path: Path, data: Dict) -> ProjectInfo:
+def analyze_project(project_path: Path, data: dict) -> ProjectInfo:
     """Extract key information from project intelligence data"""
 
     # Extract purpose
@@ -124,7 +122,7 @@ def analyze_project(project_path: Path, data: Dict) -> ProjectInfo:
     )
 
 
-def generate_mermaid_diagram(projects: List[ProjectInfo]) -> str:
+def generate_mermaid_diagram(projects: list[ProjectInfo]) -> str:
     """Generate a comprehensive Mermaid diagram for all projects"""
 
     diagram = """graph TB
@@ -186,7 +184,7 @@ def generate_mermaid_diagram(projects: List[ProjectInfo]) -> str:
     return diagram
 
 
-def generate_project_summary_table(projects: List[ProjectInfo]) -> str:
+def generate_project_summary_table(projects: list[ProjectInfo]) -> str:
     """Generate a markdown table summarizing all projects"""
 
     table = """# Custom Projects Analysis Summary
@@ -217,7 +215,7 @@ def generate_project_summary_table(projects: List[ProjectInfo]) -> str:
     return table
 
 
-def generate_individual_diagrams(projects: List[ProjectInfo]) -> Dict[str, str]:
+def generate_individual_diagrams(projects: list[ProjectInfo]) -> dict[str, str]:
     """Generate individual diagrams for complex projects"""
 
     individual_diagrams = {}

@@ -3,7 +3,8 @@
 import importlib
 import inspect
 import logging
-from typing import Any, Callable, Dict, List, Optional, Type
+from collections.abc import Callable
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -13,16 +14,16 @@ class AgentRegistry:
 
     def __init__(self) -> None:
         """Initialize the agent registry."""
-        self._agents: Dict[str, Callable] = {}
-        self._agent_configs: Dict[str, Dict[str, Any]] = {}
-        self._agent_metadata: Dict[str, Dict[str, Any]] = {}
+        self._agents: dict[str, Callable] = {}
+        self._agent_configs: dict[str, dict[str, Any]] = {}
+        self._agent_metadata: dict[str, dict[str, Any]] = {}
 
     def register_agent(
         self,
         name: str,
         agent_func: Callable,
-        config: Optional[Dict[str, Any]] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        config: dict[str, Any] | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """Register an agent function."""
         self._agents[name] = agent_func
@@ -34,8 +35,8 @@ class AgentRegistry:
         self,
         name: str,
         dotted_path: str,
-        config: Optional[Dict[str, Any]] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        config: dict[str, Any] | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """Register an agent from a dotted import path."""
         try:
@@ -55,19 +56,19 @@ class AgentRegistry:
             logger.error(f"Failed to load agent from path {dotted_path}: {e}")
             raise
 
-    def get_agent(self, name: str) -> Optional[Callable]:
+    def get_agent(self, name: str) -> Callable | None:
         """Get an agent by name."""
         return self._agents.get(name)
 
-    def get_agent_config(self, name: str) -> Dict[str, Any]:
+    def get_agent_config(self, name: str) -> dict[str, Any]:
         """Get configuration for an agent."""
         return self._agent_configs.get(name, {})
 
-    def get_agent_metadata(self, name: str) -> Dict[str, Any]:
+    def get_agent_metadata(self, name: str) -> dict[str, Any]:
         """Get metadata for an agent."""
         return self._agent_metadata.get(name, {})
 
-    def list_agents(self) -> List[str]:
+    def list_agents(self) -> list[str]:
         """List all registered agent names."""
         return list(self._agents.keys())
 
@@ -78,8 +79,8 @@ class AgentRegistry:
     def execute_agent(
         self,
         name: str,
-        input_data: Dict[str, Any],
-        config: Optional[Dict[str, Any]] = None,
+        input_data: dict[str, Any],
+        config: dict[str, Any] | None = None,
     ) -> Any:
         """Execute an agent with input data."""
         if not self.has_agent(name):
@@ -109,8 +110,8 @@ class AgentRegistry:
     async def execute_agent_async(
         self,
         name: str,
-        input_data: Dict[str, Any],
-        config: Optional[Dict[str, Any]] = None,
+        input_data: dict[str, Any],
+        config: dict[str, Any] | None = None,
     ) -> Any:
         """Execute an agent asynchronously."""
         if not self.has_agent(name):
@@ -137,7 +138,7 @@ class AgentRegistry:
             logger.error(f"Failed to execute agent {name}: {e}")
             raise
 
-    def get_agent_signature(self, name: str) -> Optional[inspect.Signature]:
+    def get_agent_signature(self, name: str) -> inspect.Signature | None:
         """Get the signature of an agent function."""
         if not self.has_agent(name):
             return None
@@ -145,7 +146,7 @@ class AgentRegistry:
         agent_func = self.get_agent(name)
         return inspect.signature(agent_func)
 
-    def validate_agent_input(self, name: str, input_data: Dict[str, Any]) -> bool:
+    def validate_agent_input(self, name: str, input_data: dict[str, Any]) -> bool:
         """Validate input data against agent signature."""
         signature = self.get_agent_signature(name)
         if not signature:

@@ -4,7 +4,6 @@ Output schema for project initialization.
 This module defines the Pydantic models for project initialization output data.
 """
 
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -26,7 +25,7 @@ class ProjectInitializationOutput(BaseModel):
         _default_factory=list, description="List of next steps for the user to follow"
     )
 
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Error message if initialization failed"
     )
 

@@ -1,6 +1,6 @@
 """TODO: Add module-level docstring."""
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -54,6 +54,6 @@ class RequirementsOutput(BaseModel):
     )
     generation_time: float = Field(..., description="Time taken to generate analysis")
     model_used: str = Field(..., description="Model used for generation")
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None, description="Error message if analysis failed"
     )

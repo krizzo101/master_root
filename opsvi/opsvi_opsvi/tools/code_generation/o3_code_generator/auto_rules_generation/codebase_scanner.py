@@ -11,12 +11,11 @@ infinite loops.
 """
 
 import ast
+import os
+import time
 from dataclasses import dataclass
 from datetime import datetime
-import os
 from pathlib import Path
-import time
-from typing import Dict, List, Optional, Set
 
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import (
     LogConfig,
@@ -39,7 +38,7 @@ class FileMetadata:
     size: int
     last_modified: datetime
     category: str
-    import_dependencies: Set[str]
+    import_dependencies: set[str]
     has_main: bool
     has_classes: bool
     has_functions: bool
@@ -53,9 +52,9 @@ class CodebaseMetadata:
 
     total_files: int
     total_lines: int
-    categories: Dict[str, List[FileMetadata]]
-    dependencies: Dict[str, Set[str]]
-    file_relationships: Dict[str, List[str]]
+    categories: dict[str, list[FileMetadata]]
+    dependencies: dict[str, set[str]]
+    file_relationships: dict[str, list[str]]
 
 
 class CodebaseScanner:
@@ -66,7 +65,7 @@ class CodebaseScanner:
     and identifies file relationships and dependencies.
     """
 
-    def __init__(self, base_path: Optional[Path] = None) -> None:
+    def __init__(self, base_path: Path | None = None) -> None:
         """
         Initialize the codebase scanner.
 
@@ -91,7 +90,7 @@ class CodebaseScanner:
             raise
 
         # Predefined file categories
-        self.categories: Dict[str, List[Path]] = {
+        self.categories: dict[str, list[Path]] = {
             "main_scripts": [],
             "modules": [],
             "utils": [],
@@ -179,7 +178,7 @@ class CodebaseScanner:
             file_relationships=relationships,
         )
 
-    def _discover_python_files(self) -> List[Path]:
+    def _discover_python_files(self) -> list[Path]:
         """
         Discover all Python files in the codebase.
 
@@ -187,7 +186,7 @@ class CodebaseScanner:
             List[Path]: All .py file paths under base_path.
         """
         start_time = time.monotonic()
-        python_files: List[Path] = []
+        python_files: list[Path] = []
         file_counter = 0
 
         # Walk the file system with infinite loop prevention via timeout
@@ -216,7 +215,7 @@ class CodebaseScanner:
         )
         return python_files
 
-    def _categorize_files(self, python_files: List[Path]) -> Dict[str, List[Path]]:
+    def _categorize_files(self, python_files: list[Path]) -> dict[str, list[Path]]:
         """
         Categorize Python files based on their location and content.
 
@@ -226,7 +225,7 @@ class CodebaseScanner:
         Returns:
             Dict[str, List[Path]]: Mapping from category to list of paths.
         """
-        categorized: Dict[str, List[Path]] = {cat: [] for cat in self.categories.keys()}
+        categorized: dict[str, list[Path]] = {cat: [] for cat in self.categories.keys()}
         file_counter = 0
         start_time = time.monotonic()
 
@@ -278,8 +277,8 @@ class CodebaseScanner:
         return "modules"
 
     def _extract_file_metadata(
-        self, categorized_files: Dict[str, List[Path]]
-    ) -> Dict[Path, FileMetadata]:
+        self, categorized_files: dict[str, list[Path]]
+    ) -> dict[Path, FileMetadata]:
         """
         Extract detailed metadata for each file.
 
@@ -289,7 +288,7 @@ class CodebaseScanner:
         Returns:
             Dict[Path, FileMetadata]: Mapping of file path to its metadata.
         """
-        file_metadata: Dict[Path, FileMetadata] = {}
+        file_metadata: dict[Path, FileMetadata] = {}
         total_files = sum(len(files) for files in categorized_files.values())
         processed_files = 0
         start_time = time.monotonic()
@@ -361,7 +360,7 @@ class CodebaseScanner:
             complexity_score=complexity_score,
         )
 
-    def _extract_import_dependencies(self, tree: ast.AST) -> Set[str]:
+    def _extract_import_dependencies(self, tree: ast.AST) -> set[str]:
         """
         Extract import dependencies from AST.
 
@@ -371,7 +370,7 @@ class CodebaseScanner:
         Returns:
             Set[str]: Set of module names imported.
         """
-        dependencies: Set[str] = set()
+        dependencies: set[str] = set()
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 for alias in node.names:
@@ -441,8 +440,8 @@ class CodebaseScanner:
         return complexity
 
     def _analyze_dependencies(
-        self, file_metadata: Dict[Path, FileMetadata]
-    ) -> Dict[str, Set[str]]:
+        self, file_metadata: dict[Path, FileMetadata]
+    ) -> dict[str, set[str]]:
         """
         Analyze dependencies between files.
 
@@ -452,7 +451,7 @@ class CodebaseScanner:
         Returns:
             Dict[str, Set[str]]: Mapping of file to imported modules.
         """
-        dependencies: Dict[str, Set[str]] = {}
+        dependencies: dict[str, set[str]] = {}
         for file_path, metadata in file_metadata.items():
             file_key = str(file_path.relative_to(self.base_path))
             dependencies[file_key] = metadata.import_dependencies
@@ -462,8 +461,8 @@ class CodebaseScanner:
         return dependencies
 
     def _analyze_file_relationships(
-        self, file_metadata: Dict[Path, FileMetadata]
-    ) -> Dict[str, List[str]]:
+        self, file_metadata: dict[Path, FileMetadata]
+    ) -> dict[str, list[str]]:
         """
         Analyze relationships between files based on imports.
 
@@ -473,10 +472,10 @@ class CodebaseScanner:
         Returns:
             Dict[str, List[str]]: Mapping of file to list of dependent files.
         """
-        relationships: Dict[str, List[str]] = {}
+        relationships: dict[str, list[str]] = {}
         for file_path, metadata in file_metadata.items():
             file_key = str(file_path.relative_to(self.base_path))
-            related: List[str] = []
+            related: list[str] = []
             for other_path, other_meta in file_metadata.items():
                 if file_path == other_path:
                     continue

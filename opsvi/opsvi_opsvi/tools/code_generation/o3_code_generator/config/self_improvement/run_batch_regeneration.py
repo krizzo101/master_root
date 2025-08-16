@@ -4,10 +4,10 @@ Batch regeneration script for all utility modules.
 Runs all enhancement requests in parallel to regenerate utility modules with project rules.
 """
 
-from pathlib import Path
 import subprocess
 import sys
 import time
+from pathlib import Path
 
 
 def run_enhancement(enhancement_file: str) -> bool:

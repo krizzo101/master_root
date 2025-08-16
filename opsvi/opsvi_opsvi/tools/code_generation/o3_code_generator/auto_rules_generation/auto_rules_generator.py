@@ -8,7 +8,7 @@ Codebase Scan → AST Analysis → Pattern Extraction → Rule Generation → Va
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any
 
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import (
     LogConfig,
@@ -37,13 +37,13 @@ class AutoRulesGenerationResult:
     """Complete result of auto rules generation process."""
 
     success: bool
-    generated_rules: List[Any]
-    validation_report: Optional[ValidationReport]
-    pattern_analysis: Optional[PatternAnalysis]
-    codebase_metadata: Optional[CodebaseMetadata]
-    output_files: List[Path]
+    generated_rules: list[Any]
+    validation_report: ValidationReport | None
+    pattern_analysis: PatternAnalysis | None
+    codebase_metadata: CodebaseMetadata | None
+    output_files: list[Path]
     summary: str
-    recommendations: List[str]
+    recommendations: list[str]
     execution_time: float
 
 
@@ -55,9 +55,7 @@ class AutoRulesGenerator:
     based on actual codebase patterns.
     """
 
-    def __init__(
-        self, base_path: Optional[Path] = None, output_dir: Optional[Path] = None
-    ):
+    def __init__(self, base_path: Path | None = None, output_dir: Path | None = None):
         """Initialize the auto rules generator."""
         # Call setup_logger before any get_logger
         setup_logger(LogConfig())
@@ -174,7 +172,7 @@ class AutoRulesGenerator:
 
     def _perform_ast_analysis(
         self, codebase_metadata: CodebaseMetadata
-    ) -> List[FileAnalysis]:
+    ) -> list[FileAnalysis]:
         """Perform AST analysis on all discovered files."""
         file_analyses = []
 
@@ -201,7 +199,7 @@ class AutoRulesGenerator:
         validation_report: ValidationReport,
         pattern_analysis: PatternAnalysis,
         codebase_metadata: CodebaseMetadata,
-    ) -> List[Path]:
+    ) -> list[Path]:
         """Generate output files with the analysis results."""
         output_files = []
 
@@ -298,7 +296,7 @@ class AutoRulesGenerator:
 
     def _generate_updated_project_rules(
         self, rule_result: RuleGenerationResult, validation_report: ValidationReport
-    ) -> Optional[Path]:
+    ) -> Path | None:
         """Generate updated project_rules.md with new rules."""
         try:
             # Read existing project rules
@@ -364,7 +362,7 @@ class AutoRulesGenerator:
 
     def _generate_updated_universal_rules(
         self, rule_result: RuleGenerationResult, validation_report: ValidationReport
-    ) -> Optional[Path]:
+    ) -> Path | None:
         """Generate updated universal_rules.md with new rules."""
         try:
             # Read existing universal rules
@@ -532,7 +530,7 @@ Rollback Recommendations: {len(validation_report.rollback_recommendations)}
 
     def _generate_recommendations(
         self, validation_report: ValidationReport, pattern_analysis: PatternAnalysis
-    ) -> List[str]:
+    ) -> list[str]:
         """Generate recommendations based on validation results."""
         recommendations = []
 

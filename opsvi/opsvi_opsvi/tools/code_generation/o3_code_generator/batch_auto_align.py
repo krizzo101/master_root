@@ -10,11 +10,11 @@ Processes multiple files in parallel using auto-align to fix:
 
 import concurrent.futures
 import json
-from pathlib import Path
 import subprocess
 import sys
 import time
-from typing import Any, Dict, List
+from pathlib import Path
+from typing import Any
 
 from src.tools.code_generation.o3_code_generator.alignment_scanner import (
     AlignmentScanner,
@@ -46,7 +46,7 @@ class BatchAutoAlign:
         self.results = {"processed_files": [], "processing_time": 0, "total_files": 0}
         self.logger.log_info(f"Initialized BatchAutoAlign with {max_workers} workers")
 
-    def load_alignment_map(self, scan_results_path: Path = None) -> List[str]:
+    def load_alignment_map(self, scan_results_path: Path = None) -> list[str]:
         """
         Load the list of files needing alignment from scan results.
 
@@ -75,7 +75,7 @@ class BatchAutoAlign:
         )
         return files_needing_alignment
 
-    def process_single_file(self, file_path: str) -> Dict[str, Any]:
+    def process_single_file(self, file_path: str) -> dict[str, Any]:
         """
         Process a single file with auto-align using progressive fixing approach.
 
@@ -213,7 +213,7 @@ class BatchAutoAlign:
         return attempt_limits.get(complexity, 5)
 
     def _calculate_improvement_score(
-        self, scan_issue: Dict[str, Any], attempt: int
+        self, scan_issue: dict[str, Any], attempt: int
     ) -> int:
         """
         Calculate improvement score based on remaining issues.
@@ -241,7 +241,7 @@ class BatchAutoAlign:
         return max(0, score)
 
     def _determine_final_status(
-        self, partial_successes: List[Dict], attempts: int, max_attempts: int
+        self, partial_successes: list[dict], attempts: int, max_attempts: int
     ) -> str:
         """
         Determine final status based on partial successes and attempts.
@@ -265,7 +265,7 @@ class BatchAutoAlign:
         else:
             return "failed"
 
-    def process_files_parallel(self, file_paths: List[str]) -> Dict[str, Any]:
+    def process_files_parallel(self, file_paths: list[str]) -> dict[str, Any]:
         """
         Process multiple files in parallel using ThreadPoolExecutor.
 
@@ -552,7 +552,7 @@ class BatchAutoAlign:
 
     def run_batch_alignment(
         self, scan_results_path: Path = None, max_files: int = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Run the complete batch alignment process.
 

@@ -6,11 +6,10 @@ This module orchestrates all bulletproofing components to ensure the auto rules
 generation system is truly bulletproof before git hook integration.
 """
 
+import time
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-import time
-from typing import List, Optional
 
 from src.tools.code_generation.o3_code_generator.o3_logger.logger import (
     LogConfig,
@@ -40,7 +39,7 @@ class BulletproofingResult:
     performance_report: str
     recovery_report: str
     config_report: str
-    recommendations: List[str]
+    recommendations: list[str]
     timestamp: datetime
 
 
@@ -166,8 +165,8 @@ class BulletproofingOrchestrator:
         return all(recovery_checks)
 
     def _generate_recommendations(
-        self, is_bulletproof: bool, validation_results: List, config_errors: List[str]
-    ) -> List[str]:
+        self, is_bulletproof: bool, validation_results: list, config_errors: list[str]
+    ) -> list[str]:
         """Generate recommendations based on validation results."""
         recommendations = []
 
@@ -412,7 +411,7 @@ class BulletproofingOrchestrator:
 
 
 # Global orchestrator instance
-_global_orchestrator: Optional[BulletproofingOrchestrator] = None
+_global_orchestrator: BulletproofingOrchestrator | None = None
 
 
 def get_bulletproofing_orchestrator() -> BulletproofingOrchestrator:

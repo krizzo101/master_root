@@ -1,0 +1,161 @@
+---
+description: "use when NEEDING CODE GENERATION OR MODIFICATION to LEVERAGE CLAUDE CODE MCP TOOLS for PARALLEL AUTONOMOUS EXECUTION"
+globs:
+alwaysApply: false
+---
+
+# Claude Code MCP Tool Leverage Protocol
+
+**Validation**: "Claude Code MCP Integration Active"
+
+## Tool Recognition Patterns
+
+**Triggers**: Code generation requests, parallel task requirements, recursive operations, autonomous code modifications
+**Principles**: Parallel-first execution, job-based architecture, recursion awareness, performance monitoring
+**Signatures**: `claude_run_async` for parallel, `claude_run` for sequential, job IDs for tracking
+**Validation**: Job completion status, dashboard metrics, recursion depth compliance
+**Integration**: Python-based server at `opsvi_mcp.servers.claude_code`, FastMCP framework
+
+## Available MCP Tools
+
+**Core Execution**:
+- `claude_run`: Synchronous task execution (blocks until complete)
+- `claude_run_async`: Asynchronous parallel execution (returns job ID immediately)
+
+**Job Management**:
+- `claude_status`: Check job progress (requires jobId)
+- `claude_result`: Retrieve completed results (requires jobId)
+- `claude_list_jobs`: View all active/recent jobs
+- `claude_kill_job`: Terminate running job (requires jobId)
+
+**Monitoring**:
+- `claude_dashboard`: System performance metrics
+- `claude_recursion_stats`: Recursion limits and depth tracking
+
+## Parallel Execution Pattern
+
+**When**: Multiple independent code generation tasks
+**How**: Launch multiple `claude_run_async` calls, collect job IDs, monitor with `claude_status`
+**Example**:
+```
+1. Launch: claude_run_async(task="Create user model")
+2. Launch: claude_run_async(task="Create API endpoints")
+3. Launch: claude_run_async(task="Write test suite")
+4. Monitor: claude_dashboard() for parallel efficiency
+5. Collect: claude_result(jobId) for each when ready
+```
+
+## Task Decomposition Strategy
+
+**Principles**:
+- Break complex tasks into parallel-executable units
+- Identify independent vs dependent operations
+- Leverage recursion for hierarchical tasks (max depth: 3)
+- Monitor system load via dashboard
+
+**Anti-patterns**:
+- Sequential execution of independent tasks
+- Exceeding recursion depth limits
+- Ignoring job failures without checking status
+- Not utilizing parallel efficiency metrics
+
+## Permission Modes
+
+**bypassPermissions** (default): Full automation, no prompts
+**acceptEdits**: Auto-accepts file modifications
+**plan**: Shows plan before execution
+**default**: Standard Claude CLI behavior
+
+## Optimal Usage Patterns
+
+**For Feature Implementation**:
+```yaml
+Task: "Implement complete user authentication system"
+Decompose:
+  - claude_run_async: "Create user model and schema"
+  - claude_run_async: "Implement JWT authentication"
+  - claude_run_async: "Create login/logout endpoints"
+  - claude_run_async: "Write authentication middleware"
+  - claude_run: "Integrate all components" (after async complete)
+```
+
+**For Refactoring**:
+```yaml
+Task: "Refactor legacy codebase"
+Strategy:
+  - claude_list_jobs: Check current load
+  - claude_run_async: Per-module refactoring
+  - claude_dashboard: Monitor parallel efficiency
+  - claude_recursion_stats: Track depth for complex refactors
+```
+
+## Configuration Parameters
+
+**Essential**:
+- `task`: Clear, specific instruction
+- `outputFormat`: "json" for structured, "text" for raw
+- `permissionMode`: "bypassPermissions" for automation
+
+**Optional**:
+- `cwd`: Working directory override
+- `verbose`: Detailed output logging
+- `parentJobId`: For recursion tracking
+
+## Performance Optimization
+
+**Metrics to Monitor**:
+- `parallelEfficiency`: Should exceed 2.0x for effective use
+- `activeJobs`: Keep under 20 (system limit)
+- `recursionDepth`: Maximum 3 levels
+- `averageDuration`: Track for capacity planning
+
+**Resource Management**:
+- Check `systemLoad` before launching jobs
+- Use `claude_kill_job` for stuck processes
+- Monitor `failedJobs` count for error patterns
+
+## Error Handling Patterns
+
+**Job Failures**:
+1. Check `claude_status(jobId)` for error details
+2. Review stderr in logs: `/home/opsvi/master_root/logs/claude-code/`
+3. Retry with adjusted parameters or permission mode
+
+**Recursion Limits**:
+- Error: "Recursion depth limit exceeded"
+- Solution: Restructure task hierarchy, flatten dependencies
+
+**Timeout Handling**:
+- Base timeout: 5 minutes (increases with depth)
+- Monitor long-running jobs with `claude_status`
+- Kill if necessary with `claude_kill_job`
+
+## Integration with OPSVI Ecosystem
+
+**Logs**: `/home/opsvi/master_root/logs/claude-code/parallel-execution-*.log`
+**Config**: Environment variables via CLAUDE_* prefix
+**Future**: Celery integration for distributed execution
+**Database**: Job metadata persistence (planned)
+
+## Success Indicators
+
+- Multiple jobs running simultaneously (check dashboard)
+- Parallel efficiency > 2.0x
+- No recursion limit violations
+- All jobs completing without timeout
+- Consistent output format (json/text as specified)
+
+## Token Efficiency Tips
+
+- Use `claude_run_async` for all independent operations
+- Batch related tasks in single job when dependencies exist
+- Monitor dashboard to avoid oversaturation
+- Leverage recursion for complex hierarchical tasks
+
+## Validation Checklist
+
+✓ Server running: `python -m opsvi_mcp.servers.claude_code`
+✓ Token configured: CLAUDE_CODE_TOKEN in environment
+✓ Parallel execution verified via dashboard
+✓ Logs accessible and structured
+✓ All 8 tools responding correctly
