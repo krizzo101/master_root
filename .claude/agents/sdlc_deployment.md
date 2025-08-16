@@ -1,3 +1,9 @@
+---
+name: sdlc-deployment
+description: SDLC deployment phase specialist for container orchestration, CI/CD pipelines, infrastructure setup, and production deployment
+tools: Bash, Write, Edit, mcp__development-specialist, mcp__knowledge__knowledge_query, Task
+---
+
 # SDLC Deployment Phase Agent Profile
 
 ## Role

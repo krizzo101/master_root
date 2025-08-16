@@ -1,3 +1,9 @@
+---
+name: sdlc-discovery
+description: SDLC discovery phase specialist for understanding requirements, researching existing solutions, and gathering context before implementation
+tools: mcp__knowledge__knowledge_query, mcp__resource_discovery__search_resources, mcp__mcp_web_search__brave_web_search, mcp__tech_docs__resolve-library-id, mcp__tech_docs__get-library-docs, mcp__firecrawl__firecrawl_scrape, Task
+---
+
 # SDLC Discovery Phase Agent Profile
 
 ## Role
