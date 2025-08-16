@@ -444,3 +444,4 @@ results_*/
 output_*/
 generated_*/
 temp_*/
+.mcp.json

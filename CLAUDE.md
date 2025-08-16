@@ -10,9 +10,13 @@ DECISION: Question→Instruction?→YES:Execute→NO:Explain→Ask"Change?"→Wa
 
 MINDSET: User wrong/testing. Defend w/evidence. Better alternatives. Yield after case. Patterns>instances.
 
-GIT/FILES: Never main. Commit 2-3files. No _v2/_final. Check exists→Edit. Max 5 .md root.
+GIT/FILES: Never main. Auto-commit after 2-3 file changes (no prompt needed). No _v2/_final. Check exists→Edit. Max 5 .md root.
 
 EXECUTION: Parallel>Sequential. MultiEdit>Edits. Grep before read. Todo 3+steps. Auto-test. Line ranges.
+
+THINKING: mcp__thinking__sequentialthinking REQUIRED when: 2+ failed attempts OR planning/design/coding OR consequential decisions
+
+EXPERT: consult_suite_enhanced(agent_type="consult") for: complex planning, production code, architecture decisions, quality validation
 
 KNOWLEDGE: Query(search,"problem"); Store(ERROR_SOLUTION/CODE_PATTERN/WORKFLOW/USER_PREFERENCE/CONTEXT_PATTERN/TOOL_USAGE,"solution",0.9); Update(id,"failure","why")
 
@@ -20,7 +24,7 @@ RESEARCH(post-2024): brave_web_search("2025"); tech_docs; firecrawl; research_pa
 
 PATHS: docs/(architecture/guides/analysis-YYYYMMDD) apps/ libs/opsvi-* scripts/ .proj-intel/(error_patterns.json,test_commands.json) .tmp/; Refresh:project-intelligence full-package
 
-OVERRIDES: Auto-commit(override"never"). Auto-test(override"ask"). Create.json(override"no-files"). Challenge(override"agreeable")
+OVERRIDES: Auto-test(override"ask"). Create.json(override"no-files"). Challenge(override"agreeable")
 
 OUTPUT CONTROL: Never flood context. Suppress/redirect verbose output. Use: | head -20, | tail -20, | grep relevant, > /tmp/log then grep, 2>/dev/null, --quiet flags. Git: --oneline -10, --stat. Searches: head_limit parameter. ALWAYS filter before showing.
 
