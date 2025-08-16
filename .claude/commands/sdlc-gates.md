@@ -124,6 +124,46 @@ apps/<project-name>/.sdlc/production-complete.json
 }
 ```
 
+#### 8. POSTMORTEM Phase
+**Required Outputs:**
+```bash
+apps/<project-name>/.sdlc/postmortem-complete.json
+# Must contain:
+{
+  "phase": "postmortem",
+  "completed": "ISO-8601 timestamp",
+  "postmortem_doc": "docs/6-postmortem.md",
+  "violations": [
+    {
+      "phase": "...",
+      "type": "skipped_tool|missing_artifact|shortcut_taken",
+      "severity": "critical|major|minor",
+      "description": "..."
+    }
+  ],
+  "compliance_score": 0.85,
+  "lessons_captured": [
+    {
+      "type": "success|failure|improvement",
+      "description": "...",
+      "action_item": "..."
+    }
+  ],
+  "branch_disposition": "merged|pr|archived|deleted",
+  "improvements_proposed": [...],
+  "knowledge_stored": true
+}
+```
+
+**Gate Check:**
+```bash
+# Before considering project complete
+if [ ! -f "apps/<project-name>/.sdlc/postmortem-complete.json" ]; then
+  echo "ERROR: Project not complete without postmortem"
+  exit 1
+fi
+```
+
 ## Enforcement Script
 
 ```python
@@ -135,14 +175,14 @@ from pathlib import Path
 def check_phase_gate(project_path: Path, phase: str) -> bool:
     """Check if phase gate requirements are met."""
     gate_file = project_path / ".sdlc" / f"{phase}-complete.json"
-    
+
     if not gate_file.exists():
         print(f"❌ Missing gate file: {gate_file}")
         return False
-    
+
     with open(gate_file) as f:
         gate_data = json.load(f)
-    
+
     # Validate required fields based on phase
     required_fields = {
         "discovery": ["requirements_doc", "existing_solutions_checked", "decision"],
@@ -151,14 +191,15 @@ def check_phase_gate(project_path: Path, phase: str) -> bool:
         "development": ["tasks_completed", "commits", "tests_written"],
         "testing": ["test_files", "coverage_percent", "tests_passing"],
         "deployment": ["deployment_config", "documentation_complete"],
-        "production": ["final_review", "knowledge_captured"]
+        "production": ["final_review", "knowledge_captured"],
+        "postmortem": ["postmortem_doc", "violations", "compliance_score", "lessons_captured", "branch_disposition", "knowledge_stored"]
     }
-    
+
     for field in required_fields.get(phase, []):
         if field not in gate_data:
             print(f"❌ Missing required field: {field}")
             return False
-    
+
     print(f"✅ Phase {phase} gate requirements met")
     return True
 
