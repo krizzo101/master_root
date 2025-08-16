@@ -12,7 +12,7 @@ if [ -z "$PROJECT_NAME" ]; then
 fi
 
 echo "🚀 Running SDLC Pre-flight Checks for: $PROJECT_NAME"
-echo "=" 
+echo "="
 echo ""
 
 # 1. Check Git Branch
@@ -152,7 +152,7 @@ git commit -m "init: create ${PROJECT_NAME} project structure
 
 # Summary
 echo ""
-echo "=" 
+echo "="
 echo "✅ PRE-FLIGHT CHECKS COMPLETE"
 echo ""
 echo "Project Path: ${PROJECT_PATH}"
