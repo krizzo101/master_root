@@ -108,118 +108,121 @@ def ts() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
-def call_openai_responses(prompt: str) -> Optional[dict]:
-    """Call OpenAI Responses API; return {'code': str, 'reasoning': str} or None."""
-    api_key = get_env_var("OPENAI_API_KEY")
-    if not api_key:
-        print(f"[{ts()}] OpenAI/Responses: missing OPENAI_API_KEY")
-        return None
-
-    base_url = get_env_var("OPENAI_BASE_URL")
-    model = select_model()
-
+def _choose_model_for_content(content: str) -> str:
+    """Heuristic: use gpt-5 for larger files, else gpt-5-mini."""
     try:
-        from openai import OpenAI, APIError, RateLimitError, APITimeoutError  # type: ignore
+        default_model = select_model()
+        # Rough char threshold where we prefer larger model capacity
+        return "gpt-5" if len(content) > 3000 else default_model
+    except Exception:
+        return "gpt-5-mini"
+
+
+def _estimate_output_tokens(basis: str) -> int:
+    # Use large headroom as requested
+    return 16000
+
+
+def _call_responses_with_schema(prompt: str, *, model: str, base_url: Optional[str], content_hint: str = "") -> Optional[dict]:
+    """Call OpenAI Responses API using proven working pattern from ACCF agents."""
+    try:
+        from openai import OpenAI  # type: ignore
+        try:
+            from openai import APIError, RateLimitError, APITimeoutError  # type: ignore
+        except Exception:  # noqa: BLE001
+            APIError = Exception  # type: ignore[assignment]
+            RateLimitError = Exception  # type: ignore[assignment]
+            APITimeoutError = Exception  # type: ignore[assignment]
     except Exception as e:  # noqa: BLE001
         print(f"[{ts()}] OpenAI SDK import failed: {e}")
         return None
 
-    client_kwargs = {}
+    client_kwargs = {
+        "timeout": get_timeout_seconds(),
+        "max_retries": 2,  # Built-in retries for network issues
+    }
     if base_url:
         client_kwargs["base_url"] = base_url
-    client = OpenAI(timeout=get_timeout_seconds(), **client_kwargs)
+    client = OpenAI(**client_kwargs)
 
-    schema = {
-        "name": "ai_populate_response",
-        "schema": {
-            "type": "object",
-            "properties": {
-                "code": {"type": "string"},
-                "reasoning": {"type": "string"},
-            },
-            "required": ["code"],
-            "additionalProperties": False,
-        },
+    max_tokens = _estimate_output_tokens(content_hint or prompt)
+
+    # Use proven working pattern from ACCF coding agent
+    params = {
+        "model": model,
+        "input": prompt,
+        "text": {"format": {"type": "json_object"}},
+        "max_output_tokens": max_tokens,
     }
 
-    for attempt in range(5):
+    # Add reasoning for GPT-5 models like the working agent does
+    if model.startswith("gpt-5"):
+        params["reasoning"] = {"effort": "minimal"}
+        params["text"]["verbosity"] = "low"
+
+    for attempt in range(1, 4):
         try:
-            print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt+1}")
-            kwargs = {
-                "model": model,
-                "input": prompt,
-                "reasoning": {"effort": "medium"},
-                "max_output_tokens": 1200,
-                "response_format": {"type": "json_schema", "json_schema": schema},
-                "text": {"verbosity": "low"},
-            }
-            try:
-                resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
-            except TypeError as e:
-                # Remove unsupported fields progressively for older SDKs
-                print(f"[{ts()}] OpenAI/Responses TypeError: {e}; retrying without response_format")
-                kwargs.pop("response_format", None)
+            print(f"[{ts()}] OpenAI/Responses: create model={model} attempt={attempt} max_tokens={max_tokens}")
+            resp = client.responses.create(**params)
+
+            # Extract output like the working ACCF interface
+            output_text = getattr(resp, "output_text", None)
+            if not output_text and hasattr(resp, "output"):
+                # Try attribute-style extraction
                 try:
-                    resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
-                except TypeError as e2:
-                    print(f"[{ts()}] OpenAI/Responses TypeError: {e2}; retrying without reasoning")
-                    kwargs.pop("reasoning", None)
-                    try:
-                        resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
-                    except TypeError as e3:
-                        print(f"[{ts()}] OpenAI/Responses TypeError: {e3}; retrying without text")
-                        kwargs.pop("text", None)
-                        resp = client.responses.create(timeout=get_timeout_seconds(), **kwargs)
-            # Prefer parsed JSON when using json_schema
-            parsed = getattr(resp, "output_parsed", None)
-            if parsed:
-                code = parsed.get("code", "")
-                reasoning = parsed.get("reasoning", "n/a")
-                if isinstance(code, str) and code.strip():
-                    return {"code": code, "reasoning": reasoning}
-            # Fallback to text if SDK/version mismatch
-            txt = getattr(resp, "output_text", "") or ""
-            if isinstance(txt, str) and txt.strip():
-                # Try to parse JSON object first
-                try:
-                    obj = json.loads(txt)
-                    if isinstance(obj, dict) and isinstance(obj.get("code"), str):
-                        return {"code": obj.get("code"), "reasoning": obj.get("reasoning", "freeform")}
+                    for item in resp.output:
+                        content = getattr(item, "content", None)
+                        if content:
+                            for c in content:
+                                txt = getattr(c, "text", None)
+                                if txt:
+                                    output_text = (output_text or "") + txt
                 except Exception:
                     pass
-                return {"code": txt, "reasoning": "freeform"}
-            # Deep fallback: inspect outputs structure
-            try:
-                data = resp.model_dump()
-            except Exception:
-                data = {}
-            outputs = (data.get("output") or data.get("outputs") or [])
-            for item in outputs:
-                if item.get("type") == "message":
-                    for c in item.get("content") or []:
-                        if c.get("type") in ("output_text", "text", "input_text"):
-                            val = c.get("text")
-                            if isinstance(val, dict):
-                                val = val.get("value") or val.get("text")
-                            if isinstance(val, str) and val.strip():
-                                return {"code": val, "reasoning": "freeform"}
-            print(f"[{ts()}] OpenAI/Responses: empty output")
-            # Try next attempt
-            continue
+
+            if output_text and output_text.strip():
+                try:
+                    obj = json.loads(output_text)
+                    if isinstance(obj, dict) and isinstance(obj.get("code"), str) and obj["code"].strip():
+                        return {"code": obj.get("code"), "reasoning": obj.get("reasoning", "")}
+                except Exception:
+                    pass
+
+            print(f"[{ts()}] OpenAI/Responses: no valid JSON code in response")
+            return None
+
         except (RateLimitError, APITimeoutError) as e:  # type: ignore[name-defined]
             print(f"[{ts()}] OpenAI/Responses retryable error: {e}")
-            time.sleep(1.5 * (attempt + 1))
+            if attempt < 3:
+                time.sleep(1.5 * attempt)
+                continue
         except APIError as e:  # type: ignore[name-defined]
             status = getattr(e, "status_code", 500)
             print(f"[{ts()}] OpenAI/Responses API error: status={status} {e}")
-            if status >= 500:
-                time.sleep(1.5 * (attempt + 1))
-            else:
+            if status < 500:
                 return None
+        except KeyboardInterrupt:
+            print(f"[{ts()}] OpenAI/Responses interrupted by user")
+            raise
         except Exception as e:  # noqa: BLE001
             print(f"[{ts()}] OpenAI/Responses exception: {e}")
-            time.sleep(1.5 * (attempt + 1))
+
+        if attempt < 3:
+            time.sleep(1.5 * attempt)
     return None
+
+
+def call_openai_responses(prompt: str, *, content_hint: str = "") -> Optional[dict]:
+    """Call OpenAI Responses API using a version-tolerant helper.
+
+    Returns {'code': str, 'reasoning': str} or None.
+    """
+    if not is_ai_enabled():
+        print(f"[{ts()}] OpenAI/Responses: missing OPENAI_API_KEY")
+        return None
+    base_url = get_env_var("OPENAI_BASE_URL")
+    model = _choose_model_for_content(content_hint)
+    return _call_responses_with_schema(prompt, model=model, base_url=base_url, content_hint=content_hint)
 
 
 # Removed chat fallback: GPT-5 is only served by Responses API
@@ -234,8 +237,8 @@ def build_prompt(file_path: Path, rel_path: str, lib_name: str, content: str) ->
         "- Keep code under ~200 lines if possible; no external network calls.\n\n"
         f"Library: {lib_name}\nFile: {rel_path}\n\n"
         "Current content:\n---BEGIN---\n" + content + "\n---END---\n\n"
-        "Return a JSON object with fields {\"code\": string, \"reasoning\": string}. "
-        "Place the full file contents in the 'code' field only. Do not include markdown fences."
+        "Return a JSON object only: {\"code\": \"<FULL FILE CODE>\"}. "
+        "The code must be complete, valid Python. No explanations outside the JSON."
     )
 
 
@@ -304,7 +307,7 @@ def main() -> int:
                         content = ""
                     prompt = build_prompt(s, rel, lib_name, content)
                     print(f"[{ts()}] invoking AI for {rel} (mode={args.mode})")
-                    result = call_openai_responses(prompt)
+                    result = call_openai_responses(prompt, content_hint=content)
                     code = (result or {}).get("code") if isinstance(result, dict) else None
                     if not code:
                         # Fallback to placeholder if AI failed
