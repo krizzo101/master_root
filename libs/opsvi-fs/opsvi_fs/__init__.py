@@ -2,6 +2,7 @@
 
 Comprehensive opsvi-fs library for the OPSVI ecosystem
 """
+from __future__ import annotations
 
 __version__ = "0.1.0"
 __author__ = "OPSVI Team"
@@ -10,31 +11,41 @@ __email__ = "team@opsvi.com"
 # Core exports
 from .core.base import BaseComponent, ComponentError
 from .config.settings import LibraryConfig, LibrarySettings
-from .exceptions.base import LibraryError, LibraryConfigurationError
+from .exceptions.base import LibraryError, LibraryConfigurationError, ProviderError
 
-# Service-specific exports
-from .providers.base import True
-from .schemas.models import 
+# Provider interfaces and a default local provider
+from .providers.interfaces import StorageProvider
+from .providers.local_adapter import LocalStorageProvider
 
-# RAG-specific exports
-
-# Manager-specific exports
+# Schemas
+from .schemas.models import FileLocation, FileStat, ListEntry
 
 __all__ = [
+    # Meta
+    "__version__",
+    "__author__",
+    "__email__",
     # Core
-    BaseComponent, ComponentError,
-    LibraryConfig, LibrarySettings,
-    LibraryError, LibraryConfigurationError,
-    # Service
-    True,
-    ,
+    "BaseComponent",
+    "ComponentError",
+    "LibraryConfig",
+    "LibrarySettings",
+    "LibraryError",
+    "LibraryConfigurationError",
+    "ProviderError",
+    # Providers
+    "StorageProvider",
+    "LocalStorageProvider",
+    # Schemas
+    "FileLocation",
+    "FileStat",
+    "ListEntry",
 ]
 
-# Version info
+
 def get_version() -> str:
-    """Get the library version."""
     return __version__
 
+
 def get_author() -> str:
-    """Get the library author."""
     return __author__

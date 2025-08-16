@@ -1,0 +1,599 @@
+libs
+├── README.md
+├── STRUCTURE.md
+├── TEMPLATES.md
+├── contexts
+│   ├── core_category_context.json
+│   ├── manager_category_context.json
+│   ├── opsvi_agents_context.json
+│   ├── opsvi_auth_context.json
+│   ├── opsvi_communication_context.json
+│   ├── opsvi_core_context.json
+│   ├── opsvi_data_context.json
+│   ├── opsvi_deploy_context.json
+│   ├── opsvi_foundation_context.json
+│   ├── opsvi_fs_context.json
+│   ├── opsvi_gateway_context.json
+│   ├── opsvi_http_context.json
+│   ├── opsvi_llm_context.json
+│   ├── opsvi_memory_context.json
+│   ├── opsvi_monitoring_context.json
+│   ├── opsvi_orchestration_context.json
+│   ├── opsvi_pipeline_context.json
+│   ├── opsvi_rag_context.json
+│   ├── opsvi_security_context.json
+│   ├── project_context.json
+│   ├── rag_category_context.json
+│   └── service_category_context.json
+├── file_manifest.yaml
+├── gatekeeper
+│   ├── README.md
+│   ├── __init__.py
+│   ├── auto_attach.py
+│   ├── context_analyzer.py
+│   ├── demo.py
+│   ├── demo_complex_result.json
+│   ├── gatekeeper_agent.py
+│   ├── test_gatekeeper.py
+│   └── test_gatekeeper_result.json
+├── generate_ecosystem_v2.py
+├── opsvi-agents
+│   ├── README.md
+│   ├── opsvi_agents
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── coordinators
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── schedulers
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_agents.py
+├── opsvi-auth
+│   ├── README.md
+│   ├── opsvi_auth
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── providers
+│   │       │   └── __init__.py
+│   │       ├── schemas
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_auth.py
+├── opsvi-communication
+│   ├── README.md
+│   ├── opsvi_communication
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── providers
+│   │       │   └── __init__.py
+│   │       ├── schemas
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_communication.py
+├── opsvi-core
+│   ├── README.md
+│   ├── opsvi_core
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_core.py
+├── opsvi-data
+│   ├── README.md
+│   ├── opsvi_data
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── providers
+│   │       │   └── __init__.py
+│   │       ├── schemas
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_data.py
+├── opsvi-deploy
+│   ├── README.md
+│   ├── opsvi_deploy
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── coordinators
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── schedulers
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_deploy.py
+├── opsvi-foundation
+│   ├── README.md
+│   ├── opsvi_foundation
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_foundation.py
+├── opsvi-fs
+│   ├── README.md
+│   ├── opsvi_fs
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── providers
+│   │       │   └── __init__.py
+│   │       ├── schemas
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_fs.py
+├── opsvi-gateway
+│   ├── README.md
+│   ├── opsvi_gateway
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── coordinators
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── schedulers
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_gateway.py
+├── opsvi-http
+│   ├── README.md
+│   ├── opsvi_http
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── providers
+│   │       │   └── __init__.py
+│   │       ├── schemas
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_http.py
+├── opsvi-llm
+│   ├── README.md
+│   ├── opsvi_llm
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── providers
+│   │       │   └── __init__.py
+│   │       ├── schemas
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_llm.py
+├── opsvi-memory
+│   ├── README.md
+│   ├── opsvi_memory
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── providers
+│   │       │   └── __init__.py
+│   │       ├── schemas
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_memory.py
+├── opsvi-monitoring
+│   ├── README.md
+│   ├── opsvi_monitoring
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── providers
+│   │       │   └── __init__.py
+│   │       ├── schemas
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_monitoring.py
+├── opsvi-orchestration
+│   ├── README.md
+│   ├── opsvi_orchestration
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── coordinators
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── schedulers
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_orchestration.py
+├── opsvi-pipeline
+│   ├── README.md
+│   ├── opsvi_pipeline
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── coordinators
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── schedulers
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_pipeline.py
+├── opsvi-rag
+│   ├── README.md
+│   ├── opsvi_rag
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── datastores
+│   │       │   └── __init__.py
+│   │       ├── embeddings
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── processors
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_rag.py
+├── opsvi-security
+│   ├── README.md
+│   ├── opsvi_security
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   ├── __init__.py
+│   │   │   └── settings.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── exceptions
+│   │   │   ├── __init__.py
+│   │   │   └── base.py
+│   │   ├── tests
+│   │   │   └── __init__.py
+│   │   └── {{package_name}}
+│   │       ├── __init__.py
+│   │       ├── config
+│   │       │   └── __init__.py
+│   │       ├── core
+│   │       │   └── __init__.py
+│   │       ├── exceptions
+│   │       │   └── __init__.py
+│   │       ├── providers
+│   │       │   └── __init__.py
+│   │       ├── schemas
+│   │       │   └── __init__.py
+│   │       └── utils
+│   │           └── __init__.py
+│   ├── pyproject.toml
+│   └── tests
+│       ├── __init__.py
+│       └── test_opsvi_security.py
+├── recommended_structure.yaml
+├── templates.yaml
+└── variable_schema.yaml
+
+238 directories, 359 files
