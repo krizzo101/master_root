@@ -404,6 +404,68 @@ class RedisProvider(BaseComponent):
             logger.error(f"Redis SUBSCRIBE failed: {e}")
             return None
 
+    # ==================== STREAM OPERATIONS ====================
+
+    def xadd(
+        self,
+        stream: str,
+        fields: Dict,
+        maxlen: Optional[int] = None,
+        approximate: bool = True,
+    ) -> Optional[str]:
+        """Add a message to a stream."""
+        try:
+            return self.client.xadd(
+                stream, fields, maxlen=maxlen, approximate=approximate
+            )
+        except Exception as e:
+            logger.error(f"Redis XADD failed: {e}")
+            return None
+
+    def xgroup_create(
+        self, stream: str, group_name: str, mkstream: bool = True
+    ) -> bool:
+        """Create a consumer group."""
+        try:
+            self.client.xgroup_create(stream, group_name, mkstream=mkstream)
+            return True
+        except redis.exceptions.ResponseError as e:
+            if "BUSYGROUP" in str(e):
+                logger.warning(
+                    f"Consumer group '{group_name}' already exists for stream '{stream}'."
+                )
+                return True
+            logger.error(f"Redis XGROUP CREATE failed: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Redis XGROUP CREATE failed: {e}")
+            return False
+
+    def xreadgroup(
+        self,
+        group_name: str,
+        consumer_name: str,
+        streams: Dict[str, str],
+        count: Optional[int] = 1,
+        block: Optional[int] = 0,
+    ) -> List:
+        """Read from a stream as part of a consumer group."""
+        try:
+            return self.client.xreadgroup(
+                group_name, consumer_name, streams, count=count, block=block
+            )
+        except Exception as e:
+            logger.error(f"Redis XREADGROUP failed: {e}")
+            return []
+
+    def xack(self, stream: str, group_name: str, *ids: str) -> int:
+        """Acknowledge a message."""
+        try:
+            return self.client.xack(stream, group_name, *ids)
+        except Exception as e:
+            logger.error(f"Redis XACK failed: {e}")
+            return 0
+
     # ==================== UTILITY OPERATIONS ====================
 
     def keys(self, pattern: str = "*") -> List[str]:

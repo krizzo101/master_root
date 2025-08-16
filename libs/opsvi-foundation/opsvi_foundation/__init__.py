@@ -23,6 +23,21 @@ from .exceptions.base import (
     LibraryStateError,
     LibraryOperationError,
 )
+from .utils.retry import (
+    retry,
+    retry_async,
+    BackoffStrategy,
+    ExponentialBackoff,
+    LinearBackoff,
+    ConstantBackoff,
+    RetryContext,
+)
+from .middleware import (
+    Middleware,
+    MiddlewareChain,
+    LoggingMiddleware,
+    ErrorHandlingMiddleware,
+)
 
 __all__ = [
     # Core
@@ -44,6 +59,19 @@ __all__ = [
     "LibraryResourceError",
     "LibraryStateError",
     "LibraryOperationError",
+    # Retry utilities
+    "retry",
+    "retry_async",
+    "BackoffStrategy",
+    "ExponentialBackoff",
+    "LinearBackoff",
+    "ConstantBackoff",
+    "RetryContext",
+    # Middleware
+    "Middleware",
+    "MiddlewareChain",
+    "LoggingMiddleware",
+    "ErrorHandlingMiddleware",
 ]
 
 

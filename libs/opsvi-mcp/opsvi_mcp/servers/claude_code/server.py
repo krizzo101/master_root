@@ -4,9 +4,15 @@ Claude Code MCP Server - Main server implementation
 
 import asyncio
 import json
+import sys
 from typing import Optional
 
-from fastmcp import FastMCP
+try:
+    from fastmcp import FastMCP
+except ImportError as e:
+    print(f"Error: Failed to import FastMCP: {e}", file=sys.stderr)
+    print("Please install fastmcp: pip install fastmcp", file=sys.stderr)
+    sys.exit(1)
 
 from .config import config
 from .job_manager import JobManager
@@ -14,7 +20,8 @@ from .parallel_logger import logger
 
 
 # Initialize FastMCP server
-mcp = FastMCP("claude-code-server")
+# Name matches the MCP registration in .mcp.json
+mcp = FastMCP("claude-code")
 
 # Initialize job manager globally
 job_manager = JobManager()
@@ -39,7 +46,7 @@ async def claude_run(
     task: str,
     cwd: Optional[str] = None,
     outputFormat: str = "json",
-    permissionMode: str = "bypassPermissions",
+    permissionMode: str = "bypassPermissions",  # Full capabilities in sandbox environment
     verbose: bool = False,
     parentJobId: Optional[str] = None,
 ) -> str:
@@ -119,7 +126,7 @@ async def claude_run_async(
     task: str,
     cwd: Optional[str] = None,
     outputFormat: str = "json",
-    permissionMode: str = "bypassPermissions",
+    permissionMode: str = "bypassPermissions",  # Full capabilities in sandbox environment
     verbose: bool = False,
     parentJobId: Optional[str] = None,
 ) -> str:
@@ -252,7 +259,7 @@ async def claude_kill_job(jobId: str) -> str:
     Returns:
         JSON with success status
     """
-    success = job_manager.kill_job(jobId)
+    success = await job_manager.kill_job(jobId)
 
     return json.dumps(
         {
@@ -299,11 +306,110 @@ async def claude_recursion_stats() -> str:
     return json.dumps(stats, indent=2)
 
 
+@mcp.tool()
+async def claude_run_batch(
+    tasks: list,
+    parent_job_id: Optional[str] = None,
+    max_concurrent: Optional[int] = None,
+) -> str:
+    """
+    Execute multiple Claude Code tasks in parallel
+
+    Args:
+        tasks: List of task configurations, each containing:
+            - task: The task description (required)
+            - cwd: Working directory (optional)
+            - output_format: Output format (optional, default: "json")
+            - permission_mode: Permission mode (optional, default: "bypassPermissions")
+            - verbose: Enable verbose output (optional, default: false)
+        parent_job_id: Parent job ID for recursion tracking (optional)
+        max_concurrent: Maximum concurrent executions (optional, uses config default)
+
+    Returns:
+        JSON with batch execution information including:
+        - batch_id: Unique batch identifier
+        - job_ids: List of individual job IDs
+        - execution_time_ms: Total execution time
+        - results_summary: Summary of successful/failed jobs
+
+    Example:
+        tasks = [
+            {"task": "Analyze security in auth.py", "cwd": "/project"},
+            {"task": "Check performance in db.py", "cwd": "/project"},
+            {"task": "Review code style in api.py", "cwd": "/project"}
+        ]
+        result = await claude_run_batch(tasks=tasks, max_concurrent=3)
+    """
+    logger.log(
+        "API",
+        "BATCH",
+        f"claude_run_batch called with {len(tasks)} tasks",
+        {
+            "parent_job_id": parent_job_id,
+            "max_concurrent": max_concurrent,
+            "tasks_preview": [t.get("task", "")[:50] for t in tasks[:3]],
+        },
+    )
+
+    try:
+        # Execute batch in parallel
+        result = await job_manager.execute_parallel_batch(
+            tasks=tasks, parent_job_id=parent_job_id, max_concurrent=max_concurrent
+        )
+
+        logger.log("API", "BATCH", "Batch execution completed", result)
+
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        logger.log_error("API", "claude_run_batch failed", e)
+        raise Exception(f"Batch execution error: {str(e)}")
+
+
+@mcp.tool()
+async def claude_batch_status(batch_id: str) -> str:
+    """
+    Get the status of a batch execution
+
+    Args:
+        batch_id: The batch ID returned by claude_run_batch
+
+    Returns:
+        JSON with batch status information
+    """
+    status = job_manager.get_batch_status(batch_id)
+
+    if status:
+        return json.dumps(status, indent=2)
+    else:
+        raise Exception(f"Batch {batch_id} not found")
+
+
+@mcp.tool()
+async def claude_list_batches() -> str:
+    """
+    List all batch executions
+
+    Returns:
+        JSON with information about all batch executions
+    """
+    batches = job_manager.get_all_batches()
+    return json.dumps(batches, indent=2)
+
+
 def main():
     """Main entry point for the MCP server"""
-    import uvloop
-
-    uvloop.install()
+    try:
+        import uvloop
+        uvloop.install()
+    except ImportError:
+        # uvloop is optional, fall back to default event loop
+        import warnings
+        warnings.warn(
+            "uvloop not available, using default event loop. "
+            "Install uvloop for better performance: pip install uvloop"
+        )
+    
     mcp.run()
 
 

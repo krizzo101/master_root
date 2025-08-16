@@ -41,7 +41,87 @@ This document outlines the rules, guidelines, and best practices for the AI codi
     *   `.proj-intel/reverse_index.json`: O(1) path lookup.
     *   `agent_architecture.jsonl`: Agent class definitions.
     *   `INTEGRATIONS_DIRECTORY_TREE.md`: Detailed integration mapping.
+*   Before reviewing or using data in `.proj-intel`, the agent needs to read and understand the `AGENT_ONBOARDING.md` file, explaining what data is available, how to access it, and why it should do so.
+*   The stats listed regarding the size of the index file, the agent/class definitions, etc are a snapshot in time and should not be given as hardcoded real numbers because they are always changing.
+*   The agent needs to check the current timestamps on project intelligence data versus the date/time they observed at startup and determine whether they need to run 'project-intelligence full-package' from the project root in order to refresh the data. It should do this every time to ensure it has the very latest information.
 *   The `.mcp.json` file in the project root of this project defines the tools the claude code app has available and is located at: `/home/opsvi/master_root/.mcp.json`.
+*   When asked to perform online research regarding the 'claude code' application, focus on understanding its command-line usage, capabilities, and functionality.
+
+## 🔄 MANDATORY: GIT COMMIT REQUIREMENTS (DEFAULT BEHAVIOR - CANNOT BE IGNORED)
+
+### CRITICAL: FREQUENT COMMITTING IS MANDATORY
+**Git commits are NOT optional** - they are a fundamental requirement for all development work. This is default behavior that cannot be skipped, ignored, or postponed.
+
+### MANDATORY COMMIT TRIGGERS (NO EXCEPTIONS)
+**You MUST commit after:**
+*   **EVERY functional change** - Any code that adds, fixes, or modifies functionality
+*   **EVERY logical unit of work** - Complete a feature, fix a bug, then commit
+*   **EVERY file modification** - After editing any file, commit the changes
+*   **BEFORE switching tasks** - Never leave uncommitted work when changing focus
+*   **AFTER any significant refactoring** - Code improvements that enhance performance/functionality
+*   **AFTER fixing errors** - Any bug fixes or error corrections
+*   **AFTER implementing features** - New functionality or capabilities
+
+### COMMIT FREQUENCY REQUIREMENTS
+*   **MINIMUM**: Commit after every 2-3 file changes
+*   **TARGET**: Commit after every logical unit of work
+*   **MAXIMUM**: Never let more than 10 file changes go uncommitted
+*   **EMERGENCY**: If approaching token limits or session issues, commit immediately
+
+### GIT COMMIT PROTOCOL (MANDATORY EXECUTION)
+```bash
+# MANDATORY COMMIT SEQUENCE - EXECUTE AFTER EVERY LOGICAL UNIT OF WORK
+git add -A
+git diff --cached --quiet --ignore-submodules -- || git commit --no-verify -m "chore: autosave commit of all changes ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+pwd
+ls -a
+git status | cat
+git branch --show-current
+git log --oneline -5 | cat
+git worktree list | cat
+```
+
+### COMMIT MESSAGE STANDARDS (ENFORCED)
+*   **Format**: `chore: autosave commit of all changes (YYYY-MM-DDTHH:MM:SSZ)`
+*   **Include timestamp**: Always use UTC timestamp in commit message
+*   **Use --no-verify**: Skip hooks that might block commits
+*   **Descriptive when needed**: For major changes, include brief description
+*   **Atomic commits**: Each commit should represent one logical change
+
+### GIT STATUS MONITORING (CONTINUOUS)
+*   **BEFORE every operation**: Check `git status` to understand current state
+*   **AFTER every operation**: Verify changes are tracked and committed
+*   **REGULAR checks**: Monitor working directory cleanliness
+*   **BRANCH awareness**: Always know which branch you're working on
+
+### COMMIT FAILURE PROTOCOLS
+*   **If commit fails**: Investigate immediately, don't continue without committing
+*   **If hooks block**: Use `--no-verify` flag to bypass non-critical hooks
+*   **If merge conflicts**: Resolve immediately, don't leave conflicts uncommitted
+*   **If large files**: Commit anyway, address size issues in separate commit
+
+### WORKFLOW INTEGRATION
+*   **Commit first, then continue**: Never proceed to next task without committing
+*   **Commit before breaks**: Always commit before taking breaks or switching contexts
+*   **Commit for safety**: Use commits as checkpoints for rollback capability
+*   **Commit for tracking**: Maintain clear history of all changes and decisions
+
+### ENFORCEMENT RULES
+*   ❌ **VIOLATION**: Making changes without committing
+*   ❌ **VIOLATION**: Switching tasks with uncommitted work
+*   ❌ **VIOLATION**: Leaving work uncommitted overnight
+*   ❌ **VIOLATION**: Ignoring git status warnings
+*   ✅ **COMPLIANT**: Committing after every logical unit of work
+*   ✅ **COMPLIANT**: Using proper commit messages with timestamps
+*   ✅ **COMPLIANT**: Monitoring git status continuously
+
+### AUTOMATIC COMMIT TRIGGERS
+The system will automatically trigger commits when:
+*   **File count threshold**: More than 5 files modified
+*   **Time threshold**: More than 30 minutes since last commit
+*   **Task completion**: Logical unit of work finished
+*   **Error recovery**: After fixing issues or rolling back changes
+*   **Session safety**: Before any operation that might cause session issues
 
 ## CODING STANDARDS
 
@@ -76,6 +156,22 @@ This document outlines the rules, guidelines, and best practices for the AI codi
 *   Always use `shell_exec` instead of `run_terminal_cmd` for executing commands.
 *   When committing changes to git, include a special note in the description if the claude code MCP server is working properly.
 *   When I ask you to generate a diagram, I expect it to be rendered inline in the chat session.
+*   When the user requests a git commit without specifying a commit message, propose a generic commit message such as "chore: commit all changes [skip ci]".
+*   When committing changes via `shell_exec`, the AI should:
+    *   Stage all changes using `git add -A`.
+    *   Check if there are any changes to commit using `git diff --cached --quiet --ignore-submodules --`.
+    *   If there are changes, commit with a message formatted with the current date and time: `git commit --no-verify -m "chore: autosave commit of all changes ($(date -u +%Y-%m-%dT%H:%M:%SZ))"`.
+    *   Print the current working directory using `pwd`.
+    *   List all files in the directory using `ls -a`.
+    *   Show the git status using `git status | cat`.
+    *   Show the current branch using `git branch --show-current`.
+    *   Show the last 5 commits using `git log --oneline -5 | cat`.
+    *   List git worktrees using `git worktree list | cat`.
+    *   Provide a summary of the commit, including the branch name, commit hash, commit message, and the number of files changed. Also include the state of the working tree (clean or not). If the working tree is clean and the commit is on a feature branch, suggest the command to push to the remote.
+    *   Include a JSON structured summary that includes all required metrics like actions, validation status, time, assumptions, and risks. It’s crucial to keep this minimal and maintain accuracy with the numbers reported.
+*   The AI should batch work whenever appropriate, by default.
+*   The AI should use parallel operations as a default behavior.
+*   When using `grep` or `find` commands, the AI should use project intel methods as a primary behavior. If the project intel methods don't return anything but it is convinced what they are looking for exists then they should fall back to grep/find. If the grep/find they need to use isn't applicable to the information in the project intel cache then this does not apply which may often be the case for grep, but shouldn't usually be for find if it's a project code file.
 
 ## DEBUGGING
 
@@ -450,6 +546,7 @@ When using a consult agent, ensure the following parameters are included in the 
 from mcp_time_current_time import current_time
 current_time = current_time(format="YYYY-MM-DD HH:mm:ss")
 ```
+Date awareness is important to understand the amount of time that has elapsed since the model's knowledge cutoff date. This period of time represents the gap in knowledge the agent has of the changes, updates, and new information available regarding the available tools, software, versions, and related details those impact such as proper syntax, access methods, etc. It also means the agent is not aware of the latest concepts, techniques, or discoveries regarding how to best implement, leverage or use various techologies, tools, and related.
 
 #### 2. ONLINE RESEARCH REQUIREMENT
 - **RESEARCH CURRENT API VERSIONS**: OpenAI API changes frequently (2025 updates)
@@ -629,197 +726,4 @@ def generate_prompt_variables(task_context: dict) -> dict:
 from pydantic import BaseModel, Field, validator
 from enum import Enum
 
-class CodeQuality(str, Enum):
-    PRODUCTION = "production"
-    DEVELOPMENT = "development"
-    PROTOTYPE = "prototype"
-
-class CodeResponse(BaseModel):
-    code: str = Field(description="Complete, executable code")
-    explanation: str = Field(description="Clear explanation of implementation")
-    dependencies: List[str] = Field(description="Required packages and versions")
-    quality_level: CodeQuality = Field(description="Code quality assessment")
-    test_cases: List[str] = Field(description="Suggested test scenarios")
-    security_notes: Optional[List[str]] = Field(description="Security considerations")
-
-    @validator('code')
-    def code_must_be_complete(cls, v):
-        if len(v.strip()) < 10:
-            raise ValueError('Code must be substantial and complete')
-        return v
-
-# ✅ STRICT JSON SCHEMA (Alternative to Pydantic)
-strict_schema = {
-    "type": "object",
-    "properties": {
-        "analysis": {"type": "string", "minLength": 50},
-        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
-        "recommendations": {
-            "type": "array",
-            "items": {"type": "string"},
-            "minItems": 1,
-            "maxItems": 10
-        },
-        "priority": {
-            "type": "string",
-            "enum": ["low", "medium", "high", "critical"]
-        }
-    },
-    "required": ["analysis", "confidence", "recommendations", "priority"],
-    "additionalProperties": False
-}
-
-response = client.responses.create(
-    model="gpt-5-mini",
-    input="Analyze security vulnerabilities in this code...",
-    text={
-        "format": {
-            "type": "json_schema",
-            "name": "security_analysis",
-            "strict": True,
-            "schema": strict_schema
-        }
-    }
-)
-```
-
-## Advanced Tool Integration Patterns
-
-### Built-in Tools with Custom Functions
-```python
-# ✅ HYBRID TOOL APPROACH - Built-in + Custom
-tools = [
-    # Built-in capabilities
-    {"type": "web_search_preview"},
-    {"type": "file_search", "vector_store_ids": ["vs_123"]},
-
-    # Custom function tools
-    {
-        "type": "function",
-        "function": {
-            "name": "validate_code_security",
-            "description": "Validate code for security vulnerabilities and best practices",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "code": {"type": "string", "description": "Code to validate"},
-                    "language": {"type": "string", "enum": ["python", "javascript", "typescript"]},
-                    "security_level": {"type": "string", "enum": ["basic", "standard", "strict"]}
-                },
-                "required": ["code", "language"],
-                "additionalProperties": False
-            }
-        }
-    }
-]
-
-response = client.responses.create(
-    model="gpt-5-mini",
-    input="Review this authentication code for security issues...",
-    tools=tools,
-    text_format=SecurityAnalysisSchema
-)
-```
-
-### Dynamic Configuration Generation (NO HARDCODED VALUES)
-
-```python
-# ✅ O3 PIPELINE CONFIGURATION - Dynamic generation only
-def generate_api_config(requirements: dict) -> dict:
-    """Generate complete API configuration using O3 reasoning model"""
-
-    config_response = client.responses.create(
-        model="o4-mini",  # Reasoning model for configuration
-        instructions="Generate optimal API configuration based on requirements",
-        input=f"Requirements: {requirements}",
-        text_format=APIConfigSchema
-    )
-
-    return config_response.output_parsed.model_dump()
-
-# ✅ ADAPTIVE MODEL SELECTION
-def select_optimal_model(task_type: str, complexity: str) -> str:
-    """Dynamically select best model for task"""
-
-    if task_type == "reasoning" or task_type == "planning":
-        return "o4-mini" if complexity == "standard" else "o3"
-    elif task_type == "execution" or task_type == "coding":
-        return "gpt-5-mini" if complexity == "standard" else "gpt-5"
-    else:
-        # Default fallback
-        return "gpt-5-mini"
-
-# ❌ HARDCODED CONFIG - PROHIBITED
-FORBIDDEN_CONFIG = {
-    "model": "gpt-5-mini",
-    "temperature": 0.1,
-    "max_tokens": 4000
-}  # VIOLATION - No hardcoded values allowed
-```
-
-## Error Handling (NO FALLBACKS PERMITTED)
-
-```python
-import backoff
-import openai
-from typing import Union
-
-@backoff.on_exception(backoff.expo, openai.RateLimitError, max_time=60)
-def safe_api_call(**kwargs) -> Union[dict, None]:
-    """Safe API call with proper error handling - NO FALLBACKS"""
-
-    try:
-        response = client.responses.create(**kwargs)
-
-        # Handle specific error conditions - NO fallbacks
-        if response.status == "incomplete":
-            if response.incomplete_details.reason == "max_output_tokens":
-                raise OpenAITokenLimitError("Token limit exceeded - increase max_tokens")
-            elif response.incomplete_details.reason == "content_filter":
-                raise OpenAIContentFilterError("Content filtered - revise input")
-            elif response.incomplete_details.reason == "max_model_tokens":
-                raise OpenAITokenLimitError("Model token limit exceeded - use a model with higher context")
-            else:
-                raise OpenAIIncompleteError(f"Incomplete response: {response.incomplete_details.reason}")
-
-        # Check for refusals
-        if hasattr(response, 'output') and response.output[0].content[0].type == "refusal":
-            raise OpenAIRefusalError(f"Model refused: {response.output[0].content[0].refusal}")
-
-        return response
-
-    except openai.AuthenticationError:
-        raise ConfigurationError("Invalid API key or authentication failure")
-    except openai.PermissionDeniedError:
-        raise ConfigurationError("Permission denied - check model access")
-    except openai.BadRequestError as e:
-        raise ConfigurationError(f"Invalid request configuration: {e}")
-
-    # NO fallback return - must succeed or fail explicitly
-
-# ❌ FALLBACK PATTERNS - ABSOLUTELY PROHIBITED
-def prohibited_fallback_pattern(**kwargs):
-    try:
-        return safe_api_call(**kwargs)
-    except Exception:
-        # FORBIDDEN - No fallback mechanisms allowed
-        return simple_text_response()  # VIOLATION
-```
-
-## Streaming with Structured Outputs (2025 PATTERN)
-
-```python
-# ✅ STRUCTURED STREAMING WITH REAL-TIME PROCESSING
-def stream_structured_response(prompt: str, schema: BaseModel):
-    """Stream structured response with real-time validation"""
-
-    accumulated_data = {}
-
-    with client.responses.stream(
-        model="gpt-5-mini",
-        input=prompt,
-        text_format=schema,
-    ) as stream:
-
-        for event in stream:
-            if event.type == "response.output_text.delta":
+class

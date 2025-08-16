@@ -2,7 +2,9 @@
 Recursion management for Claude Code jobs
 """
 
+import asyncio
 import hashlib
+import threading
 from typing import Dict, Optional, List
 from datetime import datetime
 
@@ -18,6 +20,10 @@ class RecursionManager:
         self.recursion_contexts: Dict[str, RecursionContext] = {}
         self.depth_counts: Dict[int, int] = {}
         self.root_job_tracking: Dict[str, int] = {}
+        # Use threading.Lock for sync access (create_recursion_context is sync)
+        self._lock = threading.Lock()
+        # Track async locks per job for async cleanup
+        self._async_locks: Dict[str, asyncio.Lock] = {}
 
     def create_recursion_context(
         self,
@@ -26,54 +32,55 @@ class RecursionManager:
         task: Optional[str] = None,
     ) -> RecursionContext:
         """Create and validate a new recursion context"""
-        parent_context = (
-            self.recursion_contexts.get(parent_job_id) if parent_job_id else None
-        )
-        depth = parent_context.depth + 1 if parent_context else 0
-        root_job_id = parent_context.root_job_id if parent_context else job_id
+        with self._lock:
+            parent_context = (
+                self.recursion_contexts.get(parent_job_id) if parent_job_id else None
+            )
+            depth = parent_context.depth + 1 if parent_context else 0
+            root_job_id = parent_context.root_job_id if parent_context else job_id
 
-        # Check recursion limits
-        self.validate_recursion_limits(depth, root_job_id)
+            # Check recursion limits
+            self.validate_recursion_limits(depth, root_job_id)
 
-        # Build call stack
-        call_stack = []
-        if parent_context:
-            call_stack = parent_context.call_stack.copy()
-            if parent_job_id:
-                call_stack.append(parent_job_id)
+            # Build call stack
+            call_stack = []
+            if parent_context:
+                call_stack = parent_context.call_stack.copy()
+                if parent_job_id:
+                    call_stack.append(parent_job_id)
 
-        # Build recursion path
-        recursion_path = []
-        if parent_context:
-            recursion_path = parent_context.recursion_path.copy()
-        if task:
-            recursion_path.append(self.create_task_signature(task))
+            # Build recursion path
+            recursion_path = []
+            if parent_context:
+                recursion_path = parent_context.recursion_path.copy()
+            if task:
+                recursion_path.append(self.create_task_signature(task))
 
-        context = RecursionContext(
-            job_id=job_id,
-            parent_job_id=parent_job_id,
-            depth=depth,
-            max_depth=config.recursion.max_depth,
-            call_stack=call_stack,
-            root_job_id=root_job_id,
-            recursion_path=recursion_path,
-            start_time=datetime.now(),
-            is_recursive=depth > 0,
-            task=task,
-        )
+            context = RecursionContext(
+                job_id=job_id,
+                parent_job_id=parent_job_id,
+                depth=depth,
+                max_depth=config.recursion.max_depth,
+                call_stack=call_stack,
+                root_job_id=root_job_id,
+                recursion_path=recursion_path,
+                start_time=datetime.now(),
+                is_recursive=depth > 0,
+                task=task,
+            )
 
-        self.recursion_contexts[job_id] = context
-        self.update_depth_counts(depth, 1)
-        self.update_root_job_tracking(root_job_id, 1)
+            self.recursion_contexts[job_id] = context
+            self.update_depth_counts(depth, 1)
+            self.update_root_job_tracking(root_job_id, 1)
 
-        logger.log_recursion(
-            job_id,
-            "started",
-            context,
-            {"task": task[:100] if task else None, "parent_job_id": parent_job_id},
-        )
+            logger.log_recursion(
+                job_id,
+                "started",
+                context,
+                {"task": task[:100] if task else None, "parent_job_id": parent_job_id},
+            )
 
-        return context
+            return context
 
     def validate_recursion_limits(self, depth: int, root_job_id: str) -> None:
         """Validate recursion limits and raise exception if exceeded"""
@@ -106,39 +113,58 @@ class RecursionManager:
         return hashlib.md5(normalized.encode()).hexdigest()[:8]
 
     def update_depth_counts(self, depth: int, delta: int) -> None:
-        """Update job count at a specific depth"""
+        """Update job count at a specific depth (must be called within lock)"""
         current = self.depth_counts.get(depth, 0)
-        self.depth_counts[depth] = max(0, current + delta)
+        new_count = max(0, current + delta)
+        if new_count == 0 and depth in self.depth_counts:
+            del self.depth_counts[depth]  # Clean up zero counts
+        else:
+            self.depth_counts[depth] = new_count
 
     def update_root_job_tracking(self, root_job_id: str, delta: int) -> None:
-        """Update job count for a root job"""
+        """Update job count for a root job (must be called within lock)"""
         current = self.root_job_tracking.get(root_job_id, 0)
-        self.root_job_tracking[root_job_id] = max(0, current + delta)
+        new_count = max(0, current + delta)
+        if new_count == 0 and root_job_id in self.root_job_tracking:
+            del self.root_job_tracking[root_job_id]  # Clean up zero counts
+        else:
+            self.root_job_tracking[root_job_id] = new_count
 
     def cleanup_job(self, job_id: str) -> None:
-        """Clean up recursion context for a completed job"""
-        context = self.recursion_contexts.get(job_id)
-        if not context:
-            return
+        """Clean up recursion context for a completed job (deprecated, use release_recursion_context)"""
+        self.release_recursion_context(job_id)
 
-        # Decrement counters
-        self.update_depth_counts(context.depth, -1)
-        self.update_root_job_tracking(context.root_job_id, -1)
+    def release_recursion_context(self, job_id: str) -> None:
+        """Release recursion context and decrement all associated counters"""
+        with self._lock:
+            context = self.recursion_contexts.get(job_id)
+            if not context:
+                return
 
-        del self.recursion_contexts[job_id]
+            # Decrement counters
+            self.update_depth_counts(context.depth, -1)
+            self.update_root_job_tracking(context.root_job_id, -1)
 
-        logger.log(
-            "RECURSION",
-            job_id,
-            "Recursion context cleaned up",
-            {
-                "depth": context.depth,
-                "remaining_at_depth": self.depth_counts.get(context.depth, 0),
-                "remaining_for_root": self.root_job_tracking.get(
-                    context.root_job_id, 0
-                ),
-            },
-        )
+            # Remove context
+            del self.recursion_contexts[job_id]
+            
+            # Clean up async lock if exists
+            if job_id in self._async_locks:
+                del self._async_locks[job_id]
+
+            logger.log(
+                "RECURSION",
+                job_id,
+                "Recursion context released",
+                {
+                    "depth": context.depth,
+                    "remaining_at_depth": self.depth_counts.get(context.depth, 0),
+                    "remaining_for_root": self.root_job_tracking.get(
+                        context.root_job_id, 0
+                    ),
+                    "total_active_contexts": len(self.recursion_contexts),
+                },
+            )
 
     def get_recursion_stats(self) -> Dict:
         """Get current recursion statistics"""

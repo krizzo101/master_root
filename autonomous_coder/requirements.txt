@@ -1,0 +1,3 @@
+# Core dependencies for Autonomous Coder
+pyyaml>=6.0.1
+aiofiles>=23.2.1

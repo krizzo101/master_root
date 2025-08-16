@@ -9,8 +9,12 @@ import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+import json
+from pathlib import Path
+from pydantic import Field
 
 from opsvi_foundation import BaseComponent, ComponentError, BaseSettings
+from ..persistence import PersistenceBackend, JSONBackend, MemoryBackend, RedisBackend
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +85,8 @@ class CoreConfig(BaseSettings):
     state_manager_enabled: bool = True
     state_persistence_enabled: bool = False
     state_backup_interval: float = 300.0  # seconds
+    state_backend: str = "memory"  # Options: memory, json, redis
+    state_backend_config: Dict[str, Any] = Field(default_factory=dict)
 
     class Config:
         env_prefix = "OPSVI_CORE_"
@@ -266,17 +272,37 @@ class EventBus(BaseComponent):
 
 
 class StateManager(BaseComponent):
-    """State manager for managing application state."""
+    """State manager for managing application state with pluggable backends."""
 
     def __init__(self, config: Optional[CoreConfig] = None, **kwargs: Any) -> None:
         """Initialize state manager."""
         super().__init__("state-manager", config.dict() if config else {})
         self.core_config = config or CoreConfig(**kwargs)
-        self._state: Dict[str, Any] = {}
+        self._backend: Optional[PersistenceBackend] = None
         self._backup_task: Optional[asyncio.Task] = None
+        self._init_backend()
+
+    def _init_backend(self) -> None:
+        """Initialize the persistence backend based on configuration."""
+        backend_type = self.core_config.state_backend.lower()
+        backend_config = self.core_config.state_backend_config
+        
+        if backend_type == "json":
+            if "file_path" not in backend_config:
+                backend_config["file_path"] = "/tmp/opsvi_state.json"
+            self._backend = JSONBackend(backend_config)
+        elif backend_type == "redis":
+            self._backend = RedisBackend(backend_config)
+        else:  # Default to memory
+            self._backend = MemoryBackend(backend_config)
+        
+        logger.info(f"Using {backend_type} backend for state management")
 
     async def _initialize_impl(self) -> None:
         """Initialize state manager."""
+        if self._backend:
+            await self._backend.initialize()
+        
         if (
             self.core_config.state_manager_enabled
             and self.core_config.state_persistence_enabled
@@ -291,33 +317,45 @@ class StateManager(BaseComponent):
                 await self._backup_task
             except asyncio.CancelledError:
                 pass
+        
+        if self._backend:
+            await self._backend.shutdown()
 
     async def _health_check_impl(self) -> bool:
         """Health check implementation."""
-        return True  # State manager is always healthy
+        if self._backend:
+            return await self._backend.health_check()
+        return True
 
     async def set_state(self, key: str, value: Any) -> None:
         """Set a state value."""
-        self._state[key] = value
-        logger.debug(f"Set state: {key} = {value}")
+        if self._backend:
+            await self._backend.set(key, value)
+        logger.debug(f"Set state: {key}")
 
     async def get_state(self, key: str, default: Any = None) -> Any:
         """Get a state value."""
-        return self._state.get(key, default)
+        if self._backend:
+            return await self._backend.get(key, default)
+        return default
 
     async def delete_state(self, key: str) -> None:
         """Delete a state value."""
-        if key in self._state:
-            del self._state[key]
-            logger.debug(f"Deleted state: {key}")
+        if self._backend:
+            deleted = await self._backend.delete(key)
+            if deleted:
+                logger.debug(f"Deleted state: {key}")
 
     async def list_state_keys(self) -> List[str]:
         """List all state keys."""
-        return list(self._state.keys())
+        if self._backend:
+            return await self._backend.keys()
+        return []
 
     async def clear_state(self) -> None:
         """Clear all state."""
-        self._state.clear()
+        if self._backend:
+            await self._backend.clear()
         logger.info("Cleared all state")
 
     async def _backup_loop(self) -> None:
@@ -333,5 +371,34 @@ class StateManager(BaseComponent):
 
     async def _backup_state(self) -> None:
         """Backup state to persistent storage."""
-        # TODO: Implement actual persistence
-        logger.debug("State backup completed")
+        if self._backend:
+            backup_path = self.core_config.state_backend_config.get(
+                "backup_path", "/tmp/opsvi_state_backup.json"
+            )
+            try:
+                await self._backend.backup(backup_path)
+                logger.debug(f"State backup completed to {backup_path}")
+            except Exception as e:
+                logger.error(f"Failed to backup state: {e}")
+
+    async def restore_state(self, path: str) -> None:
+        """Restore state from a backup file."""
+        if self._backend:
+            try:
+                await self._backend.restore(path)
+                logger.info(f"State restored from {path}")
+            except Exception as e:
+                logger.error(f"Failed to restore state: {e}")
+                raise StateManagerError(f"Failed to restore state: {e}")
+
+    async def get_all_state(self) -> Dict[str, Any]:
+        """Get all state data."""
+        if self._backend:
+            return await self._backend.get_all()
+        return {}
+
+    async def set_many_state(self, data: Dict[str, Any]) -> None:
+        """Set multiple state values at once."""
+        if self._backend:
+            await self._backend.set_many(data)
+            logger.debug(f"Set {len(data)} state values")

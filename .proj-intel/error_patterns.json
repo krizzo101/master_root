@@ -1,0 +1,123 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-08-14T00:00:00Z",
+  "patterns": [
+    {
+      "error_signature": "a1b2c3d4e5f6",
+      "error_type": "ImportError",
+      "pattern": "No module named '([^']+)'",
+      "solutions": [
+        {
+          "fix": "Install missing module via pip",
+          "success_rate": 0.95,
+          "code_snippet": "pip install {module_name}"
+        },
+        {
+          "fix": "Add to PYTHONPATH",
+          "success_rate": 0.85,
+          "code_snippet": "export PYTHONPATH=$PYTHONPATH:{module_path}"
+        }
+      ],
+      "first_seen": "2025-08-14T00:00:00Z",
+      "last_seen": "2025-08-14T00:00:00Z",
+      "occurrences": 0
+    },
+    {
+      "error_signature": "b2c3d4e5f6a7",
+      "error_type": "AttributeError",
+      "pattern": "'([^']+)' object has no attribute '([^']+)'",
+      "solutions": [
+        {
+          "fix": "Check for typo in attribute name",
+          "success_rate": 0.70,
+          "code_snippet": "# Verify correct attribute name from class definition"
+        },
+        {
+          "fix": "Ensure object is fully initialized",
+          "success_rate": 0.60,
+          "code_snippet": "# Check __init__ method completed successfully"
+        }
+      ],
+      "first_seen": "2025-08-14T00:00:00Z",
+      "last_seen": "2025-08-14T00:00:00Z",
+      "occurrences": 0
+    },
+    {
+      "error_signature": "c3d4e5f6a7b8",
+      "error_type": "SyntaxError",
+      "pattern": "invalid syntax",
+      "solutions": [
+        {
+          "fix": "Check for missing colons after if/for/while/def/class",
+          "success_rate": 0.40,
+          "code_snippet": "# Add ':' at end of control structure line"
+        },
+        {
+          "fix": "Check for unmatched brackets/parentheses",
+          "success_rate": 0.35,
+          "code_snippet": "# Balance (), [], {}"
+        },
+        {
+          "fix": "Check indentation consistency",
+          "success_rate": 0.25,
+          "code_snippet": "# Ensure consistent use of spaces or tabs"
+        }
+      ],
+      "first_seen": "2025-08-14T00:00:00Z",
+      "last_seen": "2025-08-14T00:00:00Z",
+      "occurrences": 0
+    },
+    {
+      "error_signature": "d4e5f6a7b8c9",
+      "error_type": "TypeError",
+      "pattern": ".*expected .* got .*",
+      "solutions": [
+        {
+          "fix": "Type conversion to match expected type",
+          "success_rate": 0.80,
+          "code_snippet": "# Convert type: int(), str(), float(), list(), etc."
+        },
+        {
+          "fix": "Check function signature for correct parameter types",
+          "success_rate": 0.65,
+          "code_snippet": "# Verify function definition matches call site"
+        }
+      ],
+      "first_seen": "2025-08-14T00:00:00Z",
+      "last_seen": "2025-08-14T00:00:00Z",
+      "occurrences": 0
+    },
+    {
+      "error_signature": "e5f6a7b8c9d0",
+      "error_type": "FileNotFoundError",
+      "pattern": "No such file or directory: '([^']+)'",
+      "solutions": [
+        {
+          "fix": "Create missing directory structure",
+          "success_rate": 0.70,
+          "code_snippet": "os.makedirs(os.path.dirname(filepath), exist_ok=True)"
+        },
+        {
+          "fix": "Verify path and fix typos",
+          "success_rate": 0.60,
+          "code_snippet": "# Check path exists: os.path.exists(filepath)"
+        },
+        {
+          "fix": "Use absolute path instead of relative",
+          "success_rate": 0.50,
+          "code_snippet": "os.path.abspath(filepath)"
+        }
+      ],
+      "first_seen": "2025-08-14T00:00:00Z",
+      "last_seen": "2025-08-14T00:00:00Z",
+      "occurrences": 0
+    }
+  ],
+  "statistics": {
+    "total_patterns": 5,
+    "total_solutions": 14,
+    "avg_success_rate": 0.61,
+    "most_common_error": "ImportError",
+    "patterns_added_this_week": 0
+  }
+}

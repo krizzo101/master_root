@@ -56,19 +56,22 @@ class ClaudeJob:
     id: str
     task: str
     status: JobStatus = JobStatus.RUNNING
-    process: Optional[Any] = None  # subprocess.Popen instance
+    process: Optional[Any] = None  # asyncio.subprocess.Process instance
     result: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
     start_time: datetime = field(default_factory=datetime.now)
     end_time: Optional[datetime] = None
     cwd: Optional[str] = None
     output_format: str = "json"
-    permission_mode: str = "bypassPermissions"
+    permission_mode: str = "default"  # Changed from bypassPermissions for security
     verbose: bool = False
     recursion_context: Optional[RecursionContext] = None
     parent_job_id: Optional[str] = None
     stdout_buffer: str = ""
     stderr_buffer: str = ""
+    env: Optional[Dict[str, str]] = None  # Custom environment variables
+    model: Optional[str] = None  # Model to use (e.g., 'sonnet', 'opus')
+    mcp_config_path: Optional[str] = None  # Path to temporary MCP config file
 
 
 @dataclass

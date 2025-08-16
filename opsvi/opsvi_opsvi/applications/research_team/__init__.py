@@ -1,1 +1,0 @@
-# Research Team Application package

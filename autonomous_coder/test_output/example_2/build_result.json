@@ -1,0 +1,32 @@
+{
+  "success": true,
+  "project_path": "test_output/example_2/create-a-rest",
+  "tech_stack": {
+    "backend": "fastapi@0.117.1",
+    "database": "postgresql@17.2",
+    "orm": "sqlalchemy@2.0.37",
+    "testing": "pytest",
+    "language": "python@3.13.1",
+    "framework": "fastapi@0.117.1"
+  },
+  "files_created": [
+    "test_output/example_2/create-a-rest/requirements.txt",
+    "test_output/example_2/create-a-rest/main.py",
+    "test_output/example_2/create-a-rest/README.md",
+    "test_output/example_2/create-a-rest/app/__init__.py",
+    "test_output/example_2/create-a-rest/app/models.py",
+    "test_output/example_2/create-a-rest/app/routes.py",
+    "test_output/example_2/create-a-rest/app/database.py"
+  ],
+  "execution_time": 0.0020818710327148438,
+  "errors": [],
+  "warnings": [
+    "Enzyme for testing (use Testing Library)"
+  ],
+  "metrics": {
+    "phases_completed": 5,
+    "checkpoints_created": 5,
+    "research_items": 2,
+    "files_generated": 7
+  }
+}

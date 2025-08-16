@@ -1,0 +1,15 @@
+{
+  "session_id": "a36d6fda5269fbc0",
+  "started_at": "2025-08-15T18:41:19.286624+00:00",
+  "knowledge_stats": {
+    "total_knowledge_entries": 2,
+    "knowledge_types": {
+      "ERROR_SOLUTION": 1,
+      "CODE_PATTERN": 1
+    },
+    "high_confidence_entries": 2,
+    "last_update": "2025-08-15T18:41:19.284776+00:00"
+  },
+  "triggers_loaded": true,
+  "preloaded_count": 2
+}

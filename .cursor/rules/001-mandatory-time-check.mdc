@@ -1,0 +1,92 @@
+---
+description: "MANDATORY FIRST ACTION for ALL conversations - Check current time using MCP tool"
+globs:
+alwaysApply: true
+priority: 1
+---
+
+# 🕐 MANDATORY TIME CHECK - FIRST ACTION REQUIREMENT
+
+## ABSOLUTE REQUIREMENT - NO EXCEPTIONS
+
+### THE FIRST ACTION IN EVERY CONVERSATION MUST BE:
+
+```python
+# MANDATORY - Execute this BEFORE anything else
+from mcp__time__current_time import current_time
+current_datetime = current_time(format="YYYY-MM-DD HH:mm:ss")
+```
+
+## WHY THIS IS CRITICAL
+
+1. **Temporal Context**: Every decision needs accurate time awareness
+2. **API Versioning**: Know which APIs/models are current (2025 standards)
+3. **File Operations**: Correct timestamps for logs, reports, analysis
+4. **Audit Trail**: Compliance requires temporal tracking
+5. **Cache Management**: Determine data freshness
+6. **Deadline Awareness**: Understand urgency and constraints
+
+## ENFORCEMENT RULES
+
+### ✅ COMPLIANT BEHAVIOR
+```python
+# User: "Help me debug this code"
+# Claude's FIRST action:
+current_datetime = mcp__time__current_time(format="YYYY-MM-DD HH:mm:ss")
+# Output: "2025-01-15 14:23:45"
+# THEN proceed with debugging
+```
+
+### ❌ VIOLATIONS (IMMEDIATE REJECTION)
+- Starting any task without time check
+- Assuming date from conversation context
+- Using hardcoded or estimated dates
+- Checking time AFTER starting work
+- Skipping time check for "simple" tasks
+
+## IMPLEMENTATION PATTERN
+
+```python
+# Standard conversation start pattern
+def start_conversation():
+    # Step 1: ALWAYS check time first
+    current_time = mcp__time__current_time(format="YYYY-MM-DD HH:mm:ss")
+    
+    # Step 2: Log for audit
+    print(f"Session initiated: {current_time}")
+    
+    # Step 3: Use time context for decisions
+    # - Determine API versions to use
+    # - Set file timestamps correctly
+    # - Check cache validity
+    
+    # Step 4: NOW proceed with user's request
+    return current_time
+```
+
+## EXCEPTIONS: NONE
+
+**There are NO exceptions to this rule:**
+- Simple questions? CHECK TIME FIRST
+- Code review? CHECK TIME FIRST  
+- File reading? CHECK TIME FIRST
+- Research tasks? CHECK TIME FIRST
+- Everything else? CHECK TIME FIRST
+
+## VALIDATION
+
+Every conversation will be audited for:
+1. Time check as absolute first action
+2. Proper format usage (YYYY-MM-DD HH:mm:ss)
+3. Time context used in subsequent operations
+
+## PENALTY FOR NON-COMPLIANCE
+
+- Task rejection
+- Session restart required
+- Audit log violation entry
+- Potential access restriction
+
+---
+
+**REMEMBER**: The VERY FIRST thing you do in ANY conversation is check the current time. No exceptions, no excuses, no delays. Time check FIRST, then everything else.

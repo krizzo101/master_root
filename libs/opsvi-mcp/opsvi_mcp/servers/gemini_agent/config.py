@@ -4,7 +4,7 @@ Configuration for Gemini Agent MCP Server
 
 import os
 from dataclasses import dataclass, field
-from typing import Dict, Any, Optional, List
+from typing import Optional, List
 from pathlib import Path
 
 
@@ -14,7 +14,9 @@ class GeminiConfig:
 
     # API Configuration
     api_key: str = field(default_factory=lambda: os.environ.get("GEMINI_API_KEY", ""))
-    model: str = "gemini-1.5-pro"  # Using 1.5-pro until Ultra plan API key is fixed
+    model: str = (
+        "gemini-2.5-pro"  # Default model preference; CLI reads gemini-settings.json
+    )
 
     # Context and Limits
     context_window: int = 1_000_000  # 1M tokens

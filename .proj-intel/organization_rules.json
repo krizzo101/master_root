@@ -1,0 +1,132 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-08-14T00:00:00Z",
+  "enforcement": "MANDATORY",
+  
+  "file_locations": {
+    "documentation": {
+      "path": "docs/",
+      "subdirs": {
+        "architecture": "PERMANENT - System design, architecture decisions",
+        "guides": "PERMANENT - How-to guides, tutorials, API documentation",
+        "analysis": "TEMPORARY - Reports, analysis (YYYY-MM-DD prefix required, archive after 30 days)",
+        "migration": "TEMPORARY - Migration plans, upgrade guides (archive when complete)",
+        "archive": "Storage for expired temporary docs only"
+      },
+      "permanent_dirs": ["architecture", "guides"],
+      "temporary_dirs": ["analysis", "migration"],
+      "root_allowed": ["README.md", "CLAUDE.md", "QUICK_START.md", "LICENSE.md", "CONTRIBUTING.md"],
+      "max_root_docs": 5
+    },
+    "temporary": {
+      "path": ".tmp/",
+      "cleanup_hours": 24,
+      "patterns": ["*.tmp", "*.log", "*.bak", "temp.*"]
+    },
+    "code": {
+      "apps": "Applications only",
+      "libs": "Libraries only",
+      "servers": "Server implementations only",
+      "scripts": "Utility scripts, tools",
+      "tests": "Test files (mirror source structure)"
+    }
+  },
+  
+  "naming_rules": {
+    "prohibited_suffixes": ["_V1", "_V2", "_v1", "_v2", "_final", "_updated", "_new", "_old", "_backup"],
+    "documentation": {
+      "time_sensitive": "YYYY-MM-DD_description.md",
+      "analysis": "YYYY-MM-DD_analysis_name.md"
+    },
+    "configs": "{service}.config.{ext}",
+    "scripts": "{action_verb}_{noun}.{ext}"
+  },
+  
+  "size_limits": {
+    "file_warning_mb": 10,
+    "file_error_mb": 50,
+    "directory_warning_mb": 100,
+    "directory_error_mb": 500,
+    "reference_max_gb": 1
+  },
+  
+  "cleanup_schedule": {
+    "daily": [
+      "delete_temp_files",
+      "compress_old_logs"
+    ],
+    "weekly": [
+      "archive_old_docs",
+      "check_size_violations",
+      "organize_misplaced_files"
+    ],
+    "monthly": [
+      "deep_archive_compression",
+      "reference_directory_review"
+    ]
+  },
+  
+  "pre_commit_checks": [
+    {
+      "check": "root_documentation_limit",
+      "rule": "Max 5 .md files in root",
+      "action": "BLOCK"
+    },
+    {
+      "check": "version_suffix_prohibition",
+      "rule": "No version suffixes in filenames",
+      "action": "BLOCK"
+    },
+    {
+      "check": "temp_file_exclusion",
+      "rule": "No .log, .tmp, .bak files",
+      "action": "BLOCK"
+    },
+    {
+      "check": "file_size_limit",
+      "rule": "No files >10MB without flag",
+      "action": "WARN"
+    },
+    {
+      "check": "documentation_location",
+      "rule": "Docs in correct subdirectories",
+      "action": "BLOCK"
+    }
+  ],
+  
+  "decision_tree": {
+    "before_file_creation": [
+      {
+        "question": "Does similar file exist?",
+        "yes": "UPDATE existing file",
+        "no": "Continue"
+      },
+      {
+        "question": "Is it temporary?",
+        "yes": "Create in .tmp/ with auto-cleanup",
+        "no": "Continue"
+      },
+      {
+        "question": "Is it documentation?",
+        "yes": "Create in docs/* subdirectory",
+        "no": "Continue"
+      },
+      {
+        "question": "Is it report/analysis?",
+        "yes": "Create in docs/analysis/ with date prefix",
+        "no": "Continue"
+      },
+      {
+        "question": "Is it configuration?",
+        "yes": "Root allowed if no subdirectory exists",
+        "no": "Must go in appropriate subdirectory"
+      }
+    ]
+  },
+  
+  "violations": {
+    "handling": "IMMEDIATE_FAILURE",
+    "reporting": "AUTOMATIC",
+    "recovery": "FIX_BEFORE_CONTINUE"
+  }
+}

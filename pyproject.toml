@@ -64,7 +64,7 @@ opsvi-rag = {workspace = true}
 opsvi-agents = {workspace = true}
 opsvi-foundation = {workspace = true}
 opsvi-auth = {workspace = true}
-opsvi-communication = {workspace = true}
+opsvi-comm = {workspace = true}
 opsvi-data = {workspace = true}
 opsvi-deploy = {workspace = true}
 opsvi-fs = {workspace = true}
@@ -72,7 +72,7 @@ opsvi-gateway = {workspace = true}
 opsvi-http = {workspace = true}
 opsvi-memory = {workspace = true}
 opsvi-monitoring = {workspace = true}
-opsvi-orchestration = {workspace = true}
+opsvi-orch = {workspace = true}
 opsvi-pipeline = {workspace = true}
 opsvi-security = {workspace = true}
 

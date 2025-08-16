@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - pattern_network
+
+  pattern-engine-1:
+    build: .
+    environment:
+      - NODE_ID=node_1
+      - REDIS_URL=redis://redis:6379
+      - PORT=8001
+    ports:
+      - "8001:8001"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - pattern_network
+    volumes:
+      - ./data/node1:/tmp/pattern_engine
+
+  pattern-engine-2:
+    build: .
+    environment:
+      - NODE_ID=node_2
+      - REDIS_URL=redis://redis:6379
+      - PORT=8002
+    ports:
+      - "8002:8002"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - pattern_network
+    volumes:
+      - ./data/node2:/tmp/pattern_engine
+
+  pattern-engine-3:
+    build: .
+    environment:
+      - NODE_ID=node_3
+      - REDIS_URL=redis://redis:6379
+      - PORT=8003
+    ports:
+      - "8003:8003"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - pattern_network
+    volumes:
+      - ./data/node3:/tmp/pattern_engine
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - pattern-engine-1
+      - pattern-engine-2
+      - pattern-engine-3
+    networks:
+      - pattern_network
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - pattern_network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=redis-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana-dashboard.json:/etc/grafana/provisioning/dashboards/pattern-engine.json:ro
+    depends_on:
+      - prometheus
+    networks:
+      - pattern_network
+
+networks:
+  pattern_network:
+    driver: bridge
+
+volumes:
+  redis_data:
+  prometheus_data:
+  grafana_data:

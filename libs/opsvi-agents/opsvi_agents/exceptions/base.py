@@ -3,9 +3,9 @@
 
 """
 
-from opsvi_foundation.exceptions.base import OPSVIError
+from opsvi_foundation.exceptions.base import LibraryError
 
-class OpsviAgentsError(OPSVIError):
+class OpsviAgentsError(LibraryError):
     """Base exception for all opsvi-agents errors."""
     pass
 
@@ -35,6 +35,10 @@ class OpsviAgentsInitializationError(OpsviAgentsError):
 
 class OpsviAgentsShutdownError(OpsviAgentsError):
     """Shutdown-related errors in opsvi-agents."""
+    pass
+
+class AgentExecutionError(OpsviAgentsError):
+    """Error during agent execution."""
     pass
 
 # Library-specific exceptions

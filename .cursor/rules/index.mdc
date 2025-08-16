@@ -7,6 +7,10 @@ alwaysApply: true
 
 # OPSVI Master Workspace Rules
 
+## 🕐 FIRST ACTION REQUIREMENT
+
+**MANDATORY**: Check current time using `mcp__time__current_time` as the VERY FIRST action in every conversation. See `001-mandatory-time-check.mdc` for details.
+
 ## Git Workflow
 
 - **Commit** every ≤10 min to the AUTOSAVE branch using the autosave script

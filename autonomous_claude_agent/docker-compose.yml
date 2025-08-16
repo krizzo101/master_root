@@ -1,0 +1,310 @@
+version: '3.9'
+
+# Autonomous Claude Agent Docker Compose Configuration
+# Generated: 2025-08-15
+# Version: 1.0.0
+
+services:
+  # Main Agent Service
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    image: autonomous-claude-agent:latest
+    container_name: claude-agent
+    hostname: claude-agent
+    restart: unless-stopped
+    
+    environment:
+      - ENVIRONMENT=production
+      - PYTHONUNBUFFERED=1
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - REDIS_HOST=redis
+      - POSTGRES_HOST=postgres
+      - CHROMA_HOST=chromadb
+      - OTEL_ENDPOINT=http://otel-collector:4317
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      
+    ports:
+      - "8000:8000"  # API server
+      - "8001:8001"  # WebSocket server
+      - "9090:9090"  # Metrics endpoint
+      
+    volumes:
+      - ./data:/data
+      - ./logs:/logs
+      - ./checkpoints:/app/checkpoints
+      - ./cache:/app/cache
+      - agent-temp:/tmp/agent
+      
+    networks:
+      - agent-network
+      
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      chromadb:
+        condition: service_started
+        
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+        reservations:
+          cpus: '2'
+          memory: 2G
+          
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  # Redis for caching and queuing
+  redis:
+    image: redis:7-alpine
+    container_name: claude-redis
+    hostname: redis
+    restart: unless-stopped
+    
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 1gb
+      --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD:-redis_secret}
+      
+    ports:
+      - "6379:6379"
+      
+    volumes:
+      - redis-data:/data
+      
+    networks:
+      - agent-network
+      
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+
+  # PostgreSQL for persistent storage
+  postgres:
+    image: postgres:16-alpine
+    container_name: claude-postgres
+    hostname: postgres
+    restart: unless-stopped
+    
+    environment:
+      - POSTGRES_DB=claude_agent
+      - POSTGRES_USER=${POSTGRES_USER:-agent}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres_secret}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      
+    ports:
+      - "5432:5432"
+      
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      
+    networks:
+      - agent-network
+      
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agent} -d claude_agent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+
+  # ChromaDB for vector storage
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: claude-chromadb
+    hostname: chromadb
+    restart: unless-stopped
+    
+    environment:
+      - CHROMA_SERVER_AUTH_PROVIDER=token
+      - CHROMA_SERVER_AUTH_TOKEN=${CHROMA_TOKEN:-chroma_secret}
+      - ANONYMIZED_TELEMETRY=false
+      
+    ports:
+      - "8002:8000"
+      
+    volumes:
+      - chroma-data:/chroma/chroma
+      
+    networks:
+      - agent-network
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: claude-prometheus
+    hostname: prometheus
+    restart: unless-stopped
+    
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      
+    ports:
+      - "9091:9090"
+      
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+      
+    networks:
+      - agent-network
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: claude-grafana
+    hostname: grafana
+    restart: unless-stopped
+    
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-grafana_secret}
+      - GF_INSTALL_PLUGINS=redis-datasource
+      
+    ports:
+      - "3000:3000"
+      
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./config/grafana:/etc/grafana/provisioning:ro
+      
+    networks:
+      - agent-network
+      
+    depends_on:
+      - prometheus
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+
+  # OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    container_name: claude-otel
+    hostname: otel-collector
+    restart: unless-stopped
+    
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "8888:8888"   # Prometheus metrics
+      
+    volumes:
+      - ./config/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+      
+    networks:
+      - agent-network
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+
+  # Nginx reverse proxy (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: claude-nginx
+    hostname: nginx
+    restart: unless-stopped
+    
+    ports:
+      - "80:80"
+      - "443:443"
+      
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./config/ssl:/etc/nginx/ssl:ro
+      - nginx-cache:/var/cache/nginx
+      
+    networks:
+      - agent-network
+      
+    depends_on:
+      - agent
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+
+networks:
+  agent-network:
+    driver: bridge
+    name: claude-agent-network
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  agent-temp:
+    driver: local
+  redis-data:
+    driver: local
+  postgres-data:
+    driver: local
+  chroma-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  nginx-cache:
+    driver: local

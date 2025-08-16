@@ -1,0 +1,27 @@
+[Unit]
+Description=WSL2 Memory Monitor and Manager
+After=network.target
+
+[Service]
+Type=simple
+User=%USER%
+WorkingDirectory=/home/%USER%
+ExecStart=/usr/bin/python3 /home/%USER%/master_root/scripts/wsl_memory_monitor.py monitor
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Resource limits
+MemoryMax=256M
+CPUQuota=10%
+
+# Security hardening
+PrivateTmp=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/%USER%/.config /home/%USER%/.local
+
+[Install]
+WantedBy=multi-user.target

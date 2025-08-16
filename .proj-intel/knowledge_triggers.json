@@ -1,0 +1,172 @@
+{
+  "version": "1.0.0",
+  "description": "Defines automatic triggers for knowledge system operations",
+  "last_updated": "2025-08-15T18:30:00Z",
+  
+  "retrieval_triggers": {
+    "before_error_fix": {
+      "pattern": ".*Error|.*Exception|.*Failed|.*not found|.*missing",
+      "action": "query_knowledge",
+      "knowledge_type": "ERROR_SOLUTION",
+      "priority": "HIGH",
+      "mandatory": true
+    },
+    "before_code_write": {
+      "pattern": "def |class |function |async |import ",
+      "action": "query_knowledge",
+      "knowledge_type": "CODE_PATTERN",
+      "priority": "MEDIUM",
+      "mandatory": true
+    },
+    "before_tool_use": {
+      "pattern": "Bash|bash|git|npm|pip|docker|kubectl",
+      "action": "query_knowledge", 
+      "knowledge_type": "TOOL_USAGE",
+      "priority": "MEDIUM",
+      "mandatory": false
+    },
+    "before_workflow": {
+      "pattern": "TodoWrite|multi-step|workflow|process",
+      "action": "query_knowledge",
+      "knowledge_type": "WORKFLOW",
+      "priority": "MEDIUM",
+      "mandatory": false
+    }
+  },
+  
+  "storage_triggers": {
+    "after_error_resolution": {
+      "condition": "error_fixed",
+      "action": "store_knowledge",
+      "knowledge_type": "ERROR_SOLUTION",
+      "priority": "HIGH",
+      "mandatory": true,
+      "data_to_store": ["error_message", "solution", "context"]
+    },
+    "after_successful_code": {
+      "condition": "code_works && (reusable || used_3_times)",
+      "action": "store_knowledge",
+      "knowledge_type": "CODE_PATTERN",
+      "priority": "MEDIUM",
+      "mandatory": true,
+      "data_to_store": ["code", "purpose", "context", "usage_examples"]
+    },
+    "after_workflow_completion": {
+      "condition": "workflow_completed && steps > 3",
+      "action": "store_knowledge",
+      "knowledge_type": "WORKFLOW",
+      "priority": "MEDIUM",
+      "mandatory": true,
+      "data_to_store": ["steps", "tools_used", "outcome", "duration"]
+    },
+    "on_user_correction": {
+      "condition": "user_corrects_behavior",
+      "action": "store_knowledge",
+      "knowledge_type": "USER_PREFERENCE",
+      "priority": "HIGH",
+      "mandatory": true,
+      "data_to_store": ["original_approach", "preferred_approach", "context"]
+    },
+    "on_pattern_recognition": {
+      "condition": "action_repeated >= 3",
+      "action": "store_knowledge",
+      "knowledge_type": "CONTEXT_PATTERN",
+      "priority": "LOW",
+      "mandatory": false,
+      "data_to_store": ["pattern", "context", "frequency"]
+    }
+  },
+  
+  "update_triggers": {
+    "on_knowledge_success": {
+      "condition": "applied_knowledge && succeeded",
+      "action": "update_success",
+      "update": {
+        "usage_count": "+1",
+        "success_rate": "weighted_average",
+        "confidence_score": "+0.05 if success_rate > 0.8"
+      }
+    },
+    "on_knowledge_failure": {
+      "condition": "applied_knowledge && failed",
+      "action": "update_failure",
+      "update": {
+        "usage_count": "+1",
+        "success_rate": "weighted_average",
+        "confidence_score": "-0.1 if success_rate < 0.3"
+      }
+    },
+    "on_knowledge_obsolete": {
+      "condition": "better_solution_found",
+      "action": "deprecate_knowledge",
+      "update": {
+        "status": "deprecated",
+        "replaced_by": "new_knowledge_id"
+      }
+    }
+  },
+  
+  "relationship_triggers": {
+    "similar_knowledge": {
+      "condition": "similarity_score > 0.8",
+      "action": "create_relationship",
+      "relationship_type": "SIMILAR_TO"
+    },
+    "derived_knowledge": {
+      "condition": "based_on_existing",
+      "action": "create_relationship",
+      "relationship_type": "DERIVED_FROM"
+    },
+    "contradictory_knowledge": {
+      "condition": "opposite_solution",
+      "action": "create_relationship",
+      "relationship_type": "CONTRADICTS"
+    },
+    "enhancement_knowledge": {
+      "condition": "improves_existing",
+      "action": "create_relationship",
+      "relationship_type": "ENHANCES"
+    }
+  },
+  
+  "automatic_patterns": {
+    "error_pattern": {
+      "regex": "(Error|Exception|Failed).*?(fixed|resolved|solved) by (.*)",
+      "creates": "ERROR_SOLUTION",
+      "extract": {
+        "error_type": "$1",
+        "solution": "$3"
+      }
+    },
+    "import_pattern": {
+      "regex": "import (.*) from ['\"](.*)['\"]]",
+      "creates": "CODE_PATTERN",
+      "extract": {
+        "import_name": "$1",
+        "module": "$2"
+      }
+    },
+    "command_pattern": {
+      "regex": "(git|npm|pip|docker) (.*)",
+      "creates": "TOOL_USAGE",
+      "extract": {
+        "tool": "$1",
+        "command": "$2"
+      }
+    }
+  },
+  
+  "confidence_thresholds": {
+    "minimum_to_apply": 0.7,
+    "high_confidence": 0.85,
+    "auto_apply": 0.95,
+    "deprecation": 0.3
+  },
+  
+  "metrics": {
+    "minimum_queries_per_session": 5,
+    "minimum_stores_per_session": 1,
+    "target_hit_rate": 0.6,
+    "target_success_rate": 0.7
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "project_path": "test_output/example_4/create-a-dashboard",
+  "tech_stack": {
+    "framework": "nextjs@15.2.0",
+    "ui": "react@19.1.1",
+    "styling": "tailwindcss@3.4.17",
+    "charts": "recharts",
+    "language": "typescript@5.7.2"
+  },
+  "files_created": [
+    "test_output/example_4/create-a-dashboard/README.md",
+    "test_output/example_4/create-a-dashboard/package.json",
+    "test_output/example_4/create-a-dashboard/index.js"
+  ],
+  "execution_time": 0.001413106918334961,
+  "errors": [
+    "Missing essential file: index.html"
+  ],
+  "warnings": [],
+  "metrics": {
+    "phases_completed": 5,
+    "checkpoints_created": 5,
+    "research_items": 2,
+    "files_generated": 3
+  }
+}

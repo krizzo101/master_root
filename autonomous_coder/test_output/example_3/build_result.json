@@ -1,0 +1,29 @@
+{
+  "success": true,
+  "project_path": "test_output/example_3/build-a-cli",
+  "tech_stack": {
+    "language": "python@3.13.1",
+    "framework": "typer",
+    "packaging": "poetry",
+    "testing": "pytest"
+  },
+  "files_created": [
+    "test_output/example_3/build-a-cli/requirements.txt",
+    "test_output/example_3/build-a-cli/cli.py",
+    "test_output/example_3/build-a-cli/README.md",
+    "test_output/example_3/build-a-cli/setup.py"
+  ],
+  "execution_time": 0.0013968944549560547,
+  "errors": [
+    "Missing essential file: main.py"
+  ],
+  "warnings": [
+    "Enzyme for testing (use Testing Library)"
+  ],
+  "metrics": {
+    "phases_completed": 5,
+    "checkpoints_created": 5,
+    "research_items": 2,
+    "files_generated": 4
+  }
+}

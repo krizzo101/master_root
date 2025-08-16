@@ -1,0 +1,221 @@
+# Resource Limits Configuration
+# Generated: 2025-08-15
+# Version: 1.0.0
+
+# System Resource Limits
+system:
+  cpu:
+    max_cores: 4
+    max_percentage: 80
+    throttle_threshold: 70
+    
+  memory:
+    max_heap: "4GB"
+    max_stack: "256MB"
+    gc_threshold: 0.8
+    oom_killer: true
+    
+  disk:
+    max_usage: "10GB"
+    temp_directory: "/tmp/agent"
+    cleanup_interval: 3600
+    
+  network:
+    max_connections: 100
+    timeout: 30
+    retry_limit: 3
+    bandwidth_limit: "100MB/s"
+    
+# Agent Operation Limits
+agent:
+  execution:
+    max_iterations: 1000
+    max_recursion_depth: 10
+    max_parallel_tasks: 20
+    max_queue_size: 1000
+    timeout_per_task: 300  # 5 minutes
+    total_timeout: 7200  # 2 hours
+    
+  context:
+    max_tokens: 100000
+    max_messages: 1000
+    max_memory_items: 10000
+    compression_ratio: 0.5
+    
+  tools:
+    max_calls_per_minute: 100
+    max_calls_per_tool: 50
+    timeout_per_call: 30
+    
+# LLM Provider Limits
+llm:
+  rate_limits:
+    anthropic:
+      requests_per_minute: 50
+      tokens_per_minute: 100000
+      concurrent_requests: 10
+      
+    openai:
+      requests_per_minute: 60
+      tokens_per_minute: 150000
+      concurrent_requests: 15
+      
+  token_limits:
+    input_max: 100000
+    output_max: 4096
+    total_max: 104096
+    
+  cost_limits:
+    max_per_request: 1.0  # USD
+    max_per_hour: 10.0
+    max_per_day: 100.0
+    max_per_month: 1000.0
+    warning_threshold: 0.8
+    
+# File Operation Limits
+files:
+  size:
+    max_file_size: "50MB"
+    max_total_size: "1GB"
+    warning_threshold: "40MB"
+    
+  count:
+    max_open_files: 100
+    max_files_per_operation: 50
+    max_directory_depth: 10
+    
+  operations:
+    max_reads_per_minute: 1000
+    max_writes_per_minute: 100
+    max_deletes_per_minute: 10
+    
+# Database Limits
+database:
+  connections:
+    max_pool_size: 20
+    min_pool_size: 2
+    max_overflow: 10
+    pool_timeout: 30
+    
+  queries:
+    max_per_minute: 1000
+    max_execution_time: 10
+    max_result_size: "100MB"
+    
+  transactions:
+    max_duration: 60
+    max_retries: 3
+    isolation_level: "READ_COMMITTED"
+    
+# Web Operations Limits
+web:
+  scraping:
+    max_pages: 100
+    max_depth: 5
+    max_concurrent: 10
+    timeout: 30
+    rate_limit: 10  # requests per second
+    
+  search:
+    max_results: 100
+    max_queries_per_minute: 30
+    cache_duration: 3600
+    
+  api_calls:
+    max_per_minute: 100
+    max_payload_size: "10MB"
+    timeout: 30
+    
+# Cache Limits
+cache:
+  memory:
+    max_size: "1GB"
+    max_items: 100000
+    ttl_default: 3600
+    ttl_max: 86400
+    
+  disk:
+    max_size: "5GB"
+    max_files: 10000
+    cleanup_interval: 3600
+    
+# Queue Limits
+queues:
+  task_queue:
+    max_size: 10000
+    max_priority_levels: 5
+    timeout: 300
+    
+  message_queue:
+    max_size: 100000
+    max_message_size: "1MB"
+    retention: 3600
+    
+# Monitoring Limits
+monitoring:
+  metrics:
+    max_datapoints: 1000000
+    retention_days: 30
+    aggregation_interval: 60
+    
+  logs:
+    max_size_per_file: "100MB"
+    max_files: 10
+    max_entries_per_minute: 10000
+    
+  traces:
+    max_spans: 100000
+    max_trace_duration: 3600
+    sampling_rate: 0.1
+    
+# Security Limits
+security:
+  auth:
+    max_attempts: 5
+    lockout_duration: 300
+    session_timeout: 3600
+    
+  api_keys:
+    max_per_user: 10
+    rotation_interval: 2592000  # 30 days
+    
+  encryption:
+    max_key_size: 4096
+    max_encrypted_size: "100MB"
+    
+# Scaling Limits
+scaling:
+  horizontal:
+    min_instances: 1
+    max_instances: 10
+    scale_up_threshold: 0.8
+    scale_down_threshold: 0.3
+    
+  vertical:
+    min_cpu: 1
+    max_cpu: 8
+    min_memory: "1GB"
+    max_memory: "16GB"
+    
+# Recovery Limits
+recovery:
+  checkpoints:
+    max_checkpoints: 100
+    max_size_per_checkpoint: "100MB"
+    retention_days: 7
+    
+  rollbacks:
+    max_rollback_depth: 10
+    max_rollback_size: "1GB"
+    
+  retries:
+    max_attempts: 5
+    backoff_base: 2
+    max_backoff: 300
+    
+# Development Limits (relaxed for development)
+development_overrides:
+  enabled: "${DEV_MODE:-false}"
+  multiplier: 2.0  # Multiply all limits by this factor in dev mode
+  disable_cost_limits: true
+  disable_rate_limits: false
