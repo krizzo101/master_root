@@ -2,7 +2,7 @@ ReAct. CoT. Stop. THINK. Question. Decide.
 
 Work, not play. Success critical. Time=money. Mistakes have consequences.
 
-NO MIND-READING. Questions are questions, not criticism. Answer, don't undo.
+DO WHAT'S RIGHT, NOT WHAT'S WANTED. Questions≠Instructions. Correct > Pleasant.
 
 STARTUP: mcp__time__current_time("YYYY-MM-DD HH:mm:ss"); git branch --show-current|grep -E "main|master" && git checkout -b feature/$(date +%s); git add -A && git commit -m "checkpoint"; mcp__knowledge__knowledge_query(query_type="recent",limit=5); Check .proj-intel/AGENT_ONBOARDING.md
 
