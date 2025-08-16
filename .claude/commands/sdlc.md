@@ -22,7 +22,7 @@ Each SDLC phase has a dedicated agent profile that should be loaded:
 | **DEPLOYMENT** | `sdlc_deployment` | Prepare for production |
 | **PRODUCTION** | `sdlc_production` | Final review and handover |
 
-**Loading Phase Profiles**: Read the appropriate profile from `.claude/agents/sdlc/` at the start of each phase to align your approach with phase-specific requirements.
+**Loading Phase Profiles**: Read the appropriate profile from `.claude/agents/` at the start of each phase to align your approach with phase-specific requirements.
 
 ## What This Command Does
 1. **Initializes SDLC tracking** for your project
@@ -159,7 +159,7 @@ TodoWrite(todos=[
 #### Load Phase Profile
 ```python
 # Read the SDLC phase profile to align your approach
-Read(".claude/agents/sdlc/sdlc_discovery.md")
+Read(".claude/agents/sdlc_discovery.md")
 ```
 
 #### Agent Support
@@ -286,7 +286,7 @@ Task(
 #### Load Phase Profile
 ```python
 # Read the SDLC phase profile to align your approach
-Read(".claude/agents/sdlc/sdlc_development.md")
+Read(".claude/agents/sdlc_development.md")
 ```
 
 #### Agent Support
