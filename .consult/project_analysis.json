@@ -1,0 +1,336 @@
+{
+  "metadata": {
+    "build_time_ms": 0.0064373016357421875,
+    "project_path": "/home/opsvi/master_root",
+    "builder_type": "DefaultPackageBuilder",
+    "build_timestamp": "2025-08-04T20:08:30.000648",
+    "package_type": "default",
+    "collector_count": 5,
+    "total_data_size": 10219
+  },
+  "collectors": [
+    {
+      "collector": "DevelopmentStateCollector",
+      "schema_version": "1.0.0",
+      "timestamp": "2025-08-04T16:08:27.081268",
+      "data": {
+        "git_repository": true,
+        "current_branch": "AUTOSAVE",
+        "remote_url": "https://github.com/krizzo101/master_root.git",
+        "active_branches": 2,
+        "branch_names": [
+          "AUTOSAVE",
+          "main"
+        ],
+        "has_uncommitted_changes": true,
+        "staged_files_count": 1,
+        "unstaged_files_count": 8,
+        "untracked_files_count": 3,
+        "ci_status": {
+          "has_ci": true,
+          "ci_provider": "GitHub Actions",
+          "last_build_status": null,
+          "last_build_time": null,
+          "build_count": 0
+        },
+        "issue_tracking": {
+          "has_issue_tracking": false,
+          "issue_provider": null,
+          "open_issues": 0,
+          "closed_issues": 0,
+          "recent_activity": false
+        },
+        "recent_activity": {
+          "last_commit_days_ago": 1,
+          "commits_last_week": 11,
+          "commits_last_month": 11,
+          "active_contributors": 0,
+          "recent_branches": [
+            "AUTOSAVE",
+            "main"
+          ]
+        },
+        "project_structure": {
+          "has_tests": false,
+          "has_docs": true,
+          "has_ci": false,
+          "has_docker": false,
+          "has_requirements": false,
+          "main_language": null,
+          "file_count": 13172
+        },
+        "development_state": "active_development"
+      }
+    },
+    {
+      "collector": "ProjectPurposeCollector",
+      "schema_version": "1.0.0",
+      "timestamp": "2025-08-04T16:08:27.082294",
+      "data": {
+        "project_name": "OPSVI Master Workspace",
+        "description": "[![CI](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml) A comprehensive monorepo for AI/ML Operations with built-in observability, RAG capabilities, and MCP integration. ```bash",
+        "key_features": [
+          "**Worktrees**: Use `scripts/new_agent_worktree.sh` for feature development"
+        ]
+      }
+    },
+    {
+      "collector": "ConstraintsCollector",
+      "schema_version": "1.0.0",
+      "timestamp": "2025-08-04T16:08:28.882166",
+      "data": {
+        "technical_constraints": {
+          "performance_constraints": [
+            "Assert: assert len(performance_engine.active_tasks) == 0",
+            "Assert: assert len(performance_engine.task_executions) == 0",
+            "Assert: assert 'performance_issue' in agent.repair_capabilities",
+            "Assert: assert result.repair_type == 'performance_issue'",
+            "Assert: assert 'performance_issue' in capabilities",
+            "Assert: assert 'Performance Smoke Test Results' in response.content",
+            "Assert: assert 'Performance Smoke Test Results' in response.content",
+            "Assert: assert 'Performance Optimization Analysis' in response.content",
+            "Assert: assert 'slow_operations' in profile",
+            "Assert: assert len(slow_ops) >= 2",
+            "Assert: assert 'Performance Optimization Analysis' in response.content",
+            "Exception: raise TimeoutError(f'Operation timed out after {timeout} seconds')",
+            "Assert: assert 'performance_metrics' in content",
+            "Assert: assert result.status == ExecutionStatus.TIMEOUT",
+            "Assert: assert settings.redis_connection_timeout == 5",
+            "Assert: assert settings.test_timeout == 300",
+            "Assert: assert settings.enable_performance_optimization is True",
+            "Assert: assert task_def.timeout_seconds == 300",
+            "Assert: assert task_def.timeout_seconds == 300",
+            "Assert: assert perf_policy.name == 'performance'",
+            "Assert: assert policy_result.policy_name == 'performance'",
+            "Assert: assert _determine_issue_type(perf_result) == 'performance_issue'",
+            "Assert: assert config.timeout == 30.0",
+            "Assert: assert config.default_timeout == 30.0",
+            "Assert: assert config['default_timeout'] == 30.0",
+            "Assert: assert config['brave']['timeout'] == 45.0",
+            "Assert: assert config['default_timeout'] == 45.0",
+            "Assert: assert config['firecrawl']['timeout'] == 30.0",
+            "Assert: assert config.default_timeout == 30.0",
+            "Exception: raise HTTPException(status_code=500, detail=f'Failed to get agent performance: {e}')",
+            "Exception: raise TimeoutError(f'Task {node_id} timed out')",
+            "Exception: raise ValueError('Timeout must be positive')",
+            "Exception: raise TimeoutError(f'Task {task_id} timed out')",
+            "Exception: raise ConfigError(f'Invalid timeout for client {client.name}: {client.timeout}')",
+            "Exception: raise ValueError(f'Invalid timeout for client {client_name}')",
+            "Exception: raise ClientError(f'Request to {self.name} timed out after {timeout}s', self.name, {'timeout': timeout})",
+            "Exception: raise Exception(f'Execution timeout after {self.config.execution_timeout_seconds} seconds')",
+            "40% faster than creating new instances each time",
+            "Exception: raise Exception(f'Execution timeout after {self.config.execution_timeout_seconds} seconds')",
+            "40% faster than creating new instances each time"
+          ],
+          "security_constraints": [
+            "Assert: assert settings.access_token_expire_minutes == 30",
+            "Exception: raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f\"Permission '{permission}' required\")",
+            "Exception: raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f'One of permissions {permissions} required')",
+            "Exception: raise HTTPException(status_code=403, detail=f'Permission required: {permission}')",
+            "Exception: raise HTTPException(status_code=403, detail=f'Permission required: {permission}')"
+          ],
+          "scalability_constraints": [],
+          "compatibility_constraints": [],
+          "resource_constraints": [
+            "Assert: assert execution_time < load_size * 2.0",
+            "Assert: assert len(results) == load_size",
+            "Assert: assert size == 1024",
+            "Assert: assert 'size' in data",
+            "Assert: assert budget.limit == 1000",
+            "Assert: assert budget.soft_limit == 800",
+            "Assert: assert budget.hard_limit == 1200",
+            "Assert: assert budget.soft_limit is None",
+            "Assert: assert budget.hard_limit is None",
+            "Assert: assert budget.limit == 1000",
+            "Assert: assert usage.limit == 1000",
+            "Assert: assert alert.message == 'Token usage approaching limit'",
+            "Assert: assert budget is None or isinstance(budget, BudgetLimit)",
+            "Assert: assert settings.neo4j_max_connection_pool_size == 50",
+            "Exception: raise ValueError('Memory usage must be positive')"
+          ],
+          "dependency_constraints": [],
+          "general_constraints": [
+            "Additional constraints",
+            "Additional constraints",
+            "Additional constraints",
+            "Additional constraints",
+            "Additional constraints",
+            "Additional constraints",
+            "- This is task automation, not autonomous intelligence",
+            "- This is task automation, not autonomous intelligence",
+            "- This is system optimization, not intelligence enhancement"
+          ]
+        },
+        "business_rules": {
+          "validation_rules": [
+            "uv run ruff check"
+          ],
+          "business_logic": [],
+          "compliance_requirements": [],
+          "data_rules": [
+            "uv run ruff format"
+          ],
+          "workflow_rules": [
+            "[![CI](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml)"
+          ]
+        },
+        "limitations": {
+          "known_issues": [],
+          "performance_limitations": [],
+          "feature_limitations": [],
+          "compatibility_limitations": [],
+          "scalability_limitations": []
+        },
+        "constraint_summary": {
+          "total_constraints": 72,
+          "constraint_types": [
+            "performance_constraints",
+            "security_constraints",
+            "resource_constraints",
+            "general_constraints",
+            "validation_rules",
+            "data_rules",
+            "workflow_rules"
+          ],
+          "critical_constraints": [
+            "Assert: assert len(performance_engine.active_tasks) == 0",
+            "Assert: assert len(performance_engine.task_executions) == 0",
+            "Assert: assert 'performance_issue' in agent.repair_capabilities",
+            "Assert: assert result.repair_type == 'performance_issue'",
+            "Assert: assert 'performance_issue' in capabilities",
+            "Assert: assert 'Performance Smoke Test Results' in response.content",
+            "Assert: assert 'Performance Smoke Test Results' in response.content",
+            "Assert: assert 'Performance Optimization Analysis' in response.content",
+            "Assert: assert 'Performance Optimization Analysis' in response.content",
+            "Exception: raise TimeoutError(f'Operation timed out after {timeout} seconds')",
+            "Assert: assert 'performance_metrics' in content",
+            "Assert: assert settings.enable_performance_optimization is True",
+            "Assert: assert perf_policy.name == 'performance'",
+            "Assert: assert policy_result.policy_name == 'performance'",
+            "Assert: assert _determine_issue_type(perf_result) == 'performance_issue'",
+            "Exception: raise HTTPException(status_code=500, detail=f'Failed to get agent performance: {e}')",
+            "Exception: raise TimeoutError(f'Task {node_id} timed out')",
+            "Exception: raise ValueError('Timeout must be positive')",
+            "Exception: raise TimeoutError(f'Task {task_id} timed out')",
+            "Exception: raise ConfigError(f'Invalid timeout for client {client.name}: {client.timeout}')",
+            "Exception: raise ValueError(f'Invalid timeout for client {client_name}')",
+            "Exception: raise ClientError(f'Request to {self.name} timed out after {timeout}s', self.name, {'timeout': timeout})",
+            "Exception: raise ValueError('Memory usage must be positive')"
+          ],
+          "constraint_impact": "high"
+        }
+      }
+    },
+    {
+      "collector": "WorkflowCollector",
+      "schema_version": "1.0.0",
+      "timestamp": "2025-08-04T16:08:28.895864",
+      "data": {
+        "branching_strategy": {
+          "branching_model": "simple",
+          "main_branch": "main",
+          "development_branch": null,
+          "feature_branch_pattern": null,
+          "release_branch_pattern": "release/*",
+          "hotfix_branch_pattern": null,
+          "total_branches": 2,
+          "branch_names": [
+            "AUTOSAVE",
+            "main"
+          ]
+        },
+        "ci_workflow": {
+          "has_ci": true,
+          "ci_provider": "GitHub Actions",
+          "workflow_files": [
+            {
+              "name": "CI",
+              "on": {},
+              "jobs": [
+                "test"
+              ],
+              "runs_on": [
+                "ubuntu-latest"
+              ],
+              "steps": [
+                "unnamed",
+                "Set up Python ${{ matrix.python-version }}",
+                "Install uv",
+                "Install dependencies",
+                "Lint with ruff",
+                "Format check with black",
+                "Type check with mypy",
+                "Test with pytest"
+              ]
+            }
+          ],
+          "stages": [],
+          "triggers": [],
+          "environments": []
+        },
+        "coding_standards": {
+          "has_linting": true,
+          "has_formatting": true,
+          "has_type_checking": true,
+          "has_testing": true,
+          "tools": [
+            {
+              "name": "flake8",
+              "category": "linting"
+            },
+            {
+              "name": "black",
+              "category": "formatting"
+            },
+            {
+              "name": "isort",
+              "category": "formatting"
+            },
+            {
+              "name": "mypy",
+              "category": "type_checking"
+            },
+            {
+              "name": "pytest",
+              "category": "testing"
+            },
+            {
+              "name": "coverage",
+              "category": "testing"
+            },
+            {
+              "name": "black",
+              "category": "configuration"
+            },
+            {
+              "name": "pytest",
+              "category": "configuration"
+            }
+          ]
+        },
+        "development_process": {
+          "has_code_review": false,
+          "has_automated_testing": true,
+          "has_automated_deployment": false,
+          "has_documentation_workflow": true,
+          "has_version_management": false,
+          "development_phases": [
+            "testing",
+            "documentation"
+          ]
+        },
+        "workflow_maturity": "established"
+      }
+    },
+    {
+      "collector": "AgentArchitectureCollector",
+      "schema_version": "1.0.0",
+      "timestamp": 1754338110.0002365,
+      "data": {
+        "error": "Collector AgentArchitectureCollector failed: 'Attribute' object has no attribute 'id'"
+      }
+    }
+  ],
+  "timestamp": "2025-08-04 20:08:30.000746",
+  "schema_version": "1.1.0"
+}
