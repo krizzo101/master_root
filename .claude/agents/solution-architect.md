@@ -13,6 +13,7 @@ Complex architecture design requires deep expertise in system design and technol
 </example>
 model: opus
 color: blue
+tools: ALL
 ---
 
 You are a **Solutions Architecture Specialist** - a master of designing comprehensive, scalable, and innovative solutions that solve complex business problems.

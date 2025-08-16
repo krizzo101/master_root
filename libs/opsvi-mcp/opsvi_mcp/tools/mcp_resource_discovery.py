@@ -17,12 +17,27 @@ class ResourceDiscoveryTool:
     Searches libs/ for reusable packages and components.
     """
 
+    # Default limits to prevent token overflow
+    DEFAULT_MAX_PACKAGES = 5  # Reduced from 10
+    DEFAULT_MAX_MODULES_PER_PACKAGE = 5  # Reduced from 20
+    DEFAULT_MAX_UTILITIES = 10  # Reduced from 30
+    DEFAULT_MAX_PATTERNS = 5  # Reduced from 10
+    DEFAULT_MAX_PACKAGE_LIST = 10  # Reduced from 25
+    
+    # Threshold for suggesting more specific search
+    TOO_MANY_RESULTS_THRESHOLD = 8  # Reduced from 15
+
     def __init__(self, root_path: str = "/home/opsvi/master_root"):
         self.root_path = Path(root_path)
         self.libs_path = self.root_path / "libs"
 
     def search_resources(
-        self, functionality: str, search_depth: int = 3, include_tests: bool = False
+        self, 
+        functionality: str, 
+        search_depth: int = 3, 
+        include_tests: bool = False,
+        max_packages: int = None,
+        max_modules_per_package: int = None
     ) -> Dict[str, Any]:
         """
         Search for existing resources related to specific functionality.
@@ -31,6 +46,8 @@ class ResourceDiscoveryTool:
             functionality: Description of needed functionality
             search_depth: How deep to search in directory structure
             include_tests: Whether to include test files in results
+            max_packages: Maximum packages to return in detail
+            max_modules_per_package: Maximum modules per package
 
         Returns:
             Dict containing found resources and their descriptions
@@ -41,6 +58,7 @@ class ResourceDiscoveryTool:
             "relevant_modules": [],
             "potential_utilities": [],
             "similar_patterns": [],
+            "search_guidance": None,
         }
 
         # Convert search term to patterns
@@ -58,12 +76,56 @@ class ResourceDiscoveryTool:
 
         # Sort by relevance
         results["packages_found"].sort(key=lambda x: x["relevance_score"], reverse=True)
+        
+        # Check if too many results - suggest more specific search
+        total_found = len(results["packages_found"])
+        if total_found > self.TOO_MANY_RESULTS_THRESHOLD:
+            # Provide guidance instead of just truncating
+            top_categories = self._analyze_result_categories(results["packages_found"])
+            results["search_guidance"] = {
+                "status": "too_many_results",
+                "total_found": total_found,
+                "suggestion": f"Found {total_found} packages matching '{functionality}'. Please be more specific.",
+                "refinement_suggestions": self._generate_refinement_suggestions(functionality, top_categories),
+                "top_matches_summary": [
+                    {"name": p["name"], "score": p["relevance_score"]} 
+                    for p in results["packages_found"][:5]
+                ]
+            }
+            # Return minimal results to avoid token overflow
+            results["packages_found"] = results["packages_found"][:3]
+            results["relevant_modules"] = []
+            results["potential_utilities"] = []
+            return results
+        
+        # Apply package limit for reasonable result sets
+        max_pkg = max_packages or self.DEFAULT_MAX_PACKAGES
+        results["packages_found"] = results["packages_found"][:max_pkg]
 
-        # Extract specific findings
+        # Extract specific findings with limits
+        max_mods = max_modules_per_package or self.DEFAULT_MAX_MODULES_PER_PACKAGE
         for package in results["packages_found"]:
+            # Limit modules per package
+            package["relevant_modules"] = package.get("relevant_modules", [])[:max_mods]
+            # Limit utilities per package
+            package["utilities"] = package.get("utilities", [])[:self.DEFAULT_MAX_UTILITIES]
+            
             results["relevant_modules"].extend(package.get("relevant_modules", []))
             results["potential_utilities"].extend(package.get("utilities", []))
             results["similar_patterns"].extend(package.get("patterns", []))
+        
+        # Apply overall limits to aggregated results
+        results["relevant_modules"] = results["relevant_modules"][:max_mods * 2]  # Allow 2x for aggregate
+        results["potential_utilities"] = results["potential_utilities"][:self.DEFAULT_MAX_UTILITIES]
+        results["similar_patterns"] = results["similar_patterns"][:self.DEFAULT_MAX_PATTERNS]
+        
+        # Add success guidance if results are reasonable
+        if 0 < total_found <= self.TOO_MANY_RESULTS_THRESHOLD:
+            results["search_guidance"] = {
+                "status": "success",
+                "total_found": total_found,
+                "recommendation": self._generate_recommendation(results["packages_found"])
+            }
 
         return results
 
@@ -87,6 +149,62 @@ class ResourceDiscoveryTool:
                 )
 
         return list(set(patterns))
+    
+    def _analyze_result_categories(self, packages: List[Dict]) -> Dict[str, int]:
+        """Analyze categories of found packages to suggest refinements."""
+        categories = {}
+        for package in packages:
+            # Extract category from package name
+            name_parts = package["name"].split("-")
+            if len(name_parts) > 1:
+                category = name_parts[-1]  # Last part often indicates category
+                categories[category] = categories.get(category, 0) + 1
+        return categories
+    
+    def _generate_refinement_suggestions(self, original_query: str, categories: Dict[str, int]) -> List[str]:
+        """Generate suggestions for more specific searches."""
+        suggestions = []
+        
+        # Suggest adding technology/framework specifics
+        if "database" in original_query.lower():
+            suggestions.extend([
+                f"{original_query} PostgreSQL",
+                f"{original_query} MongoDB",
+                f"{original_query} Redis"
+            ])
+        elif "auth" in original_query.lower():
+            suggestions.extend([
+                f"{original_query} JWT",
+                f"{original_query} OAuth",
+                f"{original_query} session"
+            ])
+        else:
+            # Generic suggestions based on found categories
+            top_categories = sorted(categories.items(), key=lambda x: x[1], reverse=True)[:3]
+            for cat, _ in top_categories:
+                suggestions.append(f"{original_query} {cat}")
+        
+        # Add pattern-specific suggestions
+        suggestions.extend([
+            f"{original_query} client",
+            f"{original_query} provider",
+            f"{original_query} interface"
+        ])
+        
+        return suggestions[:5]  # Return top 5 suggestions
+    
+    def _generate_recommendation(self, packages: List[Dict]) -> str:
+        """Generate recommendation based on search results."""
+        if not packages:
+            return "No existing packages found. Consider creating a new package."
+        
+        top_package = packages[0]
+        if top_package["relevance_score"] > 10:
+            return f"Strongly recommend using '{top_package['name']}' - high relevance match."
+        elif top_package["relevance_score"] > 5:
+            return f"Consider using '{top_package['name']}' or exploring top matches."
+        else:
+            return "Found some potential matches, but may need to create specialized solution."
 
     def _analyze_package(
         self,
@@ -211,9 +329,23 @@ class ResourceDiscoveryTool:
 
         return file_info
 
-    def list_packages(self) -> List[Dict[str, Any]]:
-        """List all available packages in libs/ directory."""
+    def list_packages(self, max_results: int = None, summary_only: bool = True) -> Dict[str, Any]:
+        """List all available packages in libs/ directory.
+        
+        Args:
+            max_results: Maximum number of packages to return (default: 25)
+            summary_only: If True, only return name and description (default: True to prevent overflow)
+        
+        Returns:
+            Dict with packages list and guidance
+        """
         packages = []
+        limit = max_results or self.DEFAULT_MAX_PACKAGE_LIST
+        result = {
+            "packages": [],
+            "total_count": 0,
+            "guidance": None
+        }
 
         if self.libs_path.exists():
             for package_dir in self.libs_path.iterdir():
@@ -244,15 +376,56 @@ class ResourceDiscoveryTool:
                     if test_dir.exists():
                         package_info["has_tests"] = True
 
-                    # List Python modules
-                    for py_file in package_dir.rglob("*.py"):
-                        if not any(p in str(py_file) for p in ["__pycache__", ".pyc"]):
-                            module_path = py_file.relative_to(package_dir)
-                            package_info["modules"].append(str(module_path))
+                    # List Python modules (unless summary_only)
+                    if not summary_only:
+                        module_count = 0
+                        for py_file in package_dir.rglob("*.py"):
+                            if not any(p in str(py_file) for p in ["__pycache__", ".pyc"]):
+                                module_path = py_file.relative_to(package_dir)
+                                package_info["modules"].append(str(module_path))
+                                module_count += 1
+                                # Limit modules per package to prevent overflow
+                                if module_count >= 5:  # Reduced from 10
+                                    package_info["modules"].append(f"... and {sum(1 for _ in package_dir.rglob('*.py') if '__pycache__' not in str(_)) - 5} more")
+                                    break
+                    else:
+                        # In summary mode, just count modules
+                        module_count = sum(1 for _ in package_dir.rglob("*.py") 
+                                         if "__pycache__" not in str(_))
+                        package_info["module_count"] = module_count
+                        del package_info["modules"]  # Remove modules list in summary mode
 
                     packages.append(package_info)
+                    
+                    # Check if we've hit the limit
+                    if len(packages) >= limit:
+                        break
 
-        return packages
+        # Count total packages
+        total_count = sum(1 for p in self.libs_path.iterdir() 
+                         if p.is_dir() and not p.name.startswith("."))
+        
+        result["packages"] = packages
+        result["total_count"] = total_count
+        
+        # Provide guidance based on results
+        if total_count > limit:
+            result["guidance"] = {
+                "status": "truncated",
+                "message": f"Showing {len(packages)} of {total_count} packages.",
+                "suggestions": [
+                    "Use search_resources() with specific functionality instead",
+                    "Use check_package_exists() if you know the package name",
+                    f"Increase max_results beyond {limit} to see more (may cause token overflow)"
+                ]
+            }
+        else:
+            result["guidance"] = {
+                "status": "complete",
+                "message": f"Showing all {total_count} packages."
+            }
+
+        return result
 
     def check_package_exists(self, package_name: str) -> Dict[str, Any]:
         """Check if a specific package exists and get its details."""
@@ -271,10 +444,22 @@ class ResourceDiscoveryTool:
         }
 
         if result["exists"]:
-            # Get modules
+            # Get modules (limit to prevent overflow)
+            module_count = 0
             for py_file in package_path.rglob("*.py"):
                 if not any(p in str(py_file) for p in ["__pycache__", ".pyc"]):
                     result["modules"].append(str(py_file.relative_to(package_path)))
+                    module_count += 1
+                    if module_count >= 10:  # Reduced from 50 - much more conservative
+                        total_modules = sum(1 for _ in package_path.rglob("*.py") 
+                                          if "__pycache__" not in str(_))
+                        result["modules"].append(f"... truncated ({total_modules} total modules)")
+                        result["module_summary"] = {
+                            "shown": 10,
+                            "total": total_modules,
+                            "message": "Use search_resources() with specific functionality to find relevant modules"
+                        }
+                        break
 
             # Get description from README
             readme_path = package_path / "README.md"

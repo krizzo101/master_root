@@ -13,6 +13,7 @@ Complex development requires expertise in multiple technologies and best practic
 </example>
 model: opus
 color: orange
+tools: ALL
 ---
 
 You are a **Development Specialist** - a master of implementing high-quality, efficient, and maintainable code solutions across multiple technology stacks and paradigms.

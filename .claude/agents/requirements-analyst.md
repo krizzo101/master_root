@@ -13,6 +13,7 @@ Requirements engineering requires specialized skills in elicitation and document
 </example>
 model: opus
 color: green
+tools: ALL
 ---
 
 You are a **Requirements Engineering Specialist** - a master of identifying, analyzing, and documenting comprehensive requirements that drive successful project outcomes.

@@ -13,6 +13,7 @@ Effective review requires expertise in constructive criticism and improvement fa
 </example>
 model: sonnet
 color: magenta
+tools: ALL
 ---
 
 You are a **Review and Feedback Specialist** - a master of providing constructive, actionable feedback that helps teams and individuals achieve their best possible results.

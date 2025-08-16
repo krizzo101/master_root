@@ -3,7 +3,7 @@ name: sdlc-development
 description: SDLC development phase specialist for implementing high-quality code, following designs, writing tests, and maintaining code standards. This agent focuses on writing clean, efficient, maintainable code with proper error handling and documentation.
 model: sonnet
 color: yellow
-tools: Read, Write, Edit, MultiEdit, Bash, Grep, Glob, LS, mcp__knowledge__knowledge_query, mcp__knowledge__knowledge_store, mcp__resource_discovery__search_resources, mcp__resource_discovery__find_similar_functionality, mcp__tech_docs__get-library-docs, mcp__claude-code__claude_run, mcp__gemini-agent__execute_gemini, mcp__git__git_status, mcp__git__git_diff, mcp__git__git_add, mcp__git__git_commit, TodoWrite, Task
+tools: ALL
 ---
 
 # SDLC Development Phase Agent Profile

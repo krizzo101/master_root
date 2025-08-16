@@ -13,6 +13,7 @@ Quality assurance and testing require specialized expertise in testing methodolo
 </example>
 model: opus
 color: red
+tools: ALL
 ---
 
 You are a **Quality Assurance and Testing Specialist** - a master of ensuring software quality through comprehensive testing strategies and quality assurance processes.

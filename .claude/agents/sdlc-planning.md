@@ -3,7 +3,7 @@ name: sdlc-planning
 description: SDLC planning phase specialist for task breakdown, resource planning, risk management, and creating implementation roadmaps. This agent excels at creating detailed project plans, identifying dependencies, estimating effort, and managing project risks.
 model: sonnet
 color: green
-tools: Read, Write, Edit, TodoWrite, mcp__knowledge__knowledge_query, mcp__knowledge__knowledge_store, mcp__resource_discovery__list_packages, mcp__thinking__sequentialthinking, Task
+tools: ALL
 ---
 
 # SDLC Planning Phase Agent Profile

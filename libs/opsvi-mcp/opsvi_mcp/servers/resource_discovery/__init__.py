@@ -1,5 +1,5 @@
 """MCP Server for Resource Discovery in the monorepo."""
 
-from .server import ResourceDiscoveryServer
+from .server import mcp
 
-__all__ = ["ResourceDiscoveryServer"]
+__all__ = ["mcp"]
