@@ -8,9 +8,10 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
-# Add the project root to the path
-root_path = Path(__file__).parent.parent.parent.parent.parent.parent
-sys.path.insert(0, str(root_path))
+# Add the libs directory to the path
+libs_path = Path(__file__).parent.parent.parent.parent
+sys.path.insert(0, str(libs_path))
+root_path = libs_path.parent
 
 from fastmcp import FastMCP  # noqa: E402
 
@@ -68,7 +69,7 @@ def search_resources(
 def list_packages(
     max_results: int = None,
     summary_only: bool = True
-) -> Dict[str, Any]:
+) -> Any:
     """
     List available packages in the libs/ directory.
     

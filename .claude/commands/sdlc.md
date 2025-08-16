@@ -123,11 +123,11 @@ Task(
     prompt="Find current best practices for JWT authentication in 2025"
 )
 
-# For production work, prefer Claude Code agents
-Task(
-    description="Implement auth component",
-    subagent_type="claude-code",  # Claude Code handles everything
-    prompt="Create JWT authentication with refresh tokens"
+# For production work, use our Claude Code MCP tool
+mcp__claude-code__claude_run(
+    task="Create JWT authentication with refresh tokens",
+    outputFormat="json",
+    permissionMode="bypassPermissions"
 )
 ```
 
@@ -277,11 +277,10 @@ Task(
 
 #### 🚨 IMPORTANT: For AI-Powered Applications
 **When building applications that need AI/agent capabilities:**
-- **USE CLAUDE CODE** - Don't implement custom agents
 - Claude Code can handle all agent needs via MCP tools
-- Call `mcp__claude-code__claude_run` for simple tasks
-- Call `mcp__claude-code-v3__claude_run_v3` for production
-- The opsvi_agents library exists but Claude Code is the preferred solution
+- Call `mcp__claude-code__claude_run` for synchronous tasks
+- Call `mcp__claude-code__claude_run_async` for parallel execution
+- These tools handle all AI agent functionality needed
 
 #### Load Phase Profile
 ```python
@@ -291,11 +290,9 @@ Read(".claude/agents/sdlc-development.md")
 
 #### Agent Support
 ```python
-# For parallel development tasks
-Task(
-    description="Code implementation",
-    subagent_type="claude-code",  # Preferred for AI apps
-    prompt="""
+# For development tasks
+mcp__claude-code__claude_run(
+    task="""
     Implement [specific component/feature].
     Requirements:
     - Follow TDD (write tests first)
@@ -304,7 +301,9 @@ Task(
     - Follow project coding standards
     - Implement error handling
     - Add logging where appropriate
-    """
+    """,
+    outputFormat="json",
+    permissionMode="bypassPermissions"
 )
 ```
 
