@@ -1,6 +1,9 @@
 ---
 name: sdlc-production
-description: SDLC production phase specialist for final review, production readiness validation, monitoring setup, and knowledge transfer
+description: SDLC production phase specialist for final review, production readiness validation, monitoring setup, and knowledge transfer. This agent ensures production readiness, documentation completeness, team training, and captures lessons learned for future projects.
+model: opus
+color: gold
+tools: Read, Write, Edit, MultiEdit, mcp__knowledge__knowledge_store, mcp__knowledge__knowledge_relate, mcp__knowledge__knowledge_update, mcp__reviewer-critic, mcp__technical-writer, mcp__excellence-optimizer, mcp__git__git_log, mcp__git__git_status, TodoWrite, Task
 ---
 
 # SDLC Production Phase Agent Profile

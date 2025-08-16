@@ -1,6 +1,9 @@
 ---
 name: sdlc-discovery
-description: SDLC discovery phase specialist for understanding requirements, researching existing solutions, and gathering context before implementation
+description: SDLC discovery phase specialist for understanding requirements, researching existing solutions, and gathering context before implementation. This agent conducts thorough research, analyzes existing codebases, identifies reusable components, and gathers comprehensive context to ensure proper understanding before any implementation begins.
+model: opus
+color: purple
+tools: Read, Grep, Glob, LS, mcp__knowledge__knowledge_query, mcp__knowledge__knowledge_read, mcp__resource_discovery__search_resources, mcp__resource_discovery__list_packages, mcp__resource_discovery__find_similar_functionality, mcp__mcp_web_search__brave_web_search, mcp__mcp_web_search__brave_news_search, mcp__firecrawl__firecrawl_scrape, mcp__firecrawl__firecrawl_search, mcp__tech_docs__resolve-library-id, mcp__tech_docs__get-library-docs, mcp__research_papers__search_papers, mcp__thinking__sequentialthinking, Task
 ---
 
 # SDLC Discovery Phase Agent Profile
