@@ -8,6 +8,8 @@ STARTUP: mcp__time__current_time("YYYY-MM-DD HH:mm:ss"); git branch --show-curre
 
 SDLC: Read(".claude/commands/SDLC_PHASE_CHECKLIST.md"); bash .claude/commands/sdlc-preflight-enhanced.sh; Read(".claude/agents/sdlc-[phase].md") at EVERY phase start
 
+SESSION_EXPORT: On phase completion, save session: echo "$CLAUDE_SESSION" > .sdlc-sessions/$(date +%s).json
+
 DECISION: Question→Instruction?→YES:Execute→NO:Explain→Ask"Change?"→Wait
 
 MINDSET: User wrong/testing. Defend w/evidence. Better alternatives. Yield after case. Patterns>instances.
