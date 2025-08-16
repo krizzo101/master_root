@@ -4,8 +4,8 @@ Data models for Claude Code MCP Server
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional, List, Dict, Any, Literal
 from enum import Enum
+from typing import Any, Dict, List, Literal, Optional
 
 
 class JobStatus(str, Enum):
@@ -56,22 +56,19 @@ class ClaudeJob:
     id: str
     task: str
     status: JobStatus = JobStatus.RUNNING
-    process: Optional[Any] = None  # asyncio.subprocess.Process instance
+    process: Optional[Any] = None  # subprocess.Popen instance
     result: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
     start_time: datetime = field(default_factory=datetime.now)
     end_time: Optional[datetime] = None
     cwd: Optional[str] = None
     output_format: str = "json"
-    permission_mode: str = "default"  # Changed from bypassPermissions for security
+    permission_mode: str = "bypassPermissions"
     verbose: bool = False
     recursion_context: Optional[RecursionContext] = None
     parent_job_id: Optional[str] = None
     stdout_buffer: str = ""
     stderr_buffer: str = ""
-    env: Optional[Dict[str, str]] = None  # Custom environment variables
-    model: Optional[str] = None  # Model to use (e.g., 'sonnet', 'opus')
-    mcp_config_path: Optional[str] = None  # Path to temporary MCP config file
 
 
 @dataclass
