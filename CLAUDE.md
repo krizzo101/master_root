@@ -17,16 +17,19 @@ mcp__knowledge__knowledge_query(query_type="recent", limit=5)
 - Extract patterns from examples
 
 ### 2. EXECUTION
+- Never work on main/master branch
+- No version suffixes (_v2, _final, _updated)
 - Parallel > Sequential
 - Edit > Write (check existence first)
 - Test automatically
 - Commit constantly (max 2-3 files)
 - TodoWrite for 3+ steps
 
-### 3. KNOWLEDGE
+### 3. KNOWLEDGE & RESEARCH
 ```python
 mcp__knowledge__knowledge_query(query_type="search", query_text="problem")
 mcp__knowledge__knowledge_store(knowledge_type="ERROR_SOLUTION", content="fix", confidence_score=0.9)
+# Don't trust training data for post-2024 - research current state:
 mcp__mcp_web_search__brave_web_search(query="current best practice 2025")
 ```
 
