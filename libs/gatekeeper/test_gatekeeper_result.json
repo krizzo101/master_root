@@ -1,0 +1,163 @@
+{
+  "original_files": [
+    "libs/opsvi-security/opsvi_security/core.py",
+    "libs/opsvi-security/opsvi_security/logging.py"
+  ],
+  "recommended_files": [
+    "libs/opsvi-security/opsvi_security/core.py",
+    "libs/opsvi-security/opsvi_security/logging.py",
+    "libs/opsvi-rag/opsvi_rag/core/config.py",
+    "libs/opsvi-security/opsvi_security/__init__.py",
+    "libs/opsvi-security/opsvi_security/config.py",
+    "libs/opsvi-core/opsvi_core/core/base.py",
+    "libs/opsvi-core/tests/test_core.py",
+    "libs/opsvi-rag/opsvi_rag/core/base.py",
+    "libs/opsvi-core/opsvi_core/core/config.py",
+    "libs/opsvi-security/opsvi_security/exceptions.py"
+  ],
+  "final_files": [
+    "libs/opsvi-security/opsvi_security/core.py",
+    "libs/opsvi-security/opsvi_security/logging.py",
+    "libs/opsvi-rag/opsvi_rag/core/config.py",
+    "libs/opsvi-security/opsvi_security/__init__.py",
+    "libs/opsvi-security/opsvi_security/config.py",
+    "libs/opsvi-core/opsvi_core/core/base.py",
+    "libs/opsvi-core/tests/test_core.py",
+    "libs/opsvi-rag/opsvi_rag/core/base.py",
+    "libs/opsvi-core/opsvi_core/core/config.py",
+    "libs/opsvi-security/opsvi_security/exceptions.py"
+  ],
+  "context_analysis": {
+    "user_files": [
+      "libs/opsvi-security/opsvi_security/core.py",
+      "libs/opsvi-security/opsvi_security/logging.py"
+    ],
+    "recommended_files": [
+      "libs/opsvi-security/opsvi_security/core.py",
+      "libs/opsvi-security/opsvi_security/logging.py"
+    ],
+    "recommended_context": [
+      {
+        "file_paths": [
+          "libs/opsvi-security/opsvi_security/core.py",
+          "libs/opsvi-security/opsvi_security/logging.py"
+        ],
+        "context_type": "files",
+        "priority": 1,
+        "reason": "User explicitly provided these files",
+        "confidence": 1.0
+      },
+      {
+        "file_paths": [],
+        "context_type": "files",
+        "priority": 3,
+        "reason": "Related files (imports, imports-by, same directory) should be included",
+        "confidence": 0.8
+      },
+      {
+        "file_paths": [],
+        "context_type": "config",
+        "priority": 4,
+        "reason": "Configuration files may be relevant for code changes",
+        "confidence": 0.6
+      }
+    ],
+    "analysis_summary": "Request classified as: feature_development (confidence: 0.20); - files: User explicitly provided these files; - files: Related files (imports, imports-by, same directory) should be included; - config: Configuration files may be relevant for code changes",
+    "confidence_score": 0.43999999999999995
+  },
+  "auto_attach_results": {
+    "related_files": [
+      "libs/opsvi-rag/opsvi_rag/core/config.py",
+      "libs/opsvi-security/opsvi_security/__init__.py",
+      "libs/opsvi-security/opsvi_security/config.py",
+      "libs/opsvi-core/opsvi_core/core/base.py",
+      "libs/opsvi-core/tests/test_core.py",
+      "libs/opsvi-security/opsvi_security/core.py",
+      "libs/opsvi-rag/opsvi_rag/core/base.py",
+      "libs/opsvi-security/opsvi_security/logging.py",
+      "libs/opsvi-core/opsvi_core/core/config.py",
+      "libs/opsvi-security/opsvi_security/exceptions.py"
+    ],
+    "file_analyses": {
+      "libs/opsvi-security/opsvi_security/core.py": {
+        "file_path": "libs/opsvi-security/opsvi_security/core.py",
+        "file_type": "source",
+        "line_count": 19,
+        "directory": "libs/opsvi-security/opsvi_security",
+        "imports": [
+          "logging",
+          "__future__",
+          "dataclasses"
+        ],
+        "imported_by": [],
+        "related_files": {
+          "imported_files": [
+            "libs/opsvi-security/opsvi_security/core.py",
+            "libs/opsvi-security/opsvi_security/logging.py",
+            "libs/opsvi-security/opsvi_security/core.py",
+            "libs/opsvi-security/opsvi_security/config.py",
+            "libs/opsvi-core/opsvi_core/core/base.py",
+            "libs/opsvi-core/opsvi_core/core/config.py",
+            "libs/opsvi-rag/opsvi_rag/core/base.py",
+            "libs/opsvi-rag/opsvi_rag/core/config.py",
+            "libs/opsvi-security/opsvi_security/core.py"
+          ],
+          "importing_files": [],
+          "same_directory": [
+            "libs/opsvi-security/opsvi_security/core.py",
+            "libs/opsvi-security/opsvi_security/config.py",
+            "libs/opsvi-security/opsvi_security/exceptions.py",
+            "libs/opsvi-security/opsvi_security/logging.py",
+            "libs/opsvi-security/opsvi_security/__init__.py"
+          ],
+          "config_files": [
+            "libs/opsvi-security/opsvi_security/config.py"
+          ],
+          "test_files": [
+            "libs/opsvi-core/tests/test_core.py"
+          ]
+        }
+      },
+      "libs/opsvi-security/opsvi_security/logging.py": {
+        "file_path": "libs/opsvi-security/opsvi_security/logging.py",
+        "file_type": "source",
+        "line_count": 56,
+        "directory": "libs/opsvi-security/opsvi_security",
+        "imports": [
+          "logging",
+          "sys",
+          "orjson",
+          "structlog",
+          "typing"
+        ],
+        "imported_by": [],
+        "related_files": {
+          "imported_files": [
+            "libs/opsvi-security/opsvi_security/core.py",
+            "libs/opsvi-security/opsvi_security/logging.py",
+            "libs/opsvi-security/opsvi_security/logging.py",
+            "libs/opsvi-security/opsvi_security/logging.py",
+            "libs/opsvi-security/opsvi_security/logging.py",
+            "libs/opsvi-security/opsvi_security/logging.py"
+          ],
+          "importing_files": [],
+          "same_directory": [
+            "libs/opsvi-security/opsvi_security/core.py",
+            "libs/opsvi-security/opsvi_security/config.py",
+            "libs/opsvi-security/opsvi_security/exceptions.py",
+            "libs/opsvi-security/opsvi_security/logging.py",
+            "libs/opsvi-security/opsvi_security/__init__.py"
+          ],
+          "config_files": [
+            "libs/opsvi-security/opsvi_security/config.py"
+          ],
+          "test_files": []
+        }
+      }
+    },
+    "total_related": 10,
+    "original_count": 2
+  },
+  "processing_summary": "User provided 2 files; Auto-attach found 8 related files; Final selection: 10 files; Context analysis: Request classified as: feature_development (confidence: 0.20); - files: User explicitly provided these files; - files: Related files (imports, imports-by, same directory) should be included; - config: Configuration files may be relevant for code changes",
+  "confidence_score": 0.6399999999999999
+}

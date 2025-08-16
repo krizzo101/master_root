@@ -326,4 +326,4 @@ python_functions = test_*
 
 ---
 
-*This optimization was completed as part of the workspace improvement initiative to enhance development productivity and code quality.* 
+*This optimization was completed as part of the workspace improvement initiative to enhance development productivity and code quality.*

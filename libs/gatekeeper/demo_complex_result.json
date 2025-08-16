@@ -1,0 +1,55 @@
+{
+  "original_files": [
+    "libs/opsvi-security/opsvi_security/core.py",
+    "libs/opsvi-security/opsvi_security/logging.py"
+  ],
+  "recommended_files": [
+    "libs/opsvi-security/opsvi_security/core.py",
+    "libs/opsvi-security/opsvi_security/logging.py"
+  ],
+  "final_files": [
+    "libs/opsvi-security/opsvi_security/core.py",
+    "libs/opsvi-security/opsvi_security/logging.py"
+  ],
+  "context_analysis": {
+    "user_files": [
+      "libs/opsvi-security/opsvi_security/core.py",
+      "libs/opsvi-security/opsvi_security/logging.py"
+    ],
+    "recommended_files": [
+      "libs/opsvi-security/opsvi_security/core.py",
+      "libs/opsvi-security/opsvi_security/logging.py"
+    ],
+    "recommended_context": [
+      {
+        "file_paths": [
+          "libs/opsvi-security/opsvi_security/core.py",
+          "libs/opsvi-security/opsvi_security/logging.py"
+        ],
+        "context_type": "files",
+        "priority": 1,
+        "reason": "User explicitly provided these files",
+        "confidence": 1.0
+      },
+      {
+        "file_paths": [],
+        "context_type": "files",
+        "priority": 3,
+        "reason": "Related files (imports, imports-by, same directory) should be included",
+        "confidence": 0.8
+      },
+      {
+        "file_paths": [],
+        "context_type": "config",
+        "priority": 4,
+        "reason": "Configuration files may be relevant for code changes",
+        "confidence": 0.6
+      }
+    ],
+    "analysis_summary": "Request classified as: feature_development (confidence: 0.20); - files: User explicitly provided these files; - files: Related files (imports, imports-by, same directory) should be included; - config: Configuration files may be relevant for code changes",
+    "confidence_score": 0.43999999999999995
+  },
+  "auto_attach_results": {},
+  "processing_summary": "User provided 2 files; Auto-attach found 0 related files; Final selection: 2 files; Context analysis: Request classified as: feature_development (confidence: 0.20); - files: User explicitly provided these files; - files: Related files (imports, imports-by, same directory) should be included; - config: Configuration files may be relevant for code changes",
+  "confidence_score": 0.43999999999999995
+}

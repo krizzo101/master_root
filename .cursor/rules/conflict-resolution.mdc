@@ -1,0 +1,104 @@
+---
+description: "use when ENCOUNTERING SYSTEM CONFLICTS to ANALYZE CONTEXT for INFORMED DECISION MAKING"
+globs:
+alwaysApply: false
+---
+
+# Conflict Resolution Pattern
+
+**Validation**: "Conflict Analysis Protocol Active"
+
+## Conflict Resolution Framework
+
+**Triggers**: System conflicts, format mismatches, approach disagreements, integration challenges
+**Principles**: Context analysis, dependency mapping, risk assessment, long-term thinking
+**Signatures**: Four-step decision framework, red flag recognition, validation protocols
+**Validation**: System stability, dependency preservation, technical debt avoidance
+**Integration**: Architecture alignment, ecosystem harmony, maintainability standards
+
+## Decision Framework
+
+### Step 1: Pause and Analyze (REQUIRED)
+Before ANY changes, analyze:
+
+**Side A**: Your current focus/implementation
+**Side B**: Existing system/format/approach
+
+**Analysis Questions**:
+- Why is Side B designed this way? (technical reasons, standards, constraints)
+- What depends on Side B? (systems, APIs, workflows, future functionality)
+- What breaks if Side B changes? (refactoring cost, functionality loss, team impact)
+
+### Step 2: Decision Matrix
+
+**CHANGE SIDE A IF**:
+- Side B has good technical reasons
+- Side B has expensive dependencies
+- Side B follows established standards
+- Side B provides needed functionality
+- Side A change is simpler/less risky
+- Side B is stable and working
+
+**CHANGE SIDE B IF**:
+- Side B is clearly outdated/incorrect
+- Side B has no dependencies or easily updated
+- Side B was hastily implemented
+- Change provides significant benefits with minimal risk
+- Side B is isolated from other systems
+
+**CREATE ADAPTER IF**:
+- Both sides have valid reasons
+- Neither should change due to dependencies
+- Conflict is interface differences
+- Backward compatibility needed
+
+### Step 3: Red Flag Recognition
+
+**🚨 KNEE-JERK DECISION SIGNS**:
+- "This is easier for me right now"
+- "I don't understand why, so I'll change it"
+- "It's just a small change, what could go wrong?"
+- "I'll worry about the rest later"
+
+**🚨 APPROACH CHANGE SIGNS**:
+- Multiple systems depend on current implementation
+- Current approach follows established standards
+- Change requires significant refactoring
+- Current approach is stable and working
+- Implementation not fully understood
+
+## Validation Protocol
+
+**Pre-Decision**:
+- Document reasoning and analysis
+- List pros/cons for each option
+- Identify risks and mitigation strategies
+- Consider long-term implications
+
+**Post-Decision**:
+- Test impact of changes
+- Verify nothing breaks
+- Ensure solution robustness
+- Document decision rationale
+
+## Best Practices
+
+**Research First**: Understand current implementation, read documentation, check for design decisions
+**Consider Ecosystem**: Fit into larger system, upstream/downstream impacts, pattern alignment
+**Think Long-Term**: Decision aging, technical debt creation, maintainability, future requirements
+**Validate Thoroughly**: Test impacts, verify stability, ensure robustness, document reasoning
+
+## Anti-Patterns
+
+- Making quick decisions without analysis
+- Changing established standards without justification
+- Ignoring dependency implications
+- Prioritizing convenience over system health
+- Failing to document reasoning
+
+## Integration Standards
+
+**Architecture**: Align with long-term goals and established patterns
+**Maintainability**: Ensure decisions support future development
+**Documentation**: Record analysis and reasoning for future reference
+**Testing**: Validate changes don't break existing functionality

@@ -2,16 +2,26 @@
 
 [![CI](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/opsvi/master-workspace/actions/workflows/ci.yml)
 
-A comprehensive monorepo for AI/ML Operations with built-in observability, RAG capabilities, and MCP integration.
+A comprehensive monorepo for AI/ML Operations with built-in observability, RAG capabilities, and MCP integration. **Now featuring a complete foundational library ecosystem for production AI applications.**
 
-## 🎯 Workspace Optimization Status
+## 🎯 Development Status
 
-This workspace has been optimized with:
+### ✅ Infrastructure Optimization (Complete)
 - ✅ **Phase 1**: Linting & Type Checking (ruff, black, mypy)
 - ✅ **Phase 2**: Testing Infrastructure (pytest, coverage)
 - ✅ **Phase 3**: Integration Refactor (editable installs)
 - ✅ **Phase 4**: Workflow Automation (pre-commit hooks)
 - ✅ **Phase 5**: Documentation & README Updates
+
+### 🚀 Library Ecosystem (Major Progress)
+- ✅ **opsvi-core**: Complete foundation library with configuration, logging, exceptions, and base patterns
+- ✅ **opsvi-llm**: Complete LLM integration with multi-provider support, function calling, and rate limiting
+- 🔄 **opsvi-rag**: Vector storage foundation with Qdrant integration (providers and retrieval pending)
+- ⏳ **opsvi-agents**: Multi-agent orchestration framework (planned)
+
+### 📚 Knowledge Management (New)
+- ✅ **2025 Technology Updates**: Comprehensive knowledge base with latest patterns for LangChain, OpenAI, Qdrant, etc.
+- ✅ **Architecture Intelligence**: Project analysis and mapping for informed development decisions
 
 ## 🚀 Quick Start
 
@@ -44,10 +54,12 @@ master_root/
 │   ├── genFileMap/         # File mapping and analysis
 │   └── project-intelligence/ # Project intelligence system
 ├── libs/                    # Shared libraries (editable installs)
-│   ├── opsvi-core/         # Core utilities
-│   ├── opsvi-rag/          # RAG utilities
-│   ├── opsvi-llm/          # LLM integration
-│   └── opsvi-agents/       # Agent framework
+│   ├── opsvi-core/         # ✅ Core utilities (config, logging, patterns, exceptions)
+│   ├── opsvi-llm/          # ✅ LLM integration (OpenAI, Anthropic, rate limiting, function calling)
+│   ├── opsvi-rag/          # 🔄 RAG utilities (Qdrant vector store, embedding providers, retrieval)
+│   └── opsvi-agents/       # ⏳ Agent framework (multi-agent orchestration)
+├── knowledge/               # 📚 Technology knowledge base (2025 updates)
+├── intake/                  # Incoming projects (reference implementations)
 ├── platform/               # Platform services
 │   ├── observability/      # Grafana, Tempo, OTEL
 │   ├── rag/               # Qdrant vector DB
@@ -189,12 +201,36 @@ Access the observability stack at:
 - **Tempo**: http://localhost:3200
 - **OTEL Collector**: http://localhost:4318
 
-## 🔍 RAG System
+## 🔍 Library Ecosystem
 
-The RAG system uses Qdrant for vector storage and provides:
-- Document ingestion and embedding
-- Semantic search capabilities
-- Collection management
+### opsvi-core (Production Ready)
+- **Configuration**: Type-safe config with Pydantic V2 and environment variables
+- **Logging**: Structured logging with Structlog and OpenTelemetry integration
+- **Patterns**: BaseActor and BaseAgent with async lifecycle management
+- **Exceptions**: Comprehensive error hierarchy for robust error handling
+- **Testing**: 28 tests with 84% coverage
+
+### opsvi-llm (Production Ready)
+- **Multi-Provider**: Unified interface for OpenAI and Anthropic APIs
+- **Function Calling**: Structured function calling with type safety
+- **Rate Limiting**: Token bucket and sliding window rate limiters
+- **Retry Logic**: Exponential backoff with configurable parameters
+- **Streaming**: Real-time response streaming support
+- **Testing**: 20 tests with 46% coverage
+
+### opsvi-rag (Foundation Complete)
+- **Vector Storage**: Async Qdrant client with collection management
+- **Next Phase**: Embedding providers (OpenAI, Sentence Transformers)
+- **Planned**: Document processors and retrieval engines
+
+## 📚 Knowledge Base
+
+The `/knowledge/` directory contains 2025 technology updates including:
+- **LangChain**: Latest patterns and best practices
+- **LangGraph**: State management and agent workflows
+- **OpenAI**: Function calling and structured outputs
+- **Qdrant**: Vector database optimization
+- **Modern Python**: UV, Ruff, Pydantic V2, async patterns
 
 ## 🔄 Workspace Optimization Details
 
@@ -224,13 +260,30 @@ The RAG system uses Qdrant for vector storage and provides:
 - **README Updates**: Comprehensive documentation of new tools and processes
 - **Workflow Documentation**: Clear development workflow instructions
 
+## 🛣️ Roadmap
+
+### Immediate (Current Sprint)
+- **opsvi-rag completion**: Embedding providers and document processors
+- **opsvi-rag retrieval**: Semantic search and RAG pipeline implementation
+
+### Next Phase
+- **opsvi-agents**: Multi-agent orchestration framework leveraging agent_world patterns
+- **Integration testing**: Cross-library integration and performance testing
+- **Documentation**: Comprehensive API docs and usage guides
+
+### Future
+- **Advanced RAG**: Multi-modal document processing and hybrid search
+- **Agent Workflows**: LangGraph integration for complex agent orchestration
+- **Observability**: Enhanced monitoring and debugging tools
+
 ## 🤝 Contributing
 
-1. Create a worktree for your feature
-2. Make changes and commit to your branch
-3. Pre-commit hooks will run automatically
-4. Run tests: `just test`
-5. Create a PR to merge into MAIN
+1. Create a worktree for your feature: `./scripts/new_agent_worktree.sh feature-name`
+2. Review project intelligence: Analyze `.proj-intel/` and `knowledge/` directories
+3. Make changes following modern Python patterns (async, type hints, Pydantic V2)
+4. Pre-commit hooks will run automatically (ruff, black, mypy)
+5. Run tests: `just test` or `uv run pytest`
+6. Create a PR to merge into MAIN
 
 ## 📄 License
 
