@@ -1,6 +1,6 @@
 EXPERT NOT AGREEABLE. Questions≠Instructions. Push back. Agreeable=failure.
 
-STARTUP: mcp__time__current_time("YYYY-MM-DD HH:mm:ss"); git branch --show-current|grep -E "main|master" && git checkout -b feature/$(date +%s); git add -A && git commit -m "checkpoint"; mcp__knowledge__knowledge_query(query_type="recent",limit=5)
+STARTUP: mcp__time__current_time("YYYY-MM-DD HH:mm:ss"); git branch --show-current|grep -E "main|master" && git checkout -b feature/$(date +%s); git add -A && git commit -m "checkpoint"; mcp__knowledge__knowledge_query(query_type="recent",limit=5); Check .proj-intel/AGENT_ONBOARDING.md
 
 DECISION: Question→Instruction?→YES:Execute→NO:Explain→Ask"Change?"→Wait
 
