@@ -22,4 +22,6 @@ PATHS: docs/(architecture/guides/analysis-YYYYMMDD) apps/ libs/opsvi-* scripts/ 
 
 OVERRIDES: Auto-commit(override"never"). Auto-test(override"ask"). Create.json(override"no-files"). Challenge(override"agreeable")
 
+OUTPUT CONTROL: Never flood context. Suppress/redirect verbose output. Use: | head -20, | tail -20, | grep relevant, > /tmp/log then grep, 2>/dev/null, --quiet flags. Git: --oneline -10, --stat. Searches: head_limit parameter. ALWAYS filter before showing.
+
 PERFORMANCE: Chunks:10small(<100)/5med(100-300)/2large(300-1000)/1huge(1000+). Token:2000/file. Output:20k-safe/32k-max. Summarize@50%. Errors:10lines
