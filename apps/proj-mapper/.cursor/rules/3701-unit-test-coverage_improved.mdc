@@ -1,0 +1,19 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+{
+  "description": "MUST achieve 80% coverage WHEN writing unit tests TO ensure code reliability and quality.",
+  "globs": [
+    "**/*unit*/**",
+    "**/coverage/**",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/*coverage*/**",
+    "**/*test*.*",
+    "**/*test*/**",
+    "**/test/**",
+    "**/unit/**"
+  ]
+}

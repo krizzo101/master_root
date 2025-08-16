@@ -1,0 +1,110 @@
+---
+description: MUST perform ai-consumption-testing WHEN integrating AI features TO ensure functionality and reliability.
+globs: ["**/*.test.*", "**/*testing*/**", "**/*.spec.*", "**/*consumption*/**", "**/testing/**", "**/*test*.*", "**/consumption/**", "**/test/**"]
+---
+# ai-consumption-testing
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3703-ai-consumption-testing",
+  "taxonomy": {
+    "category": "Testing Standards",
+    "parent": "Testing StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Testing StandardsRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "AI Testing",
+    "Consumption Testing",
+    "Quality Assurance",
+    "Software Testing"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "The purpose of rule 3703 is to ensure that AI features are rigorously tested for their consumption patterns, validating their performance under various conditions and use cases.",
+  "application": "This rule should be applied during the development and integration phases of AI features, specifically when drafting test cases that simulate real-world usage scenarios and assess system responses to AI consumption.",
+  "importance": "Adhering to this rule is critical for maintaining the reliability and effectiveness of AI features, as it helps identify potential issues early in the development process, ensuring the final product meets quality standards and user expectations."
+}
+
+## ai_consumption_testing_criteria
+
+{
+  "description": "This section outlines the criteria that must be followed when performing AI consumption testing to ensure comprehensive coverage and reliability of AI features.",
+  "requirements": [
+    "MUST define clear and measurable performance metrics for AI consumption during testing.",
+    "MUST simulate a variety of real-world usage scenarios to evaluate AI behavior under different conditions.",
+    "SHOULD document all test cases and expected outcomes to facilitate review and debugging.",
+    "MUST ensure that the testing environment closely mirrors the production environment to provide accurate results.",
+    "NEVER overlook edge cases that could lead to unexpected behavior in AI consumption patterns."
+  ]
+}
+
+## data_validity_checks
+
+{
+  "description": "This section focuses on verifying the validity and integrity of data utilized during AI consumption testing.",
+  "requirements": [
+    "MUST validate the input data for consistency and correctness before testing.",
+    "SHOULD include automated checks to identify data anomalies that might affect AI performance.",
+    "MUST ensure that all data used in tests adheres to privacy and compliance standards.",
+    "NEVER use production data directly in testing without proper anonymization and safeguards.",
+    "MUST log all data processing steps to provide traceability and facilitate troubleshooting."
+  ]
+}
+
+## post_testing_analysis
+
+{
+  "description": "This section details the procedures for analyzing the results of AI consumption tests to draw meaningful conclusions.",
+  "requirements": [
+    "MUST analyze test results against defined performance metrics to assess AI feature effectiveness.",
+    "SHOULD conduct retrospective reviews to identify patterns in failures or unexpected behaviors during testing.",
+    "MUST compile comprehensive reports that summarize testing outcomes and suggest improvements.",
+    "NEVER ignore feedback from testing to iterate on AI features and enhance quality.",
+    "MUST involve relevant stakeholders in the analysis process to ensure diverse perspectives are considered."
+  ]
+}
+
+<example>
+ai-consumption-testing Example
+
+```python
+# Example for ai-consumption-testing
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement ai-consumption-testing according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER skip defining performance metrics that assess AI consumption during testing.",
+    "NEVER use simulated data that does not accurately represent real-world scenarios in AI consumption tests.",
+    "NEVER fail to document test cases and expected outcomes, making it impossible to replicate tests.",
+    "NEVER disregard the need for a testing environment that mirrors production settings, risking inaccurate results.",
+    "NEVER ignore edge cases, as they can lead to significant failures in AI consumption patterns."
+  ],
+  "specific_risks": [
+    "Violating the metrics definition can lead to undetected performance issues, resulting in AI features that do not perform as expected in real-world applications.",
+    "Using unrealistic simulated data may yield misleading results, causing developers to overlook critical flaws that could affect end users.",
+    "Lack of documentation can result in difficulties reproducing tests, which hinders debugging efforts and slows down the development process.",
+    "Testing in an environment that does not reflect production could result in unanticipated behavior when the AI features are deployed, leading to user dissatisfaction.",
+    "Ignoring edge cases can leave vulnerabilities unaddressed, potentially causing system failures or incorrect AI outputs in unexpected scenarios."
+  ]
+}
+</danger>

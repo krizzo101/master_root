@@ -1,0 +1,108 @@
+---
+description: MUST achieve 80% coverage WHEN writing unit tests TO ensure code reliability and quality.
+globs: ["**/*unit*/**", "**/coverage/**", "**/*.test.*", "**/*.spec.*", "**/*coverage*/**", "**/*test*.*", "**/*test*/**", "**/test/**", "**/unit/**"]
+---
+# unit-test-coverage
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3701-unit-test-coverage",
+  "taxonomy": {
+    "category": "Testing Standards",
+    "parent": "Testing StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Testing StandardsRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "unit-test",
+    "code-coverage",
+    "testing",
+    "quality-assurance"
+  ],
+  "priority": "80",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "The purpose of this rule is to ensure that unit tests achieve a minimum of 80% code coverage, thereby identifying untested parts of the codebase.",
+  "application": "This rule should be applied during the development process, particularly when writing new unit tests or modifying existing ones. Developers MUST regularly check and maintain the code coverage metrics to ensure compliance with the 80% threshold.",
+  "importance": "Achieving at least 80% unit test coverage is crucial for enhancing code reliability and quality. It helps prevent bugs, facilitates easier maintenance, and boosts developer confidence in the system's functionality."
+}
+
+## unit_test_coverage_requirements
+
+{
+  "description": "Establishes clear guidelines for achieving and maintaining unit test coverage.",
+  "requirements": [
+    "MUST achieve at least 80% code coverage across all unit tests.",
+    "MUST include tests for all public methods and critical paths in the codebase.",
+    "MUST utilize a code coverage tool to measure and report coverage metrics regularly.",
+    "SHOULD review and refactor code to improve coverage when metrics fall below the threshold.",
+    "NEVER ignore untested code sections; they represent potential bugs and weaknesses."
+  ]
+}
+
+## test_maintenance_guidelines
+
+{
+  "description": "Guidelines for maintaining and updating unit tests to ensure ongoing compliance with coverage standards.",
+  "requirements": [
+    "MUST update unit tests when modifying existing code to reflect changes in functionality.",
+    "SHOULD run coverage reports after each significant code change to ensure ongoing compliance.",
+    "MUST document any exceptions to the coverage requirement in the project repository.",
+    "SHOULD encourage peer reviews of unit tests to ensure comprehensive coverage and quality."
+  ]
+}
+
+## tooling_and_integration
+
+{
+  "description": "Recommendations for tools and integration practices to facilitate adherence to unit test coverage standards.",
+  "requirements": [
+    "MUST integrate code coverage tools into the continuous integration (CI) pipeline.",
+    "SHOULD use reporting dashboards to visualize coverage metrics and trends over time.",
+    "MUST ensure that all developers are trained on utilizing coverage tools effectively.",
+    "SHOULD provide automated alerts for when coverage drops below the required threshold."
+  ]
+}
+
+<example>
+unit-test-coverage Example
+
+```python
+# Example for unit-test-coverage
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement unit-test-coverage according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER allow unit test coverage to fall below 80% as this undermines code reliability.",
+    "NEVER skip testing critical paths or public methods in the codebase, as this can introduce significant risks.",
+    "NEVER ignore the results of code coverage tools; dismissing these metrics leads to undetected issues.",
+    "NEVER make code changes without updating corresponding unit tests to reflect those changes.",
+    "NEVER fail to document exceptions to code coverage requirements, as this can create confusion and inconsistency."
+  ],
+  "specific_risks": [
+    "Violating the 80% coverage rule can lead to undetected bugs in production, resulting in a poor user experience.",
+    "Skipping tests for critical code paths increases the risk of system failures during operation, potentially leading to a loss of trust from users.",
+    "Ignoring code coverage metrics may allow problematic code to persist, making future maintenance and debugging significantly more challenging.",
+    "Failing to update unit tests after code modifications can result in tests that do not accurately reflect the current functionality, causing false positives in test results.",
+    "Not documenting exceptions to coverage requirements can lead to misunderstandings among team members about which areas of the code are adequately tested."
+  ]
+}
+</danger>

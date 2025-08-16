@@ -1,0 +1,104 @@
+---
+description: MUST follow location-reference-standards WHEN generating output TO ensure accurate data representation.
+globs: ["**/*", "**/*standards*/**", "**/standards/**", "**/*reference*/**", "**/reference/**", "**/*location*/**", "**/location/**"]
+---
+# location-reference-standards
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3604-location-reference-standards",
+  "taxonomy": {
+    "category": "Output Generation Standards",
+    "parent": "Output Generation StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Output Generation StandardsRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "location",
+    "reference",
+    "standards",
+    "output generation"
+  ],
+  "priority": "70",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "The purpose of this rule is to establish clear guidelines for the accurate representation of location data in generated outputs, ensuring consistency and reliability in referencing locations.",
+  "application": "This rule should be applied whenever output generation involves location references. It MUST be adhered to during the design and implementation of any feature that outputs location-related information.",
+  "importance": "This rule is crucial because accurate location references enhance user experience, reduce errors in data interpretation, and maintain the integrity of the system by ensuring that all location data is standardized and aligned with accepted reference standards."
+}
+
+## location_reference_format
+
+{
+  "description": "This section outlines the required format for referencing locations in generated outputs.",
+  "requirements": [
+    "MUST use standardized formats for location references, such as GPS coordinates (latitude, longitude) or recognized place names.",
+    "SHOULD validate location references against a reliable database to ensure accuracy.",
+    "MUST clearly indicate the source of location data when applicable, to maintain transparency."
+  ]
+}
+
+## location_data_accuracy
+
+{
+  "description": "This section specifies the accuracy standards for location data included in outputs.",
+  "requirements": [
+    "MUST ensure that location data is updated regularly to reflect any changes in geographical information.",
+    "SHOULD utilize geolocation APIs that provide real-time data verification for added accuracy.",
+    "MUST implement error handling procedures to manage inaccuracies in location data gracefully."
+  ]
+}
+
+## location_reference_context
+
+{
+  "description": "This section addresses the contextual relevance and clarity of location references.",
+  "requirements": [
+    "MUST provide contextual information with location references, such as the purpose or relevance of the location to the output.",
+    "SHOULD avoid ambiguous location names by providing additional identifiers (e.g., state or country) when needed.",
+    "NEVER use outdated or colloquial terms for locations that may lead to confusion or misinterpretation."
+  ]
+}
+
+<example>
+location-reference-standards Example
+
+```python
+# Example for location-reference-standards
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement location-reference-standards according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER reference locations without using standardized formats such as GPS coordinates or recognized place names.",
+    "NEVER fail to validate location references against a reliable database, risking the use of inaccurate data.",
+    "NEVER omit the source of location data when applicable, leading to a lack of transparency and trustworthiness.",
+    "NEVER use outdated or colloquial terms for locations, which could lead to confusion or misinterpretation.",
+    "NEVER overlook the need for contextual information when presenting location references, as this can lead to misunderstanding of the data's relevance."
+  ],
+  "specific_risks": [
+    "Using non-standardized location formats can result in errors in interpretation, leading to incorrect outputs that can misinform users.",
+    "Failing to validate location references may result in presenting outdated or incorrect geographical information, which could compromise the integrity of data-dependent applications.",
+    "Omitting the source of location data can diminish user trust and create liability issues if the data is found to be inaccurate.",
+    "Using ambiguous or outdated location names can cause confusion among users, potentially leading to significant operational errors in location-dependent tasks.",
+    "Lack of contextual information with location references can result in users misapplying the data, causing inefficiencies or incorrect decision-making."
+  ]
+}
+</danger>

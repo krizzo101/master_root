@@ -1,0 +1,86 @@
+{
+  "description": "MUST comply with analyzer interface standards WHEN integrating analysis tools TO ensure compatibility.",
+  "globs": [
+    "**/*",
+    "**/*analyzer*/**",
+    "**/*interface*/**",
+    "**/analyzer/**",
+    "**/compliance/**",
+    "**/*compliance*/**",
+    "**/interface/**"
+  ],
+  "rule_id": "3401-analyzer-interface-compliance",
+  "taxonomy": {
+    "category": "Analysis Subsystem Standards",
+    "parent": "Analysis Subsystem StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Analysis Subsystem StandardsRule"
+    ],
+    "children": [
+      "3402-analyzer-interface-compliance-details",
+      "3403-analyzer-interface-compliance-exceptions"
+    ]
+  },
+  "tags": [
+    "analyzer",
+    "interface",
+    "compliance",
+    "standards",
+    "analysis"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ],
+  "overview": {
+    "purpose": "The purpose of rule 3401 is to ensure that all analysis tools within the system adhere to predefined analyzer interface standards, facilitating seamless integration and interoperability.",
+    "application": "This rule MUST be applied during the development and integration phases of analysis tools to verify compliance with the specified analyzer interface standards. Developers SHOULD conduct regular audits to ensure ongoing adherence.",
+    "importance": "Compliance with this rule is crucial as it prevents compatibility issues between different analysis tools, enhancing the overall reliability and functionality of the analysis subsystem. Non-compliance could lead to errors, inefficiencies, and increased maintenance costs."
+  },
+  "interface_compliance": {
+    "description": "This section outlines the requirements for ensuring that all analysis tools comply with the established analyzer interface standards.",
+    "requirements": [
+      "All analysis tools MUST implement the standard method signatures as defined in the interface documentation.",
+      "Developers MUST provide unit tests that validate the functionality of the analyzer interfaces to ensure compliance.",
+      "All methods within an analyzer interface MUST be documented clearly, specifying input parameters and expected outputs."
+    ]
+  },
+  "integration_tests": {
+    "description": "This section details the requirements for conducting integration tests to verify compliance with analyzer interface standards.",
+    "requirements": [
+      "Integration tests MUST be executed in a controlled environment that simulates real-world analysis scenarios.",
+      "Developers SHOULD include automated integration tests as part of the continuous integration pipeline to assess compliance.",
+      "All integration test results MUST be documented and made available for review to ensure transparency."
+    ]
+  },
+  "error_handling": {
+    "description": "This section specifies the requirements for implementing error handling mechanisms within the analyzer interfaces.",
+    "requirements": [
+      "All analysis tools MUST implement error handling mechanisms that conform to the interface standards.",
+      "Developers SHOULD ensure that any errors returned by the analyzer interfaces are meaningful and provide guidance for resolution.",
+      "Error handling routines MUST be thoroughly tested and included in the documentation to assist users in troubleshooting."
+    ]
+  },
+  "example": {
+    "description": "analyzer-interface-compliance Example",
+    "code": "def example():\n    # Implement according to standards\n    pass\n\n# This example demonstrates how to implement analyzer-interface-compliance according to the standards."
+  },
+  "danger": {
+    "critical_violations": [
+      "NEVER omit required method signatures from the analyzer interface as defined in the standards.",
+      "NEVER fail to provide unit tests for the implemented analyzer interfaces that verify compliance with the specifications.",
+      "NEVER ignore documentation requirements for input parameters and expected outputs within the analyzer interfaces.",
+      "NEVER skip executing integration tests in the controlled environment as specified for compliance verification.",
+      "NEVER allow errors returned by analyzer interfaces to be vague or uninformative, as this violates the error handling requirements."
+    ],
+    "specific_risks": [
+      "Failure to comply with the required method signatures can lead to runtime errors, resulting in system incompatibilities and unexpected behavior during analysis.",
+      "Lack of unit tests may result in undetected bugs in the analyzer interfaces, leading to incorrect analysis results and reduced trust in the system's output.",
+      "Inadequate documentation of parameters and outputs can cause confusion among developers and users, leading to improper usage of the analyzer interfaces.",
+      "Not conducting integration tests can lead to significant integration issues later in the development process, causing delays and increased costs for fixing non-compliance.",
+      "If error messages from analyzer interfaces are unclear, users may struggle to troubleshoot issues effectively, leading to frustration and reduced productivity."
+    ]
+  }
+}

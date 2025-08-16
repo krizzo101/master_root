@@ -1,0 +1,148 @@
+---
+description: WHEN managing configuration TO ensure system flexibility and security you MUST follow these configuration management standards
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"config_principles": "17-45",
+"type_standards": "47-75",
+"management_requirements": "77-95"
+},
+"key_elements": {
+"principle_validation": "20-30",
+"type_validation": "50-60",
+"management_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: config_principles -> type_standards -> management_requirements. Validate against principle_validation before proceeding."
+}
+
+{
+"rule_name": "Configuration Management Standards",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"managing configurations",
+"setting up environments",
+"handling secrets",
+"deploying systems"
+],
+"priority": 5,
+"domain": "development"
+},
+
+"overview": {
+"description": "Defines comprehensive configuration management standards",
+"importance": "Proper configuration management ensures system flexibility and security"
+},
+
+"config_principles": {
+"environment_separation": {
+"requirements": [
+"Separate by environment",
+"Use environment variables",
+"Handle overrides",
+"Maintain consistency"
+],
+"validation": {"separated": true, "consistent": true}
+},
+"security_measures": {
+"requirements": [
+"Encrypt sensitive data",
+"Manage secrets",
+"Control access",
+"Audit changes"
+],
+"validation": {"secured": true, "controlled": true}
+},
+"versioning_requirements": {
+"requirements": [
+"Version configs",
+"Track changes",
+"Enable rollbacks",
+"Document updates"
+],
+"validation": {"versioned": true, "tracked": true}
+}
+},
+
+"type_standards": {
+"application_config": {
+"requirements": [
+"Define app settings",
+"Handle features",
+"Manage dependencies",
+"Set timeouts"
+],
+"validation": {"defined": true, "managed": true}
+},
+"infrastructure_config": {
+"requirements": [
+"Set resources",
+"Configure scaling",
+"Define networks",
+"Manage storage"
+],
+"validation": {"configured": true, "scalable": true}
+},
+"security_config": {
+"requirements": [
+"Set permissions",
+"Configure auth",
+"Define policies",
+"Manage certs"
+],
+"validation": {"secured": true, "compliant": true}
+}
+},
+
+"management_requirements": {
+"deployment_process": {
+"requirements": [
+"Validate configs",
+"Deploy safely",
+"Enable rollback",
+"Monitor changes"
+],
+"validation": {"validated": true, "monitored": true}
+},
+"maintenance_standards": {
+"requirements": [
+"Review regularly",
+"Update timely",
+"Clean obsolete",
+"Document changes"
+],
+"validation": {"maintained": true, "documented": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER commit secrets",
+"NEVER use hardcoded configs",
+"NEVER skip validation",
+"NEVER mix environments",
+"NEVER ignore versioning",
+"NEVER skip access control",
+"NEVER lose history",
+"NEVER deploy untested"
+],
+"validation_rules": {
+"secrets": {"protected": true},
+"hardcoding": {"prevented": true},
+"validation": {"performed": true},
+"environments": {"separated": true},
+"versioning": {"implemented": true},
+"access": {"controlled": true},
+"history": {"maintained": true},
+"testing": {"completed": true}
+}
+}
+}

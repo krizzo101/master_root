@@ -1,0 +1,112 @@
+---
+description: MUST conduct performance-testing WHEN code is deployed TO ensure optimal application performance.
+globs: ["**/*.test.*", "**/*testing*/**", "**/*.spec.*", "**/testing/**", "**/*test*.*", "**/performance/**", "**/test/**", "**/*performance*/**"]
+---
+# performance-testing
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3705-performance-testing",
+  "taxonomy": {
+    "category": "Testing Standards",
+    "parent": "Testing StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Testing StandardsRule"
+    ],
+    "children": [
+      "3706-load-testing",
+      "3707-stress-testing",
+      "3708-endurance-testing"
+    ]
+  },
+  "tags": [
+    "performance",
+    "testing",
+    "standards",
+    "quality assurance"
+  ],
+  "priority": "80",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST ensure that performance-testing is conducted to verify application responsiveness, stability, and resource usage under expected workload conditions.",
+  "application": "SHOULD be applied whenever new code is deployed or significant changes are made to the system to assess how these changes affect overall performance metrics.",
+  "importance": "This rule matters because it helps identify bottlenecks and performance issues before they impact end-users, ensuring a high-quality user experience and maintaining system reliability."
+}
+
+## performance_testing
+
+{
+  "description": "This section outlines the requirements for conducting performance testing to ensure that the application meets its performance benchmarks under various conditions.",
+  "requirements": [
+    "MUST define clear performance benchmarks before testing begins.",
+    "MUST conduct tests under realistic load conditions that simulate actual user behavior.",
+    "MUST monitor key performance metrics during tests, including response time, throughput, and resource utilization.",
+    "SHOULD document all findings and issues identified during the testing process.",
+    "SHOULD repeat performance tests after significant code changes to validate improvements or regressions."
+  ]
+}
+
+## performance_test_scenarios
+
+{
+  "description": "This section describes various scenarios that should be tested to assess the application's performance comprehensively.",
+  "requirements": [
+    "MUST create scenarios for different user loads, including peak and off-peak usage.",
+    "MUST include scenarios that test the application's performance under stress conditions to identify breaking points.",
+    "SHOULD consider scenarios that involve simultaneous operations or transactions to gauge performance under concurrent usage.",
+    "NEVER skip testing critical paths that are essential for the application's core functionality."
+  ]
+}
+
+## post_performance_testing_actions
+
+{
+  "description": "This section details the actions to take after performance testing has been completed.",
+  "requirements": [
+    "MUST analyze results to identify any performance bottlenecks and document them.",
+    "MUST communicate findings to relevant stakeholders to ensure awareness of any issues.",
+    "SHOULD propose actionable recommendations for performance improvements based on the test results.",
+    "MUST schedule follow-up tests to verify that improvements have been successfully implemented."
+  ]
+}
+
+<example>
+performance-testing Example
+
+```python
+# Example for performance-testing
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement performance-testing according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER conduct performance-testing without predefined performance benchmarks.",
+    "NEVER use unrealistic load conditions that do not reflect actual user behavior during performance-testing.",
+    "NEVER ignore monitoring key performance metrics such as response time and throughput during tests.",
+    "NEVER skip documenting findings from performance-tests, as this undermines the testing process.",
+    "NEVER fail to repeat performance tests after significant code changes, as this can lead to undetected regressions."
+  ],
+  "specific_risks": [
+    "Violating the requirement to define benchmarks can lead to a lack of clarity on acceptable performance levels, resulting in unoptimized applications.",
+    "Using unrealistic load conditions may result in performance issues being overlooked, causing degraded user experience when the application is under real-world stress.",
+    "Ignoring key performance metrics can allow critical bottlenecks to persist, leading to slow application responses and potential system failures.",
+    "Failing to document testing findings may result in unresolved issues being reintroduced in future releases, affecting overall application stability.",
+    "Not repeating performance tests after code changes can allow performance regressions to go unnoticed, leading to user dissatisfaction and loss of trust in the application."
+  ]
+}
+</danger>

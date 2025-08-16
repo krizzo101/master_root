@@ -1,0 +1,82 @@
+{
+  "description": "MUST include comprehensive docstrings WHEN defining functions TO enhance code readability and usability.",
+  "globs": ["**/docstrings/**/*.py", "**/*", "**/*docstrings*/**/*.py", "**/*comprehensive*/**/*.py", "**/comprehensive/**/*.py"],
+  "version": "1.1.0",
+  "Metadata": {
+    "rule_id": "3102-comprehensive-docstrings",
+    "taxonomy": {
+      "category": "Python Implementation Standards",
+      "parent": "Python Implementation StandardsRule",
+      "ancestors": [
+        "Rule",
+        "Python Implementation StandardsRule"
+      ],
+      "children": []
+    },
+    "tags": [
+      "docstrings",
+      "documentation",
+      "Python",
+      "coding standards"
+    ],
+    "priority": "70",
+    "inherits": [
+      "000-context-awareness",
+      "001-ai-operating-rules"
+    ]
+  },
+  "Overview": {
+    "purpose": "MUST provide comprehensive docstrings WHEN defining functions TO ensure that the functionality and usage of the code are clearly communicated to current and future developers.",
+    "application": "SHOULD be applied to all function definitions within Python codebases. This includes providing detailed explanations of parameters, return values, exceptions raised, and any relevant usage examples.",
+    "importance": "This rule matters because comprehensive docstrings significantly improve code maintainability, facilitate collaboration among developers, and enhance the overall quality of the code by making it easier to understand and utilize."
+  },
+  "docstring_format": {
+    "description": "Defines the required structure and elements that must be included in comprehensive docstrings.",
+    "requirements": [
+      "MUST start with a brief summary of the function's purpose in one sentence.",
+      "MUST include a detailed description of the function's behavior and any side effects.",
+      "MUST specify all parameters, including their types and purpose, formatted as a list.",
+      "MUST describe the return value, including its type and meaning.",
+      "MUST document any exceptions that the function may raise, indicating under what conditions they are raised.",
+      "SHOULD provide usage examples that illustrate how to use the function effectively."
+    ]
+  },
+  "style_guidelines": {
+    "description": "Outlines the stylistic considerations for writing docstrings to maintain consistency and clarity.",
+    "requirements": [
+      "MUST use triple quotes for docstrings and ensure they are properly indented.",
+      "MUST follow PEP 257 conventions for formatting and style.",
+      "SHOULD avoid excessive technical jargon to ensure that docstrings are accessible to all developers.",
+      "SHOULD use active voice and present tense for clarity.",
+      "MUST keep lines within a maximum length of 72 characters to enhance readability."
+    ]
+  },
+  "review_process": {
+    "description": "Details the process for reviewing docstrings to ensure compliance with the comprehensive docstring rule.",
+    "requirements": [
+      "MUST include docstring review as part of code review processes.",
+      "SHOULD provide feedback on non-compliant docstrings in pull requests.",
+      "MUST ensure that all new functions include comprehensive docstrings before merging.",
+      "SHOULD establish a periodic review of existing functions to update or improve docstrings as needed."
+    ]
+  },
+  "example": {
+    "description": "Example for comprehensive-docstrings",
+    "code": "def add_numbers(a: int, b: int) -> int:\n    \"\"\"\n    Add two integers and return the result.\n\n    Parameters:\n    a (int): The first integer to add.\n    b (int): The second integer to add.\n\n    Returns:\n    int: The sum of a and b.\n\n    Raises:\n    TypeError: If a or b is not an integer.\n\n    Example:\n    >>> add_numbers(5, 10)\n    15\n    \"\"\"\n    if not isinstance(a, int) or not isinstance(b, int):\n        raise TypeError('Both parameters must be integers.')\n    return a + b"
+  },
+  "danger": {
+    "critical_violations": [
+      "NEVER omit essential information in docstrings, such as parameter types or return value descriptions.",
+      "NEVER use vague language in docstrings that fails to clearly describe function behavior.",
+      "NEVER write docstrings that are inconsistent with the actual implementation of the function.",
+      "NEVER neglect to update docstrings when the function logic changes, leading to outdated documentation.",
+      "NEVER use non-standard formatting that deviates from PEP 257 guidelines, as this reduces readability."
+    ],
+    "specific_risks": [
+      "Failure to provide complete docstrings can lead to misunderstandings of how to use functions, resulting in incorrect usage and potential bugs.",
+      "Using vague or misleading language in docstrings can cause confusion among developers, slowing down development time and increasing the likelihood of errors.",
+      "Inconsistent or outdated docstrings may lead to a mismatch between the documentation and the code, making it difficult for developers to maintain or build upon existing code.",
+      "Non-compliance with PEP 257 formatting can make docstrings harder to read, reducing their effectiveness in facilitating understanding and collaboration among team members."
+    ]
+  }
+}

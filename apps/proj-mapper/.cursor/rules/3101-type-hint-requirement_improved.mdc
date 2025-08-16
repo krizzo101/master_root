@@ -1,0 +1,87 @@
+{
+  "description": "MUST use type hints WHEN defining functions TO improve code readability and type safety.",
+  "globs": [
+    "**/*requirement*/**/*.py",
+    "**/hint/**/*.py",
+    "**/type/**/*.py",
+    "**/*",
+    "**/requirement/**/*.py",
+    "**/*hint*/**/*.py",
+    "**/*type*/**/*.py"
+  ],
+  "rule_id": "3101-type-hint-requirement",
+  "taxonomy": {
+    "category": "Python Implementation Standards",
+    "parent": "Python Implementation StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Python Implementation StandardsRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "type-hinting",
+    "Python",
+    "code-quality",
+    "best-practices"
+  ],
+  "priority": "30",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ],
+  "overview": {
+    "purpose": "MUST enforce the use of type hints WHEN defining functions TO enhance code clarity and facilitate better static type checking.",
+    "application": "This rule SHOULD be applied in all Python codebases, particularly during the function definition phase, ensuring that each function has appropriate type annotations for its parameters and return values.",
+    "importance": "Implementing type hints is crucial as it improves code readability, aids in debugging, and allows for better tooling support, ultimately leading to higher code quality and maintainability."
+  },
+  "type_hint_requirements": {
+    "description": "Requirements for implementing type hints in Python functions.",
+    "requirements": [
+      "MUST annotate all function parameters with their expected types using the syntax 'def function_name(param: Type) -> ReturnType:'",
+      "MUST specify the return type of the function using a type hint.",
+      "SHOULD use 'Optional[Type]' for parameters that can accept None.",
+      "SHOULD prefer specific types (e.g., 'List[int]', 'Dict[str, Any]') over general types (e.g., 'List', 'Dict') for clarity.",
+      "NEVER omit type hints for public function interfaces in libraries."
+    ]
+  },
+  "type_hint_best_practices": {
+    "description": "Best practices for using type hints effectively.",
+    "requirements": [
+      "MUST keep type hints consistent throughout the codebase, ensuring that all functions follow the same type hinting style.",
+      "SHOULD use type aliases for complex types to enhance readability, e.g., 'Vector = List[float]'.",
+      "MUST avoid circular references in type hints by using forward references when necessary, e.g., 'def func() -> 'MyClass' if 'MyClass' is defined later.",
+      "SHOULD document any non-obvious type hints in code comments to improve understanding.",
+      "MUST ensure type hints are updated alongside code changes to maintain accuracy."
+    ]
+  },
+  "type_hint_tooling": {
+    "description": "Guidelines for leveraging tools that support type hints.",
+    "requirements": [
+      "MUST use static type checkers (e.g., mypy) to validate type hints during development.",
+      "SHOULD integrate type hint checking into the continuous integration pipeline to enforce compliance.",
+      "MUST utilize IDE features that provide type hinting support to improve developer experience.",
+      "SHOULD consider using type hint generation tools to aid in maintaining type annotations."
+    ]
+  },
+  "example": {
+    "description": "Example for type-hint-requirement",
+    "code": "def add_numbers(a: int, b: int) -> int:\n    return a + b"
+  },
+  "danger": {
+    "critical_violations": [
+      "NEVER define a function without type hints for its parameters and return types.",
+      "NEVER use ambiguous types like 'Any' or 'List' without specifying the contained types.",
+      "NEVER ignore type hinting for public APIs in libraries that are intended for external use.",
+      "NEVER allow functions to have an inconsistent application of type hints within the same codebase.",
+      "NEVER fail to update type hints when modifying function signatures or logic."
+    ],
+    "specific_risks": [
+      "Violating type hint requirements can lead to runtime errors that are difficult to diagnose due to lack of type information.",
+      "Ignoring type hints may result in reduced readability and maintainability of the code, making it harder for new developers to understand the codebase.",
+      "Failure to use type hints can lead to improper usage of functions, resulting in potential bugs and increased technical debt.",
+      "Not adhering to type hinting standards can hinder the effectiveness of static analysis tools, leading to missed opportunities for early error detection.",
+      "Inconsistent use of type hints can confuse developers and result in mismatches between expected and actual types, further complicating code interactions."
+    ]
+  }
+}

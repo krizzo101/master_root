@@ -1,0 +1,107 @@
+---
+description: MUST ensure compatibility WHEN using VSCode extensions TO maintain seamless functionality
+globs: ["**/vscode/**", "**/*compatibility*/**", "**/*", "**/compatibility/**", "**/*vscode*/**"]
+---
+# vscode-compatibility
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3801-vscode-compatibility",
+  "taxonomy": {
+    "category": "IDE Integration Standards",
+    "parent": "IDE Integration StandardsRule",
+    "ancestors": [
+      "Rule",
+      "IDE Integration StandardsRule"
+    ],
+    "children": [
+      "3802-vscode-extensions",
+      "3803-vscode-settings"
+    ]
+  },
+  "tags": [
+    "vscode",
+    "compatibility",
+    "IDE",
+    "integration"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST ensure that the system maintains compatibility with VSCode extensions to support seamless integration and functionality across different development environments.",
+  "application": "This rule SHOULD be applied whenever VSCode extensions are utilized within the IDE. It MUST be checked during the loading of extensions and when modifications are made to the environment that could affect compatibility.",
+  "importance": "Ensuring compatibility with VSCode extensions is critical as it allows developers to leverage a broad ecosystem of tools and features, enhancing productivity and reducing friction in the development process."
+}
+
+## vscode_extension_support
+
+{
+  "description": "MUST provide support for VSCode extensions to ensure full functionality.",
+  "requirements": [
+    "MUST verify that all installed VSCode extensions are compatible with the current IDE version.",
+    "SHOULD provide warnings for any incompatible extensions detected during startup.",
+    "MUST allow users to enable or disable specific VSCode extensions from within the IDE settings."
+  ]
+}
+
+## extension_configuration_management
+
+{
+  "description": "MUST manage the configuration of VSCode extensions effectively to avoid conflicts.",
+  "requirements": [
+    "MUST ensure that configuration files for extensions are correctly loaded and parsed.",
+    "MUST avoid overriding user-defined settings unless explicitly specified by the user.",
+    "NEVER allow configuration conflicts between IDE settings and VSCode extension settings."
+  ]
+}
+
+## performance_optimization
+
+{
+  "description": "MUST optimize the performance of the IDE when using VSCode extensions to prevent lag.",
+  "requirements": [
+    "MUST implement a loading strategy that prioritizes essential extensions to reduce startup time.",
+    "SHOULD monitor the performance impact of each extension and provide feedback to the user.",
+    "MUST provide an option to disable extensions that significantly degrade performance."
+  ]
+}
+
+<example>
+vscode-compatibility Example
+
+```python
+# Example for vscode-compatibility
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement vscode-compatibility according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER ignore version mismatches between VSCode extensions and the IDE, as this can lead to unexpected behavior.",
+    "NEVER allow the installation of incompatible VSCode extensions without notifying the user, risking functionality loss.",
+    "NEVER override user-defined settings for VSCode extensions without explicit user consent, which can lead to user frustration.",
+    "NEVER disable essential VSCode extensions automatically without providing a clear rationale to the user.",
+    "NEVER fail to validate the compatibility of VSCode extensions during the IDE startup process, which can cause crashes or instability."
+  ],
+  "specific_risks": [
+    "Violating compatibility can lead to significant crashes or instability in the IDE, disrupting the developer's workflow.",
+    "Ignoring version mismatches can create an environment where extensions do not function as intended, reducing developer productivity.",
+    "Overriding user-defined settings can lead to confusion and dissatisfaction, potentially causing users to abandon the IDE for alternatives.",
+    "Failing to notify users about incompatible extensions can result in lost time troubleshooting issues that arise from these extensions.",
+    "Not validating extensions during startup may result in a non-functional IDE, forcing developers to spend valuable time resolving issues instead of coding."
+  ]
+}
+</danger>

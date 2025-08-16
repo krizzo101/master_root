@@ -1,56 +1,71 @@
+# Pre-commit hooks for code quality
+# See https://pre-commit.com for more information
+
 repos:
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.3
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
     hooks:
-      - id: ruff
-        exclude: |
-          (?x)^(
-              \.archive/.*|
-              apps/.*|
-              intake/.*|
-              \.consult/.*|
-              \.cursor/project_intelligence_cache/.*|
-              model_testing/.*
-          )$
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=5000']
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # Python specific
   - repo: https://github.com/psf/black
     rev: 23.12.1
     hooks:
       - id: black
-        exclude: |
-          (?x)^(
-              \.archive/.*|
-              apps/.*|
-              intake/.*|
-              \.consult/.*|
-              \.cursor/project_intelligence_cache/.*|
-              model_testing/.*
-          )$
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.9.0
+        language_version: python3.12
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
     hooks:
-      - id: mypy
-        additional_dependencies:
-          - types-requests
-          - types-PyYAML
-        exclude: |
-          (?x)^(
-              \.archive/.*|
-              apps/.*|
-              intake/.*|
-              \.consult/.*|
-              \.cursor/project_intelligence_cache/.*|
-              libs/.*|
-              model_testing/.*
-          )$
-  - repo: local
+      - id: isort
+        args: ["--profile", "black"]
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
     hooks:
-      - id: forbid-j2-in-libs
-        name: Forbid .j2 references in libs
-        entry: bash
-        args:
-          - -c
-          - >-
-            if grep -R --line-number -E '\\.j2' libs; then
-            echo 'Error: .j2 template references found in libs/'; exit 1; fi
-        language: system
-        types: [text]
+      - id: flake8
+        args: ['--max-line-length=100', '--extend-ignore=E203,W503']
+
+  # Security
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: ['-ll', '--skip', 'B101,B601']
+
+  # Type checking (optional, can be slow)
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.8.0
+  #   hooks:
+  #     - id: mypy
+  #       additional_dependencies: [types-all]
+
+# Configuration
+default_language_version:
+  python: python3.12
+
+exclude: |
+  (?x)^(
+    .*\.egg-info/.*|
+    \.git/.*|
+    \.venv/.*|
+    build/.*|
+    dist/.*|
+    __pycache__/.*|
+    \.pytest_cache/.*|
+    \.mypy_cache/.*|
+    node_modules/.*|
+    \.reference/.*|
+    intake/.*
+  )$

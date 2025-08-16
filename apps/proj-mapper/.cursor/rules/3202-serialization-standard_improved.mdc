@@ -1,0 +1,10 @@
+{
+  "description": "MUST use JSON format WHEN serializing data TO ensure interoperability and consistency.",
+  "globs": [
+    "**/*serialization*/**",
+    "**/*standard*/**",
+    "**/standard/**",
+    "**/*",
+    "**/serialization/**"
+  ]
+}

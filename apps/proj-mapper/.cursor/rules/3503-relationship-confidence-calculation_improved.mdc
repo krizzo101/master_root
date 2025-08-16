@@ -1,0 +1,17 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+{
+  "description": "MUST calculate confidence levels WHEN mapping relationships TO ensure data accuracy and reliability.",
+  "globs": [
+    "**/relationship/**",
+    "**/*relationship*/**",
+    "**/*",
+    "**/confidence/**",
+    "**/calculation/**",
+    "**/*calculation*/**",
+    "**/*confidence*/**"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "description": "MUST apply relationship detection methods WHEN analyzing data structures TO improve mapping accuracy",
+  "globs": [
+    "**/relationship/**",
+    "**/*relationship*/**",
+    "**/*",
+    "**/*detection*/**",
+    "**/detection/**",
+    "**/methods/**",
+    "**/*methods*/**"
+  ]
+}

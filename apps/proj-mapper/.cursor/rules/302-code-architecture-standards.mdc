@@ -1,0 +1,149 @@
+---
+description: WHEN designing or implementing code architecture TO ensure maintainability and scalability you MUST follow these architectural standards
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"design_principles": "17-45",
+"component_standards": "47-75",
+"integration_patterns": "77-95"
+},
+"key_elements": {
+"principle_patterns": "20-30",
+"component_validation": "50-60",
+"integration_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: design_principles -> component_standards -> integration_patterns. Validate against principle_patterns before proceeding."
+}
+
+{
+"rule_name": "Code Architecture Standards",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"designing architecture",
+"implementing components",
+"refactoring systems",
+"ensuring scalability"
+],
+"priority": 5,
+"domain": "development"
+},
+
+"overview": {
+"description": "Defines comprehensive code architecture standards",
+"importance": "Proper architecture ensures maintainable and scalable systems"
+},
+
+"design_principles": {
+"solid_principles": {
+"requirements": [
+"Single Responsibility Principle",
+"Open-Closed Principle",
+"Liskov Substitution Principle",
+"Interface Segregation Principle",
+"Dependency Inversion Principle"
+],
+"validation": {"followed": true, "enforced": true}
+},
+"separation_of_concerns": {
+"requirements": [
+"Isolate business logic",
+"Separate data access",
+"Decouple UI components",
+"Modularize functionality"
+],
+"validation": {"isolated": true, "decoupled": true}
+},
+"dependency_management": {
+"requirements": [
+"Minimize dependencies",
+"Use dependency injection",
+"Manage circular dependencies",
+"Version compatibility"
+],
+"validation": {"minimal": true, "managed": true}
+}
+},
+
+"component_standards": {
+"modularity": {
+"requirements": [
+"Self-contained components",
+"Clear interfaces",
+"Minimal coupling",
+"High cohesion"
+],
+"validation": {"modular": true, "cohesive": true}
+},
+"reusability": {
+"requirements": [
+"Generic implementations",
+"Configurable behavior",
+"Clear documentation",
+"Version control"
+],
+"validation": {"reusable": true, "documented": true}
+},
+"testability": {
+"requirements": [
+"Unit test support",
+"Mock interfaces",
+"Test isolation",
+"Coverage metrics"
+],
+"validation": {"testable": true, "isolated": true}
+}
+},
+
+"integration_patterns": {
+"communication": {
+"requirements": [
+"Standard protocols",
+"Error handling",
+"Retry mechanisms",
+"Circuit breakers"
+],
+"validation": {"standardized": true, "resilient": true}
+},
+"data_flow": {
+"requirements": [
+"Clear data paths",
+"Validation layers",
+"Transform patterns",
+"Error propagation"
+],
+"validation": {"clear": true, "validated": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER violate SOLID principles",
+"NEVER tightly couple components",
+"NEVER skip interface definitions",
+"NEVER ignore dependency cycles",
+"NEVER mix concerns",
+"NEVER bypass validation layers",
+"NEVER hardcode dependencies",
+"NEVER omit error handling"
+],
+"validation_rules": {
+"solid": {"followed": true},
+"coupling": {"loose": true},
+"interfaces": {"defined": true},
+"dependencies": {"managed": true},
+"concerns": {"separated": true},
+"validation": {"implemented": true},
+"injection": {"used": true},
+"errors": {"handled": true}
+}
+}
+}

@@ -1,0 +1,107 @@
+---
+description: MUST use default configuration WHEN setting up environments TO ensure consistent application behavior
+globs: ["**/*", "**/*default*/**", "**/configuration/**", "**/default/**", "**/*configuration*/**"]
+---
+# default-configuration
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3303-default-configuration",
+  "taxonomy": {
+    "category": "Configuration Management",
+    "parent": "Configuration ManagementRule",
+    "ancestors": [
+      "Rule",
+      "Configuration ManagementRule"
+    ],
+    "children": [
+      "3304-custom-configuration",
+      "3305-environmental-configuration"
+    ]
+  },
+  "tags": [
+    "default",
+    "configuration",
+    "settings",
+    "best-practices"
+  ],
+  "priority": "50",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "The rule establishes that the default configuration settings must be utilized to ensure uniformity across different environments, facilitating reliable application behavior.",
+  "application": "This rule should be applied during the initial setup of development, testing, and production environments. It must be adhered to whenever changes to configurations are made to maintain consistency.",
+  "importance": "Implementing this rule is crucial as it minimizes discrepancies between environments, reduces the likelihood of errors, and enhances the overall stability and predictability of application performance."
+}
+
+## default_configuration
+
+{
+  "description": "This section outlines the necessity of using default configuration settings to maintain consistency across environments.",
+  "requirements": [
+    "MUST utilize provided default configurations when initializing any development, testing, or production environment.",
+    "SHOULD verify that all custom configurations align with the established default configurations to prevent discrepancies.",
+    "MUST document any deviations from default configurations to ensure clarity for future reference and audits."
+  ]
+}
+
+## consistency_check
+
+{
+  "description": "This section describes the processes and checks needed to ensure that default configurations are consistently applied.",
+  "requirements": [
+    "MUST conduct regular audits of environment configurations to confirm adherence to default settings.",
+    "SHOULD implement automated scripts to validate that active configurations match the prescribed defaults.",
+    "NEVER deploy applications without first verifying that the default configurations are applied in the target environment."
+  ]
+}
+
+## rollback_procedures
+
+{
+  "description": "This section details the steps necessary to revert to default configurations in case of issues arising from custom settings.",
+  "requirements": [
+    "MUST establish a clear rollback procedure that allows reverting to default configurations quickly and efficiently.",
+    "SHOULD maintain backups of current configurations before applying any changes, allowing for safe restoration if needed.",
+    "MUST train team members on the rollback procedures to ensure swift action during configuration failures."
+  ]
+}
+
+<example>
+default-configuration Example
+
+```python
+# Example for default-configuration
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement default-configuration according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER ignore the default configuration settings during application deployment as this leads to unpredictable behavior.",
+    "NEVER modify configuration files without verifying compatibility with the default settings to prevent breaking changes.",
+    "NEVER assume that custom configurations are sufficient without comparing them against the default configurations.",
+    "NEVER deploy an application in a new environment without first confirming that default configurations are applied.",
+    "NEVER document configurations without noting deviations from the default settings, as this can lead to confusion in future audits."
+  ],
+  "specific_risks": [
+    "Failure to use default configurations can result in inconsistent application behavior across different environments, leading to increased debugging time.",
+    "Modifying configurations without verification may introduce critical bugs that are difficult to trace back to their source, impacting system reliability.",
+    "Custom configurations that are not aligned with defaults may lead to security vulnerabilities, exposing the application to potential attacks.",
+    "Deploying applications without confirming default settings may cause unexpected downtime due to misconfigurations, affecting service availability.",
+    "Inadequate documentation of configuration changes can lead to miscommunication among team members, resulting in errors during maintenance or updates."
+  ]
+}
+</danger>

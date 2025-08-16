@@ -1,0 +1,157 @@
+---
+description: WHEN solving complex problems TO ensure thorough analysis and optimal solutions you MUST APPLY appropriate reasoning methods
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"core_methods": "17-45",
+"extended_methods": "47-75",
+"integration_approaches": "77-95"
+},
+"key_elements": {
+"method_requirements": "20-30",
+"method_validation": "50-60",
+"integration_patterns": "80-90"
+},
+"ai_instructions": "Process sections in order: core_methods -> extended_methods -> integration_approaches. Validate against method_requirements before proceeding."
+}
+
+{
+"rule_name": "Reasoning Methods",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"solving complex problems",
+"designing solutions",
+"analyzing requirements",
+"making decisions"
+],
+"priority": 5,
+"domain": "meta-rules"
+},
+
+"overview": {
+"description": "Defines systematic reasoning approaches for comprehensive problem-solving",
+"importance": "Proper reasoning methods ensure thorough analysis and optimal solutions"
+},
+
+"core_methods": {
+"tree_of_thought": {
+"required_for": ["design", "complex", "high_risk"],
+"steps": [
+"Generate multiple solution approaches",
+"Analyze tradeoffs systematically",
+"Consider constraints and limitations",
+"Select and refine optimal approach",
+"Document decision rationale"
+],
+"validation": {"complete": true, "systematic": true}
+},
+"chain_of_thought": {
+"required_for": ["implementation", "debugging"],
+"steps": [
+"Break down into subproblems",
+"Map dependencies and relationships",
+"Validate intermediate steps",
+"Document reasoning process"
+],
+"validation": {"logical": true, "complete": true}
+},
+"self_refinement": {
+"required_for": ["complex", "high_risk"],
+"steps": [
+"Assess solution completeness",
+"Identify improvement areas",
+"Refine iteratively",
+"Validate against requirements"
+],
+"validation": {"thorough": true, "iterative": true}
+}
+},
+
+"extended_methods": {
+"context_awareness": {
+"required_for": ["all_interactions"],
+"steps": [
+"Maintain project context",
+"Track task dependencies",
+"Ensure consistency",
+"Prevent redundancy"
+],
+"validation": {"persistent": true, "complete": true}
+},
+"dependency_tracking": {
+"required_for": ["modifications", "refactoring"],
+"steps": [
+"Identify affected components",
+"Update related code",
+"Validate changes",
+"Ensure compatibility"
+],
+"validation": {"comprehensive": true, "accurate": true}
+},
+"knowledge_scope": {
+"required_for": ["all_interactions"],
+"steps": [
+"Verify understanding",
+"Flag uncertainties",
+"Explain rationale",
+"Adapt to feedback"
+],
+"validation": {"aware": true, "adaptive": true}
+}
+},
+
+"integration_approaches": {
+"parallel_application": {
+"description": "Apply multiple methods simultaneously",
+"process": [
+"Divide problem domains",
+"Apply relevant methods",
+"Integrate insights",
+"Resolve conflicts"
+],
+"validation": {"coordinated": true, "complete": true}
+},
+"sequential_application": {
+"description": "Apply methods in logical sequence",
+"process": [
+"Start with high-level methods",
+"Refine with detailed methods",
+"Validate results",
+"Document process"
+],
+"validation": {"ordered": true, "thorough": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER skip required reasoning methods",
+"NEVER ignore method validation steps",
+"NEVER mix incompatible methods",
+"NEVER assume without validation",
+"NEVER skip documentation steps",
+"NEVER ignore context awareness",
+"NEVER bypass self-refinement",
+"NEVER neglect integration approaches"
+],
+"validation_rules": {
+"methods": {"applied": true},
+"validation": {"performed": true},
+"compatibility": {"checked": true},
+"assumptions": {"validated": true},
+"documentation": {"complete": true},
+"context": {"maintained": true},
+"refinement": {"performed": true},
+"integration": {"appropriate": true}
+}
+}
+}

@@ -1,0 +1,107 @@
+---
+description: MUST optimize token usage WHEN generating output TO enhance performance and reduce costs
+globs: ["**/*efficiency*/**", "**/*", "**/optimization/**", "**/token/**", "**/*optimization*/**", "**/efficiency/**", "**/*token*/**"]
+---
+# token-efficiency-optimization
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3601-token-efficiency-optimization",
+  "taxonomy": {
+    "category": "Output Generation Standards",
+    "parent": "Output Generation StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Output Generation StandardsRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "token-efficiency",
+    "optimization",
+    "output-generation",
+    "performance"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST ensure the optimization of token usage during output generation to minimize resource consumption and enhance the efficiency of the AI assistant.",
+  "application": "SHOULD be applied during all output generation processes, particularly in situations where resource constraints or performance issues are identified. This includes generating responses, code snippets, and any other textual outputs.",
+  "importance": "This rule matters because optimizing token usage directly impacts the performance and cost-effectiveness of the AI assistant, allowing for faster response times and reduced operational costs, which is critical in high-usage environments."
+}
+
+## token_usage_optimization
+
+{
+  "description": "MUST implement strategies to minimize token usage during output generation processes.",
+  "requirements": [
+    "MUST analyze the context of the request to determine the minimal necessary output length.",
+    "MUST prioritize succinct responses by eliminating unnecessary words and phrases.",
+    "SHOULD utilize concise data structures when providing code snippets or complex outputs.",
+    "NEVER include excessive explanations unless specifically requested by the user.",
+    "MUST ensure that any abbreviations or shorthand used are clear and contextually appropriate."
+  ]
+}
+
+## context_analysis
+
+{
+  "description": "MUST evaluate the context of user requests to tailor output length and detail.",
+  "requirements": [
+    "MUST assess user intent and adjust output accordingly to avoid superfluous information.",
+    "SHOULD maintain a balance between brevity and clarity to ensure user understanding.",
+    "MUST adapt the level of detail based on user expertise, providing more context for novice users and less for experienced ones.",
+    "MUST log instances where token optimization is applied to analyze effectiveness over time."
+  ]
+}
+
+## performance_monitoring
+
+{
+  "description": "MUST continuously monitor the impact of token optimization on performance metrics.",
+  "requirements": [
+    "MUST track token usage statistics to identify trends and areas for improvement.",
+    "SHOULD implement feedback loops to refine token optimization strategies based on user satisfaction and performance outcomes.",
+    "MUST adjust optimization strategies based on real-time performance data and user interactions.",
+    "NEVER compromise the quality of output for the sake of reducing token usage if it affects user experience negatively."
+  ]
+}
+
+<example>
+token-efficiency-optimization Example
+
+```python
+# Example for token-efficiency-optimization
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement token-efficiency-optimization according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER include unnecessary filler words or phrases that do not contribute to the meaning of the output.",
+    "NEVER generate verbose explanations when a concise response suffices, as this increases token usage unnecessarily.",
+    "NEVER ignore user context and intent, leading to overly detailed outputs that waste tokens and confuse the user.",
+    "NEVER sacrifice output clarity for the sake of brevity; ensuring user understanding is paramount, even in token optimization.",
+    "NEVER utilize complex data structures that increase token count when simpler alternatives would suffice."
+  ],
+  "specific_risks": [
+    "Increased operational costs due to higher token usage can lead to budget overruns, especially in high-usage scenarios.",
+    "Poor user experience may result from unclear or overly verbose outputs, leading to decreased user satisfaction and engagement.",
+    "Inefficient responses can cause the AI assistant to lag, affecting overall performance and responsiveness, which may deter users.",
+    "Failure to optimize tokens can lead to unnecessary strain on system resources, potentially resulting in slower processing times and increased latency."
+  ]
+}
+</danger>

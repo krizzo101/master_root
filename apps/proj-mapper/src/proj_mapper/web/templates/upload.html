@@ -1,0 +1,372 @@
+{% extends "base.html" %} {% block title %}Project Mapper - Upload Project{%
+endblock %} {% block content %}
+<div class="container my-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Upload Project</li>
+    </ol>
+  </nav>
+
+  <div class="row">
+    <div class="col-12">
+      <h1 class="mb-4">
+        <i class="fas fa-upload me-2"></i>
+        Upload Project
+      </h1>
+      <p class="lead">
+        Upload a project archive (ZIP) or provide a local directory path to
+        analyze.
+      </p>
+      <hr />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-file-archive me-1"></i>
+            Upload ZIP Archive
+          </h5>
+        </div>
+        <div class="card-body">
+          <form
+            action="{{ url_for('projects.upload_file') }}"
+            method="post"
+            enctype="multipart/form-data"
+            id="upload-form"
+          >
+            <div class="mb-3">
+              <label for="project-name" class="form-label">Project Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="project-name"
+                name="project_name"
+                placeholder="My Project"
+                required
+              />
+              <div class="form-text">A unique name for your project</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="project-file" class="form-label"
+                >Project ZIP File</label
+              >
+              <input
+                type="file"
+                class="form-control"
+                id="project-file"
+                name="project_file"
+                accept=".zip"
+                required
+              />
+              <div class="form-text">
+                ZIP archive containing your project files
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="analyze-now"
+                  name="analyze_now"
+                  checked
+                />
+                <label class="form-check-label" for="analyze-now">
+                  Analyze project immediately after upload
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fas fa-upload me-1"></i> Upload & Analyze
+            </button>
+          </form>
+
+          <div class="progress-container mt-3" style="display: none">
+            <div class="progress">
+              <div
+                class="progress-bar progress-bar-striped progress-bar-animated"
+                role="progressbar"
+                aria-valuenow="0"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                style="width: 0%"
+              ></div>
+            </div>
+            <p class="progress-status text-center mt-2">Uploading...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-folder-open me-1"></i>
+            Local Directory Path
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-1"></i>
+            This option works if you're running the app locally and want to
+            analyze a directory on your system.
+          </div>
+
+          <form
+            action="{{ url_for('projects.analyze_directory') }}"
+            method="post"
+            id="directory-form"
+          >
+            <div class="mb-3">
+              <label for="dir-project-name" class="form-label"
+                >Project Name</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="dir-project-name"
+                name="project_name"
+                placeholder="My Project"
+                required
+              />
+              <div class="form-text">A unique name for your project</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="directory-path" class="form-label"
+                >Directory Path</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="directory-path"
+                name="directory_path"
+                placeholder="/path/to/project"
+                required
+              />
+              <div class="form-text">
+                Absolute path to the project directory
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Configuration Options</label>
+              <div class="config-form">
+                <div class="mb-2">
+                  <label for="include-patterns" class="form-label"
+                    >Include Patterns</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="include-patterns"
+                    name="include_patterns"
+                    placeholder="*.py, *.md"
+                  />
+                  <div class="form-text">
+                    Comma-separated list of glob patterns to include
+                  </div>
+                </div>
+
+                <div class="mb-2">
+                  <label for="exclude-patterns" class="form-label"
+                    >Exclude Patterns</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="exclude-patterns"
+                    name="exclude_patterns"
+                    placeholder="*/__pycache__/*, */venv/*"
+                  />
+                  <div class="form-text">
+                    Comma-separated list of glob patterns to exclude
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">
+              <i class="fas fa-folder-open me-1"></i> Analyze Directory
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-cog me-1"></i>
+            Advanced Configuration
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="form-check form-switch mb-3">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="toggle-advanced"
+              role="switch"
+              data-bs-toggle="collapse"
+              data-bs-target="#advanced-config"
+            />
+            <label class="form-check-label" for="toggle-advanced">
+              Show advanced configuration options
+            </label>
+          </div>
+
+          <div class="collapse" id="advanced-config">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Analysis Options</label>
+                  <div class="form-check mb-2">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="analyze-docs"
+                      name="analyze_docs"
+                      checked
+                    />
+                    <label class="form-check-label" for="analyze-docs">
+                      Analyze documentation
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="analyze-deps"
+                      name="analyze_deps"
+                      checked
+                    />
+                    <label class="form-check-label" for="analyze-deps">
+                      Analyze dependencies
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="deep-analysis"
+                      name="deep_analysis"
+                    />
+                    <label class="form-check-label" for="deep-analysis">
+                      Perform deep analysis (slower)
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Output Options</label>
+                  <div class="form-check mb-2">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="generate-graph"
+                      name="generate_graph"
+                      checked
+                    />
+                    <label class="form-check-label" for="generate-graph">
+                      Generate relationship graphs
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="generate-docs"
+                      name="generate_docs"
+                    />
+                    <label class="form-check-label" for="generate-docs">
+                      Generate documentation
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %} {{ super() }}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const uploadForm = document.getElementById("upload-form");
+    const progressContainer = document.querySelector(".progress-container");
+    const progressBar = document.querySelector(".progress-bar");
+    const progressStatus = document.querySelector(".progress-status");
+
+    if (uploadForm) {
+      uploadForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        // Show progress
+        progressContainer.style.display = "block";
+
+        // Simulate progress (in a real app, would use AJAX with progress events)
+        let progress = 0;
+        const interval = setInterval(function () {
+          progress += 5;
+          if (progress > 100) {
+            clearInterval(interval);
+            progressStatus.textContent = "Processing...";
+            // Submit the form for real
+            uploadForm.submit();
+            return;
+          }
+
+          progressBar.style.width = progress + "%";
+          progressBar.setAttribute("aria-valuenow", progress);
+          progressStatus.textContent =
+            progress < 100 ? "Uploading: " + progress + "%" : "Processing...";
+        }, 200);
+      });
+    }
+
+    // Apply advanced config options to both forms
+    const directoryForm = document.getElementById("directory-form");
+    const advancedCheckboxes = document.querySelectorAll(
+      '#advanced-config input[type="checkbox"]'
+    );
+
+    function applyAdvancedOptions(form) {
+      advancedCheckboxes.forEach((checkbox) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = checkbox.name;
+        input.value = checkbox.checked ? "true" : "false";
+        form.appendChild(input);
+      });
+    }
+
+    if (directoryForm) {
+      directoryForm.addEventListener("submit", function (e) {
+        applyAdvancedOptions(directoryForm);
+      });
+    }
+
+    if (uploadForm) {
+      uploadForm.addEventListener("submit", function (e) {
+        applyAdvancedOptions(uploadForm);
+      });
+    }
+  });
+</script>
+{% endblock %}

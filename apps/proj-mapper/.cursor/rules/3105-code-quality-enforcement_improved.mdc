@@ -1,0 +1,92 @@
+{
+  "description": "MUST enforce code quality checks WHEN code is committed TO maintain high standards and readability.",
+  "globs": [
+    "**/enforcement/**/*.py",
+    "**/quality/**/*.py",
+    "**/*code*/**/*.py",
+    "**/*",
+    "**/code/**/*.py",
+    "**/*quality*/**/*.py",
+    "**/*enforcement*/**/*.py"
+  ],
+  "version": "1.0.1",
+  "metadata": {
+    "rule_id": "3105-code-quality-enforcement",
+    "taxonomy": {
+      "category": "Python Implementation Standards",
+      "parent": "Python Implementation StandardsRule",
+      "ancestors": [
+        "Rule",
+        "Python Implementation StandardsRule"
+      ],
+      "children": [
+        "3106-code-quality-best-practices",
+        "3107-code-quality-metrics"
+      ]
+    },
+    "tags": [
+      "code-quality",
+      "python",
+      "standards",
+      "enforcement"
+    ],
+    "priority": "50",
+    "inherits": [
+      "000-context-awareness",
+      "001-ai-operating-rules"
+    ]
+  },
+  "overview": {
+    "purpose": "MUST enforce code quality checks to ensure that all Python code adheres to established standards and practices.",
+    "application": "SHOULD be applied during the code commit process to automatically assess code quality and provide feedback to developers.",
+    "importance": "This rule matters because maintaining high code quality enhances readability, reduces bugs, and promotes maintainability in the long term."
+  },
+  "code_quality_checks": {
+    "description": "This section outlines the mandatory checks that must be enforced to maintain code quality during development.",
+    "requirements": [
+      "MUST ensure all code follows PEP 8 style guidelines without exceptions.",
+      "MUST enforce the use of type hints for all function definitions, including those in third-party libraries.",
+      "MUST check for the presence of unit tests for all new features and bug fixes, ensuring at least 80% code coverage.",
+      "MUST validate that the code passes all defined linting checks, including flake8 and pylint, before allowing commits."
+    ]
+  },
+  "code_review_process": {
+    "description": "This section describes the requirements for conducting code reviews effectively to ensure high-quality code submissions.",
+    "requirements": [
+      "MUST require at least two reviewers for every code change, with one being a senior developer.",
+      "MUST ensure reviewers verify adherence to coding standards and best practices, documenting findings in the pull request.",
+      "SHOULD provide constructive feedback focusing on code clarity, maintainability, and performance improvements.",
+      "NEVER approve code that does not meet the established quality criteria, including failing to meet all mandatory checks."
+    ]
+  },
+  "automated_testing": {
+    "description": "This section specifies the requirements for implementing automated testing to ensure code reliability.",
+    "requirements": [
+      "MUST require that all code changes include corresponding unit tests that are comprehensive and cover edge cases.",
+      "MUST ensure all tests are run and pass successfully in the CI/CD pipeline before merging, with reports generated for review.",
+      "SHOULD implement coverage checks to ensure at least 80% test coverage across new code and maintain coverage over time.",
+      "NEVER allow deployment of code with failing tests, regardless of the urgency of the release."
+    ]
+  },
+  "example": {
+    "description": "code-quality-enforcement Example",
+    "code": "def example_function(param: int) -> str:\n    \"\"\"This function demonstrates adherence to code quality standards.\"\"\"\n    return str(param)\n",
+    "explanation": "This example demonstrates how to implement code-quality-enforcement according to the standards, including type hints and PEP 8 compliance."
+  },
+  "danger": {
+    "critical_violations": [
+      "NEVER allow commits that contain code without proper adherence to PEP 8 style guidelines.",
+      "NEVER merge any code changes that lack type hints in function definitions, including those in third-party libraries.",
+      "NEVER accept code submissions that do not include unit tests for newly introduced features, ensuring at least 80% coverage.",
+      "NEVER bypass linting checks for any committed code, including flake8 and pylint.",
+      "NEVER approve pull requests that do not have at least two reviewers verifying the code quality, with one being a senior developer."
+    ],
+    "specific_risks": [
+      "Failing to enforce PEP 8 style guidelines can lead to inconsistent code formatting, making it harder for teams to read and maintain the codebase.",
+      "Lack of type hints may result in runtime errors that are difficult to debug, as type mismatches won't be caught until code execution.",
+      "Without unit tests, new features may introduce bugs that go unnoticed until they are deployed, leading to increased maintenance costs and potential application failures.",
+      "Bypassing linting checks can allow poor coding practices to enter the codebase, increasing technical debt and reducing overall code quality.",
+      "Not having multiple reviewers might result in undetected issues in the code, leading to a higher likelihood of defects and reduced reliability of the software."
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "description": "MUST establish config-source-hierarchy WHEN managing configurations TO ensure consistency and clarity.",
+  "globs": [
+    "**/*config*/**",
+    "**/*source*/**",
+    "**/*",
+    "**/hierarchy/**",
+    "**/*hierarchy*/**",
+    "**/config/**",
+    "**/source/**"
+  ]
+}

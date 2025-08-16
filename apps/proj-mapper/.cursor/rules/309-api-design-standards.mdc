@@ -1,0 +1,148 @@
+---
+description: WHEN designing or implementing APIs TO ensure usability and maintainability you MUST follow these API design standards
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"design_principles": "17-45",
+"implementation_standards": "47-75",
+"versioning_requirements": "77-95"
+},
+"key_elements": {
+"principle_validation": "20-30",
+"implementation_validation": "50-60",
+"versioning_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: design_principles -> implementation_standards -> versioning_requirements. Validate against principle_validation before proceeding."
+}
+
+{
+"rule_name": "API Design Standards",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"designing APIs",
+"implementing endpoints",
+"managing versions",
+"ensuring consistency"
+],
+"priority": 5,
+"domain": "development"
+},
+
+"overview": {
+"description": "Defines comprehensive API design standards",
+"importance": "Well-designed APIs ensure system integration and usability"
+},
+
+"design_principles": {
+"interface_design": {
+"requirements": [
+"Design for consumers",
+"Keep interfaces simple",
+"Use clear naming",
+"Maintain consistency"
+],
+"validation": {"usable": true, "consistent": true}
+},
+"resource_modeling": {
+"requirements": [
+"Define clear resources",
+"Use proper methods",
+"Structure hierarchically",
+"Enable relationships"
+],
+"validation": {"modeled": true, "structured": true}
+},
+"error_handling": {
+"requirements": [
+"Use standard codes",
+"Provide clear messages",
+"Include error details",
+"Handle edge cases"
+],
+"validation": {"standardized": true, "clear": true}
+}
+},
+
+"implementation_standards": {
+"endpoint_design": {
+"requirements": [
+"Use RESTful patterns",
+"Follow conventions",
+"Enable filtering",
+"Support pagination"
+],
+"validation": {"restful": true, "conventional": true}
+},
+"security_requirements": {
+"requirements": [
+"Implement authentication",
+"Enforce authorization",
+"Validate inputs",
+"Rate limit requests"
+],
+"validation": {"secure": true, "protected": true}
+},
+"performance_standards": {
+"requirements": [
+"Optimize responses",
+"Cache effectively",
+"Minimize payload",
+"Handle load"
+],
+"validation": {"optimized": true, "efficient": true}
+}
+},
+
+"versioning_requirements": {
+"version_management": {
+"requirements": [
+"Use semantic versioning",
+"Maintain compatibility",
+"Document changes",
+"Support transitions"
+],
+"validation": {"versioned": true, "documented": true}
+},
+"deprecation_handling": {
+"requirements": [
+"Plan deprecations",
+"Notify consumers",
+"Provide alternatives",
+"Set timelines"
+],
+"validation": {"planned": true, "communicated": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER break compatibility",
+"NEVER skip authentication",
+"NEVER ignore security",
+"NEVER omit validation",
+"NEVER skip versioning",
+"NEVER ignore performance",
+"NEVER leave endpoints undocumented",
+"NEVER mix API styles"
+],
+"validation_rules": {
+"compatibility": {"maintained": true},
+"security": {"implemented": true},
+"validation": {"complete": true},
+"versioning": {"applied": true},
+"performance": {"optimized": true},
+"documentation": {"complete": true},
+"consistency": {"enforced": true},
+"standards": {"followed": true}
+}
+}
+}

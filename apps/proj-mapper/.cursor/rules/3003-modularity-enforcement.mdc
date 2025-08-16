@@ -1,0 +1,107 @@
+---
+description: MUST enforce modularity WHEN designing system architecture TO enhance code reusability.
+globs: ["**/ARCHITECTURE.md", "**/enforcement/**", "**/modularity/**", "**/docs/architecture/**", "**/design/**", "**/*enforcement*/**", "**/*modularity*/**"]
+---
+# modularity-enforcement
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3003-modularity-enforcement",
+  "taxonomy": {
+    "category": "Architecture and Design Rules",
+    "parent": "Architecture and Design RulesRule",
+    "ancestors": [
+      "Rule",
+      "Architecture and Design RulesRule"
+    ],
+    "children": [
+      "3004-modularity-best-practices",
+      "3005-modular-design-patterns"
+    ]
+  },
+  "tags": [
+    "modularity",
+    "design principles",
+    "software architecture",
+    "best practices"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST enforce modularity in system architecture TO improve code organization and facilitate easier maintenance.",
+  "application": "SHOULD be applied during the design phase of a project, ensuring that components are developed as independent and reusable modules.",
+  "importance": "This rule matters because enforcing modularity leads to a more scalable and adaptable system, reducing dependencies and enhancing collaboration among developers."
+}
+
+## modularity_structure
+
+{
+  "description": "Defines the structural requirements for maintaining modularity in system architecture.",
+  "requirements": [
+    "MUST define clear interfaces for each module, ensuring minimal dependencies between them.",
+    "MUST encapsulate module functionality to prevent external access to internal state.",
+    "MUST organize modules into distinct layers, such as presentation, application, and data layers."
+  ]
+}
+
+## module_interaction
+
+{
+  "description": "Outlines how modules should interact with each other to maintain modularity.",
+  "requirements": [
+    "MUST use well-defined APIs for communication between modules, avoiding direct calls to another module's internals.",
+    "SHOULD implement event-driven communication where appropriate to decouple modules.",
+    "NEVER allow circular dependencies between modules, as this can lead to tightly coupled architecture."
+  ]
+}
+
+## module_reusability
+
+{
+  "description": "Establishes guidelines for ensuring modules are reusable across different projects.",
+  "requirements": [
+    "MUST document module functionality and usage clearly to promote understanding and adoption.",
+    "SHOULD follow established design patterns to enhance module reusability.",
+    "MUST create a versioning strategy for modules to manage updates and compatibility effectively."
+  ]
+}
+
+<example>
+modularity-enforcement Example
+
+```python
+# Example for modularity-enforcement
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement modularity-enforcement according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER allow modules to access each other's internal state directly, as this violates encapsulation principles.",
+    "NEVER create circular dependencies between modules, as this leads to tightly coupled architecture and complicates maintenance.",
+    "NEVER neglect to define clear interfaces for each module, as this can result in unclear communication protocols and increased coupling.",
+    "NEVER ignore the separation of concerns by embedding multiple functionalities within a single module, as this undermines reusability.",
+    "NEVER fail to document module functionality, as this can lead to misuse and hinder other developers' understanding."
+  ],
+  "specific_risks": [
+    "Violating encapsulation can lead to unintended side effects when changes are made to module internals, increasing the risk of bugs.",
+    "Circular dependencies can create complex dependency chains that make it difficult to manage module lifecycle and deployment.",
+    "Undefined interfaces may result in modules that are incompatible with one another, leading to integration failures and increased development time.",
+    "Embedding multiple functionalities in one module can hinder code reusability, making it difficult to adapt modules for new projects.",
+    "Lack of documentation can cause developers to misinterpret module functionality, leading to incorrect implementation and wasted resources."
+  ]
+}
+</danger>

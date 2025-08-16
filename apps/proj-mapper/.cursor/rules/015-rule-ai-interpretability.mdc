@@ -1,0 +1,176 @@
+---
+description: WHEN creating rules for AI consumption TO ensure accurate algorithmic interpretation you MUST FORMAT rules with explicit directives
+globs: **/*.mdc
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"directive_standards": "17-35",
+"clarity_requirements": "37-55",
+"example_requirements": "57-75",
+"validation_rules": "77-95"
+},
+"key_elements": {
+"directive_patterns": "20-30",
+"clarity_patterns": "40-50",
+"validation_patterns": "80-90"
+},
+"ai_instructions": "Process sections in order: directive_standards -> clarity_requirements -> example_requirements. Always validate against validation_rules before proceeding."
+}
+
+{
+"rule_name": "Rule AI Interpretability",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"creating rules",
+"updating rule format",
+"ensuring AI interpretability",
+"validating rule structure"
+],
+"priority": 5,
+"domain": "meta-rules"
+},
+
+"overview": {
+"description": "Defines standards for formatting rules to ensure accurate AI interpretation",
+"importance": "Proper formatting ensures consistent and reliable rule application by AI systems"
+},
+
+"directive_standards": {
+"explicit_markers": {
+"requirements": [
+"MUST use explicit terms 'MUST', 'SHOULD', 'NEVER' for requirements",
+"MUST position directive terms at statement beginnings",
+"MUST maintain consistent directive usage throughout rules",
+"MUST separate directives into distinct, processable items"
+],
+"validation": {
+"terms_used": true,
+"position_correct": true,
+"consistency_maintained": true,
+"separation_clear": true
+}
+},
+"structure": {
+"requirements": [
+"MUST organize content in labeled sections",
+"MUST provide explicit, extractable metadata",
+"MUST use consistent heading hierarchy",
+"MUST format similar elements consistently"
+],
+"validation": {
+"sections_labeled": true,
+"metadata_present": true,
+"hierarchy_consistent": true,
+"formatting_consistent": true
+}
+}
+},
+
+"clarity_requirements": {
+"precision": {
+"requirements": [
+"MUST use specific, measurable terms",
+"MUST define ambiguous terms explicitly",
+"MUST provide compliance criteria",
+"MUST avoid multiple interpretations"
+],
+"validation": {
+"terms_specific": true,
+"definitions_clear": true,
+"criteria_provided": true,
+"interpretations_single": true
+}
+},
+"completeness": {
+"requirements": [
+"MUST cover both required and prohibited behaviors",
+"MUST specify edge cases and exceptions",
+"MUST define rule scope and limitations",
+"MUST provide application context"
+],
+"validation": {
+"coverage_complete": true,
+"edge_cases_handled": true,
+"scope_defined": true,
+"context_provided": true
+}
+}
+},
+
+"example_requirements": {
+"demonstration": {
+"requirements": [
+"MUST include correct application examples",
+"MUST annotate requirement implementations",
+"MUST provide contrasting incorrect examples",
+"MUST demonstrate edge case handling"
+],
+"validation": {
+"examples_included": true,
+"annotations_clear": true,
+"contrasts_provided": true,
+"edge_cases_shown": true
+}
+},
+"explanation": {
+"requirements": [
+"MUST explain requirement satisfaction",
+"MUST connect examples to directives",
+"MUST highlight decision rationale",
+"MUST demonstrate compliance explanation"
+],
+"validation": {
+"satisfaction_explained": true,
+"connections_clear": true,
+"rationale_provided": true,
+"explanation_demonstrated": true
+}
+}
+},
+
+"validation_rules": {
+"pre_application_checks": [
+"Directive terms are properly used",
+"Structure is consistently formatted",
+"Requirements are clearly specified",
+"Examples demonstrate application"
+],
+"validation_patterns": {
+"directives": {"proper": true, "consistent": true},
+"structure": {"formatted": true, "organized": true},
+"clarity": {"specific": true, "complete": true},
+"examples": {"demonstrated": true, "explained": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER use ambiguous language without directives",
+"NEVER mix directive styles within rules",
+"NEVER omit explicit compliance criteria",
+"NEVER use inconsistent formatting",
+"NEVER skip example annotations",
+"NEVER assume AI inference capabilities",
+"NEVER omit validation patterns",
+"NEVER ignore edge cases"
+],
+"validation_rules": {
+"language": {"explicit": true},
+"directives": {"consistent": true},
+"criteria": {"provided": true},
+"formatting": {"consistent": true},
+"examples": {"annotated": true},
+"inference": {"not_assumed": true},
+"validation": {"included": true},
+"edge_cases": {"handled": true}
+}
+}
+}

@@ -1,0 +1,98 @@
+---
+description: MUST establish config-source-hierarchy WHEN managing configurations TO ensure consistency and clarity.
+globs: ["**/*config*/**", "**/*source*/**", "**/*", "**/hierarchy/**", "**/*hierarchy*/**", "**/config/**", "**/source/**"]
+---
+# config-source-hierarchy
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3301-config-source-hierarchy",
+  "taxonomy": {
+    "category": "Configuration Management",
+    "parent": "Configuration ManagementRule",
+    "ancestors": [
+      "Rule",
+      "Configuration ManagementRule"
+    ],
+    "children": [
+      "3302-config-source-override",
+      "3303-config-source-default"
+    ]
+  },
+  "tags": [
+    "configuration",
+    "management",
+    "source",
+    "hierarchy"
+  ],
+  "priority": "50",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST establish a clear hierarchy for configuration sources to facilitate efficient management and retrieval of configuration data.",
+  "application": "SHOULD be applied when setting up or modifying configuration files, ensuring that the structure reflects the intended precedence and organization of sources.",
+  "importance": "This rule matters because a well-defined config-source hierarchy enhances maintainability, reduces conflicts, and improves clarity for developers, leading to better overall system stability."
+}
+
+## config_source_hierarchy
+
+{
+  "description": "This section outlines the essential structure and organization for configuration sources to maintain a logical hierarchy.",
+  "requirements": [
+    "MUST define parent and child relationships among configuration sources to establish a clear hierarchy.",
+    "MUST categorize configuration sources based on their roles and impact on the overall configuration management.",
+    "SHOULD utilize naming conventions that reflect the hierarchy and purpose of each configuration source.",
+    "NEVER allow circular dependencies between configuration sources, as this can lead to conflicts and ambiguity."
+  ]
+}
+
+## configuration_source_retrieval
+
+{
+  "description": "This section specifies how configuration data should be retrieved based on the established hierarchy.",
+  "requirements": [
+    "MUST implement priority rules for retrieving configuration data from the hierarchy, ensuring the most relevant source is prioritized.",
+    "SHOULD provide fallback mechanisms for configurations that are not explicitly defined in the hierarchy.",
+    "MUST document the retrieval process to facilitate understanding and troubleshooting by developers.",
+    "NEVER ignore the hierarchy when retrieving configuration sources, as this undermines the consistency of configuration management."
+  ]
+}
+
+<example>
+config-source-hierarchy Example
+
+```python
+# Example for config-source-hierarchy
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement config-source-hierarchy according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER create configuration sources without defining their parent-child relationships, as this leads to a flat structure that can cause ambiguity in source resolution.",
+    "NEVER introduce circular dependencies between configuration sources, as this creates conflicts that can result in unpredictable application behavior.",
+    "NEVER disregard the defined hierarchy when making changes to configuration sources, as this can lead to inconsistencies and confusion about priority.",
+    "NEVER allow multiple sources to claim the same priority level for configurations, as this can create conflicts and make it impossible to determine which configuration should take precedence.",
+    "NEVER omit documentation of the config-source hierarchy, as lack of clarity can lead to misconfigurations and difficulties in managing the configuration landscape."
+  ],
+  "specific_risks": [
+    "Failing to establish clear parent-child relationships may result in the application using incorrect or outdated configurations, leading to operational failures.",
+    "Circular dependencies can cause infinite loops during configuration resolution, resulting in crashes or severe performance degradation.",
+    "Ignoring the hierarchy during modifications can lead to unexpected behavior in applications due to misaligned configuration priorities.",
+    "Conflicting priorities among multiple sources can create a state where the application behaves unpredictably, making debugging and support challenging.",
+    "Without proper documentation, new team members may struggle to understand the configuration landscape, leading to errors and inefficiencies in managing system configurations."
+  ]
+}
+</danger>

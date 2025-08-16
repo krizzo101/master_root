@@ -1,0 +1,148 @@
+---
+description: WHEN designing or implementing database operations TO ensure data integrity and efficiency you MUST follow these database standards
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"data_principles": "17-45",
+"operation_standards": "47-75",
+"optimization_requirements": "77-95"
+},
+"key_elements": {
+"principle_validation": "20-30",
+"operation_validation": "50-60",
+"optimization_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: data_principles -> operation_standards -> optimization_requirements. Validate against principle_validation before proceeding."
+}
+
+{
+"rule_name": "Database Standards",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"designing schemas",
+"implementing queries",
+"managing data",
+"optimizing performance"
+],
+"priority": 5,
+"domain": "development"
+},
+
+"overview": {
+"description": "Defines comprehensive database standards",
+"importance": "Proper database design ensures data integrity and system performance"
+},
+
+"data_principles": {
+"schema_design": {
+"requirements": [
+"Normalize appropriately",
+"Define constraints",
+"Use proper types",
+"Maintain relationships"
+],
+"validation": {"normalized": true, "constrained": true}
+},
+"data_integrity": {
+"requirements": [
+"Enforce ACID properties",
+"Implement transactions",
+"Handle concurrency",
+"Prevent data loss"
+],
+"validation": {"consistent": true, "reliable": true}
+},
+"security_measures": {
+"requirements": [
+"Control access",
+"Encrypt sensitive data",
+"Audit operations",
+"Prevent injection"
+],
+"validation": {"secure": true, "protected": true}
+}
+},
+
+"operation_standards": {
+"query_design": {
+"requirements": [
+"Optimize queries",
+"Use indexing",
+"Handle pagination",
+"Prevent N+1"
+],
+"validation": {"optimized": true, "efficient": true}
+},
+"transaction_management": {
+"requirements": [
+"Define boundaries",
+"Handle rollbacks",
+"Manage deadlocks",
+"Ensure isolation"
+],
+"validation": {"managed": true, "isolated": true}
+},
+"connection_handling": {
+"requirements": [
+"Pool connections",
+"Handle timeouts",
+"Manage resources",
+"Monitor usage"
+],
+"validation": {"pooled": true, "monitored": true}
+}
+},
+
+"optimization_requirements": {
+"performance_tuning": {
+"requirements": [
+"Monitor query times",
+"Optimize indexes",
+"Cache effectively",
+"Profile operations"
+],
+"validation": {"tuned": true, "profiled": true}
+},
+"scaling_strategies": {
+"requirements": [
+"Plan for growth",
+"Implement sharding",
+"Enable replication",
+"Balance loads"
+],
+"validation": {"scalable": true, "distributed": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER store sensitive data unencrypted",
+"NEVER skip query optimization",
+"NEVER ignore indexing",
+"NEVER leave transactions open",
+"NEVER trust user input",
+"NEVER leak connections",
+"NEVER ignore deadlocks",
+"NEVER skip backups"
+],
+"validation_rules": {
+"encryption": {"implemented": true},
+"optimization": {"performed": true},
+"indexing": {"applied": true},
+"transactions": {"managed": true},
+"input": {"sanitized": true},
+"connections": {"pooled": true},
+"deadlocks": {"handled": true},
+"backups": {"configured": true}
+}
+}
+}

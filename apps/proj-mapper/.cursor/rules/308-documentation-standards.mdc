@@ -1,0 +1,316 @@
+---
+description: WHEN writing or maintaining documentation TO ensure clarity and completeness you MUST follow these documentation standards
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+{
+"sections": {
+"overview": "12-15",
+"documentation_principles": "17-45",
+"content_requirements": "47-115",
+"maintenance_guidelines": "117-135",
+"diagram_requirements": "137-180"
+},
+"key_elements": {
+"principle_validation": "20-30",
+"content_validation": "50-60",
+"maintenance_validation": "120-130",
+"diagram_validation": "140-160",
+"markdown_validation": "70-80",
+"code_example_validation": "90-100",
+"version_validation": "105-115"
+},
+"ai_instructions": "Process sections in order: documentation_principles -> content_requirements -> maintenance_guidelines -> diagram_requirements. Validate against principle_validation before proceeding."
+}
+
+{
+"rule_name": "Documentation Standards",
+"version": "1.4.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"writing documentation",
+"updating docs",
+"documenting code",
+"maintaining clarity",
+"creating diagrams",
+"formatting markdown",
+"managing documentation versions",
+"creating code examples"
+],
+"priority": 4,
+"domain": "development"
+},
+
+"overview": {
+"description": "Defines comprehensive documentation standards",
+"importance": "Clear documentation ensures maintainability and usability"
+},
+
+"documentation_principles": {
+"clarity_standards": {
+"requirements": [
+"Use clear language",
+"Maintain consistency",
+"Avoid jargon",
+"Include examples"
+],
+"validation": {"clear": true, "consistent": true}
+},
+"completeness_requirements": {
+"requirements": [
+"Cover all features",
+"Document edge cases",
+"Include error handling",
+"Provide context"
+],
+"validation": {"complete": true, "thorough": true}
+},
+"accessibility_guidelines": {
+"requirements": [
+"Structure logically",
+"Use proper formatting",
+"Enable navigation",
+"Support search",
+"Include visual representations",
+"Follow heading hierarchy"
+],
+"validation": {"accessible": true, "navigable": true}
+}
+},
+
+"content*requirements": {
+"code_documentation": {
+"requirements": [
+"Document public APIs",
+"Explain complex logic",
+"Note assumptions",
+"Include examples"
+],
+"validation": {"documented": true, "explained": true}
+},
+"system_documentation": {
+"requirements": [
+"Describe architecture",
+"Detail components",
+"Explain interactions",
+"Document setup",
+"Include system diagrams"
+],
+"validation": {"detailed": true, "comprehensive": true}
+},
+"user_documentation": {
+"requirements": [
+"Provide guides",
+"Include tutorials",
+"Document features",
+"Address common issues",
+"Use workflow diagrams"
+],
+"validation": {"helpful": true, "complete": true}
+},
+"documentation_organization": {
+"requirements": [
+"Create an index.md file for all documentation sets",
+"Include hyperlink references to all related documentation files in index.md",
+"Use descriptive link text that indicates content destination",
+"Add hyperlinks between files when referencing content from another file",
+"Maintain a clear hierarchy with the index.md as the entry point",
+"Group related documentation files in appropriate directories",
+"Update index.md when adding new documentation files"
+],
+"validation": {"organized": true, "linked": true},
+"index_file_example": "# Project Documentation\n\n## Overview\n\nThis documentation covers all aspects of the project.\n\n## Contents\n\n- [Installation Guide](mdc:installation.md)\n- [User Manual](mdc:user-manual.md)\n- [API Reference](mdc:api/reference.md)\n- [Troubleshooting](mdc:troubleshooting.md)\n\n## Architecture\n\nSee the [Architecture Overview](mdc:architecture/overview.md) for system design details."
+},
+"code_examples": {
+"requirements": [
+"Ensure all code examples are functional and tested",
+"Use consistent formatting and style across all examples",
+"Include comments explaining non-obvious code",
+"Show both basic and advanced usage patterns",
+"Provide complete examples that can be executed",
+"Include error handling in examples",
+"Indicate expected output where appropriate",
+"Verify code examples work with the documented version",
+"Use syntax highlighting for better readability"
+],
+"validation": {"functional": true, "consistent": true, "complete": true},
+"example": "`python\n# Example: Connecting to a database\ndef connect_to_database(host, username, password, db_name):\n    \"\"\"Connect to a MySQL database and return the connection object.\n    \n    Args:\n        host: Database server hostname\n        username: Database username\n        password: Database password\n        db_name: Name of the database to connect to\n        \n    Returns:\n        Connection object or None if connection failed\n        \n    Raises:\n        ConnectionError: If unable to connect to the database\n    \"\"\"\n    try:\n        # Create connection object\n        connection = mysql.connector.connect(\n            host=host,\n            user=username,\n            password=password,\n            database=db_name\n        )\n        \n        # Verify connection was successful\n        if connection.is_connected():\n            print(f\"Connected to MySQL database: {db_name}\")\n            return connection\n            \n    except mysql.connector.Error as e:\n        raise ConnectionError(f\"Failed to connect to database: {e}\")\n        \n    return None\n\n# Example usage:\n# conn = connect_to_database('localhost', 'user', 'password', 'my_database')\n`"
+},
+"versioning_strategy": {
+"requirements": [
+"Clearly indicate documentation version applicability",
+"Maintain separate documentation branches for major versions",
+"Use consistent version indicators across documentation",
+"Include version history in documentation",
+"Provide upgrade/migration guidance between versions",
+"Archive documentation for deprecated versions",
+"Link to latest stable version from all version-specific pages",
+"Indicate feature availability by version"
+],
+"validation": {"version_clear": true, "migration_path": true},
+"example": "# API Reference (v2.1)\n\n> **Version Compatibility**\n> - Introduced: v2.0\n> - Current: v2.1\n> - Deprecated: No\n>\n> See [migration guide](mdc:migration-v1-to-v2.md) for upgrading from v1.x\n\n## Endpoints\n\n### GET /users\n* Available since: v1.0\n\n### POST /users/batch\n* Available since: v2.0\n\* Enhanced in: v2.1 (added support for CSV import)\n\n## Version History\n\n| Version | Release Date | Major Changes |\n|---------|--------------|---------------|\n| 2.1 | 2023-06-15 | Added batch CSV import, improved error handling |\n| 2.0 | 2023-01-10 | Complete API redesign, new authentication system |\n| 1.5 | 2022-07-22 | Added rate limiting, deprecated XML responses |"
+},
+"markdown_formatting": {
+"requirements": [
+"Use logical heading hierarchy (h1, h2, h3, etc.)",
+"Add blank lines before and after headings",
+"Keep line lengths under 120 characters",
+"Use single space after # in headings",
+"Prefer dashes (-) for unordered lists",
+"Use double asterisks (\*\*) for bold text",
+"Use single underscores (*) for italic text",
+"Create small, focused tables with clear headers",
+"Include appropriate alt text for all images",
+"Separate paragraphs with a single blank line",
+"Use consistent indentation (4 spaces) for lists",
+"Add scope attributes to table headers in HTML"
+],
+"validation": {"structured": true, "consistent": true},
+"accessibility*considerations": {
+"headers": "Maintain a logical hierarchy without skipping levels",
+"images": "Always include descriptive alt text",
+"links": "Use meaningful link text that describes the destination",
+"tables": "Keep tables simple with proper headers and structure",
+"color": "Don't rely on color alone to convey information"
+},
+"example": "# Document Title\n\nShort introduction paragraph.\n\n## Section Heading\n\nContent with **bold text** and \_italic text*.\n\n- First list item\n- Second list item\n - Nested list item\n - Another nested item\n\n### Subsection\n\nMore content.\n\n| Column 1 | Column 2 |\n|----------|----------|\n| Data 1 | Data 2 |"
+}
+},
+
+"maintenance_guidelines": {
+"update_requirements": {
+"requirements": [
+"Keep docs current",
+"Review regularly",
+"Update examples",
+"Maintain versions",
+"Update diagrams",
+"Refresh hyperlinks",
+"Verify code examples still work",
+"Update version information"
+],
+"validation": {"current": true, "maintained": true}
+},
+"quality_assurance": {
+"requirements": [
+"Review accuracy",
+"Check completeness",
+"Validate examples",
+"Test links",
+"Verify diagram rendering",
+"Check heading structure",
+"Verify index.md is up-to-date",
+"Test code examples",
+"Validate version-specific content"
+],
+"validation": {"accurate": true, "validated": true}
+}
+},
+
+"diagram_requirements": {
+"mermaid_standards": {
+"requirements": [
+"Use Mermaid diagrams for visualizing complex concepts",
+"Include diagrams in markdown using proper syntax",
+"Follow colorblind-friendly design principles",
+"Ensure diagrams render properly in markdown previewers",
+"Keep diagrams simple and focused on key information"
+],
+"validation": {"implemented": true, "accessible": true}
+},
+"color_guidelines": {
+"requirements": [
+"Use colorblind-friendly color schemes",
+"Prefer light text on dark backgrounds",
+"Use muted blue/green/grey backgrounds over bright colors",
+"Avoid red/green color combinations",
+"Use patterns or shapes in addition to colors for differentiation"
+],
+"validation": {"accessible": true, "contrast": true},
+"color_palette": [
+"#BBBBBB (Grey)",
+"#56B4E9 (Sky Blue)",
+"#009E73 (Bluish Green)",
+"#0072B2 (Blue)",
+"#CC79A7 (Reddish Purple)",
+"#000000 (Black)",
+"#E69F00 (Orange)",
+"#F0E442 (Yellow)"
+]
+},
+"syntax_guidelines": {
+"requirements": [
+"Use triple backticks with mermaid language specifier",
+"Keep diagram code under 50 lines for readability",
+"Use descriptive node IDs and labels",
+"Maintain consistent arrow directions for flow diagrams",
+"Include a title or caption for each diagram"
+],
+"validation": {"formatted": true, "consistent": true},
+"example": "`mermaid\ngraph TD;\n  A[Start] --> B{Decision};\n  B -->|Yes| C[Process];\n  B -->|No| D[End];\n  C --> D;\n`"
+},
+"theme_configuration": {
+"requirements": [
+"Use theme directives for consistent styling",
+"Configure theme with colorblind-friendly settings",
+"Use proper contrast ratios between text and background",
+"Set background colors to darker shades",
+"Apply consistent styling across all diagrams"
+],
+"validation": {"themed": true, "accessible": true},
+"example": "`mermaid\n%%{init: {'theme': 'forest', 'themeVariables': {'primaryColor': '#0072B2', 'primaryTextColor': '#FFFFFF', 'primaryBorderColor': '#009E73', 'lineColor': '#56B4E9', 'secondaryColor': '#BBBBBB', 'tertiaryColor': '#000000'}}%%\ngraph LR;\n  A --> B;\n`"
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER leave public APIs undocumented",
+"NEVER skip example code",
+"NEVER ignore outdated docs",
+"NEVER omit error handling",
+"NEVER use unclear language",
+"NEVER skip version updates",
+"NEVER leave broken links",
+"NEVER ignore feedback",
+"NEVER use red/green color combinations in diagrams",
+"NEVER create diagrams without accessibility considerations",
+"NEVER omit visual representations of complex concepts",
+"NEVER use colors as the only means of conveying information",
+"NEVER skip heading levels in documentation structure",
+"NEVER use tables for layout purposes",
+"NEVER omit alt text for images",
+"NEVER use generic link text like 'click here' or 'read more'",
+"NEVER create documentation sets without an index.md file",
+"NEVER reference content from another file without a hyperlink",
+"NEVER provide broken or non-functional code examples",
+"NEVER omit version information from documentation",
+"NEVER mix features from different versions without clear indication"
+],
+"validation_rules": {
+"apis": {"documented": true},
+"examples": {"provided": true},
+"currency": {"maintained": true},
+"errors": {"documented": true},
+"clarity": {"ensured": true},
+"versions": {"updated": true},
+"links": {"valid": true, "descriptive": true},
+"feedback": {"addressed": true},
+"diagrams": {"accessible": true},
+"visuals": {"included": true},
+"colors": {"appropriate": true},
+"information": {"multimodal": true},
+"headings": {"hierarchical": true},
+"tables": {"properly_structured": true},
+"images": {"alt_text": true},
+"index": {"created": true},
+"cross_references": {"hyperlinked": true},
+"code_examples": {"functional": true},
+"version_information": {"provided": true},
+"feature_compatibility": {"clear": true}
+}
+}
+}

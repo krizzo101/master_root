@@ -1,0 +1,107 @@
+---
+description: MUST parse docstrings WHEN analyzing code TO provide accurate documentation insights
+globs: ["**/*", "**/parsing/**", "**/*parsing*/**", "**/docstring/**", "**/*docstring*/**"]
+---
+# docstring-parsing
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3405-docstring-parsing",
+  "taxonomy": {
+    "category": "Analysis Subsystem Standards",
+    "parent": "Analysis Subsystem StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Analysis Subsystem StandardsRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "docstring",
+    "parsing",
+    "analysis",
+    "standards"
+  ],
+  "priority": "80",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST facilitate the extraction and analysis of docstrings from code to enhance documentation accuracy and consistency.",
+  "application": "SHOULD be applied during code analysis and review processes, specifically when assessing the completeness and clarity of documentation embedded within the codebase.",
+  "importance": "This rule MATTERS because well-structured docstrings contribute significantly to the maintainability of code, improve collaboration among developers, and support better understanding of code functionalities."
+}
+
+## docstring_structure
+
+{
+  "description": "MUST ensure that docstrings follow a standardized format, including sections for parameters, return values, and exceptions.",
+  "requirements": [
+    "MUST include a brief summary at the beginning of the docstring.",
+    "MUST define each parameter with its type and a short description.",
+    "MUST describe the return type and value explicitly.",
+    "MUST list any exceptions raised and under what conditions."
+  ]
+}
+
+## docstring_content
+
+{
+  "description": "MUST verify that the content of docstrings is meaningful and informative, providing context for the code it documents.",
+  "requirements": [
+    "SHOULD avoid vague language and jargon that may confuse users.",
+    "MUST provide clear examples of usage where applicable.",
+    "SHOULD include references to related functions or modules when relevant.",
+    "NEVER include unnecessary information that does not enhance understanding."
+  ]
+}
+
+## docstring_validation
+
+{
+  "description": "MUST implement checks to validate the presence and correctness of docstrings within the codebase.",
+  "requirements": [
+    "MUST flag any functions or classes that lack a docstring.",
+    "MUST ensure that all docstrings are of an acceptable length, neither too short nor excessively verbose.",
+    "SHOULD support linting tools to automate the validation process.",
+    "MUST provide feedback on formatting issues in docstrings to encourage adherence to standards."
+  ]
+}
+
+<example>
+docstring-parsing Example
+
+```python
+# Example for docstring-parsing
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement docstring-parsing according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER allow docstrings to be completely absent from functions or classes, as this undermines documentation standards.",
+    "NEVER permit vague or ambiguous language in docstrings, which can lead to misunderstandings about code functionality.",
+    "NEVER include misleading or incorrect information in docstrings, which can result in incorrect usage of the documented code.",
+    "NEVER ignore the standardized format for docstrings, as this can lead to inconsistencies and confusion among developers.",
+    "NEVER validate docstrings without ensuring that they are present in all relevant code components, compromising thorough analysis."
+  ],
+  "specific_risks": [
+    "Violating the absence of docstrings can lead to a significant loss of context, making it difficult for developers to understand the purpose and functionality of the code.",
+    "Using vague language in docstrings increases the likelihood of errors during implementation, as developers may misinterpret the intended use of functions or classes.",
+    "Providing misleading information in docstrings can result in incorrect function calls, leading to runtime errors and increased debugging time.",
+    "Failing to adhere to a standardized docstring format can create confusion in documentation, making it harder for developers to find relevant information quickly.",
+    "Not validating the presence of docstrings may allow critical functions to go undocumented, resulting in gaps in knowledge transfer within teams and affecting code maintainability."
+  ]
+}
+</danger>

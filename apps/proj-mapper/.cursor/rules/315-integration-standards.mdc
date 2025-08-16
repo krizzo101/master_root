@@ -1,0 +1,148 @@
+---
+description: WHEN implementing system integrations TO ensure reliable and maintainable connections you MUST follow these integration standards
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"integration_principles": "17-45",
+"pattern_standards": "47-75",
+"implementation_requirements": "77-95"
+},
+"key_elements": {
+"principle_validation": "20-30",
+"pattern_validation": "50-60",
+"implementation_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: integration_principles -> pattern_standards -> implementation_requirements. Validate against principle_validation before proceeding."
+}
+
+{
+"rule_name": "Integration Standards",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"implementing integrations",
+"connecting systems",
+"managing interfaces",
+"ensuring reliability"
+],
+"priority": 5,
+"domain": "development"
+},
+
+"overview": {
+"description": "Defines comprehensive integration standards",
+"importance": "Proper integration ensures system reliability and maintainability"
+},
+
+"integration_principles": {
+"contract_design": {
+"requirements": [
+"Define interfaces",
+"Version contracts",
+"Document changes",
+"Ensure backwards compatibility"
+],
+"validation": {"defined": true, "versioned": true}
+},
+"error_handling": {
+"requirements": [
+"Handle failures",
+"Provide fallbacks",
+"Maintain consistency",
+"Enable recovery"
+],
+"validation": {"handled": true, "recoverable": true}
+},
+"security_measures": {
+"requirements": [
+"Authenticate requests",
+"Authorize access",
+"Encrypt data",
+"Audit interactions"
+],
+"validation": {"secured": true, "audited": true}
+}
+},
+
+"pattern_standards": {
+"synchronous_patterns": {
+"requirements": [
+"Implement request-response",
+"Handle timeouts",
+"Manage retries",
+"Ensure idempotency"
+],
+"validation": {"implemented": true, "reliable": true}
+},
+"asynchronous_patterns": {
+"requirements": [
+"Use message queues",
+"Handle ordering",
+"Ensure delivery",
+"Manage state"
+],
+"validation": {"managed": true, "ordered": true}
+},
+"event_driven_patterns": {
+"requirements": [
+"Define events",
+"Handle subscriptions",
+"Manage consistency",
+"Scale publishers"
+],
+"validation": {"defined": true, "consistent": true}
+}
+},
+
+"implementation_requirements": {
+"monitoring_standards": {
+"requirements": [
+"Track health",
+"Monitor performance",
+"Alert failures",
+"Analyze patterns"
+],
+"validation": {"monitored": true, "analyzed": true}
+},
+"testing_requirements": {
+"requirements": [
+"Test contracts",
+"Simulate failures",
+"Verify recovery",
+"Validate performance"
+],
+"validation": {"tested": true, "verified": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER skip authentication",
+"NEVER ignore failures",
+"NEVER break contracts",
+"NEVER skip monitoring",
+"NEVER ignore timeouts",
+"NEVER lose messages",
+"NEVER skip validation",
+"NEVER ignore versioning"
+],
+"validation_rules": {
+"authentication": {"implemented": true},
+"failures": {"handled": true},
+"contracts": {"maintained": true},
+"monitoring": {"configured": true},
+"timeouts": {"managed": true},
+"messages": {"delivered": true},
+"validation": {"performed": true},
+"versioning": {"implemented": true}
+}
+}
+}

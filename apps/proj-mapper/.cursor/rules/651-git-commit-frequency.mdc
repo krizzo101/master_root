@@ -1,0 +1,280 @@
+---
+description: WHEN committing code TO ensure proper development history you MUST follow THESE commit frequency guidelines
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 98 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"commit_timing": "17-45",
+"frequency_guidelines": "47-75",
+"atomic_commit_definition": "77-95",
+"verification": "97-98"
+},
+"key_elements": {
+"validation_rules": "20-40",
+"timing_requirements": "42-60",
+"atomic_requirements": "77-85"
+},
+"ai_instructions": "Process sections in order: commit_timing -> frequency_guidelines -> specific validation. Always validate against atomic_commit_definition before proceeding."
+}
+
+{
+"rule_name": "Git Commit Frequency",
+"version": "1.0.0",
+"ai_processing_priority": "high",
+"enhanced_metadata": {
+"activation_context": [
+"committing code changes",
+"managing development workflow",
+"ensuring code history quality",
+"maintaining repository health"
+],
+"priority": 4,
+"domain": "version-control"
+},
+
+"overview": {
+"description": "Defines standards for when and how often to commit code changes",
+"importance": "Proper commit frequency ensures traceable history and manageable code reviews"
+},
+
+"commit_timing": {
+"principles": {
+"atomic_commits": {
+"definition": "Each commit should represent one logical change",
+"validation": {
+"max_files": 10,
+"max_lines": 300,
+"single_purpose": true
+}
+},
+"work_completion": {
+"definition": "Commit when a logical unit of work is complete",
+"validation": {
+"tests_pass": true,
+"lints_pass": true,
+"builds_succeed": true
+}
+},
+"regular_intervals": {
+"definition": "Commit frequently to avoid large changesets",
+"validation": {
+"max_time_between": "4 hours",
+"max_uncommitted_time": "1 day"
+}
+}
+},
+
+"frequency_guidelines": {
+"development": {
+"active_coding": {
+"minimum": "Every 30-60 minutes",
+"maximum": "Every 4 hours",
+"validation": {
+"min_interval": "30 minutes",
+"max_interval": "4 hours",
+"working_hours": "8am-6pm"
+}
+},
+"feature_completion": {
+"minimum": "One commit per subtask",
+"maximum": "One commit per major feature",
+"validation": {
+"min_commits": 1,
+"max_commits": 10,
+"per_feature": true
+}
+}
+},
+"testing": {
+"unit_tests": {
+"frequency": "One commit per test suite",
+"validation": {
+"tests_included": true,
+"test_coverage": {"min": 80}
+}
+},
+"integration_tests": {
+"frequency": "One commit per integration scenario",
+"validation": {
+"integration_tests": true,
+"scenario_coverage": {"min": 90}
+}
+}
+},
+"refactoring": {
+"code_cleanup": {
+"frequency": "One commit per refactoring type",
+"validation": {
+"single_purpose": true,
+"max_files": 5
+}
+},
+"major_changes": {
+"frequency": "Multiple small commits",
+"validation": {
+"max_lines": 200,
+"incremental": true
+}
+}
+}
+},
+
+"atomic_commit_definition": {
+"characteristics": {
+"single_purpose": "One logical change per commit",
+"self_contained": "Commit must be complete and working",
+"independent": "No dependencies on future commits",
+"reversible": "Can be reverted without breaking"
+},
+"validation": {
+"purpose_check": {
+"max_types": 1,
+"max_scopes": 2
+},
+"completeness_check": {
+"builds": true,
+"tests": true,
+"lints": true
+},
+"dependency_check": {
+"future_refs": 0,
+"breaking_changes": 0
+},
+"revert_check": {
+"clean_revert": true,
+"no_cascade": true
+}
+}
+},
+
+"ai_specific_guidelines": {
+"commit_patterns": {
+"ai_generation": {
+"frequency": "One commit per AI-generated feature",
+"validation": {
+"ai_prefix": true,
+"review_required": true,
+"max_size": {
+"files": 5,
+"lines": 200
+}
+}
+},
+"ai_experiments": {
+"frequency": "Frequent small commits",
+"validation": {
+"branch_type": "ai-exp",
+"max_interval": "30 minutes",
+"max_size": {
+"files": 3,
+"lines": 100
+}
+}
+},
+"ai_refactoring": {
+"frequency": "One commit per refactoring pattern",
+"validation": {
+"pattern_scope": true,
+"max_files": 5,
+"review_required": true
+}
+}
+},
+"stashing_guidelines": {
+"when_to_stash": [
+"Before AI generation",
+"Before experimental changes",
+"Before switching context"
+],
+"validation": {
+"stash_required": {
+"ai_generation": true,
+"context_switch": true,
+"experimental": true
+},
+"max_stash_time": "4 hours"
+}
+}
+},
+
+"verification": {
+"pre_commit_checks": [
+"Changes are atomic and logical",
+"Tests and lints pass",
+"No incomplete features",
+"Proper scope and size",
+"AI review if applicable"
+],
+"validation_rules": {
+"atomic_changes": {
+"max_files": 10,
+"max_lines": 300,
+"single_purpose": true
+},
+"quality_checks": {
+"tests": {"status": "pass"},
+"lint": {"status": "pass"},
+"build": {"status": "success"}
+},
+"completeness": {
+"no_todo": true,
+"no_incomplete": true,
+"documentation": true
+}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER commit broken code",
+"NEVER commit incomplete features",
+"NEVER delay commits beyond 4 hours",
+"NEVER mix unrelated changes",
+"NEVER commit without review for AI changes",
+"NEVER commit large changesets",
+"NEVER skip tests or linting",
+"NEVER commit directly to protected branches"
+],
+"validation_rules": {
+"broken_code": {
+"builds": true,
+"tests": true,
+"required": true
+},
+"incomplete_features": {
+"pattern": "(TODO|FIXME|WIP)",
+"allowed": false
+},
+"delayed_commits": {
+"max_time": "4 hours",
+"enforced": true
+},
+"mixed_changes": {
+"max_types": 1,
+"max_scopes": 2
+},
+"ai_changes": {
+"review_required": true,
+"prefix_required": true
+},
+"large_changes": {
+"max_files": 10,
+"max_lines": 300
+},
+"quality_checks": {
+"skip_tests": false,
+"skip_lint": false
+},
+"protected_branches": {
+"direct_commit": false,
+"branches": ["main", "develop"]
+}
+}
+}
+}

@@ -1,0 +1,105 @@
+---
+description: MUST calculate confidence levels WHEN mapping relationships TO ensure data accuracy and reliability.
+globs: ["**/relationship/**", "**/*relationship*/**", "**/*", "**/confidence/**", "**/calculation/**", "**/*calculation*/**", "**/*confidence*/**"]
+---
+# relationship-confidence-calculation
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3503-relationship-confidence-calculation",
+  "taxonomy": {
+    "category": "Relationship Mapping Standards",
+    "parent": "Relationship Mapping StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Relationship Mapping StandardsRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "relationship",
+    "confidence",
+    "calculation",
+    "mapping",
+    "standards"
+  ],
+  "priority": "85",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST define a systematic approach to calculating confidence levels in relationship mapping TO enhance the reliability of data interpretations.",
+  "application": "SHOULD be applied whenever relationships are established or modified within the system, utilizing predefined algorithms that assess the strength and reliability of these relationships.",
+  "importance": "This rule matters because accurate confidence calculations directly impact the decision-making processes, ensuring that the AI assistant provides trustworthy insights and recommendations based on relational data."
+}
+
+## confidence_calculation_methodology
+
+{
+  "description": "Details the methodology for calculating relationship confidence levels based on defined parameters.",
+  "requirements": [
+    "MUST utilize a scoring system that evaluates relationship attributes such as frequency of interaction, shared interests, and historical collaboration.",
+    "SHOULD apply weights to each attribute based on their relevance to the specific relationship context.",
+    "MUST ensure that the total confidence score falls within a predefined range (e.g., 0 to 100) for consistency."
+  ]
+}
+
+## data_sources
+
+{
+  "description": "Identifies the data sources that are required for accurate confidence level calculations.",
+  "requirements": [
+    "MUST aggregate data from user interactions, feedback, and historical relationship data.",
+    "SHOULD include external data sources where applicable, such as social media interactions or professional networks.",
+    "MUST ensure data integrity and relevance by regularly updating the sources used for calculation."
+  ]
+}
+
+## confidence_level_thresholds
+
+{
+  "description": "Establishes thresholds for interpreting confidence levels and their implications.",
+  "requirements": [
+    "MUST define specific thresholds (e.g., low, medium, high) that correlate with actionable insights based on confidence scores.",
+    "SHOULD provide guidelines on how to handle relationships that fall below the minimum acceptable threshold.",
+    "NEVER disregard relationships with low confidence without further investigation, as they may still hold potential value."
+  ]
+}
+
+<example>
+relationship-confidence-calculation Example
+
+```python
+# Example for relationship-confidence-calculation
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement relationship-confidence-calculation according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER calculate confidence levels without incorporating all relevant data sources, as this will lead to inaccurate assessments.",
+    "NEVER ignore the predefined scoring system when evaluating relationship attributes, which can result in inconsistent confidence scores.",
+    "NEVER allow confidence scores to fall outside the established range (0 to 100), as this compromises the reliability of the relationship mapping.",
+    "NEVER overlook low-confidence relationships without conducting a detailed analysis, as valuable insights may be missed.",
+    "NEVER apply uniform weights to all relationship attributes, as this can distort the confidence calculation based on context."
+  ],
+  "specific_risks": [
+    "Inaccurate confidence calculations can lead to misguided decisions, causing the AI assistant to provide users with unreliable insights.",
+    "Ignoring relevant data sources may result in a failure to identify key relationships, potentially undermining the effectiveness of the system.",
+    "Presenting confidence scores that fall outside the defined range can confuse users and diminish trust in the system's assessments.",
+    "Neglecting low-confidence relationships may cause missed opportunities for engagement or collaboration that could be beneficial.",
+    "Uniform weighting can misrepresent the significance of certain attributes, leading to a miscalculation of relationship strengths."
+  ]
+}
+</danger>

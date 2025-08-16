@@ -1,0 +1,107 @@
+---
+description: MUST define extension points WHEN designing architecture TO enhance system flexibility.
+globs: ["**/*extension*/**", "**/extension/**", "**/*point*/**", "**/point/**", "**/*design*/**", "**/docs/architecture/**", "**/design/**", "**/ARCHITECTURE.md"]
+---
+# extension-point-design
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3004-extension-point-design",
+  "taxonomy": {
+    "category": "Architecture and Design Rules",
+    "parent": "Architecture and Design RulesRule",
+    "ancestors": [
+      "Rule",
+      "Architecture and Design RulesRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "extension-point",
+    "design",
+    "architecture",
+    "best-practices"
+  ],
+  "priority": "70",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST define extension points to facilitate modular architecture that enables the integration of additional features without extensive reconfiguration.",
+  "application": "SHOULD be applied during the architecture design phase WHEN identifying areas of the system that may require future enhancements or integrations, ensuring that these points are well-documented and easily accessible.",
+  "importance": "This rule matters because it supports long-term maintainability and scalability of the system, allowing for easier updates and adaptability to changing requirements without compromising existing functionality."
+}
+
+## extension_points
+
+{
+  "description": "This section outlines the requirements for defining extension points within the architecture to ensure flexibility and modularity.",
+  "requirements": [
+    "MUST identify and document all potential extension points during the architecture design phase.",
+    "MUST ensure that each extension point has a clear interface definition to facilitate integration.",
+    "SHOULD provide guidelines on how to implement extensions to maintain consistency across the codebase.",
+    "MUST include versioning information for each extension point to manage compatibility effectively."
+  ]
+}
+
+## modularity_guidelines
+
+{
+  "description": "This section provides guidelines on maintaining modularity through well-defined extension points.",
+  "requirements": [
+    "MUST ensure that extension points do not introduce tight coupling between components.",
+    "SHOULD promote the use of design patterns that support modular architecture, such as the Strategy or Observer patterns.",
+    "MUST validate that extensions can operate independently and do not rely on internal states of the main system components.",
+    "NEVER allow extension points to expose sensitive system internals that could compromise security or integrity."
+  ]
+}
+
+## documentation_standards
+
+{
+  "description": "This section specifies the documentation standards for extension points to ensure clarity and ease of use.",
+  "requirements": [
+    "MUST provide comprehensive documentation for each extension point, including purpose, usage examples, and potential pitfalls.",
+    "SHOULD include diagrams or visual representations to illustrate the relationship between extension points and the main architecture.",
+    "MUST keep documentation updated with each modification to the extension points to prevent discrepancies.",
+    "NEVER assume that users will understand the context of an extension point without explicit documentation."
+  ]
+}
+
+<example>
+extension-point-design Example
+
+```python
+# Example for extension-point-design
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement extension-point-design according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER define extension points without a clear interface specification.",
+    "NEVER allow extension points to depend on internal implementations of the main system components.",
+    "NEVER neglect to document the purpose and usage of each extension point.",
+    "NEVER create extension points that introduce tight coupling between components.",
+    "NEVER expose sensitive data or system internals through extension points."
+  ],
+  "specific_risks": [
+    "Violating the rule by not providing a clear interface can lead to integration challenges, making it difficult for developers to implement extensions without breaking functionality.",
+    "Dependency on internal implementations can cause extensions to fail when the main system is updated, leading to system instability and increased maintenance costs.",
+    "Lack of documentation can result in misuse of extension points, causing confusion among developers and potential errors in implementation.",
+    "Tight coupling introduced through poorly designed extension points can hinder the system's modularity, making future enhancements more complex and time-consuming.",
+    "Exposing sensitive data through extension points can lead to security vulnerabilities, putting the entire system at risk of unauthorized access and data breaches."
+  ]
+}
+</danger>

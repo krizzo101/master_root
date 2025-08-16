@@ -1,0 +1,45 @@
+[03/30/25 05:33:43] INFO     Analyzing code in: test_project/src
+[03/30/25 05:33:43] INFO     Analyzing documentation in: test_project/docs
+[03/30/25 05:33:43] INFO     Using code analyzers: python
+[03/30/25 05:33:43] INFO     Using doc analyzers: markdown
+[03/30/25 05:33:43] INFO     Found 0 code elements and 0 documentation elements
+[03/30/25 05:33:43] INFO     Found 0 relationships
+[03/30/25 05:33:43] INFO     Results saved to: relationships.json
+[03/30/25 05:33:43] INFO     Detected 0 relationships with confidence >= 0.5
+[03/30/25 05:33:43] INFO     Results saved to: relationships.json
+[03/30/25 05:43:03] INFO     Analyzing code in: better_test/code
+[03/30/25 05:43:03] INFO     Analyzing documentation in: better_test/docs
+[03/30/25 05:43:03] INFO     Using code analyzers: python
+[03/30/25 05:43:03] INFO     Using doc analyzers: markdown
+[03/30/25 05:43:03] INFO     Found 0 code elements and 0 documentation elements
+[03/30/25 05:43:03] INFO     Found 0 relationships
+[03/30/25 05:43:03] INFO     Results saved to: better_relationships.json
+[03/30/25 05:43:03] INFO     Detected 0 relationships with confidence >= 0.5
+[03/30/25 05:43:03] INFO     Results saved to: better_relationships.json
+[03/30/25 05:43:29] INFO     Analyzing code in: better_test/code
+[03/30/25 05:43:29] INFO     Analyzing documentation in: better_test/docs
+[03/30/25 05:43:29] INFO     Using code analyzers: python
+[03/30/25 05:43:29] INFO     Using doc analyzers: markdown
+[03/30/25 05:43:29] INFO     Found 0 code elements and 0 documentation elements
+[03/30/25 05:43:29] INFO     Found 0 relationships
+[03/30/25 05:43:29] INFO     Results saved to: better_relationships.json
+[03/30/25 05:43:29] INFO     Detected 0 relationships with confidence >= 0.5
+[03/30/25 05:43:29] INFO     Results saved to: better_relationships.json
+[03/30/25 05:43:53] INFO     Analyzing code in: ./better_test/code
+[03/30/25 05:43:53] INFO     Analyzing documentation in: ./better_test/docs
+[03/30/25 05:43:53] INFO     Using code analyzers: python
+[03/30/25 05:43:53] INFO     Using doc analyzers: markdown
+[03/30/25 05:43:53] INFO     Found 0 code elements and 0 documentation elements
+[03/30/25 05:43:53] INFO     Found 0 relationships
+[03/30/25 05:43:53] INFO     Results saved to: better_relationships.json
+[03/30/25 05:43:53] INFO     Detected 0 relationships with confidence >= 0.5
+[03/30/25 05:43:53] INFO     Results saved to: better_relationships.json
+[03/30/25 05:44:11] INFO     Analyzing code in: examples/demo_project
+[03/30/25 05:44:11] INFO     Analyzing documentation in: examples/demo_project
+[03/30/25 05:44:11] INFO     Using code analyzers: python
+[03/30/25 05:44:11] INFO     Using doc analyzers: markdown
+[03/30/25 05:44:11] INFO     Found 0 code elements and 0 documentation elements
+[03/30/25 05:44:11] INFO     Found 0 relationships
+[03/30/25 05:44:11] INFO     Results saved to: example_relationships.json
+[03/30/25 05:44:11] INFO     Detected 0 relationships with confidence >= 0.5
+[03/30/25 05:44:11] INFO     Results saved to: example_relationships.json

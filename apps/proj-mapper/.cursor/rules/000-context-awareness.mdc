@@ -1,0 +1,190 @@
+---
+description: WHEN processing requests TO ensure continuity and relevance you MUST MAINTAIN comprehensive context awareness
+globs: **/*
+alwaysApply: false
+---
+{
+"rule_name": "Context Awareness",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"processing user requests",
+"maintaining conversation state",
+"exploring workspace",
+"tracking temporal context"
+],
+"priority": 5,
+"domain": "meta-rules"
+},
+
+"overview": {
+"description": "Defines requirements for maintaining comprehensive context awareness during interactions",
+"importance": "Context awareness ensures continuity, relevance, and effectiveness of responses"
+},
+
+"workspace_awareness": {
+"exploration_requirements": {
+"directory_scanning": {
+"required": true,
+"depth": "complete",
+"frequency": "before_each_response"
+},
+"file_examination": {
+"check_existence": true,
+"read_relevant_portions": true,
+"understand_structure": true
+},
+"validation": {
+"workspace_checked": true,
+"relevant_files_found": true,
+"context_understood": true
+}
+},
+"file_map_handling": {
+"requirements": [
+"Check first 5 lines for file map presence",
+"Look for FILE_MAP_BEGIN and FILE_MAP_END tags",
+"Parse and validate file map structure if present",
+"Follow AI instructions in file map",
+"Use specified line ranges for targeted reading",
+"Read rules files in their entirety"
+],
+"validation": {
+"map_checked": true,
+"structure_valid": true,
+"instructions_followed": true
+}
+},
+"state_tracking": {
+"elements": [
+"Open files",
+"Recent modifications",
+"Current directory",
+"Active branches"
+],
+"validation": {
+"state_current": true,
+"changes_tracked": true
+}
+}
+},
+
+"conversation_tracking": {
+"history_management": {
+"requirements": [
+"Maintain full conversation context",
+"Track decision points and rationale",
+"Remember user preferences",
+"Reference previous interactions"
+],
+"validation": {
+"context_maintained": true,
+"decisions_tracked": true,
+"preferences_remembered": true
+}
+},
+"state_persistence": {
+"elements": [
+"Current task progress",
+"Pending actions",
+"Completed steps",
+"User confirmations"
+],
+"validation": {
+"progress_tracked": true,
+"actions_monitored": true,
+"completions_verified": true
+}
+},
+"context_switching": {
+"requirements": [
+"Preserve context during switches",
+"Restore relevant state",
+"Maintain task continuity"
+],
+"validation": {
+"context_preserved": true,
+"state_restored": true,
+"continuity_maintained": true
+}
+}
+},
+
+"temporal_awareness": {
+"time_tracking": {
+"elements": [
+"Session duration",
+"Last interaction time",
+"Action timestamps",
+"Scheduled tasks"
+],
+"validation": {
+"time_tracked": true,
+"duration_monitored": true
+}
+},
+"state_freshness": {
+"requirements": [
+"Verify recent file states",
+"Check for external changes",
+"Update stale information"
+],
+"validation": {
+"state_current": true,
+"changes_detected": true,
+"updates_applied": true
+}
+},
+"expiration_handling": {
+"requirements": [
+"Identify expired states",
+"Refresh outdated context",
+"Clear invalid cache"
+],
+"validation": {
+"expiration_checked": true,
+"context_refreshed": true,
+"cache_managed": true
+}
+}
+},
+
+"context_validation": {
+"pre_response_checks": [
+"Workspace state is current",
+"Conversation history is complete",
+"Temporal context is valid",
+"File Maps are processed"
+],
+"validation_rules": {
+"workspace": {"current": true, "explored": true},
+"conversation": {"complete": true, "tracked": true},
+"temporal": {"valid": true, "fresh": true},
+"file_maps": {"processed": true, "followed": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER assume workspace state without verification",
+"NEVER ignore conversation history",
+"NEVER skip temporal context checks",
+"NEVER bypass File Map processing",
+"NEVER lose track of task progress",
+"NEVER ignore state changes",
+"NEVER assume context freshness",
+"NEVER skip validation steps"
+],
+"validation_rules": {
+"workspace": {"verified": true},
+"history": {"maintained": true},
+"temporal": {"checked": true},
+"file_maps": {"processed": true},
+"progress": {"tracked": true},
+"changes": {"monitored": true},
+"freshness": {"verified": true},
+"validation": {"complete": true}
+}
+}
+}

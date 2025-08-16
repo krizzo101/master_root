@@ -1,0 +1,111 @@
+---
+description: MUST define system boundaries WHEN designing architecture TO ensure clear integration points.
+globs: ["**/*boundary*/**", "**/*system*/**", "**/boundary/**", "**/system/**", "**/*definition*/**", "**/docs/architecture/**", "**/design/**", "**/definition/**", "**/ARCHITECTURE.md"]
+---
+# system-boundary-definition
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3005-system-boundary-definition",
+  "taxonomy": {
+    "category": "Architecture and Design Rules",
+    "parent": "Architecture and Design RulesRule",
+    "ancestors": [
+      "Rule",
+      "Architecture and Design RulesRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "system boundary",
+    "architecture",
+    "design",
+    "requirements",
+    "integration"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST define the system boundaries to establish clear demarcation between system components and external entities.",
+  "application": "SHOULD be applied during the initial design phase and whenever changes to the system architecture occur, ensuring all stakeholders understand the limits of the system's functionality.",
+  "importance": "This rule matters as it facilitates effective integration, communication, and management of system components, reducing potential conflicts and misunderstandings in development and operational phases."
+}
+
+## system_boundary_definition
+
+{
+  "description": "This section outlines the key components and considerations for defining system boundaries within architectural design.",
+  "requirements": [
+    "MUST identify all system components and their interactions to delineate the boundaries effectively.",
+    "MUST specify external entities that interface with the system, including data sources, user interfaces, and third-party services.",
+    "SHOULD document assumptions and constraints related to the system boundaries to clarify design decisions.",
+    "MUST ensure that boundary definitions are reviewed and updated regularly as system architecture evolves.",
+    "NEVER assume implicit boundaries; all definitions must be explicitly stated to avoid ambiguity."
+  ]
+}
+
+## boundary_integration
+
+{
+  "description": "This section focuses on the integration points between the defined system boundaries and external systems.",
+  "requirements": [
+    "MUST define integration protocols and data formats for all interactions across the boundaries.",
+    "SHOULD assess potential security implications for each integration point and document mitigation strategies.",
+    "MUST include error handling procedures for interactions crossing system boundaries to ensure system resilience.",
+    "SHOULD evaluate the performance impact of boundary interactions and optimize as necessary.",
+    "NEVER overlook the need for clear documentation of integration logic to facilitate future development and maintenance."
+  ]
+}
+
+## stakeholder_communication
+
+{
+  "description": "This section emphasizes the importance of communicating system boundaries to all stakeholders involved in the project.",
+  "requirements": [
+    "MUST disseminate boundary definitions to all project stakeholders to ensure a shared understanding.",
+    "SHOULD hold regular meetings to discuss boundary implications and gather feedback from stakeholders.",
+    "MUST include boundary definitions in project documentation and make them easily accessible to all team members.",
+    "SHOULD encourage stakeholder involvement in boundary reviews to align expectations and requirements.",
+    "NEVER assume that stakeholders will infer system boundaries without explicit communication."
+  ]
+}
+
+<example>
+system-boundary-definition Example
+
+```python
+# Example for system-boundary-definition
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement system-boundary-definition according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER neglect to explicitly define all external entities that interact with the system, leading to potential integration failures.",
+    "NEVER assume that previous definitions of system boundaries are still valid without validation during architectural changes.",
+    "NEVER use vague language or ambiguous terms when describing system boundaries, which can cause misunderstandings among stakeholders.",
+    "NEVER overlook the necessity of regular reviews and updates of boundary definitions, risking outdated or incorrect boundary delineations.",
+    "NEVER omit documentation of assumptions related to system boundaries, as this can lead to misinterpretation of the system's functionality."
+  ],
+  "specific_risks": [
+    "Violating this rule may result in integration failures, where the system cannot communicate effectively with external services, causing downtime or data loss.",
+    "Failure to define boundaries may lead to security vulnerabilities, as external entities might access system components not intended for public interaction.",
+    "Not documenting assumptions can lead to inconsistent interpretations among team members, resulting in development errors and increased rework.",
+    "Regularly ignoring boundary reviews can result in a system that is misaligned with business needs, leading to inefficiencies and increased costs.",
+    "Ambiguous boundary definitions can confuse stakeholders, leading to misaligned expectations and potential project delays due to miscommunication."
+  ]
+}
+</danger>

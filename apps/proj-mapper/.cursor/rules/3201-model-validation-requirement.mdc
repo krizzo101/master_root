@@ -1,0 +1,102 @@
+---
+description: MUST validate models WHEN defining data structures TO ensure data integrity and compliance.
+globs: ["**/*", "**/model/**", "**/requirement/**", "**/*validation*/**", "**/validation/**", "**/*model*/**", "**/*requirement*/**"]
+---
+# model-validation-requirement
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3201-model-validation-requirement",
+  "taxonomy": {
+    "category": "Data Model Standards",
+    "parent": "Data Model StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Data Model StandardsRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "model validation",
+    "data integrity",
+    "standard compliance"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "The purpose of this rule is to ensure that all data models undergo a validation process to verify their structure, content, and compliance with established standards.",
+  "application": "This rule MUST be applied during the design and development phases of data models. It SHOULD be revisited whenever changes are made to the model to maintain data integrity and compliance.",
+  "importance": "This rule is crucial as it helps prevent data-related issues by ensuring that models are accurate and reliable, thereby supporting the overall integrity of the system and reducing the risk of errors in data processing."
+}
+
+## validation_process
+
+{
+  "description": "This section outlines the mandatory steps involved in validating data models to ensure they meet specified criteria.",
+  "requirements": [
+    "MUST define validation criteria for each data model based on business rules and data standards.",
+    "MUST perform a structural validation to check the model's schema for compliance with defined standards.",
+    "MUST ensure that all required fields are present and correctly typed within the data model."
+  ]
+}
+
+## error_handling
+
+{
+  "description": "This section specifies how to handle validation errors that may arise during the model validation process.",
+  "requirements": [
+    "MUST log all validation errors with detailed descriptions to facilitate debugging and fixing.",
+    "MUST provide user-friendly error messages that clearly indicate the nature of the validation failure.",
+    "SHOULD implement a mechanism to prevent the deployment of models that do not pass validation checks."
+  ]
+}
+
+## validation_reporting
+
+{
+  "description": "This section describes the reporting requirements following the validation process.",
+  "requirements": [
+    "MUST generate a validation report summarizing the results of the validation process, including passed and failed checks.",
+    "SHOULD include recommendations for resolving any identified issues in the validation report.",
+    "MUST ensure that the validation report is accessible to all stakeholders involved in data model development."
+  ]
+}
+
+<example>
+model-validation-requirement Example
+
+```python
+# Example for model-validation-requirement
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement model-validation-requirement according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER skip the validation process for any data model, as this compromises data integrity and compliance.",
+    "NEVER allow unvalidated models to be deployed into production environments, as this can lead to critical system failures.",
+    "NEVER ignore validation error logs; failing to address these logs can result in unresolved data issues persisting in the system.",
+    "NEVER assume that a model is valid without conducting the required structural validation checks, as this increases the risk of data corruption."
+  ],
+  "specific_risks": [
+    "Deploying unvalidated models can cause data corruption, leading to inaccurate reporting and decision-making.",
+    "Ignoring validation errors can result in severe system malfunctions, affecting user trust and operational efficiency.",
+    "Using outdated validation criteria can introduce compliance issues, potentially resulting in legal ramifications or penalties.",
+    "Bypassing necessary validation checks can lead to security vulnerabilities, exposing sensitive data to unauthorized access.",
+    "Failure to log and address validation errors can create a backlog of unresolved issues, complicating future development and maintenance efforts."
+  ]
+}
+</danger>

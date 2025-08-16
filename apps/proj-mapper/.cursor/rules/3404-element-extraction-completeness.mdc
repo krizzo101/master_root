@@ -1,0 +1,106 @@
+---
+description: MUST ensure element extraction WHEN analyzing data TO guarantee analysis accuracy and completeness.
+globs: ["**/*extraction*/**", "**/*", "**/completeness/**", "**/extraction/**", "**/*completeness*/**", "**/*element*/**", "**/element/**"]
+---
+# element-extraction-completeness
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3404-element-extraction-completeness",
+  "taxonomy": {
+    "category": "Analysis Subsystem Standards",
+    "parent": "Analysis Subsystem StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Analysis Subsystem StandardsRule"
+    ],
+    "children": []
+  },
+  "tags": [
+    "element-extraction",
+    "data-completeness",
+    "analysis-quality"
+  ],
+  "priority": "50",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST ensure the completeness of element extraction during data analysis to provide accurate and reliable insights.",
+  "application": "SHOULD be applied when performing any data extraction operations, especially when the integrity of the extracted elements impacts the overall analysis results.",
+  "importance": "This rule is critical as incomplete element extraction can lead to flawed interpretations and decisions, undermining the effectiveness of the data analysis process."
+}
+
+## element_extraction_requirements
+
+{
+  "description": "Requirements for ensuring the completeness of element extraction during data analysis.",
+  "requirements": [
+    "MUST identify all relevant elements in the data source prior to extraction.",
+    "MUST validate the completeness of extracted elements against predefined criteria.",
+    "SHOULD implement checks to verify that no essential elements are omitted during the extraction process.",
+    "MUST document any assumptions made during the extraction that could affect completeness."
+  ]
+}
+
+## element_extraction_verification
+
+{
+  "description": "Procedures for verifying the accuracy and completeness of extracted elements.",
+  "requirements": [
+    "MUST conduct a post-extraction review to confirm all elements have been successfully extracted.",
+    "SHOULD use automated tools to compare extracted elements against expected outputs for completeness.",
+    "MUST provide a report detailing the completeness status of the extraction process, highlighting any discrepancies.",
+    "NEVER assume completeness without performing thorough validation checks on extracted elements."
+  ]
+}
+
+## element_extraction_documentation
+
+{
+  "description": "Guidelines for documenting the element extraction process to support reproducibility and accuracy.",
+  "requirements": [
+    "MUST maintain detailed records of the extraction methods used and the elements targeted.",
+    "SHOULD include versioning for extraction procedures to track changes over time.",
+    "MUST ensure documentation is accessible and understandable for future reference by analysts.",
+    "NEVER omit details regarding the selection criteria used for determining element relevance."
+  ]
+}
+
+<example>
+element-extraction-completeness Example
+
+```python
+# Example for element-extraction-completeness
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement element-extraction-completeness according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER skip validation of extracted elements against completeness criteria.",
+    "NEVER assume that all relevant elements have been extracted without conducting a thorough review.",
+    "NEVER disregard documentation of extraction methods and assumptions that could impact completeness.",
+    "NEVER ignore discrepancies found during the post-extraction review process.",
+    "NEVER proceed with analysis if there is any uncertainty regarding the completeness of extracted elements."
+  ],
+  "specific_risks": [
+    "Incomplete extraction of data elements can lead to inaccurate analysis results, resulting in poor decision-making.",
+    "Failure to validate extracted elements may cause critical insights to be overlooked, leading to missed opportunities or risks.",
+    "Neglecting to document the extraction process can hinder reproducibility, making it difficult for other analysts to verify results.",
+    "Ignoring discrepancies in extraction completeness can result in flawed interpretations, eroding stakeholders' trust in the analysis.",
+    "Proceeding with analysis without ensuring completeness can result in strategic mistakes, potentially causing financial losses or operational inefficiencies."
+  ]
+}
+</danger>

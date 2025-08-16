@@ -1,0 +1,107 @@
+---
+description: MUST assign confidence scores WHEN evaluating data models TO improve decision accuracy.
+globs: ["**/scoring/**", "**/*scoring*/**", "**/*", "**/confidence/**", "**/*confidence*/**"]
+---
+# confidence-scoring
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3205-confidence-scoring",
+  "taxonomy": {
+    "category": "Data Model Standards",
+    "parent": "Data Model StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Data Model StandardsRule"
+    ],
+    "children": [
+      "3210-confidence-threshold",
+      "3215-confidence-validation"
+    ]
+  },
+  "tags": [
+    "confidence scoring",
+    "data quality",
+    "model evaluation",
+    "AI standards"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST establish a systematic method for assigning confidence scores to data models to ensure consistent evaluation.",
+  "application": "SHOULD be applied during the model evaluation phase, specifically when assessing the reliability and predictive accuracy of data models based on their training and validation performance.",
+  "importance": "This rule matters as it enhances decision-making by providing quantifiable metrics that reflect the trustworthiness of data models, thereby improving overall data quality and reducing the risk of erroneous conclusions."
+}
+
+## confidence_scoring_methodology
+
+{
+  "description": "This section outlines the systematic approach for assigning confidence scores to data models based on their performance metrics.",
+  "requirements": [
+    "MUST evaluate model performance using standardized metrics such as accuracy, precision, recall, and F1 score.",
+    "MUST assign a confidence score ranging from 0 to 1, where 0 indicates no confidence and 1 indicates full confidence in the model's predictions.",
+    "SHOULD document the methodologies used for scoring to ensure transparency and reproducibility in evaluations."
+  ]
+}
+
+## confidence_score_thresholds
+
+{
+  "description": "This section defines the thresholds for interpreting confidence scores and their implications for decision-making.",
+  "requirements": [
+    "MUST establish clear thresholds for confidence scores: scores below 0.5 indicate low confidence, scores between 0.5 and 0.8 indicate moderate confidence, and scores above 0.8 indicate high confidence.",
+    "SHOULD provide guidelines for actions based on confidence scores, including re-evaluation of models with low confidence scores.",
+    "NEVER assign a confidence score without a corresponding explanation of the model's performance metrics."
+  ]
+}
+
+## confidence_score_validation
+
+{
+  "description": "This section specifies the validation process to ensure the reliability of assigned confidence scores.",
+  "requirements": [
+    "MUST implement cross-validation techniques to verify the robustness of confidence scores across different datasets.",
+    "SHOULD conduct regular audits of confidence scoring practices to identify discrepancies or areas for improvement.",
+    "MUST provide mechanisms for updating confidence scores based on new data or improved model performance."
+  ]
+}
+
+<example>
+confidence-scoring Example
+
+```python
+# Example for confidence-scoring
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement confidence-scoring according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER assign confidence scores without evaluating model performance using standardized metrics.",
+    "NEVER use arbitrary thresholds for confidence scores that do not comply with established guidelines.",
+    "NEVER document confidence scores without providing a clear explanation of the underlying performance metrics.",
+    "NEVER ignore low confidence scores when making decisions based on model predictions.",
+    "NEVER fail to validate confidence scores through cross-validation techniques before deployment."
+  ],
+  "specific_risks": [
+    "Failure to assign confidence scores based on proper evaluations may lead to reliance on unreliable models, increasing the likelihood of erroneous data-driven decisions.",
+    "Using arbitrary thresholds can result in misinterpretation of model performance, potentially leading to actions based on misleading confidence levels.",
+    "Not documenting the rationale for confidence scores can hinder transparency and reproducibility, making it difficult to understand or verify model evaluations.",
+    "Ignoring low confidence scores may result in significant errors in decision-making processes, ultimately causing financial or reputational damage.",
+    "Neglecting to validate confidence scores with cross-validation may result in overfitting models, which can severely undermine predictive accuracy when applied to new data."
+  ]
+}
+</danger>

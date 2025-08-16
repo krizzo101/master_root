@@ -1,0 +1,106 @@
+---
+description: MUST define relationships WHEN creating data models TO ensure data integrity and clarity.
+globs: ["**/relationship/**", "**/*relationship*/**", "**/*representation*/**", "**/*", "**/representation/**"]
+---
+# relationship-representation
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3204-relationship-representation",
+  "taxonomy": {
+    "category": "Data Model Standards",
+    "parent": "Data Model StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Data Model StandardsRule"
+    ],
+    "children": [
+      "3205-relationship-attributes",
+      "3206-relationship-types"
+    ]
+  },
+  "tags": [
+    "relationship management",
+    "data integrity",
+    "modeling standards"
+  ],
+  "priority": 85,
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST define and represent relationships in data models TO ensure that the connections between data entities are accurately captured and understood.",
+  "application": "SHOULD be applied during the creation and modification of data models, ensuring that all relationships are explicitly defined and documented for clarity and integrity.",
+  "importance": "This rule matters because clear representation of relationships enhances data integrity, supports effective data querying, and facilitates better understanding among developers and stakeholders, ultimately leading to a more robust and maintainable data architecture."
+}
+
+## relationship_definition
+
+{
+  "description": "Defines how relationships between data entities should be established and documented.",
+  "requirements": [
+    "MUST explicitly define all relationships between data entities in the data model.",
+    "MUST use clear and descriptive names for relationships to enhance understanding.",
+    "SHOULD include cardinality and participation constraints for each defined relationship."
+  ]
+}
+
+## relationship_documentation
+
+{
+  "description": "Outlines the requirements for documenting relationships within the data model.",
+  "requirements": [
+    "MUST provide detailed documentation for each relationship, including its purpose and implications.",
+    "MUST ensure that relationship documentation is easily accessible and understandable by all stakeholders.",
+    "SHOULD regularly review and update relationship documentation to reflect any changes in the data model."
+  ]
+}
+
+## relationship_validation
+
+{
+  "description": "Establishes guidelines for validating the integrity of relationships in the data model.",
+  "requirements": [
+    "MUST implement validation checks to ensure that relationships are correctly defined and functioning.",
+    "SHOULD include automated tests to verify the integrity of relationships during model changes.",
+    "NEVER allow undefined relationships to exist in the final data model."
+  ]
+}
+
+<example>
+relationship-representation Example
+
+```python
+# Example for relationship-representation
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement relationship-representation according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER omit the definition of relationships between data entities in the data model.",
+    "NEVER use ambiguous or non-descriptive names for relationships, as this leads to confusion and misinterpretation.",
+    "NEVER fail to document the purpose and implications of each defined relationship within the data model.",
+    "NEVER allow cardinality and participation constraints to be undefined for any relationship.",
+    "NEVER ignore the need for validation checks on relationships, as this undermines data integrity."
+  ],
+  "specific_risks": [
+    "Failure to define relationships can lead to data integrity issues, resulting in orphaned records and inconsistent data.",
+    "Using ambiguous relationship names may cause misunderstandings among team members, leading to incorrect data usage and application errors.",
+    "Inadequate documentation of relationships can result in misalignment between developers and stakeholders, hampering collaborative efforts and project progress.",
+    "Undefined cardinality and participation constraints can lead to incorrect assumptions about data usage, causing application logic errors and unexpected behaviors.",
+    "Not implementing validation checks on relationships increases the risk of allowing faulty data models to be deployed, potentially leading to system failures or data corruption."
+  ]
+}
+</danger>

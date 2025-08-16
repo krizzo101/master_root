@@ -1,0 +1,41 @@
+{
+    "name": "medium_test_project",
+    "version": "0.1.0",
+    "description": "A medium-sized test project for Project Mapper",
+    "analyzers": {
+        "python": {
+            "enabled": true,
+            "include_patterns": [
+                "**/*.py"
+            ],
+            "exclude_patterns": [
+                "**/test_*.py",
+                "**/conftest.py"
+            ]
+        },
+        "markdown": {
+            "enabled": true,
+            "include_patterns": [
+                "**/*.md"
+            ],
+            "exclude_patterns": []
+        }
+    },
+    "output": {
+        "format": "json",
+        "directory": ".maps",
+        "chunking": {
+            "enabled": true,
+            "chunk_size": 1000
+        }
+    },
+    "relationships": {
+        "confidence_threshold": 0.5,
+        "include_types": [
+            "imports",
+            "defines",
+            "references",
+            "documented_by"
+        ]
+    }
+}

@@ -1,0 +1,7 @@
+---
+description: WHEN organizing meta-level rules TO ensure proper categorization you MUST follow section standards
+globs: .cursor/rules/0*.mdc
+alwaysApply: false
+---
+
+CONTEXT for rules 001-049 that provide FRAMEWORK-LEVEL guidance for META-RULES

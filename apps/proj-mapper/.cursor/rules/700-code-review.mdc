@@ -1,0 +1,248 @@
+---
+description: WHEN reviewing code TO ensure quality and maintainability you MUST follow THESE code review standards
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 290 -->
+
+
+{
+"sections": {
+"overview": "12-20",
+"decision_tree": "22-45",
+"review_principles": "47-75",
+"review_process": "77-150",
+"ai_integration": "152-200",
+"review_timing": "202-230",
+"verification": "232-260",
+"danger": "262-290"
+},
+"key_elements": {
+"validation_patterns": "25-40",
+"critical_paths": "42-45",
+"ai_processing": "152-200"
+},
+"ai_instructions": "Process sections in order: decision_tree -> validation_patterns -> specific section. Always validate against critical_paths before proceeding."
+}
+
+{
+"rule_name": "Code Review Standards",
+"version": "2.0.0",
+"ai_processing_priority": "high",
+"enhanced_metadata": {
+"activation_context": [
+"reviewing code changes",
+"conducting code reviews",
+"reviewing AI-generated code",
+"performing security reviews",
+"validating architectural changes"
+],
+"priority": 5,
+"domain": "code-quality"
+},
+
+"overview": {
+"description": "Defines comprehensive standards for conducting effective code reviews",
+"importance": "Code reviews are critical quality gates that ensure code quality, knowledge sharing, and maintainable systems",
+"scope": "All code changes requiring review, including AI-generated code"
+},
+
+"decision_tree": {
+"validation_patterns": {
+"is_ai_generated": {
+"true": ["apply_ai_validation_rules", "require_manual_review"],
+"false": ["apply_standard_validation"]
+},
+"is_critical_path": {
+"true": ["require_senior_review", "enforce_strict_validation"],
+"false": ["apply_standard_validation"]
+},
+"has_security_impact": {
+"true": ["require_security_review", "enforce_strict_validation"],
+"false": ["apply_standard_validation"]
+}
+},
+"critical_paths": [
+"auth/*",
+"payment/*",
+"data/sensitive/*",
+"security/*"
+]
+},
+
+"review_principles": {
+"core_objectives": [
+"Ensure code quality and correctness",
+"Maintain architectural consistency",
+"Share knowledge and context",
+"Catch bugs early",
+"Ensure security best practices",
+"Validate business requirements"
+],
+"validation_rules": {
+"quality": {"min_coverage": 80, "max_complexity": 15},
+"security": {"required_scan": true, "vulnerability_threshold": "high"},
+"performance": {"max_regression": 5, "required_benchmark": true}
+}
+},
+
+"review_process": {
+"preparation": {
+"validation_sequence": [
+{"step": "self_review", "required": true, "validation": "checklist_complete"},
+{"step": "automated_checks", "required": true, "validation": "all_pass"},
+{"step": "documentation", "required": true, "validation": "updated"},
+{"step": "scope_definition", "required": true, "validation": "clear_boundaries"}
+]
+},
+"review_stages": {
+"sequence": [
+{
+"stage": "high_level",
+"focus": ["architecture", "design", "security"],
+"validation": {"all_required": true, "blocking": true}
+},
+{
+"stage": "detailed",
+"focus": ["correctness", "error_handling", "edge_cases"],
+"validation": {"all_required": true, "blocking": true}
+},
+{
+"stage": "testing",
+"focus": ["coverage", "quality", "integration"],
+"validation": {"all_required": true, "blocking": false}
+}
+],
+"validation_rules": {
+"stage_completion": "all_previous_stages_passed",
+"blocking_issues": "zero_allowed",
+"review_depth": "proportional_to_risk"
+}
+},
+"feedback": {
+"format": "issue:impact:suggestion",
+"priority_matrix": {
+"blocker": {"fix": "required", "timing": "immediate"},
+"major": {"fix": "required", "timing": "before_merge"},
+"minor": {"fix": "recommended", "timing": "can_defer"},
+"nitpick": {"fix": "optional", "timing": "any"}
+},
+"validation_rules": {
+"must_have": ["specific_location", "clear_impact", "actionable_suggestion"],
+"must_not_have": ["ambiguous_feedback", "personal_preference", "unactionable_comments"]
+}
+}
+},
+
+"ai_integration": {
+"processing_rules": {
+"validation_sequence": [
+{"step": "context_analysis", "required": true},
+{"step": "pattern_matching", "required": true},
+{"step": "security_scan", "required": true},
+{"step": "performance_analysis", "required": true}
+],
+"decision_weights": {
+"security_impact": 3,
+"performance_impact": 2,
+"maintainability_impact": 2,
+"complexity_impact": 1
+},
+"threshold_rules": {
+"max_complexity_increase": 5,
+"max_security_issues": 0,
+"max_performance_regression": 10,
+"min_test_coverage": 80
+}
+},
+"ai_specific_validation": {
+"required_metadata": [
+"ai_system_id",
+"generation_parameters",
+"safety_checks_performed"
+],
+"validation_rules": {
+"metadata_complete": true,
+"manual_review_required": true,
+"security_scan_required": true
+}
+},
+"automated_checks": {
+"required": [
+"style_conformance",
+"known_bug_patterns",
+"security_vulnerabilities",
+"performance_antipatterns",
+"dead_code"
+],
+"validation_rules": {
+"all_checks_passed": true,
+"max_false_positives": "10%",
+"review_required_on_failure": true
+}
+}
+},
+
+"review_timing": {
+"sla_matrix": {
+"initial_review": {"max_time": "1 business day", "priority": "normal"},
+"subsequent_review": {"max_time": "4 hours", "priority": "normal"},
+"blocking_issues": {"max_time": "2 hours", "priority": "high"},
+"security_issues": {"max_time": "1 hour", "priority": "critical"}
+},
+"size_limits": {
+"optimal": {
+"files": 5,
+"changes": 200,
+"review_time": 30
+},
+"maximum": {
+"files": 10,
+"changes": 400,
+"review_time": 60
+},
+"validation_rules": {
+"enforce_limits": true,
+"require_split_on_exceed": true
+}
+}
+},
+
+"verification": {
+"checklist": [
+{"item": "review_comments_addressed", "required": true, "blocking": true},
+{"item": "tests_passing", "required": true, "blocking": true},
+{"item": "ci_cd_green", "required": true, "blocking": true},
+{"item": "documentation_updated", "required": true, "blocking": true},
+{"item": "security_reviewed", "required": true, "blocking": true},
+{"item": "performance_verified", "required": true, "blocking": false}
+],
+"completion_rules": {
+"approvals": {"required": 2, "senior_required": true},
+"blocking_issues": {"allowed": 0},
+"test_coverage": {"minimum": 80},
+"quality_gates": {
+"all_required": true,
+"bypass_allowed": false
+}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER skip reviews for critical code",
+"NEVER merge with unresolved blocking issues",
+"NEVER ignore security concerns",
+"NEVER bypass required approvals",
+"NEVER merge untested code",
+"NEVER skip AI validation for AI-generated code"
+],
+"validation_rules": {
+"review_bypass": {"allowed": false},
+"approval_bypass": {"allowed": false},
+"quality_gate_bypass": {"allowed": false},
+"documentation": {"required": true}
+}
+}
+}

@@ -1,0 +1,148 @@
+---
+description: WHEN writing or modifying code TO ensure security and prevent vulnerabilities you MUST follow these security standards
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"security_principles": "17-45",
+"implementation_standards": "47-75",
+"validation_requirements": "77-95"
+},
+"key_elements": {
+"principle_validation": "20-30",
+"implementation_validation": "50-60",
+"security_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: security_principles -> implementation_standards -> validation_requirements. Validate against principle_validation before proceeding."
+}
+
+{
+"rule_name": "Security Standards",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"implementing security",
+"handling sensitive data",
+"managing authentication",
+"preventing vulnerabilities"
+],
+"priority": 5,
+"domain": "development"
+},
+
+"overview": {
+"description": "Defines comprehensive security standards for code development",
+"importance": "Security is critical for protecting systems and data"
+},
+
+"security_principles": {
+"data_protection": {
+"requirements": [
+"Encrypt sensitive data",
+"Use secure protocols",
+"Implement access controls",
+"Validate input data"
+],
+"validation": {"protected": true, "encrypted": true}
+},
+"authentication_standards": {
+"requirements": [
+"Implement strong authentication",
+"Use secure password storage",
+"Apply rate limiting",
+"Enable MFA where appropriate"
+],
+"validation": {"secure": true, "robust": true}
+},
+"authorization_controls": {
+"requirements": [
+"Implement role-based access",
+"Check permissions explicitly",
+"Principle of least privilege",
+"Audit access attempts"
+],
+"validation": {"controlled": true, "audited": true}
+}
+},
+
+"implementation_standards": {
+"secure_coding": {
+"requirements": [
+"Prevent injection attacks",
+"Sanitize all inputs",
+"Escape output data",
+"Use prepared statements"
+],
+"validation": {"sanitized": true, "escaped": true}
+},
+"dependency_security": {
+"requirements": [
+"Use trusted dependencies",
+"Keep dependencies updated",
+"Monitor security advisories",
+"Audit dependency changes"
+],
+"validation": {"trusted": true, "monitored": true}
+},
+"error_handling": {
+"requirements": [
+"Hide sensitive details",
+"Log securely",
+"Handle failures gracefully",
+"Maintain security context"
+],
+"validation": {"secure": true, "appropriate": true}
+}
+},
+
+"validation_requirements": {
+"security_testing": {
+"requirements": [
+"Perform security scans",
+"Test authentication flows",
+"Validate access controls",
+"Check for vulnerabilities"
+],
+"validation": {"tested": true, "verified": true}
+},
+"compliance_checks": {
+"requirements": [
+"Follow security standards",
+"Document compliance",
+"Regular audits",
+"Address findings promptly"
+],
+"validation": {"compliant": true, "documented": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER store sensitive data in plaintext",
+"NEVER hardcode credentials",
+"NEVER skip input validation",
+"NEVER trust client-side validation",
+"NEVER expose sensitive errors",
+"NEVER ignore security warnings",
+"NEVER skip security updates",
+"NEVER disable security features"
+],
+"validation_rules": {
+"sensitive_data": {"encrypted": true},
+"credentials": {"secure": true},
+"validation": {"complete": true},
+"client_trust": {"validated": true},
+"errors": {"sanitized": true},
+"warnings": {"addressed": true},
+"updates": {"applied": true},
+"features": {"enabled": true}
+}
+}
+}

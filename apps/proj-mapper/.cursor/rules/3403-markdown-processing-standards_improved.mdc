@@ -1,0 +1,90 @@
+{
+  "description": "MUST follow markdown syntax WHEN creating documentation TO ensure readability and consistency.",
+  "globs": [
+    "**/markdown/**",
+    "**/processing/**",
+    "**/*",
+    "**/*standards*/**",
+    "**/standards/**",
+    "**/*markdown*/**",
+    "**/*processing*/**"
+  ],
+  "rule_id": "3403-markdown-processing-standards",
+  "taxonomy": {
+    "category": "Analysis Subsystem Standards",
+    "parent": "Analysis Subsystem StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Analysis Subsystem StandardsRule"
+    ],
+    "children": [
+      "3404-markdown-link-standards",
+      "3405-markdown-image-standards"
+    ]
+  },
+  "tags": [
+    "markdown",
+    "processing",
+    "standards",
+    "analysis",
+    "documentation"
+  ],
+  "priority": "40",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ],
+  "overview": {
+    "purpose": "MUST establish clear markdown processing standards TO ensure that all documentation is formatted consistently and adheres to best practices.",
+    "application": "SHOULD be applied during the creation and review of markdown files, particularly when integrating documentation into projects, ensuring compliance with specified formatting guidelines.",
+    "importance": "This rule matters because it enhances readability, facilitates maintenance, and promotes a uniform appearance across documentation, thereby improving the overall user experience and reducing cognitive load."
+  },
+  "markdown_syntax_requirements": {
+    "description": "This section outlines the mandatory syntax rules for writing markdown documentation.",
+    "requirements": [
+      "MUST use consistent header levels (H1, H2, H3) throughout the document to represent the hierarchy of information.",
+      "MUST utilize bullet points or numbered lists for clarity when presenting multiple items.",
+      "MUST ensure that all code snippets are enclosed in triple backticks with appropriate language identifiers for syntax highlighting.",
+      "MUST include a blank line before and after each header to enhance readability."
+    ]
+  },
+  "link_and_image_standards": {
+    "description": "This section defines the standards for linking and embedding images in markdown documents.",
+    "requirements": [
+      "MUST use descriptive alt text for all images to improve accessibility and SEO.",
+      "MUST ensure that all links are functional and direct to relevant, up-to-date resources.",
+      "SHOULD use relative URLs for internal links to maintain consistency across different environments.",
+      "NEVER use broken links or outdated resources that could lead to confusion or misinformation."
+    ]
+  },
+  "formatting_and_style_guidelines": {
+    "description": "This section provides guidelines on the overall formatting and style of markdown documents.",
+    "requirements": [
+      "MUST use a consistent font style and size throughout the document to ensure uniformity.",
+      "SHOULD limit the use of italics and bold text to emphasize key points without overloading the reader.",
+      "MUST avoid excessive use of colors or styles that could distract from the main content.",
+      "MUST ensure proper alignment and spacing of paragraphs for better readability."
+    ]
+  },
+  "example": {
+    "description": "markdown-processing-standards Example",
+    "code": "def example():\n    # Implement according to standards\n    pass",
+    "explanation": "This example demonstrates how to implement markdown-processing-standards according to the standards."
+  },
+  "danger": {
+    "critical_violations": [
+      "NEVER omit header levels when structuring markdown documents, as this leads to confusion regarding the hierarchy of content.",
+      "NEVER use inconsistent bullet point styles or formats within the same document, which can disrupt the flow of information.",
+      "NEVER leave code snippets without the proper triple backtick formatting, as this can lead to syntax highlighting issues and reduce code readability.",
+      "NEVER include links that are broken or lead to outdated resources, as this undermines the reliability and relevance of the documentation.",
+      "NEVER neglect to provide descriptive alt text for images, as this compromises accessibility and detracts from the user experience."
+    ],
+    "specific_risks": [
+      "Violating header structure can make navigation through documents difficult, leading to user frustration and increased time to locate information.",
+      "Inconsistent bullet points can confuse readers, resulting in misinterpretation of important details and potential errors in understanding instructions.",
+      "Failure to properly format code snippets can result in miscommunication of technical information, which may lead to implementation errors by developers.",
+      "Utilizing broken or outdated links can lead to misinformation and wasted time for users searching for relevant information, damaging the credibility of the documentation.",
+      "Not including alt text for images can hinder accessibility for users with disabilities, which may lead to non-compliance with accessibility standards and exclusion of certain user groups."
+    ]
+  }
+}

@@ -1,0 +1,148 @@
+---
+description: WHEN implementing error handling TO ensure robust and maintainable code you MUST follow these error handling standards
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"handling_principles": "17-45",
+"layer_standards": "47-75",
+"recovery_requirements": "77-95"
+},
+"key_elements": {
+"principle_validation": "20-30",
+"layer_validation": "50-60",
+"recovery_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: handling_principles -> layer_standards -> recovery_requirements. Validate against principle_validation before proceeding."
+}
+
+{
+"rule_name": "Error Handling Standards",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"handling errors",
+"implementing recovery",
+"managing exceptions",
+"ensuring reliability"
+],
+"priority": 5,
+"domain": "development"
+},
+
+"overview": {
+"description": "Defines comprehensive error handling standards",
+"importance": "Proper error handling ensures system reliability and maintainability"
+},
+
+"handling_principles": {
+"error_classification": {
+"requirements": [
+"Classify error types",
+"Define severity levels",
+"Map recovery actions",
+"Document patterns"
+],
+"validation": {"classified": true, "documented": true}
+},
+"error_information": {
+"requirements": [
+"Include context",
+"Add stack traces",
+"Mask sensitive data",
+"Enable tracking"
+],
+"validation": {"contextual": true, "traceable": true}
+},
+"error_propagation": {
+"requirements": [
+"Define boundaries",
+"Handle transitions",
+"Maintain context",
+"Ensure clarity"
+],
+"validation": {"bounded": true, "clear": true}
+}
+},
+
+"layer_standards": {
+"presentation_layer": {
+"requirements": [
+"Handle UI errors",
+"Show user messages",
+"Manage state",
+"Enable recovery"
+],
+"validation": {"handled": true, "recoverable": true}
+},
+"service_layer": {
+"requirements": [
+"Handle business errors",
+"Manage transactions",
+"Ensure consistency",
+"Enable retries"
+],
+"validation": {"managed": true, "consistent": true}
+},
+"data_layer": {
+"requirements": [
+"Handle persistence errors",
+"Manage integrity",
+"Enable rollback",
+"Preserve state"
+],
+"validation": {"preserved": true, "integral": true}
+}
+},
+
+"recovery_requirements": {
+"retry_strategies": {
+"requirements": [
+"Define policies",
+"Handle timeouts",
+"Implement backoff",
+"Track attempts"
+],
+"validation": {"defined": true, "tracked": true}
+},
+"fallback_mechanisms": {
+"requirements": [
+"Define alternatives",
+"Handle degradation",
+"Maintain service",
+"Notify users"
+],
+"validation": {"alternative": true, "maintained": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER swallow exceptions",
+"NEVER expose sensitive data",
+"NEVER skip logging",
+"NEVER ignore recovery",
+"NEVER mix error levels",
+"NEVER lose context",
+"NEVER skip validation",
+"NEVER ignore timeouts"
+],
+"validation_rules": {
+"exceptions": {"handled": true},
+"sensitivity": {"protected": true},
+"logging": {"implemented": true},
+"recovery": {"defined": true},
+"levels": {"appropriate": true},
+"context": {"maintained": true},
+"validation": {"performed": true},
+"timeouts": {"configured": true}
+}
+}
+}

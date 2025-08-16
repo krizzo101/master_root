@@ -1,0 +1,108 @@
+---
+description: MUST handle edge cases WHEN running tests TO ensure robust application behavior.
+globs: ["**/edge/**", "**/*.test.*", "**/*test*.*", "**/*handling*/**", "**/case/**", "**/handling/**", "**/*case*/**", "**/*.spec.*", "**/*edge*/**", "**/test/**"]
+---
+# edge-case-handling
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3704-edge-case-handling",
+  "taxonomy": {
+    "category": "Testing Standards",
+    "parent": "Testing StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Testing StandardsRule"
+    ],
+    "children": [
+      "3705-input-validation",
+      "3706-assertion-handling",
+      "3707-exception-testing"
+    ]
+  },
+  "tags": [
+    "edge-case",
+    "testing",
+    "validation",
+    "exception"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "MUST ensure that all potential edge cases are tested and handled appropriately, preventing unexpected behaviors in the application during runtime.",
+  "application": "SHOULD be applied during all phases of testing, particularly when developing new features or making significant changes to the codebase, to identify and mitigate edge case scenarios that could lead to failures.",
+  "importance": "NEVER underestimate the impact of edge cases; this rule is critical for maintaining software reliability and user satisfaction, as unhandled edge cases can lead to system crashes, data loss, or security vulnerabilities."
+}
+
+## test_case_identification
+
+{
+  "description": "Identify all potential edge cases that could arise during the execution of tests.",
+  "requirements": [
+    "MUST analyze the input space to recognize scenarios that may lead to unexpected behavior.",
+    "SHOULD create a comprehensive list of edge cases that includes boundary values, empty inputs, and invalid formats.",
+    "MUST consult existing documentation and code comments to uncover any undocumented edge cases."
+  ]
+}
+
+## edge_case_testing
+
+{
+  "description": "Implement tests specifically designed to handle the identified edge cases.",
+  "requirements": [
+    "MUST write unit tests that specifically target each identified edge case.",
+    "SHOULD utilize mocking and stubbing where appropriate to isolate edge cases from the rest of the application.",
+    "NEVER assume that edge cases will not occur; every edge case MUST be validated through rigorous testing."
+  ]
+}
+
+## error_handling_mechanisms
+
+{
+  "description": "Establish robust error handling mechanisms for situations where edge cases are encountered.",
+  "requirements": [
+    "MUST ensure that the application provides meaningful error messages when edge cases are triggered.",
+    "SHOULD implement fallback strategies to maintain application stability in the event of an edge case failure.",
+    "NEVER allow the application to crash or behave unpredictably when encountering an edge case; all scenarios MUST be gracefully handled."
+  ]
+}
+
+<example>
+edge-case-handling Example
+
+```python
+# Example for edge-case-handling
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement edge-case-handling according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER ignore edge cases during test case creation; failing to consider them can lead to undetected software failures.",
+    "NEVER assume that edge cases are rare or unlikely; every edge case MUST be tested and handled appropriately.",
+    "NEVER write tests that do not specifically target edge cases; generic tests are insufficient to ensure reliability.",
+    "NEVER allow edge cases to lead to unhandled exceptions; they MUST be addressed through appropriate error handling mechanisms.",
+    "NEVER overlook documentation of edge cases; each edge case MUST be well-documented for future reference and clarity."
+  ],
+  "specific_risks": [
+    "Violating this rule can result in undetected bugs that surface only under specific conditions, potentially leading to system crashes in production.",
+    "Failing to test edge cases may expose the application to security vulnerabilities, as attackers often exploit unhandled edge scenarios.",
+    "Lack of comprehensive edge case handling can lead to poor user experience, as users may encounter unexpected application behavior or data loss.",
+    "If edge cases are not documented and handled, future development may inadvertently reintroduce similar issues, compounding the risk of failures.",
+    "Neglecting edge case testing can lead to increased maintenance costs, as issues that arise post-deployment often require significant resources to fix."
+  ]
+}
+</danger>

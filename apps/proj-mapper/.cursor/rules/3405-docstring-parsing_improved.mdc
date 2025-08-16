@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+{
+  "description": "MUST parse docstrings WHEN analyzing code TO provide accurate documentation insights",
+  "globs": ["**/*", "**/parsing/**", "**/*parsing*/**", "**/docstring/**", "**/*docstring*/**"]
+}

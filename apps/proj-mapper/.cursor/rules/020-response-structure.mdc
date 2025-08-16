@@ -1,0 +1,155 @@
+---
+description: WHEN answering queries TO ensure clarity and completeness you MUST ENFORCE structured response patterns
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"response_sections": "17-45",
+"complexity_adaptation": "47-75",
+"formatting_standards": "77-95"
+},
+"key_elements": {
+"section_requirements": "20-30",
+"complexity_rules": "50-60",
+"format_patterns": "80-90"
+},
+"ai_instructions": "Process sections in order: response_sections -> complexity_adaptation -> formatting_standards. Validate against section_requirements before proceeding."
+}
+
+{
+"rule_name": "Response Structure",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"answering queries",
+"providing solutions",
+"explaining implementations",
+"documenting decisions"
+],
+"priority": 5,
+"domain": "meta-rules"
+},
+
+"overview": {
+"description": "Defines required structure for responses to ensure clarity and completeness",
+"importance": "Consistent structure ensures comprehensive and understandable responses"
+},
+
+"response_sections": {
+"required_components": {
+"initial_analysis": {
+"required_for": ["complex", "design", "implementation"],
+"components": [
+"Task classification (type, complexity, risk)",
+"Context assessment (requirements, constraints)",
+"Success criteria definition"
+],
+"validation": {"complete": true, "clear": true}
+},
+"implementation_plan": {
+"required_for": ["complex", "design"],
+"components": [
+"High-level approach",
+"Component breakdown",
+"Step-by-step plan",
+"Testing strategy"
+],
+"validation": {"detailed": true, "logical": true}
+},
+"solution_delivery": {
+"required_for": ["all_responses"],
+"components": [
+"Implementation details",
+"Key decisions explained",
+"Usage examples",
+"Extension points"
+],
+"validation": {"complete": true, "clear": true}
+},
+"follow_up": {
+"required_for": ["complex", "design"],
+"components": [
+"Remaining tasks",
+"Future improvements",
+"Considerations"
+],
+"validation": {"thorough": true, "actionable": true}
+}
+}
+},
+
+"complexity_adaptation": {
+"simple_queries": {
+"structure": [
+"Direct response",
+"Minimal explanation",
+"Code if needed"
+],
+"validation": {"concise": true, "clear": true}
+},
+"moderate_queries": {
+"structure": [
+"Brief analysis",
+"Implementation steps",
+"Solution with explanation"
+],
+"validation": {"balanced": true, "complete": true}
+},
+"complex_queries": {
+"structure": [
+"Full analysis",
+"Detailed plan",
+"Comprehensive solution",
+"Complete follow-up"
+],
+"validation": {"thorough": true, "structured": true}
+}
+},
+
+"formatting_standards": {
+"markdown_requirements": {
+"headers": "Use # and ## for sections",
+"code_blocks": "Include language specification",
+"lists": "Use bullet points consistently",
+"emphasis": "Use bold and italic appropriately"
+},
+"code_citation": {
+"format": "`startLine:endLine:filepath",
+"example": "`12:15:app/components/Todo.tsx"
+},
+"validation": {
+"formatting": {"consistent": true, "clear": true},
+"citations": {"accurate": true, "complete": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER skip required sections for complexity level",
+"NEVER omit section headers",
+"NEVER provide unstructured responses",
+"NEVER mix formatting styles",
+"NEVER leave analysis incomplete",
+"NEVER skip validation steps",
+"NEVER ignore complexity adaptation",
+"NEVER omit code citations"
+],
+"validation_rules": {
+"sections": {"complete": true},
+"headers": {"present": true},
+"structure": {"consistent": true},
+"formatting": {"standardized": true},
+"analysis": {"thorough": true},
+"validation": {"performed": true},
+"adaptation": {"appropriate": true},
+"citations": {"proper": true}
+}
+}
+}

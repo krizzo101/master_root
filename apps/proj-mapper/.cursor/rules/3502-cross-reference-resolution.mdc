@@ -1,0 +1,111 @@
+---
+description: MUST cross-reference entities WHEN mapping relationships TO ensure accurate data connections
+globs: ["**/resolution/**", "**/*", "**/*reference*/**", "**/reference/**", "**/cross/**", "**/*cross*/**", "**/*resolution*/**"]
+---
+# cross-reference-resolution
+
+<version>1.0.0</version>
+
+## Metadata
+{
+  "rule_id": "3502-cross-reference-resolution",
+  "taxonomy": {
+    "category": "Relationship Mapping Standards",
+    "parent": "Relationship Mapping StandardsRule",
+    "ancestors": [
+      "Rule",
+      "Relationship Mapping StandardsRule"
+    ],
+    "children": [
+      "3503-reference-validation",
+      "3504-relationship-inference"
+    ]
+  },
+  "tags": [
+    "cross-reference",
+    "resolution",
+    "mapping",
+    "relationships",
+    "data integrity"
+  ],
+  "priority": "75",
+  "inherits": [
+    "000-context-awareness",
+    "001-ai-operating-rules"
+  ]
+}
+
+## Overview
+{
+  "purpose": "The purpose of this rule is to ensure that all entities involved in relationship mapping are correctly cross-referenced, facilitating accurate data connections across the system.",
+  "application": "This rule should be applied during the relationship mapping process, specifically when establishing links between different data entities. It is essential to cross-reference entities at the onset of the mapping to avoid misalignment and ensure data integrity.",
+  "importance": "This rule matters because proper cross-referencing prevents data discrepancies and enhances the reliability of the relationships within the system. By adhering to this rule, users can maintain high data quality and trustworthiness, which is crucial for effective decision-making."
+}
+
+## entity_cross_reference
+
+{
+  "description": "This section focuses on the requirements for establishing accurate cross-references between entities in the mapping process.",
+  "requirements": [
+    "MUST identify all entities that are relevant to the relationship being mapped.",
+    "MUST utilize unique identifiers for each entity to avoid ambiguity.",
+    "SHOULD provide contextual information for each entity to enhance understanding of the relationships.",
+    "NEVER ignore potential duplicates that may exist within different datasets."
+  ]
+}
+
+## resolution_process
+
+{
+  "description": "This section outlines the steps necessary for resolving cross-references effectively.",
+  "requirements": [
+    "MUST verify that each cross-reference is valid against the source data.",
+    "MUST update any cross-references that are found to be outdated or incorrect.",
+    "SHOULD implement automated checks to ensure ongoing accuracy of cross-references.",
+    "NEVER allow unresolved cross-references to persist in the final mapping output."
+  ]
+}
+
+## data_integrity_checks
+
+{
+  "description": "This section details the checks necessary to maintain data integrity during the cross-referencing process.",
+  "requirements": [
+    "MUST conduct integrity checks on all data sources before mapping relationships.",
+    "SHOULD log any discrepancies found during the cross-reference resolution process for future review.",
+    "MUST ensure that all changes made during mapping are documented and reversible.",
+    "NEVER assume that data from external sources is accurate without verification."
+  ]
+}
+
+<example>
+cross-reference-resolution Example
+
+```python
+# Example for cross-reference-resolution
+def example():
+    # Implement according to standards
+    pass
+```
+
+This example demonstrates how to implement cross-reference-resolution according to the standards.
+</example>
+
+<danger>
+{
+  "critical_violations": [
+    "NEVER fail to cross-reference entities during the mapping process, as this leads to inaccurate relationships.",
+    "NEVER use ambiguous identifiers that can cause confusion between different entities in cross-referencing.",
+    "NEVER overlook potential duplicates in datasets, which can result in misrepresented relationships.",
+    "NEVER allow outdated cross-references to remain in the system, as this compromises data integrity.",
+    "NEVER ignore logs of discrepancies during the cross-reference resolution process; this may prevent future resolutions."
+  ],
+  "specific_risks": [
+    "Failing to cross-reference entities accurately can lead to broken data relationships, causing errors in data retrieval and reporting.",
+    "Using ambiguous identifiers increases the risk of misidentifying entities, which can lead to incorrect data associations and decisions based on flawed data.",
+    "Overlooking duplicates can result in redundant entries, leading to inflated data volumes and increased processing time without additional value.",
+    "Allowing outdated cross-references to persist can introduce significant inaccuracies, misleading users and potentially causing financial or operational harm.",
+    "Ignoring discrepancies logs can prevent teams from addressing systemic issues, resulting in recurring errors and a loss of trust in the data integrity."
+  ]
+}
+</danger>

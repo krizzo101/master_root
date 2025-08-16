@@ -1,0 +1,148 @@
+---
+description: WHEN writing or modifying code TO ensure consistency and readability you MUST follow these code style standards
+globs: **/*
+alwaysApply: false
+---
+
+<!-- Line count: 95 -->
+
+
+{
+"sections": {
+"overview": "12-15",
+"language_standards": "17-45",
+"formatting_rules": "47-75",
+"documentation_requirements": "77-95"
+},
+"key_elements": {
+"language_patterns": "20-30",
+"format_validation": "50-60",
+"doc_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: language_standards -> formatting_rules -> documentation_requirements. Validate against language_patterns before proceeding."
+}
+
+{
+"rule_name": "Code Style Standards",
+"version": "1.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"writing new code",
+"modifying existing code",
+"reviewing code style",
+"ensuring consistency"
+],
+"priority": 4,
+"domain": "development"
+},
+
+"overview": {
+"description": "Defines comprehensive code style and formatting standards",
+"importance": "Consistent style ensures maintainable and readable code"
+},
+
+"language_standards": {
+"naming_conventions": {
+"variables": [
+"Use descriptive, meaningful names",
+"Follow camelCase for variables",
+"Use PascalCase for classes",
+"Use UPPER_SNAKE_CASE for constants"
+],
+"validation": {"descriptive": true, "consistent": true}
+},
+"code_organization": {
+"requirements": [
+"Group related functionality",
+"Order methods logically",
+"Separate concerns appropriately",
+"Maintain consistent structure"
+],
+"validation": {"organized": true, "logical": true}
+},
+"syntax_preferences": {
+"requirements": [
+"Use modern language features",
+"Prefer clarity over brevity",
+"Follow language idioms",
+"Maintain consistency"
+],
+"validation": {"modern": true, "clear": true}
+}
+},
+
+"formatting_rules": {
+"indentation": {
+"requirements": [
+"Use consistent indentation",
+"Align related elements",
+"Maintain visual hierarchy",
+"Follow language standards"
+],
+"validation": {"consistent": true, "aligned": true}
+},
+"spacing": {
+"requirements": [
+"Use consistent spacing",
+"Separate logical blocks",
+"Group related code",
+"Improve readability"
+],
+"validation": {"consistent": true, "readable": true}
+},
+"line_length": {
+"requirements": [
+"Limit to 80-120 characters",
+"Break long lines logically",
+"Maintain readability",
+"Consider display contexts"
+],
+"validation": {"length": true, "readable": true}
+}
+},
+
+"documentation_requirements": {
+"inline_comments": {
+"requirements": [
+"Explain complex logic",
+"Document assumptions",
+"Note edge cases",
+"Clarify non-obvious code"
+],
+"validation": {"helpful": true, "clear": true}
+},
+"api_documentation": {
+"requirements": [
+"Document public interfaces",
+"Specify parameters",
+"Describe return values",
+"Note exceptions"
+],
+"validation": {"complete": true, "accurate": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER use unclear variable names",
+"NEVER mix naming conventions",
+"NEVER leave complex logic undocumented",
+"NEVER ignore language standards",
+"NEVER use inconsistent formatting",
+"NEVER skip API documentation",
+"NEVER use magic numbers",
+"NEVER ignore line length limits"
+],
+"validation_rules": {
+"naming": {"clear": true},
+"conventions": {"consistent": true},
+"documentation": {"complete": true},
+"standards": {"followed": true},
+"formatting": {"consistent": true},
+"api_docs": {"present": true},
+"magic_numbers": {"documented": true},
+"line_length": {"within_limits": true}
+}
+}
+}

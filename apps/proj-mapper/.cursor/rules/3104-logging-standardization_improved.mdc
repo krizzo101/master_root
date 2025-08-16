@@ -1,0 +1,83 @@
+{
+  "description": "MUST standardize logging format WHEN implementing logging TO ensure consistency and readability.",
+  "globs": [
+    "**/standardization/**/*.py",
+    "**/*",
+    "**/*standardization*/**/*.py",
+    "**/logging/**/*.py",
+    "**/*logging*/**/*.py"
+  ],
+  "version": "1.1.0",
+  "Metadata": {
+    "rule_id": "3104-logging-standardization",
+    "taxonomy": {
+      "category": "Python Implementation Standards",
+      "parent": "Python Implementation StandardsRule",
+      "ancestors": [
+        "Rule",
+        "Python Implementation StandardsRule"
+      ],
+      "children": []
+    },
+    "tags": [
+      "logging",
+      "standardization",
+      "best practices",
+      "Python"
+    ],
+    "priority": "50",
+    "inherits": [
+      "000-context-awareness",
+      "001-ai-operating-rules"
+    ]
+  },
+  "Overview": {
+    "purpose": "MUST establish a standardized logging format for all Python applications to enhance code maintainability and facilitate debugging.",
+    "application": "SHOULD be applied whenever logging functionality is integrated into the application, ensuring that all log messages adhere to the defined format and structure.",
+    "importance": "This rule matters because consistent logging improves readability, makes it easier to track application behavior, and aids in diagnosing issues efficiently across different modules and team members."
+  },
+  "logging_format": {
+    "description": "Define a consistent logging format across the application to ensure clarity and uniformity in log messages.",
+    "requirements": [
+      "MUST use a structured format such as JSON or a standardized string format for all log messages.",
+      "MUST include timestamp, log level, message, and context information (e.g., function name, module name) in each log entry.",
+      "SHOULD avoid using plaintext messages that lack structure to facilitate automated log parsing."
+    ]
+  },
+  "log_levels": {
+    "description": "Establish a hierarchy of log levels to categorize log messages by their significance.",
+    "requirements": [
+      "MUST utilize standard log levels (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL) as defined by the Python logging library.",
+      "MUST ensure that log levels are used consistently throughout the application to allow for easy filtering and analysis of logs.",
+      "SHOULD provide documentation on the intended use case for each log level to guide developers in choosing the appropriate level."
+    ]
+  },
+  "error_handling": {
+    "description": "Implement logging practices for error handling to capture and report exceptions effectively.",
+    "requirements": [
+      "MUST log all exceptions at the ERROR level, including stack traces for troubleshooting.",
+      "MUST ensure that sensitive information is not logged during error handling to protect user data and comply with privacy standards.",
+      "SHOULD include context about the state of the application when an error occurs to aid in diagnosing the issue."
+    ]
+  },
+  "example": {
+    "description": "Example for logging-standardization",
+    "code": "import logging\n\n# Configure logging\nlogging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s %(module)s.%(funcName)s')\n\ndef example_function():\n    logging.info('This is an informational message.')\n    try:\n        1 / 0\n    except Exception as e:\n        logging.error('An error occurred', exc_info=True)\n\nexample_function()"
+  },
+  "danger": {
+    "critical_violations": [
+      "NEVER log messages without including a timestamp, log level, and context information.",
+      "NEVER use a non-standard log format that deviates from JSON or a structured string format.",
+      "NEVER omit error logging for exceptions; all exceptions MUST be logged at the ERROR level.",
+      "NEVER use inconsistent log levels across the application; all log levels MUST align with standard definitions.",
+      "NEVER include sensitive information in log messages, especially during error handling."
+    ],
+    "specific_risks": [
+      "Failure to include essential log details may lead to difficulties in debugging and tracing application behavior.",
+      "Using an unstructured log format can hinder automated log parsing, complicating log analysis and monitoring.",
+      "Not logging exceptions can result in missed critical errors, leading to unresolved issues and potential application failures.",
+      "Inconsistent log levels may confuse developers and operators, causing mismanagement of log information and ineffective troubleshooting.",
+      "Logging sensitive information could lead to data breaches, resulting in legal consequences and loss of user trust."
+    ]
+  }
+}

@@ -1,0 +1,549 @@
+Alright—here’s a **plug-and-play Python orchestrator** that runs the “multi-candidate + multi-critic + consolidation + remediation” loop we discussed.
+
+* **Main generator**: GPT-5 (produces K candidate code bundles as strict JSON)
+* **Critics**: o3 (N focused critics in parallel; strict JSON)
+* **Consolidator**: merges critic outputs → single plan
+* **Synthesizer**: GPT-5 revises the winner using critic TODOs
+* **Gates**: AST/syntax + (optional) pytest hook
+* **Responses API** with **Structured Outputs** in the **correct** `response → text → format` shape
+* **Deterministic** defaults: `temperature=0`, small `reasoning.effort` for o3
+
+Drop this into your repo as `orchestrator.py`, set `OPENAI_API_KEY`, and run:
+
+```
+python orchestrator.py --spec path/to/spec.md --context path/to/context.md --k 3 --loops 2 --out /tmp/agent_out
+```
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Multi-candidate tournament orchestrator:
+- Generates K candidate implementations (GPT-5) as strict JSON.
+- Runs N critics (o3) in parallel, each with a narrow charter; strict JSON.
+- Consolidates critic outputs; selects winner (+ runner-up fallback).
+- Synthesizes minimal revisions (GPT-5) and loops through gates.
+
+Requirements:
+  pip install --upgrade openai
+Env:
+  OPENAI_API_KEY=...
+Optional:
+  OPENAI_BASE_URL=...
+"""
+
+from __future__ import annotations
+import argparse, json, os, re, textwrap, shutil, subprocess, tempfile
+from dataclasses import dataclass
+from pathlib import Path
+from typing import List, Dict, Any, Optional
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+from openai import OpenAI
+
+# ----------------------------- Schemas ---------------------------------
+
+CANDIDATE_JSON_SCHEMA = {
+    "name": "code_candidate_bundle",
+    "schema": {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["candidate_id", "files"],
+        "properties": {
+            "schema_version": {"type": "string"},
+            "candidate_id": {"type": "string"},
+            "notes": {"type": "string"},
+            "files": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["path", "content"],
+                    "properties": {
+                        "path": {"type": "string"},
+                        "content": {"type": "string"},
+                    },
+                },
+            },
+            "tests": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["path", "content"],
+                    "properties": {
+                        "path": {"type": "string"},
+                        "content": {"type": "string"},
+                    },
+                },
+            },
+            "commands": {
+                "type": "array",
+                "items": {"type": "string"},
+            },
+        },
+    },
+    "strict": True,
+}
+
+CRITIQUE_JSON_SCHEMA = {
+    "name": "critic_result",
+    "schema": {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["candidate_id", "verdict", "scores", "failures", "next_actions"],
+        "properties": {
+            "candidate_id": {"type": "string"},
+            "verdict": {"type": "string", "enum": ["accept", "revise"]},
+            "scores": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["correctness","consistency","safety","efficiency","clarity"],
+                "properties": {
+                    "correctness": {"type": "number", "minimum": 0, "maximum": 1},
+                    "consistency": {"type": "number", "minimum": 0, "maximum": 1},
+                    "safety":      {"type": "number", "minimum": 0, "maximum": 1},
+                    "efficiency":  {"type": "number", "minimum": 0, "maximum": 1},
+                    "clarity":     {"type": "number", "minimum": 0, "maximum": 1},
+                },
+            },
+            "failures": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["category","evidence","location","minimal_fix_hint"],
+                    "properties": {
+                        "category": {"type": "string"},
+                        "evidence": {"type": "string"},
+                        "location": {"type": "string"},
+                        "minimal_fix_hint": {"type": "string"},
+                    },
+                },
+            },
+            "next_actions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        },
+    },
+    "strict": True,
+}
+
+REVISION_JSON_SCHEMA = CANDIDATE_JSON_SCHEMA  # same shape as candidate bundle
+
+
+# ----------------------------- Helpers ---------------------------------
+
+def read_text(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
+
+def ensure_dir(p: Path) -> None:
+    p.mkdir(parents=True, exist_ok=True)
+
+def write_files(bundle: Dict[str, Any], out_dir: Path) -> List[Path]:
+    written = []
+    for section in ("files", "tests"):
+        for item in bundle.get(section, []) or []:
+            target = out_dir / item["path"]
+            ensure_dir(target.parent)
+            target.write_text(item["content"], encoding="utf-8")
+            written.append(target)
+    return written
+
+def ast_gate(paths: List[Path]) -> List[str]:
+    """Return list of errors; empty if OK."""
+    import ast
+    errs = []
+    for p in paths:
+        if p.suffix != ".py":
+            continue
+        try:
+            ast.parse(p.read_text(encoding="utf-8"))
+        except SyntaxError as e:
+            errs.append(f"{p}:{e.lineno}:{e.offset} SyntaxError: {e.msg}")
+    return errs
+
+def run_pytest(root: Path, timeout: int = 60) -> tuple[bool, str]:
+    """Run pytest if tests exist. Returns (ok, output)."""
+    if not any((root / "tests").rglob("test_*.py")):
+        return True, "No tests found; skipping."
+    proc = subprocess.run(
+        ["pytest", "-q"],
+        cwd=str(root),
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        text=True, timeout=timeout
+    )
+    ok = proc.returncode == 0
+    return ok, proc.stdout
+
+def dedup_actions(actions: List[str]) -> List[str]:
+    seen, out = set(), []
+    for a in actions:
+        k = a.strip().lower()
+        if k not in seen:
+            seen.add(k); out.append(a)
+    return out
+
+# ----------------------------- OpenAI wiring ---------------------------
+
+def client_from_env() -> OpenAI:
+    base_url = os.getenv("OPENAI_BASE_URL")
+    if base_url:
+        return OpenAI(base_url=base_url)
+    return OpenAI()
+
+def responses_json(client: OpenAI, *, model: str, prompt: str, schema: Dict[str, Any],
+                   temperature: float = 0.0, max_output_tokens: int = 2000,
+                   reasoning_effort: Optional[str] = None) -> Dict[str, Any]:
+    resp = client.responses.create(
+        model=model,
+        input=[{"role": "developer", "content": prompt}],
+        response={
+            "modalities": ["text"],
+            "text": {
+                "format": {
+                    "type": "json_schema",
+                    "json_schema": schema
+                }
+            }
+        },
+        temperature=temperature,
+        max_output_tokens=max_output_tokens,
+        **({"reasoning": {"effort": reasoning_effort}} if reasoning_effort else {})
+    )
+    data = getattr(resp, "output_parsed", None)
+    if not isinstance(data, dict):
+        # last resort parse
+        txt = getattr(resp, "output_text", "")
+        data = json.loads(txt)
+    return data
+
+# ----------------------------- Prompts ---------------------------------
+
+CANDIDATE_PROMPT_TMPL = """\
+You are the MAIN generator. Produce one candidate implementation for the task.
+
+DELIMITERS:
+<spec>
+{spec}
+</spec>
+
+<context>
+{context}
+</context>
+
+RULES:
+- Return ONLY JSON per schema (no markdown).
+- Provide FULL file contents in 'files' and 'tests'. Do not include prose.
+- Keep ≤ 200 lines per file when possible; no TODO/FIXME placeholders.
+- Respect public API contracts exactly (names, parameters, types).
+- Prefer standard libraries; avoid network calls in tests.
+- candidate_id MUST be "{cid}".
+
+DIVERSITY LEVER (distinct from other candidates): {lever}
+"""
+
+CRITIC_PROMPT_TMPL = """\
+You are a specialist critic: {critic_name}.
+Judge candidate {candidate_id} narrowly for {charter}.
+
+INPUT:
+<spec>
+{spec}
+</spec>
+
+<context>
+{context}
+</context>
+
+<candidate>
+{candidate_json}
+</candidate>
+
+SCORING DIMENSIONS (0–1): correctness, consistency, safety, efficiency, clarity.
+
+HARD FAIL if: syntax/type errors, contract drift (names/args), deterministic test failure, security issues.
+
+OUTPUT:
+Return ONLY JSON per schema. Provide short, concrete evidence (assert lines, exact mismatch), no chain-of-thought.
+"""
+
+SYNTH_PROMPT_TMPL = """\
+You are the synthesizer. Improve the winner with minimal changes.
+
+INPUT:
+<spec>
+{spec}
+</spec>
+
+<context>
+{context}
+</context>
+
+<winner>
+{winner_json}
+</winner>
+
+<runner_up>
+{runner_json}
+</runner_up>
+
+<actions>
+{actions}
+</actions>
+
+RULES:
+- Return ONLY JSON per schema (no markdown).
+- Apply ONLY the minimal required changes to satisfy actions.
+- Respect public API contracts exactly (names/args). No renames unless explicitly requested.
+- Provide FULL file contents for changed files; you may include unchanged files if needed for coherence.
+"""
+
+# ----------------------------- Critics ---------------------------------
+
+CRITICS = [
+    ("contracts", "public API signatures (names & arg lists) match the spec exactly"),
+    ("tests",     "unit tests pass and coverage of core paths; add 1 minimal missing test if needed"),
+    ("security",  "secrets, unsafe subprocess, injections; no network in tests"),
+    ("perf",      "obvious inefficiencies; avoid quadratic hotspots; only safe, local suggestions"),
+    ("style",     "lint/type sanity (PEP8-ish); block only if parse/type fails")
+]
+
+BLOCKING_CATEGORIES = {"syntax", "test", "contract", "security"}
+
+# ----------------------------- Consolidation ---------------------------
+
+def consolidate(critic_results: List[Dict[str, Any]]) -> Dict[str, Any]:
+    from collections import defaultdict
+    by_cand: Dict[str, Dict[str, Any]] = defaultdict(lambda: {"scores": defaultdict(list), "failures": [], "actions": []})
+    for r in critic_results:
+        cid = r["candidate_id"]
+        for k, v in r["scores"].items():
+            by_cand[cid]["scores"][k].append(float(v))
+        by_cand[cid]["failures"] += r["failures"]
+        by_cand[cid]["actions"]  += r["next_actions"]
+
+    summaries = []
+    for cid, agg in by_cand.items():
+        scores = {k: sum(v)/len(v) for k, v in agg["scores"].items()}
+        for k in ("correctness","consistency","safety"):
+            if k in agg["scores"]:
+                scores[k] = min(agg["scores"][k])  # pessimistic on critical dims
+        blockers = [f for f in agg["failures"] if f["category"] in BLOCKING_CATEGORIES]
+        weighted = (
+            0.5*scores.get("correctness",0) +
+            0.2*scores.get("consistency",0) +
+            0.2*scores.get("safety",0) +
+            0.05*scores.get("efficiency",0) +
+            0.05*scores.get("clarity",0)
+        )
+        summaries.append({
+            "candidate_id": cid,
+            "scores": scores,
+            "blockers": blockers,
+            "weighted": weighted,
+            "next_actions": dedup_actions(agg["actions"])
+        })
+
+    # pick: no-blockers preferred, then by weighted score
+    viable = [s for s in summaries if not s["blockers"]]
+    winner = max(viable or summaries, key=lambda s: (len(s["blockers"]) == 0, s["weighted"]))
+    remaining = [s for s in summaries if s["candidate_id"] != winner["candidate_id"]]
+    runner_up = max(remaining, key=lambda s: (len(s["blockers"]) == 0, s["weighted"])) if remaining else None
+    return {"winner": winner, "runner_up": runner_up, "all": summaries}
+
+# ----------------------------- Orchestrator ----------------------------
+
+@dataclass
+class Args:
+    spec: Path
+    context: Path
+    out: Path
+    k: int
+    loops: int
+    pytest: bool
+
+def generate_candidates(client: OpenAI, spec: str, context: str, k: int) -> List[Dict[str, Any]]:
+    levers = [
+        "design A: sync functions; plain sqlite",
+        "design B: asyncio; httpx client",
+        "design C: plugin-style interface boundaries",
+        "design D: minimal deps; single-file core"
+    ]
+    outs = []
+    for i in range(k):
+        cid = f"c{i+1}"
+        prompt = CANDIDATE_PROMPT_TMPL.format(
+            spec=spec, context=context, cid=cid, lever=levers[i % len(levers)]
+        )
+        data = responses_json(
+            client, model="gpt-5", prompt=prompt,
+            schema=CANDIDATE_JSON_SCHEMA, temperature=0, max_output_tokens=6000
+        )
+        assert data.get("candidate_id") == cid, "candidate_id mismatch"
+        outs.append(data)
+    return outs
+
+def pre_gate_candidate(candidate: Dict[str, Any]) -> List[str]:
+    tmp = Path(tempfile.mkdtemp(prefix="cand_"))
+    write_files(candidate, tmp)
+    errs = ast_gate(list(tmp.rglob("*.py")))
+    shutil.rmtree(tmp, ignore_errors=True)
+    return errs
+
+def run_critics_parallel(client: OpenAI, spec: str, context: str,
+                         candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    futs = []
+    pool = ThreadPoolExecutor(max_workers=min(16, len(candidates)*len(CRITICS)))
+    for cand in candidates:
+        cand_json = json.dumps(cand, ensure_ascii=False)
+        for name, charter in CRITICS:
+            prompt = CRITIC_PROMPT_TMPL.format(
+                critic_name=name, charter=charter,
+                candidate_id=cand["candidate_id"],
+                spec=spec, context=context, candidate_json=cand_json
+            )
+            futs.append(pool.submit(
+                responses_json,
+                client, "o3", prompt, CRITIQUE_JSON_SCHEMA,
+                0.0, 1200, "low"
+            ))
+    out = []
+    for f in as_completed(futs):
+        try:
+            r = f.result()
+            out.append(r)
+        except Exception as e:
+            # In production: log and continue; here we surface it
+            raise
+    pool.shutdown(wait=True, cancel_futures=True)
+    return out
+
+def synthesize_revision(client: OpenAI, spec: str, context: str,
+                        winner: Dict[str, Any], runner: Optional[Dict[str, Any]],
+                        actions: List[str]) -> Dict[str, Any]:
+    prompt = SYNTH_PROMPT_TMPL.format(
+        spec=spec, context=context,
+        winner_json=json.dumps(winner, ensure_ascii=False),
+        runner_json=json.dumps(runner or {"candidate_id": "none", "files":[]}, ensure_ascii=False),
+        actions="\n".join(f"- {a}" for a in actions)
+    )
+    return responses_json(
+        client, model="gpt-5", prompt=prompt,
+        schema=REVISION_JSON_SCHEMA, temperature=0, max_output_tokens=6000
+    )
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--spec", required=True, type=Path)
+    ap.add_argument("--context", required=True, type=Path)
+    ap.add_argument("--out", required=True, type=Path)
+    ap.add_argument("--k", type=int, default=2, help="number of candidates")
+    ap.add_argument("--loops", type=int, default=2, help="max remediation loops")
+    ap.add_argument("--pytest", action="store_true", help="run pytest gate if tests present")
+    args_ns = ap.parse_args()
+    args = Args(args_ns.spec, args_ns.context, args_ns.out, args_ns.k, args_ns.loops, args_ns.pytest)
+
+    ensure_dir(args.out)
+    client = client_from_env()
+    spec = read_text(args.spec)
+    context = read_text(args.context)
+
+    # 1) Generate K candidates
+    candidates = generate_candidates(client, spec, context, args.k)
+
+    # 2) Pre-gate (AST). Drop failures early.
+    survivors = []
+    for c in candidates:
+        errs = pre_gate_candidate(c)
+        if errs:
+            # Convert gate failures into a faux critic output so consolidation can weigh them
+            survivors.append({
+                **c,
+                "_gate_failures": errs
+            })
+        else:
+            survivors.append(c)
+
+    # 3..L) Iterative tournament → consolidation → synthesis → gates
+    current = survivors
+    for loop in range(1, args.loops+1):
+        print(f"\n=== LOOP {loop} ===")
+        # Convert any gate-failed candidate into critics payload (blocking)
+        critic_results = []
+        gate_fail_payloads = []
+        for c in current:
+            if "_gate_failures" in c:
+                critic_results.append({
+                    "candidate_id": c["candidate_id"],
+                    "verdict": "revise",
+                    "scores": {"correctness":0,"consistency":0.3,"safety":0.7,"efficiency":0.7,"clarity":0.7},
+                    "failures": [{"category":"syntax","evidence":msg,"location":"ast","minimal_fix_hint":"Fix syntax"} for msg in c["_gate_failures"]],
+                    "next_actions": ["Fix AST syntax errors reported by gate"]
+                })
+                gate_fail_payloads.append(c)
+
+        # Real critics for others
+        real_candidates = [c for c in current if "_gate_failures" not in c]
+        if real_candidates:
+            critic_results += run_critics_parallel(client, spec, context, real_candidates)
+
+        # 4) Consolidate
+        summary = consolidate(critic_results)
+        winner_id = summary["winner"]["candidate_id"]
+        winner = next(c for c in current if c["candidate_id"] == winner_id)
+        runner = next((c for c in current if c["candidate_id"] != winner_id), None)
+
+        print(f"Winner: {winner_id}. Blockers: {len(summary['winner']['blockers'])}. "
+              f"Weighted score: {summary['winner']['weighted']:.3f}")
+
+        actions = summary["winner"]["next_actions"]
+        if summary["winner"]["blockers"]:
+            # 5) Synthesize minimal revision for the winner
+            revised = synthesize_revision(client, spec, context, winner, runner, actions)
+
+            # 6) Gate revised bundle
+            errs = pre_gate_candidate(revised)
+            if errs:
+                print("Revised candidate still fails AST gate; stopping early.")
+                current = [revised]
+                break
+
+            # optional pytest
+            if args.pytest:
+                tmp = Path(tempfile.mkdtemp(prefix="rev_"))
+                write_files(revised, tmp)
+                ok, out = run_pytest(tmp, timeout=120)
+                shutil.rmtree(tmp, ignore_errors=True)
+                if not ok:
+                    print("Pytest failed on revised candidate; feeding back would be next step.")
+                    # For brevity we stop here; in production, feed logs back through critics and loop.
+                    current = [revised]
+                    break
+
+            # next loop works with the revised winner plus the runner (fallback)
+            current = [revised] + ([runner] if runner else [])
+        else:
+            # No blockers -> done
+            current = [winner]
+            break
+
+    # 7) Write final output
+    final = current[0]
+    written = write_files(final, args.out)
+    print(f"\nWrote {len(written)} files to {args.out}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+### Notes
+
+* Uses **Responses API** with **Structured Outputs** in the correct place (`response → text → format`) and reads `output_parsed`.
+* Critics run on **o3** with `reasoning.effort="low"`. Bump to `"medium"` only if you see ambiguous or low-confidence judgments.
+* Pre-gates (AST) are cheap and eliminate junk before critics.
+* Pytest hook is optional; flip `--pytest` on when your candidates emit tests.
+* The synthesizer applies **minimal changes** to the winner using GPT-5, then re-gates.
+* All JSON payloads are **strict**, so you can wire this into your CI and trust the shapes.
+
+If you want this tailored to your exact repo layout (e.g., contracts checkers, ruff/mypy gates, custom critics), say the word and I’ll slot those in.

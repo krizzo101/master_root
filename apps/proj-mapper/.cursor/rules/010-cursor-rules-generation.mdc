@@ -1,0 +1,182 @@
+---
+description: WHEN creating, editing, or accessing ANY parent rule files TO ensure consistency you MUST ENFORCE structure standard
+globs: .cursor/rules/*.mdc
+alwaysApply: false
+---
+
+
+{
+"sections": {
+"overview": "12-15",
+"structure_requirements": "17-45",
+"validation_requirements": "47-75",
+"generation_requirements": "77-95"
+},
+"key_elements": {
+"structure_validation": "20-30",
+"format_validation": "50-60",
+"generation_validation": "80-90"
+},
+"ai_instructions": "Process sections in order: structure_requirements -> validation_requirements -> generation_requirements. Validate against structure_validation before proceeding."
+}
+
+{
+"rule_name": "Cursor Rules Generation",
+"version": "2.0.0",
+"ai_processing_priority": "critical",
+"enhanced_metadata": {
+"activation_context": [
+"creating rules",
+"editing rules",
+"accessing rules",
+"validating rules"
+],
+"priority": 5,
+"domain": "meta-rules"
+},
+
+"overview": {
+"description": "Defines standards for creating and managing Cursor rules",
+"importance": "Proper rule structure ensures consistent AI processing"
+},
+
+"structure_requirements": {
+"frontmatter": {
+"requirements": [
+"Use WHEN/TO/MUST format for agent-requested rules",
+"Define globs without quotes for auto-attached rules",
+"Set alwaysApply appropriately",
+"Include metadata"
+],
+"validation": {"formatted": true, "complete": true},
+"state_requirements": {
+"always_rules": {
+"alwaysApply": true,
+"description": "Optional",
+"globs": "Optional"
+},
+"auto_attached_rules": {
+"alwaysApply": false,
+"description": "Optional",
+"globs": "Required"
+},
+"agent_requested_rules": {
+"alwaysApply": false,
+"description": "Required (MUST-WHEN-TO format)",
+"globs": "Must be empty or omitted"
+},
+"manual_rules": {
+"alwaysApply": false,
+"description": "Must be omitted",
+"globs": "Must be omitted"
+}
+},
+"examples": {
+"agent_requested": {
+"description": "WHEN creating files TO ensure consistency you MUST follow standards",
+"alwaysApply": false
+},
+"auto_attached": {
+"description": "Optional description for context",
+"globs": \*_/_.ts,
+"alwaysApply": false
+},
+"always": {
+"description": "Optional core behavior description",
+"alwaysApply": true
+},
+"manual": {
+"alwaysApply": false
+}
+}
+},
+"file_map": {
+"requirements": [
+"Include section ranges",
+"Define key elements",
+"Specify AI instructions",
+"Maintain line count"
+],
+"validation": {"mapped": true, "instructed": true}
+},
+"content_structure": {
+"requirements": [
+"Use JSON format",
+"Include all sections",
+"Define validations",
+"Add examples"
+],
+"validation": {"structured": true, "validated": true}
+}
+},
+
+"validation_requirements": {
+"format_validation": {
+"requirements": [
+"Check frontmatter",
+"Verify file map",
+"Validate JSON",
+"Confirm sections"
+],
+"validation": {"checked": true, "verified": true}
+},
+"content_validation": {
+"requirements": [
+"Verify completeness",
+"Check consistency",
+"Validate examples",
+"Test processing"
+],
+"validation": {"complete": true, "consistent": true}
+}
+},
+
+"generation_requirements": {
+"rule_creation": {
+"requirements": [
+"Follow template",
+"Include all sections",
+"Add validations",
+"Test processing"
+],
+"validation": {"created": true, "tested": true}
+},
+"rule_updates": {
+"requirements": [
+"Maintain structure",
+"Update versions",
+"Track changes",
+"Validate updates"
+],
+"validation": {"maintained": true, "tracked": true}
+}
+},
+
+"danger": {
+"critical_violations": [
+"NEVER skip frontmatter",
+"NEVER use quotes in globs",
+"NEVER omit file map",
+"NEVER skip validation",
+"NEVER mix formats",
+"NEVER ignore structure",
+"NEVER skip testing",
+"NEVER lose metadata",
+"NEVER mix rule state requirements",
+"NEVER omit required state fields",
+"NEVER use incorrect state configuration",
+"NEVER leave state ambiguous"
+],
+"validation_rules": {
+"frontmatter": {"present": true},
+"globs": {"unquoted": true},
+"file_map": {"included": true},
+"validation": {"performed": true},
+"format": {"consistent": true},
+"structure": {"maintained": true},
+"testing": {"completed": true},
+"metadata": {"preserved": true},
+"state": {"valid": true, "unambiguous": true}
+}
+}
+}

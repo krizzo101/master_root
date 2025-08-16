@@ -1,0 +1,7 @@
+---
+description: WHEN organizing code review rules TO ensure proper categorization you MUST follow section standards
+globs: .cursor/rules/7*.mdc
+alwaysApply: false
+---
+
+CONTEXT for rules 701-749 that provide GUIDANCE on AI-ASSISTED CODE REVIEW, PEER REVIEW PROCESSES, and CODE AUDITING

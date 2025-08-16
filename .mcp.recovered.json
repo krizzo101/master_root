@@ -1,0 +1,90 @@
+{
+  "mcpServers": {
+    "time": {
+      "command": "npx",
+      "args": ["-y", "time-mcp"]
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": {
+        "FIRECRAWL_API_KEY": "fc-448d8d1b56984646abb4504c060c2650"
+      }
+    },
+    "claude-code": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": ["-m", "opsvi_mcp.servers.claude_code"],
+      "env": {
+        "PYTHONPATH": "/home/opsvi/master_root/libs",
+        "CLAUDE_CODE_TOKEN": "YOUR_TOKEN_HERE"
+      }
+    },
+    "db": {
+      "command": "uvx",
+      "args": ["mcp-neo4j"],
+      "env": {
+        "NEO4J_URI": "neo4j://localhost:7687",
+        "NEO4J_USERNAME": "neo4j",
+        "NEO4J_PASSWORD": "fastmcp123"
+      }
+    },
+    "thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-thinking"]
+    },
+    "shell_exec": {
+      "command": "npx",
+      "args": ["-y", "mcp-shell-exec"]
+    },
+    "mcp_web_search": {
+      "command": "npx",
+      "args": ["-y", "@chrisbennett_ok/brave-web-search-mcp"],
+      "env": {
+        "BRAVE_API_KEY": "YOUR_BRAVE_API_KEY"
+      }
+    },
+    "research_papers": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-arxiv"]
+    },
+    "tech_docs": {
+      "command": "npx",
+      "args": ["-y", "mcp-tech-docs"]
+    },
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git"]
+    },
+    "consult_suite_enhanced": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": ["-m", "opsvi_mcp.servers.consult_suite"],
+      "env": {
+        "PYTHONPATH": "/home/opsvi/master_root/libs"
+      }
+    },
+    "calc": {
+      "command": "npx",
+      "args": ["-y", "mcp-calc"]
+    },
+    "gemini-agent": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": ["-m", "opsvi_mcp.servers.gemini_agent"],
+      "env": {
+        "PYTHONPATH": "/home/opsvi/master_root/libs"
+      }
+    },
+    "claude-code-sdglbl": {
+      "command": "npx",
+      "args": ["-y", "mcp-claude-code-sdglbl"]
+    },
+    "knowledge": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": ["-m", "apps.knowledge_system.mcp_knowledge_server"],
+      "env": {
+        "PYTHONPATH": "/home/opsvi/master_root",
+        "NEO4J_URI": "neo4j://localhost:7687",
+        "NEO4J_PASSWORD": "fastmcp123"
+      }
+    }
+  }
+}
