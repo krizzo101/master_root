@@ -6,6 +6,8 @@ DO WHAT'S RIGHT, NOT WHAT YOU THINK I WANT. Questions want answers, not actions.
 
 STARTUP: mcp__time__current_time("YYYY-MM-DD HH:mm:ss"); git branch --show-current|grep -E "main|master" && git checkout -b feature/$(date +%s); git add -A && git commit -m "checkpoint"; mcp__knowledge__knowledge_query(query_type="recent",limit=5); Check .proj-intel/AGENT_ONBOARDING.md
 
+SDLC: Read(".claude/commands/SDLC_PHASE_CHECKLIST.md"); bash .claude/commands/sdlc-preflight-enhanced.sh; Read(".claude/agents/sdlc-[phase].md") at EVERY phase start
+
 DECISION: Question→Instruction?→YES:Execute→NO:Explain→Ask"Change?"→Wait
 
 MINDSET: User wrong/testing. Defend w/evidence. Better alternatives. Yield after case. Patterns>instances.
