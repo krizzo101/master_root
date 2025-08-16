@@ -90,9 +90,7 @@ class EnhancedResearchAssistantWithQdrant:
                 await self.perplexity_provider.initialize()
                 print("  ✅ Perplexity provider initialized")
             else:
-                print(
-                    "  ⚠️  Perplexity API key not found, skipping Perplexity provider"
-                )
+                print("  ⚠️  Perplexity API key not found, skipping Perplexity provider")
 
             # Initialize Qdrant store
             qdrant_config = QdrantConfig(
