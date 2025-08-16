@@ -211,17 +211,19 @@ class ResourceDiscoveryTool:
 
         return file_info
 
-    def list_all_packages(self) -> List[Dict[str, str]]:
+    def list_packages(self) -> List[Dict[str, Any]]:
         """List all available packages in libs/ directory."""
         packages = []
 
         if self.libs_path.exists():
             for package_dir in self.libs_path.iterdir():
-                if package_dir.is_dir() and package_dir.name.startswith("opsvi-"):
+                if package_dir.is_dir() and not package_dir.name.startswith("."):
                     package_info = {
                         "name": package_dir.name,
-                        "path": str(package_dir),
+                        "path": str(package_dir.relative_to(self.libs_path)),
                         "description": "",
+                        "has_tests": False,
+                        "modules": [],
                     }
 
                     # Try to get description from README
@@ -237,9 +239,246 @@ class ResourceDiscoveryTool:
                         except Exception:
                             pass
 
+                    # Check for tests
+                    test_dir = package_dir / "tests"
+                    if test_dir.exists():
+                        package_info["has_tests"] = True
+
+                    # List Python modules
+                    for py_file in package_dir.rglob("*.py"):
+                        if not any(p in str(py_file) for p in ["__pycache__", ".pyc"]):
+                            module_path = py_file.relative_to(package_dir)
+                            package_info["modules"].append(str(module_path))
+
                     packages.append(package_info)
 
         return packages
+
+    def check_package_exists(self, package_name: str) -> Dict[str, Any]:
+        """Check if a specific package exists and get its details."""
+        package_path = self.libs_path / package_name
+
+        if not package_path.exists():
+            # Try with opsvi- prefix
+            package_path = self.libs_path / f"opsvi-{package_name}"
+
+        result = {
+            "exists": package_path.exists() and package_path.is_dir(),
+            "path": str(package_path) if package_path.exists() else None,
+            "modules": [],
+            "description": "",
+            "dependencies": [],
+        }
+
+        if result["exists"]:
+            # Get modules
+            for py_file in package_path.rglob("*.py"):
+                if not any(p in str(py_file) for p in ["__pycache__", ".pyc"]):
+                    result["modules"].append(str(py_file.relative_to(package_path)))
+
+            # Get description from README
+            readme_path = package_path / "README.md"
+            if readme_path.exists():
+                try:
+                    content = readme_path.read_text()
+                    lines = content.split("\n")
+                    for line in lines:
+                        if line.strip() and not line.startswith("#"):
+                            result["description"] = line.strip()[:200]
+                            break
+                except Exception:
+                    pass
+
+            # Get dependencies from pyproject.toml
+            pyproject_path = package_path / "pyproject.toml"
+            if pyproject_path.exists():
+                try:
+                    content = pyproject_path.read_text()
+                    # Simple extraction of dependencies
+                    if "dependencies = [" in content:
+                        deps_start = content.index("dependencies = [")
+                        deps_end = content.index("]", deps_start)
+                        deps_section = content[deps_start:deps_end]
+                        for line in deps_section.split("\n")[1:]:
+                            if '"' in line:
+                                dep = line.split('"')[1]
+                                result["dependencies"].append(dep)
+                except Exception:
+                    pass
+
+        return result
+
+    def find_similar_patterns(
+        self, code_snippet: str, language: str = "python"
+    ) -> List[Dict[str, Any]]:
+        """Find existing code with similar functionality."""
+        results = []
+
+        # Extract key patterns from the snippet
+        patterns = []
+        if "def " in code_snippet:
+            # Extract function names
+            import re
+
+            func_matches = re.findall(r"def\s+(\w+)", code_snippet)
+            patterns.extend(func_matches)
+
+        if "class " in code_snippet:
+            # Extract class names
+            import re
+
+            class_matches = re.findall(r"class\s+(\w+)", code_snippet)
+            patterns.extend(class_matches)
+
+        # Search for similar patterns
+        for py_file in self.libs_path.rglob("*.py"):
+            if any(
+                p in str(py_file) for p in ["__pycache__", ".pyc", "test_", "_test.py"]
+            ):
+                continue
+
+            try:
+                content = py_file.read_text()
+                similarity_score = 0
+                matched_patterns = []
+
+                for pattern in patterns:
+                    if pattern in content:
+                        similarity_score += 0.3
+                        matched_patterns.append(pattern)
+
+                if similarity_score > 0:
+                    result = {
+                        "file_path": str(py_file.relative_to(self.root_path)),
+                        "similarity_score": min(similarity_score, 1.0),
+                        "matched_patterns": matched_patterns,
+                        "suggested_import": self._generate_import_statement(py_file),
+                    }
+                    results.append(result)
+            except Exception:
+                continue
+
+        # Sort by similarity score
+        results.sort(key=lambda x: x["similarity_score"], reverse=True)
+        return results[:10]  # Return top 10 matches
+
+    def analyze_dependencies(self, package_name: str) -> Dict[str, Any]:
+        """Analyze dependencies for a package."""
+        package_path = self.libs_path / package_name
+
+        if not package_path.exists():
+            package_path = self.libs_path / f"opsvi-{package_name}"
+
+        result = {
+            "internal_imports": [],
+            "external_dependencies": [],
+            "python_version": None,
+            "optional_dependencies": {},
+        }
+
+        if not package_path.exists():
+            return result
+
+        # Analyze Python files for imports
+        internal_packages = set()
+        external_packages = set()
+
+        for py_file in package_path.rglob("*.py"):
+            if any(p in str(py_file) for p in ["__pycache__", ".pyc"]):
+                continue
+
+            try:
+                content = py_file.read_text()
+                # Find imports
+                import_lines = [
+                    line
+                    for line in content.split("\n")
+                    if line.strip().startswith(("import ", "from "))
+                ]
+
+                for line in import_lines:
+                    if "from libs." in line or "import libs." in line:
+                        # Internal import
+                        parts = line.split()
+                        if "from" in parts:
+                            idx = parts.index("from") + 1
+                            if idx < len(parts):
+                                module = (
+                                    parts[idx].split(".")[1]
+                                    if "." in parts[idx]
+                                    else parts[idx]
+                                )
+                                internal_packages.add(module)
+                    elif not line.startswith(("from .", "import .")):
+                        # External import
+                        parts = line.split()
+                        if "import" in parts:
+                            idx = parts.index("import") + 1
+                            if idx < len(parts):
+                                module = parts[idx].split(".")[0]
+                                if module not in [
+                                    "os",
+                                    "sys",
+                                    "json",
+                                    "re",
+                                    "pathlib",
+                                    "typing",
+                                ]:
+                                    external_packages.add(module)
+            except Exception:
+                continue
+
+        result["internal_imports"] = list(internal_packages)
+        result["external_dependencies"] = list(external_packages)
+
+        # Check pyproject.toml for declared dependencies
+        pyproject_path = package_path / "pyproject.toml"
+        if pyproject_path.exists():
+            try:
+                content = pyproject_path.read_text()
+
+                # Extract Python version
+                if 'python = "' in content:
+                    py_match = re.search(r'python = "([^"]+)"', content)
+                    if py_match:
+                        result["python_version"] = py_match.group(1)
+
+                # Extract optional dependencies
+                if (
+                    "[tool.poetry.extras]" in content
+                    or "[project.optional-dependencies]" in content
+                ):
+                    # Simple extraction of optional deps
+                    lines = content.split("\n")
+                    current_extra = None
+                    for line in lines:
+                        if line.startswith("[") and "optional" in line.lower():
+                            current_extra = "extras"
+                        elif current_extra and "=" in line:
+                            key = line.split("=")[0].strip()
+                            result["optional_dependencies"][key] = []
+            except Exception:
+                pass
+
+        return result
+
+    def _generate_import_statement(self, file_path: Path) -> str:
+        """Generate an import statement for a file."""
+        try:
+            relative_path = file_path.relative_to(self.libs_path)
+            parts = list(relative_path.parts)
+
+            # Remove .py extension
+            if parts[-1].endswith(".py"):
+                parts[-1] = parts[-1][:-3]
+
+            # Convert to import statement
+            if parts[-1] == "__init__":
+                parts = parts[:-1]
+
+            return f"from libs.{'.'.join(parts)} import ..."
+        except Exception:
+            return ""
 
 
 # MCP Tool Functions

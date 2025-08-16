@@ -1,0 +1,146 @@
+#!/usr/bin/env python3
+"""
+MCP Server for Resource Discovery
+Provides tools to discover existing packages and components in the libs/ directory.
+"""
+
+import sys
+from pathlib import Path
+from typing import Any, Dict, List
+
+# Add the project root to the path
+root_path = Path(__file__).parent.parent.parent.parent.parent.parent
+sys.path.insert(0, str(root_path))
+
+from fastmcp import FastMCP  # noqa: E402
+
+from libs.opsvi_mcp.opsvi_mcp.tools.mcp_resource_discovery import (  # noqa: E402
+    ResourceDiscoveryTool,
+)
+
+# Initialize the MCP server
+mcp = FastMCP("resource-discovery")
+
+# Initialize the resource discovery tool
+discovery_tool = ResourceDiscoveryTool(root_path=str(root_path))
+
+
+@mcp.tool()
+def search_resources(
+    functionality: str, search_depth: int = 3, include_tests: bool = False
+) -> Dict[str, Any]:
+    """
+    Search for existing resources related to specific functionality.
+
+    Args:
+        functionality: Description of needed functionality (e.g., "database", "auth")
+        search_depth: How deep to search in directory structure (default: 3)
+        include_tests: Whether to include test files in results (default: False)
+
+    Returns:
+        Dict containing:
+        - packages_found: List of relevant packages with descriptions
+        - relevant_modules: List of specific modules that might help
+        - potential_utilities: List of utility functions found
+        - similar_patterns: Code patterns that match the search
+
+    Example:
+        search_resources("database ORM", search_depth=2)
+    """
+    return discovery_tool.search_resources(functionality, search_depth, include_tests)
+
+
+@mcp.tool()
+def list_packages() -> List[Dict[str, Any]]:
+    """
+    List all available packages in the libs/ directory.
+
+    Returns:
+        List of package information including:
+        - name: Package name
+        - path: Relative path from libs/
+        - description: Package description from README or docstring
+        - has_tests: Whether package has tests
+        - modules: List of Python modules in the package
+
+    Example:
+        packages = list_packages()
+        # Returns all packages with their metadata
+    """
+    return discovery_tool.list_packages()
+
+
+@mcp.tool()
+def check_package_exists(package_name: str) -> Dict[str, Any]:
+    """
+    Check if a specific package exists and get its details.
+
+    Args:
+        package_name: Name of the package to check (e.g., "opsvi-llm", "opsvi-agents")
+
+    Returns:
+        Dict containing:
+        - exists: Boolean indicating if package exists
+        - path: Full path to package if it exists
+        - modules: List of modules in the package
+        - description: Package description if available
+        - dependencies: List of dependencies if pyproject.toml exists
+
+    Example:
+        result = check_package_exists("opsvi-llm")
+        if result["exists"]:
+            print(f"Found at: {result['path']}")
+    """
+    return discovery_tool.check_package_exists(package_name)
+
+
+@mcp.tool()
+def find_similar_functionality(
+    code_snippet: str, language: str = "python"
+) -> List[Dict[str, Any]]:
+    """
+    Find existing code with similar functionality to a given snippet.
+
+    Args:
+        code_snippet: Code snippet to find similar implementations for
+        language: Programming language (default: "python")
+
+    Returns:
+        List of similar code found with:
+        - file_path: Path to file containing similar code
+        - similarity_score: Score indicating how similar (0-1)
+        - matched_patterns: What patterns matched
+        - suggested_import: How to import and use this code
+
+    Example:
+        snippet = "def authenticate_user(username, password):"
+        similar = find_similar_functionality(snippet)
+    """
+    return discovery_tool.find_similar_patterns(code_snippet, language)
+
+
+@mcp.tool()
+def get_package_dependencies(package_name: str) -> Dict[str, Any]:
+    """
+    Get dependencies and imports for a specific package.
+
+    Args:
+        package_name: Name of the package to analyze
+
+    Returns:
+        Dict containing:
+        - internal_imports: Other libs/ packages this depends on
+        - external_dependencies: Third-party packages required
+        - python_version: Required Python version if specified
+        - optional_dependencies: Optional/extra dependencies
+
+    Example:
+        deps = get_package_dependencies("opsvi-agents")
+        print(f"Requires: {deps['external_dependencies']}")
+    """
+    return discovery_tool.analyze_dependencies(package_name)
+
+
+if __name__ == "__main__":
+    # Run the MCP server
+    mcp.run()

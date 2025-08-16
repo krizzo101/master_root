@@ -10,17 +10,19 @@ This command initiates a new project following strict SDLC phases with appropria
 ## 🤖 Agent Strategy for SDLC Phases
 
 ### Phase-Specific Agent Profiles
-Each SDLC phase leverages specialized agents via the Task tool:
+Each SDLC phase has a dedicated agent profile that should be loaded:
 
-| Phase | Agent Type | Purpose |
+| Phase | Agent Profile | Purpose |
 |-------|------------|---------|
-| **DISCOVERY** | `research-genius` | Research best practices, find existing solutions |
-| **DESIGN** | `solution-architect` | Design system architecture and components |
-| **PLANNING** | `business-analyst` | Break down requirements into tasks |
-| **DEVELOPMENT** | `development-specialist` | Implement high-quality code |
-| **TESTING** | `qa-testing-guru` | Comprehensive testing strategy |
-| **DEPLOYMENT** | `solution-architect` | Deployment and infrastructure planning |
-| **PRODUCTION** | `reviewer-critic` | Final review and feedback |
+| **DISCOVERY** | `sdlc_discovery` | Understand requirements, research solutions |
+| **DESIGN** | `sdlc_design` | Create robust, scalable architecture |
+| **PLANNING** | `sdlc_planning` | Break down into actionable tasks |
+| **DEVELOPMENT** | `sdlc_development` | Implement clean, tested code |
+| **TESTING** | `sdlc_testing` | Validate all requirements met |
+| **DEPLOYMENT** | `sdlc_deployment` | Prepare for production |
+| **PRODUCTION** | `sdlc_production` | Final review and handover |
+
+**Loading Phase Profiles**: Read the appropriate profile from `.claude/agents/sdlc/` at the start of each phase to align your approach with phase-specific requirements.
 
 ## What This Command Does
 1. **Initializes SDLC tracking** for your project
@@ -64,61 +66,108 @@ result = mcp__knowledge__knowledge_query(
 ```
 
 ### 2. Resource Discovery - Check Existing Code
+
+**IMPORTANT**: The resource discovery MCP server must be configured in your MCP settings to use these tools.
+
 ```python
-# Use MCP resource discovery tool to find existing packages in libs/
-result = mcp__resource_discovery__search_resources(
+# Search for existing functionality in libs/
+result = search_resources(
     functionality="description of what you need",
     search_depth=3,
     include_tests=False
 )
-# This searches our actual codebase for reusable components
+# Returns packages, modules, and similar patterns
 
-# Also list all available packages
-packages = mcp__resource_discovery__list_packages()
+# List all available packages
+packages = list_packages()
+# Returns all packages with descriptions and modules
+
+# Check if specific package exists
+package_info = check_package_exists("opsvi-llm")
+# Returns package details and dependencies
+
+# Find similar code patterns
+similar = find_similar_functionality(
+    code_snippet="def authenticate_user(username, password):",
+    language="python"
+)
+# Returns files with similar implementations
 ```
 
-### 3. External Research with Task Tool (When Needed)
+**Note**: These are MCP tools provided by the resource_discovery server. Do NOT try to import Python modules directly.
+
+### 3. External Research and Parallel Processing
+
+#### Research Current Best Practices (MANDATORY)
 ```python
-# Use Task tool for researching best practices and external solutions
-Task(
-    description="Research best practices",
-    subagent_type="research-genius",
-    prompt="""
-    Research current best practices for [technology/pattern].
-    Find:
-    - Industry standard approaches
-    - Common pitfalls to avoid
-    - Performance considerations
-    - Security best practices
-    """
+# Use MCP tools for research - don't skip this!
+mcp__mcp_web_search__brave_web_search(
+    query="[technology] best practices 2025",
+    count=10
+)
+
+mcp__tech_docs__get-library-docs(
+    context7CompatibleLibraryID="/org/library",
+    topic="specific feature"
 )
 ```
+
+#### Parallel Agent Spawning with Task Tool
+**Use the Task tool to spawn multiple agents for parallel work:**
+
+```python
+# Spawn parallel research agents
+Task(
+    description="Research authentication patterns",
+    subagent_type="research-genius",  # Or use claude-code for complex tasks
+    prompt="Find current best practices for JWT authentication in 2025"
+)
+
+# For production work, prefer Claude Code agents
+Task(
+    description="Implement auth component",
+    subagent_type="claude-code",  # Claude Code handles everything
+    prompt="Create JWT authentication with refresh tokens"
+)
+```
+
+**Remember**: Use Task tool whenever you have independent work that can be parallelized. This significantly speeds up development.
 
 ## 📋 SDLC Phases with Agent Support
 
-### Phase Tracking with SDLC Enforcer
-```python
-# Initialize enforcer and create project at start
-from libs.opsvi_mcp.tools.sdlc_enforcer_scoped import ScopedSDLCEnforcer
-enforcer = ScopedSDLCEnforcer()
-project = enforcer.create_project(
-    project_name="[project-name]",
-    description="[project description]",
-    root_path="apps/[project-name]"
-)
+### Phase Tracking and Project Management
 
-# Progress through phases
-enforcer.advance_phase(project.project_id)  # After completing each phase
-enforcer.get_project_status(project.project_id)  # Check current status
+**DO NOT import Python modules directly!** Use MCP tools and TodoWrite for tracking.
+
+```python
+# Track your progress through SDLC phases
+TodoWrite(todos=[
+    {"id": "1", "content": "DISCOVERY: Gather requirements", "status": "in_progress"},
+    {"id": "2", "content": "DESIGN: Create architecture", "status": "pending"},
+    {"id": "3", "content": "PLANNING: Break down tasks", "status": "pending"},
+    {"id": "4", "content": "DEVELOPMENT: Implement code", "status": "pending"},
+    {"id": "5", "content": "TESTING: Validate solution", "status": "pending"},
+    {"id": "6", "content": "DEPLOYMENT: Prepare production", "status": "pending"},
+    {"id": "7", "content": "PRODUCTION: Final review", "status": "pending"}
+])
+
+# Each phase has specific deliverables - mark complete when done
 ```
 
 ### 1️⃣ DISCOVERY (Research & Requirements)
 
+#### Load Phase Profile
+```python
+# Read the SDLC phase profile to align your approach
+Read(".claude/agents/sdlc/sdlc_discovery.md")
+```
+
 #### Agent Support
 ```python
+# For parallel research tasks
 Task(
     description="Research phase",
-    subagent_type="research-genius",
+    subagent_type="research-genius",  # Can also use claude-code
     prompt="""
     Research current best practices for [technology/framework] in 2025.
     Find:
@@ -226,11 +275,26 @@ Task(
 
 ### 4️⃣ DEVELOPMENT (Implementation)
 
+#### 🚨 IMPORTANT: For AI-Powered Applications
+**When building applications that need AI/agent capabilities:**
+- **USE CLAUDE CODE** - Don't implement custom agents
+- Claude Code can handle all agent needs via MCP tools
+- Call `mcp__claude-code__claude_run` for simple tasks
+- Call `mcp__claude-code-v3__claude_run_v3` for production
+- The opsvi_agents library exists but Claude Code is the preferred solution
+
+#### Load Phase Profile
+```python
+# Read the SDLC phase profile to align your approach
+Read(".claude/agents/sdlc/sdlc_development.md")
+```
+
 #### Agent Support
 ```python
+# For parallel development tasks
 Task(
     description="Code implementation",
-    subagent_type="development-specialist",
+    subagent_type="claude-code",  # Preferred for AI apps
     prompt="""
     Implement [specific component/feature].
     Requirements:
