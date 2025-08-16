@@ -19,8 +19,14 @@ def execute_phase_with_export(phase: str) -> None:
         phase: The SDLC phase to execute
     """
     # Import the phase task definitions
-    sys.path.insert(0, str(Path(__file__).parent))
-    from sdlc_phase_executor_v2 import PHASE_TASKS
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "sdlc_phase_executor_v2", Path(__file__).parent / "sdlc-phase-executor-v2.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    PHASE_TASKS = module.PHASE_TASKS
 
     if phase not in PHASE_TASKS:
         print(f"Error: Unknown phase '{phase}'")
