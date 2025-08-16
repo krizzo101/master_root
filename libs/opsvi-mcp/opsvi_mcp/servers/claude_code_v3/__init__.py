@@ -5,6 +5,11 @@ from .config import EnhancedConfig
 from .task_decomposer import TaskDecomposer
 from .timeout_manager import TimeoutManager
 
-__all__ = ["server", "EnhancedConfig", "TaskDecomposer", "TimeoutManager"]
+__all__ = [
+    "server",
+    "EnhancedConfig",
+    "TaskDecomposer",
+    "TimeoutManager"
+]
 
 __version__ = "3.0.0"
