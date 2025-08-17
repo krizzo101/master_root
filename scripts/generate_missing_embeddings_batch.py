@@ -36,7 +36,7 @@ class EmbeddingGenerator:
         """Fetch all knowledge entries that don't have embeddings."""
         query = """
         MATCH (k:Knowledge)
-        WHERE k.embedding IS NULL OR NOT exists(k.embedding)
+        WHERE k.embedding IS NULL
         RETURN k.knowledge_id as id,
                k.knowledge_type as type,
                k.content as content,
