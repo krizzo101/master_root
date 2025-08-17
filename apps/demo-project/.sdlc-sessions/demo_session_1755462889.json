@@ -1,0 +1,43 @@
+{
+  "session_id": "demo-session-001",
+  "project": "demo-project",
+  "phase": "development",
+  "timestamp": "2025-08-17T16:34:49.344624",
+  "execution": {
+    "total_tasks": 9,
+    "successful": 8,
+    "failed": 1,
+    "duration_seconds": 745
+  },
+  "waves": [
+    {
+      "wave": 1,
+      "tasks": 3,
+      "success": 3,
+      "duration": 180
+    },
+    {
+      "wave": 2,
+      "tasks": 3,
+      "success": 3,
+      "duration": 320
+    },
+    {
+      "wave": 3,
+      "tasks": 3,
+      "success": 2,
+      "duration": 245
+    }
+  ],
+  "metrics": {
+    "parallelization_factor": 3.2,
+    "average_task_duration": 82.8,
+    "mode_distribution": {
+      "task": 5,
+      "mcp": 3,
+      "direct": 1
+    },
+    "retry_count": 1,
+    "correction_tasks": 1
+  }
+}
