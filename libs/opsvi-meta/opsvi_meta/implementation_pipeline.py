@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from .todo_discovery import TodoItem
+from .mcp_integration import MCPIntegration
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +47,7 @@ class ImplementationPipeline:
         self.knowledge_base_enabled = knowledge_base_enabled
         self.results: List[ImplementationResult] = []
         self.active_implementations: Dict[str, Any] = {}
+        self.mcp = MCPIntegration()
 
     async def implement_todo(self, todo: TodoItem) -> ImplementationResult:
         """Implement a single TODO using appropriate SDLC agent"""
@@ -136,11 +138,10 @@ class ImplementationPipeline:
         4. Suggested approach
         """
 
-        # Use Claude Code V1 for discovery
-        result = await self._execute_claude_agent(
+        # Use MCP integration for discovery
+        result = await self.mcp.execute_claude_task(
             task=prompt,
-            agent="mcp__claude-code-wrapper__claude_run",
-            output_format="json",
+            mode="discovery"
         )
 
         return result
@@ -164,11 +165,10 @@ class ImplementationPipeline:
         5. Performance considerations
         """
 
-        # Use solution-architect agent for design
-        result = await self._execute_claude_agent(
+        # Use MCP integration for design
+        result = await self.mcp.execute_claude_task(
             task=prompt,
-            agent="mcp__claude-code-wrapper__claude_run",
-            output_format="json",
+            mode="design"
         )
 
         return result
@@ -195,11 +195,10 @@ class ImplementationPipeline:
         5. Ensure backward compatibility
         """
 
-        # Use development-specialist for implementation
-        result = await self._execute_claude_agent(
+        # Use MCP integration for implementation
+        result = await self.mcp.execute_claude_task(
             task=prompt,
-            agent="mcp__claude-code-wrapper__claude_run",
-            output_format="json",
+            mode="implementation"
         )
 
         return result
@@ -223,11 +222,10 @@ class ImplementationPipeline:
         5. Verify performance is acceptable
         """
 
-        # Use test-remediation-specialist for testing
-        result = await self._execute_claude_agent(
+        # Use MCP integration for testing
+        result = await self.mcp.execute_claude_task(
             task=prompt,
-            agent="mcp__claude-code-wrapper__claude_run",
-            output_format="json",
+            mode="testing"
         )
 
         return result
@@ -272,28 +270,117 @@ class ImplementationPipeline:
         self, task: str, agent: str, output_format: str = "json"
     ) -> Dict[str, Any]:
         """Execute a Claude agent via MCP"""
+        
+        import subprocess
+        import tempfile
+        
+        # Create a temporary Python script to execute the MCP call
+        script_content = f"""
+import asyncio
+import json
+import sys
+sys.path.insert(0, '/home/opsvi/master_root/libs')
 
-        # This would integrate with the actual MCP servers
-        # For now, returning a placeholder
+async def run_claude():
+    # Import MCP client capabilities
+    from opsvi_mcp.servers.claude_code import models
+    
+    # For now, use subprocess to call Claude directly
+    # This will be replaced with proper MCP integration
+    
+    task = '''{task}'''
+    
+    # Use Claude Code V1 for implementation tasks
+    cmd = [
+        '/home/opsvi/miniconda/bin/python', '-m', 'opsvi_mcp.servers.claude_code',
+        '--task', task,
+        '--output-format', '{output_format}'
+    ]
+    
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            env={{
+                'PYTHONPATH': '/home/opsvi/master_root/libs',
+                'CLAUDE_CODE_TOKEN': 'test_token'
+            }}
+        )
+        stdout, stderr = await proc.communicate()
+        
+        if proc.returncode == 0:
+            result = json.loads(stdout.decode())
+            return {{
+                "status": "completed",
+                "approach": result.get("approach", "automated"),
+                "files_modified": result.get("files_modified", []),
+                "tests_created": result.get("tests_created", []),
+                "passed": True,
+                "details": result
+            }}
+        else:
+            return {{
+                "status": "failed",
+                "error": stderr.decode(),
+                "passed": False
+            }}
+    except Exception as e:
+        return {{
+            "status": "error",
+            "error": str(e),
+            "passed": False
+        }}
 
-        # In real implementation:
-        # result = await mcp_client.execute(agent, task=task, output_format=output_format)
-
-        return {
-            "status": "completed",
-            "approach": "automated implementation",
-            "files_modified": [str(self.project_root / "example.py")],
-            "tests_created": [str(self.project_root / "test_example.py")],
-            "passed": True,
-        }
+result = asyncio.run(run_claude())
+print(json.dumps(result))
+"""
+        
+        # Write script to temp file and execute
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+            f.write(script_content)
+            temp_script = f.name
+        
+        try:
+            # Execute the script
+            proc = await asyncio.create_subprocess_exec(
+                '/home/opsvi/miniconda/bin/python', temp_script,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            stdout, stderr = await proc.communicate()
+            
+            if proc.returncode == 0:
+                return json.loads(stdout.decode())
+            else:
+                logger.error(f"Claude agent execution failed: {stderr.decode()}")
+                return {
+                    "status": "failed",
+                    "error": stderr.decode(),
+                    "passed": False,
+                    "files_modified": [],
+                    "tests_created": []
+                }
+        finally:
+            # Clean up temp file
+            import os
+            os.unlink(temp_script)
 
     async def _store_knowledge(self, knowledge: Dict[str, Any]):
         """Store knowledge in the knowledge base"""
-
-        # This would integrate with mcp__knowledge__knowledge_store
-        # For now, just log it
-
-        logger.info(f"Storing knowledge: {json.dumps(knowledge, indent=2)}")
+        
+        # Use MCP integration to store knowledge
+        success = await self.mcp.store_knowledge(
+            knowledge_type=knowledge.get("pattern_type", "TODO_IMPLEMENTATION"),
+            content=json.dumps(knowledge.get("solution", {})),
+            context=knowledge.get("context", {}),
+            confidence=0.8
+        )
+        
+        if success:
+            logger.info("Successfully stored knowledge in knowledge base")
+        else:
+            logger.warning("Failed to store knowledge in knowledge base")
 
     async def run_batch_implementation(
         self, todos: List[TodoItem], max_parallel: int = 3
