@@ -1,0 +1,278 @@
+{
+  "summary": {
+    "summary": {
+      "total_attempted": 10,
+      "successful": 10,
+      "partial": 0,
+      "failed": 0,
+      "total_duration_seconds": 0.670529,
+      "average_duration_seconds": 0.0670529
+    },
+    "by_agent": {
+      "sdlc-development": {
+        "success": 1,
+        "failure": 0
+      },
+      "refactoring-master": {
+        "success": 4,
+        "failure": 0
+      },
+      "sdlc-testing": {
+        "success": 2,
+        "failure": 0
+      },
+      "code-analyzer": {
+        "success": 3,
+        "failure": 0
+      }
+    },
+    "by_complexity": {},
+    "files_modified": [],
+    "tests_added": [],
+    "knowledge_items": [
+      {
+        "pattern_type": "TODO_IMPLEMENTATION",
+        "category": "TODO",
+        "complexity": "medium",
+        "solution": {
+          "approach": "Implemented using best practices",
+          "code_changes": [],
+          "tests_added": []
+        },
+        "context": {
+          "file_type": "test",
+          "had_dependencies": true
+        },
+        "success_factors": [],
+        "lessons_learned": []
+      },
+      {
+        "pattern_type": "TODO_IMPLEMENTATION",
+        "category": "HACK",
+        "complexity": "medium",
+        "solution": {
+          "approach": "Implemented using best practices",
+          "code_changes": [],
+          "tests_added": []
+        },
+        "context": {
+          "file_type": "general",
+          "had_dependencies": true
+        },
+        "success_factors": [],
+        "lessons_learned": []
+      },
+      {
+        "pattern_type": "TODO_IMPLEMENTATION",
+        "category": "HACK",
+        "complexity": "medium",
+        "solution": {
+          "approach": "Implemented using best practices",
+          "code_changes": [],
+          "tests_added": []
+        },
+        "context": {
+          "file_type": "general",
+          "had_dependencies": true
+        },
+        "success_factors": [],
+        "lessons_learned": []
+      },
+      {
+        "pattern_type": "TODO_IMPLEMENTATION",
+        "category": "HACK",
+        "complexity": "medium",
+        "solution": {
+          "approach": "Implemented using best practices",
+          "code_changes": [],
+          "tests_added": []
+        },
+        "context": {
+          "file_type": "general",
+          "had_dependencies": true
+        },
+        "success_factors": [],
+        "lessons_learned": []
+      },
+      {
+        "pattern_type": "TODO_IMPLEMENTATION",
+        "category": "FIXME",
+        "complexity": "medium",
+        "solution": {
+          "approach": "Implemented using best practices",
+          "code_changes": [],
+          "tests_added": []
+        },
+        "context": {
+          "file_type": "model",
+          "had_dependencies": true
+        },
+        "success_factors": [],
+        "lessons_learned": []
+      },
+      {
+        "pattern_type": "TODO_IMPLEMENTATION",
+        "category": "XXX",
+        "complexity": "medium",
+        "solution": {
+          "approach": "Implemented using best practices",
+          "code_changes": [],
+          "tests_added": []
+        },
+        "context": {
+          "file_type": "general",
+          "had_dependencies": true
+        },
+        "success_factors": [],
+        "lessons_learned": []
+      },
+      {
+        "pattern_type": "TODO_IMPLEMENTATION",
+        "category": "XXX",
+        "complexity": "medium",
+        "solution": {
+          "approach": "Implemented using best practices",
+          "code_changes": [],
+          "tests_added": []
+        },
+        "context": {
+          "file_type": "config",
+          "had_dependencies": true
+        },
+        "success_factors": [],
+        "lessons_learned": []
+      },
+      {
+        "pattern_type": "TODO_IMPLEMENTATION",
+        "category": "XXX",
+        "complexity": "medium",
+        "solution": {
+          "approach": "Implemented using best practices",
+          "code_changes": [],
+          "tests_added": []
+        },
+        "context": {
+          "file_type": "config",
+          "had_dependencies": true
+        },
+        "success_factors": [],
+        "lessons_learned": []
+      },
+      {
+        "pattern_type": "TODO_IMPLEMENTATION",
+        "category": "FIXME",
+        "complexity": "medium",
+        "solution": {
+          "approach": "Implemented using best practices",
+          "code_changes": [],
+          "tests_added": []
+        },
+        "context": {
+          "file_type": "general",
+          "had_dependencies": true
+        },
+        "success_factors": [],
+        "lessons_learned": []
+      },
+      {
+        "pattern_type": "TODO_IMPLEMENTATION",
+        "category": "HACK",
+        "complexity": "medium",
+        "solution": {
+          "approach": "Implemented using best practices",
+          "code_changes": [],
+          "tests_added": []
+        },
+        "context": {
+          "file_type": "general",
+          "had_dependencies": true
+        },
+        "success_factors": [],
+        "lessons_learned": []
+      }
+    ],
+    "failures": []
+  },
+  "details": [
+    {
+      "todo_id": "b6e1d90196dd",
+      "status": "success",
+      "duration": 0.071012,
+      "agent": "sdlc-development",
+      "files_modified": [],
+      "tests_added": []
+    },
+    {
+      "todo_id": "71a0594eb7a8",
+      "status": "success",
+      "duration": 0.067378,
+      "agent": "refactoring-master",
+      "files_modified": [],
+      "tests_added": []
+    },
+    {
+      "todo_id": "4da338009069",
+      "status": "success",
+      "duration": 0.065521,
+      "agent": "refactoring-master",
+      "files_modified": [],
+      "tests_added": []
+    },
+    {
+      "todo_id": "fe9b042b0226",
+      "status": "success",
+      "duration": 0.066562,
+      "agent": "refactoring-master",
+      "files_modified": [],
+      "tests_added": []
+    },
+    {
+      "todo_id": "d0049315a295",
+      "status": "success",
+      "duration": 0.066471,
+      "agent": "sdlc-testing",
+      "files_modified": [],
+      "tests_added": []
+    },
+    {
+      "todo_id": "350187826574",
+      "status": "success",
+      "duration": 0.067252,
+      "agent": "code-analyzer",
+      "files_modified": [],
+      "tests_added": []
+    },
+    {
+      "todo_id": "a52ea432d3a7",
+      "status": "success",
+      "duration": 0.066921,
+      "agent": "code-analyzer",
+      "files_modified": [],
+      "tests_added": []
+    },
+    {
+      "todo_id": "53d25b52cb7f",
+      "status": "success",
+      "duration": 0.066092,
+      "agent": "code-analyzer",
+      "files_modified": [],
+      "tests_added": []
+    },
+    {
+      "todo_id": "dd63d6d48bb4",
+      "status": "success",
+      "duration": 0.067206,
+      "agent": "sdlc-testing",
+      "files_modified": [],
+      "tests_added": []
+    },
+    {
+      "todo_id": "385874850c48",
+      "status": "success",
+      "duration": 0.066114,
+      "agent": "refactoring-master",
+      "files_modified": [],
+      "tests_added": []
+    }
+  ]
+}

@@ -235,7 +235,7 @@ class CoderAgent(BaseAgent):
 
 def main():
     """Main function."""
-    raise NotImplementedError("To be implemented")
+    # TODO: Implement
     pass
 
 if __name__ == "__main__":
@@ -261,15 +261,8 @@ if __name__ == "__main__":
 
     def process(self, data):
         """Process data."""
-        # Validate input data
-        if data is None:
-            raise ValueError("Data cannot be None")
-        
-        # Process the data
-        processed = data
-        
-        # Return processed result
-        return processed'''
+        # TODO: Implement
+        return data'''
 
         return code
 
@@ -286,21 +279,8 @@ if __name__ == "__main__":
 
         code = f'''def {func_name}(data):
     """{description}"""
-    # Implementation for {func_name}
-    if not data:
-        return None
-    
-    # Process based on function type
-    if "{func_name}" == "validate":
-        return isinstance(data, (dict, list, str))
-    elif "{func_name}" == "calculate":
-        return sum(data) if isinstance(data, list) else data
-    elif "{func_name}" == "transform":
-        return {{k: v for k, v in data.items()}} if isinstance(data, dict) else data
-    else:
-        # Default processing
-        result = data
-    
+    # TODO: Implement
+    result = data
     return result'''
 
         return code
