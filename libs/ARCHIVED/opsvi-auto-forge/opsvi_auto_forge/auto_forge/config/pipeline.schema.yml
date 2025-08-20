@@ -1,0 +1,28 @@
+
+reasoning:
+  strategy: auto         # auto | single | self_consistency | solver_verifier | tot | debate | reflexion
+  k_samples: 5
+  max_thoughts: 20
+  verifier: gpt-4.1
+  min_confidence: 0.85
+
+knowledge:
+  retrievers:
+    - name: hybrid
+      top_k: 12
+      bm25_k: 8
+      namespaces: [project, org, stdlib, web]
+    - name: graph_paths
+      communities_top_k: 4
+      paths_top_k: 6
+  cite_required: true
+  freshness_days: 90
+  max_ctx_chars: 120000
+
+quality_gates:
+  overall_threshold: 0.95
+  policy_threshold: 0.90
+
+auto_repair:
+  max_repair_attempts: 3
+  enabled: true

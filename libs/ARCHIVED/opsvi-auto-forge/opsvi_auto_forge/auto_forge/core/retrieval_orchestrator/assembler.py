@@ -1,0 +1,200 @@
+from __future__ import annotations
+
+import logging
+import time
+from typing import List
+from uuid import uuid4
+
+# Import inside functions to avoid circular imports
+from opsvi_auto_forge.infrastructure.monitoring.metrics.decision_metrics import (
+    evidence_coverage,
+    ro_context_pack_assembly_duration_ms,
+    ro_context_pack_size_chars,
+)
+
+from . import retrievers
+from .models import ContextPack, GraphPath, RetrievalConfig, Snippet
+
+logger = logging.getLogger(__name__)
+
+
+def _dedupe(snips: List[Snippet]) -> List[Snippet]:
+    """Remove duplicate snippets based on citation."""
+    seen = set()
+    out: List[Snippet] = []
+    for s in sorted(snips, key=lambda x: x.score, reverse=True):
+        key = s.citation
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(s)
+    return out
+
+
+def _apply_freshness_weighting(
+    snippets: List[Snippet], freshness_days: int = 90
+) -> List[Snippet]:
+    """Apply freshness weighting to snippets."""
+    from .freshness import calculate_freshness_score
+
+    weighted_snippets = []
+    for snippet in snippets:
+        # Calculate freshness score (simplified - assume recent content is better)
+        freshness_score = calculate_freshness_score(snippet, freshness_days)
+
+        # Combine original score with freshness
+        combined_score = snippet.score * 0.8 + freshness_score * 0.2
+
+        # Create new snippet with weighted score
+        weighted_snippet = Snippet(
+            id=snippet.id,
+            text=snippet.text,
+            score=combined_score,
+            citation=snippet.citation,
+        )
+        weighted_snippets.append(weighted_snippet)
+
+    return sorted(weighted_snippets, key=lambda x: x.score, reverse=True)
+
+
+def _trim_to_budget(snippets: List[Snippet], max_chars: int) -> List[Snippet]:
+    """Trim snippets to fit within character budget."""
+    total_chars = 0
+    trimmed_snippets = []
+
+    for snippet in snippets:
+        snippet_chars = len(snippet.text)
+        if total_chars + snippet_chars <= max_chars:
+            trimmed_snippets.append(snippet)
+            total_chars += snippet_chars
+        else:
+            # Try to truncate snippet to fit
+            remaining_chars = max_chars - total_chars
+            if remaining_chars > 100:  # Only if we can fit a meaningful chunk
+                truncated_text = snippet.text[:remaining_chars] + "..."
+                truncated_snippet = Snippet(
+                    id=snippet.id,
+                    text=truncated_text,
+                    score=snippet.score,
+                    citation=snippet.citation,
+                )
+                trimmed_snippets.append(truncated_snippet)
+            break
+
+    return trimmed_snippets
+
+
+def _calculate_evidence_coverage(snippets: List[Snippet]) -> float:
+    """Calculate evidence coverage ratio."""
+    if not snippets:
+        return 0.0
+
+    # Count unique sources
+    unique_sources = len(set(s.citation.split("://")[0] for s in snippets))
+    total_snippets = len(snippets)
+
+    # Coverage ratio: unique sources / total snippets
+    coverage = unique_sources / total_snippets if total_snippets > 0 else 0.0
+
+    # Update metric
+    evidence_coverage.set(coverage)
+
+    return coverage
+
+
+async def build_context_pack(
+    query: str, entities: list[str], cfg: RetrievalConfig
+) -> ContextPack:
+    """Build context pack with hybrid retrieval and assembly."""
+    start_time = time.perf_counter()
+
+    # Run all retrievers in parallel
+    vec = await retrievers.vector_search(query, cfg)
+    bm25 = await retrievers.bm25_search(query, cfg)
+    graph = await retrievers.graph_paths(query, cfg)
+    web = await retrievers.web_search(query, cfg)
+
+    # Apply freshness weighting
+    vec = _apply_freshness_weighting(vec, cfg.freshness_days)
+    bm25 = _apply_freshness_weighting(bm25, cfg.freshness_days)
+    graph = _apply_freshness_weighting(graph, cfg.freshness_days)
+    web = _apply_freshness_weighting(web, cfg.freshness_days)
+
+    # Dedupe and limit results
+    vec = _dedupe(vec)[: cfg.top_k]
+    bm25 = _dedupe(bm25)[: cfg.bm25_k]
+    graph = _dedupe(graph)[: cfg.paths_top_k]
+    web = _dedupe(web)[:5]  # Limit web results
+
+    # Combine all snippets
+    all_snippets = vec + bm25 + graph + web
+
+    # Calculate evidence coverage
+    coverage_ratio = _calculate_evidence_coverage(all_snippets)
+
+    # Trim to budget
+    final_snippets = _trim_to_budget(all_snippets, cfg.max_ctx_chars)
+
+    # Create community summaries from graph paths
+    community_summaries = []
+    if graph:
+        # Group by citation domain
+        communities = {}
+        for snippet in graph:
+            domain = snippet.citation.split("://")[0]
+            if domain not in communities:
+                communities[domain] = []
+            communities[domain].append(snippet)
+
+        # Create summaries for each community
+        for domain, snippets in communities.items():
+            if len(snippets) > 1:
+                summary_text = (
+                    f"Community {domain}: {len(snippets)} related paths found"
+                )
+                summary = Snippet(
+                    id=f"community_{domain}",
+                    text=summary_text,
+                    score=sum(s.score for s in snippets) / len(snippets),
+                    citation=f"community://{domain}",
+                )
+                community_summaries.append(summary)
+
+    # Create graph paths from graph snippets
+    graph_paths = []
+    for snippet in graph:
+        if "Path:" in snippet.text:
+            path_text = snippet.text.replace("Path: ", "")
+            nodes = path_text.split(" -> ")
+            path = GraphPath(
+                nodes=nodes,
+                edges=[f"edge_{i}" for i in range(len(nodes) - 1)],
+                score=snippet.score,
+            )
+            graph_paths.append(path)
+
+    pack = ContextPack(
+        context_pack_id=f"cpk_{uuid4().hex}",
+        query=query,
+        vector_snippets=vec,
+        bm25_snippets=bm25,
+        graph_paths=graph_paths,
+        community_summaries=community_summaries,
+        web_findings=web,
+        citations_required=cfg.cite_required,
+        max_ctx_chars=cfg.max_ctx_chars,
+    )
+
+    assembly_time = (time.perf_counter() - start_time) * 1000
+    logger.info(
+        f"Context pack assembled in {assembly_time:.2f}ms with {len(final_snippets)} snippets, coverage: {coverage_ratio:.2f}"
+    )
+
+    # Emit context pack metrics
+    total_chars = sum(len(snippet.text) for snippet in final_snippets)
+    ro_context_pack_size_chars.labels(pack_type="hybrid").set(total_chars)
+    ro_context_pack_assembly_duration_ms.labels(pack_type="hybrid").observe(
+        assembly_time
+    )
+
+    return pack

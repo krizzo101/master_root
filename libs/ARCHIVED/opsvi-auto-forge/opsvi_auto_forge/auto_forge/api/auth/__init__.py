@@ -1,0 +1,60 @@
+"""Authentication module for the API."""
+
+from .dependencies import (
+    get_current_active_user,
+    get_current_user,
+    require_admin,
+    require_admin_or_developer,
+    require_admin_or_developer_or_viewer,
+    require_admin_permission,
+    require_any_permission,
+    require_any_role,
+    require_delete,
+    require_developer,
+    require_permission,
+    require_read,
+    require_read_or_write,
+    require_role,
+    require_viewer,
+    require_write,
+    require_write_or_admin,
+)
+from .jwt_handler import Token, TokenData, User, jwt_manager
+from .routes import router as auth_router
+from .user_management import (
+    PasswordChange,
+    UserCreate,
+    UserLogin,
+    UserUpdate,
+    user_manager,
+)
+
+__all__ = [
+    "jwt_manager",
+    "Token",
+    "User",
+    "TokenData",
+    "user_manager",
+    "UserCreate",
+    "UserUpdate",
+    "UserLogin",
+    "PasswordChange",
+    "get_current_user",
+    "get_current_active_user",
+    "require_permission",
+    "require_any_permission",
+    "require_role",
+    "require_any_role",
+    "require_admin",
+    "require_developer",
+    "require_viewer",
+    "require_read",
+    "require_write",
+    "require_delete",
+    "require_admin_permission",
+    "require_admin_or_developer",
+    "require_admin_or_developer_or_viewer",
+    "require_read_or_write",
+    "require_write_or_admin",
+    "auth_router",
+]

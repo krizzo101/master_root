@@ -1,0 +1,330 @@
+# Software Factory v1 Pipeline Configuration
+# This defines the core pipeline for autonomous software development
+
+name: software_factory_v1
+version: "1.0.0"
+description: "Core pipeline for autonomous software development with critic-gated loops"
+
+# Pipeline stages
+stages:
+  - name: plan
+    description: "Analyze requirements and create development plan"
+    agent: planner
+    queue: default
+    timeout: 300
+    retries: 2
+    required: true
+
+  - name: brainstorm
+    description: "Generate creative solutions and approaches"
+    agent: planner
+    queue: default
+    timeout: 180
+    retries: 1
+    required: false
+
+  - name: requirements
+    description: "Extract and formalize requirements"
+    agent: specifier
+    queue: default
+    timeout: 240
+    retries: 2
+    required: true
+
+  - name: spec
+    description: "Create detailed technical specifications"
+    agent: specifier
+    queue: default
+    timeout: 300
+    retries: 2
+    required: true
+
+  - name: techspec
+    description: "Generate technology-specific specifications"
+    agent: specifier
+    queue: default
+    timeout: 240
+    retries: 2
+    required: true
+
+  - name: arch
+    description: "Design system architecture"
+    agent: architect
+    queue: default
+    timeout: 300
+    retries: 2
+    required: true
+
+  - name: dataflow
+    description: "Design data flow and integration patterns"
+    agent: architect
+    queue: default
+    timeout: 180
+    retries: 1
+    required: false
+
+  - name: dbschema
+    description: "Design database schema"
+    agent: architect
+    queue: default
+    timeout: 180
+    retries: 1
+    required: false
+
+  - name: cicd
+    description: "Design CI/CD pipeline"
+    agent: architect
+    queue: default
+    timeout: 120
+    retries: 1
+    required: false
+
+  - name: scaffold
+    description: "Create project structure and boilerplate"
+    agent: coder
+    queue: io
+    timeout: 180
+    retries: 2
+    required: true
+
+  - name: code
+    description: "Implement core functionality"
+    agent: coder
+    queue: heavy
+    timeout: 600
+    retries: 3
+    required: true
+
+  - name: testgen
+    description: "Generate comprehensive test suites"
+    agent: tester
+    queue: io
+    timeout: 240
+    retries: 2
+    required: true
+
+  - name: testrun
+    description: "Execute test suites and collect results"
+    agent: tester
+    queue: test
+    timeout: 300
+    retries: 2
+    required: true
+
+  - name: assure
+    description: "Run assurance checks in parallel"
+    agent: critic
+    queue: io
+    timeout: 180
+    retries: 1
+    required: true
+    parallel:
+      - compliance
+      - security
+      - fiximp
+      - fixsyn
+
+  - name: perf_smoke
+    description: "Run performance smoke tests"
+    agent: tester
+    queue: test
+    timeout: 120
+    retries: 1
+    required: false
+
+  - name: critic
+    description: "Evaluate overall quality and generate critique"
+    agent: critic
+    queue: io
+    timeout: 180
+    retries: 1
+    required: true
+
+  - name: repair
+    description: "Repair issues based on critique"
+    agent: coder
+    queue: heavy
+    timeout: 300
+    retries: 2
+    required: false
+    condition: "critic.pass == false"
+
+  - name: perf_opt
+    description: "Optimize performance if needed"
+    agent: coder
+    queue: heavy
+    timeout: 240
+    retries: 1
+    required: false
+    condition: "critic.pass == true"
+
+  - name: finalize
+    description: "Package and document the solution"
+    agent: coder
+    queue: io
+    timeout: 180
+    retries: 1
+    required: true
+
+# Quality gates
+quality_gates:
+  overall_threshold: 0.95
+  policy_threshold: 0.90
+
+# Auto-repair configuration
+auto_repair:
+  max_repair_attempts: 3
+  enabled: true
+
+# Policies for critic evaluation
+policies:
+  - name: spec_quality
+    description: "Specification completeness and clarity"
+    weight: 0.15
+
+  - name: arch_quality
+    description: "Architecture design quality"
+    weight: 0.15
+
+  - name: compile_static
+    description: "Compilation and static analysis"
+    weight: 0.20
+
+  - name: tests
+    description: "Test coverage and quality"
+    weight: 0.20
+
+  - name: compliance_security
+    description: "Compliance and security checks"
+    weight: 0.15
+
+  - name: performance
+    description: "Performance requirements"
+    weight: 0.15
+
+# Agent configurations
+agents:
+  planner:
+    model: o4-mini
+    temperature: 0.1
+    max_tokens: 4000
+
+  specifier:
+    model: gpt-4.1-mini
+    temperature: 0.1
+    max_tokens: 4000
+
+  architect:
+    model: gpt-4.1-mini
+    temperature: 0.1
+    max_tokens: 4000
+
+  coder:
+    model: gpt-4.1-mini
+    temperature: 0.1
+    max_tokens: 4000
+
+  tester:
+    model: gpt-4.1-mini
+    temperature: 0.1
+    max_tokens: 4000
+
+  critic:
+    model: gpt-4.1-mini
+    temperature: 0.1
+    max_tokens: 4000
+
+# Artifact types
+artifacts:
+  - type: plan
+    description: "Development plan"
+    format: markdown
+
+  - type: spec
+    description: "Technical specifications"
+    format: markdown
+
+  - type: arch
+    description: "Architecture design"
+    format: markdown
+
+  - type: code
+    description: "Source code"
+    format: text
+
+  - type: test
+    description: "Test files"
+    format: text
+
+  - type: config
+    description: "Configuration files"
+    format: yaml
+
+  - type: docs
+    description: "Documentation"
+    format: markdown
+
+  - type: report
+    description: "Analysis reports"
+    format: json
+
+# Dependencies between stages
+dependencies:
+  brainstorm:
+    - plan
+
+  requirements:
+    - plan
+    - brainstorm
+
+  spec:
+    - requirements
+
+  techspec:
+    - spec
+
+  arch:
+    - spec
+
+  dataflow:
+    - arch
+
+  dbschema:
+    - arch
+
+  cicd:
+    - arch
+
+  scaffold:
+    - arch
+    - techspec
+
+  code:
+    - scaffold
+
+  testgen:
+    - code
+
+  testrun:
+    - testgen
+
+  assure:
+    - testrun
+
+  perf_smoke:
+    - testrun
+
+  critic:
+    - assure
+    - perf_smoke
+
+  repair:
+    - critic
+
+  perf_opt:
+    - critic
+
+  finalize:
+    - critic
+    - repair
+    - perf_opt
