@@ -47,6 +47,7 @@ This document outlines the rules, guidelines, and best practices for the AI codi
 *   The agent needs to check the current timestamps on project intelligence data versus the date/time they observed at startup and determine whether they need to run 'project-intelligence full-package' from the project root in order to refresh the data. It should do this every time to ensure it has the very latest information.
 *   The `.mcp.json` file in the project root of this project defines the tools the claude code app has available and is located at: `/home/opsvi/master_root/.mcp.json`.
 *   When asked to perform online research regarding the 'claude code' application, focus on understanding its command-line usage, capabilities, and functionality.
+*   `tech_docs` is also a useful research tool.
 
 ## 🔄 MANDATORY: GIT COMMIT REQUIREMENTS (DEFAULT BEHAVIOR - CANNOT BE IGNORED)
 
@@ -174,6 +175,10 @@ The system will automatically trigger commits when:
 *   The AI should use parallel operations as a default behavior.
 *   When using `grep` or `find` commands, the AI should use project intel methods as a primary behavior. If the project intel methods don't return anything but it is convinced what they are looking for exists then they should fall back to grep/find. If the grep/find they need to use isn't applicable to the information in the project intel cache then this does not apply which may often be the case for grep, but shouldn't usually be for find if it's a project code file.
 *   Any testing of the tool after code changes needs to be done with direct modules calls as the tool loaded in this session and available to you as an mcp tool will not include any changes until the tool is manually restarted by the user. If you need this done, ask me to do so otherwise tests from the command line to verify your changes.
+*   The Git safety rules indicate that I should avoid force-pushing to the main branch, even when it's necessary to remove a secret.
+*   When force-pushing is necessary:
+    *   Get approval from the user.
+    *   If force-pushing to `main` is not allowed, create a new branch with a cleaned history and open a PR to merge into `main`.
 
 ## DEBUGGING
 
@@ -275,7 +280,7 @@ Phase 3 (Medium-term):
 intake/custom/agent_world/src/shared/openai_interfaces/
   → libs/opsvi-llm/opsvi_llm/providers/openai_provider.py
 
-# HTTP Client → opsvi-http  
+# HTTP Client → opsvi-http
 intake/custom/agent_world/src/shared/interfaces/http/
   → libs/opsvi-http/opsvi_http/client/base.py
 
@@ -703,17 +708,4 @@ response = client.responses.create(
         "cache": True,  # Enable prompt caching
         "variables": {
             "language": "Python",
-            "framework": "FastAPI",
-            "task_type": "API endpoint",
-            "requirements": "authentication, validation, error handling"
-        }
-    },
-    input="Create secure user registration endpoint",
-    text_format=CodeResponseSchema
-)
-
-# ✅ DYNAMIC PROMPT GENERATION
-def generate_prompt_variables(task_context: dict) -> dict:
-    """Generate prompt variables dynamically based on context"""
-    return {
-        "complexity": analyze
+            "framework
