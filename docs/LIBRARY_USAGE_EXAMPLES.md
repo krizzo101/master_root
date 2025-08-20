@@ -60,11 +60,11 @@ class MyApp(CLIApplication):
             version="1.0.0",
             help="My awesome CLI application"
         )
-    
+
     def cmd_hello(self, name: str = "World"):
         """Say hello to someone"""
         print(f"Hello, {name}!")
-    
+
     def cmd_status(self):
         """Show application status"""
         print("Application is running")
@@ -120,7 +120,7 @@ import asyncio
 class AsyncApp(CLIApplication):
     def __init__(self):
         super().__init__(name="async-app")
-    
+
     @async_command()
     async def cmd_fetch(self, url: str):
         """Fetch data from URL"""
@@ -216,7 +216,7 @@ class AIAssistant(CLIApplication):
             help="AI-powered CLI assistant"
         )
         self.llm = AnthropicProvider()
-    
+
     def cmd_ask(self, question: str):
         """Ask the AI a question"""
         response = self.llm.chat({
@@ -225,7 +225,7 @@ class AIAssistant(CLIApplication):
             ]
         })
         print(response.content)
-    
+
     def cmd_code(self, description: str, language: str = "python"):
         """Generate code from description"""
         prompt = f"Generate {language} code for: {description}"
@@ -277,7 +277,7 @@ def test_cli_application():
     class TestApp(CLIApplication):
         def cmd_test(self):
             return "test"
-    
+
     app = TestApp(name="test-app")
     assert app.cli.name == "test-app"
 ```
