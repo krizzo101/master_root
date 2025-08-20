@@ -1,0 +1,108 @@
+{
+  "timestamp": "2025-08-20T16:42:58.258505+00:00",
+  "summary": {
+    "total_tests": 8,
+    "passed_tests": 8,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "total_duration": 9.012222290039062e-05
+  },
+  "results": [
+    {
+      "test_name": "Knowledge Storage",
+      "success": true,
+      "duration": 2.6702880859375e-05,
+      "error": null,
+      "metrics": {
+        "stored_count": 3,
+        "expected_count": 3,
+        "embedding_generated": true
+      }
+    },
+    {
+      "test_name": "Knowledge Query",
+      "success": true,
+      "duration": 4.291534423828125e-06,
+      "error": null,
+      "metrics": {
+        "query_tests": 4,
+        "successful_queries": 4
+      }
+    },
+    {
+      "test_name": "Knowledge Update",
+      "success": true,
+      "duration": 1.1920928955078125e-06,
+      "error": null,
+      "metrics": {
+        "success_update": true,
+        "failure_update": true
+      }
+    },
+    {
+      "test_name": "Knowledge Relationships",
+      "success": true,
+      "duration": 1.1920928955078125e-06,
+      "error": null,
+      "metrics": {
+        "relationship_created": true
+      }
+    },
+    {
+      "test_name": "Error Handling",
+      "success": true,
+      "duration": 3.0994415283203125e-06,
+      "error": null,
+      "metrics": {
+        "error_tests": 3,
+        "graceful_failures": 3
+      }
+    },
+    {
+      "test_name": "Data Integrity",
+      "success": true,
+      "duration": 7.152557373046875e-07,
+      "error": null,
+      "metrics": {
+        "valid_query_structure": true,
+        "valid_params": true,
+        "embeddings_available": true
+      }
+    },
+    {
+      "test_name": "Edge Cases",
+      "success": true,
+      "duration": 7.867813110351562e-06,
+      "error": null,
+      "metrics": {
+        "edge_tests": 4,
+        "successful_edge_tests": 4
+      }
+    },
+    {
+      "test_name": "MCP Integration",
+      "success": true,
+      "duration": 4.76837158203125e-07,
+      "error": null,
+      "metrics": {
+        "expected_tools": 5,
+        "available_tools": 5,
+        "tools": [
+          "knowledge_query",
+          "knowledge_store",
+          "knowledge_update",
+          "knowledge_relate",
+          "knowledge_read"
+        ]
+      }
+    }
+  ],
+  "recommendations": [
+    "All tests passed! System is ready for integration testing."
+  ],
+  "system_info": {
+    "python_version": "3.12.9 | packaged by Anaconda, Inc. | (main, Feb  6 2025, 18:56:27) [GCC 11.2.0]",
+    "test_timestamp": "2025-08-20T16:42:58.258498+00:00",
+    "test_environment": "simulated_mcp"
+  }
+}
