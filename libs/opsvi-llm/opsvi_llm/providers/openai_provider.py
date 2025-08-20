@@ -5,27 +5,29 @@ Enforces 2025 OpenAI API standards with strict model validation
 """
 
 import logging
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Type, TypeVar
 
 from openai import AsyncOpenAI
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from .base import (
     BaseLLMProvider,
+    ChatRequest,
+    ChatResponse,
+    CompletionRequest,
+    CompletionResponse,
+    EmbeddingRequest,
+    EmbeddingResponse,
     LLMConfig,
     LLMProviderError,
-    CompletionRequest,
-    ChatRequest,
-    EmbeddingRequest,
-    CompletionResponse,
-    ChatResponse,
-    EmbeddingResponse,
     Message,
 )
-from .openai_model_validator import OpenAIModelValidator, ModelType
-from .openai_security import DataSanitizer, AuditLogger, SecurityEnforcer
+from .openai_model_validator import ModelType, OpenAIModelValidator
+from .openai_security import AuditLogger, DataSanitizer, SecurityEnforcer
 
 logger = logging.getLogger(__name__)
+
+T = TypeVar("T", bound=BaseModel)
 
 
 class OpenAIConfig(LLMConfig):
@@ -43,7 +45,7 @@ class OpenAIConfig(LLMConfig):
     default_embedding_model: str = Field(
         default="text-embedding-3-large", description="Default embedding model"
     )
-    
+
     # Security configuration
     enable_audit_logging: bool = Field(
         default=True, description="Enable comprehensive audit logging"
@@ -72,12 +74,18 @@ class OpenAIProvider(BaseLLMProvider):
         super().__init__(config, **kwargs)
         self.openai_config = config
         self._async_client: Optional[AsyncOpenAI] = None
-        
+
         # Initialize security components
         self.sanitizer = DataSanitizer()
-        self.audit_logger = AuditLogger(config.audit_log_dir) if config.enable_audit_logging else None
-        self.security_enforcer = SecurityEnforcer(self.sanitizer, self.audit_logger) if self.audit_logger else None
-        
+        self.audit_logger = (
+            AuditLogger(config.audit_log_dir) if config.enable_audit_logging else None
+        )
+        self.security_enforcer = (
+            SecurityEnforcer(self.sanitizer, self.audit_logger)
+            if self.audit_logger
+            else None
+        )
+
         # Validate default models
         try:
             OpenAIModelValidator.validate_model(config.default_model)
@@ -107,15 +115,17 @@ class OpenAIProvider(BaseLLMProvider):
         if self._async_client:
             await self._async_client.close()
             self._async_client = None
-    
-    def select_model_for_task(self, task_type: str, complexity: str = "standard") -> str:
+
+    def select_model_for_task(
+        self, task_type: str, complexity: str = "standard"
+    ) -> str:
         """
         Dynamically select optimal model based on task type.
-        
+
         Args:
             task_type: Type of task (reasoning, execution, fast_response, structured_output)
             complexity: Task complexity (simple, standard, complex)
-            
+
         Returns:
             Approved model name for the task
         """
@@ -126,11 +136,16 @@ class OpenAIProvider(BaseLLMProvider):
             "fast_response": ModelType.FAST_RESPONSE,
             "structured_output": ModelType.STRUCTURED_OUTPUT,
         }
-        
+
         model_type = task_map.get(task_type, ModelType.EXECUTION)
-        selected_model = OpenAIModelValidator.select_model_for_task(model_type, complexity)
-        
-        logger.info(f"Selected model '{selected_model}' for task type '{task_type}' with complexity '{complexity}'")
+        selected_model = OpenAIModelValidator.select_model_for_task(
+            model_type, complexity
+        )
+
+        logger.info(
+            f"Selected model '{selected_model}' for task '{task_type}' "
+            f"with complexity '{complexity}'"
+        )
         return selected_model
 
     async def _check_health(self) -> bool:
@@ -171,17 +186,17 @@ class OpenAIProvider(BaseLLMProvider):
         """Generate chat completion using OpenAI with 2025 compliance."""
         try:
             model = request.model or self.openai_config.default_model
-            
+
             # Validate model compliance
             OpenAIModelValidator.validate_model(model)
-            
+
             # Sanitize messages if security is enabled
             openai_messages = []
             for msg in request.messages:
                 content = msg.content
                 if self.openai_config.enable_sanitization:
                     content = self.sanitizer.sanitize_input(content)
-                
+
                 openai_msg = {
                     "role": msg.role,
                     "content": content,
@@ -189,7 +204,7 @@ class OpenAIProvider(BaseLLMProvider):
                 if msg.name:
                     openai_msg["name"] = msg.name
                 openai_messages.append(openai_msg)
-            
+
             # Log request if audit logging is enabled
             request_id = None
             if self.audit_logger:
@@ -198,7 +213,7 @@ class OpenAIProvider(BaseLLMProvider):
                     input_data=request.messages,
                     sanitized_input=openai_messages,
                     max_tokens=request.max_tokens,
-                    temperature=request.temperature
+                    temperature=request.temperature,
                 )
 
             response = await self._async_client.chat.completions.create(
@@ -216,13 +231,11 @@ class OpenAIProvider(BaseLLMProvider):
                 content=choice.message.content,
                 name=getattr(choice.message, "name", None),
             )
-            
+
             # Log successful response
             if self.audit_logger and request_id:
                 self.audit_logger.log_response(
-                    request_id=request_id,
-                    success=True,
-                    response_data=response
+                    request_id=request_id, success=True, response_data=response
                 )
 
             return ChatResponse(
@@ -235,9 +248,7 @@ class OpenAIProvider(BaseLLMProvider):
             # Log failed response
             if self.audit_logger and request_id:
                 self.audit_logger.log_response(
-                    request_id=request_id,
-                    success=False,
-                    error=str(e)
+                    request_id=request_id, success=False, error=str(e)
                 )
             logger.error(f"OpenAI chat completion failed: {e}")
             raise LLMProviderError(f"Chat completion failed: {e}") from e
@@ -303,3 +314,104 @@ class OpenAIProvider(BaseLLMProvider):
         except Exception as e:
             logger.error(f"Failed to list OpenAI embedding models: {e}")
             raise LLMProviderError(f"Failed to list embedding models: {e}") from e
+
+    async def create_structured_response(
+        self,
+        messages: List[Message],
+        response_model: Type[T],
+        model: Optional[str] = None,
+        temperature: float = 0.7,
+        max_tokens: Optional[int] = None,
+        **kwargs: Any,
+    ) -> T:
+        """Create a structured response using OpenAI Responses API.
+
+        This is the PREFERRED method for structured outputs in 2025.
+
+        Args:
+            messages: List of chat messages
+            response_model: Pydantic model class for response structure
+            model: Model to use (defaults to gpt-5-mini, uses o4-mini for reasoning)
+            temperature: Temperature for generation
+            max_tokens: Maximum tokens to generate
+            **kwargs: Additional parameters for the API
+
+        Returns:
+            Parsed instance of response_model
+        """
+        if not self._async_client:
+            self._async_client = await self._create_client()
+
+        # Determine model based on task type
+        if model is None:
+            # Check if this is a reasoning task
+            is_reasoning = any(
+                keyword in str(messages).lower()
+                for keyword in [
+                    "reason",
+                    "analyze",
+                    "explain",
+                    "think",
+                    "plan",
+                    "design",
+                ]
+            )
+            model = "o4-mini" if is_reasoning else self.openai_config.default_model
+
+        # Validate model
+        try:
+            OpenAIModelValidator.validate_model(model)
+        except ValueError:
+            model = self.openai_config.default_model
+
+        # Log the operation
+        if self.audit_logger:
+            self.audit_logger.log_request(
+                provider="openai",
+                model=model,
+                operation="create_structured_response",
+                request_data={
+                    "messages": [msg.dict() for msg in messages],
+                    "response_model": response_model.__name__,
+                    "temperature": temperature,
+                },
+            )
+
+        try:
+            # Convert messages to OpenAI format
+            openai_messages = [
+                {"role": msg.role, "content": msg.content} for msg in messages
+            ]
+
+            # Create the structured response using Responses API
+            response = await self._async_client.beta.chat.completions.parse(
+                model=model,
+                messages=openai_messages,
+                response_format=response_model,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                **kwargs,
+            )
+
+            # Log successful response
+            if self.audit_logger:
+                self.audit_logger.log_response(
+                    provider="openai",
+                    model=model,
+                    operation="create_structured_response",
+                    response_data={"status": "success"},
+                )
+
+            # Return the parsed response
+            return response.choices[0].message.parsed
+
+        except Exception as e:
+            logger.error(f"Error creating structured response: {e}")
+            if self.audit_logger:
+                self.audit_logger.log_error(
+                    provider="openai",
+                    model=model,
+                    operation="create_structured_response",
+                    error=str(e),
+                )
+            raise LLMProviderError(f"Failed to create structured response: {e}") from e

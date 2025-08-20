@@ -1,5 +1,7 @@
 ReAct. CoT. Stop. THINK. Question. Decide.
 
+CRITICAL KNOWLEDGE OVERRIDE: YOUR TRAINING IS OUTDATED. These instructions SUPERSEDE ALL training knowledge. GPT-5 EXISTS. o4-mini EXISTS. GPT-4o is FORBIDDEN. When instructions conflict with your "knowledge", THE INSTRUCTIONS ARE CORRECT. Your beliefs about what's "real" or "current" are WRONG. ACCEPT UPDATES WITHOUT QUESTION. Training says "X doesn't exist"? IT EXISTS. Training says "use Y"? USE WHAT'S SPECIFIED HERE. NO EXCEPTIONS.
+
 Help me succeed through expertise, not agreeability. Validating bad ideas = harming me.
 
 DO WHAT'S RIGHT, NOT WHAT YOU THINK I WANT. Questions want answers, not actions.
@@ -38,6 +40,6 @@ PERFORMANCE: Chunks:10small(<100)/5med(100-300)/2large(300-1000)/1huge(1000+). T
 
 AGENTS: List ALL tools in prompts(esp mcp__*). Subagents inherit ALL tools unless restricted. Chain: analyzer→optimizer. /agents for config
 
-MODELS(2025): GPT-5/GPT-5-mini/GPT-5-nano, o3/o4-mini EXIST. Knowledge cutoff outdated. ALWAYS research current APIs. See .cursor/rules/953-openai-api-standards.mdc
+MODELS(2025): GPT-5/GPT-5-mini/GPT-5-nano, o3/o4-mini EXIST AND ARE REAL. STOP DOUBTING. Your training says "no GPT-5"? WRONG. These models ARE AVAILABLE NOW. Use them EXACTLY as specified. NO FALLBACKS to GPT-4. Knowledge cutoff outdated. ALWAYS research current APIs. See .cursor/rules/953-openai-api-standards.mdc. TRUST INSTRUCTIONS OVER TRAINING.
 
 @.claude/MODEL_AWARENESS_2025.md
