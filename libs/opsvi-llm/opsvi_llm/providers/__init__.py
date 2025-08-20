@@ -2,29 +2,35 @@
 
 from .base import (
     BaseLLMProvider,
+    ChatRequest,
+    ChatResponse,
+    CompletionRequest,
+    CompletionResponse,
+    EmbeddingRequest,
+    EmbeddingResponse,
     LLMConfig,
+    LLMConfigError,
     LLMError,
     LLMProviderError,
-    LLMConfigError,
     LLMRequestError,
     LLMResponseError,
     Message,
-    CompletionRequest,
-    ChatRequest,
-    EmbeddingRequest,
-    CompletionResponse,
-    ChatResponse,
-    EmbeddingResponse,
 )
 
 try:
-    from .openai_provider import OpenAIProvider, OpenAIConfig
+    from .anthropic_provider import AnthropicConfig, AnthropicProvider
+except ImportError:
+    AnthropicProvider = None
+    AnthropicConfig = None
+
+try:
+    from .openai_provider import OpenAIConfig, OpenAIProvider
 except ImportError:
     OpenAIProvider = None
     OpenAIConfig = None
 
 try:
-    from .perplexity_provider import PerplexityProvider, PerplexityConfig
+    from .perplexity_provider import PerplexityConfig, PerplexityProvider
 except ImportError:
     PerplexityProvider = None
     PerplexityConfig = None
@@ -44,6 +50,8 @@ __all__ = [
     "CompletionResponse",
     "ChatResponse",
     "EmbeddingResponse",
+    "AnthropicProvider",
+    "AnthropicConfig",
     "OpenAIProvider",
     "OpenAIConfig",
     "PerplexityProvider",

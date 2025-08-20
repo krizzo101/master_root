@@ -1,0 +1,46 @@
+#!/bin/bash
+# Production wrapper for proj-mapper
+# Handles Python environment setup automatically
+
+# Set up environment
+MASTER_ROOT="/home/opsvi/master_root"
+PROJ_MAPPER_DIR="$MASTER_ROOT/apps/proj-mapper"
+
+# Try venv Python first (has dependencies installed)
+VENV_PYTHON="$MASTER_ROOT/.venv/bin/python"
+MINICONDA_PYTHON="/home/opsvi/miniconda/bin/python"
+
+# Select Python - prefer venv if it exists and has markdown_it
+if [ -f "$VENV_PYTHON" ]; then
+    # Check if venv has required dependencies
+    if $VENV_PYTHON -c "import markdown_it" 2>/dev/null; then
+        PYTHON_BIN="$VENV_PYTHON"
+        echo "Using venv Python with dependencies" >&2
+    elif [ -f "$MINICONDA_PYTHON" ]; then
+        PYTHON_BIN="$MINICONDA_PYTHON"
+        echo "Using miniconda Python (venv missing dependencies)" >&2
+    else
+        echo "Error: No suitable Python found" >&2
+        exit 1
+    fi
+elif [ -f "$MINICONDA_PYTHON" ]; then
+    PYTHON_BIN="$MINICONDA_PYTHON"
+else
+    echo "Error: No Python installation found" >&2
+    exit 1
+fi
+
+# Check if proj-mapper exists
+if [ ! -d "$PROJ_MAPPER_DIR" ]; then
+    echo "Error: proj-mapper not found at $PROJ_MAPPER_DIR"
+    exit 1
+fi
+
+# Set Python path to include master_root libs and proj-mapper src
+export PYTHONPATH="$MASTER_ROOT/libs:$PROJ_MAPPER_DIR/src"
+
+# Change to proj-mapper directory for relative paths to work
+cd "$PROJ_MAPPER_DIR"
+
+# Run proj-mapper with all arguments passed through
+exec "$PYTHON_BIN" "$PROJ_MAPPER_DIR/src/proj_mapper/cli/main.py" "$@"

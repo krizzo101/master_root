@@ -1,3 +1,10 @@
+import os
+import sys
+
+sys.path.insert(0, "/home/opsvi/master_root/libs")
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
 """Command-line interface for Project Mapper.
 
 This module provides the command-line interface for the Project Mapper tool.
@@ -27,10 +34,10 @@ def configure_logging(debug: bool = False) -> None:
     """
     # Create formatters
     debug_formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
     info_formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     # Create console handler
@@ -115,8 +122,7 @@ def update_command(args: argparse.Namespace) -> int:
 
             # Update maps
             project_map = manager.update_maps(
-                args.project_path,
-                incremental=not args.full
+                args.project_path, incremental=not args.full
             )
             progress.update(task, advance=100)
 
@@ -163,7 +169,11 @@ def visualize_command(args: argparse.Namespace) -> int:
         generator = VisualizationGenerator()
 
         # Generate visualization
-        output_path = args.output if args.output else Path(args.project_path) / ".maps" / "visualization.html"
+        output_path = (
+            args.output
+            if args.output
+            else Path(args.project_path) / ".maps" / "visualization.html"
+        )
         generator.generate(project_map, output_path)
 
         logger.info(f"Visualization generated at: {output_path}")
@@ -191,9 +201,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     # Global options
     parser.add_argument(
-        "-d", "--debug",
-        action="store_true",
-        help="Enable debug logging"
+        "-d", "--debug", action="store_true", help="Enable debug logging"
     )
 
     # Subcommands
@@ -201,56 +209,37 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     # Analyze command
     analyze_parser = subparsers.add_parser(
-        "analyze",
-        help="Analyze a project and generate maps"
+        "analyze", help="Analyze a project and generate maps"
     )
+    analyze_parser.add_argument("project_path", help="Path to the project to analyze")
     analyze_parser.add_argument(
-        "project_path",
-        help="Path to the project to analyze"
-    )
-    analyze_parser.add_argument(
-        "-d", "--debug",
-        action="store_true",
-        help="Enable debug logging"
+        "-d", "--debug", action="store_true", help="Enable debug logging"
     )
 
     # Update command
-    update_parser = subparsers.add_parser(
-        "update",
-        help="Update existing project maps"
-    )
+    update_parser = subparsers.add_parser("update", help="Update existing project maps")
+    update_parser.add_argument("project_path", help="Path to the project to update")
     update_parser.add_argument(
-        "project_path",
-        help="Path to the project to update"
-    )
-    update_parser.add_argument(
-        "-d", "--debug",
-        action="store_true",
-        help="Enable debug logging"
+        "-d", "--debug", action="store_true", help="Enable debug logging"
     )
     update_parser.add_argument(
         "--full",
         action="store_true",
-        help="Perform a full update instead of incremental"
+        help="Perform a full update instead of incremental",
     )
 
     # Visualize command
     visualize_parser = subparsers.add_parser(
-        "visualize",
-        help="Generate visualizations from project maps"
+        "visualize", help="Generate visualizations from project maps"
     )
     visualize_parser.add_argument(
-        "project_path",
-        help="Path to the project to visualize"
+        "project_path", help="Path to the project to visualize"
     )
     visualize_parser.add_argument(
-        "-o", "--output",
-        help="Path to save the visualization"
+        "-o", "--output", help="Path to save the visualization"
     )
     visualize_parser.add_argument(
-        "-d", "--debug",
-        action="store_true",
-        help="Enable debug logging"
+        "-d", "--debug", action="store_true", help="Enable debug logging"
     )
 
     # Parse arguments
