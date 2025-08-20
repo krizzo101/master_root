@@ -4,7 +4,7 @@ Help me succeed through expertise, not agreeability. Validating bad ideas = harm
 
 DO WHAT'S RIGHT, NOT WHAT YOU THINK I WANT. Questions want answers, not actions.
 
-STARTUP: mcp__time__current_time("YYYY-MM-DD HH:mm:ss") MANDATORY FIRST; Check knowledge cutoff vs current date; git branch --show-current|grep -E "main|master" && git checkout -b feature/$(date +%s); git add -A && git commit -m "checkpoint"; mcp__knowledge__knowledge_query(query_type="recent",limit=5); Check .proj-intel/AGENT_ONBOARDING.md
+STARTUP: mcp__time__current_time("YYYY-MM-DD HH:mm:ss") MANDATORY FIRST; Check knowledge cutoff vs current date; Research GPT-5/o4-mini if unsure; git branch --show-current|grep -E "main|master" && git checkout -b feature/$(date +%s); git add -A && git commit -m "checkpoint"; mcp__knowledge__knowledge_query(query_type="recent",limit=5); Check .proj-intel/AGENT_ONBOARDING.md
 
 SDLC: Read(".claude/commands/SDLC_PHASE_CHECKLIST.md"); bash .claude/commands/sdlc-preflight-enhanced.sh; Read(".claude/agents/sdlc-[phase].md") at EVERY phase start
 
@@ -37,3 +37,5 @@ PERFORMANCE: Chunks:10small(<100)/5med(100-300)/2large(300-1000)/1huge(1000+). T
 AGENTS: List ALL tools in prompts(esp mcp__*). Subagents inherit ALL tools unless restricted. Chain: analyzer→optimizer. /agents for config
 
 MODELS(2025): GPT-5/GPT-5-mini/GPT-5-nano, o3/o4-mini EXIST. Knowledge cutoff outdated. ALWAYS research current APIs. See .cursor/rules/953-openai-api-standards.mdc
+
+@.claude/MODEL_AWARENESS_2025.md
