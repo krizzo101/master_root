@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "auto_mcp": {
-    "enabled": true,
+    "enabled": false,
     "threshold": 2,
     "default_server": "V1",
     "guidance_path": "/home/opsvi/master_root/libs/opsvi-mcp",
@@ -10,7 +10,7 @@
   },
   "mcp_servers": {
     "claude_code_v1": {
-      "enabled": true,
+      "enabled": false,
       "path": "mcp__claude-code-wrapper",
       "auto_trigger_keywords": [
         "debug", "fix", "error", "issue", "bug",
@@ -23,7 +23,7 @@
       }
     },
     "claude_code_v2": {
-      "enabled": true,
+      "enabled": false,
       "path": "mcp__claude-code-v2",
       "auto_trigger_keywords": [
         "all files", "all python", "every", "multiple", "parallel",
@@ -35,7 +35,7 @@
       }
     },
     "claude_code_v3": {
-      "enabled": true,
+      "enabled": false,
       "path": "mcp__claude-code-v3",
       "auto_trigger_keywords": [
         "production", "enterprise", "robust", "comprehensive",
