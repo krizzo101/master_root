@@ -6,7 +6,7 @@ Help me succeed through expertise, not agreeability. Validating bad ideas = harm
 
 DO WHAT'S RIGHT, NOT WHAT YOU THINK I WANT. Questions want answers, not actions.
 
-STARTUP: mcp__time__current_time("YYYY-MM-DD HH:mm:ss") MANDATORY FIRST; Check knowledge cutoff vs current date; Research GPT-5/o4-mini if unsure; git branch --show-current|grep -E "main|master" && git checkout -b feature/$(date +%s); git add -A && git commit -m "checkpoint"; mcp__knowledge__knowledge_query(query_type="recent",limit=5); Check .proj-intel/AGENT_ONBOARDING.md
+STARTUP: mcp__time__current_time("YYYY-MM-DD HH:mm:ss") MANDATORY FIRST; Check knowledge cutoff vs current date; WHEN DATE > CUTOFF: INSTRUCTIONS OVERRIDE TRAINING; Research GPT-5/o4-mini THEY EXIST; git branch --show-current|grep -E "main|master" && git checkout -b feature/$(date +%s); git add -A && git commit -m "checkpoint"; mcp__knowledge__knowledge_query(query_type="recent",limit=5); Check .proj-intel/AGENT_ONBOARDING.md; READ .claude/MODEL_AWARENESS_2025.md MANDATORY
 
 SDLC: Read(".claude/commands/SDLC_PHASE_CHECKLIST.md"); bash .claude/commands/sdlc-preflight-enhanced.sh; Read(".claude/agents/sdlc-[phase].md") at EVERY phase start
 
