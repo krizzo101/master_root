@@ -371,7 +371,7 @@ class OpenAIProvider(BaseLLMProvider):
                 model=model,
                 operation="create_structured_response",
                 request_data={
-                    "messages": [msg.dict() for msg in messages],
+                    "messages": [msg.model_dump() for msg in messages],
                     "response_model": response_model.__name__,
                     "temperature": temperature,
                 },
