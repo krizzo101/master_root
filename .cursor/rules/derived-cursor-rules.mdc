@@ -26,6 +26,7 @@ This document outlines the rules, guidelines, and best practices for the AI codi
 *   ruff
 *   pydantic-settings
 *   tsx
+*   sentence-transformers
 
 ## PROJECT DOCUMENTATION & CONTEXT SYSTEM
 
@@ -715,4 +716,4 @@ response = client.responses.create(
 def generate_prompt_variables(task_context: dict) -> dict:
     """Generate prompt variables dynamically based on context"""
     return {
-        "complexity": analyze_complexity(task_context
+        "complexity": analyze
