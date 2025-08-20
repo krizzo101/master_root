@@ -1,1 +1,0 @@
-Place reasoning_retrieval.json here or mount this folder at /var/lib/grafana/dashboards.

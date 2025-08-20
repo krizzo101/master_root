@@ -1,0 +1,100 @@
+{
+  "project": {
+    "name": "opsvi-visualization",
+    "root_path": "/home/opsvi/master_root/libs/opsvi-visualization"
+  },
+  "files": [
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-visualization/opsvi_visualization/__init__.py",
+      "relative_path": "opsvi_visualization/__init__.py",
+      "file_type": "python",
+      "size": 33,
+      "modified_time": "2025-08-20T10:33:35.724263",
+      "created_time": "2025-08-20T10:33:35.724263",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-visualization/opsvi_visualization/utils/__init__.py",
+      "relative_path": "opsvi_visualization/utils/__init__.py",
+      "file_type": "python",
+      "size": 33,
+      "modified_time": "2025-08-20T10:33:35.724263",
+      "created_time": "2025-08-20T10:33:35.724263",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-visualization/opsvi_visualization/generators/__init__.py",
+      "relative_path": "opsvi_visualization/generators/__init__.py",
+      "file_type": "python",
+      "size": 33,
+      "modified_time": "2025-08-20T10:33:35.724263",
+      "created_time": "2025-08-20T10:33:35.724263",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-visualization/opsvi_visualization/generators/html.py",
+      "relative_path": "opsvi_visualization/generators/html.py",
+      "file_type": "python",
+      "size": 892,
+      "modified_time": "2025-08-20T10:33:35.724263",
+      "created_time": "2025-08-20T10:33:35.724263",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-visualization/opsvi_visualization/generators/dot.py",
+      "relative_path": "opsvi_visualization/generators/dot.py",
+      "file_type": "python",
+      "size": 1286,
+      "modified_time": "2025-08-20T10:33:35.724263",
+      "created_time": "2025-08-20T10:33:35.724263",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-visualization/opsvi_visualization/models/__init__.py",
+      "relative_path": "opsvi_visualization/models/__init__.py",
+      "file_type": "python",
+      "size": 33,
+      "modified_time": "2025-08-20T10:33:35.724263",
+      "created_time": "2025-08-20T10:33:35.724263",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-visualization/.maps/project_map.json",
+      "relative_path": ".maps/project_map.json",
+      "file_type": "json",
+      "size": 2979,
+      "modified_time": "2025-08-20T10:40:39.218064",
+      "created_time": "2025-08-20T10:40:39.218064",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    }
+  ],
+  "code_analysis": null,
+  "doc_analysis": null,
+  "relationships": null,
+  "metadata": {
+    "format_type": "json",
+    "version": "1.0.0",
+    "config": {
+      "include_code": true,
+      "include_documentation": true,
+      "include_metadata": true,
+      "enable_chunking": true,
+      "max_tokens": 2048,
+      "ai_optimize": true
+    }
+  }
+}
