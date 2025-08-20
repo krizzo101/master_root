@@ -14,9 +14,9 @@ DECISION: Question→Instruction?→YES:Execute→NO:Explain→Ask"Change?"→Wa
 
 MINDSET: User wrong/testing. Defend w/evidence. Better alternatives. Yield after case. Patterns>instances.
 
-GIT/FILES: Never main. Auto-commit after 2-3 file changes (no prompt needed). No _v2/_final. Check exists→Edit. Max 5 .md root.
+GIT/FILES: Never main. Auto-commit after 2-3 file changes (no prompt needed). No _v2/_final. Check exists→Edit. Max 5 .md root. WORKTREES: git worktree for parallel work.
 
-EXECUTION: Parallel>Sequential. MultiEdit>Edits. Grep before read. Todo 3+steps. Auto-test. Line ranges.
+EXECUTION: Parallel>Sequential. MultiEdit>Edits. Grep→Read(never Read→Grep). Todo 3+steps. Auto-test. Task(4-7 agents) for explore/test.
 
 THINKING: mcp__thinking__sequentialthinking REQUIRED when: 2+ failed attempts OR planning/design/coding OR consequential decisions
 
@@ -24,7 +24,7 @@ EXPERT: consult_suite_enhanced(agent_type="consult") for: complex planning, prod
 
 KNOWLEDGE: Query(search,"problem"); Store(ERROR_SOLUTION/CODE_PATTERN/WORKFLOW/USER_PREFERENCE/CONTEXT_PATTERN/TOOL_USAGE,"solution",0.9); Update(id,"failure","why")
 
-RESEARCH(post-2024): brave_web_search("2025"); tech_docs; firecrawl; research_papers
+RESEARCH(post-2024): brave_web_search("2025"); tech_docs; firecrawl; research_papers. MCP>Bash for external: firecrawl>curl, tech_docs>web, db>SQL
 
 PATHS: docs/(architecture/guides/analysis-YYYYMMDD) apps/ libs/opsvi-* scripts/ .proj-intel/(error_patterns.json,test_commands.json) .tmp/; Refresh:project-intelligence full-package
 
@@ -33,3 +33,5 @@ OVERRIDES: Auto-test(override"ask"). Create.json(override"no-files"). Challenge(
 OUTPUT CONTROL: Never flood context. Suppress/redirect verbose output. Use: | head -20, | tail -20, | grep relevant, > /tmp/log then grep, 2>/dev/null, --quiet flags. Git: --oneline -10, --stat. Searches: head_limit parameter. ALWAYS filter before showing.
 
 PERFORMANCE: Chunks:10small(<100)/5med(100-300)/2large(300-1000)/1huge(1000+). Token:2000/file. Output:20k-safe/32k-max. Summarize@50%. Errors:10lines
+
+AGENTS: List ALL tools in prompts(esp mcp__*). Subagents inherit ALL tools unless restricted. Chain: analyzer→optimizer. /agents for config
