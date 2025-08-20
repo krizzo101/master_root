@@ -30,6 +30,7 @@ Each SDLC phase has a dedicated agent profile that should be loaded:
 | **TESTING** | `sdlc-testing` | Validate all requirements met |
 | **DEPLOYMENT** | `sdlc-deployment` | Prepare for production |
 | **PRODUCTION** | `sdlc-production` | Final review and handover |
+| **POSTMORTEM** | `sdlc-postmortem` | Review process, capture lessons |
 
 **Loading Phase Profiles**: Read the appropriate profile from `.claude/agents/` at the start of each phase to align your approach with phase-specific requirements.
 
@@ -160,7 +161,8 @@ TodoWrite(todos=[
     {"id": "4", "content": "DEVELOPMENT: Implement code", "status": "pending"},
     {"id": "5", "content": "TESTING: Validate solution", "status": "pending"},
     {"id": "6", "content": "DEPLOYMENT: Prepare production", "status": "pending"},
-    {"id": "7", "content": "PRODUCTION: Final review", "status": "pending"}
+    {"id": "7", "content": "PRODUCTION: Final review", "status": "pending"},
+    {"id": "8", "content": "POSTMORTEM: Review and improve", "status": "pending"}
 ])
 
 # Each phase has specific deliverables - mark complete when done
@@ -449,6 +451,95 @@ Task(
       confidence_score=0.95
   )
   ```
+
+### 8️⃣ POSTMORTEM (Review & Improvement)
+
+#### Phase Gate: Cannot proceed unless
+- [ ] All 7 previous phases completed
+- [ ] All artifacts generated
+- [ ] Tests passing
+- [ ] Documentation complete
+
+#### Load Phase Profile
+```python
+# Read the SDLC phase profile to align your approach
+Read(".claude/agents/sdlc-postmortem.md")
+```
+
+#### Agent Support
+```python
+Task(
+    description="Postmortem analysis",
+    subagent_type="reviewer-critic",
+    prompt="""
+    Perform comprehensive postmortem for [project].
+    Analyze:
+    - Process compliance (were all phases followed?)
+    - Violations or shortcuts taken
+    - Lessons learned (what worked, what didn't)
+    - Areas for improvement
+    - Knowledge to capture for future projects
+    - Branch disposition recommendation (merge/PR/archive)
+    """
+)
+```
+
+#### Activities
+- Run violation analysis (compare plan vs actual)
+- Generate compliance report
+- Document lessons learned
+- Capture patterns and anti-patterns
+- Update knowledge system with findings
+- Determine branch disposition
+- Update SDLC process if needed
+
+#### Required Deliverables (MUST complete all)
+- [ ] `docs/postmortem/<project>.md` created with:
+  - Executive summary
+  - Process compliance score
+  - Violations detected and severity
+  - What went well
+  - What could improve
+  - Lessons learned
+  - Action items for process improvement
+  - Knowledge captured
+- [ ] Branch disposition decided (merge/PR/archive/delete)
+- [ ] Knowledge system updated with lessons
+- [ ] Process improvements proposed if applicable
+
+#### Git Commit
+```bash
+git add docs/postmortem/<project>.md
+git add .sdlc/postmortem-complete.json
+git commit -m "docs: add postmortem for <project>
+
+- Compliance score: X%
+- Lessons learned documented
+- Process improvements identified
+- Knowledge captured for future projects"
+```
+
+#### Branch Handling
+```bash
+# Based on postmortem findings, choose one:
+
+# Option 1: Create PR for review
+gh pr create --title "feat: <project> implementation" \
+  --body "SDLC project completed with postmortem review"
+
+# Option 2: Merge directly (if authorized)
+git checkout main
+git merge feature/<project>
+git push origin main
+
+# Option 3: Archive branch (experimental/prototype)
+git tag archive/<project>-$(date +%Y%m%d)
+git push origin --tags
+
+# Option 4: Delete branch (failed/abandoned)
+git checkout main
+git branch -D feature/<project>
+```
 
 ## 🏗️ Project Structure
 

@@ -1,0 +1,287 @@
+{
+  "project": {
+    "name": "opsvi-llm",
+    "root_path": "/home/opsvi/master_root/libs/opsvi-llm"
+  },
+  "files": [
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/__init__.py",
+      "relative_path": "opsvi_llm/__init__.py",
+      "file_type": "python",
+      "size": 2025,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/core/__init__.py",
+      "relative_path": "opsvi_llm/core/__init__.py",
+      "file_type": "python",
+      "size": 228,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/core/base.py",
+      "relative_path": "opsvi_llm/core/base.py",
+      "file_type": "python",
+      "size": 2112,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/tests/__init__.py",
+      "relative_path": "opsvi_llm/tests/__init__.py",
+      "file_type": "python",
+      "size": 22,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/exceptions/__init__.py",
+      "relative_path": "opsvi_llm/exceptions/__init__.py",
+      "file_type": "python",
+      "size": 532,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/exceptions/base.py",
+      "relative_path": "opsvi_llm/exceptions/base.py",
+      "file_type": "python",
+      "size": 967,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/config/__init__.py",
+      "relative_path": "opsvi_llm/config/__init__.py",
+      "file_type": "python",
+      "size": 205,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/config/settings.py",
+      "relative_path": "opsvi_llm/config/settings.py",
+      "file_type": "python",
+      "size": 1124,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/providers/openai_responses_interface.py",
+      "relative_path": "opsvi_llm/providers/openai_responses_interface.py",
+      "file_type": "python",
+      "size": 14354,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/providers/__init__.py",
+      "relative_path": "opsvi_llm/providers/__init__.py",
+      "file_type": "python",
+      "size": 1048,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/providers/base.py",
+      "relative_path": "opsvi_llm/providers/base.py",
+      "file_type": "python",
+      "size": 7450,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/providers/openai_provider.py",
+      "relative_path": "opsvi_llm/providers/openai_provider.py",
+      "file_type": "python",
+      "size": 11562,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/providers/openai_models_interface.py",
+      "relative_path": "opsvi_llm/providers/openai_models_interface.py",
+      "file_type": "python",
+      "size": 12775,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/providers/perplexity_provider.py",
+      "relative_path": "opsvi_llm/providers/perplexity_provider.py",
+      "file_type": "python",
+      "size": 10153,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/providers/openai_agents_interface.py",
+      "relative_path": "opsvi_llm/providers/openai_agents_interface.py",
+      "file_type": "python",
+      "size": 6820,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/providers/openai_security.py",
+      "relative_path": "opsvi_llm/providers/openai_security.py",
+      "file_type": "python",
+      "size": 13285,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/providers/llm_embedding_interface.py",
+      "relative_path": "opsvi_llm/providers/llm_embedding_interface.py",
+      "file_type": "python",
+      "size": 8026,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/providers/openai_model_validator.py",
+      "relative_path": "opsvi_llm/providers/openai_model_validator.py",
+      "file_type": "python",
+      "size": 6320,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/providers/openai_embeddings_interface.py",
+      "relative_path": "opsvi_llm/providers/openai_embeddings_interface.py",
+      "file_type": "python",
+      "size": 8614,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/opsvi_llm/providers/openai_batch_interface.py",
+      "relative_path": "opsvi_llm/providers/openai_batch_interface.py",
+      "file_type": "python",
+      "size": 13024,
+      "modified_time": "2025-08-16T05:18:47.154159",
+      "created_time": "2025-08-16T05:18:47.154159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/tests/__init__.py",
+      "relative_path": "tests/__init__.py",
+      "file_type": "python",
+      "size": 28,
+      "modified_time": "2025-08-16T05:18:47.158159",
+      "created_time": "2025-08-16T05:18:47.158159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/tests/test_opsvi_llm.py",
+      "relative_path": "tests/test_opsvi_llm.py",
+      "file_type": "python",
+      "size": 1577,
+      "modified_time": "2025-08-16T05:18:47.158159",
+      "created_time": "2025-08-16T05:18:47.158159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/tests/test_llm.py",
+      "relative_path": "tests/test_llm.py",
+      "file_type": "python",
+      "size": 21123,
+      "modified_time": "2025-08-16T05:18:47.158159",
+      "created_time": "2025-08-16T05:18:47.158159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-llm/tests/test_perplexity_provider.py",
+      "relative_path": "tests/test_perplexity_provider.py",
+      "file_type": "python",
+      "size": 7000,
+      "modified_time": "2025-08-16T05:18:47.158159",
+      "created_time": "2025-08-16T05:18:47.158159",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    }
+  ],
+  "code_analysis": null,
+  "doc_analysis": null,
+  "relationships": null,
+  "metadata": {
+    "format_type": "json",
+    "version": "1.0.0",
+    "config": {
+      "include_code": true,
+      "include_documentation": true,
+      "include_metadata": true,
+      "enable_chunking": true,
+      "max_tokens": 2048,
+      "ai_optimize": true
+    }
+  }
+}

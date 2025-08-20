@@ -1,0 +1,265 @@
+{
+  "project": {
+    "name": "opsvi-core",
+    "root_path": "/home/opsvi/master_root/libs/opsvi-core"
+  },
+  "files": [
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/__init__.py",
+      "relative_path": "opsvi_core/__init__.py",
+      "file_type": "python",
+      "size": 1548,
+      "modified_time": "2025-08-16T05:18:46.958155",
+      "created_time": "2025-08-16T05:18:46.958155",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/core/__init__.py",
+      "relative_path": "opsvi_core/core/__init__.py",
+      "file_type": "python",
+      "size": 530,
+      "modified_time": "2025-08-16T05:18:46.958155",
+      "created_time": "2025-08-16T05:18:46.958155",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/core/base.py",
+      "relative_path": "opsvi_core/core/base.py",
+      "file_type": "python",
+      "size": 13957,
+      "modified_time": "2025-08-16T05:18:46.958155",
+      "created_time": "2025-08-16T05:18:46.958155",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/middleware/__init__.py",
+      "relative_path": "opsvi_core/middleware/__init__.py",
+      "file_type": "python",
+      "size": 458,
+      "modified_time": "2025-08-16T05:18:46.958155",
+      "created_time": "2025-08-16T05:18:46.958155",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/middleware/tracing.py",
+      "relative_path": "opsvi_core/middleware/tracing.py",
+      "file_type": "python",
+      "size": 12165,
+      "modified_time": "2025-08-16T05:18:46.958155",
+      "created_time": "2025-08-16T05:18:46.958155",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/middleware/auth.py",
+      "relative_path": "opsvi_core/middleware/auth.py",
+      "file_type": "python",
+      "size": 9636,
+      "modified_time": "2025-08-16T05:18:46.958155",
+      "created_time": "2025-08-16T05:18:46.958155",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/middleware/metrics.py",
+      "relative_path": "opsvi_core/middleware/metrics.py",
+      "file_type": "python",
+      "size": 10313,
+      "modified_time": "2025-08-16T05:18:46.958155",
+      "created_time": "2025-08-16T05:18:46.958155",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/utils/rate_limiter.py",
+      "relative_path": "opsvi_core/utils/rate_limiter.py",
+      "file_type": "python",
+      "size": 17122,
+      "modified_time": "2025-08-16T05:18:46.962156",
+      "created_time": "2025-08-16T05:18:46.962156",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/tests/__init__.py",
+      "relative_path": "opsvi_core/tests/__init__.py",
+      "file_type": "python",
+      "size": 22,
+      "modified_time": "2025-08-16T05:18:46.962156",
+      "created_time": "2025-08-16T05:18:46.962156",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/persistence/__init__.py",
+      "relative_path": "opsvi_core/persistence/__init__.py",
+      "file_type": "python",
+      "size": 408,
+      "modified_time": "2025-08-16T05:18:46.958155",
+      "created_time": "2025-08-16T05:18:46.958155",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/persistence/base.py",
+      "relative_path": "opsvi_core/persistence/base.py",
+      "file_type": "python",
+      "size": 5409,
+      "modified_time": "2025-08-16T05:18:46.962156",
+      "created_time": "2025-08-16T05:18:46.962156",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/persistence/json_backend.py",
+      "relative_path": "opsvi_core/persistence/json_backend.py",
+      "file_type": "python",
+      "size": 4692,
+      "modified_time": "2025-08-16T05:18:46.962156",
+      "created_time": "2025-08-16T05:18:46.962156",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/persistence/redis_backend.py",
+      "relative_path": "opsvi_core/persistence/redis_backend.py",
+      "file_type": "python",
+      "size": 9199,
+      "modified_time": "2025-08-16T05:18:46.962156",
+      "created_time": "2025-08-16T05:18:46.962156",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/persistence/memory_backend.py",
+      "relative_path": "opsvi_core/persistence/memory_backend.py",
+      "file_type": "python",
+      "size": 5031,
+      "modified_time": "2025-08-16T05:18:46.962156",
+      "created_time": "2025-08-16T05:18:46.962156",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/exceptions/__init__.py",
+      "relative_path": "opsvi_core/exceptions/__init__.py",
+      "file_type": "python",
+      "size": 547,
+      "modified_time": "2025-08-16T05:18:46.958155",
+      "created_time": "2025-08-16T05:18:46.958155",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/exceptions/base.py",
+      "relative_path": "opsvi_core/exceptions/base.py",
+      "file_type": "python",
+      "size": 991,
+      "modified_time": "2025-08-16T05:18:46.958155",
+      "created_time": "2025-08-16T05:18:46.958155",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/config/__init__.py",
+      "relative_path": "opsvi_core/config/__init__.py",
+      "file_type": "python",
+      "size": 208,
+      "modified_time": "2025-08-16T05:18:46.958155",
+      "created_time": "2025-08-16T05:18:46.958155",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/opsvi_core/config/settings.py",
+      "relative_path": "opsvi_core/config/settings.py",
+      "file_type": "python",
+      "size": 1132,
+      "modified_time": "2025-08-16T05:18:46.958155",
+      "created_time": "2025-08-16T05:18:46.958155",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/.maps/project_map.json",
+      "relative_path": ".maps/project_map.json",
+      "file_type": "json",
+      "size": 8696,
+      "modified_time": "2025-08-20T10:53:05.700281",
+      "created_time": "2025-08-20T10:53:05.700281",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/tests/__init__.py",
+      "relative_path": "tests/__init__.py",
+      "file_type": "python",
+      "size": 29,
+      "modified_time": "2025-08-16T05:18:46.962156",
+      "created_time": "2025-08-16T05:18:46.962156",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/tests/test_core.py",
+      "relative_path": "tests/test_core.py",
+      "file_type": "python",
+      "size": 13404,
+      "modified_time": "2025-08-16T05:18:46.962156",
+      "created_time": "2025-08-16T05:18:46.962156",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    },
+    {
+      "path": "/home/opsvi/master_root/libs/opsvi-core/tests/test_opsvi_core.py",
+      "relative_path": "tests/test_opsvi_core.py",
+      "file_type": "python",
+      "size": 1597,
+      "modified_time": "2025-08-16T05:18:46.962156",
+      "created_time": "2025-08-16T05:18:46.962156",
+      "is_binary": false,
+      "is_directory": false,
+      "is_symlink": false
+    }
+  ],
+  "code_analysis": null,
+  "doc_analysis": null,
+  "relationships": null,
+  "metadata": {
+    "format_type": "json",
+    "version": "1.0.0",
+    "config": {
+      "include_code": true,
+      "include_documentation": true,
+      "include_metadata": true,
+      "enable_chunking": true,
+      "max_tokens": 2048,
+      "ai_optimize": true
+    }
+  }
+}

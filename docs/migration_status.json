@@ -1,0 +1,125 @@
+{
+  "timestamp": "2025-08-20T10:47:55.453139",
+  "apps": [
+    {
+      "name": "ACCF",
+      "path": "/home/opsvi/master_root/apps/ACCF",
+      "is_symlink": true,
+      "has_venv": true,
+      "has_wrapper": false,
+      "uses_shared_libs": false,
+      "has_claude_adapter": false,
+      "migration_status": "symlink",
+      "files_count": 0,
+      "python_files": 0
+    },
+    {
+      "name": "auto-forge-factory",
+      "path": "/home/opsvi/master_root/apps/auto-forge-factory",
+      "is_symlink": false,
+      "has_venv": false,
+      "has_wrapper": false,
+      "uses_shared_libs": false,
+      "has_claude_adapter": false,
+      "migration_status": "partial",
+      "files_count": 29,
+      "python_files": 11
+    },
+    {
+      "name": "demo-project",
+      "path": "/home/opsvi/master_root/apps/demo-project",
+      "is_symlink": false,
+      "has_venv": false,
+      "has_wrapper": false,
+      "uses_shared_libs": false,
+      "has_claude_adapter": false,
+      "migration_status": "partial",
+      "files_count": 2,
+      "python_files": 0
+    },
+    {
+      "name": "genFileMap",
+      "path": "/home/opsvi/master_root/apps/genFileMap",
+      "is_symlink": true,
+      "has_venv": true,
+      "has_wrapper": false,
+      "uses_shared_libs": false,
+      "has_claude_adapter": false,
+      "migration_status": "symlink",
+      "files_count": 0,
+      "python_files": 0
+    },
+    {
+      "name": "hello-cli",
+      "path": "/home/opsvi/master_root/apps/hello-cli",
+      "is_symlink": false,
+      "has_venv": false,
+      "has_wrapper": false,
+      "uses_shared_libs": false,
+      "has_claude_adapter": false,
+      "migration_status": "partial",
+      "files_count": 30,
+      "python_files": 9
+    },
+    {
+      "name": "hello-disneyworld",
+      "path": "/home/opsvi/master_root/apps/hello-disneyworld",
+      "is_symlink": false,
+      "has_venv": false,
+      "has_wrapper": false,
+      "uses_shared_libs": false,
+      "has_claude_adapter": false,
+      "migration_status": "partial",
+      "files_count": 2,
+      "python_files": 0
+    },
+    {
+      "name": "hello-world",
+      "path": "/home/opsvi/master_root/apps/hello-world",
+      "is_symlink": false,
+      "has_venv": false,
+      "has_wrapper": false,
+      "uses_shared_libs": false,
+      "has_claude_adapter": false,
+      "migration_status": "partial",
+      "files_count": 5,
+      "python_files": 0
+    },
+    {
+      "name": "knowledge_system",
+      "path": "/home/opsvi/master_root/apps/knowledge_system",
+      "is_symlink": false,
+      "has_venv": false,
+      "has_wrapper": false,
+      "uses_shared_libs": false,
+      "has_claude_adapter": false,
+      "migration_status": "partial",
+      "files_count": 23,
+      "python_files": 21
+    },
+    {
+      "name": "proj-mapper",
+      "path": "/home/opsvi/master_root/apps/proj-mapper",
+      "is_symlink": false,
+      "has_venv": false,
+      "has_wrapper": true,
+      "uses_shared_libs": false,
+      "has_claude_adapter": true,
+      "migration_status": "in_progress",
+      "files_count": 651,
+      "python_files": 211
+    },
+    {
+      "name": "project-intelligence",
+      "path": "/home/opsvi/master_root/apps/project-intelligence",
+      "is_symlink": true,
+      "has_venv": true,
+      "has_wrapper": false,
+      "uses_shared_libs": false,
+      "has_claude_adapter": false,
+      "migration_status": "symlink",
+      "files_count": 0,
+      "python_files": 0
+    }
+  ]
+}

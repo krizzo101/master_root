@@ -1,0 +1,40 @@
+======================================================================
+APP MIGRATION STATUS DASHBOARD
+======================================================================
+Generated: 2025-08-20 10:47:55
+
+SUMMARY
+------------------------------
+Total Apps: 10
+✅ Completed: 0
+🔄 In Progress: 1
+⚠️  Partial: 6
+❌ Not Started: 0
+🔗 Symlinks: 3
+
+DETAILED STATUS
+------------------------------
+
+🔄 IN PROGRESS:
+  - proj-mapper: 211 py files, has wrapper, has claude adapter
+
+⚠️ PARTIAL:
+  - auto-forge-factory: 11 py files
+  - demo-project: 0 py files
+  - hello-cli: 9 py files
+  - hello-disneyworld: 0 py files
+  - hello-world: 0 py files
+  - knowledge_system: 21 py files
+
+🔗 SYMLINK:
+  - ACCF: symlink
+  - genFileMap: symlink
+  - project-intelligence: symlink
+
+RECOMMENDATIONS
+------------------------------
+
+Apps needing completion:
+  - proj-mapper
+
+======================================================================

@@ -1,0 +1,75 @@
+from __future__ import annotations
+
+from typing import List
+
+from opsvi_auto_forge.infrastructure.monitoring.metrics.hooks import time_retriever
+
+from .models import RetrievalConfig, Snippet
+
+try:
+    from opsvi_auto_forge.infrastructure.memory.vector.context_store import ContextStore
+except Exception:
+    ContextStore = None  # type: ignore
+
+try:
+    from opsvi_auto_forge.infrastructure.memory.graph.client import Neo4jClient
+except Exception:
+    Neo4jClient = None  # type: ignore
+
+
+@time_retriever("vector")
+def vector_search(query: str, cfg: RetrievalConfig) -> List[Snippet]:
+    if ContextStore is None:
+        return []
+    store = ContextStore()
+    results = store.search(query, top_k=cfg.top_k, namespaces=cfg.namespaces)
+    out: List[Snippet] = []
+    for r in results:
+        out.append(
+            Snippet(
+                id=r["id"],
+                text=r["text"],
+                score=float(r.get("score", 0.0)),
+                citation=r.get("uri", r["id"]),
+            )
+        )
+    return out
+
+
+@time_retriever("bm25")
+def bm25_search(query: str, cfg: RetrievalConfig) -> List[Snippet]:
+    # Implement when lexical index is available; return [] otherwise
+    return []
+
+
+@time_retriever("graph")
+def graph_paths(query: str, cfg: RetrievalConfig) -> List[Snippet]:
+    if Neo4jClient is None:
+        return []
+    client = Neo4jClient()
+    # Minimal placeholder: fetch top connected nodes by name similarity
+    cypher = """
+    MATCH (n) WHERE toLower(n.name) CONTAINS toLower($q)
+    WITH n, size((n)--()) AS deg
+    RETURN n.name AS name, deg
+    ORDER BY deg DESC
+    LIMIT 10
+    """
+    rows = client.run(cypher, q=query)
+    out: List[Snippet] = []
+    for row in rows:
+        name = row.get("name")
+        deg = float(row.get("deg", 0))
+        out.append(
+            Snippet(
+                id=f"node:{name}",
+                text=f"Graph node {name} with degree {deg}",
+                score=deg,
+                citation=f"graph:{name}",
+            )
+        )
+    return out
+
+
+def web_search(query: str, cfg: RetrievalConfig) -> List[Snippet]:
+    return []

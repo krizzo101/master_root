@@ -26,6 +26,7 @@ This document outlines the rules, guidelines, and best practices for the AI codi
 *   ruff
 *   pydantic-settings
 *   tsx
+*   sentence-transformers
 
 ## PROJECT DOCUMENTATION & CONTEXT SYSTEM
 
@@ -172,6 +173,7 @@ The system will automatically trigger commits when:
 *   The AI should batch work whenever appropriate, by default.
 *   The AI should use parallel operations as a default behavior.
 *   When using `grep` or `find` commands, the AI should use project intel methods as a primary behavior. If the project intel methods don't return anything but it is convinced what they are looking for exists then they should fall back to grep/find. If the grep/find they need to use isn't applicable to the information in the project intel cache then this does not apply which may often be the case for grep, but shouldn't usually be for find if it's a project code file.
+*   Any testing of the tool after code changes needs to be done with direct modules calls as the tool loaded in this session and available to you as an mcp tool will not include any changes until the tool is manually restarted by the user. If you need this done, ask me to do so otherwise tests from the command line to verify your changes.
 
 ## DEBUGGING
 
@@ -714,16 +716,4 @@ response = client.responses.create(
 def generate_prompt_variables(task_context: dict) -> dict:
     """Generate prompt variables dynamically based on context"""
     return {
-        "complexity": analyze_complexity(task_context),
-        "technologies": extract_technologies(task_context),
-        "constraints": identify_constraints(task_context)
-    }
-```
-
-### Enhanced Structured Outputs with Validation
-```python
-# ✅ COMPREHENSIVE SCHEMA DEFINITION
-from pydantic import BaseModel, Field, validator
-from enum import Enum
-
-class
+        "complexity": analyze

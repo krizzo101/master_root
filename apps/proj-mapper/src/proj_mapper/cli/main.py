@@ -1,31 +1,47 @@
-"""Main entry point for the Project Mapper CLI.
+#!/usr/bin/env python3
+"""Project Mapper CLI using shared interfaces
 
 This module provides the main CLI entry point for the Project Mapper tool.
 """
 
+import sys
+
+sys.path.insert(0, "/home/opsvi/master_root/libs")
+
+from pathlib import Path
+from typing import Optional
+
+import click
+
+# Use shared interfaces
+from opsvi_interfaces.cli import BaseCLI
+from opsvi_interfaces.config import ConfigManager
+
+SHARED_LIBS = True
+
+import json
+import logging
 import os
 import sys
-import click
-import logging
-from pathlib import Path
-from typing import Optional, Dict, Any, List
-import json
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
+import click
 from rich.console import Console
 
-from proj_mapper.version import __version__
-from proj_mapper.core.project_manager import ProjectManager
-from proj_mapper.output.config import GeneratorConfig, MapFormatType
-from proj_mapper.output.storage import StorageManager
 from proj_mapper.analysis.report import make_report, print_report_text
-from proj_mapper.cli.progress import ProgressReporter, LogHandler
-from proj_mapper.cli.interactive import run_interactive_mode
-from proj_mapper.cli.config_handler import ConfigManager
-from proj_mapper.utils.json_encoder import EnumEncoder
 
 # Import CLI command groups
 from proj_mapper.cli.commands import relationship_group
+from proj_mapper.cli.config_handler import ConfigManager
+from proj_mapper.cli.interactive import run_interactive_mode
+from proj_mapper.cli.progress import LogHandler, ProgressReporter
+from proj_mapper.core.project_manager import ProjectManager
+from proj_mapper.output.config import GeneratorConfig, MapFormatType
+from proj_mapper.output.storage import StorageManager
+from proj_mapper.utils.json_encoder import EnumEncoder
+from proj_mapper.version import __version__
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -277,7 +293,9 @@ def update(ctx, project_path, full):
         progress.start_progress(total=100, description="Updating project maps")
 
         # Get project manager from context
-        config_obj = ctx.obj.config_manager.load_config() if ctx.obj.config_file else None
+        config_obj = (
+            ctx.obj.config_manager.load_config() if ctx.obj.config_file else None
+        )
         manager = ProjectManager(config=config_obj)
 
         # Run update
@@ -476,7 +494,9 @@ def config(ctx, key, value, list_config, save):
 @click.argument(
     "project_path", type=click.Path(exists=True, file_okay=False, dir_okay=True)
 )
-@click.option("--output", "-o", type=click.Path(), help="Output file for the visualization")
+@click.option(
+    "--output", "-o", type=click.Path(), help="Output file for the visualization"
+)
 @click.option(
     "--format",
     "-f",
@@ -494,33 +514,49 @@ def visualize(ctx, project_path, output, format):
     try:
         latest_map_path = storage.get_latest_map(project_path)
         if not latest_map_path:
-            console.print(f"[bold red]Error:[/] No project map found for '{project_path}'.")
+            console.print(
+                f"[bold red]Error:[/] No project map found for '{project_path}'."
+            )
             console.print("Please run the 'analyze' command first.")
             return
 
         project_map = storage.load_map(project_path)
         if not project_map:
-            console.print(f"[bold red]Error:[/] Could not load project map from '{latest_map_path}'.")
+            console.print(
+                f"[bold red]Error:[/] Could not load project map from '{latest_map_path}'."
+            )
             return
 
+        from proj_mapper.output.visualization.base import (
+            VisualizationConfig,
+            VisualizationFormat,
+        )
         from proj_mapper.output.visualization.generator import VisualizationGenerator
-        from proj_mapper.output.visualization.base import VisualizationConfig, VisualizationFormat
+
         generator = VisualizationGenerator()
 
         # Resolve output path and extension
         fmt_enum = (
-            VisualizationFormat.DOT if format.lower() == "dot" else VisualizationFormat.HTML
+            VisualizationFormat.DOT
+            if format.lower() == "dot"
+            else VisualizationFormat.HTML
         )
 
         if not output:
-            default_name = "visualization.dot" if fmt_enum == VisualizationFormat.DOT else "visualization.html"
+            default_name = (
+                "visualization.dot"
+                if fmt_enum == VisualizationFormat.DOT
+                else "visualization.html"
+            )
             output = Path(project_path) / ".maps" / default_name
         else:
             output = Path(output)
 
         # Ensure extension matches format if no suffix provided
         if output.suffix == "":
-            output = output.with_suffix(".dot" if fmt_enum == VisualizationFormat.DOT else ".html")
+            output = output.with_suffix(
+                ".dot" if fmt_enum == VisualizationFormat.DOT else ".html"
+            )
         else:
             # If suffix doesn't match desired format, adjust it
             desired_suffix = ".dot" if fmt_enum == VisualizationFormat.DOT else ".html"
@@ -530,7 +566,9 @@ def visualize(ctx, project_path, output, format):
         output.parent.mkdir(parents=True, exist_ok=True)
 
         # Generate visualization with selected format
-        generator = VisualizationGenerator(config=VisualizationConfig(output_format=fmt_enum))
+        generator = VisualizationGenerator(
+            config=VisualizationConfig(output_format=fmt_enum)
+        )
         generated_path = generator.generate(project_map, output)
 
         # Verify file existence before claiming success
@@ -539,7 +577,9 @@ def visualize(ctx, project_path, output, format):
                 f"Visualization generation reported success but no file found at: {output}"
             )
 
-        console.print(f"[bold green]Success:[/] Visualization saved to [cyan]{Path(generated_path).resolve()}[/cyan]")
+        console.print(
+            f"[bold green]Success:[/] Visualization saved to [cyan]{Path(generated_path).resolve()}[/cyan]"
+        )
 
     except Exception as e:
         logger.error(f"Error generating visualization: {e}")
@@ -551,7 +591,9 @@ def visualize(ctx, project_path, output, format):
     "project_path", type=click.Path(exists=True, file_okay=False, dir_okay=True)
 )
 @click.option("--json", "json_out", is_flag=True, help="Output JSON instead of text")
-@click.option("--top", type=int, default=15, show_default=True, help="Top N hubs/components")
+@click.option(
+    "--top", type=int, default=15, show_default=True, help="Top N hubs/components"
+)
 @click.pass_context
 def report(ctx, project_path, json_out, top):
     """Compute actionable metrics (hubs, orphans, cycles, package coupling)."""
@@ -563,6 +605,7 @@ def report(ctx, project_path, json_out, top):
         rep = make_report(data, top_n=top)
         if json_out:
             import json as _json
+
             click.echo(_json.dumps(rep, indent=2))
         else:
             print_report_text(rep)

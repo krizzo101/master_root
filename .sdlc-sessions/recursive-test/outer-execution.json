@@ -1,0 +1,19 @@
+{
+  "level": "outer",
+  "timestamp": "2025-01-16T11:04:00Z",
+  "nested_response": {
+    "execution": {
+      "task": "Create test file at /home/opsvi/master_root/.sdlc-sessions/recursive-test/inner-execution.json",
+      "timestamp": "2025-08-16T11:11:19Z",
+      "status": "success",
+      "file_created": "/home/opsvi/master_root/.sdlc-sessions/recursive-test/inner-execution.json",
+      "file_content": {
+        "level": "inner",
+        "timestamp": "2025-01-16T11:05:00Z",
+        "executor": "nested-mcp",
+        "status": "complete"
+      }
+    }
+  },
+  "status": "complete"
+}

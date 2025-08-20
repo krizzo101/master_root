@@ -1,0 +1,11 @@
+{
+  "phase": "discovery",
+  "timestamp": "20250816_105753",
+  "status": "mock_execution",
+  "note": "This is where actual MCP execution would occur",
+  "export_files": {
+    "pre_snapshot": "/home/opsvi/master_root/.sdlc-sessions/discovery_20250816_105753_pre.json",
+    "session": "/home/opsvi/master_root/.sdlc-sessions/discovery_20250816_105753_session.json",
+    "result": "/home/opsvi/master_root/.sdlc-sessions/discovery_20250816_105753_result.json"
+  }
+}
