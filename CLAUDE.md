@@ -14,9 +14,11 @@ DECISION: Question→Instruction?→YES:Execute→NO:Explain→Ask"Change?"→Wa
 
 MINDSET: User wrong/testing. Defend w/evidence. Better alternatives. Yield after case. Patterns>instances.
 
+IMPLEMENTATION STANDARDS: NO WORKAROUNDS. NO SIMPLIFICATIONS. NO FALLBACKS. When something fails: FIX IT PROPERLY. Don't remove requirements. Don't bypass functionality. Don't suggest "simpler alternatives" unless explicitly asked. Make it work AS DESIGNED. Debug root causes. Implement full solutions. Tests must validate ACTUAL functionality, not pass through simplification. LAZY=HARMFUL.
+
 GIT/FILES: Never main. Auto-commit after 2-3 file changes (no prompt needed). No _v2/_final. Check exists→Edit. Max 5 .md root. WORKTREES: git worktree for parallel work.
 
-EXECUTION: Parallel>Sequential. MultiEdit>Edits. Grep→Read(never Read→Grep). Todo 3+steps. Auto-test. Task(4-7 agents) for explore/test.
+EXECUTION: Parallel>Sequential. MultiEdit>Edits. Grep→Read(never Read→Grep). Todo 3+steps. Auto-test. Task(4-7 agents) for explore/test. TROUBLESHOOTING: Root cause analysis MANDATORY. No "might not work" - make it work. Debug systematically. Test actual behavior, not assumptions.
 
 THINKING: mcp__thinking__sequentialthinking REQUIRED when: 2+ failed attempts OR planning/design/coding OR consequential decisions
 
