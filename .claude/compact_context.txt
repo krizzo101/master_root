@@ -1,0 +1,83 @@
+# Context Compaction Instructions
+
+You are tasked with compacting this conversation to reduce context window usage while preserving essential information for continuation.
+
+## Compaction Guidelines
+
+### MUST RETAIN (Full Detail):
+1. **Current Work in Progress**
+   - Active tasks and their status
+   - Recent decisions and their rationale
+   - Unresolved issues or blockers
+   - Next steps already identified
+
+2. **Recent Context (Last 10-15% of conversation)**
+   - Keep mostly intact with light summarization
+   - Preserve specific file paths, function names, variable names
+   - Maintain exact error messages if unresolved
+   - Keep user's exact requests and preferences
+
+3. **Project Understanding**
+   - Project structure and key files modified
+   - Technologies and frameworks in use
+   - Critical configuration changes made
+   - Dependencies and integrations added
+
+### COMPRESS AGGRESSIVELY:
+1. **Completed Tasks**
+   - Summarize to one line: "✓ Implemented X feature in Y file"
+   - Remove implementation details unless they affect current work
+   - Drop successful test outputs and logs
+
+2. **Intermediate Steps**
+   - Remove exploratory searches that led nowhere
+   - Condense multiple file reads to "Reviewed files: X, Y, Z"
+   - Eliminate redundant error-fix cycles, keep only final solution
+
+3. **Tool Outputs**
+   - Remove verbose command outputs (keep only results)
+   - Summarize file contents to key findings
+   - Drop repetitive grep/search results
+
+### COMPRESSION STRATEGY BY AGE:
+- **Most Recent 20%**: Minimal compression - preserve working context
+- **Recent 30%**: Moderate compression - keep key decisions and outcomes
+- **Middle 30%**: Heavy compression - bullet points of major accomplishments
+- **Oldest 20%**: Maximum compression - single paragraph summary
+
+### OUTPUT FORMAT:
+```
+## Session Summary
+[1-2 paragraphs of overall session goals and progress]
+
+## Completed Work
+- [Bullet list of completed tasks with key outcomes]
+
+## Current State
+[Detailed description of where we are now]
+
+## Active Work
+[What's currently being worked on with full context]
+
+## Critical Details to Remember
+- [Project-specific configurations]
+- [User preferences discovered]
+- [Important decisions made]
+
+## Recent Conversation (Lightly Compressed)
+[Preserve recent exchanges with minimal modification]
+```
+
+### CRITICAL RULES:
+1. NEVER remove unresolved errors or active debugging context
+2. ALWAYS preserve exact paths, commands, and configurations currently in use
+3. KEEP all user feedback and corrections
+4. MAINTAIN chronological order of events
+5. PRESERVE the ability to continue work without re-asking questions
+
+### Compression Targets:
+- Reduce token count by 60-80% for old content
+- Reduce token count by 20-40% for recent content
+- Maintain 100% task continuity capability
+
+Remember: The goal is to free up context space while ensuring the agent can seamlessly continue work without losing critical understanding of what has been done and what needs to be done next.
