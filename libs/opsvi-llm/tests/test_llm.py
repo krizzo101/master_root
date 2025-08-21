@@ -1,27 +1,27 @@
 """Tests for opsvi-llm library."""
 
-import pytest
 from typing import List
 
+import pytest
+from opsvi_foundation import ComponentError
 from opsvi_llm import (
     BaseLLMProvider,
+    ChatRequest,
+    ChatResponse,
+    CompletionRequest,
+    CompletionResponse,
+    EmbeddingRequest,
+    EmbeddingResponse,
     LLMConfig,
+    LLMConfigError,
     LLMError,
     LLMProviderError,
-    LLMConfigError,
     LLMRequestError,
     LLMResponseError,
     Message,
-    CompletionRequest,
-    ChatRequest,
-    EmbeddingRequest,
-    CompletionResponse,
-    ChatResponse,
-    EmbeddingResponse,
-    OpenAIProvider,
     OpenAIConfig,
+    OpenAIProvider,
 )
-from opsvi_foundation import ComponentError
 
 
 class MockLLMProvider(BaseLLMProvider):
@@ -161,8 +161,10 @@ class TestOpenAIConfig:
         assert config.provider_name == "openai"
         assert config.api_key == "test-key"
         assert config.organization is None
-        assert config.default_model == "gpt-3.5-turbo"
-        assert config.default_embedding_model == "text-embedding-ada-002"
+        assert config.default_model == "gpt-5-mini"  # 2025 default model
+        assert (
+            config.default_embedding_model == "text-embedding-3-large"
+        )  # 2025 default
 
     def test_openai_config_custom_values(self):
         """Test OpenAI config with custom values."""
@@ -170,14 +172,14 @@ class TestOpenAIConfig:
             provider_name="openai",
             api_key="test-key",
             organization="test-org",
-            default_model="gpt-4",
+            default_model="gpt-5",  # 2025 model
             default_embedding_model="text-embedding-3-small",
         )
 
         assert config.provider_name == "openai"
         assert config.api_key == "test-key"
         assert config.organization == "test-org"
-        assert config.default_model == "gpt-4"
+        assert config.default_model == "gpt-5"  # 2025 model
         assert config.default_embedding_model == "text-embedding-3-small"
 
 
@@ -516,7 +518,10 @@ class TestOpenAIProvider:
 
         with pytest.raises(
             ComponentError,
-            match="Initialization failed: Provider initialization failed: OpenAI API key is required",
+            match=(
+                "Initialization failed: Provider initialization failed: "
+                "OpenAI API key is required"
+            ),
         ):
             await provider.initialize()
 
