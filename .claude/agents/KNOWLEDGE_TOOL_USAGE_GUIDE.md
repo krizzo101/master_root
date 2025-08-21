@@ -1,8 +1,37 @@
 # Knowledge Tool Usage Guide for All Agents
 
+## ⚠️ CRITICAL LIMITATIONS (As of 2025-08-21)
+
+### MCP Interface Is Broken - Use Helper Library
+
+**THE PROBLEM:** MCP server only exposes 2 of 5 parameters. Tags, context, and confidence parameters cause validation errors.
+
+**THE SOLUTION:** Use the helper library at `/home/opsvi/master_root/libs/knowledge_tool_helper.py`
+
+```python
+# DON'T DO THIS (will fail with current MCP):
+mcp__knowledge__knowledge_store(
+    knowledge_type="ERROR_SOLUTION",
+    content="Fix for issue",
+    tags=["bug", "fix"],  # ❌ CAUSES VALIDATION ERROR
+    confidence=0.9  # ❌ CAUSES VALIDATION ERROR
+)
+
+# DO THIS INSTEAD (using helper):
+from knowledge_tool_helper import safe_knowledge_store
+
+result = safe_knowledge_store(
+    knowledge_type="ERROR_SOLUTION",
+    content="Fix for issue",
+    tags=["bug", "fix"],  # ✅ Will be embedded in content
+    context={"tool": "mcp"},  # ✅ Will be embedded in content
+    confidence=0.9  # ✅ Will be embedded in content
+)
+```
+
 ## CRITICAL: Correct Parameter Format for knowledge_store
 
-### ⚠️ MANDATORY RULES
+### ⚠️ MANDATORY RULES (When MCP Is Fixed)
 
 1. **`tags` MUST be a List**
    ```python
