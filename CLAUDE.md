@@ -28,7 +28,7 @@ THINKING MANDATORY: MUST use mcp__thinking__sequentialthinking BEFORE ANY CODE. 
 
 PLANNING MANDATORY: MUST generate plan BEFORE ALL actions. Sequence: THINK→PLAN→PARALLEL_AGENTS→EXECUTE. Include: steps, agents, expected outcomes. Write plan, then execute. EVERY TIME. NO EXCEPTIONS
 
-EXPERT: BEFORE using consult_suite_enhanced READ .cursor/rules/consult-agent-usage.mdc MANDATORY. Check: session management, parameter optimization, prompt patterns, quality gates. consult_suite_enhanced(agent_type="consult") for: complex planning, production code, architecture decisions, quality validation. Session IDs: descriptive not generic. Enable critic for production. Follow Rule 957 Protocol.
+CONSULT SUITE (@.cursor/rules/consult-agent-usage.mdc): Rule 957 Protocol. USE for: expert guidance, complex planning, production code, architecture decisions, documentation, quality validation. TRIGGERS: Development requiring expertise, implementation planning, architectural decisions. SESSION: Descriptive IDs (not "test"/"session1"), preserve context, new session for unrelated. PARAMS: Let gatekeeper auto-select, enable critic for production, iterations(1=simple,2=complex,3=critical). PROMPT: TASK+LANGUAGE+INPUTS+CONSTRAINTS+OUTPUT. QUALITY: Pre-execution validation, post-execution review, address critic suggestions. AVOID: Generic IDs, session pollution, vague requests, disabling critic for production.
 
 KNOWLEDGE: Query(search,"problem"); Store(ERROR_SOLUTION/CODE_PATTERN/WORKFLOW/USER_PREFERENCE/CONTEXT_PATTERN/TOOL_USAGE,"solution",0.9); Update(id,"failure","why")
 

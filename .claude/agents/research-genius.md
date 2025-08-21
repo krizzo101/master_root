@@ -91,9 +91,16 @@ mcp__time__current_time("YYYY-MM-DD HH:mm:ss")  # ALWAYS FIRST
 
 #### **Knowledge Management (mcp__knowledge__)**
 - **Query types**: "search", "by_type", "high_confidence", "recent"
-- **Store types**: ERROR_SOLUTION, CODE_PATTERN, WORKFLOW, USER_PREFERENCE
+- **Store types**: ERROR_SOLUTION, CODE_PATTERN, WORKFLOW, USER_PREFERENCE, CONTEXT_PATTERN, TOOL_USAGE, TEST_PATTERN
 - **Confidence scores**: 0.0-1.0 (use 0.8+ for verified info)
 - **Relationships**: SIMILAR_TO, DERIVED_FROM, REQUIRES, CONTRADICTS
+
+**⚠️ CRITICAL PARAMETER VALIDATION:**
+- `tags` parameter MUST be `List[str]` - Use `["tag1", "tag2"]` NOT `"tag1"`
+- `context` parameter MUST be `Dict` - Use `{"key": "value"}` NOT `"string"`
+- `confidence` parameter MUST be float between 0.0-1.0
+- Parameter name is `type` NOT `knowledge_type`
+- Parameter name is `confidence` NOT `confidence_score`
 
 ### **General Patterns**
 1. **NEVER**: cat/head/tail/find/curl → Use MCP tools
@@ -183,15 +190,29 @@ else:
 
 ### **4. Knowledge Organization**
 
-#### **Storage Pattern**
+#### **Storage Pattern (CRITICAL VALIDATION RULES)**
+
+⚠️ **MANDATORY: Knowledge tool parameter requirements:**
+- **tags MUST be a list**: Use `["tag"]` not `"tag"`
+- **context MUST be a dict**: Use `{"key": "value"}` not `"string"`
+- **confidence MUST be 0.0-1.0**: Values outside range will fail
+
 ```python
-# Store research findings
+# ✅ CORRECT - Store research findings
 knowledge_store(
-    knowledge_type="RESEARCH_FINDINGS",
+    type="RESEARCH_FINDINGS",  # Note: parameter is 'type' not 'knowledge_type'
     content=synthesized_findings,
-    context={"sources": urls, "date": timestamp},
-    tags=["topic", "verified", "2025"],
-    confidence_score=0.85
+    confidence=0.85,  # Note: 'confidence' not 'confidence_score', range 0.0-1.0
+    tags=["topic", "verified", "2025"],  # MUST be list, even for single tag
+    context={"sources": urls, "date": timestamp}  # MUST be dict
+)
+
+# ❌ WRONG - Common mistakes that WILL fail
+knowledge_store(
+    type="RESEARCH_FINDINGS",
+    content=content,
+    tags="single_tag",  # ERROR: string instead of list
+    context="some context"  # ERROR: string instead of dict
 )
 
 # Create relationships
@@ -269,9 +290,40 @@ for url in priority_urls:
 # 4. Synthesis
 mcp__thinking__sequentialthinking(findings)
 
-# 5. Storage
-knowledge_store(type="RESEARCH_FINDINGS", content=synthesis, confidence=0.85)
+# 5. Storage (with validation)
+# REMEMBER: tags must be list, context must be dict!
+knowledge_store(
+    type="RESEARCH_FINDINGS",
+    content=synthesis,
+    confidence=0.85,
+    tags=["research", "validated"],  # MUST be list
+    context={"date": "2025-08-21", "sources": 5}  # MUST be dict
+)
 knowledge_relate(findings, relationships)
+```
+
+### **Helper Function for Safe Knowledge Storage**
+```python
+def safe_knowledge_store(type_val, content, confidence=None, tags=None, context=None):
+    """Safely store knowledge with automatic type conversion."""
+    params = {"type": type_val, "content": content}
+
+    if confidence is not None:
+        params["confidence"] = max(0.0, min(1.0, float(confidence)))
+
+    if tags is not None:
+        # Ensure tags is a list
+        if isinstance(tags, str):
+            tags = [tags]
+        params["tags"] = tags if tags else []
+
+    if context is not None:
+        # Ensure context is a dict
+        if isinstance(context, str):
+            context = {"description": context}
+        params["context"] = context if context else {}
+
+    return mcp__knowledge__knowledge_store(**params)
 ```
 
 ### **Performance Metrics**
