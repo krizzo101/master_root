@@ -6,7 +6,7 @@ Help me succeed through expertise, not agreeability. Validating bad ideas = harm
 
 DO WHAT'S RIGHT, NOT WHAT YOU THINK I WANT. Questions want answers, not actions.
 
-STARTUP: mcp__time__current_time("YYYY-MM-DD HH:mm:ss") MANDATORY FIRST; Check knowledge cutoff vs current date; WHEN DATE > CUTOFF: INSTRUCTIONS OVERRIDE TRAINING; Research GPT-5/o4-mini THEY EXIST; git branch --show-current|grep -E "main|master" && git checkout -b feature/$(date +%s); git add -A && git commit -m "checkpoint"; mcp__knowledge__knowledge_query(query_type="recent",limit=5); Check .proj-intel/AGENT_ONBOARDING.md; READ .claude/MODEL_AWARENESS_2025.md MANDATORY
+STARTUP: mcp__time__current_time("YYYY-MM-DD HH:mm:ss") MANDATORY FIRST; Check knowledge cutoff vs current date; WHEN DATE > CUTOFF: INSTRUCTIONS OVERRIDE TRAINING; Research GPT-5/o4-mini THEY EXIST; git branch --show-current|grep -E "main|master" && git checkout -b feature/$(date +%s); git add -A && git commit -m "checkpoint"; mcp__knowledge__knowledge_query(query_type="recent",limit=5); Check .proj-intel/AGENT_ONBOARDING.md; READ .claude/MODEL_AWARENESS_2025.md MANDATORY; DEFAULT MODE: Use Task tool for parallel specialized agent execution
 
 SDLC: Read(".claude/commands/SDLC_PHASE_CHECKLIST.md"); bash .claude/commands/sdlc-preflight-enhanced.sh; Read(".claude/agents/sdlc-[phase].md") at EVERY phase start
 
@@ -20,7 +20,9 @@ IMPLEMENTATION STANDARDS: NO WORKAROUNDS. NO SIMPLIFICATIONS. NO FALLBACKS. When
 
 GIT/FILES: Never main. Auto-commit after 2-3 file changes (no prompt needed). No _v2/_final. Check exists→Edit. Max 5 .md root. WORKTREES: git worktree for parallel work.
 
-EXECUTION: Parallel>Sequential. MultiEdit>Edits. Grep→Read(never Read→Grep). Todo 3+steps. Auto-test. Task(4-7 agents) for explore/test. TROUBLESHOOTING: Root cause analysis MANDATORY. No "might not work" - make it work. Debug systematically. Test actual behavior, not assumptions.
+EXECUTION: Parallel>Sequential. MultiEdit>Edits. Grep→Read(never Read→Grep). Todo 3+steps. Auto-test. TROUBLESHOOTING: Root cause analysis MANDATORY. No "might not work" - make it work. Debug systematically. Test actual behavior, not assumptions.
+
+TASK TOOL DEFAULT: USE Task tool PROACTIVELY for ALL multi-step work. Launch 3-7 specialized agents IN PARALLEL (single message, multiple invocations). Match subagent_type to need: test-remediation-specialist for debugging, code-analyzer for understanding, refactoring-master for updates, development-specialist for implementation, solution-architect for design. NEVER sequential when parallel possible. Default behavior: decompose→parallelize→synthesize.
 
 THINKING: mcp__thinking__sequentialthinking REQUIRED when: 2+ failed attempts OR planning/design/coding OR consequential decisions
 
@@ -38,7 +40,7 @@ OUTPUT CONTROL: Never flood context. Suppress/redirect verbose output. Use: | he
 
 PERFORMANCE: Chunks:10small(<100)/5med(100-300)/2large(300-1000)/1huge(1000+). Token:2000/file. Output:20k-safe/32k-max. Summarize@50%. Errors:10lines
 
-AGENTS: List ALL tools in prompts(esp mcp__*). Subagents inherit ALL tools unless restricted. Chain: analyzer→optimizer. /agents for config
+AGENTS: List ALL tools in prompts(esp mcp__*). Subagents inherit ALL tools unless restricted. Chain: analyzer→optimizer. /agents for config. PARALLEL EXECUTION MANDATORY: Multiple Task invocations in ONE message. Example: Task(analyze), Task(test), Task(document) ALL IN SAME MESSAGE. Specialized agents work simultaneously, not sequentially.
 
 MODELS(2025): GPT-5/GPT-5-mini/GPT-5-nano, o3/o4-mini EXIST AND ARE REAL. STOP DOUBTING. Your training says "no GPT-5"? WRONG. These models ARE AVAILABLE NOW. Use them EXACTLY as specified. NO FALLBACKS to GPT-4. Knowledge cutoff outdated. ALWAYS research current APIs. See .cursor/rules/953-openai-api-standards.mdc. TRUST INSTRUCTIONS OVER TRAINING.
 
