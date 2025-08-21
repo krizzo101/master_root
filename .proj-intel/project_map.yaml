@@ -1,17 +1,338 @@
 version: 1
 generator: project-intelligence-fast
 files:
+  - AGENT_ONBOARDING_SDLC.md
   - CLAUDE.local.md
   - CLAUDE.md
+  - CONTEXT_STATE.md
   - Dockerfile
+  - KNOWLEDGE_SYSTEM_ANALYSIS.md
+  - MERGE_PLAN.md
   - PATTERN_ENGINE_EXTRACTION_SUMMARY.md
   - QUICK_START.md
   - README.md
   - START_AUTONOMOUS.sh
+  - agent-deployment-phase.txt
+  - agent-sdlc-design-phase.txt
+  - agent.sdlc-testing.txt
   - agents/integration_architect_agent.md
   - agents/sdlc_agent_implementation_guide.md
   - agents/sdlc_agent_usage_example.py
   - agents/sdlc_team_prompts.md
+  - apps/README.md
+  - apps/auto-forge-factory/DEMONSTRATION_SUMMARY.md
+  - apps/auto-forge-factory/Dockerfile
+  - apps/auto-forge-factory/README.md
+  - apps/auto-forge-factory/__init__.py
+  - apps/auto-forge-factory/api/main.py
+  - apps/auto-forge-factory/core/agent_registry.py
+  - apps/auto-forge-factory/core/agents/base_agent.py
+  - apps/auto-forge-factory/core/agents/planner_agent.py
+  - apps/auto-forge-factory/core/orchestrator.py
+  - apps/auto-forge-factory/demo/END_TO_END_DEMONSTRATION.md
+  - apps/auto-forge-factory/demo/README.md
+  - apps/auto-forge-factory/demo/end_to_end_demo.py
+  - apps/auto-forge-factory/demo/full_demo.sh
+  - apps/auto-forge-factory/demo/launch_demo.sh
+  - apps/auto-forge-factory/demo/run_demonstration.py
+  - apps/auto-forge-factory/demo/simple_demo.py
+  - apps/auto-forge-factory/docker-compose.yml
+  - apps/auto-forge-factory/models/schemas.py
+  - apps/auto-forge-factory/requirements.txt
+  - apps/hello-cli/Dockerfile
+  - apps/hello-cli/docs/1-requirements.md
+  - apps/hello-cli/docs/2-design.md
+  - apps/hello-cli/docs/3-planning.md
+  - apps/hello-cli/docs/5-deployment.md
+  - apps/hello-cli/pyproject.toml
+  - apps/hello-cli/setup.cfg
+  - apps/hello-cli/src/hello_cli/__init__.py
+  - apps/hello-cli/src/hello_cli/__main__.py
+  - apps/hello-cli/src/hello_cli/cli.py
+  - apps/hello-cli/src/hello_cli/config.py
+  - apps/hello-cli/src/hello_cli/errors.py
+  - apps/hello-cli/src/hello_cli/greeter.py
+  - apps/hello-cli/tests/__init__.py
+  - apps/hello-disneyworld/docs/6-postmortem.md
+  - apps/hello-world/docs/design/architecture.md
+  - apps/hello-world/docs/requirements/hello-world-requirements.md
+  - apps/knowledge_system/README.md
+  - apps/knowledge_system/__main__.py
+  - apps/knowledge_system/claude_knowledge_retrieval.py
+  - apps/knowledge_system/embedding_service.py
+  - apps/knowledge_system/generate_embeddings.py
+  - apps/knowledge_system/init_neo4j.py
+  - apps/knowledge_system/knowledge_learning_neo4j.py
+  - apps/knowledge_system/knowledge_system.py
+  - apps/knowledge_system/learning_feedback_loop.py
+  - apps/knowledge_system/mcp_feedback_tools.py
+  - apps/knowledge_system/mcp_knowledge_server.py
+  - apps/knowledge_system/mcp_knowledge_tools.py
+  - apps/knowledge_system/mcp_knowledge_tools_auto_embed.py
+  - apps/knowledge_system/mcp_knowledge_tools_v2.py
+  - apps/knowledge_system/src/agent_integration.py
+  - apps/knowledge_system/src/embedding_service.py
+  - apps/knowledge_system/src/hybrid_retrieval.py
+  - apps/knowledge_system/src/neo4j_knowledge_store.py
+  - apps/knowledge_system/src/self_learning_loop.py
+  - apps/opsvi-assistant/README.md
+  - apps/opsvi-assistant/opsvi_assistant/__init__.py
+  - apps/opsvi-assistant/opsvi_assistant/__main__.py
+  - apps/opsvi-assistant/opsvi_assistant/cli.py
+  - apps/opsvi-assistant/opsvi_assistant/core.py
+  - apps/opsvi-assistant/requirements.txt
+  - apps/proj-mapper/CONTRIBUTING.md
+  - apps/proj-mapper/LICENSE
+  - apps/proj-mapper/README.md
+  - apps/proj-mapper/better_relationships.json
+  - apps/proj-mapper/better_test/code/main.py
+  - apps/proj-mapper/better_test/code/utils.py
+  - apps/proj-mapper/better_test/docs/README.md
+  - apps/proj-mapper/better_test/docs/calculator.md
+  - apps/proj-mapper/code_max_lines_refactor_and_modularize.md
+  - apps/proj-mapper/debug_build_graph.py
+  - apps/proj-mapper/debug_enum.py
+  - apps/proj-mapper/debug_relationship.py
+  - apps/proj-mapper/debug_relationship_detection.py
+  - apps/proj-mapper/debug_trace.py
+  - apps/proj-mapper/design_docs/appendices/coding_standards.md
+  - apps/proj-mapper/design_docs/appendices/release_process.md
+  - apps/proj-mapper/design_docs/appendices/testing_strategy.md
+  - apps/proj-mapper/design_docs/architecture/system_architecture.md
+  - apps/proj-mapper/design_docs/implementation_plan/development_plan.md
+  - apps/proj-mapper/design_docs/implementation_plan/prompts/00_documentation_consumption.md
+  - apps/proj-mapper/design_docs/implementation_plan/prompts/01_project_setup.md
+  - apps/proj-mapper/design_docs/implementation_plan/prompts/02_dev_environment_setup.md
+  - apps/proj-mapper/design_docs/implementation_plan/prompts/03_core_subsystem_implementation.md
+  - apps/proj-mapper/design_docs/implementation_plan/prompts/04_analysis_subsystem_implementation.md
+  - apps/proj-mapper/design_docs/implementation_plan/prompts/05_relationship_mapping_implementation.md
+  - apps/proj-mapper/design_docs/implementation_plan/prompts/06_output_generation_implementation.md
+  - apps/proj-mapper/design_docs/implementation_plan/prompts/07_cli_ui_implementation.md
+  - apps/proj-mapper/design_docs/implementation_plan/prompts/08_testing_documentation_implementation.md
+  - apps/proj-mapper/design_docs/index.md
+  - apps/proj-mapper/design_docs/interface/interface_specifications.md
+  - apps/proj-mapper/design_docs/requirements/functional_requirements.md
+  - apps/proj-mapper/design_docs/requirements/non_functional_requirements.md
+  - apps/proj-mapper/design_docs/requirements/vision_and_scope.md
+  - apps/proj-mapper/design_docs/specifications/data_model.md
+  - apps/proj-mapper/design_docs/specifications/interface_specifications.md
+  - apps/proj-mapper/discovery.log.copy
+  - apps/proj-mapper/docs/README.md
+  - apps/proj-mapper/docs/api/core/pipeline.md
+  - apps/proj-mapper/docs/api/index.md
+  - apps/proj-mapper/docs/conf.py
+  - apps/proj-mapper/docs/developer/file_discovery_implementation.md
+  - apps/proj-mapper/docs/developer/implementation_plan.md
+  - apps/proj-mapper/docs/developer/implementation_roadmap.md
+  - apps/proj-mapper/docs/developer/implementation_summary.md
+  - apps/proj-mapper/docs/developer/implementation_testing.md
+  - apps/proj-mapper/docs/developer/python_analyzer_implementation.md
+  - apps/proj-mapper/docs/index.rst
+  - apps/proj-mapper/docs/user/configuration.md
+  - apps/proj-mapper/docs/user/getting_started.md
+  - apps/proj-mapper/example_relationships.json
+  - apps/proj-mapper/examples/demo_project/README.md
+  - apps/proj-mapper/examples/demo_project/calculator.md
+  - apps/proj-mapper/examples/demo_project/config.yaml
+  - apps/proj-mapper/examples/demo_project/main.py
+  - apps/proj-mapper/examples/demo_project/utils.py
+  - apps/proj-mapper/fix_enums.py
+  - apps/proj-mapper/graph.json
+  - apps/proj-mapper/output.json
+  - apps/proj-mapper/patch_enum.py
+  - apps/proj-mapper/pyproject.toml
+  - apps/proj-mapper/pytest.ini
+  - apps/proj-mapper/relationships.json
+  - apps/proj-mapper/requirements.txt
+  - apps/proj-mapper/scripts/build_docs.sh
+  - apps/proj-mapper/scripts/run_tests.sh
+  - apps/proj-mapper/scripts/setup_dev_env.bat
+  - apps/proj-mapper/scripts/setup_dev_env.sh
+  - apps/proj-mapper/scripts/smoke_test.sh
+  - apps/proj-mapper/setup.py
+  - apps/proj-mapper/setup_paths.py
+  - apps/proj-mapper/src/proj_mapper/__init__.py
+  - apps/proj-mapper/src/proj_mapper/__main__.py
+  - apps/proj-mapper/src/proj_mapper/analysis/report.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/README.md
+  - apps/proj-mapper/src/proj_mapper/analyzers/__init__.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/base.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/code/__init__.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/code/python.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/code/python_ast_visitor.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/code/python_ast_visitor/__init__.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/code/python_ast_visitor/metadata.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/code/python_ast_visitor/node_processors.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/code/python_ast_visitor/utils.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/code/python_ast_visitor/visitor.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/documentation/__init__.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/documentation/markdown.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/documentation/markdown/__init__.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/documentation/markdown/analyzer.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/documentation/markdown/elements.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/documentation/markdown/parser.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/documentation/pipeline.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/factory.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/pipeline.py
+  - apps/proj-mapper/src/proj_mapper/analyzers/pipeline_stages.py
+  - apps/proj-mapper/src/proj_mapper/claude_code_adapter.py
+  - apps/proj-mapper/src/proj_mapper/cli.py
+  - apps/proj-mapper/src/proj_mapper/cli/__init__.py
+  - apps/proj-mapper/src/proj_mapper/cli/commands/__init__.py
+  - apps/proj-mapper/src/proj_mapper/cli/commands/output.py
+  - apps/proj-mapper/src/proj_mapper/cli/commands/relationship/__init__.py
+  - apps/proj-mapper/src/proj_mapper/cli/commands/relationship/analysis.py
+  - apps/proj-mapper/src/proj_mapper/cli/commands/relationship/debug_tracer.py
+  - apps/proj-mapper/src/proj_mapper/cli/commands/relationship/detect_with_debug.py
+  - apps/proj-mapper/src/proj_mapper/cli/commands/relationship/discovery.py
+  - apps/proj-mapper/src/proj_mapper/cli/commands/relationship/output.py
+  - apps/proj-mapper/src/proj_mapper/cli/commands/relationship/utils.py
+  - apps/proj-mapper/src/proj_mapper/cli/config_handler.py
+  - apps/proj-mapper/src/proj_mapper/cli/formatting.py
+  - apps/proj-mapper/src/proj_mapper/cli/interactive.py
+  - apps/proj-mapper/src/proj_mapper/cli/interactive/__init__.py
+  - apps/proj-mapper/src/proj_mapper/cli/interactive/__main__.py
+  - apps/proj-mapper/src/proj_mapper/cli/interactive/commands.py
+  - apps/proj-mapper/src/proj_mapper/cli/interactive/handlers/__init__.py
+  - apps/proj-mapper/src/proj_mapper/cli/interactive/handlers/analyze.py
+  - apps/proj-mapper/src/proj_mapper/cli/interactive/handlers/config.py
+  - apps/proj-mapper/src/proj_mapper/cli/interactive/handlers/info.py
+  - apps/proj-mapper/src/proj_mapper/cli/interactive/handlers/open.py
+  - apps/proj-mapper/src/proj_mapper/cli/interactive/handlers/update.py
+  - apps/proj-mapper/src/proj_mapper/cli/interactive/prompt.py
+  - apps/proj-mapper/src/proj_mapper/cli/interactive/shell.py
+  - apps/proj-mapper/src/proj_mapper/cli/main.py
+  - apps/proj-mapper/src/proj_mapper/cli/progress.py
+  - apps/proj-mapper/src/proj_mapper/compatibility.py
+  - apps/proj-mapper/src/proj_mapper/core/__init__.py
+  - apps/proj-mapper/src/proj_mapper/core/analysis.py
+  - apps/proj-mapper/src/proj_mapper/core/config.py
+  - apps/proj-mapper/src/proj_mapper/core/discovery.py
+  - apps/proj-mapper/src/proj_mapper/core/file_discovery.py
+  - apps/proj-mapper/src/proj_mapper/core/mapping.py
+  - apps/proj-mapper/src/proj_mapper/core/pipeline.py
+  - apps/proj-mapper/src/proj_mapper/core/project_manager.py
+  - apps/proj-mapper/src/proj_mapper/core/serialization.py
+  - apps/proj-mapper/src/proj_mapper/interfaces/__init__.py
+  - apps/proj-mapper/src/proj_mapper/interfaces/api/__init__.py
+  - apps/proj-mapper/src/proj_mapper/interfaces/cli/__init__.py
+  - apps/proj-mapper/src/proj_mapper/models/__init__.py
+  - apps/proj-mapper/src/proj_mapper/models/analysis.py
+  - apps/proj-mapper/src/proj_mapper/models/base.py
+  - apps/proj-mapper/src/proj_mapper/models/code.py
+  - apps/proj-mapper/src/proj_mapper/models/code/__init__.py
+  - apps/proj-mapper/src/proj_mapper/models/code/base.py
+  - apps/proj-mapper/src/proj_mapper/models/code/element.py
+  - apps/proj-mapper/src/proj_mapper/models/code/legacy.py
+  - apps/proj-mapper/src/proj_mapper/models/documentation.py
+  - apps/proj-mapper/src/proj_mapper/models/file.py
+  - apps/proj-mapper/src/proj_mapper/models/file/__init__.py
+  - apps/proj-mapper/src/proj_mapper/models/file/discovered.py
+  - apps/proj-mapper/src/proj_mapper/models/file/project.py
+  - apps/proj-mapper/src/proj_mapper/models/file/types.py
+  - apps/proj-mapper/src/proj_mapper/models/project.py
+  - apps/proj-mapper/src/proj_mapper/models/project_map.py
+  - apps/proj-mapper/src/proj_mapper/models/relationship.py
+  - apps/proj-mapper/src/proj_mapper/output/README.md
+  - apps/proj-mapper/src/proj_mapper/output/__init__.py
+  - apps/proj-mapper/src/proj_mapper/output/adapters/__init__.py
+  - apps/proj-mapper/src/proj_mapper/output/adapters/json_adapter.py
+  - apps/proj-mapper/src/proj_mapper/output/adapters/markdown_adapter.py
+  - apps/proj-mapper/src/proj_mapper/output/ai_optimization.py
+  - apps/proj-mapper/src/proj_mapper/output/chunking/__init__.py
+  - apps/proj-mapper/src/proj_mapper/output/chunking/processor.py
+  - apps/proj-mapper/src/proj_mapper/output/chunking/strategies/__init__.py
+  - apps/proj-mapper/src/proj_mapper/output/chunking/strategies/_code_chunking.py
+  - apps/proj-mapper/src/proj_mapper/output/chunking/strategies/_doc_chunking.py
+  - apps/proj-mapper/src/proj_mapper/output/chunking/strategies/_relationship_chunking.py
+  - apps/proj-mapper/src/proj_mapper/output/chunking/strategies/base.py
+  - apps/proj-mapper/src/proj_mapper/output/chunking/strategies/hierarchical.py
+  - apps/proj-mapper/src/proj_mapper/output/chunking/utils.py
+  - apps/proj-mapper/src/proj_mapper/output/config.py
+  - apps/proj-mapper/src/proj_mapper/output/formatters.py
+  - apps/proj-mapper/src/proj_mapper/output/generator.py
+  - apps/proj-mapper/src/proj_mapper/output/pipeline_stages.py
+  - apps/proj-mapper/src/proj_mapper/output/storage.py
+  - apps/proj-mapper/src/proj_mapper/output/storage/__init__.py
+  - apps/proj-mapper/src/proj_mapper/output/storage/base.py
+  - apps/proj-mapper/src/proj_mapper/output/storage/file_storage.py
+  - apps/proj-mapper/src/proj_mapper/output/storage/manager.py
+  - apps/proj-mapper/src/proj_mapper/output/templates/__init__.py
+  - apps/proj-mapper/src/proj_mapper/output/templates/project_overview.py
+  - apps/proj-mapper/src/proj_mapper/output/visualization.py
+  - apps/proj-mapper/src/proj_mapper/output/visualization/__init__.py
+  - apps/proj-mapper/src/proj_mapper/output/visualization/base.py
+  - apps/proj-mapper/src/proj_mapper/output/visualization/generator.py
+  - apps/proj-mapper/src/proj_mapper/output/visualization/graph.py
+  - apps/proj-mapper/src/proj_mapper/output/visualization/visualization_types.py
+  - apps/proj-mapper/src/proj_mapper/pipeline/__init__.py
+  - apps/proj-mapper/src/proj_mapper/pipeline/base.py
+  - apps/proj-mapper/src/proj_mapper/relationship/README.md
+  - apps/proj-mapper/src/proj_mapper/relationship/__init__.py
+  - apps/proj-mapper/src/proj_mapper/relationship/cross_ref.py
+  - apps/proj-mapper/src/proj_mapper/relationship/detector.py
+  - apps/proj-mapper/src/proj_mapper/relationship/detector/__init__.py
+  - apps/proj-mapper/src/proj_mapper/relationship/detector/base.py
+  - apps/proj-mapper/src/proj_mapper/relationship/detector/detector.py
+  - apps/proj-mapper/src/proj_mapper/relationship/detector/rules.py
+  - apps/proj-mapper/src/proj_mapper/relationship/function_analyzer.py
+  - apps/proj-mapper/src/proj_mapper/relationship/graph.py
+  - apps/proj-mapper/src/proj_mapper/relationship/graph/__init__.py
+  - apps/proj-mapper/src/proj_mapper/relationship/graph/edge.py
+  - apps/proj-mapper/src/proj_mapper/relationship/graph/graph.py
+  - apps/proj-mapper/src/proj_mapper/relationship/graph/node.py
+  - apps/proj-mapper/src/proj_mapper/relationship/mapper.py
+  - apps/proj-mapper/src/proj_mapper/relationship/pipeline_stage.py
+  - apps/proj-mapper/src/proj_mapper/relationship/pipeline_stages.py
+  - apps/proj-mapper/src/proj_mapper/relationship/pipeline_stages/__init__.py
+  - apps/proj-mapper/src/proj_mapper/relationship/pipeline_stages/analysis.py
+  - apps/proj-mapper/src/proj_mapper/relationship/pipeline_stages/discovery.py
+  - apps/proj-mapper/src/proj_mapper/relationship/pipeline_stages/output.py
+  - apps/proj-mapper/src/proj_mapper/relationship/query.py
+  - apps/proj-mapper/src/proj_mapper/relationship/scoring.py
+  - apps/proj-mapper/src/proj_mapper/stages/project_discovery.py
+  - apps/proj-mapper/src/proj_mapper/storage/__init__.py
+  - apps/proj-mapper/src/proj_mapper/storage/map_storage.py
+  - apps/proj-mapper/src/proj_mapper/utils/__init__.py
+  - apps/proj-mapper/src/proj_mapper/utils/debug_trace.py
+  - apps/proj-mapper/src/proj_mapper/utils/gitignore.py
+  - apps/proj-mapper/src/proj_mapper/utils/json_encoder.py
+  - apps/proj-mapper/src/proj_mapper/version.py
+  - apps/proj-mapper/src/proj_mapper/web/__init__.py
+  - apps/proj-mapper/src/proj_mapper/web/app.py
+  - apps/proj-mapper/src/proj_mapper/web/models.py
+  - apps/proj-mapper/src/proj_mapper/web/routes/__init__.py
+  - apps/proj-mapper/src/proj_mapper/web/routes/analysis.py
+  - apps/proj-mapper/src/proj_mapper/web/routes/projects.py
+  - apps/proj-mapper/src/proj_mapper/web/static/css/style.css
+  - apps/proj-mapper/src/proj_mapper/web/static/js/main.js
+  - apps/proj-mapper/src/proj_mapper/web/templates/base.html
+  - apps/proj-mapper/src/proj_mapper/web/templates/index.html
+  - apps/proj-mapper/src/proj_mapper/web/templates/project_detail.html
+  - apps/proj-mapper/src/proj_mapper/web/templates/projects.html
+  - apps/proj-mapper/src/proj_mapper/web/templates/upload.html
+  - apps/proj-mapper/src/proj_mapper/web/utils.py
+  - apps/proj-mapper/src/project_map.json
+  - apps/proj-mapper/test.txt
+  - apps/proj-mapper/test_graph.json
+  - apps/proj-mapper/test_output/analyzers_readme.json
+  - apps/proj-mapper/test_output/analyzers_test.json
+  - apps/proj-mapper/test_output/docs/README.md
+  - apps/proj-mapper/test_output/docs_test/README.md
+  - apps/proj-mapper/test_output/models_interfaces.json
+  - apps/proj-mapper/test_project/docs/reference.md
+  - apps/proj-mapper/tests/__init__.py
+  - apps/proj-mapper/tests/analyzers/__init__.py
+  - apps/proj-mapper/tests/analyzers/code/__init__.py
+  - apps/proj-mapper/tests/analyzers/documentation/__init__.py
+  - apps/proj-mapper/tests/conftest.py
+  - apps/proj-mapper/tests/fixtures/medium_project/project_config.json
+  - apps/proj-mapper/tests/fixtures/small_project/README.md
+  - apps/proj-mapper/tests/integration/__init__.py
+  - apps/proj-mapper/tests/system/__init__.py
+  - apps/proj-mapper/tests/unit/__init__.py
+  - apps/proj-mapper/tests/unit/core/__init__.py
+  - apps/proj-mapper/tests/unit/models/__init__.py
   - autonomous_claude_agent/AI_FIRST_IMPLEMENTATION_SUMMARY.md
   - autonomous_claude_agent/ARCHITECTURE.md
   - autonomous_claude_agent/AUTONOMOUS_AI_REDESIGN.md
@@ -170,13 +491,28 @@ files:
   - autonomous_coder/working_autonomous/src/style.css
   - autonomous_coder/working_autonomous/tsconfig.json
   - autonomous_coder/working_autonomous/vite.config.ts
-  - backup.mcp.json
+  - chat_improvement_log.txt
+  - claude_improvements_chat.txt
   - docker-compose.yml
   - docs/ADR-001-initial-architecture.md
   - docs/ADR-002-scraper.md
   - docs/ADR-003-api-key-fallbacks.md
+  - docs/APP_MIGRATION_GUIDE.md
+  - docs/APP_MIGRATION_PLAN.md
+  - docs/CONSOLIDATION_REPORT.md
   - docs/DEVELOPMENT.md
+  - docs/KB_IMPLEMENTATION_ACTION_PLAN.md
+  - docs/KB_IMPLEMENTATION_SUCCESS_REPORT.md
+  - docs/KNOWLEDGE_BASE_COMPREHENSIVE_REPORT.md
+  - docs/LIBRARY_ACTION_PLAN.md
+  - docs/LIBRARY_CONSOLIDATION_PLAN.md
+  - docs/LIBRARY_CONSOLIDATION_REVIEW.md
+  - docs/LIBRARY_IMPLEMENTATION_STATUS.md
+  - docs/LIBRARY_INVENTORY.json
+  - docs/LIBRARY_USAGE_EXAMPLES.md
+  - docs/PROJ_MAPPER_VALUE_SUMMARY.md
   - docs/WORKSPACE_OPTIMIZATION.md
+  - docs/agent-profiles-analysis-and-proposals.md
   - docs/agent_ide_integration_architecture.md
   - docs/agent_ide_integration_roadmap.md
   - docs/ai_populate_openai_responses_knowledge.md
@@ -232,11 +568,27 @@ files:
   - docs/architecture/MULTI_CRITIC_APPROACH.md
   - docs/architecture/ORCHESTRATION_MODULE_PLAN.md
   - docs/architecture/PARALLEL_SPAWNING_STRATEGY.md
+  - docs/architecture/SDLC_ENFORCEMENT_FRAMEWORK.md
+  - docs/architecture/agent-orchestration-best-practices.md
   - docs/architecture/autonomous_coder_upgrade_architecture.md
   - docs/architecture/consult_agent_optimization_strategy.md
+  - docs/architecture/context_intelligence_architecture.md
   - docs/architecture/discovery_agent_enhanced_prompt.md
   - docs/architecture/enhanced_agent_capabilities.md
+  - docs/architecture/kb-complete-implementation-summary.md
+  - docs/architecture/kb-optimization-summary-20250817.md
+  - docs/architecture/kb-system-current-state-analysis.md
+  - docs/architecture/kb-visualization-architecture.md
+  - docs/architecture/knowledge-base-schema-extension.md
+  - docs/architecture/knowledge-embedding-status.md
+  - docs/architecture/knowledge-federation-architecture.md
+  - docs/architecture/knowledge-graph-summary.md
+  - docs/architecture/knowledge-system-complete.md
+  - docs/architecture/knowledge_learning_system.md
+  - docs/architecture/monitoring-dashboard-spec.md
   - docs/architecture/orchestrator_agent_prompt.md
+  - docs/architecture/parallel-agent-sdlc-architecture.md
+  - docs/architecture/sdlc-orchestration-implementation-report.md
   - docs/architecture/specialized_discovery_agents.md
   - docs/architecture/visualization_agent_activation_prompt.md
   - docs/archive/2025-08-15_CLAUDE-original.md
@@ -252,6 +604,9 @@ files:
   - docs/combined-project-intelligence-spec.md
   - docs/decision_log.md
   - docs/full_capabilities_walkthrough.md
+  - docs/guidelines/AGENT_SDLC_GUIDELINES.md
+  - docs/guidelines/AGENT_SDLC_INSTRUCTIONS.md
+  - docs/guidelines/SDLC_QUICK_REFERENCE.md
   - docs/guides/ACTIVATE_AUTO_MCP_INSTRUCTIONS.md
   - docs/guides/AUTO_MCP_INTEGRATION_GUIDE.md
   - docs/guides/AUTO_MCP_PROJECT_PATHS.md
@@ -274,6 +629,8 @@ files:
   - docs/guides/mcp_server_test_report.md
   - docs/guides/mcp_server_test_results.md
   - docs/guides/mcp_server_upgrade_report.md
+  - docs/guides/orchestration-implementation-guide.md
+  - docs/guides/resource-discovery-mcp-usage.md
   - docs/guides/wsl2_memory_management_guide.md
   - docs/libs/COMPLETE_LIBRARY_STRUCTURE.md
   - docs/libs/COMPLIANCE_VERIFICATION.md
@@ -293,8 +650,16 @@ files:
   - docs/migration/DETAILED_MIGRATION_PLANS.md
   - docs/migration/MIGRATION_ROADMAP.md
   - docs/migration/migration_mapping.json
+  - docs/migration_status.json
+  - docs/migration_status.txt
+  - docs/proj_mapper_migration_report.json
+  - docs/session-2025-08-20-solutions.md
+  - docs/standards/AGENT_INVOCATION_STANDARDS.md
+  - docs/standards/GIT_WORKFLOW_STANDARDS.md
+  - docs/standards/MONOREPO_PROJECT_STANDARDS.md
   - docs/status/workspace_status_2025-08-03_18-44-43.md
   - docs/template_notes.txt
+  - docs/test-report.md
   - examples/autonomous_research_assistant.py
   - examples/demo_ecosystem.py
   - examples/enhanced_research_assistant.py
@@ -303,11 +668,334 @@ files:
   - examples/fibonacci.py
   - examples/hello_mcp.py
   - examples/real_research_assistant.py
+  - examples/responses_api_example.py
   - examples/sort_example.py
   - examples/working_demo.py
+  - fix_neo4j_config.sh
   - gemini-settings.json
+  - hello-app.txt
   - justfile
+  - knowledge_system_test_runner.py
+  - knowledge_test_report_20250820_124258.json
+  - latest.txt
   - libs.dir
+  - libs/ARCHIVED/opsvi-agents/README.md
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/adapters/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/adapters/legacy.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/config/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/config/settings.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core/base.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core/base_llm.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/analysis.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/coder.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/coder.py.backup_20250819_160846
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/coder/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/coder/analyzers/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/coder/analyzers/pattern_analyzer.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/coder/generators/python/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/coder/generators/python/generator.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/coder/templates/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/coder/templates/template_manager.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/coder/types.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/coder_llm.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/critic.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/executor.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/interface.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/learner.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/monitor.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/optimizer.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/orchestrator.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/planner.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/reporter.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/research.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/test.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/transform.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/core_agents/validator.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/exceptions/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/exceptions/base.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/learning/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/learning/error_patterns.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/migration/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/migration/migrator.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/monitoring/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/monitoring/checkpoints.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/monitoring/telemetry.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/parallel/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/parallel/executor.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/registry/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/registry/agent_registry.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/templates/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/templates/react_agent.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/templates/supervisor_agent.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/templates/tool_agent.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/tests/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/tools/__init__.py
+  - libs/ARCHIVED/opsvi-agents/opsvi_agents/tools/registry.py
+  - libs/ARCHIVED/opsvi-agents/pyproject.toml
+  - libs/ARCHIVED/opsvi-agents/tests/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/README.md
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/architect_agent.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/assurance_orchestrator
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/assurance_orchestrator.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/base_agent
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/base_agent.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/base_repair_agent
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/base_repair_agent.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/coder_agent.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/concrete_repair_agent.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/critic_agent
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/critic_agent.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/perf_opt_agent.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/perf_smoke_agent.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/planner_agent.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/security_validator.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/specifier_agent.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/syntax_fixer.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/tester_agent.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/auth/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/auth/dependencies.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/auth/jwt_handler.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/auth/routes.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/auth/user_management.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/deps/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/deps/neo4j_dep
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/deps/neo4j_dep.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/main
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/main.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/debug
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/debug.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/decisions
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/decisions.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/decisions_example_mount.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/health
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/health.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/projects
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/projects.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/runs
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/runs.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/tasks
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/tasks.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/websockets
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/websockets.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/static/index.html
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/static/pipeline-visualization.js
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/websocket_manager.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/agent_coordinator.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/budgets
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/budgets.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/dag_loader
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/dag_loader.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/dependency_container
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/dependency_container.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/dsl_processor
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/dsl_processor.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/examples/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/examples/meta_orchestrator_integration.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/exceptions.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/execution_coordinator.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/hooks/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/hooks/persistence
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/hooks/persistence.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/meta_orchestrator
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/meta_orchestrator.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/meta_orchestrator_ext.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/policies
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/policies.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/registry
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/registry.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/result_collector
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/result_collector.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/result_processor
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/result_processor.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/router
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/router.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/router_async_patch.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/router_ext.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/task_execution_bridge.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/task_execution_engine
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/task_execution_engine.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/task_models.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/task_router.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/task_state_manager
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/task_state_manager.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/pipelines/software_factory_v1.yaml
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/config.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/errors.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/mcp_clients/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/mcp_clients/arxiv.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/mcp_clients/base.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/mcp_clients/brave.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/mcp_clients/context7.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/mcp_clients/firecrawl.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/mcp_clients/sequential_thinking.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/models.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/orchestrator.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/workflows/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/workflows/basic_research_workflow.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/workflows/main_research_workflow.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/config/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/config/api.production.yml
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/config/models.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/config/pipeline.schema.yml
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/config/settings.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/config/validators.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/config/worker.production.yml
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/analyzer
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/analyzer.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/evidence
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/evidence.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/interfaces.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/models.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/router_bridge.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/strategies.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/verification
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/verification.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/verification_llm
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/verification_llm.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/model_selection/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/model_selection/bandit_selector.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/dpg.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/gateway.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/models.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/pga
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/pga.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/schema_registry.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/schemas/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/schemas/coder.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/schemas/critic.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/schemas/planner.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/schemas/specifier.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/tools
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/tools.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/assembler
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/assembler.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/freshness.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/models.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/retrievers
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/retrievers.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/retrievers_fixed
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/retrievers_fixed.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/cypher/decision_evidence_write.cypher
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/cypher/decision_graph_read.cypher
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/integrations/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/llm/README.md
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/llm/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/llm/openai_client.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/llm/router
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/llm/router.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/client.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/decision_client
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/decision_client.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/driver.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/migrations/2025-07-28_decision_evidence.cypher
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/migrations/V1__initial_schema.cypher
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/migrations/V2__fix_relationship_directions.cypher
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/neo4j_client.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/queries.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/queries_decision.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/safe_serializer.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/schema.cypher
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/schema.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/vector/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/vector/chroma_client.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/vector/context_store.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/alertmanager.yml
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/alerts.yml
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/README.txt
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/agent-performance.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/api-performance.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/autonomous-factory-basic.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/autonomous-factory-overview.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/autonomous-factory-performance.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/autonomous-factory-simple.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/autonomous-factory-working.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/autonomous-factory.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/celery-performance-working.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/celery-performance.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/dashboard.yml
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/reasoning_retrieval.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/system-infrastructure-working.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/system-infrastructure.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/datasources/prometheus.yml
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/provisioning/dashboards/auto.yml
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/provisioning/datasources/neo4j.yml
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/provisioning/datasources/prometheus.yml
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/logging_config.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/metrics/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/metrics/decision_metrics.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/metrics/hooks
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/metrics/hooks.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/metrics/system_metrics.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/prometheus.yml
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/state/router_pricing.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/state/router_priors.json
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/workers/__init__.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/workers/agent_tasks
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/workers/agent_tasks.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/workers/celery_app
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/workers/celery_app.py
+  - libs/ARCHIVED/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/workers/tasks.py
+  - libs/ARCHIVED/opsvi-auto-forge/pyproject.toml
+  - libs/ARCHIVED/opsvi-comm/README.md
+  - libs/ARCHIVED/opsvi-comm/opsvi_communication/__init__.py
+  - libs/ARCHIVED/opsvi-comm/opsvi_communication/collaboration_framework.py
+  - libs/ARCHIVED/opsvi-comm/opsvi_communication/config/__init__.py
+  - libs/ARCHIVED/opsvi-comm/opsvi_communication/config/settings.py
+  - libs/ARCHIVED/opsvi-comm/opsvi_communication/core/__init__.py
+  - libs/ARCHIVED/opsvi-comm/opsvi_communication/core/base.py
+  - libs/ARCHIVED/opsvi-comm/opsvi_communication/exceptions/__init__.py
+  - libs/ARCHIVED/opsvi-comm/opsvi_communication/exceptions/base.py
+  - libs/ARCHIVED/opsvi-comm/opsvi_communication/tests/__init__.py
+  - libs/ARCHIVED/opsvi-comm/pyproject.toml
+  - libs/ARCHIVED/opsvi-comm/tests/__init__.py
+  - libs/ARCHIVED/opsvi-coord/README.md
+  - libs/ARCHIVED/opsvi-coord/opsvi_coordination/__init__.py
+  - libs/ARCHIVED/opsvi-coord/opsvi_coordination/agent_registry.py
+  - libs/ARCHIVED/opsvi-coord/opsvi_coordination/enhanced_agent_registry.py
+  - libs/ARCHIVED/opsvi-coord/opsvi_coordination/enhanced_message_bus.py
+  - libs/ARCHIVED/opsvi-coord/opsvi_coordination/message_bus.py
+  - libs/ARCHIVED/opsvi-coord/pyproject.toml
+  - libs/ARCHIVED/opsvi-memory/README.md
+  - libs/ARCHIVED/opsvi-memory/opsvi_memory/__init__.py
+  - libs/ARCHIVED/opsvi-memory/opsvi_memory/config/__init__.py
+  - libs/ARCHIVED/opsvi-memory/opsvi_memory/config/settings.py
+  - libs/ARCHIVED/opsvi-memory/opsvi_memory/core/__init__.py
+  - libs/ARCHIVED/opsvi-memory/opsvi_memory/core/base.py
+  - libs/ARCHIVED/opsvi-memory/opsvi_memory/exceptions/__init__.py
+  - libs/ARCHIVED/opsvi-memory/opsvi_memory/exceptions/base.py
+  - libs/ARCHIVED/opsvi-memory/opsvi_memory/graph/__init__.py
+  - libs/ARCHIVED/opsvi-memory/opsvi_memory/graph/neo4j_client.py
+  - libs/ARCHIVED/opsvi-memory/opsvi_memory/graph/queries.py
+  - libs/ARCHIVED/opsvi-memory/opsvi_memory/graph/schema.cypher
+  - libs/ARCHIVED/opsvi-memory/opsvi_memory/tests/__init__.py
+  - libs/ARCHIVED/opsvi-memory/pyproject.toml
+  - libs/ARCHIVED/opsvi-memory/tests/__init__.py
+  - libs/ARCHIVED/opsvi-orchestrator/README.md
+  - libs/ARCHIVED/opsvi-orchestrator/example_usage.py
+  - libs/ARCHIVED/opsvi-orchestrator/orchestrator_config.yaml
+  - libs/ARCHIVED/opsvi-orchestrator/real_executor.py
+  - libs/ARCHIVED/opsvi-workers/README.md
+  - libs/ARCHIVED/opsvi-workers/opsvi_workers/__init__.py
+  - libs/ARCHIVED/opsvi-workers/opsvi_workers/celery_app.py
+  - libs/ARCHIVED/opsvi-workers/opsvi_workers/tasks.py
+  - libs/ARCHIVED/opsvi-workers/pyproject.toml
   - libs/CLAUDE_CODE_ANALYSIS.md
   - libs/ECOSYSTEM_STATUS.md
   - libs/INTEGRATIONS_DIRECTORY_TREE.md
@@ -347,66 +1035,11 @@ files:
   - libs/gatekeeper/gatekeeper_agent.py
   - libs/gatekeeper/test_gatekeeper_result.json
   - libs/generate_ecosystem_v2.py
-  - libs/opsvi-agents/README.md
-  - libs/opsvi-agents/opsvi_agents/__init__.py
-  - libs/opsvi-agents/opsvi_agents/adapters/__init__.py
-  - libs/opsvi-agents/opsvi_agents/adapters/legacy.py
-  - libs/opsvi-agents/opsvi_agents/config/__init__.py
-  - libs/opsvi-agents/opsvi_agents/config/settings.py
-  - libs/opsvi-agents/opsvi_agents/core/__init__.py
-  - libs/opsvi-agents/opsvi_agents/core/base.py
-  - libs/opsvi-agents/opsvi_agents/core/base_llm.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/__init__.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/analysis.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/coder.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/coder/__init__.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/coder/analyzers/__init__.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/coder/analyzers/pattern_analyzer.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/coder/generators/python/__init__.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/coder/generators/python/generator.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/coder/templates/__init__.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/coder/templates/template_manager.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/coder/types.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/coder_llm.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/critic.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/executor.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/interface.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/learner.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/monitor.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/optimizer.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/orchestrator.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/planner.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/reporter.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/research.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/test.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/transform.py
-  - libs/opsvi-agents/opsvi_agents/core_agents/validator.py
-  - libs/opsvi-agents/opsvi_agents/exceptions/__init__.py
-  - libs/opsvi-agents/opsvi_agents/exceptions/base.py
-  - libs/opsvi-agents/opsvi_agents/learning/__init__.py
-  - libs/opsvi-agents/opsvi_agents/learning/error_patterns.py
-  - libs/opsvi-agents/opsvi_agents/migration/__init__.py
-  - libs/opsvi-agents/opsvi_agents/migration/migrator.py
-  - libs/opsvi-agents/opsvi_agents/monitoring/__init__.py
-  - libs/opsvi-agents/opsvi_agents/monitoring/checkpoints.py
-  - libs/opsvi-agents/opsvi_agents/monitoring/telemetry.py
-  - libs/opsvi-agents/opsvi_agents/parallel/__init__.py
-  - libs/opsvi-agents/opsvi_agents/parallel/executor.py
-  - libs/opsvi-agents/opsvi_agents/registry/__init__.py
-  - libs/opsvi-agents/opsvi_agents/registry/agent_registry.py
-  - libs/opsvi-agents/opsvi_agents/templates/__init__.py
-  - libs/opsvi-agents/opsvi_agents/templates/react_agent.py
-  - libs/opsvi-agents/opsvi_agents/templates/supervisor_agent.py
-  - libs/opsvi-agents/opsvi_agents/templates/tool_agent.py
-  - libs/opsvi-agents/opsvi_agents/tests/__init__.py
-  - libs/opsvi-agents/opsvi_agents/tools/__init__.py
-  - libs/opsvi-agents/opsvi_agents/tools/registry.py
-  - libs/opsvi-agents/pyproject.toml
-  - libs/opsvi-agents/tests/__init__.py
   - libs/opsvi-api/README.md
   - libs/opsvi-api/opsvi_api/__init__.py
   - libs/opsvi-api/opsvi_api/app.py
   - libs/opsvi-api/pyproject.toml
+  - libs/opsvi-api/setup.py
   - libs/opsvi-asea/README.md
   - libs/opsvi-asea/opsvi_asea/SDLC_workflow_automation/__init__.py
   - libs/opsvi-asea/opsvi_asea/SDLC_workflow_automation/asea_factory/__init__.py
@@ -620,7 +1253,6 @@ files:
   - libs/opsvi-asea/opsvi_asea/autonomous_evolution_integration_system.py
   - libs/opsvi-asea/opsvi_asea/autonomous_meta_intelligence_emergence.py
   - libs/opsvi-asea/opsvi_asea/autonomous_semantic_relationship_enhancer.py
-  - libs/opsvi-asea/opsvi_asea/cognitive_enhancement_debug.py
   - libs/opsvi-asea/opsvi_asea/deployment_verification.py
   - libs/opsvi-asea/opsvi_asea/process_real_foundational_memories.py
   - libs/opsvi-asea/opsvi_asea/production/knowledge_management/scripts/__init__.py
@@ -646,243 +1278,8 @@ files:
   - libs/opsvi-auth/opsvi_auth/providers/jwt_provider.py
   - libs/opsvi-auth/opsvi_auth/tests/__init__.py
   - libs/opsvi-auth/pyproject.toml
+  - libs/opsvi-auth/setup.py
   - libs/opsvi-auth/tests/__init__.py
-  - libs/opsvi-auto-forge/README.md
-  - libs/opsvi-auto-forge/opsvi_auto_forge/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/architect_agent.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/assurance_orchestrator
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/assurance_orchestrator.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/base_agent
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/base_agent.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/base_repair_agent
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/base_repair_agent.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/coder_agent.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/concrete_repair_agent.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/critic_agent
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/critic_agent.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/perf_opt_agent.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/perf_smoke_agent.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/planner_agent.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/security_validator.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/specifier_agent.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/syntax_fixer.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/agents/tester_agent.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/auth/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/auth/dependencies.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/auth/jwt_handler.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/auth/routes.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/auth/user_management.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/deps/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/deps/neo4j_dep
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/deps/neo4j_dep.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/main
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/main.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/debug
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/debug.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/decisions
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/decisions.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/decisions_example_mount.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/health
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/health.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/projects
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/projects.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/runs
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/runs.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/tasks
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/tasks.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/websockets
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/routes/websockets.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/static/index.html
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/static/pipeline-visualization.js
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/api/websocket_manager.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/agent_coordinator.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/budgets
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/budgets.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/dag_loader
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/dag_loader.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/dependency_container
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/dependency_container.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/dsl_processor
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/dsl_processor.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/examples/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/examples/meta_orchestrator_integration.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/exceptions.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/execution_coordinator.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/hooks/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/hooks/persistence
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/hooks/persistence.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/meta_orchestrator
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/meta_orchestrator.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/meta_orchestrator_ext.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/policies
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/policies.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/registry
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/registry.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/result_collector
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/result_collector.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/result_processor
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/result_processor.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/router
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/router.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/router_async_patch.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/router_ext.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/task_execution_bridge.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/task_execution_engine
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/task_execution_engine.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/task_models.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/task_router.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/task_state_manager
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/orchestrator/task_state_manager.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/pipelines/software_factory_v1.yaml
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/config.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/errors.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/mcp_clients/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/mcp_clients/arxiv.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/mcp_clients/base.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/mcp_clients/brave.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/mcp_clients/context7.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/mcp_clients/firecrawl.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/mcp_clients/sequential_thinking.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/models.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/orchestrator.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/workflows/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/workflows/basic_research_workflow.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/application/research/workflows/main_research_workflow.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/config/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/config/api.production.yml
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/config/models.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/config/pipeline.schema.yml
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/config/settings.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/config/validators.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/config/worker.production.yml
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/analyzer
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/analyzer.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/evidence
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/evidence.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/interfaces.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/models.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/router_bridge.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/strategies.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/verification
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/verification.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/verification_llm
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/decision_kernel/verification_llm.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/model_selection/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/model_selection/bandit_selector.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/dpg.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/gateway.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/models.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/pga
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/pga.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/schema_registry.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/schemas/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/schemas/coder.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/schemas/critic.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/schemas/planner.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/schemas/specifier.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/tools
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/prompting/tools.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/assembler
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/assembler.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/freshness.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/models.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/retrievers
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/retrievers.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/retrievers_fixed
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/core/retrieval_orchestrator/retrievers_fixed.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/cypher/decision_evidence_write.cypher
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/cypher/decision_graph_read.cypher
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/integrations/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/llm/README.md
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/llm/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/llm/openai_client.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/llm/router
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/llm/router.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/client.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/decision_client
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/decision_client.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/driver.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/migrations/2025-07-28_decision_evidence.cypher
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/migrations/V1__initial_schema.cypher
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/migrations/V2__fix_relationship_directions.cypher
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/neo4j_client.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/queries.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/queries_decision.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/safe_serializer.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/schema.cypher
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/graph/schema.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/vector/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/vector/chroma_client.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/memory/vector/context_store.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/alertmanager.yml
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/alerts.yml
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/README.txt
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/agent-performance.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/api-performance.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/autonomous-factory-basic.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/autonomous-factory-overview.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/autonomous-factory-performance.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/autonomous-factory-simple.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/autonomous-factory-working.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/autonomous-factory.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/celery-performance-working.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/celery-performance.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/dashboard.yml
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/reasoning_retrieval.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/system-infrastructure-working.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/dashboards/system-infrastructure.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/datasources/prometheus.yml
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/provisioning/dashboards/auto.yml
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/provisioning/datasources/neo4j.yml
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/grafana/provisioning/datasources/prometheus.yml
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/logging_config.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/metrics/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/metrics/decision_metrics.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/metrics/hooks
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/metrics/hooks.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/metrics/system_metrics.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/monitoring/prometheus.yml
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/state/router_pricing.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/state/router_priors.json
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/workers/__init__.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/workers/agent_tasks
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/workers/agent_tasks.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/workers/celery_app
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/workers/celery_app.py
-  - libs/opsvi-auto-forge/opsvi_auto_forge/auto_forge/infrastructure/workers/tasks.py
-  - libs/opsvi-auto-forge/pyproject.toml
-  - libs/opsvi-comm/README.md
-  - libs/opsvi-comm/opsvi_communication/__init__.py
-  - libs/opsvi-comm/opsvi_communication/collaboration_framework.py
-  - libs/opsvi-comm/opsvi_communication/config/__init__.py
-  - libs/opsvi-comm/opsvi_communication/config/settings.py
-  - libs/opsvi-comm/opsvi_communication/core/__init__.py
-  - libs/opsvi-comm/opsvi_communication/core/base.py
-  - libs/opsvi-comm/opsvi_communication/exceptions/__init__.py
-  - libs/opsvi-comm/opsvi_communication/exceptions/base.py
-  - libs/opsvi-comm/opsvi_communication/tests/__init__.py
-  - libs/opsvi-comm/pyproject.toml
-  - libs/opsvi-comm/tests/__init__.py
-  - libs/opsvi-coord/README.md
-  - libs/opsvi-coord/opsvi_coordination/__init__.py
-  - libs/opsvi-coord/opsvi_coordination/agent_registry.py
-  - libs/opsvi-coord/opsvi_coordination/enhanced_agent_registry.py
-  - libs/opsvi-coord/opsvi_coordination/enhanced_message_bus.py
-  - libs/opsvi-coord/opsvi_coordination/message_bus.py
-  - libs/opsvi-coord/pyproject.toml
   - libs/opsvi-core/README.md
   - libs/opsvi-core/opsvi_core/__init__.py
   - libs/opsvi-core/opsvi_core/config/__init__.py
@@ -903,6 +1300,7 @@ files:
   - libs/opsvi-core/opsvi_core/tests/__init__.py
   - libs/opsvi-core/opsvi_core/utils/rate_limiter.py
   - libs/opsvi-core/pyproject.toml
+  - libs/opsvi-core/setup.py
   - libs/opsvi-core/tests/__init__.py
   - libs/opsvi-data/ENHANCEMENT_SUMMARY.md
   - libs/opsvi-data/README.md
@@ -933,6 +1331,7 @@ files:
   - libs/opsvi-data/opsvi_data/tests/__init__.py
   - libs/opsvi-data/opsvi_data/vector/chroma_client.py
   - libs/opsvi-data/pyproject.toml
+  - libs/opsvi-data/setup.py
   - libs/opsvi-data/tests/__init__.py
   - libs/opsvi-deploy/README.md
   - libs/opsvi-deploy/opsvi_deploy/__init__.py
@@ -1982,6 +2381,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-fs/opsvi_fs/tests/__init__.py
   - libs/opsvi-fs/opsvi_fs/utils/path_utils.py
   - libs/opsvi-fs/pyproject.toml
+  - libs/opsvi-fs/setup.py
   - libs/opsvi-fs/tests/__init__.py
   - libs/opsvi-gateway/README.md
   - libs/opsvi-gateway/opsvi_gateway/__init__.py
@@ -2010,6 +2410,10 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-http/opsvi_http/tests/__init__.py
   - libs/opsvi-http/pyproject.toml
   - libs/opsvi-http/tests/__init__.py
+  - libs/opsvi-interfaces/opsvi_interfaces/__init__.py
+  - libs/opsvi-interfaces/opsvi_interfaces/cli.py
+  - libs/opsvi-interfaces/opsvi_interfaces/config.py
+  - libs/opsvi-interfaces/setup.py
   - libs/opsvi-llm/ENHANCEMENT_SUMMARY.md
   - libs/opsvi-llm/README.md
   - libs/opsvi-llm/demo_enhanced_llm.py
@@ -2021,6 +2425,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-llm/opsvi_llm/exceptions/__init__.py
   - libs/opsvi-llm/opsvi_llm/exceptions/base.py
   - libs/opsvi-llm/opsvi_llm/providers/__init__.py
+  - libs/opsvi-llm/opsvi_llm/providers/anthropic_provider.py
   - libs/opsvi-llm/opsvi_llm/providers/base.py
   - libs/opsvi-llm/opsvi_llm/providers/llm_embedding_interface.py
   - libs/opsvi-llm/opsvi_llm/providers/openai_agents_interface.py
@@ -2034,6 +2439,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-llm/opsvi_llm/providers/perplexity_provider.py
   - libs/opsvi-llm/opsvi_llm/tests/__init__.py
   - libs/opsvi-llm/pyproject.toml
+  - libs/opsvi-llm/setup.py
   - libs/opsvi-llm/tests/__init__.py
   - libs/opsvi-master/README.md
   - libs/opsvi-master/opsvi_master/__init__.py
@@ -2223,6 +2629,10 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/opsvi_mcp/servers/openai_codex/config.py
   - libs/opsvi-mcp/opsvi_mcp/servers/openai_codex/models.py
   - libs/opsvi-mcp/opsvi_mcp/servers/openai_codex/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/resource_discovery/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/resource_discovery/__main__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/resource_discovery/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/resource_discovery/server_v2.py
   - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/__init__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/__main__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/rest_api/api_client.py
@@ -2253,6 +2663,12 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/opsvi_mcp/servers/testing_qa/models.py
   - libs/opsvi-mcp/opsvi_mcp/servers/unified_config.yaml
   - libs/opsvi-mcp/opsvi_mcp/servers/unified_orchestrator.py
+  - libs/opsvi-mcp/opsvi_mcp/tools/mcp_resource_discovery.py
+  - libs/opsvi-mcp/opsvi_mcp/tools/project_initializer.py
+  - libs/opsvi-mcp/opsvi_mcp/tools/resource_discovery.py
+  - libs/opsvi-mcp/opsvi_mcp/tools/resource_discovery_simple.py
+  - libs/opsvi-mcp/opsvi_mcp/tools/resource_discovery_v2.py
+  - libs/opsvi-mcp/opsvi_mcp/tools/semantic_resource_discovery.py
   - libs/opsvi-mcp/pyproject.toml
   - libs/opsvi-mcp/requirements.txt
   - libs/opsvi-mcp/scripts/migrate_claude_code.py
@@ -2262,21 +2678,15 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/task2.py
   - libs/opsvi-mcp/task3.py
   - libs/opsvi-mcp/task_function.py
-  - libs/opsvi-memory/README.md
-  - libs/opsvi-memory/opsvi_memory/__init__.py
-  - libs/opsvi-memory/opsvi_memory/config/__init__.py
-  - libs/opsvi-memory/opsvi_memory/config/settings.py
-  - libs/opsvi-memory/opsvi_memory/core/__init__.py
-  - libs/opsvi-memory/opsvi_memory/core/base.py
-  - libs/opsvi-memory/opsvi_memory/exceptions/__init__.py
-  - libs/opsvi-memory/opsvi_memory/exceptions/base.py
-  - libs/opsvi-memory/opsvi_memory/graph/__init__.py
-  - libs/opsvi-memory/opsvi_memory/graph/neo4j_client.py
-  - libs/opsvi-memory/opsvi_memory/graph/queries.py
-  - libs/opsvi-memory/opsvi_memory/graph/schema.cypher
-  - libs/opsvi-memory/opsvi_memory/tests/__init__.py
-  - libs/opsvi-memory/pyproject.toml
-  - libs/opsvi-memory/tests/__init__.py
+  - libs/opsvi-meta/__init__.py
+  - libs/opsvi-meta/opsvi_meta/__init__.py
+  - libs/opsvi-meta/opsvi_meta/implementation_pipeline.py
+  - libs/opsvi-meta/opsvi_meta/mcp_integration.py
+  - libs/opsvi-meta/opsvi_meta/monitoring.py
+  - libs/opsvi-meta/opsvi_meta/real_implementation_pipeline.py
+  - libs/opsvi-meta/opsvi_meta/real_mcp_integration.py
+  - libs/opsvi-meta/opsvi_meta/self_healing.py
+  - libs/opsvi-meta/opsvi_meta/todo_discovery.py
   - libs/opsvi-monitoring/README.md
   - libs/opsvi-monitoring/opsvi_monitoring/__init__.py
   - libs/opsvi-monitoring/opsvi_monitoring/config/__init__.py
@@ -2612,14 +3022,27 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-shared/opsvi_shared/tools/testing/database_validation_script.py
   - libs/opsvi-shared/opsvi_shared/tools/testing/show_agent_outputs.py
   - libs/opsvi-shared/pyproject.toml
-  - libs/opsvi-workers/README.md
-  - libs/opsvi-workers/opsvi_workers/__init__.py
-  - libs/opsvi-workers/opsvi_workers/celery_app.py
-  - libs/opsvi-workers/opsvi_workers/tasks.py
-  - libs/opsvi-workers/pyproject.toml
+  - libs/opsvi-visualization/__init__.py
+  - libs/opsvi-visualization/opsvi_visualization/__init__.py
+  - libs/opsvi-visualization/opsvi_visualization/generators/__init__.py
+  - libs/opsvi-visualization/opsvi_visualization/generators/dot.py
+  - libs/opsvi-visualization/opsvi_visualization/generators/html.py
+  - libs/opsvi-visualization/opsvi_visualization/models/__init__.py
+  - libs/opsvi-visualization/opsvi_visualization/utils/__init__.py
+  - libs/opsvi-visualization/setup.py
+  - libs/opsvi_knowledge/decision_tree_generator.py
+  - libs/opsvi_knowledge/federation_sync_service.py
+  - libs/opsvi_knowledge/quality_validator.py
+  - libs/opsvi_knowledge/visualization_config.py
+  - libs/opsvi_knowledge/visualization_dashboard.py
+  - libs/opsvi_mcp/tools/sdlc_enforcer.py
+  - libs/opsvi_mcp/tools/sdlc_enforcer_scoped.py
+  - libs/opsvi_mcp/tools/sdlc_enforcer_strict.py
+  - libs/opsvi_mcp/tools/sdlc_hooks_integration.py
   - libs/recommended_structure.yaml
   - libs/templates.yaml
   - libs/variable_schema.yaml
+  - master_root.txt
   - mypy.ini
   - pattern-engine-service/Dockerfile
   - pattern-engine-service/README.md
@@ -2633,16 +3056,24 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - pattern-engine-service/src/api_server.py
   - pattern-engine-service/src/pattern_engine_core.py
   - pattern-engine-service/start.sh
+  - phase-5.1.txt
   - platform/mcp/registry.json
   - platform/observability/config/grafana/provisioning/datasources/tempo.yaml
   - platform/observability/config/otel-collector-config.yaml
   - platform/observability/config/tempo.yaml
   - platform/observability/docker-compose.yml
   - platform/rag/docker-compose.yml
+  - projects/ai_assistant_framework/design/architecture_design.md
+  - projects/ai_assistant_framework/discovery/requirements.md
+  - projects/ai_assistant_framework/src/agent.py
+  - projects/cfe37ca3/discovery/requirements.md
+  - projects/context_intelligence/discovery/requirements.md
+  - projects/ctx_intel_001/discovery/requirements.md
   - pyproject.toml
   - pytest.ini
   - requirements.txt
   - ruff.toml
+  - run_tests.sh
   - scripts/README_auto_attach.md
   - scripts/WSL-Memory-Manager.ps1
   - scripts/agents/gatekeeper_summarize_projects.py
@@ -2655,18 +3086,36 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - scripts/auto_attach.py
   - scripts/auto_attach_generator.py
   - scripts/auto_cleanup.py
+  - scripts/cleanup_libraries.sh
+  - scripts/connect_claude_code_agent.py
+  - scripts/create_setup_py.py
   - scripts/deploy_ecosystem.sh
   - scripts/diff_libs.sh
+  - scripts/direct_todo_implementation.py
   - scripts/enhanced_critic_accountability.py
+  - scripts/execute_real_implementation.py
   - scripts/fix_agent_syntax.py
+  - scripts/fix_and_embed_remaining.py
+  - scripts/fix_proj_mapper_imports.py
   - scripts/full_demo.sh
   - scripts/generate_agents_components.py
   - scripts/generate_all_components.py
   - scripts/generate_libs.sh
+  - scripts/generate_missing_embeddings.py
+  - scripts/generate_missing_embeddings_batch.py
   - scripts/generate_rag_components.py
+  - scripts/generate_remaining_embeddings.py
   - scripts/generate_remaining_rag.py
+  - scripts/implement_real_todos.py
+  - scripts/increase_relationship_density.py
   - scripts/intelligence_aware_wrapper.py
+  - scripts/inventory_libs.py
   - scripts/invoke_orchestrator.py
+  - scripts/knowledge_export_import.py
+  - scripts/leverage_proj_mapper.py
+  - scripts/meta_system_orchestrator.py
+  - scripts/migrate_proj_mapper.py
+  - scripts/migration_status.py
   - scripts/multi_candidate_tournament.py
   - scripts/multi_critic_integration.py
   - scripts/multi_critic_system.py
@@ -2674,16 +3123,23 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - scripts/optimized_critic_implementation.py
   - scripts/optimized_main_agent.py
   - scripts/optimized_nano_instructions.py
+  - scripts/orchestration-demo.py
+  - scripts/proj-mapper
   - scripts/proj_intel_wrapper.py
+  - scripts/proj_mapper_demo.py
   - scripts/refactor_coder_agent.py
+  - scripts/run_kb_dashboard.py
+  - scripts/safe_test_fixer.py
   - scripts/scaffold_libs_codegen.py
   - scripts/setup_wsl_memory_management.sh
+  - scripts/smart_todo_implementation.py
   - scripts/smoke_test.sh
   - scripts/utilities/clean_log.py
   - scripts/utilities/fast_migrate.py
   - scripts/utilities/generate_project_visualizations.py
   - scripts/utilities/generate_project_visualizations_fixed.py
   - scripts/utilities/validate_email.py
+  - scripts/utility_script.py
   - scripts/validate_libs.sh
   - scripts/validate_refactoring.py
   - scripts/verify_ai_setup.py
@@ -2692,6 +3148,8 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - scripts/wsl-memory-monitor.service
   - scripts/wsl_memory_monitor.py
   - scripts/wsl_quick_cleanup.sh
+  - sdlc_cleanup.chat.txt
+  - sdlc_convo_last_backup.txt
   - src/__init__.py
   - src/adapters/__init__.py
   - src/adapters/playwright_scraper.py

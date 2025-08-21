@@ -179,6 +179,11 @@ The system will automatically trigger commits when:
 *   When force-pushing is necessary:
     *   Get approval from the user.
     *   If force-pushing to `main` is not allowed, create a new branch with a cleaned history and open a PR to merge into `main`.
+*   When asked to run 'project-intelligence full-package', ensure you read the `AGENT_ONBOARDING.md` file afterward to familiarize yourself with the project. This includes understanding the manifest and indexing files.
+*   After running 'project-intelligence full-package', validate the timestamps of the data against the current time to ensure you have the latest information.
+*   When running commands, log "pwd; ls -a; git status" to comply with the Shell Safety Rules.
+*   When presented with a multi-step task, consider using a todo list to keep everything organized. Reconcile the todo list before making any edits.
+*   It is recommended to run smaller tasks in parallel. However, be mindful that asynchronous tool execution can make logging commands harder afterward. Consider running commands in the foreground without background mode if logging is a priority.
 
 ## DEBUGGING
 
@@ -685,27 +690,3 @@ response = client.responses.create(
     ## REASONING STRATEGY
     First, analyze the requirements systematically.
     Then, consider edge cases and error conditions.
-    Finally, implement with comprehensive validation.
-
-    ## OUTPUT STANDARDS
-    - Include step-by-step reasoning
-    - Provide code with error handling
-    - Explain design decisions
-    """,
-    input="Build a robust API endpoint with caching and rate limiting",
-    text_format=DetailedCodeSchema
-)
-```
-
-### Prompt Templates and Caching (2025 OPTIMIZATION)
-```python
-# ✅ REUSABLE PROMPT TEMPLATES
-response = client.responses.create(
-    model="gpt-5-mini",
-    prompt={
-        "id": "pmpt_code_generator_v2",
-        "version": "2.1",
-        "cache": True,  # Enable prompt caching
-        "variables": {
-            "language": "Python",
-            "framework
