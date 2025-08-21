@@ -110,6 +110,69 @@ if [ ! -d "$SOURCE_DIR" ]; then
     exit 1
 fi
 
+# Function to customize .mcp.json for target project
+customize_mcp_json() {
+    local source_json="$1"
+    local target_json="$2"
+    local target_dir="$3"
+
+    # Get the project name from the target path
+    local project_name=$(basename "$target_dir")
+
+    # Create a customized version with updated paths
+    jq --arg targetdir "$target_dir" --arg projname "$project_name" '
+        # Update shell_exec working directory if it exists
+        if .mcpServers.shell_exec then
+            .mcpServers.shell_exec.args |= map(
+                if . == "/home/opsvi/master_root" then $targetdir else . end
+            )
+        else . end |
+
+        # Update PYTHONPATH in all servers
+        .mcpServers |= with_entries(
+            .value |= (
+                if .env.PYTHONPATH then
+                    .env.PYTHONPATH |= (
+                        gsub("/home/opsvi/master_root"; $targetdir) |
+                        # Special case for ACCF keeping its own path
+                        if ($projname == "ACCF" and (. | contains("/ACCF/src"))) then .
+                        else gsub("/home/opsvi/[^/]+/libs"; ($targetdir + "/libs"))
+                        end
+                    )
+                else . end |
+
+                # Update args array for paths
+                if .args then
+                    .args |= map(
+                        if (type == "string" and (. | contains("/home/opsvi/master_root"))) then
+                            gsub("/home/opsvi/master_root"; $targetdir)
+                        else . end
+                    )
+                else . end |
+
+                # Update other env variables with paths
+                if .env then
+                    .env |= with_entries(
+                        if (.value | type == "string") and (.value | contains("/home/opsvi/master_root")) then
+                            .value |= gsub("/home/opsvi/master_root"; $targetdir)
+                        else . end
+                    )
+                else . end
+            )
+        )
+    ' "$source_json" > "$target_json"
+
+    # Verify the customization worked
+    if [ $? -eq 0 ]; then
+        return 0
+    else
+        # Fallback to simple copy if jq processing failed
+        cp "$source_json" "$target_json"
+        echo -e "  ${YELLOW}⚠ Could not customize paths, using default${NC}"
+        return 1
+    fi
+}
+
 # Function to sync files to a target
 sync_to_target() {
     local target="$1"
@@ -150,8 +213,15 @@ sync_to_target() {
                     echo -e "  ${BLUE}[DRY-RUN] Would copy: $file${NC}"
                 fi
             else
-                cp "$source_file" "$target_file"
-                echo -e "  ${GREEN}✓ Synced: $file${NC}"
+                # Special handling for .mcp.json - customize paths
+                if [ "$file" = ".mcp.json" ] && command -v jq &> /dev/null; then
+                    # Create customized version for target project
+                    customize_mcp_json "$source_file" "$target_file" "$target"
+                    echo -e "  ${GREEN}✓ Synced and customized: $file${NC}"
+                else
+                    cp "$source_file" "$target_file"
+                    echo -e "  ${GREEN}✓ Synced: $file${NC}"
+                fi
             fi
         else
             echo -e "  ${YELLOW}⚠ Source not found: $file${NC}"
