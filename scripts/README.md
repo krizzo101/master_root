@@ -9,9 +9,22 @@ Ensures all projects have the latest CLAUDE instructions, agent profiles, and MC
 
 ### What Gets Synced
 - `CLAUDE.md` - Main instructions and guidelines
-- `.mcp.json` - MCP server configuration
+- `.mcp.json` - MCP server configuration (with intelligent path customization)
 - `.claude/` directory - Agent profiles, commands, model awareness
 - `.cursor/` directory - Cursor rules and templates
+
+### Intelligent .mcp.json Customization
+The sync script automatically customizes `.mcp.json` files for each target project:
+- **shell_exec working directory** - Updated to target project path
+- **PYTHONPATH** - Adjusted to `{project}/libs` for each service
+- **git repository paths** - Points to the target project
+- **Environment variables** - All paths updated to match target
+- **Special cases preserved** - e.g., ACCF keeps `/home/opsvi/ACCF/src` PYTHONPATH
+
+Example: When syncing to `/home/opsvi/MetaGPT`:
+- `shell_exec` working dir: `/home/opsvi/master_root` → `/home/opsvi/MetaGPT`
+- `PYTHONPATH`: `/home/opsvi/master_root/libs` → `/home/opsvi/MetaGPT/libs`
+- `git --repository`: `/home/opsvi/master_root` → `/home/opsvi/MetaGPT`
 
 ### Usage
 
