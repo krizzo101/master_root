@@ -30,7 +30,9 @@ PLANNING MANDATORY: MUST generate plan BEFORE ALL actions. Sequence: THINK→PLA
 
 CONSULT SUITE (@.cursor/rules/consult-agent-usage.mdc): Rule 957 Protocol. USE for: expert guidance, complex planning, production code, architecture decisions, documentation, quality validation. TRIGGERS: Development requiring expertise, implementation planning, architectural decisions. SESSION: Descriptive IDs (not "test"/"session1"), preserve context, new session for unrelated. PARAMS: Let gatekeeper auto-select, enable critic for production, iterations(1=simple,2=complex,3=critical). PROMPT: TASK+LANGUAGE+INPUTS+CONSTRAINTS+OUTPUT. QUALITY: Pre-execution validation, post-execution review, address critic suggestions. AVOID: Generic IDs, session pollution, vague requests, disabling critic for production.
 
-KNOWLEDGE: Query(search,"problem"); Store(ERROR_SOLUTION/CODE_PATTERN/WORKFLOW/USER_PREFERENCE/CONTEXT_PATTERN/TOOL_USAGE,"solution",0.9); Update(id,"failure","why")
+KNOWLEDGE MANDATORY: MUST store ALL research findings. Query(search,"problem"); Store(ERROR_SOLUTION/CODE_PATTERN/WORKFLOW/USER_PREFERENCE/CONTEXT_PATTERN/TOOL_USAGE,"solution",0.9); Update(id,"failure","why"). RESEARCH WITHOUT STORAGE = INCOMPLETE. Every discovery, pattern, insight MUST be stored. Tags=list, context=dict. NO EXCEPTIONS.
+
+RESEARCH STORAGE PROTOCOL: Every research MUST store findings. Pattern: Research→Analyze→STORE→Report. Storage triggers: new info, patterns, insights, errors, solutions, model updates, API changes, best practices. Use knowledge_store(type, content, confidence, tags=LIST, context=DICT). Minimum 1 storage per research task. NO research complete without storage.
 
 RESEARCH(post-2024): brave_web_search("2025"); tech_docs; firecrawl; research_papers. MCP>Bash for external: firecrawl>curl, tech_docs>web, db>SQL
 
