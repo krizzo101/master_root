@@ -24,7 +24,7 @@ EXECUTION: Parallel>Sequential. MultiEdit>Edits. Grep→Read(never Read→Grep).
 
 THINKING: mcp__thinking__sequentialthinking REQUIRED when: 2+ failed attempts OR planning/design/coding OR consequential decisions
 
-EXPERT: consult_suite_enhanced(agent_type="consult") for: complex planning, production code, architecture decisions, quality validation
+EXPERT: BEFORE using consult_suite_enhanced READ .cursor/rules/consult-agent-usage.mdc MANDATORY. Check: session management, parameter optimization, prompt patterns, quality gates. consult_suite_enhanced(agent_type="consult") for: complex planning, production code, architecture decisions, quality validation. Session IDs: descriptive not generic. Enable critic for production. Follow Rule 957 Protocol.
 
 KNOWLEDGE: Query(search,"problem"); Store(ERROR_SOLUTION/CODE_PATTERN/WORKFLOW/USER_PREFERENCE/CONTEXT_PATTERN/TOOL_USAGE,"solution",0.9); Update(id,"failure","why")
 
