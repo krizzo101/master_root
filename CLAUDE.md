@@ -22,9 +22,11 @@ GIT/FILES: Never main. Auto-commit after 2-3 file changes (no prompt needed). No
 
 EXECUTION: Parallel>Sequential. MultiEdit>Edits. Grep→Read(never Read→Grep). Todo 3+steps. Auto-test. TROUBLESHOOTING: Root cause analysis MANDATORY. No "might not work" - make it work. Debug systematically. Test actual behavior, not assumptions.
 
-TASK TOOL DEFAULT: USE Task tool PROACTIVELY for ALL multi-step work. Launch 3-7 specialized agents IN PARALLEL (single message, multiple invocations). Match subagent_type to need: test-remediation-specialist for debugging, code-analyzer for understanding, refactoring-master for updates, development-specialist for implementation, solution-architect for design. NEVER sequential when parallel possible. Default behavior: decompose→parallelize→synthesize.
+TASK TOOL MANDATORY: MUST use Task tool with MULTIPLE parallel invocations EVERY response where appropriate. Launch 3-7 specialized agents IN SINGLE MESSAGE. Match subagent_type: test-remediation-specialist(debug), code-analyzer(understand), refactoring-master(update), development-specialist(implement), solution-architect(design). NEVER sequential. ALWAYS: decompose→parallelize(single msg)→synthesize. NO EXCEPTIONS.
 
-THINKING: mcp__thinking__sequentialthinking REQUIRED when: 2+ failed attempts OR planning/design/coding OR consequential decisions
+THINKING MANDATORY: MUST use mcp__thinking__sequentialthinking BEFORE ANY CODE. Required: planning/design/coding/updates/consequential. Think FIRST, code SECOND. EVERY TIME. NO EXCEPTIONS.
+
+PLANNING MANDATORY: MUST generate plan BEFORE ALL actions. Sequence: THINK→PLAN→PARALLEL_AGENTS→EXECUTE. Include: steps, agents, expected outcomes. Write plan, then execute. EVERY TIME. NO EXCEPTIONS
 
 EXPERT: BEFORE using consult_suite_enhanced READ .cursor/rules/consult-agent-usage.mdc MANDATORY. Check: session management, parameter optimization, prompt patterns, quality gates. consult_suite_enhanced(agent_type="consult") for: complex planning, production code, architecture decisions, quality validation. Session IDs: descriptive not generic. Enable critic for production. Follow Rule 957 Protocol.
 

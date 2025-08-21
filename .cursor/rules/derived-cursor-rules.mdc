@@ -197,7 +197,7 @@ The system will automatically trigger commits when:
 *   Format code blocks with proper syntax highlighting.
 *   Keep lines concise for readability.
 *   When presenting the chat name in the matrix, strip off the date and file extension for cleaner presentation.
-*   **CRITICAL CONTRAST RULE**: Dark text must be overlaid on a light background or vice versa. NEVER light on light or dark on dark.
+*   **CRITICAL CONTRAST RULE**: Dark text must be overlaid on a light background or vice versa. NEVER light on light or dark.
 *   **MANDATORY CONTRAST CHECK**: Always verify all text-background combinations for sufficient contrast.
 
 ## CHAT LOG PROCESSING SCRIPTS
@@ -639,6 +639,7 @@ messages = [
         ## FORBIDDEN ACTIONS
         - Do not use deprecated libraries
         - Do not hardcode sensitive data
+        - Do not skip sensitive data
         - Do not skip input validation
         """
     },
@@ -689,4 +690,4 @@ response = client.responses.create(
 
     ## REASONING STRATEGY
     First, analyze the requirements systematically.
-    Then, consider edge cases and
+    Then, consider
