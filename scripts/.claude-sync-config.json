@@ -1,0 +1,50 @@
+{
+  "description": "Configuration for CLAUDE sync script",
+  "source_dir": "/home/opsvi/master_root",
+  "projects": [
+    {
+      "path": "/home/opsvi/MetaGPT",
+      "name": "MetaGPT",
+      "active": true,
+      "auto_commit": true
+    },
+    {
+      "path": "/home/opsvi/tool_research",
+      "name": "Tool Research",
+      "active": true,
+      "auto_commit": false
+    },
+    {
+      "path": "/home/opsvi/ACCF",
+      "name": "ACCF",
+      "active": true,
+      "auto_commit": true
+    },
+    {
+      "path": "/home/opsvi/project-intelligence",
+      "name": "Project Intelligence",
+      "active": true,
+      "auto_commit": true
+    },
+    {
+      "path": "/home/opsvi/genFileMap",
+      "name": "genFileMap",
+      "active": true,
+      "auto_commit": true
+    }
+  ],
+  "sync_files": [
+    "CLAUDE.md",
+    ".mcp.json"
+  ],
+  "sync_dirs": [
+    ".claude",
+    ".cursor"
+  ],
+  "options": {
+    "use_rsync": true,
+    "preserve_timestamps": true,
+    "delete_orphaned": false,
+    "verbose": true
+  }
+}

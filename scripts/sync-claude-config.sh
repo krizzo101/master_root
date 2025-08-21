@@ -13,23 +13,44 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_FILE="${SCRIPT_DIR}/.claude-sync-config.json"
 SOURCE_DIR="${CLAUDE_SOURCE_DIR:-/home/opsvi/master_root}"
-DEFAULT_PROJECTS=(
-    "/home/opsvi/MetaGPT"
-    "/home/opsvi/tool_research"
-    "/home/opsvi/project-intelligence"
-    "/home/opsvi/ARCANE_FOCUS"
-)
 
-# Files and directories to sync
-SYNC_FILES=(
-    "CLAUDE.md"
-    ".mcp.json"
-)
-SYNC_DIRS=(
-    ".claude"
-    ".cursor"
-)
+# Load configuration from JSON file if it exists
+if [ -f "$CONFIG_FILE" ] && command -v jq &> /dev/null; then
+    # Read from config file
+    SOURCE_DIR=$(jq -r '.source_dir // "/home/opsvi/master_root"' "$CONFIG_FILE")
+    mapfile -t DEFAULT_PROJECTS < <(jq -r '.projects[] | select(.active == true) | .path' "$CONFIG_FILE")
+    mapfile -t SYNC_FILES < <(jq -r '.sync_files[]' "$CONFIG_FILE")
+    mapfile -t SYNC_DIRS < <(jq -r '.sync_dirs[]' "$CONFIG_FILE")
+    USE_RSYNC=$(jq -r '.options.use_rsync // true' "$CONFIG_FILE")
+    VERBOSE=$(jq -r '.options.verbose // false' "$CONFIG_FILE")
+    echo -e "${GREEN}Loaded configuration from $CONFIG_FILE${NC}"
+elif [ -f "$CONFIG_FILE" ]; then
+    # Config exists but jq not available - use fallback
+    echo -e "${YELLOW}Config file found but jq not installed. Using defaults.${NC}"
+    echo -e "${YELLOW}Install jq for config support: sudo apt-get install jq${NC}"
+    DEFAULT_PROJECTS=(
+        "/home/opsvi/MetaGPT"
+        "/home/opsvi/tool_research"
+        "/home/opsvi/ACCF"
+        "/home/opsvi/project-intelligence"
+        "/home/opsvi/genFileMap"
+    )
+    SYNC_FILES=("CLAUDE.md" ".mcp.json")
+    SYNC_DIRS=(".claude" ".cursor")
+else
+    # No config file - use original defaults
+    DEFAULT_PROJECTS=(
+        "/home/opsvi/MetaGPT"
+        "/home/opsvi/tool_research"
+        "/home/opsvi/project-intelligence"
+        "/home/opsvi/ARCANE_FOCUS"
+    )
+    SYNC_FILES=("CLAUDE.md" ".mcp.json")
+    SYNC_DIRS=(".claude" ".cursor")
+fi
 
 # Parse arguments
 DRY_RUN=false
@@ -173,16 +194,22 @@ sync_to_target() {
         fi
     done
 
-    # Check if project is a git repository and offer to commit
+    # Check if project is a git repository and handle commits
     if [ -d "$target/.git" ] && [ "$DRY_RUN" = false ]; then
         cd "$target"
         if git diff --quiet 2>/dev/null; then
             echo -e "  ${GREEN}No changes to commit${NC}"
         else
             echo -e "  ${YELLOW}Changes detected in git repository${NC}"
-            read -p "  Commit changes? (y/n) " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
+
+            # Check if auto-commit is enabled for this project
+            AUTO_COMMIT=false
+            if [ -f "$CONFIG_FILE" ] && command -v jq &> /dev/null; then
+                AUTO_COMMIT=$(jq -r --arg path "$target" '.projects[] | select(.path == $path) | .auto_commit // false' "$CONFIG_FILE")
+            fi
+
+            if [ "$AUTO_COMMIT" = "true" ]; then
+                echo -e "  ${BLUE}Auto-committing changes (configured in .claude-sync-config.json)${NC}"
                 git add -A
                 git commit -m "sync: update CLAUDE configuration from master_root
 
@@ -190,7 +217,20 @@ sync_to_target() {
 - Synced .claude/ agent profiles and commands
 - Updated .mcp.json configuration
 - Synced .cursor/ rules and templates"
-                echo -e "  ${GREEN}✓ Changes committed${NC}"
+                echo -e "  ${GREEN}✓ Changes auto-committed${NC}"
+            else
+                read -p "  Commit changes? (y/n) " -n 1 -r
+                echo
+                if [[ $REPLY =~ ^[Yy]$ ]]; then
+                    git add -A
+                    git commit -m "sync: update CLAUDE configuration from master_root
+
+- Updated CLAUDE.md with latest instructions
+- Synced .claude/ agent profiles and commands
+- Updated .mcp.json configuration
+- Synced .cursor/ rules and templates"
+                    echo -e "  ${GREEN}✓ Changes committed${NC}"
+                fi
             fi
         fi
         cd - >/dev/null
