@@ -5,9 +5,10 @@ Enforces 2025 OpenAI API standards with strict model validation
 """
 
 import logging
-from typing import Any, List, Optional, Type, TypeVar
+from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 
 from openai import AsyncOpenAI
+from openai.types.responses import Response as OpenAIResponse
 from pydantic import BaseModel, Field
 
 from .base import (
@@ -147,6 +148,37 @@ class OpenAIProvider(BaseLLMProvider):
             f"with complexity '{complexity}'"
         )
         return selected_model
+
+    def _convert_messages_to_input(
+        self, messages: List[Message]
+    ) -> List[Dict[str, Any]]:
+        """Convert Message objects to Responses API input format.
+
+        Args:
+            messages: List of Message objects
+
+        Returns:
+            List of message dictionaries for Responses API
+        """
+        input_messages = []
+        for msg in messages:
+            # Map role names if needed
+            role = msg.role
+            if role == "system":
+                # In Responses API, system messages become developer messages
+                role = "developer"
+
+            message_dict = {
+                "role": role,
+                "content": msg.content,
+            }
+
+            if msg.name:
+                message_dict["name"] = msg.name
+
+            input_messages.append(message_dict)
+
+        return input_messages
 
     async def _check_health(self) -> bool:
         """Check OpenAI API health."""
@@ -324,9 +356,10 @@ class OpenAIProvider(BaseLLMProvider):
         max_tokens: Optional[int] = None,
         **kwargs: Any,
     ) -> T:
-        """Create a structured response using OpenAI Responses API.
+        """Create a structured response using OpenAI Chat Completions API.
 
-        This is the PREFERRED method for structured outputs in 2025.
+        NOTE: For new implementations, prefer responses_create_with_structured_output().
+        This method is maintained for backward compatibility.
 
         Args:
             messages: List of chat messages
@@ -415,3 +448,327 @@ class OpenAIProvider(BaseLLMProvider):
                     error=str(e),
                 )
             raise LLMProviderError(f"Failed to create structured response: {e}") from e
+
+    async def responses_create(
+        self,
+        input: Union[str, List[Dict[str, Any]]],
+        model: Optional[str] = None,
+        instructions: Optional[str] = None,
+        reasoning_effort: Optional[str] = None,
+        temperature: float = 0.7,
+        max_tokens: Optional[int] = None,
+        tools: Optional[List[Dict[str, Any]]] = None,
+        stream: bool = False,
+        **kwargs: Any,
+    ) -> OpenAIResponse:
+        """Create a response using the OpenAI Responses API (2025 standard).
+
+        This is the PREFERRED method for new implementations.
+
+        Args:
+            input: Text or message list input for the model
+            model: Model to use (auto-selected based on task if None)
+            instructions: System instructions for the model
+            reasoning_effort: For reasoning models (o3, o4-mini) - "low", "medium", "high"
+            temperature: Temperature for generation
+            max_tokens: Maximum tokens to generate
+            tools: Tools available to the model
+            stream: Whether to stream the response
+            **kwargs: Additional parameters for the API
+
+        Returns:
+            OpenAI Response object
+        """
+        if not self._async_client:
+            self._async_client = await self._create_client()
+
+        # Auto-select model if not provided
+        if model is None:
+            # Check if this is a reasoning task
+            is_reasoning = any(
+                keyword in str(input).lower()
+                for keyword in [
+                    "reason",
+                    "analyze",
+                    "explain",
+                    "think",
+                    "plan",
+                    "design",
+                    "evaluate",
+                    "solve",
+                ]
+            )
+
+            if is_reasoning:
+                model = "o4-mini"
+                # Set reasoning effort if not provided
+                if reasoning_effort is None:
+                    reasoning_effort = "medium"
+            else:
+                model = self.openai_config.default_model
+
+        # Validate model
+        OpenAIModelValidator.validate_model(model)
+
+        # Prepare parameters
+        create_params = {
+            "model": model,
+            "input": input,
+            "temperature": temperature,
+        }
+
+        # Add optional parameters
+        if instructions:
+            create_params["instructions"] = instructions
+        if max_tokens:
+            create_params["max_tokens"] = max_tokens
+        if tools:
+            create_params["tools"] = tools
+        if stream:
+            create_params["stream"] = stream
+
+        # Add reasoning-specific parameters
+        if model in ["o3", "o4-mini"] and reasoning_effort:
+            create_params["reasoning_effort"] = reasoning_effort
+
+        # Add any additional kwargs
+        create_params.update(kwargs)
+
+        # Sanitize input if enabled
+        if self.openai_config.enable_sanitization and isinstance(input, str):
+            create_params["input"] = self.sanitizer.sanitize_input(input)
+
+        # Log request if audit logging is enabled
+        request_id = None
+        if self.audit_logger:
+            request_id = self.audit_logger.log_request(
+                model=model,
+                operation="responses.create",
+                input_data=create_params,
+                provider="openai",
+            )
+
+        try:
+            # Create response using Responses API
+            response = await self._async_client.responses.create(**create_params)
+
+            # Log successful response
+            if self.audit_logger and request_id:
+                self.audit_logger.log_response(
+                    request_id=request_id,
+                    success=True,
+                    response_data={"status": "success", "id": response.id},
+                )
+
+            return response
+
+        except Exception as e:
+            # Log failed response
+            if self.audit_logger and request_id:
+                self.audit_logger.log_response(
+                    request_id=request_id, success=False, error=str(e)
+                )
+            logger.error(f"OpenAI Responses API call failed: {e}")
+            raise LLMProviderError(f"Responses API call failed: {e}") from e
+
+    async def responses_create_with_structured_output(
+        self,
+        input: Union[str, List[Dict[str, Any]]],
+        response_model: Type[T],
+        model: Optional[str] = None,
+        instructions: Optional[str] = None,
+        reasoning_effort: Optional[str] = None,
+        temperature: float = 0.7,
+        max_tokens: Optional[int] = None,
+        **kwargs: Any,
+    ) -> T:
+        """Create a structured response using the OpenAI Responses API.
+
+        This method uses the Responses API with structured output format.
+
+        Args:
+            input: Text or message list input for the model
+            response_model: Pydantic model class for response structure
+            model: Model to use (auto-selected based on task if None)
+            instructions: System instructions for the model
+            reasoning_effort: For reasoning models - "low", "medium", "high"
+            temperature: Temperature for generation
+            max_tokens: Maximum tokens to generate
+            **kwargs: Additional parameters for the API
+
+        Returns:
+            Parsed instance of response_model
+        """
+        if not self._async_client:
+            self._async_client = await self._create_client()
+
+        # Auto-select model if not provided
+        if model is None:
+            # Check if this is a reasoning task
+            is_reasoning = any(
+                keyword in str(input).lower()
+                for keyword in [
+                    "reason",
+                    "analyze",
+                    "explain",
+                    "think",
+                    "plan",
+                    "design",
+                    "evaluate",
+                    "solve",
+                ]
+            )
+
+            if is_reasoning:
+                model = "o4-mini"
+                if reasoning_effort is None:
+                    reasoning_effort = "medium"
+            else:
+                # For structured outputs, prefer gpt-5 over gpt-5-mini
+                model = "gpt-5"
+
+        # Validate model
+        OpenAIModelValidator.validate_model(model)
+
+        # Prepare text format for structured output
+        text_format = {
+            "type": "json_schema",
+            "json_schema": {
+                "name": response_model.__name__,
+                "strict": True,
+                "schema": response_model.model_json_schema(),
+            },
+        }
+
+        # Prepare parameters
+        create_params = {
+            "model": model,
+            "input": input,
+            "text_format": text_format,
+            "temperature": temperature,
+        }
+
+        # Add optional parameters
+        if instructions:
+            create_params["instructions"] = instructions
+        if max_tokens:
+            create_params["max_tokens"] = max_tokens
+
+        # Add reasoning-specific parameters
+        if model in ["o3", "o4-mini"] and reasoning_effort:
+            create_params["reasoning_effort"] = reasoning_effort
+
+        # Add any additional kwargs
+        create_params.update(kwargs)
+
+        # Sanitize input if enabled
+        if self.openai_config.enable_sanitization and isinstance(input, str):
+            create_params["input"] = self.sanitizer.sanitize_input(input)
+
+        # Log request if audit logging is enabled
+        request_id = None
+        if self.audit_logger:
+            request_id = self.audit_logger.log_request(
+                model=model,
+                operation="responses.create_structured",
+                input_data=create_params,
+                provider="openai",
+            )
+
+        try:
+            # Create response using Responses API
+            response = await self._async_client.responses.create(**create_params)
+
+            # Parse the structured output
+            if hasattr(response, "output_parsed"):
+                parsed_output = response.output_parsed
+            elif hasattr(response, "output_text"):
+                # Fallback to parsing JSON from text
+                import json
+
+                parsed_output = response_model.model_validate(
+                    json.loads(response.output_text)
+                )
+            else:
+                raise ValueError("Response does not contain parseable output")
+
+            # Log successful response
+            if self.audit_logger and request_id:
+                self.audit_logger.log_response(
+                    request_id=request_id,
+                    success=True,
+                    response_data={"status": "success", "id": response.id},
+                )
+
+            return parsed_output
+
+        except Exception as e:
+            # Log failed response
+            if self.audit_logger and request_id:
+                self.audit_logger.log_response(
+                    request_id=request_id, success=False, error=str(e)
+                )
+            logger.error(f"OpenAI Responses API structured call failed: {e}")
+            raise LLMProviderError(f"Responses API structured call failed: {e}") from e
+
+    async def responses_create_from_messages(
+        self,
+        messages: List[Message],
+        model: Optional[str] = None,
+        instructions: Optional[str] = None,
+        reasoning_effort: Optional[str] = None,
+        temperature: float = 0.7,
+        max_tokens: Optional[int] = None,
+        tools: Optional[List[Dict[str, Any]]] = None,
+        stream: bool = False,
+        **kwargs: Any,
+    ) -> OpenAIResponse:
+        """Create a response using the Responses API with Message objects.
+
+        This is a convenience method that converts Message objects to the
+        Responses API input format.
+
+        Args:
+            messages: List of Message objects
+            model: Model to use (auto-selected based on task if None)
+            instructions: System instructions for the model
+            reasoning_effort: For reasoning models - "low", "medium", "high"
+            temperature: Temperature for generation
+            max_tokens: Maximum tokens to generate
+            tools: Tools available to the model
+            stream: Whether to stream the response
+            **kwargs: Additional parameters for the API
+
+        Returns:
+            OpenAI Response object
+        """
+        # Convert messages to Responses API input format
+        input_messages = self._convert_messages_to_input(messages)
+
+        # Extract instructions from system/developer messages if not provided
+        if not instructions:
+            for msg in messages:
+                if msg.role in ["system", "developer"]:
+                    instructions = msg.content
+                    # Remove the system message from input
+                    input_messages = [
+                        m
+                        for m in input_messages
+                        if not (
+                            m["role"] == "developer" and m["content"] == instructions
+                        )
+                    ]
+                    break
+
+        # Call the main responses_create method
+        return await self.responses_create(
+            input=input_messages,
+            model=model,
+            instructions=instructions,
+            reasoning_effort=reasoning_effort,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            tools=tools,
+            stream=stream,
+            **kwargs,
+        )
