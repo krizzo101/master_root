@@ -689,4 +689,4 @@ response = client.responses.create(
 
     ## REASONING STRATEGY
     First, analyze the requirements systematically.
-    Then, consider edge cases and error conditions.
+    Then, consider edge cases and
