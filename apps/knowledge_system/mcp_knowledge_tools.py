@@ -36,6 +36,19 @@ except ImportError:
     NEO4J_AVAILABLE = False
     logging.warning("Neo4j driver not available. Will use db MCP tool fallback.")
 
+# Import RAG components
+try:
+    from apps.knowledge_system.simple_rag import (
+        RAGContext,
+        SimpleCache,
+        SimpleVectorSearch,
+    )
+
+    RAG_AVAILABLE = True
+except ImportError:
+    RAG_AVAILABLE = False
+    logging.warning("RAG components not available")
+
 logger = logging.getLogger(__name__)
 
 
@@ -50,6 +63,9 @@ class EnhancedKnowledgeStore:
         self.nano_agent = get_nano_agent()
         self.embedding_service = None
         self.neo4j_driver = None
+        self.vector_search = None
+        self.cache = None
+        self.rag_context = None
 
         # Try to initialize embedding service
         try:
@@ -68,6 +84,16 @@ class EnhancedKnowledgeStore:
                 logger.info("Neo4j driver initialized for direct execution")
             except Exception as e:
                 logger.warning(f"Neo4j driver initialization failed: {e}")
+
+        # Initialize RAG components
+        if RAG_AVAILABLE:
+            try:
+                self.vector_search = SimpleVectorSearch()
+                self.cache = SimpleCache()
+                self.rag_context = RAGContext()
+                logger.info("RAG components initialized")
+            except Exception as e:
+                logger.warning(f"RAG initialization failed: {e}")
 
     def generate_knowledge_id(self, content: str, knowledge_type: str) -> str:
         """Generate a unique knowledge ID"""
@@ -185,6 +211,32 @@ class EnhancedKnowledgeStore:
                 embedding = self.embedding_service.generate_embedding(embed_text)
                 embedding_model = self.embedding_service.model_name
                 logger.info(f"Generated embedding with {len(embedding)} dimensions")
+
+                # Index in vector search if available
+                if self.vector_search and embedding:
+                    try:
+                        metadata = {
+                            "knowledge_type": structured.knowledge_type,
+                            "tags": structured.tags,
+                            "confidence": structured.confidence_score,
+                        }
+                        self.vector_search.index_knowledge(
+                            knowledge_id, embedding, metadata
+                        )
+                        logger.info(
+                            f"Indexed knowledge {knowledge_id} in vector search"
+                        )
+                    except Exception as e:
+                        logger.warning(f"Vector indexing failed: {e}")
+
+                # Cache the embedding if available
+                if self.cache and embedding:
+                    try:
+                        self.cache.cache_embedding(embed_text, embedding)
+                        logger.info("Cached embedding for future use")
+                    except Exception as e:
+                        logger.warning(f"Embedding caching failed: {e}")
+
             except Exception as e:
                 logger.warning(f"Embedding generation failed: {e}")
 
@@ -332,10 +384,14 @@ class EnhancedKnowledgeStore:
 
 
 class EnhancedKnowledgeQuery:
-    """Enhanced knowledge query with direct execution"""
+    """Enhanced knowledge query with direct execution and semantic search"""
 
     def __init__(self):
         self.neo4j_driver = None
+        self.vector_search = None
+        self.cache = None
+        self.embedding_service = None
+
         if NEO4J_AVAILABLE:
             try:
                 uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
@@ -344,6 +400,21 @@ class EnhancedKnowledgeQuery:
                 self.neo4j_driver = GraphDatabase.driver(uri, auth=(user, password))
             except Exception as e:
                 logger.warning(f"Neo4j driver initialization failed: {e}")
+
+        # Initialize RAG components for semantic search
+        if RAG_AVAILABLE:
+            try:
+                self.vector_search = SimpleVectorSearch()
+                self.cache = SimpleCache()
+                logger.info("RAG query components initialized")
+            except Exception as e:
+                logger.warning(f"RAG query initialization failed: {e}")
+
+        # Initialize embedding service for semantic queries
+        try:
+            self.embedding_service = get_embedding_service()
+        except Exception as e:
+            logger.warning(f"Embedding service not available for queries: {e}")
 
     def query(
         self,
@@ -355,8 +426,102 @@ class EnhancedKnowledgeQuery:
         direct_execute: bool = True,
     ) -> Dict[str, Any]:
         """
-        Query knowledge with optional direct execution.
+        Query knowledge with optional direct execution and semantic search support.
         """
+        # Try semantic search first if available
+        if query_type == "semantic" and query_text:
+            # Check cache first
+            if self.cache:
+                cached_results = self.cache.get_cached_search(query_text)
+                if cached_results:
+                    logger.info(f"Cache hit for semantic search: {query_text[:50]}...")
+                    # Fetch full knowledge from Neo4j
+                    knowledge_ids = cached_results[:limit]
+                    if knowledge_ids and direct_execute and self.neo4j_driver:
+                        cypher = """
+                        MATCH (k:Knowledge)
+                        WHERE k.knowledge_id IN $knowledge_ids
+                        AND k.deprecated = false
+                        RETURN k
+                        """
+                        params = {"knowledge_ids": knowledge_ids}
+                        try:
+                            with self.neo4j_driver.session() as session:
+                                result = session.run(cypher, params)
+                                knowledge = [dict(record["k"]) for record in result]
+                                return {
+                                    "success": True,
+                                    "query_type": "semantic_cached",
+                                    "knowledge": knowledge,
+                                    "count": len(knowledge),
+                                }
+                        except Exception as e:
+                            logger.error(
+                                f"Failed to fetch cached semantic results: {e}"
+                            )
+
+            # Generate embedding and search
+            if self.embedding_service and self.vector_search:
+                try:
+                    # Get or generate embedding
+                    embedding = None
+                    if self.cache:
+                        embedding = self.cache.get_cached_embedding(query_text)
+
+                    if not embedding:
+                        embedding = self.embedding_service.generate_embedding(
+                            query_text
+                        )
+                        if self.cache and embedding:
+                            self.cache.cache_embedding(query_text, embedding)
+
+                    # Search in vector store
+                    if embedding:
+                        knowledge_ids = self.vector_search.search_similar(
+                            embedding, limit
+                        )
+
+                        # Cache the results
+                        if self.cache and knowledge_ids:
+                            self.cache.cache_search(query_text, knowledge_ids)
+
+                        # Fetch full knowledge from Neo4j
+                        if knowledge_ids and direct_execute and self.neo4j_driver:
+                            cypher = """
+                            MATCH (k:Knowledge)
+                            WHERE k.knowledge_id IN $knowledge_ids
+                            AND k.deprecated = false
+                            RETURN k
+                            """
+                            params = {"knowledge_ids": knowledge_ids}
+                            try:
+                                with self.neo4j_driver.session() as session:
+                                    result = session.run(cypher, params)
+                                    knowledge = [dict(record["k"]) for record in result]
+                                    return {
+                                        "success": True,
+                                        "query_type": "semantic",
+                                        "knowledge": knowledge,
+                                        "count": len(knowledge),
+                                    }
+                            except Exception as e:
+                                logger.error(
+                                    f"Failed to fetch semantic search results: {e}"
+                                )
+
+                        return {
+                            "success": True,
+                            "query_type": "semantic",
+                            "knowledge_ids": knowledge_ids,
+                            "instruction": "Fetch via Neo4j with provided IDs",
+                        }
+
+                except Exception as e:
+                    logger.warning(
+                        f"Semantic search failed, falling back to keyword: {e}"
+                    )
+                    query_type = "search"  # Fall back to keyword search
+
         # Build query based on type
         if query_type == "search":
             cypher = """
