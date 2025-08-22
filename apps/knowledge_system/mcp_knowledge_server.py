@@ -206,7 +206,7 @@ async def knowledge_update(
             k.success_rate = ((k.success_rate * k.usage_count) + 1.0) / (k.usage_count + 1),
             k.confidence_score = CASE
                 WHEN k.success_rate > 0.8 AND k.usage_count > 5
-                THEN min(1.0, k.confidence_score + 0.05)
+                THEN CASE WHEN k.confidence_score + 0.05 > 1.0 THEN 1.0 ELSE k.confidence_score + 0.05 END
                 ELSE k.confidence_score
             END,
             k.updated_at = datetime(),
@@ -222,7 +222,7 @@ async def knowledge_update(
             k.success_rate = ((k.success_rate * k.usage_count) + 0.0) / (k.usage_count + 1),
             k.confidence_score = CASE
                 WHEN k.success_rate < 0.3
-                THEN max(0.1, k.confidence_score - 0.1)
+                THEN CASE WHEN k.confidence_score - 0.1 < 0.1 THEN 0.1 ELSE k.confidence_score - 0.1 END
                 ELSE k.confidence_score
             END,
             k.updated_at = datetime(),
