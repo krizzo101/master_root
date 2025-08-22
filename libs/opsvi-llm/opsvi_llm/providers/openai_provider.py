@@ -630,23 +630,24 @@ class OpenAIProvider(BaseLLMProvider):
         # Validate model
         OpenAIModelValidator.validate_model(model)
 
-        # Prepare text format for structured output
+        # Prepare text format for structured output (Responses API format)
         text_format = {
             "type": "json_schema",
-            "json_schema": {
-                "name": response_model.__name__,
-                "strict": True,
-                "schema": response_model.model_json_schema(),
-            },
+            "name": response_model.__name__,
+            "strict": True,
+            "schema": response_model.model_json_schema(),
         }
 
         # Prepare parameters
         create_params = {
             "model": model,
             "input": input,
-            "text_format": text_format,
-            "temperature": temperature,
+            "text": {"format": text_format},  # Correct parameter for Responses API
         }
+
+        # Add temperature only if not using gpt-5-nano (which doesn't support it)
+        if model != "gpt-5-nano" and temperature is not None:
+            create_params["temperature"] = temperature
 
         # Add optional parameters
         if instructions:
@@ -668,10 +669,12 @@ class OpenAIProvider(BaseLLMProvider):
         # Log request if audit logging is enabled
         request_id = None
         if self.audit_logger:
+            sanitized = create_params.get("input", input)
             request_id = self.audit_logger.log_request(
                 model=model,
                 operation="responses.create_structured",
                 input_data=create_params,
+                sanitized_input=sanitized,
                 provider="openai",
             )
 
@@ -679,25 +682,52 @@ class OpenAIProvider(BaseLLMProvider):
             # Create response using Responses API
             response = await self._async_client.responses.create(**create_params)
 
-            # Parse the structured output
-            if hasattr(response, "output_parsed"):
-                parsed_output = response.output_parsed
-            elif hasattr(response, "output_text"):
-                # Fallback to parsing JSON from text
-                import json
+            # Parse the structured output from Responses API format
+            # The response structure includes output array with content
+            import json
 
-                parsed_output = response_model.model_validate(
-                    json.loads(response.output_text)
-                )
+            if hasattr(response, "output_text") and response.output_text:
+                # Direct output_text field
+                json_str = response.output_text
+            elif hasattr(response, "output") and response.output:
+                # Extract from output array structure
+                content = None
+                for output_item in response.output:
+                    if hasattr(output_item, "content") and output_item.content:
+                        for content_item in output_item.content:
+                            if hasattr(content_item, "text"):
+                                content = content_item.text
+                                break
+                        if content:
+                            break
+
+                if content:
+                    json_str = content
+                else:
+                    raise ValueError("No text content found in response output")
             else:
-                raise ValueError("Response does not contain parseable output")
+                raise ValueError("Response does not contain expected output structure")
+
+            # Parse JSON and validate with Pydantic model
+            try:
+                parsed_data = json.loads(json_str)
+                parsed_output = response_model.model_validate(parsed_data)
+            except (json.JSONDecodeError, ValueError) as e:
+                logger.error(f"Failed to parse structured response: {e}")
+                logger.error(f"Response content: {json_str}")
+                raise LLMProviderError(
+                    f"Failed to parse structured response: {e}"
+                ) from e
 
             # Log successful response
             if self.audit_logger and request_id:
                 self.audit_logger.log_response(
                     request_id=request_id,
                     success=True,
-                    response_data={"status": "success", "id": response.id},
+                    response_data={
+                        "status": "success",
+                        "type": response_model.__name__,
+                    },
                 )
 
             return parsed_output
