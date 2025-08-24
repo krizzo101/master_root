@@ -274,39 +274,42 @@ Respond in JSON format:
 }}"""
 
         try:
-            # Call OpenAI API with nano model
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    "https://api.openai.com/v1/chat/completions",
-                    headers={
-                        "Authorization": f"Bearer {self.api_key}",
-                        "Content-Type": "application/json",
-                    },
-                    json={
-                        "model": "gpt-4o-mini",  # Using mini as nano proxy
-                        "messages": [
-                            {
-                                "role": "system",
-                                "content": "You are a precise thought analyzer. Always respond with valid JSON.",
-                            },
-                            {"role": "user", "content": prompt},
-                        ],
-                        "temperature": 0.3,
-                        "max_tokens": 500,
-                        "response_format": {"type": "json_object"},
-                    },
-                    timeout=10.0,
-                )
+            # Use OpenAI Responses API (approved model) with JSON-like output
+            from openai import AsyncOpenAI
+            client = AsyncOpenAI(api_key=self.api_key)
 
-            if response.status_code == 200:
-                result = response.json()
-                analysis = json.loads(result["choices"][0]["message"]["content"])
-                return analysis
-            else:
-                logger.error(f"API call failed: {response.status_code}")
+            resp = await client.responses.create(
+                model=os.getenv("TRIAGE_MODEL", "gpt-5-nano"),
+                input=prompt,
+                temperature=0.2,
+                max_output_tokens=500
+            )
 
+            text = None
+            for out in getattr(resp, "output", []) or []:
+                if hasattr(out, "content") and out.content:
+                    for c in out.content:
+                        if hasattr(c, "text") and c.text:
+                            text = c.text
+                            break
+                    if text:
+                        break
+            if text:
+                try:
+                    return json.loads(text)
+                except Exception:
+                    return {
+                        "violations": [],
+                        "patterns": [],
+                        "coaching_questions": [],
+                        "needs_escalation": False,
+                        "escalation_reason": None,
+                        "reminders": [],
+                        "confidence": 0.5,
+                        "analysis": text[:800],
+                    }
         except Exception as e:
-            logger.error(f"Failed to analyze with nano model: {e}")
+            logger.error(f"Failed to analyze with Responses API: {e}")
 
         # Fallback analysis if API fails
         return {
@@ -454,7 +457,7 @@ async def health_check():
         "status": "healthy",
         "mode": analyzer.mode,
         "type": "intelligent-direct",
-        "model": "nano/gpt-4o-mini",
+        "model": os.getenv("TRIAGE_MODEL", "gpt-5-nano"),
         "knowledge_access": "direct",
         "neo4j": neo4j_status,
         "performance": "10-50ms (direct access)",

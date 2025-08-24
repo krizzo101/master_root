@@ -43,10 +43,18 @@ class MetacognitiveThinkingServer {
   private metacognitiveInsights: StoredInsight[] = [];
   private metacognitiveCounter: number = 0;
   private metacognitiveInterval: number = 3; // Every 3rd thought gets meta-analysis
+  // Triage integration
+  private triageUrl: string;
+  private triageTimeoutMs: number;
+  private triageMode: string;
 
   constructor() {
     this.disableThoughtLogging = (process.env.DISABLE_THOUGHT_LOGGING || "").toLowerCase() === "true";
     this.metacognitiveInterval = parseInt(process.env.METACOGNITIVE_INTERVAL || "3");
+    // Triage config (defaults safe for local)
+    this.triageUrl = process.env.TRIAGE_URL || "http://127.0.0.1:8102/analyze";
+    this.triageTimeoutMs = parseInt(process.env.TRIAGE_TIMEOUT_MS || "2000");
+    this.triageMode = process.env.TRIAGE_MODE || "shadow"; // shadow|advisory|enforce
   }
 
   private validateThoughtData(input: unknown): MetacognitiveThoughtData {
@@ -163,7 +171,7 @@ class MetacognitiveThinkingServer {
     });
   }
 
-  public processThought(input: unknown): { content: Array<{ type: string; text: string }>; isError?: boolean } {
+  public async processThought(input: unknown): Promise<{ content: Array<{ type: string; text: string }>; isError?: boolean }> {
     try {
       const validatedInput = this.validateThoughtData(input);
 
@@ -204,20 +212,64 @@ class MetacognitiveThinkingServer {
       const shouldPromptMeta = this.metacognitiveCounter % this.metacognitiveInterval === 0;
       const nextMetaPrompt = shouldPromptMeta ? this.generateMetacognitivePrompt() : null;
 
+      // Build recent textual history (last 3 thoughts)
+      const recentHistory = this.thoughtHistory
+        .slice(-3)
+        .map(t => t.thought);
+
+      // Optional session id if provided by caller
+      const sessionId = (input as any)?.sessionId || "default-session";
+
+      // Call triage API with timeout; ignore failures gracefully
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), this.triageTimeoutMs);
+      let triage: any = null;
+      try {
+        // Include recent insights (last 3) for context
+        const recentInsights = this.metacognitiveInsights.slice(-3);
+        const payload = {
+          thought: validatedInput.thought,
+          thought_number: validatedInput.thoughtNumber,
+          session_id: sessionId,
+          context: {},
+          history: recentHistory,
+          insights: recentInsights
+        };
+        // Use global fetch (Node 18+)
+        const res = await (globalThis as any).fetch(this.triageUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        } as any);
+        if (res && res.ok) {
+          triage = await res.json();
+        }
+      } catch (e) {
+        // swallow triage errors; operate in shadow mode by default
+        triage = null;
+      } finally {
+        clearTimeout(timer);
+      }
+
+      const responsePayload = {
+        thoughtNumber: validatedInput.thoughtNumber,
+        totalThoughts: validatedInput.totalThoughts,
+        nextThoughtNeeded: validatedInput.nextThoughtNeeded,
+        branches: Object.keys(this.branches),
+        thoughtHistoryLength: this.thoughtHistory.length,
+        // New metacognitive feedback
+        metacognitivePrompt: nextMetaPrompt,
+        recentInsights: this.metacognitiveInsights.slice(-3),
+        insightCount: this.metacognitiveInsights.length,
+        // Triage (if available)
+        triage
+      };
+
       return {
         content: [{
           type: "text",
-          text: JSON.stringify({
-            thoughtNumber: validatedInput.thoughtNumber,
-            totalThoughts: validatedInput.totalThoughts,
-            nextThoughtNeeded: validatedInput.nextThoughtNeeded,
-            branches: Object.keys(this.branches),
-            thoughtHistoryLength: this.thoughtHistory.length,
-            // New metacognitive feedback
-            metacognitivePrompt: nextMetaPrompt,
-            recentInsights: this.metacognitiveInsights.slice(-3),
-            insightCount: this.metacognitiveInsights.length
-          }, null, 2)
+          text: JSON.stringify(responsePayload, null, 2)
         }]
       };
     } catch (error) {
@@ -392,7 +444,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   if (request.params.name === "metacognitivethinking") {
-    return thinkingServer.processThought(request.params.arguments);
+    return await thinkingServer.processThought(request.params.arguments);
   }
 
   if (request.params.name === "getthinkinginsights") {
