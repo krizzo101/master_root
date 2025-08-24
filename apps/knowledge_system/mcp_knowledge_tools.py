@@ -38,6 +38,7 @@ except ImportError:
 
 # Import RAG components
 try:
+    from apps.knowledge_system.hybrid_search import HybridSearch
     from apps.knowledge_system.simple_rag import (
         RAGContext,
         SimpleCache,
@@ -384,13 +385,14 @@ class EnhancedKnowledgeStore:
 
 
 class EnhancedKnowledgeQuery:
-    """Enhanced knowledge query with direct execution and semantic search"""
+    """Enhanced knowledge query with direct execution and hybrid search"""
 
     def __init__(self):
         self.neo4j_driver = None
         self.vector_search = None
         self.cache = None
         self.embedding_service = None
+        self.hybrid_search = None
 
         if NEO4J_AVAILABLE:
             try:
@@ -406,7 +408,8 @@ class EnhancedKnowledgeQuery:
             try:
                 self.vector_search = SimpleVectorSearch()
                 self.cache = SimpleCache()
-                logger.info("RAG query components initialized")
+                self.hybrid_search = HybridSearch()
+                logger.info("RAG query components initialized with hybrid search")
             except Exception as e:
                 logger.warning(f"RAG query initialization failed: {e}")
 
@@ -421,15 +424,59 @@ class EnhancedKnowledgeQuery:
         query_type: str,
         query_text: Optional[str] = None,
         knowledge_type: Optional[str] = None,
-        min_confidence: float = 0.7,
+        min_confidence: float = 0.0,  # CHANGED: Show ALL knowledge by default
         limit: int = 5,
         direct_execute: bool = True,
     ) -> Dict[str, Any]:
         """
         Query knowledge with optional direct execution and semantic search support.
         """
-        # Try semantic search first if available
-        if query_type == "semantic" and query_text:
+        # Try hybrid search if available
+        if query_type in ["semantic", "hybrid"] and query_text and self.hybrid_search:
+            try:
+                # Determine strategy based on query type
+                strategy = "hybrid" if query_type == "hybrid" else "vector"
+
+                # Use hybrid search
+                search_results = self.hybrid_search.search(
+                    query=query_text,
+                    limit=limit,
+                    strategy=strategy,
+                    expand_depth=1,
+                    filters={"knowledge_type": knowledge_type}
+                    if knowledge_type
+                    else None,
+                )
+
+                if search_results:
+                    # Convert search results to knowledge format
+                    knowledge_items = []
+                    for result in search_results:
+                        item = {
+                            "id": result.knowledge_id,
+                            "type": result.knowledge_type,
+                            "content": result.content,
+                            "source": result.source,
+                            "confidence": result.combined_score,
+                            "vector_score": result.vector_score,
+                            "graph_score": result.graph_score,
+                            "relationships": result.relationships,
+                        }
+                        knowledge_items.append(item)
+
+                    return {
+                        "success": True,
+                        "query_type": query_type,
+                        "knowledge": knowledge_items,
+                        "count": len(knowledge_items),
+                        "strategy": strategy,
+                    }
+            except Exception as e:
+                logger.warning(f"Hybrid search failed, falling back to keyword: {e}")
+                query_type = "search"  # Fall back to keyword search
+
+        # Legacy semantic search via vector search
+        elif query_type == "semantic" and query_text:
             # Check cache first
             if self.cache:
                 cached_results = self.cache.get_cached_search(query_text)
@@ -526,10 +573,10 @@ class EnhancedKnowledgeQuery:
         if query_type == "search":
             cypher = """
             MATCH (k:Knowledge)
-            WHERE k.deprecated = false
+            WHERE (k.deprecated = false OR k.deprecated IS NULL)
             AND (toLower(k.content) CONTAINS toLower($query_text)
             OR any(tag IN k.tags WHERE toLower(tag) CONTAINS toLower($query_text)))
-            AND k.confidence_score >= $min_confidence
+            AND (k.confidence_score >= $min_confidence OR k.confidence_score IS NULL)
             RETURN k
             ORDER BY k.confidence_score DESC, k.usage_count DESC
             LIMIT $limit
@@ -543,10 +590,10 @@ class EnhancedKnowledgeQuery:
         elif query_type == "recent":
             cypher = """
             MATCH (k:Knowledge)
-            WHERE k.deprecated = false
-            AND k.confidence_score >= $min_confidence
+            WHERE (k.deprecated = false OR k.deprecated IS NULL)
+            AND (k.confidence_score >= $min_confidence OR k.confidence_score IS NULL)
             RETURN k
-            ORDER BY k.updated_at DESC
+            ORDER BY COALESCE(k.updated_at, k.created_at, datetime()) DESC
             LIMIT $limit
             """
             params = {"min_confidence": min_confidence, "limit": limit}

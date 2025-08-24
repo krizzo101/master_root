@@ -7,11 +7,17 @@ files:
   - CONTEXT_STATE.md
   - Dockerfile
   - KNOWLEDGE_SYSTEM_ANALYSIS.md
+  - KNOWLEDGE_TOOL_CURRENT_STATUS.md
+  - KNOWLEDGE_TOOL_ENHANCEMENT_PROPOSAL.md
+  - KNOWLEDGE_TOOL_FIX_PLAN.md
+  - KNOWLEDGE_TOOL_SOLUTION_SUMMARY.md
+  - MCP_SERVER_FIX_REQUIREMENTS.md
   - MERGE_PLAN.md
   - PATTERN_ENGINE_EXTRACTION_SUMMARY.md
   - QUICK_START.md
   - README.md
   - START_AUTONOMOUS.sh
+  - SYNC_REPORT.md
   - agent-deployment-phase.txt
   - agent-sdlc-design-phase.txt
   - agent.sdlc-testing.txt
@@ -56,25 +62,72 @@ files:
   - apps/hello-disneyworld/docs/6-postmortem.md
   - apps/hello-world/docs/design/architecture.md
   - apps/hello-world/docs/requirements/hello-world-requirements.md
+  - apps/knowledge_system/FUTURE_READY.md
+  - apps/knowledge_system/OPERATIONAL_STATUS.md
   - apps/knowledge_system/README.md
+  - apps/knowledge_system/SELF_AWARENESS_REPORT.md
+  - apps/knowledge_system/SYSTEM_STATUS.md
+  - apps/knowledge_system/TRANSCENDENCE.md
   - apps/knowledge_system/__main__.py
+  - apps/knowledge_system/acquisition_log.jsonl
+  - apps/knowledge_system/activate_evolution.py
+  - apps/knowledge_system/adaptive_learning.py
+  - apps/knowledge_system/add_relationships.py
+  - apps/knowledge_system/automated_acquisition_pipeline.py
+  - apps/knowledge_system/autonomous_evolution.py
   - apps/knowledge_system/claude_knowledge_retrieval.py
+  - apps/knowledge_system/curated_ingestion.py
+  - apps/knowledge_system/demo_rag.py
+  - apps/knowledge_system/direct_acquisition.py
+  - apps/knowledge_system/direct_ingestion.py
   - apps/knowledge_system/embedding_service.py
+  - apps/knowledge_system/enhanced_context.py
+  - apps/knowledge_system/evaluation.py
+  - apps/knowledge_system/fast_ingest.py
+  - apps/knowledge_system/final_validation.py
+  - apps/knowledge_system/fix_connections.py
+  - apps/knowledge_system/fix_knowledge_query.py
   - apps/knowledge_system/generate_embeddings.py
+  - apps/knowledge_system/hybrid_search.py
+  - apps/knowledge_system/ingest_with_mcp.py
   - apps/knowledge_system/init_neo4j.py
+  - apps/knowledge_system/knowledge_activation.py
   - apps/knowledge_system/knowledge_learning_neo4j.py
+  - apps/knowledge_system/knowledge_nano_agent.py
+  - apps/knowledge_system/knowledge_self_analysis.py
+  - apps/knowledge_system/knowledge_synthesis.py
   - apps/knowledge_system/knowledge_system.py
   - apps/knowledge_system/learning_feedback_loop.py
+  - apps/knowledge_system/letta_integration.py
   - apps/knowledge_system/mcp_feedback_tools.py
+  - apps/knowledge_system/mcp_knowledge_enhanced.py
   - apps/knowledge_system/mcp_knowledge_server.py
+  - apps/knowledge_system/mcp_knowledge_server.py.backup_20250822_095714
   - apps/knowledge_system/mcp_knowledge_tools.py
   - apps/knowledge_system/mcp_knowledge_tools_auto_embed.py
   - apps/knowledge_system/mcp_knowledge_tools_v2.py
+  - apps/knowledge_system/memory_crystal.py
+  - apps/knowledge_system/migrate_deprecated_property.py
+  - apps/knowledge_system/monitored_ingestion.py
+  - apps/knowledge_system/neo4j_connection.py
+  - apps/knowledge_system/predictive_prefetch.py
+  - apps/knowledge_system/prefetch_state.pkl
+  - apps/knowledge_system/real_acquisition_pipeline.py
+  - apps/knowledge_system/reference_ingestion_pipeline.py
+  - apps/knowledge_system/reindex_knowledge.py
+  - apps/knowledge_system/search_reference.py
+  - apps/knowledge_system/search_with_feedback.py
+  - apps/knowledge_system/semantic_code_analyzer.py
+  - apps/knowledge_system/simple_rag.py
   - apps/knowledge_system/src/agent_integration.py
   - apps/knowledge_system/src/embedding_service.py
   - apps/knowledge_system/src/hybrid_retrieval.py
   - apps/knowledge_system/src/neo4j_knowledge_store.py
   - apps/knowledge_system/src/self_learning_loop.py
+  - apps/knowledge_system/synthesis_results.json
+  - apps/knowledge_system/system_diagnostic.py
+  - apps/knowledge_system/unified_intelligent_search.py
+  - apps/knowledge_system/usage_tracking.py
   - apps/opsvi-assistant/README.md
   - apps/opsvi-assistant/opsvi_assistant/__init__.py
   - apps/opsvi-assistant/opsvi_assistant/__main__.py
@@ -497,6 +550,7 @@ files:
   - docs/ADR-001-initial-architecture.md
   - docs/ADR-002-scraper.md
   - docs/ADR-003-api-key-fallbacks.md
+  - docs/AI-Model-Capabilities-Analysis-2025-08-21.md
   - docs/APP_MIGRATION_GUIDE.md
   - docs/APP_MIGRATION_PLAN.md
   - docs/CONSOLIDATION_REPORT.md
@@ -616,6 +670,7 @@ files:
   - docs/guides/GEMINI.md
   - docs/guides/GEMINI_API_KEY_ISSUE.md
   - docs/guides/GEMINI_SUBSCRIPTION_CLARIFICATION.md
+  - docs/guides/NEO4J_KNOWLEDGE_SETUP_PROMPT.md
   - docs/guides/PERPLEXITY_INTEGRATION_SUCCESS.md
   - docs/guides/PROJECT_INTELLIGENCE_INTEGRATION_STRATEGY.md
   - docs/guides/TEST_AUTO_MCP_LIVE.md
@@ -1035,6 +1090,7 @@ files:
   - libs/gatekeeper/gatekeeper_agent.py
   - libs/gatekeeper/test_gatekeeper_result.json
   - libs/generate_ecosystem_v2.py
+  - libs/knowledge_tool_helper.py
   - libs/opsvi-api/README.md
   - libs/opsvi-api/opsvi_api/__init__.py
   - libs/opsvi-api/opsvi_api/app.py
@@ -2436,6 +2492,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-llm/opsvi_llm/providers/openai_provider.py
   - libs/opsvi-llm/opsvi_llm/providers/openai_responses_interface.py
   - libs/opsvi-llm/opsvi_llm/providers/openai_security.py
+  - libs/opsvi-llm/opsvi_llm/providers/openai_unified_interface.py
   - libs/opsvi-llm/opsvi_llm/providers/perplexity_provider.py
   - libs/opsvi-llm/opsvi_llm/tests/__init__.py
   - libs/opsvi-llm/pyproject.toml
@@ -3074,6 +3131,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - requirements.txt
   - ruff.toml
   - run_tests.sh
+  - scripts/README.md
   - scripts/README_auto_attach.md
   - scripts/WSL-Memory-Manager.ps1
   - scripts/agents/gatekeeper_summarize_projects.py
@@ -3134,6 +3192,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - scripts/setup_wsl_memory_management.sh
   - scripts/smart_todo_implementation.py
   - scripts/smoke_test.sh
+  - scripts/sync-claude-config.sh
   - scripts/utilities/clean_log.py
   - scripts/utilities/fast_migrate.py
   - scripts/utilities/generate_project_visualizations.py
