@@ -48,6 +48,12 @@ This document outlines the rules, guidelines, and best practices for the AI codi
 *   The `.mcp.json` file in the project root of this project defines the tools the claude code app has available and is located at: `/home/opsvi/master_root/.mcp.json`.
 *   When asked to perform online research regarding the 'claude code' application, focus on understanding its command-line usage, capabilities, and functionality.
 *   `tech_docs` is also a useful research tool.
+*   The AI should load the `CLAUDE.md` instructions and use them to help with operational behavior and instructions moving forward.
+*   The AI should use the enhanced versions of the tools over the others when available.
+*   The AI should read the `mcp.json` to understand where the enhanced versions point to as entry points and that you are using the right code if you make any updates.
+*   The AI should analyze the new enhanced thinking tool code in detail to make sure you understand it and the new knowledge tool as well.
+*   The AI should make use of the KB to help you get up to speed and understand what's been going on.
+*   The tools are only referred to as "enhanced" in the `mcp.json` configs, so searching the codebase or KB for "enhanced" might not yield results. Remember that the code is local, not remote MCP servers.
 
 ## 🔄 MANDATORY: GIT COMMIT REQUIREMENTS (DEFAULT BEHAVIOR - CANNOT BE IGNORED)
 
@@ -184,6 +190,7 @@ The system will automatically trigger commits when:
 *   When running commands, log "pwd; ls -a; git status" to comply with the Shell Safety Rules.
 *   When presented with a multi-step task, consider using a todo list to keep everything organized. Reconcile the todo list before making any edits.
 *   It is recommended to run smaller tasks in parallel. However, be mindful that asynchronous tool execution can make logging commands harder afterward. Consider running commands in the foreground without background mode if logging is a priority.
+*   When asked to add enhanced versions of existing tools to the `.cursor/mcp.json` file, ensure the new tools are named distinctly (e.g., `thinking-enhanced`, `knowledge-enhanced`). Also, when the consult suite tool requires a migrated consult suite, create a new entry for that too.
 
 ## DEBUGGING
 
@@ -662,32 +669,4 @@ response = client.responses.create(
 
 ### Model-Specific Optimization Patterns
 
-#### **For O3/o4-mini Models (Reasoning Focus)**
-```python
-# ✅ O3-OPTIMIZED PATTERN - Minimal, clear prompts
-response = client.responses.create(
-    model="o4-mini",
-    instructions="You are a system architect. Design a scalable microservices architecture.",
-    input="Requirements: 100k users, real-time chat, file sharing, mobile support",
-    text_format=ArchitectureSchema,
-    # O3-specific parameters
-    reasoning_effort="high",  # thorough analysis
-    verbosity="concise"       # controlled output length
-)
-
-# ✅ NO CHAIN-OF-THOUGHT for O3 - they reason internally
-# ❌ AVOID: "Think step by step...", "Let's break this down..."
-```
-
-#### **For GPT-5 Models (Execution Focus)**
-```python
-# ✅ GPT-5-OPTIMIZED PATTERN - Detailed, explicit guidance
-response = client.responses.create(
-    model="gpt-5-mini",
-    instructions="""
-    ## PERSISTENCE
-    Continue until the user's query is completely resolved.
-
-    ## REASONING STRATEGY
-    First, analyze the requirements systematically.
-    Then, consider
+#### **For O3/o4-mini Models (Reasoning

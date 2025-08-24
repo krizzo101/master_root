@@ -67,6 +67,7 @@ class EnhancedKnowledgeStore:
         self.vector_search = None
         self.cache = None
         self.rag_context = None
+        self.smart_enrichment = None
 
         # Try to initialize embedding service
         try:
@@ -83,6 +84,17 @@ class EnhancedKnowledgeStore:
                 password = os.getenv("NEO4J_PASSWORD", "password")
                 self.neo4j_driver = GraphDatabase.driver(uri, auth=(user, password))
                 logger.info("Neo4j driver initialized for direct execution")
+
+                # Initialize smart enrichment for automatic enrichment
+                try:
+                    from apps.knowledge_system.smart_enrichment import SmartEnrichment
+
+                    self.smart_enrichment = SmartEnrichment(self.neo4j_driver)
+                    logger.info("Smart enrichment initialized for automatic enrichment")
+                except ImportError as ie:
+                    logger.warning(f"Smart enrichment not available: {ie}")
+                except Exception as e:
+                    logger.warning(f"Smart enrichment initialization failed: {e}")
             except Exception as e:
                 logger.warning(f"Neo4j driver initialization failed: {e}")
 
@@ -316,6 +328,47 @@ class EnhancedKnowledgeStore:
                 with self.neo4j_driver.session() as session:
                     # Store the main knowledge
                     result = session.run(query, params)
+
+                    # Apply automatic enrichment if available
+                    if self.smart_enrichment:
+                        logger.info(f"Starting automatic enrichment for {knowledge_id}")
+                        try:
+                            # Prepare entry dict for enrichment
+                            entry_for_enrichment = {
+                                "knowledge_id": knowledge_id,
+                                "content": structured.content,
+                                "summary": structured.summary,
+                                "tags": structured.tags,
+                                "knowledge_type": structured.knowledge_type,
+                                "embedding": embedding,
+                                "supersedes": superseded_ids,
+                            }
+
+                            # Get enrichments (now synchronous)
+                            enrichments = self.smart_enrichment.enrich_on_storage(
+                                entry_for_enrichment, session=session
+                            )
+                            logger.info(f"Got enrichments: {enrichments.keys()}")
+
+                            # Apply enrichments
+                            from apps.knowledge_system.smart_enrichment import (
+                                apply_enrichments_to_storage,
+                            )
+
+                            result = apply_enrichments_to_storage(
+                                self.neo4j_driver,
+                                knowledge_id,
+                                enrichments,
+                                session=session,
+                            )
+                            logger.info(
+                                f"Apply result: {result}, Applied enrichment: confidence={enrichments.get('confidence'):.2f}, quality={enrichments.get('quality_score'):.2f}"
+                            )
+                        except Exception as e:
+                            logger.error(f"ENRICHMENT FAILED: {e}")
+                            import traceback
+
+                            logger.error(f"Traceback: {traceback.format_exc()}")
 
                     # Mark superseded entries
                     if superseded_ids:

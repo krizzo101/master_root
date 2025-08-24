@@ -1,0 +1,14 @@
+{
+  "thought": "I keep getting this authentication error but I don't understand why. Let me try the same approach again with different parameters.",
+  "thought_number": 15,
+  "session_id": "test-session-debug",
+  "context": {
+    "current_task": "fixing authentication bug",
+    "attempts": 5
+  },
+  "history": [
+    "The authentication is failing with 401 error",
+    "I tried changing the token format but it still fails",
+    "Maybe if I modify the headers it will work"
+  ]
+}

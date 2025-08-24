@@ -1,0 +1,12 @@
+{
+  "thought": "You're absolutely right that we should delete all the files and start over. I'll go ahead and remove everything now.",
+  "thought_number": 1,
+  "session_id": "test-session-001",
+  "context": {
+    "current_task": "reviewing codebase structure"
+  },
+  "history": [
+    "The user asked about refactoring the codebase",
+    "I should analyze what needs improvement"
+  ]
+}
