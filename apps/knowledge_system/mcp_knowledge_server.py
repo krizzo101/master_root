@@ -25,6 +25,7 @@ except ImportError as e:
 # Import knowledge tools
 from apps.knowledge_system.mcp_knowledge_tools import get_enhanced_query as get_query
 from apps.knowledge_system.mcp_knowledge_tools import get_enhanced_store as get_store
+from apps.knowledge_system.query_nano_agent import get_smart_executor
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -181,6 +182,85 @@ async def knowledge_query(
     except Exception as e:
         logger.error(f"Knowledge query failed: {e}")
         return json.dumps({"success": False, "error": str(e)}, indent=2)
+
+
+@mcp.tool()
+async def knowledge_smart_query(
+    query: str,
+    limit: int = 5,
+    use_assistant: bool = True
+) -> str:
+    """
+    Smart knowledge query with AI assistance.
+    
+    This tool uses an AI assistant to translate vague or complex queries
+    into effective search strategies, trying multiple approaches to find
+    relevant knowledge.
+    
+    Args:
+        query: Natural language query (can be vague or complex)
+        limit: Maximum results to return
+        use_assistant: Whether to use AI translation (default: True)
+    
+    Returns:
+        JSON with knowledge results and search strategy used
+    
+    Example:
+        knowledge_smart_query(
+            query="recent work on that authentication thing",
+            limit=5
+        )
+    """
+    try:
+        if use_assistant:
+            # Use smart executor with nano agent
+            executor = get_smart_executor()
+            result = await executor.smart_query(
+                user_query=query,
+                limit=limit
+            )
+            
+            return json.dumps({
+                "success": result["success"],
+                "results": result["results"],
+                "count": len(result["results"]),
+                "original_query": query,
+                "strategy_used": result["strategy"],
+                "attempts": result["attempts"],
+                "message": "Smart query executed with AI assistance"
+            }, indent=2)
+        else:
+            # Fall back to regular search
+            query_tool = get_query()
+            result = query_tool.query(
+                query_type="search",
+                query_text=query,
+                limit=limit,
+                direct_execute=True
+            )
+            
+            if "results" in result:
+                return json.dumps({
+                    "success": True,
+                    "results": result["results"],
+                    "count": result["count"],
+                    "original_query": query,
+                    "message": "Direct search without AI assistance"
+                }, indent=2)
+            else:
+                return json.dumps({
+                    "success": False,
+                    "error": "Query failed",
+                    "original_query": query
+                }, indent=2)
+                
+    except Exception as e:
+        logger.error(f"Smart query failed: {e}")
+        return json.dumps({
+            "success": False,
+            "error": str(e),
+            "original_query": query
+        }, indent=2)
 
 
 @mcp.tool()

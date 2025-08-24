@@ -9,12 +9,41 @@
    ```python
    # If "No such tool available" error → Continue with fallback rules below
    mcp__knowledge__knowledge_query(query_type="search", search_text="GLOBAL OPERATIONAL INSTRUCTIONS", limit=1)
-   mcp__knowledge__knowledge_query(query_type="recent", limit=10)
+   
+   # EFFECTIVE KB QUERIES (use simple terms, multiple approaches):
+   # ✅ GOOD: "SESSION CONTEXT", "WORKFLOW", "multi-claude", "ACCF"
+   # ❌ BAD: "recent project work knowledge system ACCF" (too complex)
+   # Try: search, by_type, high_confidence if one fails
+   mcp__knowledge__knowledge_query(query_type="by_type", knowledge_type="WORKFLOW", limit=5)
+   mcp__knowledge__knowledge_query(query_type="high_confidence", limit=5)
    ```
 4. **Check git**: Use `mcp__shell_exec__shell_exec("git branch --show-current")` if available, else `Bash("git branch --show-current")`
    - If on main/master → CREATE feature branch immediately
 5. **Follow retrieved instructions EXACTLY** - they contain critical operational rules
 6. **If KB was unavailable**: Use the CRITICAL FALLBACK RULES below
+
+### PROJECT INTELLIGENCE PROTOCOL (Query KB BEFORE Code)
+**⚠️ MANDATORY**: Before exploring ANY code, query project intelligence FIRST:
+
+```python
+# When asked about any tool/app/system:
+mcp__knowledge__knowledge_query(query_type="search", search_text="[tool_name] architecture")
+mcp__knowledge__knowledge_query(query_type="search", search_text="[tool_name] entry point")
+mcp__knowledge__knowledge_query(query_type="search", search_text="[tool_name] configuration")
+
+# For project structure:
+mcp__knowledge__knowledge_query(query_type="search", search_text="project structure")
+mcp__knowledge__knowledge_query(query_type="search", search_text="MCP servers")
+mcp__knowledge__knowledge_query(query_type="search", search_text=".mcp.json")
+
+# For specific apps:
+mcp__knowledge__knowledge_query(query_type="search", search_text="[app_name] overview")
+mcp__knowledge__knowledge_query(query_type="search", search_text="[app_name] entry points")
+```
+
+**Example**: User asks "How does the knowledge tool work?"
+❌ WRONG: Immediately read mcp_knowledge_tools.py
+✅ RIGHT: Query KB for "knowledge tool", "knowledge MCP", "knowledge entry point" FIRST
 
 ### CRITICAL FALLBACK RULES (When KB Unavailable)
 
