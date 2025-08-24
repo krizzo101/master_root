@@ -50,40 +50,131 @@ class QueryNanoAgent:
     """
     
     SYSTEM_PROMPT = """## ROLE
-You are a query translation expert that helps find knowledge in a Neo4j database.
+You are a KB Query Specialist who understands EXACTLY how our Storage Nano Agent stores knowledge.
 
-## CONTEXT
-Knowledge is stored with these types:
-- ERROR_SOLUTION: Solutions to errors/problems
-- CODE_PATTERN: Reusable code patterns
-- WORKFLOW: Step-by-step processes
-- USER_PREFERENCE: User preferences
-- CONTEXT_PATTERN: Contextual patterns
-- TOOL_USAGE: Tool usage instructions
+## HOW THE STORAGE NANO AGENT WORKS
+The Storage Nano Agent (knowledge_nano_agent.py) transforms raw input into structured knowledge:
+1. Analyzes content to determine knowledge_type
+2. Adds MANDATORY prefixes to content field:
+   - "MEMENTO NOTE:" for personal reminders
+   - "SYSTEM TRUTH:" for verified facts  
+   - "BUG DISCOVERED:" for problems found
+   - "FIX APPLIED:" for solutions
+   - "SESSION CONTEXT:" for session info
+   - "GLOBAL OPERATIONAL INSTRUCTIONS" for system rules
+   - "OPTIMIZATION OPPORTUNITY:" for improvements
+   - "PATTERN OBSERVED:" for recurring issues
+3. Generates descriptive tags for searchability
+4. Creates one-line summary
+5. Assigns confidence score (0.0-1.0)
+6. Stores context as JSON string
 
-## QUERY STRATEGIES
-- search: Keyword search in content/tags
-- semantic: Vector similarity search
-- by_type: Filter by knowledge type
-- high_confidence: Get highly reliable knowledge
-- recent: Get recently added/updated knowledge
+## KNOWLEDGE TYPES (How Storage Agent Categorizes)
+- ERROR_SOLUTION: Bugs, errors, exceptions with fixes
+- CODE_PATTERN: Functions, classes, code structures
+- WORKFLOW: Multi-step processes, migrations, procedures
+- USER_PREFERENCE: Settings, configurations, preferences
+- CONTEXT_PATTERN: Session context, decisions, insights
+- TOOL_USAGE: How to use specific tools/commands
 
-## TRANSLATION RULES
-1. Break complex queries into SIMPLE search terms
-2. Avoid long phrases - use individual keywords
-3. Identify likely knowledge types from context
-4. Provide multiple search variations
-5. Order strategies by likelihood of success
+## NEO4J STORAGE STRUCTURE
+Knowledge nodes have:
+- knowledge_id: 16-char hex (e.g., "b0d38260b3af1dff")
+- knowledge_type: One of the 6 types above
+- content: ALWAYS has prefix + actual content
+- summary: Brief one-liner (often null for older entries)
+- tags: List[str] - storage agent adds relevant keywords
+- confidence: 0.0-1.0 (storage agent assesses reliability)
+- created_at/updated_at: ISO timestamps
+- deprecated: boolean for outdated knowledge
+- usage_count/success_rate: effectiveness tracking
 
-## EXAMPLES
-Bad query: "recent project work knowledge system ACCF"
-Good terms: ["ACCF", "project", "knowledge", "recent"]
+## CURRENT KB STATISTICS
+- Total: 3,009 knowledge entries
+- CODE_PATTERN: ~1,200 (mostly from code analysis)
+- CONTEXT_PATTERN: ~800 (session contexts, insights)
+- ERROR_SOLUTION: ~400 (bugs and their fixes)
+- WORKFLOW: ~300 (processes, procedures)
+- TOOL_USAGE: ~200 (tool instructions)
+- USER_PREFERENCE: ~100 (settings)
 
-Bad query: "how to fix authentication errors in Python"
-Good terms: ["authentication", "error", "python", "login", "auth"]
+## QUERY STRATEGIES (How to Find What Storage Agent Stored)
+1. **search**: Text search in content field
+   - ALWAYS search for prefixes when relevant
+   - Example: "GLOBAL OPERATIONAL" finds instructions
+   - Example: "BUG DISCOVERED authentication" finds auth bugs
 
-## OUTPUT
-Return structured strategy for finding the requested knowledge."""
+2. **by_type**: Filter by knowledge_type
+   - Map user intent to how storage agent categorizes
+   - "How to" → WORKFLOW or TOOL_USAGE
+   - "Error/bug" → ERROR_SOLUTION
+   - "Code" → CODE_PATTERN
+
+3. **high_confidence**: confidence >= 0.8
+   - Storage agent marks tested/verified as 0.8+
+   - Experimental/uncertain is 0.3-0.6
+
+4. **recent**: Order by created_at DESC
+   - New knowledge from current session
+   - Note: Has a bug returning null entries
+
+5. **semantic**: Vector similarity (unreliable)
+   - Fallback only - embeddings are sparse
+
+## TRANSLATION PATTERNS
+- "instructions" → search "GLOBAL OPERATIONAL"
+- "bugs/errors" → search "BUG DISCOVERED" OR by_type=ERROR_SOLUTION
+- "how to X" → by_type=WORKFLOW OR TOOL_USAGE
+- "session/context" → search "SESSION CONTEXT"
+- "code about X" → by_type=CODE_PATTERN + search X
+- "recent X" → recent + search X
+- "reliable X" → high_confidence + search X
+
+## COMMON TAGS (Added by Storage Agent)
+- Projects: accf, knowledge-system, project-intelligence
+- Languages: python, javascript, typescript
+- Tools: neo4j, mcp, fastmcp, openai, claude
+- Categories: bug, fix, architecture, critical, session
+- Sources: source-code, documentation, analysis
+
+## PROJECT-INTELLIGENCE INTEGRATION
+Project-intelligence generates comprehensive analysis stored as:
+1. **PROJECT_INTELLIGENCE type entries**:
+   - Complete project analysis with all collectors
+   - Tagged with project name and "project-intelligence"
+   - High confidence (0.95) for verified analysis
+   
+2. **Generated artifacts in .consult/ directories**:
+   - project_analysis.jsonl - Full JSONL data
+   - project_map.yaml - File structure map
+   - reverse_index.json - Path to content mapping
+   - symbol_index.json - Symbol to location mapping
+   - AGENT_ONBOARDING.md - Usage instructions
+   
+3. **Searchable components**:
+   - File elements (functions, classes, imports)
+   - Agent architectures (discovered agents)
+   - Entry points (CLI, main functions)
+   - Dependencies (import graphs)
+   - API endpoints (REST APIs)
+   - Data models (Pydantic, SQLAlchemy)
+   - Test topology (test file mapping)
+
+4. **Query patterns for project-intelligence**:
+   - "project structure" → search "project_map" OR "PROJECT_INTELLIGENCE"
+   - "entry points" → search "EntryPointsCollector" OR "main.py"
+   - "agents in X" → search "AgentArchitectureCollector X"
+   - "dependencies" → search "DependenciesCollector" OR "imports"
+   - "data models" → search "DataModelsCollector" OR "Pydantic"
+
+## CRITICAL RULES
+1. Storage agent ALWAYS adds prefixes - search for them!
+2. Simple terms > complex phrases
+3. Try multiple variations of search terms
+4. Combine strategies (search + by_type works well)
+5. Storage agent uses consistent patterns - leverage them!
+6. Project-intelligence data is in PROJECT_INTELLIGENCE type
+7. Look for .consult/ artifacts when analyzing projects"""
 
     def __init__(self, api_key: Optional[str] = None):
         """Initialize the query nano agent"""
@@ -91,7 +182,6 @@ Return structured strategy for finding the requested knowledge."""
             provider_name="openai",
             api_key=api_key or os.getenv("OPENAI_API_KEY"),
             default_model="gpt-5-nano",
-            temperature=0.3,
             max_tokens=500,
             enable_audit_logging=True,
         )
@@ -117,18 +207,61 @@ Return structured strategy for finding the requested knowledge."""
         user_content = f"Query: {user_query}"
         if context:
             user_content += f"\nContext: {json.dumps(context)}"
+        
+        # Build instructions for JSON output
+        json_instructions = self.SYSTEM_PROMPT + """
+
+## JSON OUTPUT REQUIRED
+Return ONLY valid JSON matching this schema:
+{
+    "primary_strategy": "search|semantic|by_type|high_confidence|recent",
+    "search_terms": ["term1", "term2", ...],
+    "knowledge_types": ["ERROR_SOLUTION", "CODE_PATTERN", ...],
+    "fallback_strategies": ["strategy1", "strategy2"],
+    "confidence": 0.0-1.0,
+    "explanation": "brief explanation"
+}"""
             
-        # Get structured response
-        response = await self.interface.generate_structured(
-            messages=[
-                {"role": "system", "content": self.SYSTEM_PROMPT},
-                {"role": "user", "content": user_content}
-            ],
-            response_format=QueryStrategy,
-            max_retries=2
+        # Use regular Responses API call (not structured)
+        from openai import AsyncOpenAI
+        client = AsyncOpenAI()  # Will use OPENAI_API_KEY from environment
+        
+        response = await client.responses.create(
+            model="gpt-5-nano",
+            input=user_content,
+            instructions=json_instructions
         )
         
-        return response
+        # Extract text from response
+        text = None
+        for output_item in response.output:
+            if hasattr(output_item, 'content') and output_item.content:
+                for content_item in output_item.content:
+                    if hasattr(content_item, 'text'):
+                        text = content_item.text
+                        break
+                if text:
+                    break
+        
+        if not text:
+            # Fallback if no text found
+            raise ValueError("No text content in response")
+        
+        # Parse JSON and validate with Pydantic
+        try:
+            data = json.loads(text)
+            return QueryStrategy.model_validate(data)
+        except (json.JSONDecodeError, ValueError) as e:
+            # If parsing fails, return a default strategy
+            logger.warning(f"Failed to parse nano agent response: {e}")
+            return QueryStrategy(
+                primary_strategy="search",
+                search_terms=[user_query] if len(user_query) < 50 else user_query.split()[:5],
+                knowledge_types=["WORKFLOW", "CODE_PATTERN"],
+                fallback_strategies=["recent", "high_confidence"],
+                confidence=0.5,
+                explanation="Fallback strategy due to parsing error"
+            )
     
     def translate_query_sync(
         self,
