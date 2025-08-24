@@ -38,6 +38,7 @@ mcp__shell_exec__shell_exec("grep pattern *.js")
 2. **Before creating files**: Consider editing existing files
 3. **Multiple operations**: Use parallel execution in ONE message
 4. **3+ step tasks**: Create TodoWrite list FIRST
+5. **GIT COMMITS**: Track file_changes_count. When ≥3, IMMEDIATE commit required
 
 #### METACOGNITIVE QUESTIONS (Ask Yourself)
 - "Is there redundancy here?"
