@@ -328,15 +328,28 @@ class ThinkingServer:
                     # CRITICAL: Check if Devil's Advocate says to STOP
                     devils_advocate = triage_result.get("devils_advocate", {})
                     if devils_advocate.get("should_pause"):
-                        # Add critical warning to response
-                        response["CRITICAL_WARNING"] = devils_advocate.get("summary", "Devil's Advocate says STOP")
-                        response["MUST_RECONSIDER"] = True
-                        response["critical_violations"] = devils_advocate.get("critical_violations", [])
-                        response["alternative_approaches"] = devils_advocate.get("alternatives", [])
+                        critical_summary = devils_advocate.get("summary", "Devil's Advocate says STOP")
+                        violations = devils_advocate.get("critical_violations", [])
                         
-                        # Modify the coaching to be more assertive
-                        if triage_result.get("coaching"):
-                            triage_result["coaching"] = f"🛑 STOP: {devils_advocate.get('summary', '')}\n\n{triage_result['coaching']}"
+                        # FORCE reconsideration by making it prominent
+                        response["thoughtNumber"] = data.thoughtNumber
+                        response["totalThoughts"] = data.totalThoughts + 1  # Force more thinking
+                        response["nextThoughtNeeded"] = True  # Override to force continuation
+                        response["CRITICAL_WARNING"] = f"""
+🛑 STOP - CRITICAL ISSUES DETECTED 🛑
+
+{critical_summary}
+
+Violations: {', '.join(violations) if violations else 'Multiple concerns'}
+
+You MUST address these issues before proceeding.
+Alternative approaches: {', '.join(devils_advocate.get('alternatives', [])[:2])}
+"""
+                        
+                        # Make the response scream at me
+                        print(f"\n{'='*60}", file=sys.stderr)
+                        print(f"🛑 DEVIL'S ADVOCATE: {critical_summary}", file=sys.stderr)
+                        print(f"{'='*60}\n", file=sys.stderr)
 
             except Exception as e:
                 response["triageError"] = str(e)
