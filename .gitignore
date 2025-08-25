@@ -362,6 +362,9 @@ intake
 #.proj-intel/
 .cursor/project_intelligence_cache/
 
+# Consult agent cache
+.consult/
+
 # genFileMap directories
 .genfilemap/
 libs_backup_20250807_112624
