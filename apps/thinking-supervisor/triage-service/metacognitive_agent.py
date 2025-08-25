@@ -202,7 +202,6 @@ Respond with JSON: {{"violations": [{{"rule": "NO_ASSUMPTIONS|NO_FALLBACKS|THINK
                     "Always respond with valid JSON format."
                 ),
                 reasoning_effort="low",
-                temperature=0.3,
             )
 
             # Extract content from response
@@ -283,7 +282,6 @@ Respond with JSON: {{"patterns": [{{"type": "...", "evidence": "...", "impact": 
                     "actionable patterns that require intervention. Always respond with valid JSON."
                 ),
                 reasoning_effort="medium",  # Higher reasoning for pattern detection
-                temperature=0.4,
             )
 
             # Extract content from response
@@ -359,7 +357,6 @@ Respond with JSON: {{"status": "on_track|behind|stuck", "reason": "...", "though
                     "about intervention needs. Always respond with valid JSON format."
                 ),
                 reasoning_effort="low",
-                temperature=0.3,
             )
 
             # Extract content from response
@@ -443,7 +440,6 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
                     "Use direct, imperative language. Always respond with valid JSON format."
                 ),
                 reasoning_effort="low",
-                temperature=0.5,  # Slightly creative for coaching
             )
 
             # Extract content from response
