@@ -173,8 +173,8 @@ class EnhancedKnowledgeStore:
                                 f"Similarity with {record['id'][:8]}: {similarity:.4f}"
                             )
 
-                            # Lower threshold to 0.85 for better duplicate detection
-                            if similarity >= 0.85:
+                            # Lower threshold to 0.75 for better duplicate detection (was 0.85)
+                            if similarity >= 0.75:
                                 superseded_ids.append(record["id"])
                                 logger.info(
                                     f"Found superseded knowledge via embedding (similarity={similarity:.2f}): {record['id'][:8]}..."
@@ -264,12 +264,16 @@ class EnhancedKnowledgeStore:
         superseded_ids = await self.find_superseded_knowledge(
             structured.content, structured.knowledge_type, structured.tags
         )
-
+        
+        logger.info(f"DEBUG: superseded_ids returned from find_superseded_knowledge: {superseded_ids}")
+        
         if superseded_ids:
             structured.supersedes = superseded_ids
             logger.info(
                 f"This knowledge supersedes {len(superseded_ids)} existing entries"
             )
+        else:
+            logger.info("DEBUG: No superseded entries found (superseded_ids is empty)")
 
         # Step 4: Generate embedding
         embedding = None

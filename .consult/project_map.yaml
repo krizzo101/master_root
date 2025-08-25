@@ -1001,11 +1001,13 @@ files:
   - apps/thinking-supervisor/triage-service/intelligent_triage.py
   - apps/thinking-supervisor/triage-service/intelligent_triage_direct.py
   - apps/thinking-supervisor/triage-service/kb_storage.py
+  - apps/thinking-supervisor/triage-service/test_module.json
   - apps/thinking-supervisor/triage-service/test_no_fallback.json
   - apps/thinking-supervisor/triage-service/test_struggling_thought.json
   - apps/thinking-supervisor/triage-service/test_thought.json
   - apps/thinking-supervisor/triage-service/test_violation.json
   - apps/thinking-supervisor/triage-service/triage_api.py
+  - apps/thinking-supervisor/triage-service/triage_module.py
   - apps/thinking-supervisor/triage-service/triage_with_mcp.py
   - autonomous_claude_agent/AI_FIRST_IMPLEMENTATION_SUMMARY.md
   - autonomous_claude_agent/ARCHITECTURE.md
