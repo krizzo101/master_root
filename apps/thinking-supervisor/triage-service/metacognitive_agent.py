@@ -66,20 +66,6 @@ class MetacognitiveAgent:
         self._cache_timestamp = None
         self._cache_ttl = 300  # 5 minutes
 
-    def _extract_response_content(self, response) -> str:
-        """Extract text content from Responses API response object"""
-        content = ""
-        if hasattr(response, "output"):
-            for item in response.output:
-                if hasattr(item, "content") and item.content:
-                    for content_item in item.content:
-                        if hasattr(content_item, "text"):
-                            content += content_item.text
-        else:
-            # Fallback for unexpected format
-            content = str(response)
-        return content
-
         # Common programming context for better analysis
         self.domain_context = """
 SPECIFIC VIOLATIONS FROM OPERATIONAL INSTRUCTIONS:
@@ -93,6 +79,20 @@ SPECIFIC VIOLATIONS FROM OPERATIONAL INSTRUCTIONS:
 - Multiple tool messages = EFFICIENCY violation (batch in single message)
 - Creating _v2 files = GIT/FILES violation (use proper versioning)
         """.strip()
+
+    def _extract_response_content(self, response) -> str:
+        """Extract text content from Responses API response object"""
+        content = ""
+        if hasattr(response, "output"):
+            for item in response.output:
+                if hasattr(item, "content") and item.content:
+                    for content_item in item.content:
+                        if hasattr(content_item, "text"):
+                            content += content_item.text
+        else:
+            # Fallback for unexpected format
+            content = str(response)
+        return content
 
     def _detect_repetition_quick(self, thought_history: List[Dict]) -> bool:
         """Quick check for obvious repetitive patterns"""
