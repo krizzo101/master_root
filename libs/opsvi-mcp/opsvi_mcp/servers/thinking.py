@@ -40,6 +40,12 @@ class ThoughtData(BaseModel):
         None, description="Key assumptions that could be wrong"
     )
 
+    # Work phase for context-aware rules
+    workPhase: Optional[str] = Field(
+        "auto",
+        description="Current work phase: design|implementation|debugging|research|review|auto",
+    )
+
     # Optional revision/branching
     isRevision: Optional[bool] = Field(
         None, description="Whether this revises previous thinking"
@@ -114,8 +120,57 @@ class ThinkingServer:
             )
         )
 
+    def auto_detect_phase(self, data: ThoughtData) -> str:
+        """Auto-detect work phase based on context and content"""
+        trigger = data.triggerContext.lower() if data.triggerContext else ""
+        thought = data.thought.lower()
+        action = data.intendedAction.lower() if data.intendedAction else ""
+
+        # Debugging phase indicators
+        if any(
+            word in trigger for word in ["error", "exception", "failure", "bug", "fix"]
+        ):
+            return "debugging"
+        if any(word in thought for word in ["error:", "traceback", "failed", "broken"]):
+            return "debugging"
+
+        # Implementation phase indicators
+        if any(
+            word in action for word in ["write", "edit", "create", "implement", "code"]
+        ):
+            return "implementation"
+        if "```" in data.thought:  # Code blocks present
+            return "implementation"
+
+        # Design phase indicators
+        if any(
+            word in thought
+            for word in ["should", "could", "architecture", "design", "approach"]
+        ):
+            if "```" not in data.thought:  # Design discussion without code
+                return "design"
+
+        # Research phase indicators
+        if any(word in action for word in ["search", "read", "investigate", "explore"]):
+            return "research"
+        if any(
+            word in thought for word in ["what is", "how does", "understand", "learn"]
+        ):
+            return "research"
+
+        # Review phase indicators
+        if any(word in trigger for word in ["review", "check", "validate", "test"]):
+            return "review"
+
+        # Default to design for high-level thinking
+        return "design"
+
     async def process_thought(self, data: ThoughtData) -> Dict[str, Any]:
         """Process a thought with optional triage"""
+
+        # Auto-detect phase if set to auto
+        if data.workPhase == "auto" or not data.workPhase:
+            data.workPhase = self.auto_detect_phase(data)
 
         # Adjust total thoughts if needed
         if data.thoughtNumber > data.totalThoughts:
@@ -247,6 +302,10 @@ async def metacognitivethinking(
     assumptions: Optional[str] = Field(
         None, description="Key assumptions you're making that could be wrong"
     ),
+    workPhase: Optional[str] = Field(
+        "auto",
+        description="Work phase: design|implementation|debugging|research|review|auto",
+    ),
     isRevision: Optional[bool] = Field(
         None, description="Whether this revises previous thinking"
     ),
@@ -293,6 +352,7 @@ async def metacognitivethinking(
         nextThoughtNeeded=nextThoughtNeeded,
         intendedAction=intendedAction,
         assumptions=assumptions,
+        workPhase=workPhase,
         isRevision=isRevision,
         revisesThought=revisesThought,
         branchFromThought=branchFromThought,

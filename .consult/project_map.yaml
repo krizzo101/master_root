@@ -6,6 +6,7 @@ files:
   - CLAUDE.local.md
   - CLAUDE.md
   - CLAUDE.md.backup.20250824_123411
+  - CLAUDE.md.backup.20250825_005017
   - CLEANUP_PLAN.md
   - CLEANUP_RESULTS.md
   - CONTEXT_STATE.md
@@ -1001,6 +1002,7 @@ files:
   - apps/thinking-supervisor/triage-service/intelligent_triage.py
   - apps/thinking-supervisor/triage-service/intelligent_triage_direct.py
   - apps/thinking-supervisor/triage-service/kb_storage.py
+  - apps/thinking-supervisor/triage-service/metacognitive_agent.py
   - apps/thinking-supervisor/triage-service/test_module.json
   - apps/thinking-supervisor/triage-service/test_no_fallback.json
   - apps/thinking-supervisor/triage-service/test_struggling_thought.json
@@ -2832,9 +2834,9 @@ files:
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/fractal_integration_example.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/main.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/main.py
-src/applications/oamat/workflows/orchestrator/__init__.py
+  - src/applications/oamat/workflows/orchestrator/__init__.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/main.py
-src/applications/oamat/workflows/orchestrator/graph_builder.py
+  - src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/monitoring/__init__.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/oamat_logging.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/parallel_executor.py
@@ -3342,6 +3344,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/opsvi_mcp/servers/simple_python/server.py
   - libs/opsvi-mcp/opsvi_mcp/servers/testing_qa/config.py
   - libs/opsvi-mcp/opsvi_mcp/servers/testing_qa/models.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/thinking.py
   - libs/opsvi-mcp/opsvi_mcp/servers/unified_config.yaml
   - libs/opsvi-mcp/opsvi_mcp/servers/unified_orchestrator.py
   - libs/opsvi-mcp/opsvi_mcp/tools/mcp_resource_discovery.py
@@ -3728,6 +3731,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/templates.yaml
   - libs/variable_schema.yaml
   - master_root.txt
+  - master_rules.chat.log.txt
   - mcp-servers-fork/CODE_OF_CONDUCT.md
   - mcp-servers-fork/CONTRIBUTING.md
   - mcp-servers-fork/LICENSE

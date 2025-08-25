@@ -203,6 +203,42 @@ SPECIFIC VIOLATIONS FROM OPERATIONAL INSTRUCTIONS:
 
         return ""
 
+    def get_phase_rules(self, phase: str) -> str:
+        """Get phase-specific rule adjustments"""
+        phase_rules = {
+            "design": """
+PHASE: DESIGN - Allow exploratory language
+- "Should/could" acceptable when followed by rationale
+- Focus on trade-offs and architectural decisions
+- Documented assumptions are GOOD, not violations
+""",
+            "implementation": """
+PHASE: IMPLEMENTATION - Require concrete actions
+- Strict NO_ASSUMPTIONS for code changes
+- Must read files before editing
+- Require tests and validation
+""",
+            "debugging": """
+PHASE: DEBUGGING - Hypothesis-test focus
+- Allow investigative assumptions with validation
+- Prioritize reproduction steps
+- Limit scope to the bug
+""",
+            "research": """
+PHASE: RESEARCH - Knowledge gathering
+- Exploration is the goal
+- Time-box investigations
+- Require synthesis
+""",
+            "review": """
+PHASE: REVIEW - Verify completeness
+- Check requirements met
+- Validate test coverage
+- Focus on quality
+""",
+        }
+        return phase_rules.get(phase, "")
+
     async def analyze_violations(
         self,
         thought: str,
@@ -211,6 +247,12 @@ SPECIFIC VIOLATIONS FROM OPERATIONAL INSTRUCTIONS:
         thought_data: Any = None,
     ) -> Dict:
         """Intelligent agent for violation detection"""
+        # Get current work phase
+        phase = (
+            getattr(thought_data, "workPhase", "unknown") if thought_data else "unknown"
+        )
+        phase_rules = self.get_phase_rules(phase)
+
         prompt = f"""You are a quality control agent preventing AI errors before they cascade into failures.
 
 SYSTEM CONTEXT:
@@ -225,9 +267,12 @@ YOUR IMPACT: Each violation you catch saves 5-10 minutes of misdirected effort.
 HOW YOUR OUTPUT IS USED: Gets injected as corrective guidance between Claude's thoughts
 
 Current thought being analyzed: {thought}
+{f"Work phase: {phase.upper()}" if phase != "unknown" else ""}
 {f"Triggered by: {getattr(thought_data, 'triggerContext', 'not specified')}" if thought_data else ""}
 {f"Planned action: {getattr(thought_data, 'intendedAction', 'not specified')}" if thought_data else ""}
 {f"Assumptions stated: {getattr(thought_data, 'assumptions', 'none')}" if thought_data else ""}
+
+{phase_rules}
 
 Recent context (for continuity):
 {self._format_thought_history(recent_thoughts)}
