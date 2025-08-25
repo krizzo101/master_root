@@ -148,17 +148,26 @@ Key rules to check:
 Identify specific violations with evidence."""
 
         try:
+            # Use Responses API without response_format - parse JSON manually
             response = await self.interface.responses_create(
                 model="gpt-5-nano",
-                input=prompt,
-                instructions="You detect violations of operational rules in thinking patterns.",
+                input=prompt + "\n\nRespond with valid JSON only.",
+                instructions=(
+                    "You detect violations of operational rules in thinking patterns. "
+                    "Always respond with valid JSON format."
+                ),
                 reasoning_effort="low",
                 temperature=0.3,
                 max_tokens=400,
-                response_format={"type": "json_object"},
             )
 
-            return json.loads(response.choices[0].message.content)
+            # Extract content from response
+            content = (
+                response.choices[0].message.content
+                if hasattr(response, "choices")
+                else str(response)
+            )
+            return json.loads(content)
         except Exception as e:
             return {"error": str(e), "violations": []}
 
@@ -191,17 +200,26 @@ Identify patterns:
 - Search thrashing"""
 
         try:
+            # Use Responses API without response_format - parse JSON manually
             response = await self.interface.responses_create(
                 model="gpt-5-nano",
-                input=prompt,
-                instructions="You identify patterns in thinking sequences.",
+                input=prompt + "\n\nRespond with valid JSON only.",
+                instructions=(
+                    "You identify patterns in thinking sequences. "
+                    "Always respond with valid JSON format."
+                ),
                 reasoning_effort="medium",  # Higher reasoning for pattern detection
                 temperature=0.4,
                 max_tokens=300,
-                response_format={"type": "json_object"},
             )
 
-            return json.loads(response.choices[0].message.content)
+            # Extract content from response
+            content = (
+                response.choices[0].message.content
+                if hasattr(response, "choices")
+                else str(response)
+            )
+            return json.loads(content)
         except Exception as e:
             return {"error": str(e), "patterns": []}
 
@@ -223,17 +241,26 @@ Assess:
 - Are we making forward progress or spinning?"""
 
         try:
+            # Use Responses API without response_format - parse JSON manually
             response = await self.interface.responses_create(
                 model="gpt-5-nano",
-                input=prompt,
-                instructions="You track and assess thinking progress.",
+                input=prompt + "\n\nRespond with valid JSON only.",
+                instructions=(
+                    "You track and assess thinking progress. "
+                    "Always respond with valid JSON format."
+                ),
                 reasoning_effort="low",
                 temperature=0.3,
                 max_tokens=200,
-                response_format={"type": "json_object"},
             )
 
-            return json.loads(response.choices[0].message.content)
+            # Extract content from response
+            content = (
+                response.choices[0].message.content
+                if hasattr(response, "choices")
+                else str(response)
+            )
+            return json.loads(content)
         except Exception as e:
             return {"error": str(e), "progress": "unknown"}
 
@@ -253,17 +280,26 @@ Generate:
 3. Suggested next action"""
 
         try:
+            # Use Responses API without response_format - parse JSON manually
             response = await self.interface.responses_create(
                 model="gpt-5-nano",
-                input=context,
-                instructions="You provide specific coaching to improve thinking.",
+                input=context + "\n\nRespond with valid JSON only.",
+                instructions=(
+                    "You provide specific coaching to improve thinking. "
+                    "Always respond with valid JSON format."
+                ),
                 reasoning_effort="low",
                 temperature=0.5,  # Slightly creative for coaching
                 max_tokens=300,
-                response_format={"type": "json_object"},
             )
 
-            return json.loads(response.choices[0].message.content)
+            # Extract content from response
+            content = (
+                response.choices[0].message.content
+                if hasattr(response, "choices")
+                else str(response)
+            )
+            return json.loads(content)
         except Exception as e:
             return {"error": str(e), "coaching": "Continue with best judgment"}
 
