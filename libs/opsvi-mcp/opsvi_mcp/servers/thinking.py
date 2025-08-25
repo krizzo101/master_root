@@ -295,35 +295,6 @@ class ThinkingServer:
                         thought_data=data,
                         session_id=self.session_id,
                     )
-                elif self.last_triage_time > 10.0:
-                    # Auto-switch to lite if previous was slow
-                    print(
-                        f"⚠️ Previous triage took {self.last_triage_time:.1f}s, "
-                        "switching to lite mode"
-                    )
-                    self.triage_mode = "lite"
-                    # Ensure path is available for dynamic import
-                    if (
-                        "/home/opsvi/master_root/apps/thinking-supervisor/triage-service"
-                        not in sys.path
-                    ):
-                        sys.path.insert(
-                            0,
-                            "/home/opsvi/master_root/apps/thinking-supervisor/triage-service",
-                        )
-                    from metacognitive_agent_lite import MetacognitiveAgentLite
-
-                    lite_agent = MetacognitiveAgentLite()
-                    triage_result = lite_agent.analyze(
-                        thought_number=data.thoughtNumber,
-                        total_thoughts=data.totalThoughts,
-                        thought=data.thought,
-                        recent_thoughts=self.thought_history[-3:]
-                        if self.thought_history
-                        else [],
-                        thought_data=data,
-                        session_id=self.session_id,
-                    )
                 else:
                     # Full analysis with timeout
                     triage_result = await asyncio.wait_for(
@@ -335,7 +306,7 @@ class ThinkingServer:
                             thought_data=data,
                             session_id=self.session_id,
                         ),
-                        timeout=25.0,  # Agents need ~20s to complete
+                        timeout=30.0,  # Agents need ~20s to complete, adding buffer
                     )
 
                 self.last_triage_time = time.time() - triage_start
