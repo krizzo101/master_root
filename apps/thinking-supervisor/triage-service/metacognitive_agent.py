@@ -29,10 +29,7 @@ from opsvi_llm.providers.openai_unified_interface import (  # noqa: E402
 
 # Import knowledge tools for direct access
 try:
-    from apps.knowledge_system.mcp_knowledge_tools import (
-        get_enhanced_query,
-        get_smart_executor,
-    )
+    from apps.knowledge_system.mcp_knowledge_tools import get_enhanced_query
 
     KNOWLEDGE_AVAILABLE = True
 except ImportError as e:
@@ -61,15 +58,27 @@ class MetacognitiveAgent:
         # Initialize knowledge tools if available
         if KNOWLEDGE_AVAILABLE:
             self.query_tool = get_enhanced_query()
-            self.smart_query = get_smart_executor()
         else:
             self.query_tool = None
-            self.smart_query = None
 
         # Cache for instructions
         self._cached_instructions = None
         self._cache_timestamp = None
         self._cache_ttl = 300  # 5 minutes
+
+    def _extract_response_content(self, response) -> str:
+        """Extract text content from Responses API response object"""
+        content = ""
+        if hasattr(response, "output"):
+            for item in response.output:
+                if hasattr(item, "content") and item.content:
+                    for content_item in item.content:
+                        if hasattr(content_item, "text"):
+                            content += content_item.text
+        else:
+            # Fallback for unexpected format
+            content = str(response)
+        return content
 
         # Common programming context for better analysis
         self.domain_context = """
@@ -239,13 +248,13 @@ Respond with JSON: {{"violations": [{{"rule": "NO_ASSUMPTIONS|NO_FALLBACKS|THINK
                 reasoning_effort="low",
             )
 
-            # Extract content from response
-            content = (
-                response.choices[0].message.content
-                if hasattr(response, "choices")
-                else str(response)
+            # Extract and parse response
+            content = self._extract_response_content(response)
+            return (
+                json.loads(content)
+                if content
+                else {"error": "No content in response", "violations": []}
             )
-            return json.loads(content)
         except Exception as e:
             return {"error": str(e), "violations": []}
 
@@ -319,13 +328,13 @@ Respond with JSON: {{"patterns": [{{"type": "...", "evidence": "...", "impact": 
                 reasoning_effort="medium",  # Higher reasoning for pattern detection
             )
 
-            # Extract content from response
-            content = (
-                response.choices[0].message.content
-                if hasattr(response, "choices")
-                else str(response)
+            # Extract and parse response
+            content = self._extract_response_content(response)
+            return (
+                json.loads(content)
+                if content
+                else {"error": "No content in response", "patterns": []}
             )
-            return json.loads(content)
         except Exception as e:
             return {"error": str(e), "patterns": []}
 
@@ -394,13 +403,13 @@ Respond with JSON: {{"status": "on_track|behind|stuck", "reason": "...", "though
                 reasoning_effort="low",
             )
 
-            # Extract content from response
-            content = (
-                response.choices[0].message.content
-                if hasattr(response, "choices")
-                else str(response)
+            # Extract and parse response
+            content = self._extract_response_content(response)
+            return (
+                json.loads(content)
+                if content
+                else {"error": "No content in response", "progress": "unknown"}
             )
-            return json.loads(content)
         except Exception as e:
             return {"error": str(e), "progress": "unknown"}
 
@@ -477,13 +486,16 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
                 reasoning_effort="low",
             )
 
-            # Extract content from response
-            content = (
-                response.choices[0].message.content
-                if hasattr(response, "choices")
-                else str(response)
+            # Extract and parse response
+            content = self._extract_response_content(response)
+            return (
+                json.loads(content)
+                if content
+                else {
+                    "error": "No content in response",
+                    "coaching": "Continue with best judgment",
+                }
             )
-            return json.loads(content)
         except Exception as e:
             return {"error": str(e), "coaching": "Continue with best judgment"}
 
