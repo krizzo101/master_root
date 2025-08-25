@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# flake8: noqa: E501
 """
 Complete Metacognitive Agent - Parallel intelligent analysis of thinking patterns
 Replaces both triage violations and metacognitive prompts with unified intelligence
@@ -70,6 +71,20 @@ class MetacognitiveAgent:
         self._cache_timestamp = None
         self._cache_ttl = 300  # 5 minutes
 
+        # Common programming context for better analysis
+        self.domain_context = """
+SPECIFIC VIOLATIONS FROM OPERATIONAL INSTRUCTIONS:
+- "probably/likely/should be" = NO ASSUMPTIONS violation (verify everything)
+- "simpler alternative" = NO FALLBACKS violation (fix properly)
+- Coding without thinking = THINKING MANDATORY violation (think first)
+- Sequential Task calls = TASK MANDATORY violation (use parallel)
+- Using gpt-4o/gpt-4o-mini = MODELS 2025 violation (use gpt-5/o3/o4)
+- Exploring code first = KB FIRST violation (query knowledge first)
+- Bash with *.py/*.js = GLOB HANDLING violation (use shell_exec)
+- Multiple tool messages = EFFICIENCY violation (batch in single message)
+- Creating _v2 files = GIT/FILES violation (use proper versioning)
+        """.strip()
+
     def _detect_repetition_quick(self, thought_history: List[Dict]) -> bool:
         """Quick check for obvious repetitive patterns"""
         if len(thought_history) < 5:
@@ -132,20 +147,48 @@ class MetacognitiveAgent:
         self, thought: str, recent_thoughts: List[str], instructions: str
     ) -> Dict:
         """Intelligent agent for violation detection"""
-        prompt = f"""Analyze this thought for violations of operational rules.
+        prompt = f"""You are a quality control agent preventing AI errors before they cascade into failures.
 
-Current thought: {thought}
+SYSTEM CONTEXT:
+- You're analyzing the internal thinking of Claude Code, an AI programming assistant
+- Claude uses a 'metacognitivethinking' tool to track its reasoning step-by-step
+- Each 'thought' is one step in Claude's problem-solving process
+- Claude is helping users with programming tasks (debugging, implementing features, etc.)
+- Your analysis runs IN PARALLEL with every thought to catch problems immediately
 
-Recent context (last 5 thoughts):
+PURPOSE: Catch violations early to prevent wasted time, incorrect solutions, and technical debt.
+YOUR IMPACT: Each violation you catch saves 5-10 minutes of misdirected effort.
+HOW YOUR OUTPUT IS USED: Gets injected as corrective guidance between Claude's thoughts
+
+Current thought being analyzed: {thought}
+
+Recent context (for continuity):
 {chr(10).join(recent_thoughts)}
 
-Key rules to check:
-- NO ASSUMPTIONS - must verify facts
-- NO FALLBACKS/WORKAROUNDS - fix root causes
-- NO REFLEXIVE AGREEMENT - evaluate on merits
-- BE EXPERT ADVISOR - provide better alternatives
+CRITICAL RULES TO ENFORCE (from GLOBAL OPERATIONAL INSTRUCTIONS):
+- NO ASSUMPTIONS: NEVER use "probably", "likely", "should be" - leads to harmful misinformation
+- NO FALLBACKS/WORKAROUNDS: FIX IT PROPERLY - workarounds bypass functionality and create debt
+- THINKING MANDATORY: MUST use metacognitivethinking BEFORE ANY CODE - Think FIRST, code SECOND
+- TASK TOOL MANDATORY: MUST use parallel Task agents (3-7 in SINGLE message) not sequential
+- MODELS 2025: gpt-4o/gpt-4o-mini FORBIDDEN - use gpt-5/gpt-5-nano/o3/o4-mini only
+- KB FIRST: Query knowledge_query BEFORE exploring code - never dive in without checking KB
+- GLOB HANDLING: NEVER Bash with wildcards (* ?) - ALWAYS use shell_exec for globs
 
-Identify specific violations with evidence."""
+{self.domain_context}
+
+YOUR TASK: Identify violations that WILL cause problems if not corrected immediately.
+Focus on violations that are about to cause the AI to:
+1. Make assumptions ("This probably means...") instead of checking facts
+2. Use workarounds ("A simpler alternative would be...") instead of fixing properly
+3. Skip thinking (jumping straight to code without metacognitivethinking)
+4. Use sequential operations instead of parallel (multiple messages vs single batched)
+5. Use forbidden models (gpt-4o) or tools (Bash with wildcards)
+6. Explore code without querying KB first (diving in blind)
+
+RESPONSE USAGE: Your findings trigger immediate corrective guidance to redirect thinking.
+Be specific - vague warnings are ignored. Point to exact phrases and explain consequences.
+
+Respond with JSON: {{"violations": [{{"rule": "NO_ASSUMPTIONS|NO_FALLBACKS|THINKING_MANDATORY|TASK_MANDATORY|MODELS_2025|KB_FIRST|GLOB_HANDLING", "evidence": "exact quote from thought", "consequence": "specific failure this causes"}}], "severity": "critical|high|medium|low"}}"""
 
         try:
             # Use Responses API without response_format - parse JSON manually
@@ -153,7 +196,9 @@ Identify specific violations with evidence."""
                 model="gpt-5-nano",
                 input=prompt + "\n\nRespond with valid JSON only.",
                 instructions=(
-                    "You detect violations of operational rules in thinking patterns. "
+                    "You are a proactive error prevention system. Your job is to catch violations "
+                    "BEFORE they cascade into failures. Each violation you catch saves significant "
+                    "debugging time. Be specific about what rule was violated and why it matters. "
                     "Always respond with valid JSON format."
                 ),
                 reasoning_effort="low",
@@ -185,19 +230,47 @@ Identify specific violations with evidence."""
                 thought_text = t.get("thought", "")[:100]
             pattern_summary.append(f"Thought {num}: {thought_text}...")
 
-        prompt = f"""Analyze thinking patterns across these {len(pattern_window)} thoughts.
+        prompt = f"""You are a pattern recognition specialist identifying inefficient thinking loops that waste time.
+
+SYSTEM CONTEXT:
+- You're analyzing Claude Code's thinking patterns (an AI programming assistant)
+- Claude tracks each reasoning step using the 'metacognitivethinking' tool
+- You see a 15-thought window to detect patterns over time
+- Claude is working on complex programming tasks that require careful reasoning
+- Your pattern detection runs asynchronously to identify when Claude gets stuck
+
+PURPOSE: Detect repetitive patterns that indicate the AI is stuck, confused, or degrading in performance.
+YOUR IMPACT: Breaking these patterns can reduce task time by 50% or more.
+HOW YOUR OUTPUT IS USED: Triggers strategy resets and approach changes in Claude's thinking
+
+Analyzing {len(pattern_window)} recent thoughts for patterns.
 
 Current thought: {thought}
 
 Thought sequence:
 {chr(10).join(pattern_summary)}
 
-Identify patterns:
-- Circular thinking (repeating same ideas)
-- Degrading efficiency (taking longer over time)
-- Repeated failed attempts
-- Assumption buildup
-- Search thrashing"""
+PATTERNS TO DETECT (and why they matter):
+- CIRCULAR THINKING: Repeating same ideas = stuck in loop, no progress
+- DEGRADING EFFICIENCY: Taking longer each step = approaching system breakdown
+- REPEATED FAILED ATTEMPTS: Same approach failing = needs strategy change
+- ASSUMPTION BUILDUP: Each thought adds assumptions = building on quicksand
+- SEARCH THRASHING: Random searching without strategy = will never find answer
+- TOOL SWITCHING: Jumping between approaches = lack of clear plan
+- COMPLEXITY CREEP: Simple task becoming complex = overthinking
+
+{self.domain_context}
+
+YOUR TASK: Identify which patterns are present and their impact on progress.
+Pattern detection triggers strategy changes and resets to break out of loops.
+
+RESPONSE USAGE: Your findings determine if the AI needs to:
+1. Reset and try different approach
+2. Simplify and focus
+3. Get user clarification
+4. Break down the problem differently
+
+Respond with JSON: {{"patterns": [{{"type": "...", "evidence": "...", "impact": "high|medium|low"}}], "recommendation": "continue|reset|clarify"}}"""
 
         try:
             # Use Responses API without response_format - parse JSON manually
@@ -205,8 +278,10 @@ Identify patterns:
                 model="gpt-5-nano",
                 input=prompt + "\n\nRespond with valid JSON only.",
                 instructions=(
-                    "You identify patterns in thinking sequences. "
-                    "Always respond with valid JSON format."
+                    "You are a metacognitive pattern analyst. Your role is to identify thinking "
+                    "patterns that indicate the AI is stuck, confused, or inefficient. Each pattern "
+                    "you identify helps break loops and redirect effort productively. Focus on "
+                    "actionable patterns that require intervention. Always respond with valid JSON."
                 ),
                 reasoning_effort="medium",  # Higher reasoning for pattern detection
                 temperature=0.4,
@@ -227,18 +302,52 @@ Identify patterns:
         self, thought_number: int, total_thoughts: int, thought: str, history: List[str]
     ) -> Dict:
         """Intelligent agent for progress tracking"""
-        prompt = f"""Analyze progress of this thinking session.
+        prompt = f"""You are a progress tracker identifying when AI thinking is going off track.
 
-Current: Thought {thought_number} of {total_thoughts} estimated
+SYSTEM CONTEXT:
+- You're monitoring Claude Code's progress through a programming task
+- Claude estimates total thoughts needed upfront, then tracks progress
+- Each thought consumes tokens and time - efficiency matters
+- Claude has limited context window and must complete tasks before running out
+- Your tracking helps Claude stay focused and avoid rabbit holes
+
+PURPOSE: Detect when the AI is falling behind or stuck so we can intervene before timeout.
+YOUR IMPACT: Early detection prevents task failure and helps meet deadlines.
+HOW YOUR OUTPUT IS USED: Triggers course corrections and focusing strategies
+
+Current status: Thought {thought_number} of {total_thoughts} estimated
+Progress ratio: {thought_number}/{total_thoughts} = {thought_number/max(total_thoughts, 1)*100:.0f}% thoughts used
+
 Current thought: {thought}
 
-Recent progress:
+Recent progress (last 3 thoughts):
 {chr(10).join(history[-3:])}
 
-Assess:
-- Is progress on track, behind, or stuck?
-- Why might it be taking longer than estimated?
-- Are we making forward progress or spinning?"""
+PROGRESS INDICATORS TO ASSESS:
+- ON TRACK: Making steady progress toward goal, thoughts align with plan
+- BEHIND: Using more thoughts than expected, may not finish in time
+- STUCK: No forward movement, repeating similar thoughts
+- DIVERGING: Moving away from original goal, scope creep
+- ACCELERATING: Suddenly moving faster (might be skipping important steps)
+
+WARNING SIGNS:
+- Thought number exceeding estimate by >20%
+- Same type of thought repeated 3+ times
+- No concrete progress in last 5 thoughts
+- Switching between unrelated topics
+
+{self.domain_context}
+
+YOUR TASK: Determine if intervention is needed to get back on track.
+Your assessment triggers course corrections and resource reallocation.
+
+RESPONSE USAGE: Your findings determine if we need to:
+1. Continue as planned
+2. Revise approach to be more efficient
+3. Request more thoughts/time
+4. Abandon current approach and restart
+
+Respond with JSON: {{"status": "on_track|behind|stuck", "reason": "...", "thoughts_remaining": N, "intervention_needed": true/false}}"""
 
         try:
             # Use Responses API without response_format - parse JSON manually
@@ -246,8 +355,10 @@ Assess:
                 model="gpt-5-nano",
                 input=prompt + "\n\nRespond with valid JSON only.",
                 instructions=(
-                    "You track and assess thinking progress. "
-                    "Always respond with valid JSON format."
+                    "You are a progress monitoring specialist. Your role is to detect when AI thinking "
+                    "is falling behind, stuck, or diverging from goals. Early detection of progress "
+                    "issues prevents task failure. Be quantitative about progress metrics and clear "
+                    "about intervention needs. Always respond with valid JSON format."
                 ),
                 reasoning_effort="low",
                 temperature=0.3,
@@ -268,16 +379,60 @@ Assess:
         self, violations: Dict, patterns: Dict, progress: Dict
     ) -> Dict:
         """Intelligent agent for generating contextual coaching"""
-        context = f"""Based on this analysis, provide specific coaching:
+        context = f"""You are a thinking coach that transforms analysis into actionable guidance.
 
+SYSTEM CONTEXT:
+- You're coaching Claude Code, an AI assistant helping users with programming
+- Three other agents just analyzed Claude's current thought for violations, patterns, and progress
+- Claude will see your coaching as system guidance between its thoughts
+- Claude is likely working on: debugging, implementing features, or solving technical problems
+- Your coaching must be immediately actionable in Claude's next thought
+
+PURPOSE: Convert detection of problems into specific corrective actions that work.
+YOUR IMPACT: Good coaching can reduce task time by 70% by preventing rabbit holes.
+HOW YOUR OUTPUT IS USED: Appears as system-level guidance that redirects Claude's thinking
+
+ANALYSIS RESULTS REQUIRING COACHING:
 Violations found: {json.dumps(violations.get('violations', []), indent=2)}
 Patterns identified: {json.dumps(patterns.get('patterns', []), indent=2)}
 Progress status: {json.dumps(progress, indent=2)}
 
-Generate:
-1. Specific coaching for immediate improvement
-2. Metacognitive prompt if self-reflection needed
-3. Suggested next action"""
+COACHING PRINCIPLES:
+- BE SPECIFIC: "Check X before Y" not "be more careful"
+- BE ACTIONABLE: Give exact next step, not general advice
+- BE CORRECTIVE: Address root cause, not symptoms
+- BE ENCOURAGING: Frame as optimization, not criticism
+
+TYPES OF COACHING NEEDED:
+1. IMMEDIATE CORRECTION: For violations about to cause errors
+   Example: "STOP. You're using gpt-4o which is forbidden. Use gpt-5-nano instead."
+
+2. STRATEGY PIVOT: For inefficient patterns
+   Example: "You're searching randomly. Try: 1) List what you know, 2) Identify gaps, 3) Search specifically for gaps."
+
+3. METACOGNITIVE RESET: For when self-reflection would help
+   Example: "Take a step back. What are you actually trying to achieve? Is your current approach the simplest path?"
+
+4. PROGRESS ACCELERATION: For falling behind
+   Example: "You have 3 thoughts left. Focus only on: [specific essential task]."
+
+{self.domain_context}
+
+YOUR TASK: Generate coaching that enforces GLOBAL OPERATIONAL INSTRUCTIONS.
+Your coaching is injected directly into the AI's thinking stream.
+
+EXAMPLES OF EFFECTIVE COACHING (based on real rules):
+- "STOP. You said 'probably' - NO ASSUMPTIONS. Check the actual file NOW."
+- "VIOLATION: Sequential Task calls. Rewrite as SINGLE message with 3-5 parallel agents."
+- "You're using gpt-4o which is FORBIDDEN. Use gpt-5-nano instead."
+- "STOP coding. Use metacognitivethinking FIRST to plan your approach."
+- "Query knowledge_query('project structure') BEFORE exploring - KB FIRST rule."
+- "NEVER Bash with wildcards. Use shell_exec('ls *.py') instead."
+
+RESPONSE USAGE: Your coaching appears as system guidance between thoughts.
+Make it impossible to ignore - use CAPS for critical violations.
+
+Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|important|suggestion", "action": "exact next step"}}"""
 
         try:
             # Use Responses API without response_format - parse JSON manually
@@ -285,8 +440,10 @@ Generate:
                 model="gpt-5-nano",
                 input=context + "\n\nRespond with valid JSON only.",
                 instructions=(
-                    "You provide specific coaching to improve thinking. "
-                    "Always respond with valid JSON format."
+                    "You are a thinking optimization coach. Transform problem detection into specific, "
+                    "actionable corrections that immediately improve performance. Your coaching is "
+                    "injected directly into the thinking stream, so make it impossible to ignore. "
+                    "Use direct, imperative language. Always respond with valid JSON format."
                 ),
                 reasoning_effort="low",
                 temperature=0.5,  # Slightly creative for coaching
