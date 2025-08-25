@@ -881,8 +881,8 @@ Respond with JSON: {{"status": "on_track|behind|stuck|diverging|accelerating", "
             thought_number, total_thoughts
         )
 
-        # Truncate thought for speed - coaching doesn't need full context
-        truncated_thought = thought[:500] if len(thought) > 500 else thought
+        # Truncate thought if extremely long, but keep enough context
+        truncated_thought = thought[:1500] if len(thought) > 1500 else thought
 
         context = f"""You are the synthesis coach transforming feedback into actionable wisdom.
 
@@ -891,17 +891,25 @@ SYSTEM CONTEXT:
 - Current work phase: {phase}
 - Progress: thought {thought_number} of {total_thoughts}
 - Your coaching appears as system-level guidance between thoughts
+- Claude is likely working on: debugging, implementing features, or solving technical problems
+- The other agents (violations detector, pattern advisor, progress optimizer) are analyzing in parallel
 
 PURPOSE: Provide immediate, actionable guidance based on the current thought.
 YOUR IMPACT: Good coaching can reduce task time by 70% by preventing rabbit holes.
 
 {progression_context}
 
-CURRENT THOUGHT:
+CURRENT THOUGHT BEING ANALYZED:
 {truncated_thought}
 
 PHASE-SPECIFIC FOCUS for {phase}:
 {self.get_phase_coaching_focus(phase)}
+
+Based on this thought, anticipate likely issues:
+- If it mentions assumptions, warn about NO_ASSUMPTIONS rule
+- If it shows uncertainty, suggest concrete verification steps
+- If it's repetitive, propose alternative approaches
+- If it's making progress, reinforce good patterns
 
 COACHING PRINCIPLES:
 - BE SPECIFIC: "Check X before Y" not "be more careful"
@@ -928,10 +936,12 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
                 model="gpt-5-nano",
                 input=context + "\n\nRespond with valid JSON only.",
                 instructions=(
-                    "You are the SYNTHESIZER - blending enforcement with creativity. You see input from the enforcer, "
-                    "pattern advisor, and progress optimizer. Your job is to create ACTIONABLE SYNTHESIS: take the "
-                    "violations and transform them into opportunities, take the patterns and make them concrete, "
-                    "take the progress issues and chart a clear path. Be both firm and inspiring. Always respond with valid JSON."
+                    "You are the COACHING SYNTHESIZER providing real-time guidance. While other agents detect violations and patterns, "
+                    "you provide IMMEDIATE ACTIONABLE GUIDANCE based on the current thought. Your role is to anticipate problems "
+                    "before they happen, suggest better approaches when you see inefficiency brewing, and reinforce good patterns "
+                    "when you see them. You're not waiting for violation reports - you're PREVENTING violations by coaching proactively. "
+                    "Be specific, actionable, and creative. Transform potential issues into opportunities for better solutions. "
+                    "Always respond with valid JSON."
                 ),
                 reasoning_effort="low",
             )
