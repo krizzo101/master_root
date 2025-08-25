@@ -175,21 +175,19 @@ class ThinkingServer:
                     session_id=self.session_id,
                 )
 
-                # Include results only if analysis was performed and found something
-                if not triage_result.get("skipped"):
-                    # Full analysis was performed
-                    if (
-                        triage_result.get("violations")
-                        or triage_result.get("patterns")
-                        or triage_result.get("coaching")
-                        or triage_result.get("metacognitive_prompt")
-                    ):
-                        response["triage"] = triage_result
-                        # Add metacognitive prompt if provided
-                        if triage_result.get("metacognitive_prompt"):
-                            response["metacognitivePrompt"] = triage_result[
-                                "metacognitive_prompt"
-                            ]
+                # Include results if analysis found something meaningful
+                if (
+                    triage_result.get("violations")
+                    or triage_result.get("patterns")
+                    or triage_result.get("coaching")
+                    or triage_result.get("metacognitive_prompt")
+                ):
+                    response["triage"] = triage_result
+                    # Add metacognitive prompt if provided
+                    if triage_result.get("metacognitive_prompt"):
+                        response["metacognitivePrompt"] = triage_result[
+                            "metacognitive_prompt"
+                        ]
 
             except Exception as e:
                 response["triageError"] = str(e)

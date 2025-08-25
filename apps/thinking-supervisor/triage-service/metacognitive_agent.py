@@ -535,54 +535,9 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
         # Combine instructions with lessons for agents
         full_context = instructions + lessons
 
-        # Quick exit if not enough history for meaningful analysis
-        if len(thought_history) < 3 and not any(
-            trigger in thought.lower()
-            for trigger in ["probably", "maybe", "i think", "fallback", "workaround"]
-        ):
-            # Not enough context and no red flags - skip analysis
-            return {
-                "thought_number": thought_number,
-                "analysis_time": 0,
-                "skipped": True,
-                "reason": "Insufficient context for meaningful analysis",
-            }
-
-        # Intelligent decision: Should we run full analysis?
-        # Run if: violations likely, patterns emerging, progress issues, or periodic check
-        should_analyze_fully = (
-            thought_number % 5 == 0  # Periodic deep check
-            or thought_number > total_thoughts + 3  # Way over estimate
-            or any(
-                flag in thought.lower()
-                for flag in [
-                    "probably",
-                    "maybe",
-                    "fallback",
-                    "workaround",
-                    "let me try",
-                    "not sure",
-                    "might work",
-                    "hopefully",
-                    "i think",
-                ]
-            )
-            or (
-                len(thought_history) > 10
-                and self._detect_repetition_quick(thought_history)
-            )
-        )
-
-        if not should_analyze_fully:
-            # Quick surface check only
-            return {
-                "thought_number": thought_number,
-                "analysis_time": 0,
-                "skipped": True,
-                "reason": "No intervention needed",
-            }
-
-        # Launch FULL parallel analysis when needed
+        # Always run full analysis - let the agents be intelligent about what to report
+        # No keyword matching, no arbitrary skip logic
+        # If token usage becomes an issue, we can add INTELLIGENT skip logic later
         print("🧠 Launching parallel metacognitive analysis...", file=sys.stderr)
 
         tasks = await asyncio.gather(
