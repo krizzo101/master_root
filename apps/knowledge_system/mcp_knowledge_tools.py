@@ -443,6 +443,22 @@ class EnhancedKnowledgeStore:
                         logger.info(
                             f"Marking {len(superseded_ids)} entries as superseded by {knowledge_id}"
                         )
+                        
+                        # First, verify these nodes exist
+                        verify_query = """
+                        MATCH (k:Knowledge)
+                        WHERE k.knowledge_id IN $ids
+                        RETURN k.knowledge_id as id, k.content as content
+                        """
+                        verify_result = session.run(verify_query, {"ids": superseded_ids})
+                        existing_nodes = list(verify_result)
+                        logger.info(f"Found {len(existing_nodes)} nodes to deprecate out of {len(superseded_ids)} IDs")
+                        for node in existing_nodes:
+                            logger.info(f"  - Node {node['id'][:8]}... exists with content: {node['content'][:50]}...")
+                        
+                        if not existing_nodes:
+                            logger.error(f"WARNING: None of the superseded IDs exist in the database! IDs: {superseded_ids}")
+                        
                         deprecate_query = """
                         MATCH (k:Knowledge)
                         WHERE k.knowledge_id IN $ids
@@ -459,6 +475,16 @@ class EnhancedKnowledgeStore:
                         logger.info(
                             f"Successfully marked {deprecated_count} entries as deprecated"
                         )
+                        
+                        # Verify the deprecation actually worked
+                        verify_deprecation = """
+                        MATCH (k:Knowledge)
+                        WHERE k.knowledge_id IN $ids
+                        RETURN k.knowledge_id as id, k.deprecated as deprecated, k.superseded_by as superseded_by
+                        """
+                        verify_dep_result = session.run(verify_deprecation, {"ids": superseded_ids})
+                        for record in verify_dep_result:
+                            logger.info(f"Verification - ID: {record['id'][:8]}..., deprecated: {record['deprecated']}, superseded_by: {record['superseded_by'][:8] if record['superseded_by'] else 'None'}...")
 
                     # Create relationships
                     if structured.related_to:
