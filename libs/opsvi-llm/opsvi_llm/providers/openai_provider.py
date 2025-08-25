@@ -514,8 +514,24 @@ class OpenAIProvider(BaseLLMProvider):
         create_params = {
             "model": model,
             "input": input,
-            "temperature": temperature,
         }
+
+        # Add temperature only for non-reasoning models
+        # GPT-5 series and O-series models don't support temperature
+        reasoning_models = [
+            "gpt-5",
+            "gpt-5-mini",
+            "gpt-5-nano",
+            "o3",
+            "o4-mini",
+            "o1",
+            "o1-mini",
+        ]
+        if (
+            not any(model.startswith(rm) for rm in reasoning_models)
+            and temperature is not None
+        ):
+            create_params["temperature"] = temperature
 
         # Add optional parameters
         if instructions:
