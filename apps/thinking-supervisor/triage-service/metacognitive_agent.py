@@ -150,13 +150,8 @@ Identify specific violations with evidence."""
         try:
             response = await self.interface.responses_create(
                 model="gpt-5-nano",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You detect violations of operational rules in thinking patterns.",  # noqa: E501
-                    },
-                    {"role": "user", "content": prompt},
-                ],
+                input=prompt,
+                instructions="You detect violations of operational rules in thinking patterns.",
                 reasoning_effort="low",
                 temperature=0.3,
                 max_completion_tokens=400,
@@ -198,13 +193,8 @@ Identify patterns:
         try:
             response = await self.interface.responses_create(
                 model="gpt-5-nano",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You identify patterns in thinking sequences.",
-                    },
-                    {"role": "user", "content": prompt},
-                ],
+                input=prompt,
+                instructions="You identify patterns in thinking sequences.",
                 reasoning_effort="medium",  # Higher reasoning for pattern detection
                 temperature=0.4,
                 max_completion_tokens=300,
@@ -235,13 +225,8 @@ Assess:
         try:
             response = await self.interface.responses_create(
                 model="gpt-5-nano",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You track and assess thinking progress.",
-                    },
-                    {"role": "user", "content": prompt},
-                ],
+                input=prompt,
+                instructions="You track and assess thinking progress.",
                 reasoning_effort="low",
                 temperature=0.3,
                 max_completion_tokens=200,
@@ -270,13 +255,8 @@ Generate:
         try:
             response = await self.interface.responses_create(
                 model="gpt-5-nano",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You provide specific coaching to improve thinking.",
-                    },
-                    {"role": "user", "content": context},
-                ],
+                input=context,
+                instructions="You provide specific coaching to improve thinking.",
                 reasoning_effort="low",
                 temperature=0.5,  # Slightly creative for coaching
                 max_completion_tokens=300,
