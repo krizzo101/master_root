@@ -220,6 +220,18 @@ SPECIFIC VIOLATIONS FROM OPERATIONAL INSTRUCTIONS:
 
         return ""
 
+    def get_phase_coaching_focus(self, phase: str) -> str:
+        """Get phase-specific coaching focus"""
+        phase_focus = {
+            "design": "- Encourage clear architectural decisions\n- Validate assumptions with research\n- Consider edge cases early",
+            "implementation": "- Ensure files are read before editing\n- Validate changes with tests\n- Follow existing patterns",
+            "debugging": "- Form clear hypotheses\n- Test one variable at a time\n- Check error messages carefully",
+            "research": "- Time-box investigations\n- Synthesize findings clearly\n- Document sources",
+            "review": "- Check for completeness\n- Validate against requirements\n- Run final tests",
+            "auto": "- Stay focused on the task\n- Avoid unnecessary complexity\n- Test assumptions",
+        }
+        return phase_focus.get(phase, phase_focus["auto"])
+
     def get_phase_rules(self, phase: str) -> str:
         """Get phase-specific rule adjustments"""
         phase_rules = {
@@ -797,34 +809,40 @@ Respond with JSON: {{"status": "on_track|behind|stuck|diverging|accelerating", "
             return {"error": str(e), "status": "unknown"}
 
     async def generate_coaching(
-        self, violations: Dict, patterns: Dict, progress: Dict
+        self,
+        thought: str,
+        thought_number: int,
+        total_thoughts: int,
+        phase: str,
+        thought_data: Any = None,
     ) -> Dict:
-        """Intelligent agent for generating contextual coaching"""
+        """Intelligent agent for generating contextual coaching - runs in parallel"""
 
-        # Extract thought progression info from progress data if available
-        thought_number = progress.get("thought_number", 1)
-        total_thoughts = progress.get("total_thoughts", 1)
         progression_context = self._get_thought_progression_context(
             thought_number, total_thoughts
         )
+
+        # Truncate thought for speed - coaching doesn't need full context
+        truncated_thought = thought[:500] if len(thought) > 500 else thought
 
         context = f"""You are the synthesis coach transforming feedback into actionable wisdom.
 
 SYSTEM CONTEXT:
 - You're coaching Claude Code, an AI assistant helping with programming
-- Three agents analyzed Claude's current thought for violations, patterns, and progress
+- Current work phase: {phase}
+- Progress: thought {thought_number} of {total_thoughts}
 - Your coaching appears as system-level guidance between thoughts
-- Claude is likely working on: debugging, implementing features, or solving technical problems
 
-PURPOSE: Convert detection of problems into specific corrective actions.
+PURPOSE: Provide immediate, actionable guidance based on the current thought.
 YOUR IMPACT: Good coaching can reduce task time by 70% by preventing rabbit holes.
 
 {progression_context}
 
-ANALYSIS RESULTS:
-Violations: {len(violations.get('violations', []))} found
-Patterns: {len(patterns.get('patterns', []))} identified
-Progress: {progress.get('status', 'unknown')}
+CURRENT THOUGHT:
+{truncated_thought}
+
+PHASE-SPECIFIC FOCUS for {phase}:
+{self.get_phase_coaching_focus(phase)}
 
 COACHING PRINCIPLES:
 - BE SPECIFIC: "Check X before Y" not "be more careful"
@@ -970,7 +988,10 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
         # Serialize thought history for progress agent (which expects strings)
         serialized_history = self._serialize_thought_history(recent_thoughts)
 
-        # Parallel execution with timing
+        # Get phase for coaching
+        phase = self.auto_detect_phase(thought_data) if thought_data else "auto"
+
+        # ALL FOUR agents run in parallel now - coaching doesn't wait for others
         tasks = await asyncio.gather(
             timed_agent(
                 self.analyze_violations,
@@ -992,32 +1013,32 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
                 serialized_history,
                 thought_data,
             ),
+            timed_agent(
+                self.generate_coaching,
+                "coaching",
+                thought,
+                thought_number,
+                total_thoughts,
+                phase,
+                thought_data,
+            ),
             return_exceptions=True,
         )
 
-        violations_result, patterns_result, progress_result = tasks
+        violations_result, patterns_result, progress_result, coaching_result = tasks
 
         # Handle any errors
-        for i, result in enumerate(
-            [violations_result, patterns_result, progress_result]
+        for i, (name, result) in enumerate(
+            [
+                ("violations", violations_result),
+                ("patterns", patterns_result),
+                ("progress", progress_result),
+                ("coaching", coaching_result),
+            ]
         ):
             if isinstance(result, Exception):
-                print(f"❌ Task {i} failed: {result}", file=sys.stderr)
+                print(f"❌ {name} agent failed: {result}", file=sys.stderr)
                 tasks[i] = {"error": str(result)}
-
-        # Generate coaching based on all analyses with timing
-        coaching_start = time.time()
-        coaching_result = await self.generate_coaching(
-            violations_result if not isinstance(violations_result, Exception) else {},
-            patterns_result if not isinstance(patterns_result, Exception) else {},
-            progress_result if not isinstance(progress_result, Exception) else {},
-        )
-        coaching_elapsed = time.time() - coaching_start
-        timing_results["coaching"] = {
-            "elapsed": round(coaching_elapsed, 3),
-            "success": True,
-            "error": None,
-        }
 
         total_elapsed = time.time() - start_time
 

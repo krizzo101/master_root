@@ -1,0 +1,150 @@
+{
+  "mcpServers": {
+    "// === EXISTING SERVERS ===": "Keep all existing servers from .mcp.json",
+
+    "// === FILE & PROJECT MANAGEMENT ===": "",
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/opsvi/master_root"]
+    },
+
+    "// === VERSION CONTROL ===": "",
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git", "--repository", "/home/opsvi/master_root"]
+    },
+
+    "// === DATABASES ===": "",
+    "sqlite": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sqlite", "--db-path", "/home/opsvi/master_root/data.db"]
+    },
+
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/dbname"
+      }
+    },
+
+    "// === MONITORING & OBSERVABILITY ===": "",
+    "sentry": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sentry"],
+      "env": {
+        "SENTRY_API_KEY": "your-sentry-api-key",
+        "SENTRY_ORG": "your-org",
+        "SENTRY_PROJECT": "your-project"
+      }
+    },
+
+    "// === CLOUD SERVICES ===": "",
+    "aws": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-aws"],
+      "env": {
+        "AWS_ACCESS_KEY_ID": "your-access-key",
+        "AWS_SECRET_ACCESS_KEY": "your-secret-key",
+        "AWS_REGION": "us-east-1"
+      }
+    },
+
+    "google-cloud": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-gcp"],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "/path/to/service-account.json"
+      }
+    },
+
+    "// === COMMUNICATION ===": "",
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "xoxb-your-token",
+        "SLACK_APP_TOKEN": "xapp-your-token"
+      }
+    },
+
+    "email": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-email"],
+      "env": {
+        "EMAIL_SERVER": "smtp.gmail.com",
+        "EMAIL_PORT": "587",
+        "EMAIL_USER": "your-email@gmail.com",
+        "EMAIL_PASSWORD": "your-app-password"
+      }
+    },
+
+    "// === AI & ML ===": "",
+    "openai": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-openai"],
+      "env": {
+        "OPENAI_API_KEY": "sk-your-key"
+      }
+    },
+
+    "langchain": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-langchain"],
+      "env": {
+        "LANGCHAIN_API_KEY": "your-key"
+      }
+    },
+
+    "// === DOCUMENTATION ===": "",
+    "confluence": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-confluence"],
+      "env": {
+        "CONFLUENCE_URL": "https://your-domain.atlassian.net",
+        "CONFLUENCE_USER": "your-email",
+        "CONFLUENCE_API_TOKEN": "your-token"
+      }
+    },
+
+    "// === TESTING & QA ===": "",
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-playwright"]
+    },
+
+    "jest": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-jest", "--project", "/home/opsvi/master_root"]
+    },
+
+    "// === CUSTOM MCP SERVERS ===": "",
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+
+    "puppeteer": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"]
+    },
+
+    "youtube": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-youtube"],
+      "env": {
+        "YOUTUBE_API_KEY": "your-youtube-api-key"
+      }
+    },
+
+    "reddit": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-reddit"],
+      "env": {
+        "REDDIT_CLIENT_ID": "your-client-id",
+        "REDDIT_CLIENT_SECRET": "your-secret",
+        "REDDIT_USER_AGENT": "your-app-name"
+      }
+    }
+  }
+}
