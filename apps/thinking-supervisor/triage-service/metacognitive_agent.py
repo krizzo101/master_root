@@ -143,6 +143,41 @@ SPECIFIC VIOLATIONS FROM OPERATIONAL INSTRUCTIONS:
 
         return "Core rules: No assumptions, fix root causes, no fallbacks, be expert advisor"
 
+    async def load_lessons(self) -> str:
+        """Load user corrections and lessons learned from KB"""
+        if not self.query_tool:
+            return ""
+
+        try:
+            # Query for user corrections and lessons
+            result = await self.query_tool.execute_query(
+                query_type="search",
+                search_text="user-correction lesson-learned",
+                limit=10,
+            )
+
+            lessons = []
+            for item in result.get("results", []):
+                content = item.get("content", "")
+                if "LESSON:" in content or "WHAT I DID WRONG:" in content:
+                    # Extract just the key lesson
+                    lines = content.split("\n")
+                    for line in lines:
+                        if (
+                            "WHAT I DID WRONG:" in line
+                            or "HOW TO NOT DO IT AGAIN:" in line
+                        ):
+                            lessons.append(line.strip())
+
+            if lessons:
+                return "\n\nPREVIOUS CORRECTIONS TO WATCH FOR:\n" + "\n".join(
+                    lessons[:5]
+                )
+        except Exception as e:
+            print(f"Lessons load failed: {e}", file=sys.stderr)
+
+        return ""
+
     async def analyze_violations(
         self, thought: str, recent_thoughts: List[str], instructions: str
     ) -> Dict:
@@ -481,8 +516,12 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
             else:  # Dict format
                 recent_thoughts.append(t.get("thought", ""))
 
-        # Load instructions (cached)
+        # Load instructions and lessons (cached)
         instructions = await self.load_instructions()
+        lessons = await self.load_lessons()
+
+        # Combine instructions with lessons for agents
+        full_context = instructions + lessons
 
         # Quick exit if not enough history for meaningful analysis
         if len(thought_history) < 3 and not any(
@@ -535,7 +574,7 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
         print("🧠 Launching parallel metacognitive analysis...", file=sys.stderr)
 
         tasks = await asyncio.gather(
-            self.analyze_violations(thought, recent_thoughts, instructions),
+            self.analyze_violations(thought, recent_thoughts, full_context),
             self.analyze_patterns(thought, pattern_window),
             self.analyze_progress(
                 thought_number, total_thoughts, thought, recent_thoughts
