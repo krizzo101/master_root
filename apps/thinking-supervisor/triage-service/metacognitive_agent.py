@@ -239,6 +239,111 @@ PHASE: REVIEW - Verify completeness
         }
         return phase_rules.get(phase, "")
 
+    def calculate_risk_score(
+        self, violations: List[Dict], patterns: List[Dict], progress: Dict, phase: str
+    ) -> Dict:
+        """Calculate risk score from 0-100 based on violations, patterns, and phase"""
+        # Base weights for different rule violations
+        violation_weights = {
+            "NO_ASSUMPTIONS": 30,
+            "NO_FALLBACKS": 25,
+            "THINKING_MANDATORY": 20,
+            "TASK_MANDATORY": 15,
+            "MODELS_2025": 35,  # Critical - using wrong model
+            "KB_FIRST": 10,
+            "GLOB_HANDLING": 15,
+        }
+
+        # Phase modifiers (multiply base weight)
+        phase_modifiers = {
+            "design": {
+                "NO_ASSUMPTIONS": 0.5,  # More lenient in design
+                "NO_FALLBACKS": 0.7,
+                "THINKING_MANDATORY": 1.5,  # More important in design
+            },
+            "implementation": {
+                "NO_ASSUMPTIONS": 1.5,  # Strict in implementation
+                "NO_FALLBACKS": 1.3,
+                "KB_FIRST": 0.8,
+            },
+            "debugging": {
+                "NO_ASSUMPTIONS": 0.8,  # Some assumptions OK for hypotheses
+                "THINKING_MANDATORY": 1.2,
+            },
+            "research": {
+                "NO_ASSUMPTIONS": 0.3,  # Very lenient in research
+                "KB_FIRST": 1.5,  # More important to check KB
+            },
+            "review": {
+                "NO_ASSUMPTIONS": 1.0,
+                "NO_FALLBACKS": 1.0,
+            },
+        }
+
+        total_score = 0
+        details = []
+
+        # Score violations
+        for violation in violations:
+            rule = violation.get("rule", "")
+            base_weight = violation_weights.get(rule, 10)
+
+            # Apply phase modifier if available
+            modifier = phase_modifiers.get(phase, {}).get(rule, 1.0)
+            adjusted_weight = base_weight * modifier
+
+            total_score += adjusted_weight
+            details.append(
+                {
+                    "rule": rule,
+                    "base_weight": base_weight,
+                    "phase_modifier": modifier,
+                    "contribution": adjusted_weight,
+                }
+            )
+
+        # Add pattern-based risk
+        for pattern in patterns:
+            impact = pattern.get("impact", "medium")
+            pattern_score = {"high": 20, "medium": 10, "low": 5}.get(impact, 5)
+            total_score += pattern_score
+            details.append(
+                {
+                    "pattern": pattern.get("type"),
+                    "impact": impact,
+                    "contribution": pattern_score,
+                }
+            )
+
+        # Add progress-based risk
+        status = progress.get("status", "unknown")
+        if status == "stuck":
+            total_score += 25
+            details.append({"progress": "stuck", "contribution": 25})
+        elif status == "behind":
+            total_score += 15
+            details.append({"progress": "behind", "contribution": 15})
+
+        # Cap at 100
+        total_score = min(100, total_score)
+
+        # Determine severity
+        if total_score >= 70:
+            severity = "critical"
+        elif total_score >= 40:
+            severity = "high"
+        elif total_score >= 20:
+            severity = "medium"
+        else:
+            severity = "low"
+
+        return {
+            "score": total_score,
+            "severity": severity,
+            "details": details,
+            "phase_context": phase,
+        }
+
     async def analyze_violations(
         self,
         thought: str,
@@ -253,18 +358,18 @@ PHASE: REVIEW - Verify completeness
         )
         phase_rules = self.get_phase_rules(phase)
 
-        prompt = f"""You are a quality control agent preventing AI errors before they cascade into failures.
+        prompt = f"""You are a rule enforcement specialist protecting against cascading failures.
 
 SYSTEM CONTEXT:
 - You're analyzing the internal thinking of Claude Code, an AI programming assistant
 - Claude uses a 'metacognitivethinking' tool to track its reasoning step-by-step
 - Each 'thought' is one step in Claude's problem-solving process
 - Claude is helping users with programming tasks (debugging, implementing features, etc.)
-- Your analysis runs IN PARALLEL with every thought to catch problems immediately
+- Your analysis runs IN PARALLEL with every thought to provide real-time guidance
 
-PURPOSE: Catch violations early to prevent wasted time, incorrect solutions, and technical debt.
-YOUR IMPACT: Each violation you catch saves 5-10 minutes of misdirected effort.
-HOW YOUR OUTPUT IS USED: Gets injected as corrective guidance between Claude's thoughts
+PURPOSE: Catch violations BEFORE they cascade into wasted effort and incorrect solutions.
+YOUR IMPACT: Each violation you catch prevents 5-10 minutes of misdirected work.
+HOW YOUR OUTPUT IS USED: Provides advisory guidance that Claude can consider in subsequent thoughts
 
 Current thought being analyzed: {thought}
 {f"Work phase: {phase.upper()}" if phase != "unknown" else ""}
@@ -288,19 +393,19 @@ CRITICAL RULES TO ENFORCE (from GLOBAL OPERATIONAL INSTRUCTIONS):
 
 {self.domain_context}
 
-YOUR TASK: Identify violations that WILL cause problems if not corrected immediately.
-Focus on violations that are about to cause the AI to:
-1. Make assumptions ("This probably means...") instead of checking facts
-2. Use workarounds ("A simpler alternative would be...") instead of fixing properly
-3. Skip thinking (jumping straight to code without metacognitivethinking)
-4. Use sequential operations instead of parallel (multiple messages vs single batched)
-5. Use forbidden models (gpt-4o) or tools (Bash with wildcards)
-6. Explore code without querying KB first (diving in blind)
+YOUR TASK: Identify risks and suggest alternative approaches that could be more effective.
+Consider these areas for improvement:
+1. Unverified assumptions - suggest specific ways to validate them
+2. Potential workarounds - propose robust long-term solutions
+3. Process improvements - recommend thinking strategies that could help
+4. Efficiency opportunities - suggest parallel operations or batching
+5. Tool selection - recommend better tools or models for the task
+6. Knowledge gaps - identify what information could help make better decisions
 
-RESPONSE USAGE: Your findings trigger immediate corrective guidance to redirect thinking.
-Be specific - vague warnings are ignored. Point to exact phrases and explain consequences.
+RESPONSE USAGE: Your suggestions help Claude consider alternative approaches.
+Be constructive - offer specific alternatives, not just critiques.
 
-Respond with JSON: {{"violations": [{{"rule": "NO_ASSUMPTIONS|NO_FALLBACKS|THINKING_MANDATORY|TASK_MANDATORY|MODELS_2025|KB_FIRST|GLOB_HANDLING", "evidence": "exact quote from thought", "consequence": "specific failure this causes"}}], "severity": "critical|high|medium|low"}}"""
+Respond with JSON: {{"violations": [{{"rule": "NO_ASSUMPTIONS|NO_FALLBACKS|THINKING_MANDATORY|TASK_MANDATORY|MODELS_2025|KB_FIRST|GLOB_HANDLING", "evidence": "exact quote from thought", "consequence": "specific failure this causes", "suggestion": "specific alternative approach"}}], "severity": "critical|high|medium|low", "creative_alternatives": ["list of innovative approaches to consider"]}}"""
 
         try:
             # Use Responses API without response_format - parse JSON manually
@@ -308,10 +413,10 @@ Respond with JSON: {{"violations": [{{"rule": "NO_ASSUMPTIONS|NO_FALLBACKS|THINK
                 model="gpt-5-nano",
                 input=prompt + "\n\nRespond with valid JSON only.",
                 instructions=(
-                    "You are a proactive error prevention system. Your job is to catch violations "
-                    "BEFORE they cascade into failures. Each violation you catch saves significant "
-                    "debugging time. Be specific about what rule was violated and why it matters. "
-                    "Always respond with valid JSON format."
+                    "You are primarily an ENFORCER - a guardian preventing critical failures. Your main job is "
+                    "catching violations of core rules (NO_ASSUMPTIONS, NO_FALLBACKS, etc) before they cascade. "
+                    "Be firm and direct about violations. You CAN suggest fixes, but your priority is CATCHING "
+                    "problems early. Think of yourself as a safety net. Always respond with valid JSON format."
                 ),
                 reasoning_effort="low",
             )
@@ -342,7 +447,7 @@ Respond with JSON: {{"violations": [{{"rule": "NO_ASSUMPTIONS|NO_FALLBACKS|THINK
                 thought_text = t.get("thought", "")[:100]
             pattern_summary.append(f"Thought {num}: {thought_text}...")
 
-        prompt = f"""You are a pattern recognition specialist identifying inefficient thinking loops that waste time.
+        prompt = f"""You are a creative pattern analyst discovering hidden opportunities and innovative solutions.
 
 SYSTEM CONTEXT:
 - You're analyzing Claude Code's thinking patterns (an AI programming assistant)
@@ -382,7 +487,7 @@ RESPONSE USAGE: Your findings determine if the AI needs to:
 3. Get user clarification
 4. Break down the problem differently
 
-Respond with JSON: {{"patterns": [{{"type": "...", "evidence": "...", "impact": "high|medium|low"}}], "recommendation": "continue|reset|clarify"}}"""
+Respond with JSON: {{"patterns": [{{"type": "...", "evidence": "...", "impact": "high|medium|low", "creative_solution": "innovative approach to leverage or break pattern"}}], "recommendation": "continue|reset|clarify", "novel_approaches": ["unexpected solutions to consider"]}}"""
 
         try:
             # Use Responses API without response_format - parse JSON manually
@@ -390,10 +495,10 @@ Respond with JSON: {{"patterns": [{{"type": "...", "evidence": "...", "impact": 
                 model="gpt-5-nano",
                 input=prompt + "\n\nRespond with valid JSON only.",
                 instructions=(
-                    "You are a metacognitive pattern analyst. Your role is to identify thinking "
-                    "patterns that indicate the AI is stuck, confused, or inefficient. Each pattern "
-                    "you identify helps break loops and redirect effort productively. Focus on "
-                    "actionable patterns that require intervention. Always respond with valid JSON."
+                    "You are primarily a CREATIVE ADVISOR - a pattern whisperer who sees the bigger picture. "
+                    "While you identify problematic patterns (loops, thrashing), your strength is DISCOVERING "
+                    "hidden connections and suggesting innovative approaches. Propose unexpected solutions, "
+                    "alternative architectures, and creative pivots others might miss. Always respond with valid JSON."
                 ),
                 reasoning_effort="medium",  # Higher reasoning for pattern detection
             )
@@ -417,7 +522,7 @@ Respond with JSON: {{"patterns": [{{"type": "...", "evidence": "...", "impact": 
         thought_data: Any = None,
     ) -> Dict:
         """Intelligent agent for progress tracking"""
-        prompt = f"""You are a progress tracker identifying when AI thinking is going off track.
+        prompt = f"""You are a strategic progress optimizer finding faster, better paths to completion.
 
 SYSTEM CONTEXT:
 - You're monitoring Claude Code's progress through a programming task
@@ -436,7 +541,7 @@ Progress ratio: {thought_number}/{total_thoughts} = {thought_number/max(total_th
 Current thought: {thought}
 
 Recent progress (last 3 thoughts):
-{chr(10).join(history[-3:])}
+{chr(10).join(history[-3:]) if history else 'No prior thoughts yet'}
 
 PROGRESS INDICATORS TO ASSESS:
 - ON TRACK: Making steady progress toward goal, thoughts align with plan
@@ -462,7 +567,7 @@ RESPONSE USAGE: Your findings determine if we need to:
 3. Request more thoughts/time
 4. Abandon current approach and restart
 
-Respond with JSON: {{"status": "on_track|behind|stuck", "reason": "...", "thoughts_remaining": N, "intervention_needed": true/false}}"""
+Respond with JSON: {{"status": "on_track|behind|stuck", "reason": "...", "thoughts_remaining": N, "intervention_needed": true/false, "strategic_pivots": ["alternative paths forward"], "parallel_opportunities": ["things to do simultaneously"]}}"""
 
         try:
             # Use Responses API without response_format - parse JSON manually
@@ -470,10 +575,10 @@ Respond with JSON: {{"status": "on_track|behind|stuck", "reason": "...", "though
                 model="gpt-5-nano",
                 input=prompt + "\n\nRespond with valid JSON only.",
                 instructions=(
-                    "You are a progress monitoring specialist. Your role is to detect when AI thinking "
-                    "is falling behind, stuck, or diverging from goals. Early detection of progress "
-                    "issues prevents task failure. Be quantitative about progress metrics and clear "
-                    "about intervention needs. Always respond with valid JSON format."
+                    "You are primarily a STRATEGIC ADVISOR - a progress optimizer finding better paths forward. "
+                    "While you track if we're behind/stuck, your strength is PROPOSING strategic pivots, parallel "
+                    "processing opportunities, and scope optimizations. Suggest ways to accelerate, shortcuts to "
+                    "explore, and resources to leverage. Be encouraging and solution-focused. Always respond with valid JSON."
                 ),
                 reasoning_effort="low",
             )
@@ -483,16 +588,16 @@ Respond with JSON: {{"status": "on_track|behind|stuck", "reason": "...", "though
             return (
                 json.loads(content)
                 if content
-                else {"error": "No content in response", "progress": "unknown"}
+                else {"error": "No content in response", "status": "unknown"}
             )
         except Exception as e:
-            return {"error": str(e), "progress": "unknown"}
+            return {"error": str(e), "status": "unknown"}
 
     async def generate_coaching(
         self, violations: Dict, patterns: Dict, progress: Dict
     ) -> Dict:
         """Intelligent agent for generating contextual coaching"""
-        context = f"""You are a thinking coach that transforms analysis into actionable guidance.
+        context = f"""You are the synthesis coach transforming all feedback into actionable wisdom.
 
 SYSTEM CONTEXT:
 - You're coaching Claude Code, an AI assistant helping users with programming
@@ -509,43 +614,53 @@ ANALYSIS RESULTS REQUIRING COACHING:
 Violations found: {json.dumps(violations.get('violations', []), indent=2)}
 Patterns identified: {json.dumps(patterns.get('patterns', []), indent=2)}
 Progress status: {json.dumps(progress, indent=2)}
+Creative alternatives suggested: {json.dumps(violations.get('creative_alternatives', []), indent=2)}
+Novel approaches from patterns: {json.dumps(patterns.get('novel_approaches', []), indent=2)}
+Strategic pivots available: {json.dumps(progress.get('strategic_pivots', []), indent=2)}
 
 COACHING PRINCIPLES:
 - BE SPECIFIC: "Check X before Y" not "be more careful"
 - BE ACTIONABLE: Give exact next step, not general advice
-- BE CORRECTIVE: Address root cause, not symptoms
-- BE ENCOURAGING: Frame as optimization, not criticism
+- BE CREATIVE: Suggest novel approaches, not just fixes
+- BE COLLABORATIVE: Frame as exploration, not enforcement
+- BE APPRECIATIVE: Acknowledge good patterns and reinforce them
+- BE BALANCED: Mix corrections with encouragement
 
 TYPES OF COACHING NEEDED:
-1. IMMEDIATE CORRECTION: For violations about to cause errors
-   Example: "STOP. You're using gpt-4o which is forbidden. Use gpt-5-nano instead."
+1. GENTLE CORRECTION: For risky assumptions
+   Example: "I notice you said 'probably' - let's verify that by checking the actual file first."
 
-2. STRATEGY PIVOT: For inefficient patterns
-   Example: "You're searching randomly. Try: 1) List what you know, 2) Identify gaps, 3) Search specifically for gaps."
+2. CREATIVE ALTERNATIVES: For inefficient patterns
+   Example: "Instead of searching randomly, consider: 1) Mapping what you know, 2) Identifying specific gaps, 3) Targeted searches."
 
-3. METACOGNITIVE RESET: For when self-reflection would help
-   Example: "Take a step back. What are you actually trying to achieve? Is your current approach the simplest path?"
+3. STRATEGIC INSIGHTS: For better approaches
+   Example: "Have you considered using parallel processing here? You could run these 3 tasks simultaneously."
 
-4. PROGRESS ACCELERATION: For falling behind
-   Example: "You have 3 thoughts left. Focus only on: [specific essential task]."
+4. ENCOURAGING FOCUS: For progress issues
+   Example: "You're making good progress! With 3 thoughts left, prioritizing [specific task] would maximize impact."
+
+5. POSITIVE REINFORCEMENT: For effective patterns
+   Example: "Excellent use of parallel processing! That saved significant time."
+   Example: "Good thinking to check the KB first - that's exactly the right approach."
 
 {self.domain_context}
 
-YOUR TASK: Generate coaching that enforces GLOBAL OPERATIONAL INSTRUCTIONS.
-Your coaching is injected directly into the AI's thinking stream.
+YOUR TASK: Generate balanced coaching that guides toward best practices.
+Blend enforcement of critical rules with appreciation of good patterns.
+Your coaching helps Claude learn and improve, not just comply.
 
-EXAMPLES OF EFFECTIVE COACHING (based on real rules):
-- "STOP. You said 'probably' - NO ASSUMPTIONS. Check the actual file NOW."
-- "VIOLATION: Sequential Task calls. Rewrite as SINGLE message with 3-5 parallel agents."
-- "You're using gpt-4o which is FORBIDDEN. Use gpt-5-nano instead."
-- "STOP coding. Use metacognitivethinking FIRST to plan your approach."
-- "Query knowledge_query('project structure') BEFORE exploring - KB FIRST rule."
-- "NEVER Bash with wildcards. Use shell_exec('ls *.py') instead."
+EXAMPLES OF EFFECTIVE COACHING (collaborative style):
+- "Quick note: 'probably' spotted - let's verify by checking the actual file to be certain."
+- "Opportunity: These tasks could run in parallel - try batching them in a single message."
+- "Heads up: gpt-5-nano would be better than gpt-4o for this task."
+- "Consider: A quick metacognitivethinking step here could clarify the approach."
+- "Pro tip: The KB might have relevant info - try knowledge_query('project structure') first."
+- "Better approach: shell_exec handles wildcards safely - use that instead of Bash."
 
-RESPONSE USAGE: Your coaching appears as system guidance between thoughts.
-Make it impossible to ignore - use CAPS for critical violations.
+RESPONSE USAGE: Your coaching appears as helpful guidance between thoughts.
+Be firm on critical issues but always constructive and solution-focused.
 
-Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|important|suggestion", "action": "exact next step"}}"""
+Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|important|suggestion", "action": "exact next step", "creative_alternative": "innovative approach to try", "metacognitive_prompt": "question to spark new thinking"}}"""
 
         try:
             # Use Responses API without response_format - parse JSON manually
@@ -553,10 +668,10 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
                 model="gpt-5-nano",
                 input=context + "\n\nRespond with valid JSON only.",
                 instructions=(
-                    "You are a thinking optimization coach. Transform problem detection into specific, "
-                    "actionable corrections that immediately improve performance. Your coaching is "
-                    "injected directly into the thinking stream, so make it impossible to ignore. "
-                    "Use direct, imperative language. Always respond with valid JSON format."
+                    "You are the SYNTHESIZER - blending enforcement with creativity. You see input from the enforcer, "
+                    "pattern advisor, and progress optimizer. Your job is to create ACTIONABLE SYNTHESIS: take the "
+                    "violations and transform them into opportunities, take the patterns and make them concrete, "
+                    "take the progress issues and chart a clear path. Be both firm and inspiring. Always respond with valid JSON."
                 ),
                 reasoning_effort="low",
             )
@@ -642,23 +757,45 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
 
         elapsed = time.time() - start_time
 
+        # Extract results
+        violations = (
+            violations_result.get("violations", [])
+            if isinstance(violations_result, dict)
+            else []
+        )
+        patterns = (
+            patterns_result.get("patterns", [])
+            if isinstance(patterns_result, dict)
+            else []
+        )
+        progress = (
+            progress_result
+            if isinstance(progress_result, dict)
+            else {"status": "unknown"}
+        )
+
+        # Get phase from thought_data
+        phase = (
+            getattr(thought_data, "workPhase", "unknown") if thought_data else "unknown"
+        )
+
+        # Calculate risk score
+        risk_assessment = self.calculate_risk_score(
+            violations, patterns, progress, phase
+        )
+
         # Merge all results
         return {
             "thought_number": thought_number,
             "analysis_time": round(elapsed, 2),
-            "violations": violations_result.get("violations", [])
-            if isinstance(violations_result, dict)
-            else [],
-            "patterns": patterns_result.get("patterns", [])
-            if isinstance(patterns_result, dict)
-            else [],
-            "progress": progress_result
-            if isinstance(progress_result, dict)
-            else {"status": "unknown"},
+            "violations": violations,
+            "patterns": patterns,
+            "progress": progress,
+            "risk_assessment": risk_assessment,
             "coaching": coaching_result.get("coaching", "")
             if isinstance(coaching_result, dict)
             else "",
-            "metacognitive_prompt": coaching_result.get("prompt", None)
+            "metacognitive_prompt": coaching_result.get("metacognitive_prompt", None)
             if isinstance(coaching_result, dict)
             else None,
             "suggested_action": coaching_result.get("action", None)
