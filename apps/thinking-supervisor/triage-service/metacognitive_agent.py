@@ -465,7 +465,12 @@ THOUGHT PHASE: FINAL (90-100% complete)
         }
 
     def calculate_risk_score(
-        self, violations: List[Dict], patterns: List[Dict], progress: Dict, phase: str
+        self,
+        violations: List[Dict],
+        patterns: List[Dict],
+        progress: Dict,
+        phase: str,
+        thought_data: Any = None,
     ) -> Dict:
         """Calculate risk score from 0-100 based on violations, patterns, and phase"""
         # Base weights for different rule violations
@@ -562,11 +567,61 @@ THOUGHT PHASE: FINAL (90-100% complete)
         else:
             severity = "low"
 
+        # AUTO-ESCALATION based on context
+        escalation_recommendations = []
+
+        # Low confidence triggers
+        confidence = (
+            getattr(thought_data, "confidenceLevel", None) if thought_data else None
+        )
+        if confidence is not None and confidence < 30:
+            escalation_recommendations.append(
+                {
+                    "agent": "consult",
+                    "reason": f"Confidence very low ({confidence}%)",
+                    "priority": "high",
+                }
+            )
+
+        # Multiple attempts trigger
+        attempt = getattr(thought_data, "attemptNumber", 1) if thought_data else 1
+        if attempt > 3:
+            escalation_recommendations.append(
+                {
+                    "agent": "excellence-optimizer",
+                    "reason": f"Multiple attempts ({attempt}) without success",
+                    "priority": "high",
+                }
+            )
+
+        # Blocker-based triggers
+        blocker = (
+            getattr(thought_data, "currentBlocker", None) if thought_data else None
+        )
+        if blocker:
+            if "permission" in blocker.lower():
+                escalation_recommendations.append(
+                    {
+                        "agent": "requirements-analyst",
+                        "reason": f"Permission/requirements blocker: {blocker[:50]}",
+                        "priority": "medium",
+                    }
+                )
+            elif "understand" in blocker.lower() or "concept" in blocker.lower():
+                escalation_recommendations.append(
+                    {
+                        "agent": "solution-architect",
+                        "reason": f"Conceptual blocker: {blocker[:50]}",
+                        "priority": "high",
+                    }
+                )
+
         return {
             "score": total_score,
             "severity": severity,
             "details": details,
             "phase_context": phase,
+            "escalation_needed": escalation_recommendations,
         }
 
     async def analyze_violations(
@@ -594,6 +649,19 @@ THOUGHT PHASE: FINAL (90-100% complete)
             thought_number, total_thoughts
         )
 
+        # Extract NEW CONTEXT FIELDS
+        user_request = (
+            getattr(thought_data, "userRequest", None) if thought_data else None
+        )
+        confidence = (
+            getattr(thought_data, "confidenceLevel", None) if thought_data else None
+        )
+        attempt = getattr(thought_data, "attemptNumber", 1) if thought_data else 1
+        failures = getattr(thought_data, "previousFailures", []) if thought_data else []
+        blocker = (
+            getattr(thought_data, "currentBlocker", None) if thought_data else None
+        )
+
         prompt = f"""You are a rule enforcement specialist protecting against cascading failures.
 
 SYSTEM CONTEXT:
@@ -607,6 +675,11 @@ YOUR IMPACT: Each violation you catch prevents 5-10 minutes of misdirected work.
 
 Current thought: {thought[:300]}...
 {f"Work phase: {phase.upper()}" if phase != "unknown" else ""}
+{f"User request: {user_request[:200]}" if user_request else "User request: Not provided"}
+{f"Confidence level: {confidence}%" if confidence is not None else ""}
+{f"Attempt #{attempt}" if attempt > 1 else ""}
+{f"Previous failures: {', '.join(failures[:3])}" if failures else ""}
+{f"Current blocker: {blocker}" if blocker else ""}
 
 {phase_rules}
 
@@ -1135,7 +1208,7 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
 
         # Calculate risk score
         risk_assessment = self.calculate_risk_score(
-            violations, patterns, progress, phase
+            violations, patterns, progress, phase, thought_data
         )
 
         # Performance analysis

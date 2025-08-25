@@ -47,6 +47,30 @@ class ThoughtData(BaseModel):
         description="Current work phase: design|implementation|debugging|research|review|auto",
     )
 
+    # MANDATORY CONTEXT FIELDS - Critical for agent understanding
+    userRequest: Optional[str] = Field(
+        None, description="The exact user message that triggered this thought chain"
+    )
+    confidenceLevel: Optional[int] = Field(
+        None,
+        ge=0,
+        le=100,
+        description="Confidence in current approach (0=guessing, 50=uncertain, 100=certain)",
+    )
+    attemptNumber: Optional[int] = Field(
+        1, ge=1, description="Which attempt is this for solving the same problem?"
+    )
+    previousFailures: Optional[List[str]] = Field(
+        default_factory=list, description="List of approaches that have already failed"
+    )
+    currentBlocker: Optional[str] = Field(
+        None, description="What's preventing progress right now?"
+    )
+    evidenceGathered: Optional[List[str]] = Field(
+        default_factory=list,
+        description="Facts/observations supporting the current thought",
+    )
+
     # Optional revision/branching
     isRevision: Optional[bool] = Field(
         None, description="Whether this revises previous thinking"
@@ -106,6 +130,12 @@ class ThinkingServer:
         self.triage_mode = os.getenv("TRIAGE_MODE", "lite")  # lite|full|disabled
         self.session_id = os.getenv("SESSION_ID", "default")
         self.last_triage_time = 0.0  # Track analysis time
+
+        # CONTEXT TRACKING - Auto-populate fields
+        self.current_user_request: Optional[str] = None
+        self.attempt_counters: Dict[str, int] = {}  # Track attempts per problem
+        self.failure_history: Dict[str, List[str]] = {}  # Track failed approaches
+        self.last_confidence: Optional[int] = None  # Track confidence trends
 
     # Metacognitive prompts now come from intelligent agent, not hardcoded
 
@@ -175,6 +205,23 @@ class ThinkingServer:
         # Adjust total thoughts if needed
         if data.thoughtNumber > data.totalThoughts:
             data.totalThoughts = data.thoughtNumber
+
+        # CONTEXT TRACKING - Update tracking data
+        if data.userRequest:
+            self.current_user_request = data.userRequest
+
+        # Track attempts for this problem
+        problem_key = data.userRequest or data.triggerContext
+        if data.attemptNumber and data.attemptNumber > 1:
+            self.attempt_counters[problem_key] = data.attemptNumber
+
+        # Track failures
+        if data.previousFailures:
+            self.failure_history[problem_key] = data.previousFailures
+
+        # Track confidence trends
+        if data.confidenceLevel is not None:
+            self.last_confidence = data.confidenceLevel
 
         # Store thought
         self.thought_history.append(data)
@@ -399,6 +446,31 @@ async def metacognitivethinking(
     metacognitiveType: Optional[str] = Field(
         None, description="Category of metacognitive observation"
     ),
+    # NEW CONTEXT PARAMETERS - Strongly encouraged for better agent assistance
+    userRequest: Optional[str] = Field(
+        None,
+        description="What did the user actually ask? (Helps agents understand the goal)",
+    ),
+    confidenceLevel: Optional[int] = Field(
+        None,
+        ge=0,
+        le=100,
+        description="How confident are you? 0=guessing, 100=certain (Triggers help if low)",
+    ),
+    attemptNumber: Optional[int] = Field(
+        1, description="Which attempt is this? (Helps detect stuck patterns)"
+    ),
+    previousFailures: Optional[List[str]] = Field(
+        default_factory=list,
+        description="What approaches already failed? (Prevents repetition)",
+    ),
+    currentBlocker: Optional[str] = Field(
+        None, description="What's blocking you? (Helps agents provide targeted help)"
+    ),
+    evidenceGathered: Optional[List[str]] = Field(
+        default_factory=list,
+        description="What facts support your thinking? (Ensures evidence-based approach)",
+    ),
 ) -> Dict[str, Any]:
     """
     Enhanced thinking tool with metacognitive awareness.
@@ -426,6 +498,13 @@ async def metacognitivethinking(
         improvementIdentified=improvementIdentified,
         redundancyDetected=redundancyDetected,
         metacognitiveType=metacognitiveType,
+        # Enhanced context fields
+        userRequest=userRequest,
+        confidenceLevel=confidenceLevel,
+        attemptNumber=attemptNumber,
+        previousFailures=previousFailures,
+        currentBlocker=currentBlocker,
+        evidenceGathered=evidenceGathered,
     )
 
     # Process thought
