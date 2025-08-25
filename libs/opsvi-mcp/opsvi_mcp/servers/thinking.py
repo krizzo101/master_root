@@ -288,7 +288,7 @@ class ThinkingServer:
                             thought_data=data,
                             session_id=self.session_id,
                         ),
-                        timeout=10.0,
+                        timeout=25.0,  # Agents need ~20s to complete
                     )
 
                 self.last_triage_time = time.time() - triage_start
