@@ -445,11 +445,11 @@ async def metacognitivethinking(
     ),
     # NEW CONTEXT PARAMETERS - Strongly encouraged for better agent assistance
     userRequest: Optional[str] = Field(
-        None,
+        default=None,
         description="What did the user actually ask? (Helps agents understand the goal)",
     ),
     confidenceLevel: Optional[int] = Field(
-        None,
+        default=None,
         ge=0,
         le=100,
         description="How confident are you? 0=guessing, 100=certain (Triggers help if low)",
@@ -462,7 +462,7 @@ async def metacognitivethinking(
         description="What approaches already failed? (Prevents repetition)",
     ),
     currentBlocker: Optional[str] = Field(
-        None, description="What's blocking you? (Helps agents provide targeted help)"
+        default=None, description="What's blocking you? (Helps agents provide targeted help)"
     ),
     evidenceGathered: Optional[List[str]] = Field(
         default_factory=list,
