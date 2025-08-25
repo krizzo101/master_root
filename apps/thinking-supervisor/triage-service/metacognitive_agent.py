@@ -166,7 +166,7 @@ SPECIFIC VIOLATIONS FROM OPERATIONAL INSTRUCTIONS:
 
         # Load from KB
         try:
-            result = await self.query_tool.execute_query(
+            result = await self.query_tool.query(
                 query_type="search",
                 search_text="GLOBAL OPERATIONAL INSTRUCTIONS MASTER",
                 limit=1,
@@ -192,7 +192,7 @@ SPECIFIC VIOLATIONS FROM OPERATIONAL INSTRUCTIONS:
 
         try:
             # Query for user corrections and lessons
-            result = await self.query_tool.execute_query(
+            result = await self.query_tool.query(
                 query_type="search",
                 search_text="user-correction lesson-learned",
                 limit=10,
@@ -219,6 +219,65 @@ SPECIFIC VIOLATIONS FROM OPERATIONAL INSTRUCTIONS:
             print(f"Lessons load failed: {e}", file=sys.stderr)
 
         return ""
+
+    def auto_detect_phase(self, thought_data: Any) -> str:
+        """Auto-detect work phase based on context"""
+        if not thought_data:
+            return "auto"
+
+        # Check triggerContext and thought content
+        trigger = (
+            getattr(thought_data, "triggerContext", "").lower()
+            if hasattr(thought_data, "triggerContext")
+            else ""
+        )
+        thought = (
+            getattr(thought_data, "thought", "").lower()
+            if hasattr(thought_data, "thought")
+            else ""
+        )
+
+        # If it's a dict, handle that too
+        if isinstance(thought_data, dict):
+            trigger = thought_data.get("triggerContext", "").lower()
+            thought = thought_data.get("thought", "").lower()
+
+        # Debugging indicators
+        if any(
+            word in trigger + thought
+            for word in ["error", "exception", "failure", "bug", "fix", "issue"]
+        ):
+            return "debugging"
+
+        # Implementation indicators
+        if any(
+            word in trigger + thought
+            for word in ["implement", "create", "add", "build", "write"]
+        ):
+            return "implementation"
+
+        # Design indicators
+        if any(
+            word in trigger + thought
+            for word in ["design", "architect", "plan", "structure"]
+        ):
+            return "design"
+
+        # Research indicators
+        if any(
+            word in trigger + thought
+            for word in ["research", "investigate", "explore", "find", "search"]
+        ):
+            return "research"
+
+        # Review indicators
+        if any(
+            word in trigger + thought
+            for word in ["review", "test", "validate", "check"]
+        ):
+            return "review"
+
+        return "auto"
 
     def get_phase_coaching_focus(self, phase: str) -> str:
         """Get phase-specific coaching focus"""

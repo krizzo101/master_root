@@ -1,0 +1,188 @@
+{
+  "model": {
+    "default": "claude-opus-4-1",
+    "fallback": "claude-sonnet-4",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "tools": {
+    "auto_approve": [
+      "Read",
+      "LS",
+      "Grep",
+      "Glob",
+      "WebSearch",
+      "mcp__time__current_time"
+    ],
+    "require_approval": [
+      "Bash",
+      "Write",
+      "Edit",
+      "MultiEdit"
+    ],
+    "disabled": []
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import json,sys; d=json.load(sys.stdin); p=d.get('tool_input',{}).get('file_path',''); sys.exit(2 if any(x in p for x in ['.env','secrets','credentials','password','key','token']) else 0)\"",
+            "description": "Block writes to sensitive files"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-edit.sh",
+            "description": "Backup and validate edits"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🔧 Executing command...'",
+            "description": "Command notification"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit.sh",
+            "description": "Auto-format and document"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/test-runner.sh",
+            "description": "Auto-run tests"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🚀 Session started: '$(date '+%Y-%m-%d %H:%M:%S')",
+            "description": "Session start notification"
+          },
+          {
+            "type": "command",
+            "command": "git status --short",
+            "description": "Show git status"
+          }
+        ]
+      }
+    ],
+    "SessionStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/export-session.sh $TRANSCRIPT_PATH SessionStop",
+            "description": "Export session"
+          },
+          {
+            "type": "command",
+            "command": "echo '👋 Session ended: '$(date '+%Y-%m-%d %H:%M:%S')",
+            "description": "Session end notification"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-compact-export-v2.sh",
+            "description": "Export before compacting"
+          }
+        ]
+      }
+    ],
+    "OnError": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '❌ Error occurred at: '$(date '+%Y-%m-%d %H:%M:%S')",
+            "description": "Error notification"
+          }
+        ]
+      }
+    ]
+  },
+  "behavior": {
+    "auto_commit": false,
+    "auto_test": true,
+    "auto_format": true,
+    "verbose_output": true,
+    "show_progress": true,
+    "confirm_destructive": true
+  },
+  "output": {
+    "format": "markdown",
+    "syntax_highlighting": true,
+    "line_numbers": true,
+    "max_lines": 500,
+    "truncate_large": true
+  },
+  "context": {
+    "auto_load": [
+      "CLAUDE.md",
+      ".claude/commands/",
+      ".claude/agents/"
+    ],
+    "ignore_patterns": [
+      "*.pyc",
+      "__pycache__",
+      ".git",
+      "node_modules",
+      "*.log"
+    ],
+    "max_file_size": 1048576
+  },
+  "mcp": {
+    "auto_start": true,
+    "restart_on_failure": true,
+    "timeout": 30,
+    "max_retries": 3
+  },
+  "performance": {
+    "parallel_tools": true,
+    "cache_results": true,
+    "cache_ttl": 300,
+    "batch_operations": true
+  },
+  "security": {
+    "block_sensitive_files": true,
+    "require_approval_for_destructive": true,
+    "audit_logging": true,
+    "encrypt_sessions": false
+  },
+  "integrations": {
+    "github": {
+      "enabled": true,
+      "auto_create_pr": false,
+      "pr_template": true
+    },
+    "slack": {
+      "enabled": false,
+      "webhook_url": ""
+    },
+    "jira": {
+      "enabled": false,
+      "api_url": ""
+    }
+  }
+}

@@ -9,7 +9,6 @@ import json
 import os
 import sys
 import time
-from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 # CRITICAL: Set environment variables from .mcp.json BEFORE any imports
@@ -23,9 +22,11 @@ os.environ.setdefault("EMBEDDING_SERVICE_URL", "http://localhost:8000")
 sys.path.insert(0, "/home/opsvi/master_root/libs")
 sys.path.insert(0, "/home/opsvi/master_root/apps")
 
-from opsvi_llm.providers.openai_provider import OpenAIConfig
-from opsvi_llm.providers.openai_unified_interface import OpenAIUnifiedInterface
-from pydantic import BaseModel, Field
+from opsvi_llm.providers.openai_provider import OpenAIConfig  # noqa: E402
+from opsvi_llm.providers.openai_unified_interface import (  # noqa: E402
+    OpenAIUnifiedInterface,
+)
+from pydantic import BaseModel, Field  # noqa: E402
 
 # Import knowledge tools for direct access (fast path for internal agents)
 try:
@@ -117,7 +118,7 @@ class TriageAnalyzer:
 
         try:
             # Query for global operational instructions
-            result = await self.query_tool.execute_query(
+            result = await self.query_tool.query(
                 query_type="search",
                 search_text="GLOBAL OPERATIONAL INSTRUCTIONS",
                 limit=3,
@@ -126,7 +127,7 @@ class TriageAnalyzer:
                 instructions.append(item.get("content", ""))
 
             # Query for specific rules about common violations
-            result = await self.query_tool.execute_query(
+            result = await self.query_tool.query(
                 query_type="search",
                 search_text="NO FALLBACKS reflexive agreement",
                 limit=2,
@@ -180,8 +181,10 @@ PATTERNS TO DETECT:
 Provide structured analysis with actionable coaching questions and reminders."""
 
         # System instructions
-        instructions = """You are a metacognitive analyzer detecting thinking violations and patterns.
-Be precise, actionable, and helpful. Focus on improving thinking quality."""
+        instructions = (
+            "You are a metacognitive analyzer detecting thinking violations and patterns. "
+            "Be precise, actionable, and helpful. Focus on improving thinking quality."
+        )
 
         try:
             # ONE nano call only
