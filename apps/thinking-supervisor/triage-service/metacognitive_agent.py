@@ -945,6 +945,13 @@ Respond with JSON: {{"status": "on_track|behind|stuck|diverging|accelerating", "
         except Exception as e:
             return {"error": str(e), "status": "unknown"}
 
+    async def run_devils_advocate(self, thought: str, intended_action: Optional[str], thought_data: Any) -> Dict:
+        """Async wrapper for Devil's Advocate (which is sync)"""
+        # Run the sync function in a thread to not block
+        return await asyncio.to_thread(
+            self.devils_advocate.analyze, thought, intended_action, thought_data
+        )
+    
     async def generate_coaching(
         self,
         thought: str,
@@ -1173,8 +1180,11 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
                 thought_data,
             ),
             timed_agent(
-                lambda: self.devils_advocate.analyze(thought, intended_action, thought_data),
-                "devils_advocate",
+                self.run_devils_advocate,
+                "devils_advocate", 
+                thought,
+                intended_action,
+                thought_data,
             ),
             return_exceptions=True,
         )
