@@ -76,7 +76,13 @@ class MetacognitiveAgent:
             return False
 
         # Check last 5 thoughts for repetition
-        recent = [t.get("thought", "").lower()[:50] for t in thought_history[-5:]]
+        # Handle both dict and ThoughtData objects
+        recent = []
+        for t in thought_history[-5:]:
+            if hasattr(t, "thought"):  # ThoughtData object
+                recent.append(t.thought.lower()[:50] if t.thought else "")
+            else:  # Dict format
+                recent.append(t.get("thought", "").lower()[:50])
 
         # Look for similar starts (likely repeated searches/attempts)
         for i in range(len(recent) - 2):
@@ -166,9 +172,14 @@ Identify specific violations with evidence."""
         # Compress pattern window for analysis
         pattern_summary = []
         for t in pattern_window:
-            pattern_summary.append(
-                f"Thought {t.get('number', '?')}: {t.get('thought', '')[:100]}..."
-            )
+            # Handle both dict and ThoughtData objects
+            if hasattr(t, "thought"):  # ThoughtData object
+                num = getattr(t, "thoughtNumber", "?")
+                thought_text = t.thought[:100] if t.thought else ""
+            else:  # Dict format
+                num = t.get("number", t.get("thoughtNumber", "?"))
+                thought_text = t.get("thought", "")[:100]
+            pattern_summary.append(f"Thought {num}: {thought_text}...")
 
         prompt = f"""Analyze thinking patterns across these {len(pattern_window)} thoughts.
 
@@ -297,7 +308,13 @@ Generate:
             thought_history[-15:] if len(thought_history) > 15 else thought_history
         )
 
-        recent_thoughts = [t.get("thought", "") for t in recent_detailed]
+        # Handle both dict and ThoughtData objects
+        recent_thoughts = []
+        for t in recent_detailed:
+            if hasattr(t, "thought"):  # ThoughtData object
+                recent_thoughts.append(t.thought if t.thought else "")
+            else:  # Dict format
+                recent_thoughts.append(t.get("thought", ""))
 
         # Load instructions (cached)
         instructions = await self.load_instructions()
