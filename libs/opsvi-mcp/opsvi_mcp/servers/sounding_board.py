@@ -18,6 +18,7 @@ sys.path.insert(0, "/home/opsvi/master_root/apps")
 
 from fastmcp import FastMCP
 from pydantic import BaseModel, Field
+from typing import Any  # Add Any import
 
 # Import OpenAI for real LLM integration
 try:
@@ -36,7 +37,7 @@ class ProposalData(BaseModel):
     code_samples: Optional[str] = Field(None, description="Code examples if applicable")
     documentation: Optional[str] = Field(None, description="Supporting documentation")
     test_strategy: Optional[str] = Field(None, description="How you'll test this")
-    evidence: Optional[List[str]] = Field(default_factory=list, description="Evidence supporting the plan")
+    evidence: List[str] = Field(default_factory=list, description="Evidence supporting the plan")
     context: Optional[str] = Field(None, description="Additional context")
     iteration: int = Field(1, description="Which iteration of this proposal")
     counter_proposal: Optional['ProposalData'] = Field(None, description="Counter-proposal from agents")
@@ -201,7 +202,7 @@ Test Strategy:
 {proposal.test_strategy or 'None provided'}
 
 Evidence:
-{json.dumps(proposal.evidence) if proposal.evidence else 'None provided'}
+{json.dumps(proposal.evidence, default=str) if proposal.evidence else 'None provided'}
 
 Context:
 {proposal.context or 'None provided'}
@@ -272,7 +273,12 @@ Respond with JSON:
         
         # Store counter-proposal if provided
         if result.get("counter_proposal") and result.get("confidence", 100) < 80:
-            agent_response.counter_proposal = result.get("counter_proposal")
+            cp = result.get("counter_proposal")
+            # Convert dict to string if needed
+            if isinstance(cp, dict):
+                import json
+                cp = json.dumps(cp, indent=2, default=str)
+            agent_response.counter_proposal = cp
         
         return agent_response
     
@@ -308,7 +314,7 @@ Test Strategy:
 {proposal.test_strategy or 'None provided'}
 
 Evidence:
-{json.dumps(proposal.evidence) if proposal.evidence else 'None provided'}
+{json.dumps(proposal.evidence, default=str) if proposal.evidence else 'None provided'}
 
 Context:
 {proposal.context or 'None provided'}
@@ -376,7 +382,12 @@ Respond with JSON:
         
         # Store counter-proposal if provided
         if result.get("counter_proposal") and result.get("confidence", 100) < 80:
-            agent_response.counter_proposal = result.get("counter_proposal")
+            cp = result.get("counter_proposal")
+            # Convert dict to string if needed
+            if isinstance(cp, dict):
+                import json
+                cp = json.dumps(cp, indent=2, default=str)
+            agent_response.counter_proposal = cp
         
         return agent_response
     
@@ -441,9 +452,17 @@ Respond with JSON:
             # Collect counter-proposals from agents
             counter_proposals = []
             if violations_response.counter_proposal:
-                counter_proposals.append(violations_response.counter_proposal)
+                # Ensure it's a string
+                cp = violations_response.counter_proposal
+                if isinstance(cp, dict):
+                    cp = json.dumps(cp, indent=2, default=str)
+                counter_proposals.append(str(cp))
             if coach_response.counter_proposal:
-                counter_proposals.append(coach_response.counter_proposal)
+                # Ensure it's a string
+                cp = coach_response.counter_proposal
+                if isinstance(cp, dict):
+                    cp = json.dumps(cp, indent=2, default=str)
+                counter_proposals.append(str(cp))
             
             # Create combined counter-proposal
             if counter_proposals:
@@ -522,8 +541,8 @@ async def review_proposal(
     code_samples: Optional[str] = Field(None, description="Code examples if applicable"),
     documentation: Optional[str] = Field(None, description="Supporting documentation"),
     test_strategy: Optional[str] = Field(None, description="How you'll test this"),
-    evidence: Optional[List[str]] = Field(
-        default_factory=list,
+    evidence: Optional[Any] = Field(
+        None,
         description="Evidence supporting the plan"
     ),
     context: Optional[str] = Field(None, description="Additional context"),
@@ -545,12 +564,24 @@ async def review_proposal(
     if session_id in sounding_board.review_sessions:
         iteration = sounding_board.review_sessions[session_id]["iterations"] + 1
     
+    # Handle evidence coercion
+    evidence_list = []
+    if evidence:
+        if isinstance(evidence, list):
+            evidence_list = evidence
+        elif isinstance(evidence, str):
+            try:
+                import json
+                evidence_list = json.loads(evidence)
+            except:
+                evidence_list = [evidence]
+    
     proposal = ProposalData(
         plan=plan,
         code_samples=code_samples,
         documentation=documentation,
         test_strategy=test_strategy,
-        evidence=evidence or [],
+        evidence=evidence_list,
         context=context,
         iteration=iteration,
     )
