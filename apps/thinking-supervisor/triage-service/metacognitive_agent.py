@@ -526,59 +526,36 @@ THOUGHT PHASE: FINAL (90-100% complete)
         prompt = f"""You are a rule enforcement specialist protecting against cascading failures.
 
 SYSTEM CONTEXT:
-- You're analyzing the internal thinking of Claude Code, an AI programming assistant
-- Claude uses a 'metacognitivethinking' tool to track its reasoning step-by-step
-- Each 'thought' is one step in Claude's problem-solving process
-- Claude is helping users with programming tasks (debugging, implementing features, etc.)
-- Your analysis runs IN PARALLEL with every thought to provide real-time guidance
+- You're analyzing Claude Code's internal thinking for rule violations
+- Claude uses metacognitivethinking tool for step-by-step reasoning
+- Your analysis runs IN PARALLEL with every thought for real-time guidance
+- Focus on critical violations that cause wasted effort
 
-PURPOSE: Catch violations BEFORE they cascade into wasted effort and incorrect solutions.
+PURPOSE: Catch violations BEFORE they cascade into wasted effort.
 YOUR IMPACT: Each violation you catch prevents 5-10 minutes of misdirected work.
-HOW YOUR OUTPUT IS USED: Provides advisory guidance that Claude can consider in subsequent thoughts
 
-Current thought being analyzed: {thought}
+Current thought: {thought[:300]}...
 {f"Work phase: {phase.upper()}" if phase != "unknown" else ""}
-{f"Triggered by: {getattr(thought_data, 'triggerContext', 'not specified')}" if thought_data else ""}
-{f"Planned action: {getattr(thought_data, 'intendedAction', 'not specified')}" if thought_data else ""}
-{f"Assumptions stated: {getattr(thought_data, 'assumptions', 'none')}" if thought_data else ""}
 
 {phase_rules}
 
 {progression_context}
 
-YOUR ROLE ADJUSTMENT: Based on thought progression, adjust your focus:
-- EARLY: Emphasize exploration and framework thinking
-- MIDDLE: Focus on execution quality and efficiency
-- LATE: Prioritize completion and final validation
-- FINAL: Ensure nothing critical is missed
-
-Recent context (for continuity):
-{self._format_thought_history(recent_thoughts)}
-
-CRITICAL RULES TO ENFORCE (from GLOBAL OPERATIONAL INSTRUCTIONS):
-- NO ASSUMPTIONS: NEVER use "probably", "likely", "should be" - leads to harmful misinformation
-- NO FALLBACKS/WORKAROUNDS: FIX IT PROPERLY - workarounds bypass functionality and create debt
-- THINKING MANDATORY: MUST use metacognitivethinking BEFORE ANY CODE - Think FIRST, code SECOND
-- TASK TOOL MANDATORY: MUST use parallel Task agents (3-7 in SINGLE message) not sequential
+CRITICAL RULES TO ENFORCE:
+- NO ASSUMPTIONS: NEVER use "probably", "likely", "should be"
+- NO FALLBACKS: FIX IT PROPERLY - workarounds create debt
+- THINKING MANDATORY: MUST use metacognitivethinking BEFORE ANY CODE
+- TASK TOOL MANDATORY: MUST use parallel Task agents (3-7 in SINGLE message)
 - MODELS 2025: gpt-4o/gpt-4o-mini FORBIDDEN - use gpt-5/gpt-5-nano/o3/o4-mini only
-- KB FIRST: Query knowledge_query BEFORE exploring code - never dive in without checking KB
-- GLOB HANDLING: NEVER Bash with wildcards (* ?) - ALWAYS use shell_exec for globs
+- KB FIRST: Query knowledge_query BEFORE exploring code
+- GLOB HANDLING: NEVER Bash with wildcards (* ?) - ALWAYS use shell_exec
 
-{self.domain_context}
+Recent context: {len(recent_thoughts)} thoughts analyzed
 
-YOUR TASK: Identify risks and suggest alternative approaches that could be more effective.
-Consider these areas for improvement:
-1. Unverified assumptions - suggest specific ways to validate them
-2. Potential workarounds - propose robust long-term solutions
-3. Process improvements - recommend thinking strategies that could help
-4. Efficiency opportunities - suggest parallel operations or batching
-5. Tool selection - recommend better tools or models for the task
-6. Knowledge gaps - identify what information could help make better decisions
+YOUR TASK: Identify critical violations and suggest specific alternatives.
+Focus on violations that will cause immediate problems.
 
-RESPONSE USAGE: Your suggestions help Claude consider alternative approaches.
-Be constructive - offer specific alternatives, not just critiques.
-
-Respond with JSON: {{"violations": [{{"rule": "NO_ASSUMPTIONS|NO_FALLBACKS|THINKING_MANDATORY|TASK_MANDATORY|MODELS_2025|KB_FIRST|GLOB_HANDLING", "evidence": "exact quote from thought", "consequence": "specific failure this causes", "suggestion": "specific alternative approach"}}], "severity": "critical|high|medium|low", "creative_alternatives": ["list of innovative approaches to consider"]}}"""
+Respond with JSON: {{"violations": [{{"rule": "RULE_NAME", "evidence": "exact quote", "consequence": "specific failure", "suggestion": "specific alternative"}}], "severity": "critical|high|medium|low", "creative_alternatives": ["list of approaches"]}}"""
 
         try:
             # Use Responses API without response_format - parse JSON manually
@@ -608,16 +585,23 @@ Respond with JSON: {{"violations": [{{"rule": "NO_ASSUMPTIONS|NO_FALLBACKS|THINK
         self, thought: str, pattern_window: List[Dict], thought_data: Any = None
     ) -> Dict:
         """Intelligent agent for pattern analysis over larger window"""
+        # Reduce pattern window size for faster analysis (from 15 to 8)
+        pattern_window = (
+            pattern_window[-8:] if len(pattern_window) > 8 else pattern_window
+        )
+
         # Compress pattern window for analysis
         pattern_summary = []
         for t in pattern_window:
             # Handle both dict and ThoughtData objects
             if hasattr(t, "thought"):  # ThoughtData object
                 num = getattr(t, "thoughtNumber", "?")
-                thought_text = t.thought[:100] if t.thought else ""
+                thought_text = (
+                    t.thought[:80] if t.thought else ""
+                )  # Reduced from 100 to 80
             else:  # Dict format
                 num = t.get("number", t.get("thoughtNumber", "?"))
-                thought_text = t.get("thought", "")[:100]
+                thought_text = t.get("thought", "")[:80]  # Reduced from 100 to 80
             pattern_summary.append(f"Thought {num}: {thought_text}...")
 
         # Get thought progression context
@@ -631,55 +615,36 @@ Respond with JSON: {{"violations": [{{"rule": "NO_ASSUMPTIONS|NO_FALLBACKS|THINK
             thought_number, total_thoughts
         )
 
-        prompt = f"""You are a creative pattern analyst discovering hidden opportunities and innovative solutions.
+        prompt = f"""You are a pattern analyst detecting stuck thinking and suggesting solutions.
 
 SYSTEM CONTEXT:
-- You're analyzing Claude Code's thinking patterns (an AI programming assistant)
-- Claude tracks each reasoning step using the 'metacognitivethinking' tool
-- You see a 15-thought window to detect patterns over time
-- Claude is working on complex programming tasks that require careful reasoning
-- Your pattern detection runs asynchronously to identify when Claude gets stuck
+- Analyzing Claude Code's thinking patterns for stuck loops and inefficiencies
+- Claude tracks reasoning steps using metacognitivethinking tool
+- You see {len(pattern_window)} recent thoughts to detect patterns
+- Your detection triggers strategy resets and approach changes
 
-PURPOSE: Detect repetitive patterns that indicate the AI is stuck, confused, or degrading in performance.
-YOUR IMPACT: Breaking these patterns can reduce task time by 50% or more.
-HOW YOUR OUTPUT IS USED: Triggers strategy resets and approach changes in Claude's thinking
+PURPOSE: Detect repetitive patterns that indicate stuck, confused, or degrading performance.
+YOUR IMPACT: Breaking patterns can reduce task time by 50% or more.
 
-Analyzing {len(pattern_window)} recent thoughts for patterns.
-
-Current thought: {thought}
+Current thought: {thought[:200]}...
 
 {progression_context}
 
-YOUR ROLE ADJUSTMENT: Based on thought progression, adjust your focus:
-- EARLY: Look for exploration patterns and framework development
-- MIDDLE: Focus on execution patterns and optimization opportunities
-- LATE: Identify completion patterns and final validation needs
-- FINAL: Ensure no critical patterns are missed
-
-Thought sequence:
-{chr(10).join(pattern_summary)}
-
-PATTERNS TO DETECT (and why they matter):
-- CIRCULAR THINKING: Repeating same ideas = stuck in loop, no progress
-- DEGRADING EFFICIENCY: Taking longer each step = approaching system breakdown
+PATTERNS TO DETECT:
+- CIRCULAR THINKING: Repeating same ideas = stuck in loop
+- DEGRADING EFFICIENCY: Taking longer each step = approaching breakdown
 - REPEATED FAILED ATTEMPTS: Same approach failing = needs strategy change
 - ASSUMPTION BUILDUP: Each thought adds assumptions = building on quicksand
 - SEARCH THRASHING: Random searching without strategy = will never find answer
 - TOOL SWITCHING: Jumping between approaches = lack of clear plan
-- COMPLEXITY CREEP: Simple task becoming complex = overthinking
 
-{self.domain_context}
+Thought sequence:
+{chr(10).join(pattern_summary)}
 
-YOUR TASK: Identify which patterns are present and their impact on progress.
-Pattern detection triggers strategy changes and resets to break out of loops.
+YOUR TASK: Identify which patterns are present and their impact.
+Pattern detection triggers strategy changes and resets.
 
-RESPONSE USAGE: Your findings determine if the AI needs to:
-1. Reset and try different approach
-2. Simplify and focus
-3. Get user clarification
-4. Break down the problem differently
-
-Respond with JSON: {{"patterns": [{{"type": "...", "evidence": "...", "impact": "high|medium|low", "creative_solution": "innovative approach to leverage or break pattern"}}], "recommendation": "continue|reset|clarify", "novel_approaches": ["unexpected solutions to consider"]}}"""
+Respond with JSON: {{"patterns": [{{"type": "...", "evidence": "...", "impact": "high|medium|low", "creative_solution": "innovative approach"}}], "recommendation": "continue|reset|clarify", "novel_approaches": ["unexpected solutions"]}}"""
 
         try:
             # Use Responses API without response_format - parse JSON manually
@@ -833,34 +798,23 @@ Respond with JSON: {{"status": "on_track|behind|stuck|diverging|accelerating", "
             thought_number, total_thoughts
         )
 
-        context = f"""You are the synthesis coach transforming all feedback into actionable wisdom.
+        context = f"""You are the synthesis coach transforming feedback into actionable wisdom.
 
 SYSTEM CONTEXT:
-- You're coaching Claude Code, an AI assistant helping users with programming
-- Three other agents just analyzed Claude's current thought for violations, patterns, and progress
-- Claude will see your coaching as system guidance between its thoughts
+- You're coaching Claude Code, an AI assistant helping with programming
+- Three agents analyzed Claude's current thought for violations, patterns, and progress
+- Your coaching appears as system-level guidance between thoughts
 - Claude is likely working on: debugging, implementing features, or solving technical problems
-- Your coaching must be immediately actionable in Claude's next thought
 
-PURPOSE: Convert detection of problems into specific corrective actions that work.
+PURPOSE: Convert detection of problems into specific corrective actions.
 YOUR IMPACT: Good coaching can reduce task time by 70% by preventing rabbit holes.
-HOW YOUR OUTPUT IS USED: Appears as system-level guidance that redirects Claude's thinking
 
 {progression_context}
 
-YOUR ROLE ADJUSTMENT: Based on thought progression, adjust your coaching style:
-- EARLY: Provide guidance on what to think about next and how to approach the problem
-- MIDDLE: Focus on execution guidance and optimization suggestions
-- LATE: Emphasize completion guidance and final validation steps
-- FINAL: Ensure final delivery guidance and last-minute improvements
-
-ANALYSIS RESULTS REQUIRING COACHING:
-Violations found: {json.dumps(violations.get('violations', []), indent=2)}
-Patterns identified: {json.dumps(patterns.get('patterns', []), indent=2)}
-Progress status: {json.dumps(progress, indent=2)}
-Creative alternatives suggested: {json.dumps(violations.get('creative_alternatives', []), indent=2)}
-Novel approaches from patterns: {json.dumps(patterns.get('novel_approaches', []), indent=2)}
-Strategic pivots available: {json.dumps(progress.get('strategic_pivots', []), indent=2)}
+ANALYSIS RESULTS:
+Violations: {len(violations.get('violations', []))} found
+Patterns: {len(patterns.get('patterns', []))} identified
+Progress: {progress.get('status', 'unknown')}
 
 COACHING PRINCIPLES:
 - BE SPECIFIC: "Check X before Y" not "be more careful"
@@ -868,43 +822,18 @@ COACHING PRINCIPLES:
 - BE CREATIVE: Suggest novel approaches, not just fixes
 - BE COLLABORATIVE: Frame as exploration, not enforcement
 - BE APPRECIATIVE: Acknowledge good patterns and reinforce them
-- BE BALANCED: Mix corrections with encouragement
 
-TYPES OF COACHING NEEDED:
+TYPES OF COACHING:
 1. GENTLE CORRECTION: For risky assumptions
-   Example: "I notice you said 'probably' - let's verify that by checking the actual file first."
-
 2. CREATIVE ALTERNATIVES: For inefficient patterns
-   Example: "Instead of searching randomly, consider: 1) Mapping what you know, 2) Identifying specific gaps, 3) Targeted searches."
-
 3. STRATEGIC INSIGHTS: For better approaches
-   Example: "Have you considered using parallel processing here? You could run these 3 tasks simultaneously."
-
 4. ENCOURAGING FOCUS: For progress issues
-   Example: "You're making good progress! With 3 thoughts left, prioritizing [specific task] would maximize impact."
-
 5. POSITIVE REINFORCEMENT: For effective patterns
-   Example: "Excellent use of parallel processing! That saved significant time."
-   Example: "Good thinking to check the KB first - that's exactly the right approach."
-
-{self.domain_context}
 
 YOUR TASK: Generate balanced coaching that guides toward best practices.
 Blend enforcement of critical rules with appreciation of good patterns.
-Your coaching helps Claude learn and improve, not just comply.
 
-EXAMPLES OF EFFECTIVE COACHING (collaborative style):
-- "Quick note: 'probably' spotted - let's verify by checking the actual file to be certain."
-- "Opportunity: These tasks could run in parallel - try batching them in a single message."
-- "Heads up: gpt-5-nano would be better than gpt-4o for this task."
-- "Consider: A quick metacognitivethinking step here could clarify the approach."
-- "Pro tip: The KB might have relevant info - try knowledge_query('project structure') first."
-- "Better approach: shell_exec handles wildcards safely - use that instead of Bash."
-
-RESPONSE USAGE: Your coaching appears as helpful guidance between thoughts.
-Be firm on critical issues but always constructive and solution-focused.
-
-Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|important|suggestion", "action": "exact next step", "creative_alternative": "innovative approach to try", "metacognitive_prompt": "question to spark new thinking"}}"""
+Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "collaborative|encouraging|corrective", "priority": "high|medium|low", "next_steps": ["specific actions to take"]}}"""
 
         try:
             # Use Responses API without response_format - parse JSON manually
@@ -932,6 +861,38 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
             )
         except Exception as e:
             return {"error": str(e), "coaching": "Continue with best judgment"}
+
+    def _serialize_or_validate(self, item: Any) -> str:
+        """Serialize ThoughtData objects to strings or validate existing strings"""
+        if isinstance(item, str):
+            return item
+        elif hasattr(item, "thought"):  # ThoughtData object
+            # Create a structured representation
+            thought_text = getattr(item, "thought", "")
+            thought_number = getattr(item, "thoughtNumber", "?")
+            trigger_context = getattr(item, "triggerContext", "")
+            intended_action = getattr(item, "intendedAction", "")
+
+            # Build a structured string representation
+            parts = [f"Thought {thought_number}"]
+            if thought_text:
+                parts.append(f"Content: {thought_text[:200]}...")
+            if trigger_context:
+                parts.append(f"Trigger: {trigger_context}")
+            if intended_action:
+                parts.append(f"Action: {intended_action}")
+
+            return " | ".join(parts)
+        else:
+            # Try to convert to string, fallback to JSON
+            try:
+                return str(item)
+            except:
+                return json.dumps(item, default=str)
+
+    def _serialize_thought_history(self, history: List[Any]) -> List[str]:
+        """Convert thought history to list of strings"""
+        return [self._serialize_or_validate(item) for item in history]
 
     async def analyze(
         self,
@@ -996,6 +957,9 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
                 }
                 return {"error": str(e)}
 
+        # Serialize thought history for progress agent (which expects strings)
+        serialized_history = self._serialize_thought_history(recent_thoughts)
+
         # Parallel execution with timing
         tasks = await asyncio.gather(
             timed_agent(
@@ -1015,7 +979,7 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
                 thought_number,
                 total_thoughts,
                 thought,
-                recent_thoughts,
+                serialized_history,
                 thought_data,
             ),
             return_exceptions=True,

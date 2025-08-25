@@ -194,6 +194,15 @@ The system will automatically trigger commits when:
 *   When asked to commit outstanding changes to git, first check the current branch. If the current branch is "main" or "master", create a new feature branch named "feature/enhanced-thinking-prep-(date +%Y%m%d-%H%M%S)". Then, add all changes using `git add -A`. Check if there are any staged changes using `git diff --cached --quiet`. If there are staged changes, commit them with the message "chore: commit outstanding changes before enhanced thinking updates [prep]". Finally, print the current working directory (`pwd`), list all files (`ls -a | cat`), show the git status (`git status`), show the current branch (`git branch --show-current`), show the last 5 commits (`git log --oneline -5`), and list git worktrees (`git worktree list`).
 *   When pre-commit hooks prevent a commit, and the user instructs to proceed, use the `--no-verify` flag with the `git commit` command.
 *   When updating the `.cursor/mcp.json` config to match the `.mcp.json` config in the project root for a specific tool, ensure all relevant environment variables and configurations are included.
+*   When implementing concrete improvements to the thinking system:
+    *   The key issues identified are: 1) Progress agent returning "unknown" status, 2) Coaching tone still too enforcement-heavy, 3) Risk scoring system needs refinement, 4) Missing firecrawl configuration. Focus on the most impactful fix first: improving the progress agent's status detection logic.
+*   When the progress agent is returning "unknown" status, implement the following:
+    1.  Add a `serialize_or_validate(input)` -> `str` function that does: if `isinstance(input, str)`: return input; if `isinstance(input, ThoughtData)`: return `str(input)` or `input.to_string()`; else raise `TypeError` with a clear message.
+    2.  Replace direct inputs to the progress agent with `serialize_or_validate(thought_output)`.
+    3.  Add unit tests: `ThoughtData` -> string, string -> string, invalid types raise `TypeError`, edge cases (empty, long, non-ASCII).
+    4.  Run tests (prefer parallel).
+    5.  Add a lightweight runtime sanity flag after each thought (e.g., `sanity_check_pass = True/False` with a timestamp) to prevent silent regressions.
+    6.  Document the `ThoughtData` schema and serializer contract in the knowledge base and reference it in code comments and tests.
 
 ## DEBUGGING
 
@@ -598,41 +607,4 @@ Date awareness is important to understand the amount of time that has elapsed si
 | **Fast responses**         | `gpt-5-nano`, `gpt-5-mini`     | Efficiency priority |
 
 **CRITICAL MODEL CONSTRAINTS**:
-- **OAMAT-SD Application**: MUST use `o4-mini` (reasoning) and `gpt-5-mini` (agents)
-- **Structured Outputs**: Use `gpt-5-mini` or `gpt-5` for JSON schema compliance
-- **NO GPT-4O VARIANTS**: Only o3, o4, and GPT-5 series approved for use
-- **NO GPT-3.5 MODELS**
-- **Resolution**: Use appropriate model for specific requirements, document conflicts
-
-### Latest Responses API Patterns (2025 PREFERRED)
-
-#### Standard Responses API with Structured Outputs
-```python
-# ✅ CURRENT STANDARD - Responses API (2025)
-from openai import OpenAI
-from pydantic import BaseModel
-from typing import List, Optional
-
-client = OpenAI()
-
-# Structured Output with Pydantic
-class ResponseSchema(BaseModel):
-    analysis: str
-    confidence: float
-    recommendations: List[str]
-    metadata: Optional[dict] = None
-
-response = client.responses.create(
-    model="gpt-5-mini",  # or "o4-mini" for reasoning
-    instructions="You are a helpful assistant that provides structured analysis.",
-    input="Analyze this data and provide recommendations...",
-    text_format=ResponseSchema
-)
-
-# Access parsed response
-result = response.output_parsed
-```
-
-#### Advanced Role Hierarchy (2025 BEST PRACTICE)
-```python
-# ✅ PRI
+- **OAMAT-
