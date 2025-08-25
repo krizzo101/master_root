@@ -94,6 +94,22 @@ SPECIFIC VIOLATIONS FROM OPERATIONAL INSTRUCTIONS:
             content = str(response)
         return content
 
+    def _format_thought_history(self, thoughts: List) -> str:
+        """Format thought history including context if available"""
+        formatted = []
+        for t in thoughts:
+            if hasattr(t, "thought"):  # ThoughtData object
+                line = f"- {t.thought[:100]}..."
+                if hasattr(t, "triggerContext"):
+                    line += f" [Trigger: {t.triggerContext[:50]}]"
+                formatted.append(line)
+            elif isinstance(t, dict):
+                line = f"- {t.get('thought', '')[:100]}..."
+                formatted.append(line)
+            else:
+                formatted.append(f"- {str(t)[:100]}...")
+        return "\n".join(formatted)
+
     def _detect_repetition_quick(self, thought_history: List[Dict]) -> bool:
         """Quick check for obvious repetitive patterns"""
         if len(thought_history) < 5:
@@ -188,7 +204,11 @@ SPECIFIC VIOLATIONS FROM OPERATIONAL INSTRUCTIONS:
         return ""
 
     async def analyze_violations(
-        self, thought: str, recent_thoughts: List[str], instructions: str
+        self,
+        thought: str,
+        recent_thoughts: List,
+        instructions: str,
+        thought_data: Any = None,
     ) -> Dict:
         """Intelligent agent for violation detection"""
         prompt = f"""You are a quality control agent preventing AI errors before they cascade into failures.
@@ -205,9 +225,12 @@ YOUR IMPACT: Each violation you catch saves 5-10 minutes of misdirected effort.
 HOW YOUR OUTPUT IS USED: Gets injected as corrective guidance between Claude's thoughts
 
 Current thought being analyzed: {thought}
+{f"Triggered by: {getattr(thought_data, 'triggerContext', 'not specified')}" if thought_data else ""}
+{f"Planned action: {getattr(thought_data, 'intendedAction', 'not specified')}" if thought_data else ""}
+{f"Assumptions stated: {getattr(thought_data, 'assumptions', 'none')}" if thought_data else ""}
 
 Recent context (for continuity):
-{chr(10).join(recent_thoughts)}
+{self._format_thought_history(recent_thoughts)}
 
 CRITICAL RULES TO ENFORCE (from GLOBAL OPERATIONAL INSTRUCTIONS):
 - NO ASSUMPTIONS: NEVER use "probably", "likely", "should be" - leads to harmful misinformation
@@ -258,7 +281,9 @@ Respond with JSON: {{"violations": [{{"rule": "NO_ASSUMPTIONS|NO_FALLBACKS|THINK
         except Exception as e:
             return {"error": str(e), "violations": []}
 
-    async def analyze_patterns(self, thought: str, pattern_window: List[Dict]) -> Dict:
+    async def analyze_patterns(
+        self, thought: str, pattern_window: List[Dict], thought_data: Any = None
+    ) -> Dict:
         """Intelligent agent for pattern analysis over larger window"""
         # Compress pattern window for analysis
         pattern_summary = []
@@ -339,7 +364,12 @@ Respond with JSON: {{"patterns": [{{"type": "...", "evidence": "...", "impact": 
             return {"error": str(e), "patterns": []}
 
     async def analyze_progress(
-        self, thought_number: int, total_thoughts: int, thought: str, history: List[str]
+        self,
+        thought_number: int,
+        total_thoughts: int,
+        thought: str,
+        history: List,
+        thought_data: Any = None,
     ) -> Dict:
         """Intelligent agent for progress tracking"""
         prompt = f"""You are a progress tracker identifying when AI thinking is going off track.
@@ -505,6 +535,7 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
         thought_number: int,
         total_thoughts: int,
         thought_history: List[Dict[str, Any]],
+        thought_data: Any = None,  # Full ThoughtData object with context
         session_id: str = "default",
     ) -> Dict[str, Any]:
         """
@@ -520,13 +551,9 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
             thought_history[-15:] if len(thought_history) > 15 else thought_history
         )
 
-        # Handle both dict and ThoughtData objects
-        recent_thoughts = []
-        for t in recent_detailed:
-            if hasattr(t, "thought"):  # ThoughtData object
-                recent_thoughts.append(t.thought if t.thought else "")
-            else:  # Dict format
-                recent_thoughts.append(t.get("thought", ""))
+        # Pass full ThoughtData objects to preserve context
+        # Agents need triggerContext, intendedAction, assumptions etc.
+        recent_thoughts = recent_detailed  # Keep full objects, not just text
 
         # Load instructions and lessons (cached)
         instructions = await self.load_instructions()
@@ -541,10 +568,12 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
         print("🧠 Launching parallel metacognitive analysis...", file=sys.stderr)
 
         tasks = await asyncio.gather(
-            self.analyze_violations(thought, recent_thoughts, full_context),
-            self.analyze_patterns(thought, pattern_window),
+            self.analyze_violations(
+                thought, recent_thoughts, full_context, thought_data
+            ),
+            self.analyze_patterns(thought, pattern_window, thought_data),
             self.analyze_progress(
-                thought_number, total_thoughts, thought, recent_thoughts
+                thought_number, total_thoughts, thought, recent_thoughts, thought_data
             ),
             return_exceptions=True,
         )

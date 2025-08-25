@@ -172,6 +172,7 @@ class ThinkingServer:
                     thought_number=data.thoughtNumber,
                     total_thoughts=data.totalThoughts,
                     thought_history=self.thought_history,
+                    thought_data=data,  # Pass full ThoughtData for context
                     session_id=self.session_id,
                 )
 
