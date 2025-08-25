@@ -4,6 +4,7 @@ FastMCP-based thinking server with integrated triage support.
 Direct module integration for sub-50ms triage latency.
 """
 
+import asyncio
 import os
 import sys
 import time
@@ -102,10 +103,9 @@ class ThinkingServer:
 
         # Initialize metacognitive agent for parallel analysis
         self.metacognitive_agent = MetacognitiveAgent()
-        self.triage_mode = os.getenv(
-            "TRIAGE_MODE", "advisory"
-        )  # shadow|advisory|enforce
+        self.triage_mode = os.getenv("TRIAGE_MODE", "lite")  # lite|full|disabled
         self.session_id = os.getenv("SESSION_ID", "default")
+        self.last_triage_time = 0.0  # Track analysis time
 
     # Metacognitive prompts now come from intelligent agent, not hardcoded
 
@@ -221,15 +221,63 @@ class ThinkingServer:
         # The agent will intelligently decide when to provide feedback
         if self.triage_mode != "disabled":
             try:
-                # Let the metacognitive agent decide when to intervene
-                triage_result = await self.metacognitive_agent.analyze(
-                    thought=data.thought,
-                    thought_number=data.thoughtNumber,
-                    total_thoughts=data.totalThoughts,
-                    thought_history=self.thought_history,
-                    thought_data=data,  # Pass full ThoughtData for context
-                    session_id=self.session_id,
-                )
+                triage_start = time.time()
+
+                # Use lite mode for speed
+                if self.triage_mode == "lite":
+                    # Ultra-fast analysis without LLM
+                    from apps.thinking_supervisor.triage_service.metacognitive_agent_lite import (
+                        MetacognitiveAgentLite,
+                    )
+
+                    lite_agent = MetacognitiveAgentLite()
+                    triage_result = lite_agent.analyze(
+                        thought_number=data.thoughtNumber,
+                        total_thoughts=data.totalThoughts,
+                        thought=data.thought,
+                        recent_thoughts=self.thought_history[-3:]
+                        if self.thought_history
+                        else [],
+                        thought_data=data,
+                        session_id=self.session_id,
+                    )
+                elif self.last_triage_time > 10.0:
+                    # Auto-switch to lite if previous was slow
+                    print(
+                        f"⚠️ Previous triage took {self.last_triage_time:.1f}s, "
+                        "switching to lite mode"
+                    )
+                    self.triage_mode = "lite"
+                    from apps.thinking_supervisor.triage_service.metacognitive_agent_lite import (
+                        MetacognitiveAgentLite,
+                    )
+
+                    lite_agent = MetacognitiveAgentLite()
+                    triage_result = lite_agent.analyze(
+                        thought_number=data.thoughtNumber,
+                        total_thoughts=data.totalThoughts,
+                        thought=data.thought,
+                        recent_thoughts=self.thought_history[-3:]
+                        if self.thought_history
+                        else [],
+                        thought_data=data,
+                        session_id=self.session_id,
+                    )
+                else:
+                    # Full analysis with timeout
+                    triage_result = await asyncio.wait_for(
+                        self.metacognitive_agent.analyze(
+                            thought=data.thought,
+                            thought_number=data.thoughtNumber,
+                            total_thoughts=data.totalThoughts,
+                            thought_history=self.thought_history,
+                            thought_data=data,
+                            session_id=self.session_id,
+                        ),
+                        timeout=10.0,
+                    )
+
+                self.last_triage_time = time.time() - triage_start
 
                 # Include results if analysis found something meaningful
                 if (

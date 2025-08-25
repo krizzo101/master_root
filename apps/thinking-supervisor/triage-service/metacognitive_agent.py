@@ -1050,15 +1050,21 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
             "patterns": patterns,
             "progress": progress,
             "risk_assessment": risk_assessment,
-            "coaching": coaching_result.get("coaching", "")
-            if isinstance(coaching_result, dict)
-            else "",
-            "metacognitive_prompt": coaching_result.get("metacognitive_prompt", None)
-            if isinstance(coaching_result, dict)
-            else None,
-            "suggested_action": coaching_result.get("action", None)
-            if isinstance(coaching_result, dict)
-            else None,
+            "coaching": (
+                coaching_result.get("coaching", "")
+                if isinstance(coaching_result, dict)
+                else ""
+            ),
+            "metacognitive_prompt": (
+                coaching_result.get("metacognitive_prompt", None)
+                if isinstance(coaching_result, dict)
+                else None
+            ),
+            "suggested_action": (
+                coaching_result.get("action", None)
+                if isinstance(coaching_result, dict)
+                else None
+            ),
             "session_id": session_id,
             "timing": timing_results,
             "performance_analysis": performance_analysis,

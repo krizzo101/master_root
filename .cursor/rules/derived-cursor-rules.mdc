@@ -203,6 +203,25 @@ The system will automatically trigger commits when:
     4.  Run tests (prefer parallel).
     5.  Add a lightweight runtime sanity flag after each thought (e.g., `sanity_check_pass = True/False` with a timestamp) to prevent silent regressions.
     6.  Document the `ThoughtData` schema and serializer contract in the knowledge base and reference it in code comments and tests.
+*   When implementing performance improvements to the metacognitive agents:
+    *   Ensure that each agent is operating in parallel.
+    *   Track the time each agent takes to respond.
+    *   Consider the use of `reasoning_effort="low"` in the agent's configuration.
+    *   Reduce the prompt length to reduce the processing time.
+    *   Ensure that you run your tests after all changes are implemented.
+*   When implementing fixes related to `ThoughtData` objects, ensure that all inputs are properly serialized to strings. Use a `_serialize_or_validate(item: Any) -> str` function to achieve this. The function should:
+    *   If `isinstance(item, str)`: return the item.
+    *   If `hasattr(item, 'thought')`: (i.e., it's a `ThoughtData` object), create a structured string representation including thought number, content, trigger, and action.
+    *   Otherwise: try to convert the item to a string, and fallback to JSON serialization.
+*   When optimizing the violations agent:
+    *   Reduce prompt length.
+    *   Use lower `reasoning_effort` for faster response times.
+*   When optimizing the patterns agent:
+    *   Reduce the pattern window size.
+    *   Simplify the prompt.
+*   When optimizing the coaching agent:
+    *   Simplify the prompt.
+    *   Reduce the amount of context it processes.
 
 ## DEBUGGING
 
@@ -583,28 +602,4 @@ Date awareness is important to understand the amount of time that has elapsed si
 - **RESEARCH CURRENT API VERSIONS**: OpenAI API changes frequently (2025 updates)
 - **VERIFY MODEL AVAILABILITY**: Confirm model names and capabilities
 - **CHECK SYNTAX UPDATES**: API syntax evolves rapidly (Responses API vs Chat Completions)
-- **VALIDATE PRICING**: Confirm current token costs and limits
-- **PROMPTING BEST PRACTICES**: Research latest model-specific optimization techniques
-
-#### 3. EVIDENCE-BASED API SELECTION
-- Base model choices on CURRENT documentation
-- Verify feature availability through research
-- No assumptions about API capabilities
-- Test model-specific prompting strategies
-
-### Model Selection (2025 Current Standards)
-
-**APPROVED MODELS ONLY**: o3, o4 series, GPT-5 series
-**gpt-4o series models are FORBIDDEN**
-**NO GPT-3.5 MODELS**
-
-| Use‑Case                   | Primary Model                  | Alternative         | Notes                               |
-| ----- | --- | ---- | ----- |
-| **Reasoning/Planning**     | `o4-mini`                      | `o3`                | MANDATORY for reasoning workflows   |
-| **Agent Execution**        | `gpt-5-mini`                   | `gpt-5`             | MANDATORY for agent implementation  |
-| **Structured Outputs**     | `gpt-5`                        | `gpt-5-mini`        | Required for JSON schema compliance |
-| **Complex reasoning/code** | `gpt-5`, `o3`                  | `o4-mini`           | Context-dependent selection         |
-| **Fast responses**         | `gpt-5-nano`, `gpt-5-mini`     | Efficiency priority |
-
-**CRITICAL MODEL CONSTRAINTS**:
-- **OAMAT-
+- **VALIDATE PRICING
