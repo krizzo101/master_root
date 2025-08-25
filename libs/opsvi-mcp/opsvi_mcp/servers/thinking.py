@@ -324,6 +324,19 @@ class ThinkingServer:
                         response["metacognitivePrompt"] = triage_result[
                             "metacognitive_prompt"
                         ]
+                    
+                    # CRITICAL: Check if Devil's Advocate says to STOP
+                    devils_advocate = triage_result.get("devils_advocate", {})
+                    if devils_advocate.get("should_pause"):
+                        # Add critical warning to response
+                        response["CRITICAL_WARNING"] = devils_advocate.get("summary", "Devil's Advocate says STOP")
+                        response["MUST_RECONSIDER"] = True
+                        response["critical_violations"] = devils_advocate.get("critical_violations", [])
+                        response["alternative_approaches"] = devils_advocate.get("alternatives", [])
+                        
+                        # Modify the coaching to be more assertive
+                        if triage_result.get("coaching"):
+                            triage_result["coaching"] = f"🛑 STOP: {devils_advocate.get('summary', '')}\n\n{triage_result['coaching']}"
 
             except Exception as e:
                 response["triageError"] = str(e)

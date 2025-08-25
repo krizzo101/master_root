@@ -27,6 +27,8 @@ from opsvi_llm.providers.openai_unified_interface import (  # noqa: E402
     OpenAIUnifiedInterface,
 )
 
+from devils_advocate import DevilsAdvocate  # noqa: E402
+
 # Import knowledge tools for direct access
 try:
     from apps.knowledge_system.mcp_knowledge_tools import get_enhanced_query
@@ -82,6 +84,9 @@ class MetacognitiveAgent:
         self._cached_instructions = None
         self._cache_timestamp = None
         self._cache_ttl = 300  # 5 minutes
+        
+        # Initialize Devil's Advocate for skeptical questioning
+        self.devils_advocate = DevilsAdvocate()
 
         # Common programming context for better analysis
         self.domain_context = """
@@ -1133,7 +1138,10 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
         # Get phase for coaching
         phase = self.auto_detect_phase(thought_data) if thought_data else "auto"
 
-        # ALL FOUR agents run in parallel now - coaching doesn't wait for others
+        # Get intended action for Devil's Advocate
+        intended_action = getattr(thought_data, "intendedAction", None) if thought_data else None
+        
+        # ALL FIVE agents run in parallel now - including Devil's Advocate
         tasks = await asyncio.gather(
             timed_agent(
                 self.analyze_violations,
@@ -1164,10 +1172,14 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
                 phase,
                 thought_data,
             ),
+            timed_agent(
+                lambda: self.devils_advocate.analyze(thought, intended_action, thought_data),
+                "devils_advocate",
+            ),
             return_exceptions=True,
         )
 
-        violations_result, patterns_result, progress_result, coaching_result = tasks
+        violations_result, patterns_result, progress_result, coaching_result, devils_result = tasks
 
         # Handle any errors
         for i, (name, result) in enumerate(
@@ -1176,6 +1188,7 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
                 ("patterns", patterns_result),
                 ("progress", progress_result),
                 ("coaching", coaching_result),
+                ("devils_advocate", devils_result),
             ]
         ):
             if isinstance(result, Exception):
@@ -1201,6 +1214,13 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
             else {"status": "unknown"}
         )
 
+        # Extract Devil's Advocate results
+        devils_advocate = (
+            devils_result
+            if isinstance(devils_result, dict)
+            else {"warnings": [], "questions": [], "alternatives": []}
+        )
+        
         # Get phase from thought_data
         phase = (
             getattr(thought_data, "workPhase", "unknown") if thought_data else "unknown"
@@ -1214,6 +1234,11 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
         # Performance analysis
         performance_analysis = self._analyze_performance(timing_results, total_elapsed)
         parallel_verification = self._verify_parallel_execution(timing_results)
+        
+        # Modify coaching if Devil's Advocate has critical warnings
+        final_coaching = coaching_result.get("coaching", "") if isinstance(coaching_result, dict) else ""
+        if devils_advocate.get("should_pause") and devils_advocate.get("summary"):
+            final_coaching = f"⚠️ {devils_advocate['summary']}\n\n{final_coaching}"
 
         # Merge all results
         return {
@@ -1223,11 +1248,8 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
             "patterns": patterns,
             "progress": progress,
             "risk_assessment": risk_assessment,
-            "coaching": (
-                coaching_result.get("coaching", "")
-                if isinstance(coaching_result, dict)
-                else ""
-            ),
+            "devils_advocate": devils_advocate,  # NEW: Skeptical analysis
+            "coaching": final_coaching,
             "metacognitive_prompt": (
                 coaching_result.get("metacognitive_prompt", None)
                 if isinstance(coaching_result, dict)
