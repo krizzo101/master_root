@@ -8,6 +8,7 @@ import {
   Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 import chalk from 'chalk';
+import { spawn } from 'child_process';
 
 interface MetacognitiveThoughtData {
   thought: string;
@@ -43,17 +44,19 @@ class MetacognitiveThinkingServer {
   private metacognitiveInsights: StoredInsight[] = [];
   private metacognitiveCounter: number = 0;
   private metacognitiveInterval: number = 3; // Every 3rd thought gets meta-analysis
-  // Triage integration
-  private triageUrl: string;
+  // Triage integration (direct subprocess)
+  private triageModulePath: string;
   private triageTimeoutMs: number;
   private triageMode: string;
+  private pythonPath: string;
 
   constructor() {
     this.disableThoughtLogging = (process.env.DISABLE_THOUGHT_LOGGING || "").toLowerCase() === "true";
     this.metacognitiveInterval = parseInt(process.env.METACOGNITIVE_INTERVAL || "3");
-    // Triage config (defaults safe for local)
-    this.triageUrl = process.env.TRIAGE_URL || "http://127.0.0.1:8102/analyze";
-    this.triageTimeoutMs = parseInt(process.env.TRIAGE_TIMEOUT_MS || "2000");
+    // Triage config (direct module execution)
+    this.pythonPath = process.env.PYTHON_PATH || "/home/opsvi/miniconda/bin/python";
+    this.triageModulePath = process.env.TRIAGE_MODULE_PATH || "/home/opsvi/master_root/apps/thinking-supervisor/triage-service/triage_module.py";
+    this.triageTimeoutMs = parseInt(process.env.TRIAGE_TIMEOUT_MS || "10000");
     this.triageMode = process.env.TRIAGE_MODE || "shadow"; // shadow|advisory|enforce
   }
 
