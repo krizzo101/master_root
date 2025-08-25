@@ -27,7 +27,7 @@ from opsvi_llm.providers.openai_unified_interface import (  # noqa: E402
     OpenAIUnifiedInterface,
 )
 
-from devils_advocate import DevilsAdvocate  # noqa: E402
+# from devils_advocate import DevilsAdvocate  # noqa: E402  # REMOVED: Template questions without value
 
 # Import knowledge tools for direct access
 try:
@@ -85,8 +85,8 @@ class MetacognitiveAgent:
         self._cache_timestamp = None
         self._cache_ttl = 300  # 5 minutes
         
-        # Initialize Devil's Advocate for skeptical questioning
-        self.devils_advocate = DevilsAdvocate()
+        # Devil's Advocate removed - was generating template questions without real value
+        # self.devils_advocate = DevilsAdvocate()
 
         # Common programming context for better analysis
         self.domain_context = """
@@ -945,12 +945,13 @@ Respond with JSON: {{"status": "on_track|behind|stuck|diverging|accelerating", "
         except Exception as e:
             return {"error": str(e), "status": "unknown"}
 
-    async def run_devils_advocate(self, thought: str, intended_action: Optional[str], thought_data: Any) -> Dict:
-        """Async wrapper for Devil's Advocate (which is sync)"""
-        # Run the sync function in a thread to not block
-        return await asyncio.to_thread(
-            self.devils_advocate.analyze, thought, intended_action, thought_data
-        )
+    # Devil's Advocate removed - generated template questions without understanding context
+    # async def run_devils_advocate(self, thought: str, intended_action: Optional[str], thought_data: Any) -> Dict:
+    #     """Async wrapper for Devil's Advocate (which is sync)"""
+    #     # Run the sync function in a thread to not block
+    #     return await asyncio.to_thread(
+    #         self.devils_advocate.analyze, thought, intended_action, thought_data
+    #     )
     
     async def generate_coaching(
         self,
@@ -1170,26 +1171,12 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
                 serialized_history,
                 thought_data,
             ),
-            timed_agent(
-                self.generate_coaching,
-                "coaching",
-                thought,
-                thought_number,
-                total_thoughts,
-                phase,
-                thought_data,
-            ),
-            timed_agent(
-                self.run_devils_advocate,
-                "devils_advocate", 
-                thought,
-                intended_action,
-                thought_data,
-            ),
+            # Coaching removed - redundant with other agents
+            # Devil's Advocate removed - template questions without real value
             return_exceptions=True,
         )
 
-        violations_result, patterns_result, progress_result, coaching_result, devils_result = tasks
+        violations_result, patterns_result, progress_result = tasks
 
         # Handle any errors
         for i, (name, result) in enumerate(
@@ -1197,8 +1184,6 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
                 ("violations", violations_result),
                 ("patterns", patterns_result),
                 ("progress", progress_result),
-                ("coaching", coaching_result),
-                ("devils_advocate", devils_result),
             ]
         ):
             if isinstance(result, Exception):
@@ -1225,11 +1210,8 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
         )
 
         # Extract Devil's Advocate results
-        devils_advocate = (
-            devils_result
-            if isinstance(devils_result, dict)
-            else {"warnings": [], "questions": [], "alternatives": []}
-        )
+        # Devil's Advocate removed
+        devils_advocate = {"warnings": [], "questions": [], "alternatives": []}
         
         # Get phase from thought_data
         phase = (
@@ -1245,10 +1227,8 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
         performance_analysis = self._analyze_performance(timing_results, total_elapsed)
         parallel_verification = self._verify_parallel_execution(timing_results)
         
-        # Modify coaching if Devil's Advocate has critical warnings
-        final_coaching = coaching_result.get("coaching", "") if isinstance(coaching_result, dict) else ""
-        if devils_advocate.get("should_pause") and devils_advocate.get("summary"):
-            final_coaching = f"⚠️ {devils_advocate['summary']}\n\n{final_coaching}"
+        # Coaching removed - was redundant
+        final_coaching = ""
 
         # Merge all results
         return {
@@ -1258,8 +1238,8 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
             "patterns": patterns,
             "progress": progress,
             "risk_assessment": risk_assessment,
-            "devils_advocate": devils_advocate,  # NEW: Skeptical analysis
-            "coaching": final_coaching,
+            # "devils_advocate": removed - was generating template questions
+            # "coaching": removed - redundant with other agents,
             "metacognitive_prompt": (
                 coaching_result.get("metacognitive_prompt", None)
                 if isinstance(coaching_result, dict)

@@ -325,30 +325,25 @@ class ThinkingServer:
                             "metacognitive_prompt"
                         ]
                     
-                    # CRITICAL: Check if Devil's Advocate says to STOP
-                    devils_advocate = triage_result.get("devils_advocate", {})
-                    if devils_advocate.get("should_pause"):
-                        critical_summary = devils_advocate.get("summary", "Devil's Advocate says STOP")
-                        violations = devils_advocate.get("critical_violations", [])
-                        
+                    # Check for critical violations that require stopping
+                    violations = triage_result.get("violations", [])
+                    if violations:
                         # FORCE reconsideration by making it prominent
                         response["thoughtNumber"] = data.thoughtNumber
                         response["totalThoughts"] = data.totalThoughts + 1  # Force more thinking
                         response["nextThoughtNeeded"] = True  # Override to force continuation
                         response["CRITICAL_WARNING"] = f"""
-🛑 STOP - CRITICAL ISSUES DETECTED 🛑
+🛑 STOP - CRITICAL VIOLATIONS DETECTED 🛑
 
-{critical_summary}
-
-Violations: {', '.join(violations) if violations else 'Multiple concerns'}
+Violations found: {', '.join(violations[:3])}
 
 You MUST address these issues before proceeding.
-Alternative approaches: {', '.join(devils_advocate.get('alternatives', [])[:2])}
+Fix the violations and verify your approach.
 """
                         
-                        # Make the response scream at me
+                        # Make the response visible
                         print(f"\n{'='*60}", file=sys.stderr)
-                        print(f"🛑 DEVIL'S ADVOCATE: {critical_summary}", file=sys.stderr)
+                        print(f"🛑 VIOLATIONS: {len(violations)} critical issues found", file=sys.stderr)
                         print(f"{'='*60}\n", file=sys.stderr)
 
             except Exception as e:
