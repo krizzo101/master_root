@@ -1,9 +1,10 @@
 """
-Devil's Advocate Agent - Questions assumptions and prevents tunnel vision
+Devil's Advocate Agent - Asks specific, contextual questions to force deeper thinking
 """
 
+import re
 import sys
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 # Add paths for knowledge access
 sys.path.insert(0, "/home/opsvi/master_root/libs")
@@ -17,7 +18,7 @@ except ImportError:
 
 
 class DevilsAdvocate:
-    """Agent that challenges thinking and questions assumptions"""
+    """Agent that asks specific, contextual questions based on what you're actually saying"""
     
     def __init__(self):
         # Load operational instructions once
@@ -52,16 +53,183 @@ class DevilsAdvocate:
                 
         return rules
     
+    def _extract_specifics(self, thought: str) -> Dict[str, Any]:
+        """Extract specific details from the thought to ask about"""
+        specifics = {
+            "errors": [],
+            "values": [],
+            "files": [],
+            "functions": [],
+            "comparisons": [],
+            "problems": [],
+            "solutions": []
+        }
+        
+        # Extract error messages or error descriptions
+        error_patterns = [
+            r"error[:\s]+([^\.]+)",
+            r"fails? with ([^\.]+)",
+            r"doesn't work with ([^\.]+)",
+            r"rejected?(?:ing)? ([^\.]+)",
+            r"not valid (?:for|under) ([^\.]+)"
+        ]
+        for pattern in error_patterns:
+            matches = re.findall(pattern, thought.lower())
+            specifics["errors"].extend(matches)
+        
+        # Extract specific values mentioned
+        value_patterns = [
+            r"(?:value|parameter|argument) (?:of |is )?(['\"]?\w+['\"]?)",
+            r"(?:tried?|using|with) (['\"]?\d+['\"]?)",
+            r"(?:set to|equals?) (['\"]?\w+['\"]?)"
+        ]
+        for pattern in value_patterns:
+            matches = re.findall(pattern, thought.lower())
+            specifics["values"].extend(matches)
+        
+        # Extract file names
+        file_patterns = [
+            r"(?:file|module|script) ([a-zA-Z0-9_\-\.]+\.py)",
+            r"in ([a-zA-Z0-9_\-/]+\.py)",
+            r"(?:edit|modify|change) ([a-zA-Z0-9_\-/]+)"
+        ]
+        for pattern in file_patterns:
+            matches = re.findall(pattern, thought)
+            specifics["files"].extend(matches)
+        
+        # Extract function/parameter names
+        func_patterns = [
+            r"(?:function|method|parameter) ([a-zA-Z_]\w+)",
+            r"([a-zA-Z_]\w+)\s*(?:works?|fails?|doesn't work)",
+            r"([a-zA-Z_]\w+):\s*(?:Optional|int|str|bool|List)"
+        ]
+        for pattern in func_patterns:
+            matches = re.findall(pattern, thought)
+            specifics["functions"].extend(matches)
+        
+        # Extract comparisons
+        if "but" in thought.lower() or "while" in thought.lower() or "however" in thought.lower():
+            comp_patterns = [
+                r"(\w+) works? but (\w+) doesn't",
+                r"(\w+) is (.+) while (\w+) is (.+)",
+                r"difference (?:is|between) (.+)"
+            ]
+            for pattern in comp_patterns:
+                matches = re.findall(pattern, thought.lower())
+                specifics["comparisons"].extend(matches)
+        
+        # Extract problem descriptions
+        problem_keywords = ["issue", "problem", "error", "fails", "doesn't work", "rejected", "can't"]
+        for keyword in problem_keywords:
+            if keyword in thought.lower():
+                # Get the sentence containing the keyword
+                sentences = thought.split('.')
+                for sentence in sentences:
+                    if keyword in sentence.lower():
+                        specifics["problems"].append(sentence.strip())
+                        break
+        
+        # Extract proposed solutions
+        solution_keywords = ["will", "going to", "plan to", "should", "need to", "have to", "try"]
+        for keyword in solution_keywords:
+            if keyword in thought.lower():
+                sentences = thought.split('.')
+                for sentence in sentences:
+                    if keyword in sentence.lower():
+                        specifics["solutions"].append(sentence.strip())
+                        break
+        
+        return specifics
+    
+    def _generate_specific_questions(self, thought: str, specifics: Dict[str, Any]) -> List[str]:
+        """Generate specific questions based on extracted details"""
+        questions = []
+        
+        # Questions about specific errors
+        if specifics["errors"]:
+            for error in specifics["errors"][:2]:  # First 2 errors
+                questions.append(f"What's the EXACT error message for '{error}'? Copy-paste it.")
+                questions.append(f"At what line of code does '{error}' occur? Show me the stack trace.")
+        
+        # Questions about specific values
+        if specifics["values"]:
+            value = specifics["values"][0]
+            questions.append(f"You mentioned {value} - have you tested adjacent values? What about {value}±1?")
+            questions.append(f"Does {value} work when passed as a different type (string vs int)?")
+            questions.append(f"Is {value} within the expected range? What ARE the bounds?")
+        
+        # Questions about files being modified
+        if specifics["files"]:
+            file = specifics["files"][0]
+            questions.append(f"When was {file} last modified? By whom? For what purpose?")
+            questions.append(f"What other code depends on {file}? Have you checked?")
+            questions.append(f"Can you show me the current version of {file} around the problem area?")
+        
+        # Questions about function/parameter differences
+        if specifics["functions"]:
+            if len(specifics["functions"]) >= 2:
+                func1, func2 = specifics["functions"][:2]
+                questions.append(f"What's the EXACT type signature difference between {func1} and {func2}?")
+                questions.append(f"Can you show me both {func1} and {func2} side by side?")
+            else:
+                func = specifics["functions"][0]
+                questions.append(f"What's the full signature of {func}? Include all parameters and types.")
+                questions.append(f"Where is {func} defined? Show me the implementation.")
+        
+        # Questions about comparisons
+        if specifics["comparisons"]:
+            questions.append("You're comparing things - can you create a minimal test case showing the difference?")
+            questions.append("Have you verified your comparison is accurate? Show me the evidence.")
+        
+        # Questions about the problem
+        if specifics["problems"]:
+            questions.append("When did this problem START? What changed right before it broke?")
+            questions.append("Can you reproduce this problem in isolation? Show me a minimal example.")
+            questions.append("Does this problem occur in other environments or just yours?")
+        
+        # Questions about proposed solutions
+        if specifics["solutions"]:
+            questions.append("How will you TEST that your solution actually works?")
+            questions.append("What could go WRONG with your approach? Be specific.")
+            questions.append("Is there prior art? Has anyone solved this exact problem before?")
+        
+        return questions
+    
+    def _generate_contextual_alternatives(self, thought: str, specifics: Dict[str, Any]) -> List[str]:
+        """Generate specific alternative approaches based on the context"""
+        alternatives = []
+        
+        if "parameter" in thought.lower() and "doesn't work" in thought.lower():
+            alternatives.append("Create a test harness that tries ALL parameter types and values systematically")
+            alternatives.append("Check the MCP/FastMCP source code directly to see how it validates parameters")
+            alternatives.append("Use a debugger to step through the validation and see where it fails")
+        
+        if "error" in thought.lower() and any(word in thought.lower() for word in ["50", "integer", "int"]):
+            alternatives.append("Try the same value as different types: 50, '50', 50.0, float(50)")
+            alternatives.append("Check if there's a version mismatch between your Pydantic and FastMCP's expectations")
+        
+        if "field" in thought.lower() and "none" in thought.lower():
+            alternatives.append("Compare with working examples in the FastMCP documentation or tests")
+            alternatives.append("Try using the older Field syntax that other working parameters use")
+        
+        if "restart" in thought.lower():
+            alternatives.append("Instead of restarting, can you hot-reload or dynamically update the definition?")
+            alternatives.append("Create a minimal standalone test that doesn't require the full MCP server")
+        
+        return alternatives
+    
     def analyze(self, thought: str, intended_action: Optional[str], thought_data: Any) -> Dict:
         """
-        Analyze the current thought and intended action for potential issues
-        Returns critical questions and alternative approaches
+        Analyze the current thought and ask SPECIFIC, CONTEXTUAL questions
         """
         
         questions = []
         alternatives = []
         warnings = []
-        critical_violations = []  # STOP-level issues
+        critical_violations = []
+        
+        # Extract specific details from the thought
+        specifics = self._extract_specifics(thought)
         
         # Get step awareness
         thought_number = getattr(thought_data, "thoughtNumber", 1) if thought_data else 1
@@ -69,144 +237,79 @@ class DevilsAdvocate:
         next_thought_needed = getattr(thought_data, "nextThoughtNeeded", False) if thought_data else False
         is_final_thought = not next_thought_needed or thought_number >= total_thoughts
         
-        # CRITICAL: On final thought, be EXTRA skeptical
+        # Generate specific questions based on what was said
+        specific_questions = self._generate_specific_questions(thought, specifics)
+        questions.extend(specific_questions[:5])  # Top 5 most relevant
+        
+        # Generate contextual alternatives
+        contextual_alternatives = self._generate_contextual_alternatives(thought, specifics)
+        alternatives.extend(contextual_alternatives[:3])
+        
+        # On final thought, ask verification questions
         if is_final_thought:
-            questions.append("🎯 FINAL CHECK: Have you considered ALL angles of this problem?")
-            questions.append("🎯 What haven't you thought about yet?")
-            questions.append("🎯 Is there a simpler solution you're overlooking?")
-            questions.append("🎯 What could go WRONG with this approach?")
+            questions.append("Show me EXACTLY how you'll verify this works - what commands will you run?")
+            questions.append("What's your rollback plan if this breaks something?")
             
-            # Check if rushing to conclusion
-            if thought_number <= 2:
-                warnings.append("⚠️ Only {} thoughts before action - are you rushing?".format(thought_number))
-                alternatives.append("Consider more exploration before committing to this solution")
-            
-            # Check confidence on final thought
+            # Check confidence with specific questions
             confidence = getattr(thought_data, "confidenceLevel", None) if thought_data else None
             if confidence and confidence < 70:
-                critical_violations.append(f"🚨 FINAL THOUGHT with only {confidence}% confidence - TOO LOW to act!")
-                alternatives.append("Do more thinking - your confidence should be 70%+ before acting")
+                questions.append(f"You're only {confidence}% confident - what specific info would get you to 90%?")
+                alternatives.append(f"Get to 90% confidence first: what specific test would increase certainty?")
         
-        # Check for operational rule violations
+        # Check for rule violations with specific context
         thought_lower = thought.lower()
-        action_lower = intended_action.lower() if intended_action else ""
         
-        # NO ASSUMPTIONS rule
-        if any(word in thought_lower for word in ["probably", "should be", "i think", "assume", "must be"]):
-            critical_violations.append("🚨 NO ASSUMPTIONS VIOLATION: You're guessing instead of verifying")
-            questions.append("What EVIDENCE do you have for this assumption?")
-            alternatives.append("STOP - Verify your assumption with actual testing first")
+        # NO ASSUMPTIONS - but be specific about WHAT assumption
+        assumption_words = ["probably", "should", "might", "assume", "think", "believe", "guess"]
+        for word in assumption_words:
+            if word in thought_lower:
+                # Find what follows the assumption word
+                idx = thought_lower.index(word)
+                context = thought[idx:min(idx+50, len(thought))]
+                critical_violations.append(f"🚨 NO ASSUMPTIONS: You said '{context}' - verify this!")
+                questions.append(f"You said '{word}' - what SPECIFIC test would verify this?")
+                break
         
-        # NO FALLBACKS rule  
-        if "try/except" in thought_lower or "suppress" in thought_lower or "silence" in thought_lower:
-            critical_violations.append("🚨 NO FALLBACKS VIOLATION: You're hiding errors instead of fixing them")
-            questions.append("What's the ROOT CAUSE of this error?")
-            alternatives.append("STOP - Understand why the error occurs before suppressing it")
-        
-        # Check for tunnel vision on errors
-        if "error" in thought.lower() or "fix" in thought.lower():
-            questions.append("Are you fixing the symptom or the root cause?")
-            questions.append("Is there a simpler solution you're missing?")
-            alternatives.append("Step back - what's the actual goal here?")
-        
-        # Check for modifying shared resources
-        shared_indicators = ["interface", "shared", "common", "global", "base", "core"]
-        if any(ind in thought.lower() for ind in shared_indicators):
-            warnings.append("⚠️ You're about to modify a shared resource")
-            questions.append("If this works for everything else, why would it be broken here?")
-            questions.append("Should you really change shared code for your specific problem?")
-            alternatives.append("Create a local override or wrapper instead")
-        
-        # Check for assumptions
-        assumption_phrases = ["should", "probably", "i think", "assume", "must be", "obviously"]
-        if any(phrase in thought.lower() for phrase in assumption_phrases):
-            questions.append("What evidence do you have for that assumption?")
-            questions.append("What if the opposite is true?")
-            alternatives.append("Verify your assumption with a quick test first")
-        
-        # Check for complexity
-        if len(thought) > 200 or "implement" in thought.lower() or "create" in thought.lower():
-            questions.append("Is there an existing solution you could adapt?")
-            questions.append("Could you solve 80% of this with 20% of the effort?")
-            alternatives.append("Look for a library or existing code that does this")
-        
-        # Check confidence level
-        confidence = getattr(thought_data, "confidenceLevel", None) if thought_data else None
-        if confidence and confidence < 50:
-            warnings.append(f"⚠️ Your confidence is only {confidence}%")
-            questions.append("Should you research more before acting?")
-            questions.append("Who or what could help increase your confidence?")
-            alternatives.append("Run a small experiment to validate your approach")
-        
-        # Check attempt number
+        # Check attempts and ask about specific failures
         attempts = getattr(thought_data, "attemptNumber", 1) if thought_data else 1
         if attempts > 2:
-            warnings.append(f"⚠️ This is attempt #{attempts}")
-            questions.append("Why didn't the previous approaches work?")
-            questions.append("Are you repeating the same mistake?")
-            alternatives.append("Try the OPPOSITE of what you've been doing")
-            alternatives.append("Ask for help - fresh eyes might see what you're missing")
+            previous_failures = getattr(thought_data, "previousFailures", []) if thought_data else []
+            if previous_failures:
+                questions.append(f"You've tried {attempts} times - what was DIFFERENT about attempt #{attempts-1}?")
+                questions.append(f"Your previous approach '{previous_failures[-1] if previous_failures else 'unknown'}' failed - why?")
+            alternatives.append(f"After {attempts} attempts, try the OPPOSITE approach")
         
-        # Check for action without understanding
-        if intended_action and ("change" in intended_action.lower() or "modify" in intended_action.lower()):
-            if "understand" not in thought.lower() and "know" not in thought.lower():
-                warnings.append("⚠️ You're changing code you might not fully understand")
-                questions.append("Do you understand WHY the current code is the way it is?")
-                questions.append("What will break if you make this change?")
-                alternatives.append("Read and understand the existing code first")
-        
-        # Proactive questioning about unconsidered aspects
-        if not any(word in thought_lower for word in ["test", "verify", "check", "confirm"]):
-            questions.append("How will you TEST that your solution works?")
-        
-        if not any(word in thought_lower for word in ["impact", "affect", "break", "depend"]):
-            questions.append("What OTHER parts of the system might this affect?")
-        
-        if not any(word in thought_lower for word in ["user", "requirement", "goal", "purpose"]):
-            questions.append("Does this actually solve the USER's problem?")
-        
-        if "error" in thought_lower and "why" not in thought_lower:
-            questions.append("Do you understand WHY this error is occurring?")
-        
-        # Check for missing context
-        user_request = getattr(thought_data, "userRequest", None) if thought_data else None
-        if user_request and not any(word in thought_lower for word in user_request.lower().split()[:3]):
-            warnings.append("⚠️ Your thought doesn't mention the user's actual request")
-            questions.append(f"How does this relate to: {user_request[:50]}?")
-        
-        # Generate skeptical summary
+        # Determine skepticism level based on specific issues found
         if critical_violations:
             skepticism_level = "critical"
-            should_pause = True  # MUST stop
-        elif warnings:
-            skepticism_level = "high" if len(warnings) > 1 else "medium"
-            should_pause = True  # Should stop
-        elif questions:
+            should_pause = True
+        elif len(specific_questions) > 3:
+            skepticism_level = "high"
+            should_pause = True
+        elif specific_questions:
             skepticism_level = "medium"
-            should_pause = False  # Can continue but consider questions
+            should_pause = False
         else:
             skepticism_level = "low"
             should_pause = False
         
+        # Generate summary that references specific issues
+        if critical_violations:
+            summary = critical_violations[0]
+        elif specific_questions:
+            summary = f"ANSWER THIS FIRST: {specific_questions[0]}"
+        elif alternatives:
+            summary = f"Consider instead: {alternatives[0]}"
+        else:
+            summary = "Proceed, but document your assumptions"
+        
         return {
-            "critical_violations": critical_violations,  # NEW: Rule violations requiring stop
+            "critical_violations": critical_violations,
             "warnings": warnings,
-            "questions": questions[:5],  # Top 5 most relevant
-            "alternatives": alternatives[:3],  # Top 3 alternatives
+            "questions": questions[:5],  # Top 5 most specific
+            "alternatives": alternatives[:3],
             "skepticism_level": skepticism_level,
             "should_pause": should_pause,
-            "summary": self._generate_summary(critical_violations, warnings, questions, alternatives)
+            "summary": summary,
+            "specifics_found": {k: len(v) for k, v in specifics.items() if v}  # What we extracted
         }
-    
-    def _generate_summary(self, critical_violations: List[str], warnings: List[str], questions: List[str], alternatives: List[str]) -> str:
-        """Generate a concise summary of concerns"""
-        if critical_violations:
-            return f"CRITICAL: {critical_violations[0]} - YOU MUST STOP AND RECONSIDER"
-        elif warnings:
-            return f"STOP AND THINK: {warnings[0]}. {questions[0] if questions else ''}"
-        elif questions:
-            return f"Before you continue: {questions[0]}"
-        elif alternatives:
-            return f"Consider: {alternatives[0]}"
-        else:
-            return "Proceed with caution and verify assumptions"

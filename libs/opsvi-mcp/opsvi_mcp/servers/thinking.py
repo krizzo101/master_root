@@ -450,9 +450,7 @@ async def metacognitivethinking(
     ),
     confidenceLevel: Optional[int] = Field(
         default=None,
-        ge=0,
-        le=100,
-        description="How confident are you? 0=guessing, 100=certain (Triggers help if low)",
+        description="How confident are you? 0-100 where 0=guessing, 100=certain (Triggers help if low)",
     ),
     attemptNumber: Optional[int] = Field(
         1, description="Which attempt is this? (Helps detect stuck patterns)"
