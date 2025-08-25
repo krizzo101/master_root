@@ -559,17 +559,23 @@ Respond with JSON: {{"violations": [{{"rule": "RULE_NAME", "evidence": "exact qu
 
         try:
             # Use Responses API without response_format - parse JSON manually
-            response = await self.interface.responses_create(
-                model="gpt-5-nano",
-                input=prompt + "\n\nRespond with valid JSON only.",
-                instructions=(
-                    "You are primarily an ENFORCER - a guardian preventing critical failures. Your main job is "
-                    "catching violations of core rules (NO_ASSUMPTIONS, NO_FALLBACKS, etc) before they cascade. "
-                    "Be firm and direct about violations. You CAN suggest fixes, but your priority is CATCHING "
-                    "problems early. Think of yourself as a safety net. Always respond with valid JSON format."
+            print(f"🔍 Violations agent starting API call...")
+            start = time.time()
+            response = await asyncio.wait_for(
+                self.interface.responses_create(
+                    model="gpt-5-nano",
+                    input=prompt + "\n\nRespond with valid JSON only.",
+                    instructions=(
+                        "You are primarily an ENFORCER - a guardian preventing critical failures. Your main job is "
+                        "catching violations of core rules (NO_ASSUMPTIONS, NO_FALLBACKS, etc) before they cascade. "
+                        "Be firm and direct about violations. You CAN suggest fixes, but your priority is CATCHING "
+                        "problems early. Think of yourself as a safety net. Always respond with valid JSON format."
+                    ),
+                    reasoning_effort="low",
                 ),
-                reasoning_effort="low",
+                timeout=15.0,  # 15 second timeout, no retries
             )
+            print(f"✅ Violations agent completed in {time.time() - start:.1f}s")
 
             # Extract and parse response
             content = self._extract_response_content(response)
@@ -578,7 +584,11 @@ Respond with JSON: {{"violations": [{{"rule": "RULE_NAME", "evidence": "exact qu
                 if content
                 else {"error": "No content in response", "violations": []}
             )
+        except asyncio.TimeoutError:
+            print(f"❌ Violations agent TIMEOUT after 15s")
+            return {"error": "timeout", "violations": []}
         except Exception as e:
+            print(f"❌ Violations agent error: {e}")
             return {"error": str(e), "violations": []}
 
     async def analyze_patterns(
