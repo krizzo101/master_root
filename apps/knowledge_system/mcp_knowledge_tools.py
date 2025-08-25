@@ -130,13 +130,17 @@ class EnhancedKnowledgeStore:
             try:
                 # Generate embedding for new content
                 embed_text = f"{knowledge_type}: {content}"
+                logger.info(
+                    f"Generating embedding for duplicate check: {embed_text[:50]}..."
+                )
                 new_embedding = self.embedding_service.generate_embedding(embed_text)
+                logger.info(f"Generated embedding with {len(new_embedding)} dimensions")
 
                 # Query for similar knowledge with embeddings
                 query = """
                 MATCH (k:Knowledge)
                 WHERE k.knowledge_type = $knowledge_type
-                AND k.deprecated IS NULL
+                AND (k.deprecated = false OR k.deprecated IS NULL)
                 AND k.embedding IS NOT NULL
                 RETURN k.knowledge_id as id,
                        k.content as content,
@@ -149,22 +153,35 @@ class EnhancedKnowledgeStore:
 
                 with self.neo4j_driver.session() as session:
                     result = session.run(query, params)
+                    found_count = 0
                     for record in result:
+                        found_count += 1
                         existing_embedding = record["embedding"]
                         if existing_embedding:
                             # Calculate cosine similarity
                             import numpy as np
 
-                            similarity = np.dot(new_embedding, existing_embedding) / (
-                                np.linalg.norm(new_embedding)
-                                * np.linalg.norm(existing_embedding)
+                            # Convert to numpy arrays if needed
+                            new_emb_array = np.array(new_embedding)
+                            existing_emb_array = np.array(existing_embedding)
+
+                            similarity = np.dot(new_emb_array, existing_emb_array) / (
+                                np.linalg.norm(new_emb_array)
+                                * np.linalg.norm(existing_emb_array)
                             )
+                            logger.debug(
+                                f"Similarity with {record['id'][:8]}: {similarity:.4f}"
+                            )
+
                             # Lower threshold to 0.85 for better duplicate detection
                             if similarity >= 0.85:
                                 superseded_ids.append(record["id"])
                                 logger.info(
                                     f"Found superseded knowledge via embedding (similarity={similarity:.2f}): {record['id'][:8]}..."
                                 )
+                    logger.info(
+                        f"Checked {found_count} existing entries for duplicates"
+                    )
             except Exception as e:
                 logger.warning(f"Embedding-based superseding check failed: {e}")
 

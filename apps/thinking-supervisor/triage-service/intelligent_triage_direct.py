@@ -17,6 +17,11 @@ from pydantic import BaseModel
 # Add project to path for direct imports
 sys.path.insert(0, "/home/opsvi/master_root")
 
+from opsvi_llm.providers.openai_provider import OpenAIConfig
+
+# Import OpenAI unified interface (SAME AS KNOWLEDGE SYSTEM USES)
+from opsvi_llm.providers.openai_unified_interface import OpenAIUnifiedInterface
+
 # Direct imports from knowledge system (10-50ms vs 100-500ms for MCP)
 from apps.knowledge_system.mcp_knowledge_tools import (
     get_enhanced_query,
@@ -56,6 +61,16 @@ class IntelligentTriageAnalyzer:
     def __init__(self):
         self.mode = os.getenv("TRIAGE_MODE", "shadow")
         self.api_key = os.getenv("OPENAI_API_KEY")  # For nano model
+
+        # Initialize OpenAI interface (SAME AS KNOWLEDGE SYSTEM)
+        config = OpenAIConfig(
+            api_key=self.api_key,
+            provider_name="openai",
+            default_model="gpt-5-nano",
+            enable_audit_logging=True,
+            enable_sanitization=True,
+        )
+        self.openai_interface = OpenAIUnifiedInterface(config)
 
         # Initialize direct knowledge access
         self.store = get_enhanced_store()
@@ -302,106 +317,69 @@ Respond in JSON format:
 }}"""
 
         try:
-            # Use OpenAI Responses API with structured output (2025 standard)
-            from openai import AsyncOpenAI
+            # Define Pydantic model for structured response (SAME PATTERN AS KNOWLEDGE SYSTEM)
+            from typing import List, Optional
 
-            client = AsyncOpenAI(api_key=self.api_key)
+            from pydantic import BaseModel, Field
 
-            # Define the JSON schema for structured response
-            triage_schema = {
-                "name": "triage_analysis",
-                "strict": True,
-                "schema": {
-                    "type": "object",
-                    "properties": {
-                        "violations": {
-                            "type": "array",
-                            "items": {"type": "string"},
-                            "description": "List of violations detected",
-                        },
-                        "patterns": {
-                            "type": "array",
-                            "items": {"type": "string"},
-                            "description": "Multi-thought patterns observed",
-                        },
-                        "coaching_questions": {
-                            "type": "array",
-                            "items": {"type": "string"},
-                            "description": "Helpful leading questions",
-                        },
-                        "needs_escalation": {
-                            "type": "boolean",
-                            "description": "Whether to escalate to consult suite",
-                        },
-                        "escalation_reason": {
-                            "type": ["string", "null"],
-                            "description": "Why escalation is needed",
-                        },
-                        "reminders": {
-                            "type": "array",
-                            "items": {"type": "string"},
-                            "description": "Instructions to remind about",
-                        },
-                        "confidence": {
-                            "type": "number",
-                            "minimum": 0.0,
-                            "maximum": 1.0,
-                            "description": "Confidence in analysis",
-                        },
-                        "analysis": {
-                            "type": "string",
-                            "description": "Brief explanation of analysis",
-                        },
-                    },
-                    "required": [
-                        "violations",
-                        "patterns",
-                        "coaching_questions",
-                        "needs_escalation",
-                        "reminders",
-                        "confidence",
-                        "analysis",
-                    ],
-                    "additionalProperties": False,
-                },
-            }
+            class TriageAnalysisSchema(BaseModel):
+                """Structured output schema for triage analysis"""
+
+                model_config = {
+                    "extra": "forbid"
+                }  # Ensures additionalProperties: false
+
+                violations: List[str] = Field(
+                    description="List of violations detected (reflexive agreement, overconfidence, etc.)"
+                )
+                patterns: List[str] = Field(
+                    description="Multi-thought patterns observed (repetition, frustration, etc.)"
+                )
+                coaching_questions: List[str] = Field(
+                    description="Helpful leading questions to unstick the assistant"
+                )
+                needs_escalation: bool = Field(
+                    description="Whether to escalate to consult suite for deeper analysis"
+                )
+                escalation_reason: Optional[str] = Field(
+                    description="Why escalation would help", default=None
+                )
+                reminders: List[str] = Field(
+                    description="Specific instructions/rules to remind the assistant about"
+                )
+                confidence: float = Field(
+                    description="Confidence in analysis (0.0 to 1.0)", ge=0.0, le=1.0
+                )
+                analysis: str = Field(description="Brief explanation of the analysis")
+
+            # Prepare system instructions
+            system_instructions = "You are a precise thought analyzer. Analyze the input and provide structured analysis."
 
             model_name = os.getenv("TRIAGE_MODEL", "gpt-5-nano")
             logger.info(f"Calling OpenAI Responses API with model: {model_name}")
             logger.info(f"Prompt length: {len(prompt)} characters")
 
-            # Use Responses API with structured JSON output (matching working examples)
-            resp = await client.responses.create(
+            # Use the SAME PATTERN as knowledge system - responses_create_structured
+            response = await self.openai_interface.responses_create_structured(
+                input=prompt,
+                response_model=TriageAnalysisSchema,
                 model=model_name,
-                input=[{"role": "developer", "content": prompt}],
-                response={
-                    "modalities": ["text"],
-                    "text": {
-                        "format": {
-                            "type": "json_schema",
-                            "json_schema": triage_schema,
-                        }
-                    },
-                },
+                instructions=system_instructions,
                 temperature=0.3,
-                max_output_tokens=500,
+                # No max_output_tokens - not supported by responses_create_structured
             )
 
-            # Access parsed output directly (as seen in working examples)
-            if hasattr(resp, "output_parsed"):
-                data = resp.output_parsed
-                logger.info(f"Successfully received structured response")
-                logger.info(f"Violations detected: {len(data.get('violations', []))}")
-                logger.info(f"Patterns observed: {len(data.get('patterns', []))}")
-                logger.info(
-                    f"Coaching questions: {len(data.get('coaching_questions', []))}"
-                )
-                return data
-            else:
-                logger.error(f"No output_parsed found in response")
-                logger.error(f"Response type: {type(resp)}")
-                logger.error(f"Response attributes: {dir(resp)}")
-                raise ValueError("No output_parsed in response")
+            # Response is a Pydantic model instance, convert to dict
+            data = response.model_dump()
+
+            logger.info(f"Successfully received structured response")
+            logger.info(f"Violations detected: {len(data.get('violations', []))}")
+            logger.info(f"Patterns observed: {len(data.get('patterns', []))}")
+            logger.info(
+                f"Coaching questions: {len(data.get('coaching_questions', []))}"
+            )
+
+            return data
         except Exception as e:
             logger.error(f"Failed to analyze with Responses API: {e}")
             logger.error(f"Exception type: {type(e).__name__}")
