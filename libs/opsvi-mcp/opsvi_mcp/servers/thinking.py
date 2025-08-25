@@ -472,20 +472,91 @@ async def metacognitivethinking(
     Includes integrated triage for detecting violations and patterns.
     """
     
-    # Coerce string parameters to integers for MCP compatibility
-    # MCP transport converts integers to strings, so we need to convert them back
-    if isinstance(confidenceLevel, str):
-        confidenceLevel = int(confidenceLevel) if confidenceLevel and confidenceLevel != 'None' else None
-    if isinstance(attemptNumber, str):
-        attemptNumber = int(attemptNumber) if attemptNumber and attemptNumber != 'None' else 1
+    # Coerce string parameters for MCP compatibility
+    # MCP transport converts types to strings, so we need to convert them back
+    import json
+    
+    # Helper function to clean None-like strings
+    def is_none_string(val):
+        return val in ['None', 'null', 'undefined', ''] if isinstance(val, str) else False
+    
+    # Handle required integer coercion
     if isinstance(thoughtNumber, str):
         thoughtNumber = int(thoughtNumber)
     if isinstance(totalThoughts, str):
         totalThoughts = int(totalThoughts)
+    
+    # Handle optional integer coercion with None checking
+    if isinstance(confidenceLevel, str):
+        if is_none_string(confidenceLevel):
+            confidenceLevel = None
+        else:
+            confidenceLevel = int(confidenceLevel)
+    
+    if isinstance(attemptNumber, str):
+        if is_none_string(attemptNumber):
+            attemptNumber = 1  # Default value
+        else:
+            attemptNumber = int(attemptNumber)
+    elif attemptNumber is None:
+        attemptNumber = 1  # Ensure default
+    
     if isinstance(revisesThought, str):
-        revisesThought = int(revisesThought) if revisesThought and revisesThought != 'None' else None
+        if is_none_string(revisesThought):
+            revisesThought = None
+        else:
+            revisesThought = int(revisesThought)
+    
     if isinstance(branchFromThought, str):
-        branchFromThought = int(branchFromThought) if branchFromThought and branchFromThought != 'None' else None
+        if is_none_string(branchFromThought):
+            branchFromThought = None
+        else:
+            branchFromThought = int(branchFromThought)
+    
+    # Handle boolean coercion (MCP might send as strings)
+    if isinstance(nextThoughtNeeded, str):
+        nextThoughtNeeded = nextThoughtNeeded.lower() in ['true', '1', 'yes']
+    
+    if isinstance(isRevision, str):
+        if is_none_string(isRevision):
+            isRevision = None
+        else:
+            isRevision = isRevision.lower() in ['true', '1', 'yes']
+    
+    if isinstance(needsMoreThoughts, str):
+        if is_none_string(needsMoreThoughts):
+            needsMoreThoughts = None
+        else:
+            needsMoreThoughts = needsMoreThoughts.lower() in ['true', '1', 'yes']
+    
+    # Handle list coercion - MCP sends lists as JSON strings
+    if isinstance(previousFailures, str):
+        if is_none_string(previousFailures):
+            previousFailures = []
+        else:
+            try:
+                previousFailures = json.loads(previousFailures)
+                if not isinstance(previousFailures, list):
+                    previousFailures = []
+            except:
+                # If it's not valid JSON, treat as single item list
+                previousFailures = [previousFailures] if previousFailures else []
+    elif previousFailures is None:
+        previousFailures = []
+    
+    if isinstance(evidenceGathered, str):
+        if is_none_string(evidenceGathered):
+            evidenceGathered = []
+        else:
+            try:
+                evidenceGathered = json.loads(evidenceGathered)
+                if not isinstance(evidenceGathered, list):
+                    evidenceGathered = []
+            except:
+                # If it's not valid JSON, treat as single item list
+                evidenceGathered = [evidenceGathered] if evidenceGathered else []
+    elif evidenceGathered is None:
+        evidenceGathered = []
 
     # Create validated thought data
     thought_data = ThoughtData(
