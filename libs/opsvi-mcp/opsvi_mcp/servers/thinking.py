@@ -25,9 +25,20 @@ class ThoughtData(BaseModel):
     """Validated thought data structure"""
 
     thought: str = Field(description="Current thinking step")
+    triggerContext: str = Field(
+        description="What triggered this thought (user request, error, result, etc.)"
+    )
     thoughtNumber: int = Field(description="Current thought number", ge=1)
     totalThoughts: int = Field(description="Estimated total thoughts", ge=1)
     nextThoughtNeeded: bool = Field(description="Whether another thought is needed")
+
+    # Optional action planning
+    intendedAction: Optional[str] = Field(
+        None, description="What specific action will be taken next"
+    )
+    assumptions: Optional[str] = Field(
+        None, description="Key assumptions that could be wrong"
+    )
 
     # Optional revision/branching
     isRevision: Optional[bool] = Field(
@@ -223,10 +234,19 @@ thinking_server = ThinkingServer()
 @mcp.tool()
 async def metacognitivethinking(
     thought: str = Field(description="Your current thinking step"),
+    triggerContext: str = Field(
+        description="What triggered this thought (user request, error, previous result, etc.)"
+    ),
     thoughtNumber: int = Field(description="Current thought number", ge=1),
     totalThoughts: int = Field(description="Estimated total thoughts needed", ge=1),
     nextThoughtNeeded: bool = Field(
         description="Whether another thought step is needed"
+    ),
+    intendedAction: Optional[str] = Field(
+        None, description="What specific action you plan to take next"
+    ),
+    assumptions: Optional[str] = Field(
+        None, description="Key assumptions you're making that could be wrong"
     ),
     isRevision: Optional[bool] = Field(
         None, description="Whether this revises previous thinking"
@@ -268,9 +288,12 @@ async def metacognitivethinking(
     # Create validated thought data
     thought_data = ThoughtData(
         thought=thought,
+        triggerContext=triggerContext,
         thoughtNumber=thoughtNumber,
         totalThoughts=totalThoughts,
         nextThoughtNeeded=nextThoughtNeeded,
+        intendedAction=intendedAction,
+        assumptions=assumptions,
         isRevision=isRevision,
         revisesThought=revisesThought,
         branchFromThought=branchFromThought,
