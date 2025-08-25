@@ -3,6 +3,8 @@ generator: project-intelligence-fast
 files:
   - 2025-08-24-knowledge_KB_master_root_migration_etc.txt
   - AGENT_ONBOARDING_SDLC.md
+  - "CLAUDE copy.md"
+  - CLAUDE-ENHANCED.md
   - CLAUDE.local.md
   - CLAUDE.md
   - CLAUDE.md.backup.20250824_123411
@@ -16,8 +18,10 @@ files:
   - KNOWLEDGE_TOOL_ENHANCEMENT_PROPOSAL.md
   - KNOWLEDGE_TOOL_FIX_PLAN.md
   - KNOWLEDGE_TOOL_SOLUTION_SUMMARY.md
+  - MCP_PARAMETER_ANALYSIS.md
   - MCP_SERVER_FIX_REQUIREMENTS.md
   - MERGE_PLAN.md
+  - MONITORING_QUICK_START.md
   - PATTERN_ENGINE_EXTRACTION_SUMMARY.md
   - QUICK_START.md
   - README.md
@@ -998,11 +1002,13 @@ files:
   - apps/thinking-supervisor/mcp-integration/thinking_triage_client.ts
   - apps/thinking-supervisor/mcp_integration.py
   - apps/thinking-supervisor/metacognitive_supervisor.py
+  - apps/thinking-supervisor/triage-service/devils_advocate.py
   - apps/thinking-supervisor/triage-service/enhanced_triage_api.py
   - apps/thinking-supervisor/triage-service/intelligent_triage.py
   - apps/thinking-supervisor/triage-service/intelligent_triage_direct.py
   - apps/thinking-supervisor/triage-service/kb_storage.py
   - apps/thinking-supervisor/triage-service/metacognitive_agent.py
+  - apps/thinking-supervisor/triage-service/metacognitive_agent_lite.py
   - apps/thinking-supervisor/triage-service/test_module.json
   - apps/thinking-supervisor/triage-service/test_no_fallback.json
   - apps/thinking-supervisor/triage-service/test_struggling_thought.json
@@ -1011,6 +1017,7 @@ files:
   - apps/thinking-supervisor/triage-service/triage_api.py
   - apps/thinking-supervisor/triage-service/triage_module.py
   - apps/thinking-supervisor/triage-service/triage_with_mcp.py
+  - auto_pilot_demo.py
   - autonomous_claude_agent/AI_FIRST_IMPLEMENTATION_SUMMARY.md
   - autonomous_claude_agent/ARCHITECTURE.md
   - autonomous_claude_agent/AUTONOMOUS_AI_REDESIGN.md
@@ -2834,9 +2841,9 @@ files:
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/fractal_integration_example.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/main.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/main.py
-  - src/applications/oamat/workflows/orchestrator/__init__.py
+src/applications/oamat/workflows/orchestrator/__init__.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/main.py
-  - src/applications/oamat/workflows/orchestrator/graph_builder.py
+src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/monitoring/__init__.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/oamat_logging.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/parallel_executor.py
@@ -3212,6 +3219,7 @@ files:
   - libs/opsvi-mcp/docs/EMERGENT_QUESTIONS_AND_CONSIDERATIONS.md
   - libs/opsvi-mcp/docs/IMPLEMENTATION_ROADMAP.md
   - libs/opsvi-mcp/docs/MCP_INTEGRATION_POINTS.md
+  - libs/opsvi-mcp/docs/MONITORING_SYSTEM.md
   - libs/opsvi-mcp/docs/SESSION_CONCURRENCY_FINDINGS.md
   - libs/opsvi-mcp/docs/UNIFIED_MCP_ARCHITECTURE.md
   - libs/opsvi-mcp/docs/claude-code-api-reference.md
@@ -3264,11 +3272,14 @@ files:
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/job_manager.py.stub_backup
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/job_manager_fixed.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/mcp_manager.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/monitored_job_manager.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/result_collector.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/server_monitored.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/README.md
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/__init__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/__main__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agent_monitor.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/__init__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/critic_agent.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/documentation_agent.py
@@ -3277,9 +3288,11 @@ files:
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/security_agent.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/testing_agent.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/enhanced_orchestrator.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/server.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/server.py.stub_backup
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/server_fixed.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/session_debugger.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/task_decomposer.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/timeout_manager.py
   - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/README.md
@@ -3342,6 +3355,7 @@ files:
   - libs/opsvi-mcp/opsvi_mcp/servers/simple_python/__main__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/simple_python/config.py
   - libs/opsvi-mcp/opsvi_mcp/servers/simple_python/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/sounding_board.py
   - libs/opsvi-mcp/opsvi_mcp/servers/testing_qa/config.py
   - libs/opsvi-mcp/opsvi_mcp/servers/testing_qa/models.py
   - libs/opsvi-mcp/opsvi_mcp/servers/thinking.py
@@ -3730,6 +3744,7 @@ files:
   - libs/recommended_structure.yaml
   - libs/templates.yaml
   - libs/variable_schema.yaml
+  - master_orchestrator.py
   - master_root.txt
   - master_rules.chat.log.txt
   - mcp-servers-fork/CODE_OF_CONDUCT.md
@@ -3801,6 +3816,7 @@ files:
   - mcp-servers-fork/src/time/src/mcp_server_time/server.py
   - mcp-servers-fork/src/time/uv.lock
   - mcp-servers-fork/tsconfig.json
+  - mcp_e2e_test_20250825.md
   - mypy.ini
   - pattern-engine-service/Dockerfile
   - pattern-engine-service/README.md
@@ -3829,8 +3845,10 @@ files:
   - projects/ctx_intel_001/discovery/requirements.md
   - pyproject.toml
   - pytest.ini
+  - quiet_commit.sh
   - requirements.txt
   - ruff.toml
+  - run_monitored_sdlc.sh
   - run_tests.sh
   - scripts/README.md
   - scripts/README_auto_attach.md
@@ -3845,6 +3863,9 @@ files:
   - scripts/auto_attach.py
   - scripts/auto_attach_generator.py
   - scripts/auto_cleanup.py
+  - scripts/claude-workflows/code-review.sh
+  - scripts/claude-workflows/deploy-pipeline.sh
+  - scripts/claude-workflows/full-test-suite.sh
   - scripts/cleanup_libraries.sh
   - scripts/connect_claude_code_agent.py
   - scripts/create_setup_py.py
@@ -3853,6 +3874,8 @@ files:
   - scripts/direct_todo_implementation.py
   - scripts/enhanced_critic_accountability.py
   - scripts/execute_real_implementation.py
+  - scripts/fetch-innovative-commands.sh
+  - scripts/fetch-popular-commands.sh
   - scripts/fix_agent_syntax.py
   - scripts/fix_and_embed_remaining.py
   - scripts/fix_proj_mapper_imports.py

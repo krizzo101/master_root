@@ -27,7 +27,7 @@ from opsvi_llm.providers.openai_unified_interface import (  # noqa: E402
     OpenAIUnifiedInterface,
 )
 
-# from devils_advocate import DevilsAdvocate  # noqa: E402  # REMOVED: Template questions without value
+from devils_advocate import DevilsAdvocate  # noqa: E402
 
 # Import knowledge tools for direct access
 try:
@@ -85,8 +85,8 @@ class MetacognitiveAgent:
         self._cache_timestamp = None
         self._cache_ttl = 300  # 5 minutes
         
-        # Devil's Advocate removed - was generating template questions without real value
-        # self.devils_advocate = DevilsAdvocate()
+        # Initialize Devil's Advocate for targeted questioning
+        self.devils_advocate = DevilsAdvocate()
 
         # Common programming context for better analysis
         self.domain_context = """
@@ -945,13 +945,12 @@ Respond with JSON: {{"status": "on_track|behind|stuck|diverging|accelerating", "
         except Exception as e:
             return {"error": str(e), "status": "unknown"}
 
-    # Devil's Advocate removed - generated template questions without understanding context
-    # async def run_devils_advocate(self, thought: str, intended_action: Optional[str], thought_data: Any) -> Dict:
-    #     """Async wrapper for Devil's Advocate (which is sync)"""
-    #     # Run the sync function in a thread to not block
-    #     return await asyncio.to_thread(
-    #         self.devils_advocate.analyze, thought, intended_action, thought_data
-    #     )
+    async def run_devils_advocate(self, thought: str, intended_action: Optional[str], thought_data: Any) -> Dict:
+        """Async wrapper for Devil's Advocate (which is sync)"""
+        # Run the sync function in a thread to not block
+        return await asyncio.to_thread(
+            self.devils_advocate.analyze, thought, intended_action, thought_data
+        )
     
     async def generate_coaching(
         self,
@@ -1149,7 +1148,7 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
         # Get intended action for Devil's Advocate
         intended_action = getattr(thought_data, "intendedAction", None) if thought_data else None
         
-        # ALL FIVE agents run in parallel now - including Devil's Advocate
+        # Only Violations and Devil's Advocate agents now
         tasks = await asyncio.gather(
             timed_agent(
                 self.analyze_violations,
@@ -1160,30 +1159,22 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
                 thought_data,
             ),
             timed_agent(
-                self.analyze_patterns, "patterns", thought, pattern_window, thought_data
-            ),
-            timed_agent(
-                self.analyze_progress,
-                "progress",
-                thought_number,
-                total_thoughts,
+                self.run_devils_advocate,
+                "devils_advocate",
                 thought,
-                serialized_history,
+                intended_action,
                 thought_data,
             ),
-            # Coaching removed - redundant with other agents
-            # Devil's Advocate removed - template questions without real value
             return_exceptions=True,
         )
 
-        violations_result, patterns_result, progress_result = tasks
+        violations_result, devils_result = tasks
 
         # Handle any errors
         for i, (name, result) in enumerate(
             [
                 ("violations", violations_result),
-                ("patterns", patterns_result),
-                ("progress", progress_result),
+                ("devils_advocate", devils_result),
             ]
         ):
             if isinstance(result, Exception):
@@ -1198,20 +1189,16 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
             if isinstance(violations_result, dict)
             else []
         )
-        patterns = (
-            patterns_result.get("patterns", [])
-            if isinstance(patterns_result, dict)
-            else []
-        )
-        progress = (
-            progress_result
-            if isinstance(progress_result, dict)
-            else {"status": "unknown"}
-        )
-
         # Extract Devil's Advocate results
-        # Devil's Advocate removed
-        devils_advocate = {"warnings": [], "questions": [], "alternatives": []}
+        devils_advocate = (
+            devils_result
+            if isinstance(devils_result, dict)
+            else {"warnings": [], "questions": [], "alternatives": []}
+        )
+        
+        # Set empty patterns and progress since we removed those agents
+        patterns = []
+        progress = {"status": "unknown"}
         
         # Get phase from thought_data
         phase = (
@@ -1235,21 +1222,11 @@ Respond with JSON: {{"coaching": "specific, actionable guidance", "tone": "colla
             "thought_number": thought_number,
             "analysis_time": round(total_elapsed, 2),
             "violations": violations,
-            "patterns": patterns,
-            "progress": progress,
+            # Removed patterns and progress agents
             "risk_assessment": risk_assessment,
-            # "devils_advocate": removed - was generating template questions
-            # "coaching": removed - redundant with other agents,
-            "metacognitive_prompt": (
-                coaching_result.get("metacognitive_prompt", None)
-                if isinstance(coaching_result, dict)
-                else None
-            ),
-            "suggested_action": (
-                coaching_result.get("action", None)
-                if isinstance(coaching_result, dict)
-                else None
-            ),
+            "devils_advocate": devils_advocate,  # Enhanced with coaching
+            "coaching": devils_advocate.get("coaching", ""),  # From enhanced Devil's Advocate
+            "suggested_action": devils_advocate.get("suggested_action", None),
             "session_id": session_id,
             "timing": timing_results,
             "performance_analysis": performance_analysis,
