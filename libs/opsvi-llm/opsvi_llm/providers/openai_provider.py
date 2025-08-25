@@ -521,7 +521,8 @@ class OpenAIProvider(BaseLLMProvider):
         if instructions:
             create_params["instructions"] = instructions
         if max_tokens:
-            create_params["max_tokens"] = max_tokens
+            # Responses API uses max_output_tokens instead of max_tokens
+            create_params["max_output_tokens"] = max_tokens
         if tools:
             create_params["tools"] = tools
         if stream:
@@ -653,7 +654,8 @@ class OpenAIProvider(BaseLLMProvider):
         if instructions:
             create_params["instructions"] = instructions
         if max_tokens:
-            create_params["max_tokens"] = max_tokens
+            # Responses API uses max_output_tokens instead of max_tokens
+            create_params["max_output_tokens"] = max_tokens
 
         # Add reasoning-specific parameters
         if model in ["o3", "o4-mini"] and reasoning_effort:
