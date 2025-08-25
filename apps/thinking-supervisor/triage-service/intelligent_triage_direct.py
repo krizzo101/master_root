@@ -326,8 +326,21 @@ Respond in JSON format:
                 """Structured output schema for triage analysis"""
 
                 model_config = {
-                    "extra": "forbid"
-                }  # Ensures additionalProperties: false
+                    "extra": "forbid",
+                    # OpenAI Responses API requires ALL fields in required array
+                    "json_schema_extra": {
+                        "required": [
+                            "violations",
+                            "patterns",
+                            "coaching_questions",
+                            "needs_escalation",
+                            "escalation_reason",
+                            "reminders",
+                            "confidence",
+                            "analysis",
+                        ]
+                    },
+                }
 
                 violations: List[str] = Field(
                     description="List of violations detected (reflexive agreement, overconfidence, etc.)"
@@ -356,8 +369,13 @@ Respond in JSON format:
             system_instructions = "You are a precise thought analyzer. Analyze the input and provide structured analysis."
 
             model_name = os.getenv("TRIAGE_MODEL", "gpt-5-nano")
-            logger.info(f"Calling OpenAI Responses API with model: {model_name}")
-            logger.info(f"Prompt length: {len(prompt)} characters")
+            import time
+
+            nano_call_start = time.time()
+            logger.info(
+                f"[NANO] Calling OpenAI Responses API with model: {model_name} at {nano_call_start:.3f}"
+            )
+            logger.info(f"[NANO] Prompt length: {len(prompt)} characters")
 
             # Use the SAME PATTERN as knowledge system - responses_create_structured
             response = await self.openai_interface.responses_create_structured(
@@ -368,11 +386,17 @@ Respond in JSON format:
                 temperature=0.3,
                 # No max_output_tokens - not supported by responses_create_structured
             )
+            nano_call_end = time.time()
+            logger.info(
+                f"[NANO] API call completed in {nano_call_end-nano_call_start:.3f}s"
+            )
 
             # Response is a Pydantic model instance, convert to dict
             data = response.model_dump()
 
-            logger.info(f"Successfully received structured response")
+            logger.info(
+                f"[NANO] Successfully received structured response at {nano_call_end:.3f}"
+            )
             logger.info(f"Violations detected: {len(data.get('violations', []))}")
             logger.info(f"Patterns observed: {len(data.get('patterns', []))}")
             logger.info(
@@ -388,66 +412,8 @@ Respond in JSON format:
 
             logger.error(f"Traceback: {traceback.format_exc()}")
 
-            # Check if it's a model not found error
-            if "model" in str(e).lower() and (
-                "not found" in str(e).lower() or "does not exist" in str(e).lower()
-            ):
-                logger.error(
-                    f"Model {os.getenv('TRIAGE_MODEL', 'gpt-5-nano')} not available"
-                )
-                logger.error(
-                    "Ensure TRIAGE_MODEL env var is set to a valid model (gpt-5-nano, gpt-5-mini, gpt-5)"
-                )
-                logger.error(
-                    "Available models: gpt-5-nano, gpt-5-mini, gpt-5 (NOT gpt-4o-mini!)"
-                )
-
-        # Fallback analysis if API fails
-        logger.warning("Using fallback analysis due to API failure")
-
-        # Basic heuristic fallback for critical violations
-        violations = []
-        coaching = []
-        reminders = []
-
-        thought_lower = thought.lower()
-
-        # Check for reflexive agreement
-        if any(
-            phrase in thought_lower
-            for phrase in ["you're right", "you're absolutely", "absolutely right"]
-        ):
-            violations.append("Reflexive agreement without analysis")
-            reminders.append("Evaluate ideas on MERITS before agreeing")
-            coaching.append("Have you verified this assumption?")
-
-        # Check for overconfidence
-        if any(
-            phrase in thought_lower
-            for phrase in ["will definitely", "obviously", "clearly must"]
-        ):
-            violations.append("Overconfidence without evidence")
-            coaching.append("What evidence supports this certainty?")
-
-        # Check for repetition (simple pattern)
-        if "again" in thought_lower or "still" in thought_lower:
-            patterns = ["Possible repeated attempt"]
-            coaching.append(
-                "Are you trying the same approach? What could you try differently?"
-            )
-        else:
-            patterns = []
-
-        return {
-            "violations": violations,
-            "patterns": patterns,
-            "coaching_questions": coaching,
-            "needs_escalation": len(violations) > 0,
-            "escalation_reason": "Violations detected" if violations else None,
-            "reminders": reminders,
-            "confidence": 0.3,
-            "analysis": f"Fallback heuristic analysis - {len(violations)} violations detected",
-        }
+            # NO FALLBACKS ALLOWED - fail properly
+            raise ValueError(f"Triage API call failed - NO FALLBACKS: {e}") from e
 
     async def store_pattern_directly(
         self, content: str, tags: List[str]
@@ -475,26 +441,36 @@ Respond in JSON format:
 
     async def analyze(self, analysis: ThoughtAnalysis) -> TriageResponse:
         """Main analysis entry point with direct knowledge access"""
+        import time
 
-        logger.info(f"=== TRIAGE ANALYSIS START ===")
+        start_time = time.time()
+
+        logger.info(f"=== TRIAGE ANALYSIS START at {time.time():.3f} ===")
         logger.info(f"Thought #{analysis.thought_number}: {analysis.thought[:100]}...")
         logger.info(f"Session: {analysis.session_id}")
         logger.info(f"History length: {len(analysis.history)}")
 
         # Load instructions from KB (direct access)
-        logger.info("Loading instructions from KB...")
+        kb_start = time.time()
+        logger.info(f"[{time.time()-start_time:.3f}s] Loading instructions from KB...")
         instructions = await self.load_instructions_from_kb()
         logger.info(
-            f"Loaded {len(instructions.get('global_rules', []))} global rules, {len(instructions.get('project_rules', []))} project rules"
+            f"[{time.time()-start_time:.3f}s] KB load took {time.time()-kb_start:.3f}s - Loaded {len(instructions.get('global_rules', []))} global rules, {len(instructions.get('project_rules', []))} project rules"
         )
 
         # Get extended thought history (direct access)
-        logger.info("Loading thought history...")
+        history_start = time.time()
+        logger.info(f"[{time.time()-start_time:.3f}s] Loading thought history...")
         extended_history = await self.get_thought_history(analysis.session_id)
-        logger.info(f"Extended history: {len(extended_history)} entries")
+        logger.info(
+            f"[{time.time()-start_time:.3f}s] History load took {time.time()-history_start:.3f}s - Extended history: {len(extended_history)} entries"
+        )
 
         # Analyze with nano model
-        logger.info("Starting AI analysis...")
+        nano_start = time.time()
+        logger.info(
+            f"[{time.time()-start_time:.3f}s] Starting AI analysis with nano..."
+        )
         ai_analysis = await self.analyze_with_nano_model(
             analysis.thought,
             analysis.thought_number,
@@ -502,10 +478,19 @@ Respond in JSON format:
             analysis.history,
             extended_history,
         )
+        logger.info(
+            f"[{time.time()-start_time:.3f}s] Nano analysis took {time.time()-nano_start:.3f}s"
+        )
 
-        # Store this thought in memory (direct access)
-        await self.store_thought_memory(
-            analysis.session_id, analysis.thought, analysis.thought_number, ai_analysis
+        # TEMPORARILY DISABLED: Store memory causes another nano API call (15s delay)
+        # store_start = time.time()
+        # logger.info(f"[{time.time()-start_time:.3f}s] Storing thought memory...")
+        # await self.store_thought_memory(
+        #     analysis.session_id, analysis.thought, analysis.thought_number, ai_analysis
+        # )
+        # logger.info(f"[{time.time()-start_time:.3f}s] Store memory took {time.time()-store_start:.3f}s")
+        logger.info(
+            f"[{time.time()-start_time:.3f}s] Skipping memory storage to avoid extra nano call"
         )
 
         # Log analysis results
@@ -541,8 +526,15 @@ Mode: {self.mode}
         for violation in ai_analysis.get("violations", []):
             tags.append(f"violation-{violation.lower().replace(' ', '-')[:30]}")
 
-        # Store in KB (direct access - FAST!)
-        kb_id = await self.store_pattern_directly(kb_content, tags)
+        # TEMPORARILY DISABLED: Pattern storage causes another nano API call (30s delay)
+        # pattern_start = time.time()
+        # logger.info(f"[{time.time()-start_time:.3f}s] Storing pattern in KB...")
+        # kb_id = await self.store_pattern_directly(kb_content, tags)
+        # logger.info(f"[{time.time()-start_time:.3f}s] Pattern storage took {time.time()-pattern_start:.3f}s")
+        kb_id = None
+        logger.info(
+            f"[{time.time()-start_time:.3f}s] Skipping pattern storage to avoid extra nano call"
+        )
 
         # Return response based on mode
         response = TriageResponse(
@@ -564,9 +556,11 @@ Mode: {self.mode}
 
         # Log for debugging
         logger.info(
-            f"Triage complete: escalation={response.needs_escalation}, violations={len(response.violations_detected)}, patterns={len(response.patterns_observed)}, coaching={len(response.coaching_questions)}"
+            f"[{time.time()-start_time:.3f}s] Triage complete: escalation={response.needs_escalation}, violations={len(response.violations_detected)}, patterns={len(response.patterns_observed)}, coaching={len(response.coaching_questions)}"
         )
-        logger.info(f"=== TRIAGE ANALYSIS END ===")
+        logger.info(
+            f"=== TRIAGE ANALYSIS END - TOTAL TIME: {time.time()-start_time:.3f}s ==="
+        )
 
         return response
 

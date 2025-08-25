@@ -432,17 +432,28 @@ class EnhancedKnowledgeStore:
                             logger.error(f"Traceback: {traceback.format_exc()}")
 
                     # Mark superseded entries
+                    logger.info(
+                        f"About to mark superseded entries. superseded_ids: {superseded_ids}"
+                    )
                     if superseded_ids:
+                        logger.info(
+                            f"Marking {len(superseded_ids)} entries as superseded by {knowledge_id}"
+                        )
                         deprecate_query = """
                         MATCH (k:Knowledge)
                         WHERE k.knowledge_id IN $ids
                         SET k.deprecated = true,
                             k.deprecated_at = datetime(),
                             k.superseded_by = $new_id
+                        RETURN count(k) as deprecated_count
                         """
-                        session.run(
+                        result = session.run(
                             deprecate_query,
                             {"ids": superseded_ids, "new_id": knowledge_id},
+                        )
+                        deprecated_count = result.single()["deprecated_count"]
+                        logger.info(
+                            f"Successfully marked {deprecated_count} entries as deprecated"
                         )
 
                     # Create relationships
@@ -685,33 +696,76 @@ class EnhancedKnowledgeQuery:
 
         # Build query based on type
         if query_type == "search":
-            cypher = """
-            MATCH (k:Knowledge)
-            WHERE (k.deprecated = false OR k.deprecated IS NULL)
-            AND (toLower(k.content) CONTAINS toLower($query_text)
-            OR toLower(k.summary) CONTAINS toLower($query_text)
-            OR any(tag IN k.tags WHERE toLower(tag) CONTAINS toLower($query_text))
-            OR toLower(k.knowledge_type) CONTAINS toLower($query_text))
-            AND (k.confidence_score >= $min_confidence OR k.confidence_score IS NULL)
-            RETURN k.knowledge_id as id,
-                   k.knowledge_type as type,
-                   k.content as content,
-                   k.summary as summary,
-                   k.tags as tags,
-                   k.confidence as confidence,
-                   k.quality_score as quality_score,
-                   k.usage_count as usage_count,
-                   k.success_rate as success_rate,
-                   k.relationships as relationships,
-                   k.created_at as created_at
-            ORDER BY k.confidence DESC, k.usage_count DESC
-            LIMIT $limit
-            """
-            params = {
-                "query_text": query_text or "",
-                "min_confidence": min_confidence,
-                "limit": limit,
-            }
+            # Split multi-word queries and search for ALL words
+            query_words = query_text.split() if query_text else []
+
+            if len(query_words) > 1:
+                # For multi-word queries, require ALL words to be present
+                where_clauses = []
+                for i, word in enumerate(query_words):
+                    where_clauses.append(
+                        f"""
+                    (toLower(k.content) CONTAINS toLower($word{i})
+                    OR toLower(k.summary) CONTAINS toLower($word{i})
+                    OR any(tag IN k.tags WHERE toLower(tag) CONTAINS toLower($word{i})))
+                    """
+                    )
+
+                where_condition = " AND ".join(where_clauses)
+
+                cypher = f"""
+                MATCH (k:Knowledge)
+                WHERE (k.deprecated = false OR k.deprecated IS NULL)
+                AND ({where_condition})
+                AND (k.confidence_score >= $min_confidence OR k.confidence_score IS NULL)
+                RETURN k.knowledge_id as id,
+                       k.knowledge_type as type,
+                       k.content as content,
+                       k.summary as summary,
+                       k.tags as tags,
+                       k.confidence as confidence,
+                       k.quality_score as quality_score,
+                       k.usage_count as usage_count,
+                       k.success_rate as success_rate,
+                       k.relationships as relationships,
+                       k.created_at as created_at
+                ORDER BY k.confidence DESC, k.usage_count DESC
+                LIMIT $limit
+                """
+
+                # Build params with individual words
+                params = {"min_confidence": min_confidence, "limit": limit}
+                for i, word in enumerate(query_words):
+                    params[f"word{i}"] = word
+            else:
+                # Single word or empty query
+                cypher = """
+                MATCH (k:Knowledge)
+                WHERE (k.deprecated = false OR k.deprecated IS NULL)
+                AND (toLower(k.content) CONTAINS toLower($query_text)
+                OR toLower(k.summary) CONTAINS toLower($query_text)
+                OR any(tag IN k.tags WHERE toLower(tag) CONTAINS toLower($query_text))
+                OR toLower(k.knowledge_type) CONTAINS toLower($query_text))
+                AND (k.confidence_score >= $min_confidence OR k.confidence_score IS NULL)
+                RETURN k.knowledge_id as id,
+                       k.knowledge_type as type,
+                       k.content as content,
+                       k.summary as summary,
+                       k.tags as tags,
+                       k.confidence as confidence,
+                       k.quality_score as quality_score,
+                       k.usage_count as usage_count,
+                       k.success_rate as success_rate,
+                       k.relationships as relationships,
+                       k.created_at as created_at
+                ORDER BY k.confidence DESC, k.usage_count DESC
+                LIMIT $limit
+                """
+                params = {
+                    "query_text": query_text or "",
+                    "min_confidence": min_confidence,
+                    "limit": limit,
+                }
 
         elif query_type == "recent":
             cypher = """
