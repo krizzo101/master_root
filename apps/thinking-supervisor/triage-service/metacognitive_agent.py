@@ -203,7 +203,7 @@ Respond with JSON: {{"violations": [{{"rule": "NO_ASSUMPTIONS|NO_FALLBACKS|THINK
                 ),
                 reasoning_effort="low",
                 temperature=0.3,
-                max_output_tokens=400,
+                max_tokens=400,
             )
 
             # Extract content from response
@@ -285,7 +285,7 @@ Respond with JSON: {{"patterns": [{{"type": "...", "evidence": "...", "impact": 
                 ),
                 reasoning_effort="medium",  # Higher reasoning for pattern detection
                 temperature=0.4,
-                max_output_tokens=300,
+                max_tokens=300,
             )
 
             # Extract content from response
@@ -362,7 +362,7 @@ Respond with JSON: {{"status": "on_track|behind|stuck", "reason": "...", "though
                 ),
                 reasoning_effort="low",
                 temperature=0.3,
-                max_output_tokens=200,
+                max_tokens=200,
             )
 
             # Extract content from response
@@ -447,7 +447,7 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
                 ),
                 reasoning_effort="low",
                 temperature=0.5,  # Slightly creative for coaching
-                max_output_tokens=300,
+                max_tokens=300,
             )
 
             # Extract content from response
