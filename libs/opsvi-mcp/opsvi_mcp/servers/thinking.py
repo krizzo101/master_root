@@ -16,9 +16,9 @@ sys.path.insert(0, "/home/opsvi/master_root/apps")
 from fastmcp import FastMCP  # noqa: E402
 from pydantic import BaseModel, Field  # noqa: E402
 
-# Import triage module directly for speed
+# Import metacognitive agent for parallel intelligent analysis
 sys.path.insert(0, "/home/opsvi/master_root/apps/thinking-supervisor/triage-service")
-from triage_module import TriageAnalyzer  # noqa: E402
+from metacognitive_agent import MetacognitiveAgent  # noqa: E402
 
 
 class ThoughtData(BaseModel):
@@ -84,8 +84,8 @@ class ThinkingServer:
         self.metacognitive_counter = 0
         self.metacognitive_interval = int(os.getenv("METACOGNITIVE_INTERVAL", "5"))
 
-        # Initialize triage analyzer
-        self.triage_analyzer = TriageAnalyzer()
+        # Initialize metacognitive agent for parallel analysis
+        self.metacognitive_agent = MetacognitiveAgent()
         self.triage_mode = os.getenv(
             "TRIAGE_MODE", "advisory"
         )  # shadow|advisory|enforce
@@ -166,19 +166,17 @@ class ThinkingServer:
                 for i in self.metacognitive_insights[-3:]
             ]
 
-        # Run triage analysis (only if enabled and every 5 thoughts)
+        # Run metacognitive analysis (every 5 thoughts)
         if self.triage_mode != "disabled" and data.thoughtNumber % 5 == 0:
             try:
-                # Build history
-                history = [t.thought for t in self.thought_history[-5:]]
-
-                # Run triage analysis
-                triage_result = await self.triage_analyzer.analyze(
+                # Use full thought history for metacognitive agent
+                # It will handle the 15-thought pattern window internally
+                triage_result = await self.metacognitive_agent.analyze(
                     thought=data.thought,
                     thought_number=data.thoughtNumber,
+                    total_thoughts=data.totalThoughts,
+                    thought_history=self.thought_history,
                     session_id=self.session_id,
-                    history=history,
-                    context={"mode": self.triage_mode},
                 )
 
                 # Include triage if it found issues or in advisory mode
