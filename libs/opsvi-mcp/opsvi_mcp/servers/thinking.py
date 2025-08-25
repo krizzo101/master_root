@@ -304,12 +304,5 @@ async def getthinkinginsights() -> Dict[str, Any]:
 
 
 if __name__ == "__main__":
-    # Run the server
-    import uvicorn
-
-    uvicorn.run(
-        "thinking:mcp",
-        host="127.0.0.1",
-        port=int(os.getenv("PORT", "3001")),
-        log_level="error",  # Minimize output
-    )
+    # Run the FastMCP server
+    mcp.run()
