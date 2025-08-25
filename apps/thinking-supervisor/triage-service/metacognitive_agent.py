@@ -154,7 +154,7 @@ Identify specific violations with evidence."""
                 instructions="You detect violations of operational rules in thinking patterns.",
                 reasoning_effort="low",
                 temperature=0.3,
-                max_completion_tokens=400,
+                max_tokens=400,
                 response_format={"type": "json_object"},
             )
 
@@ -197,7 +197,7 @@ Identify patterns:
                 instructions="You identify patterns in thinking sequences.",
                 reasoning_effort="medium",  # Higher reasoning for pattern detection
                 temperature=0.4,
-                max_completion_tokens=300,
+                max_tokens=300,
                 response_format={"type": "json_object"},
             )
 
@@ -229,7 +229,7 @@ Assess:
                 instructions="You track and assess thinking progress.",
                 reasoning_effort="low",
                 temperature=0.3,
-                max_completion_tokens=200,
+                max_tokens=200,
                 response_format={"type": "json_object"},
             )
 
@@ -259,7 +259,7 @@ Generate:
                 instructions="You provide specific coaching to improve thinking.",
                 reasoning_effort="low",
                 temperature=0.5,  # Slightly creative for coaching
-                max_completion_tokens=300,
+                max_tokens=300,
                 response_format={"type": "json_object"},
             )
 
