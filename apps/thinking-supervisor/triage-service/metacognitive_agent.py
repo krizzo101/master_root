@@ -166,9 +166,9 @@ SPECIFIC VIOLATIONS FROM OPERATIONAL INSTRUCTIONS:
 
         # Load from KB
         try:
-            result = await self.query_tool.query(
+            result = self.query_tool.query(
                 query_type="search",
-                search_text="GLOBAL OPERATIONAL INSTRUCTIONS MASTER",
+                query_text="GLOBAL OPERATIONAL INSTRUCTIONS MASTER",
                 limit=1,
             )
             instructions = ""
@@ -192,9 +192,9 @@ SPECIFIC VIOLATIONS FROM OPERATIONAL INSTRUCTIONS:
 
         try:
             # Query for user corrections and lessons
-            result = await self.query_tool.query(
+            result = self.query_tool.query(
                 query_type="search",
-                search_text="user-correction lesson-learned",
+                query_text="user-correction lesson-learned",
                 limit=10,
             )
 

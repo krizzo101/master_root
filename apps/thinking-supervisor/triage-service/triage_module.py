@@ -118,18 +118,18 @@ class TriageAnalyzer:
 
         try:
             # Query for global operational instructions
-            result = await self.query_tool.query(
+            result = self.query_tool.query(
                 query_type="search",
-                search_text="GLOBAL OPERATIONAL INSTRUCTIONS",
+                query_text="GLOBAL OPERATIONAL INSTRUCTIONS",
                 limit=3,
             )
             for item in result.get("results", []):
                 instructions.append(item.get("content", ""))
 
             # Query for specific rules about common violations
-            result = await self.query_tool.query(
+            result = self.query_tool.query(
                 query_type="search",
-                search_text="NO FALLBACKS reflexive agreement",
+                query_text="NO FALLBACKS reflexive agreement",
                 limit=2,
             )
             for item in result.get("results", []):
