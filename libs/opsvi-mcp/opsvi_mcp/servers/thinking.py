@@ -86,7 +86,9 @@ class ThinkingServer:
 
         # Initialize triage analyzer
         self.triage_analyzer = TriageAnalyzer()
-        self.triage_mode = os.getenv("TRIAGE_MODE", "shadow")  # shadow|advisory|enforce
+        self.triage_mode = os.getenv(
+            "TRIAGE_MODE", "advisory"
+        )  # shadow|advisory|enforce
         self.session_id = os.getenv("SESSION_ID", "default")
 
     def generate_metacognitive_prompt(self) -> str:
