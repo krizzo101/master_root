@@ -226,9 +226,16 @@ class ThinkingServer:
                 # Use lite mode for speed
                 if self.triage_mode == "lite":
                     # Ultra-fast analysis without LLM
-                    from apps.thinking_supervisor.triage_service.metacognitive_agent_lite import (
-                        MetacognitiveAgentLite,
-                    )
+                    # Ensure path is available for dynamic import
+                    if (
+                        "/home/opsvi/master_root/apps/thinking-supervisor/triage-service"
+                        not in sys.path
+                    ):
+                        sys.path.insert(
+                            0,
+                            "/home/opsvi/master_root/apps/thinking-supervisor/triage-service",
+                        )
+                    from metacognitive_agent_lite import MetacognitiveAgentLite
 
                     lite_agent = MetacognitiveAgentLite()
                     triage_result = lite_agent.analyze(
@@ -248,9 +255,16 @@ class ThinkingServer:
                         "switching to lite mode"
                     )
                     self.triage_mode = "lite"
-                    from apps.thinking_supervisor.triage_service.metacognitive_agent_lite import (
-                        MetacognitiveAgentLite,
-                    )
+                    # Ensure path is available for dynamic import
+                    if (
+                        "/home/opsvi/master_root/apps/thinking-supervisor/triage-service"
+                        not in sys.path
+                    ):
+                        sys.path.insert(
+                            0,
+                            "/home/opsvi/master_root/apps/thinking-supervisor/triage-service",
+                        )
+                    from metacognitive_agent_lite import MetacognitiveAgentLite
 
                     lite_agent = MetacognitiveAgentLite()
                     triage_result = lite_agent.analyze(
