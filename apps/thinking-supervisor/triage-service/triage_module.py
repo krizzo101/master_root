@@ -12,12 +12,32 @@ import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
+# CRITICAL: Set environment variables from .mcp.json BEFORE any imports
+# These are required for knowledge system to work when imported directly
+os.environ.setdefault("NEO4J_URI", "bolt://localhost:7687")
+os.environ.setdefault("NEO4J_USER", "neo4j")
+os.environ.setdefault("NEO4J_PASSWORD", "password")
+os.environ.setdefault("EMBEDDING_SERVICE_URL", "http://localhost:8000")
+
 # Add libs to path
 sys.path.insert(0, "/home/opsvi/master_root/libs")
+sys.path.insert(0, "/home/opsvi/master_root/apps")
 
 from opsvi_llm.providers.openai_provider import OpenAIConfig
 from opsvi_llm.providers.openai_unified_interface import OpenAIUnifiedInterface
 from pydantic import BaseModel, Field
+
+# Import knowledge tools for direct access (fast path for internal agents)
+try:
+    from apps.knowledge_system.mcp_knowledge_tools import (
+        get_enhanced_query,
+        get_smart_executor,
+    )
+
+    KNOWLEDGE_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Knowledge system not available: {e}", file=sys.stderr)
+    KNOWLEDGE_AVAILABLE = False
 
 
 class TriageAnalysisSchema(BaseModel):
@@ -79,6 +99,49 @@ class TriageAnalyzer:
             enable_sanitization=False,  # Disable for speed
         )
         self.interface = OpenAIUnifiedInterface(config)
+
+        # Initialize knowledge tools if available
+        if KNOWLEDGE_AVAILABLE:
+            self.query_tool = get_enhanced_query()
+            self.smart_query = get_smart_executor()
+        else:
+            self.query_tool = None
+            self.smart_query = None
+
+    async def load_instructions_from_kb(self) -> str:
+        """Load relevant instructions from KB"""
+        if not self.query_tool:
+            return "No instructions available (KB not connected)"
+
+        instructions = []
+
+        try:
+            # Query for global operational instructions
+            result = await self.query_tool.execute_query(
+                query_type="search",
+                search_text="GLOBAL OPERATIONAL INSTRUCTIONS",
+                limit=3,
+            )
+            for item in result.get("results", []):
+                instructions.append(item.get("content", ""))
+
+            # Query for specific rules about common violations
+            result = await self.query_tool.execute_query(
+                query_type="search",
+                search_text="NO FALLBACKS reflexive agreement",
+                limit=2,
+            )
+            for item in result.get("results", []):
+                instructions.append(item.get("content", ""))
+
+        except Exception as e:
+            print(f"Warning: KB query failed: {e}", file=sys.stderr)
+
+        return (
+            "\n\n".join(instructions)
+            if instructions
+            else "No specific instructions found"
+        )
 
     async def analyze(
         self,
