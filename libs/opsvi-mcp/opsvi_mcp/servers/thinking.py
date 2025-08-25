@@ -397,8 +397,8 @@ async def metacognitivethinking(
     triggerContext: str = Field(
         description="What triggered this thought (user request, error, previous result, etc.)"
     ),
-    thoughtNumber: int = Field(description="Current thought number", ge=1),
-    totalThoughts: int = Field(description="Estimated total thoughts needed", ge=1),
+    thoughtNumber: Any = Field(description="Current thought number"),
+    totalThoughts: Any = Field(description="Estimated total thoughts needed"),
     nextThoughtNeeded: bool = Field(
         description="Whether another thought step is needed"
     ),
@@ -415,10 +415,10 @@ async def metacognitivethinking(
     isRevision: Optional[bool] = Field(
         None, description="Whether this revises previous thinking"
     ),
-    revisesThought: Optional[int] = Field(
+    revisesThought: Any = Field(
         None, description="Which thought is being reconsidered"
     ),
-    branchFromThought: Optional[int] = Field(
+    branchFromThought: Any = Field(
         None, description="Branching point thought number"
     ),
     branchId: Optional[str] = Field(None, description="Branch identifier"),
@@ -448,21 +448,21 @@ async def metacognitivethinking(
         default=None,
         description="What did the user actually ask? (Helps agents understand the goal)",
     ),
-    confidenceLevel: Optional[int] = Field(
+    confidenceLevel: Any = Field(
         default=None,
         description="How confident are you? 0-100 where 0=guessing, 100=certain (Triggers help if low)",
     ),
-    attemptNumber: Optional[int] = Field(
-        1, description="Which attempt is this? (Helps detect stuck patterns)"
+    attemptNumber: Any = Field(
+        default=1, description="Which attempt is this? (Helps detect stuck patterns)"
     ),
-    previousFailures: Optional[List[str]] = Field(
+    previousFailures: Any = Field(
         default_factory=list,
         description="What approaches already failed? (Prevents repetition)",
     ),
     currentBlocker: Optional[str] = Field(
         default=None, description="What's blocking you? (Helps agents provide targeted help)"
     ),
-    evidenceGathered: Optional[List[str]] = Field(
+    evidenceGathered: Any = Field(
         default_factory=list,
         description="What facts support your thinking? (Ensures evidence-based approach)",
     ),
@@ -471,6 +471,21 @@ async def metacognitivethinking(
     Enhanced thinking tool with metacognitive awareness.
     Includes integrated triage for detecting violations and patterns.
     """
+    
+    # Coerce string parameters to integers for MCP compatibility
+    # MCP transport converts integers to strings, so we need to convert them back
+    if isinstance(confidenceLevel, str):
+        confidenceLevel = int(confidenceLevel) if confidenceLevel and confidenceLevel != 'None' else None
+    if isinstance(attemptNumber, str):
+        attemptNumber = int(attemptNumber) if attemptNumber and attemptNumber != 'None' else 1
+    if isinstance(thoughtNumber, str):
+        thoughtNumber = int(thoughtNumber)
+    if isinstance(totalThoughts, str):
+        totalThoughts = int(totalThoughts)
+    if isinstance(revisesThought, str):
+        revisesThought = int(revisesThought) if revisesThought and revisesThought != 'None' else None
+    if isinstance(branchFromThought, str):
+        branchFromThought = int(branchFromThought) if branchFromThought and branchFromThought != 'None' else None
 
     # Create validated thought data
     thought_data = ThoughtData(
