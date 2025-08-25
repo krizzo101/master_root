@@ -123,32 +123,76 @@ class EnhancedKnowledgeStore:
 
         Returns list of knowledge IDs that should be marked as superseded.
         """
-        # Query for similar knowledge
-        query = """
-        MATCH (k:Knowledge)
-        WHERE k.knowledge_type = $knowledge_type
-        AND k.deprecated IS NULL
-        AND any(tag IN $tags WHERE tag IN k.tags)
-        RETURN k.knowledge_id as id, k.content as content, k.confidence_score as confidence
-        ORDER BY k.confidence_score DESC
-        LIMIT 10
-        """
-
-        params = {"knowledge_type": knowledge_type, "tags": tags}
-
         superseded_ids = []
 
-        try:
-            if self.neo4j_driver:
+        # First try embedding-based similarity if available
+        if self.embedding_service and self.neo4j_driver:
+            try:
+                # Generate embedding for new content
+                embed_text = f"{knowledge_type}: {content}"
+                new_embedding = self.embedding_service.generate_embedding(embed_text)
+
+                # Query for similar knowledge with embeddings
+                query = """
+                MATCH (k:Knowledge)
+                WHERE k.knowledge_type = $knowledge_type
+                AND k.deprecated IS NULL
+                AND k.embedding IS NOT NULL
+                RETURN k.knowledge_id as id,
+                       k.content as content,
+                       k.embedding as embedding,
+                       k.confidence_score as confidence
+                ORDER BY k.created_at DESC
+                LIMIT 20
+                """
+                params = {"knowledge_type": knowledge_type}
+
                 with self.neo4j_driver.session() as session:
                     result = session.run(query, params)
                     for record in result:
-                        # Simple similarity check - could be enhanced
+                        existing_embedding = record["embedding"]
+                        if existing_embedding:
+                            # Calculate cosine similarity
+                            import numpy as np
+
+                            similarity = np.dot(new_embedding, existing_embedding) / (
+                                np.linalg.norm(new_embedding)
+                                * np.linalg.norm(existing_embedding)
+                            )
+                            # Lower threshold to 0.85 for better duplicate detection
+                            if similarity >= 0.85:
+                                superseded_ids.append(record["id"])
+                                logger.info(
+                                    f"Found superseded knowledge via embedding (similarity={similarity:.2f}): {record['id'][:8]}..."
+                                )
+            except Exception as e:
+                logger.warning(f"Embedding-based superseding check failed: {e}")
+
+        # Fallback to word-based similarity if no embeddings or no matches found
+        if not superseded_ids and self.neo4j_driver:
+            try:
+                query = """
+                MATCH (k:Knowledge)
+                WHERE k.knowledge_type = $knowledge_type
+                AND k.deprecated IS NULL
+                AND any(tag IN $tags WHERE tag IN k.tags)
+                RETURN k.knowledge_id as id, k.content as content
+                LIMIT 10
+                """
+                params = {"knowledge_type": knowledge_type, "tags": tags}
+
+                with self.neo4j_driver.session() as session:
+                    result = session.run(query, params)
+                    for record in result:
                         existing_content = record["content"]
-                        if self._is_similar(content, existing_content):
+                        # Lower threshold to 0.6 for better detection
+                        if self._is_similar(content, existing_content, threshold=0.6):
                             superseded_ids.append(record["id"])
-        except Exception as e:
-            logger.warning(f"Could not check for superseded knowledge: {e}")
+                            logger.info(
+                                f"Found superseded knowledge via word similarity: {record['id'][:8]}..."
+                            )
+            except Exception as e:
+                logger.warning(f"Word-based superseding check failed: {e}")
 
         return superseded_ids
 
@@ -628,10 +672,22 @@ class EnhancedKnowledgeQuery:
             MATCH (k:Knowledge)
             WHERE (k.deprecated = false OR k.deprecated IS NULL)
             AND (toLower(k.content) CONTAINS toLower($query_text)
-            OR any(tag IN k.tags WHERE toLower(tag) CONTAINS toLower($query_text)))
+            OR toLower(k.summary) CONTAINS toLower($query_text)
+            OR any(tag IN k.tags WHERE toLower(tag) CONTAINS toLower($query_text))
+            OR toLower(k.knowledge_type) CONTAINS toLower($query_text))
             AND (k.confidence_score >= $min_confidence OR k.confidence_score IS NULL)
-            RETURN k
-            ORDER BY k.confidence_score DESC, k.usage_count DESC
+            RETURN k.knowledge_id as id,
+                   k.knowledge_type as type,
+                   k.content as content,
+                   k.summary as summary,
+                   k.tags as tags,
+                   k.confidence as confidence,
+                   k.quality_score as quality_score,
+                   k.usage_count as usage_count,
+                   k.success_rate as success_rate,
+                   k.relationships as relationships,
+                   k.created_at as created_at
+            ORDER BY k.confidence DESC, k.usage_count DESC
             LIMIT $limit
             """
             params = {
@@ -645,7 +701,17 @@ class EnhancedKnowledgeQuery:
             MATCH (k:Knowledge)
             WHERE (k.deprecated = false OR k.deprecated IS NULL)
             AND (k.confidence_score >= $min_confidence OR k.confidence_score IS NULL)
-            RETURN k
+            RETURN k.knowledge_id as id,
+                   k.knowledge_type as type,
+                   k.content as content,
+                   k.summary as summary,
+                   k.tags as tags,
+                   k.confidence as confidence,
+                   k.quality_score as quality_score,
+                   k.usage_count as usage_count,
+                   k.success_rate as success_rate,
+                   k.relationships as relationships,
+                   k.created_at as created_at
             ORDER BY COALESCE(k.updated_at, k.created_at, datetime()) DESC
             LIMIT $limit
             """
@@ -657,8 +723,18 @@ class EnhancedKnowledgeQuery:
             WHERE k.deprecated = false
             AND k.knowledge_type = $knowledge_type
             AND k.confidence_score >= $min_confidence
-            RETURN k
-            ORDER BY k.confidence_score DESC
+            RETURN k.knowledge_id as id,
+                   k.knowledge_type as type,
+                   k.content as content,
+                   k.summary as summary,
+                   k.tags as tags,
+                   k.confidence as confidence,
+                   k.quality_score as quality_score,
+                   k.usage_count as usage_count,
+                   k.success_rate as success_rate,
+                   k.relationships as relationships,
+                   k.created_at as created_at
+            ORDER BY k.confidence DESC
             LIMIT $limit
             """
             params = {
@@ -672,8 +748,18 @@ class EnhancedKnowledgeQuery:
             MATCH (k:Knowledge)
             WHERE k.deprecated = false
             AND k.confidence_score >= $min_confidence
-            RETURN k
-            ORDER BY k.confidence_score DESC
+            RETURN k.knowledge_id as id,
+                   k.knowledge_type as type,
+                   k.content as content,
+                   k.summary as summary,
+                   k.tags as tags,
+                   k.confidence as confidence,
+                   k.quality_score as quality_score,
+                   k.usage_count as usage_count,
+                   k.success_rate as success_rate,
+                   k.relationships as relationships,
+                   k.created_at as created_at
+            ORDER BY k.confidence DESC
             LIMIT $limit
             """
             params = {"min_confidence": min_confidence, "limit": limit}
@@ -685,17 +771,21 @@ class EnhancedKnowledgeQuery:
                     result = session.run(cypher, params)
                     knowledge_items = []
                     for record in result:
-                        k = record["k"]
-                        # Clean up the response (no embeddings)
+                        # Now we're returning individual fields, not the whole node
                         item = {
-                            "id": k.get("knowledge_id"),
-                            "type": k.get("knowledge_type"),
-                            "content": k.get("content"),
-                            "summary": k.get("summary"),
-                            "tags": k.get("tags", []),
-                            "confidence": k.get("confidence_score"),
-                            "usage_count": k.get("usage_count", 0),
-                            "success_rate": k.get("success_rate", 0.0),
+                            "id": record.get("id"),
+                            "type": record.get("type"),
+                            "content": record.get("content"),
+                            "summary": record.get("summary"),
+                            "tags": record.get("tags", []),
+                            "confidence": record.get("confidence"),
+                            "quality_score": record.get("quality_score"),
+                            "usage_count": record.get("usage_count", 0),
+                            "success_rate": record.get("success_rate", 0.0),
+                            "relationships": record.get("relationships", []),
+                            "created_at": str(record.get("created_at"))
+                            if record.get("created_at")
+                            else None,
                         }
                         knowledge_items.append(item)
 

@@ -305,7 +305,7 @@ Respond in JSON format:
                         "Content-Type": "application/json",
                     },
                     json={
-                        "model": "gpt-4o-mini",  # Using mini as nano proxy
+                        "model": "gpt-5-nano",  # Fast response model
                         "messages": [
                             {
                                 "role": "system",

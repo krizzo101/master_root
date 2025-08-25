@@ -19,8 +19,8 @@ sys.path.insert(0, "/home/opsvi/master_root")
 
 # Direct imports from knowledge system (10-50ms vs 100-500ms for MCP)
 from apps.knowledge_system.mcp_knowledge_tools import (
-    get_enhanced_store,
     get_enhanced_query,
+    get_enhanced_store,
 )
 from apps.knowledge_system.query_nano_agent import get_smart_executor
 
@@ -302,63 +302,106 @@ Respond in JSON format:
 }}"""
 
         try:
-            # Use OpenAI Responses API (approved model) with JSON-like output
+            # Use OpenAI Responses API with structured output (2025 standard)
             from openai import AsyncOpenAI
 
             client = AsyncOpenAI(api_key=self.api_key)
 
-            logger.info(
-                f"Calling OpenAI API with model: {os.getenv('TRIAGE_MODEL', 'gpt-5-nano')}"
-            )
+            # Define the JSON schema for structured response
+            triage_schema = {
+                "name": "triage_analysis",
+                "strict": True,
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "violations": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "List of violations detected",
+                        },
+                        "patterns": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Multi-thought patterns observed",
+                        },
+                        "coaching_questions": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Helpful leading questions",
+                        },
+                        "needs_escalation": {
+                            "type": "boolean",
+                            "description": "Whether to escalate to consult suite",
+                        },
+                        "escalation_reason": {
+                            "type": ["string", "null"],
+                            "description": "Why escalation is needed",
+                        },
+                        "reminders": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Instructions to remind about",
+                        },
+                        "confidence": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0,
+                            "description": "Confidence in analysis",
+                        },
+                        "analysis": {
+                            "type": "string",
+                            "description": "Brief explanation of analysis",
+                        },
+                    },
+                    "required": [
+                        "violations",
+                        "patterns",
+                        "coaching_questions",
+                        "needs_escalation",
+                        "reminders",
+                        "confidence",
+                        "analysis",
+                    ],
+                    "additionalProperties": False,
+                },
+            }
+
+            model_name = os.getenv("TRIAGE_MODEL", "gpt-5-nano")
+            logger.info(f"Calling OpenAI Responses API with model: {model_name}")
             logger.info(f"Prompt length: {len(prompt)} characters")
 
+            # Use Responses API with structured JSON output (matching working examples)
             resp = await client.responses.create(
-                model=os.getenv("TRIAGE_MODEL", "gpt-5-nano"),
-                input=prompt,
+                model=model_name,
+                input=[{"role": "developer", "content": prompt}],
+                response={
+                    "modalities": ["text"],
+                    "text": {
+                        "format": {
+                            "type": "json_schema",
+                            "json_schema": triage_schema,
+                        }
+                    },
+                },
+                temperature=0.3,
                 max_output_tokens=500,
             )
 
-            text = None
-            logger.info(f"Processing OpenAI response...")
-            logger.info(f"Response object type: {type(resp)}")
-            logger.info(f"Response attributes: {dir(resp)}")
-
-            for out in getattr(resp, "output", []) or []:
-                logger.info(f"Processing output: {type(out)} - {dir(out)}")
-                if hasattr(out, "content") and out.content:
-                    for c in out.content:
-                        logger.info(f"Processing content: {type(c)} - {dir(c)}")
-                        if hasattr(c, "text") and c.text:
-                            text = c.text
-                            logger.info(f"Found text: {text[:100]}...")
-                            break
-                    if text:
-                        break
-
-            if text:
-                logger.info(f"OpenAI response received: {len(text)} characters")
-                logger.info(f"Response text: {text[:500]}...")
+            # Access parsed output directly (as seen in working examples)
+            if hasattr(resp, "output_parsed"):
+                data = resp.output_parsed
+                logger.info(f"Successfully received structured response")
+                logger.info(f"Violations detected: {len(data.get('violations', []))}")
+                logger.info(f"Patterns observed: {len(data.get('patterns', []))}")
+                logger.info(
+                    f"Coaching questions: {len(data.get('coaching_questions', []))}"
+                )
+                return data
             else:
-                logger.error(f"No text found in response!")
-                logger.error(f"Full response object: {resp}")
-                try:
-                    result = json.loads(text)
-                    logger.info(f"Successfully parsed JSON response")
-                    logger.info(f"Parsed result: {json.dumps(result, indent=2)}")
-                    return result
-                except Exception as e:
-                    logger.error(f"Failed to parse JSON response: {e}")
-                    logger.error(f"Raw text: {text}")
-                    return {
-                        "violations": [],
-                        "patterns": [],
-                        "coaching_questions": [],
-                        "needs_escalation": False,
-                        "escalation_reason": None,
-                        "reminders": [],
-                        "confidence": 0.5,
-                        "analysis": text[:800],
-                    }
+                logger.error(f"No output_parsed found in response")
+                logger.error(f"Response type: {type(resp)}")
+                logger.error(f"Response attributes: {dir(resp)}")
+                raise ValueError("No output_parsed in response")
         except Exception as e:
             logger.error(f"Failed to analyze with Responses API: {e}")
             logger.error(f"Exception type: {type(e).__name__}")
@@ -367,17 +410,65 @@ Respond in JSON format:
 
             logger.error(f"Traceback: {traceback.format_exc()}")
 
+            # Check if it's a model not found error
+            if "model" in str(e).lower() and (
+                "not found" in str(e).lower() or "does not exist" in str(e).lower()
+            ):
+                logger.error(
+                    f"Model {os.getenv('TRIAGE_MODEL', 'gpt-5-nano')} not available"
+                )
+                logger.error(
+                    "Ensure TRIAGE_MODEL env var is set to a valid model (gpt-5-nano, gpt-5-mini, gpt-5)"
+                )
+                logger.error(
+                    "Available models: gpt-5-nano, gpt-5-mini, gpt-5 (NOT gpt-4o-mini!)"
+                )
+
         # Fallback analysis if API fails
         logger.warning("Using fallback analysis due to API failure")
+
+        # Basic heuristic fallback for critical violations
+        violations = []
+        coaching = []
+        reminders = []
+
+        thought_lower = thought.lower()
+
+        # Check for reflexive agreement
+        if any(
+            phrase in thought_lower
+            for phrase in ["you're right", "you're absolutely", "absolutely right"]
+        ):
+            violations.append("Reflexive agreement without analysis")
+            reminders.append("Evaluate ideas on MERITS before agreeing")
+            coaching.append("Have you verified this assumption?")
+
+        # Check for overconfidence
+        if any(
+            phrase in thought_lower
+            for phrase in ["will definitely", "obviously", "clearly must"]
+        ):
+            violations.append("Overconfidence without evidence")
+            coaching.append("What evidence supports this certainty?")
+
+        # Check for repetition (simple pattern)
+        if "again" in thought_lower or "still" in thought_lower:
+            patterns = ["Possible repeated attempt"]
+            coaching.append(
+                "Are you trying the same approach? What could you try differently?"
+            )
+        else:
+            patterns = []
+
         return {
-            "violations": [],
-            "patterns": [],
-            "coaching_questions": [],
-            "needs_escalation": False,
-            "escalation_reason": None,
-            "reminders": [],
-            "confidence": 0.0,
-            "analysis": "Analysis failed - API error",
+            "violations": violations,
+            "patterns": patterns,
+            "coaching_questions": coaching,
+            "needs_escalation": len(violations) > 0,
+            "escalation_reason": "Violations detected" if violations else None,
+            "reminders": reminders,
+            "confidence": 0.3,
+            "analysis": f"Fallback heuristic analysis - {len(violations)} violations detected",
         }
 
     async def store_pattern_directly(
