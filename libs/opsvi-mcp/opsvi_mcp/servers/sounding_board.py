@@ -19,51 +19,14 @@ sys.path.insert(0, "/home/opsvi/master_root/apps")
 from fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
-# Import LLM interfaces - using mock for now due to Pydantic v1/v2 conflict
-# TODO: Fix opsvi_llm to be Pydantic v2 compatible
-class LLMConfig:
-    def __init__(self, **kwargs):
-        self.provider_name = kwargs.get("provider_name", "openai")
-        self.default_model = kwargs.get("default_model", "gpt-5")
-        self.reasoning_effort = kwargs.get("reasoning_effort", "medium")
-        self.enable_audit_logging = kwargs.get("enable_audit_logging", False)
-
-class OpenAIUnifiedInterface:
-    def __init__(self, config):
-        self.config = config
-    
-    async def responses_create(self, messages, response_format=None):
-        # Mock response for testing
-        import random
-        confidence = random.randint(70, 95)
-        text = json.dumps({
-            "confidence": confidence,
-            "violations": [] if confidence > 80 else ["Test violation"],
-            "concerns": [] if confidence > 85 else ["Test concern"],
-            "questions": ["What about X?"] if confidence < 90 else [],
-            "suggestions": ["Consider Y"] if confidence < 85 else [],
-            "reasoning": f"Mock response with {confidence}% confidence",
-            "counter_proposal": "Improved proposal" if confidence < 80 else None,
-            "coaching": "Test coaching" if self.config.default_model == "gpt-5" else None
-        })
-        
-        class MockContent:
-            pass
-        class MockOutput:
-            def __init__(self):
-                self.content = [MockContent()]
-                self.content[0].text = text
-        class MockResponse:
-            def __init__(self):
-                self.output = [MockOutput()]
-        return MockResponse()
-
-# Import knowledge tools if available
+# Import OpenAI for real LLM integration
 try:
-    from apps.knowledge_system.mcp_knowledge_tools import get_enhanced_query
-    KNOWLEDGE_AVAILABLE = True
+    from openai import AsyncOpenAI
+    OPENAI_AVAILABLE = True
 except ImportError:
-    KNOWLEDGE_AVAILABLE = False
+    OPENAI_AVAILABLE = False
+    print("ERROR: OpenAI library required. Install with: pip install openai")
+    sys.exit(1)
 
 
 class ProposalData(BaseModel):
@@ -114,108 +77,188 @@ class SoundingBoardServer:
     """Sounding board server for proactive plan review"""
     
     def __init__(self):
-        # Initialize LLM clients for agents
-        self.violations_client = self._init_violations_client()
-        self.coach_client = self._init_coach_client()
+        # Initialize OpenAI client
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError("OPENAI_API_KEY environment variable not set")
+        
+        self.client = AsyncOpenAI(api_key=api_key)
+        
+        # Agent model mapping (using available models)
+        self.agent_models = {
+            "violations": "gpt-4o-mini",  # Fast, efficient for rule checking
+            "coach": "gpt-4o",  # More capable for complex analysis
+        }
         
         # Track review sessions
         self.review_sessions = {}
         self.max_iterations = 10  # Prevent infinite loops
         
-        # Load operational instructions
+        # Load operational rules
         self.operational_rules = self._load_operational_rules()
-        
-    def _init_violations_client(self) -> OpenAIUnifiedInterface:
-        """Initialize Violations agent with gpt-5-nano"""
-        config = LLMConfig(
-            provider_name="openai",
-            default_model="gpt-5-nano",
-            reasoning_effort="low",  # Low reasoning as specified
-            enable_audit_logging=False,
-        )
-        return OpenAIUnifiedInterface(config)
-    
-    def _init_coach_client(self) -> OpenAIUnifiedInterface:
-        """Initialize Coach agent with gpt-5"""
-        config = LLMConfig(
-            provider_name="openai",
-            default_model="gpt-5",
-            reasoning_effort="medium",  # Medium reasoning as specified
-            enable_audit_logging=False,
-        )
-        return OpenAIUnifiedInterface(config)
     
     def _load_operational_rules(self) -> str:
-        """Load operational rules from KB"""
-        rules = """
-GLOBAL OPERATIONAL RULES:
-- NO ASSUMPTIONS: Verify everything with evidence
-- NO FALLBACKS: Fix root causes, not symptoms
-- NO WORKAROUNDS: Implement proper solutions
-- Think BEFORE coding: Plans must be approved
-- Test everything: Include test strategy
-"""
+        """Load operational rules from knowledge base or use comprehensive defaults"""
         
-        if KNOWLEDGE_AVAILABLE:
-            try:
-                query_tool = get_enhanced_query()
-                result = query_tool.query(
-                    query_type="search",
-                    query_text="GLOBAL OPERATIONAL INSTRUCTIONS MASTER",
-                    limit=1
-                )
-                if result.get("results"):
-                    rules = result["results"][0].get("content", rules)
-            except:
-                pass  # Use default rules
-                
-        return rules
+        # Try to load from knowledge base using MCP
+        try:
+            # Import the knowledge query tool if available
+            from opsvi_mcp.servers.knowledge.server import query
+            result = query(
+                query_type="search",
+                search_text="GLOBAL OPERATIONAL INSTRUCTIONS MASTER",
+                limit=1
+            )
+            if result and result.get("results"):
+                return result["results"][0].get("content", "")
+        except:
+            pass
+        
+        # Comprehensive fallback operational rules
+        return """
+# Operational Rules and Guidelines
+
+## Code Quality Standards
+1. All code must include proper error handling and logging
+2. Functions must have clear docstrings with parameter and return types
+3. No hardcoded credentials or sensitive data
+4. Follow established patterns in the codebase
+5. Maintain backward compatibility unless explicitly approved
+6. Include unit tests for all new functionality
+7. Performance implications must be documented
+
+## Security Requirements
+1. Never log or expose sensitive information (passwords, tokens, PII)
+2. All external inputs must be validated and sanitized
+3. Use parameterized queries for database operations
+4. Implement proper authentication and authorization
+5. Follow principle of least privilege
+6. Encrypt sensitive data at rest and in transit
+
+## Architectural Guidelines
+1. Follow SOLID principles
+2. Maintain separation of concerns
+3. Avoid tight coupling between components
+4. Use dependency injection where appropriate
+5. Document all external dependencies
+6. Consider scalability in design decisions
+7. Plan for failure scenarios
+
+## Testing Requirements
+1. Minimum 80% code coverage for new code
+2. Include unit, integration, and end-to-end tests
+3. Test error conditions and edge cases
+4. Performance tests for critical paths
+5. Security tests for authentication/authorization
+6. Document test scenarios and expected outcomes
+
+## Documentation Standards
+1. README must include setup instructions
+2. API documentation for all public interfaces
+3. Architecture diagrams for complex systems
+4. Deployment and configuration guides
+5. Troubleshooting documentation
+6. Keep documentation in sync with code
+
+## Deployment and Operations
+1. Use infrastructure as code
+2. Implement proper logging and monitoring
+3. Include health checks and metrics
+4. Document rollback procedures
+5. Consider zero-downtime deployments
+6. Environment-specific configurations
+
+## Process Requirements
+1. Code reviews required for all changes
+2. Automated CI/CD pipelines
+3. Version control with meaningful commits
+4. Issue tracking and linking
+5. Regular dependency updates
+6. Security scanning in pipeline
+"""
     
     async def review_violations(self, proposal: ProposalData) -> AgentResponse:
-        """Violations agent review using common sense + operational rules"""
+        """Violations agent review using operational rules"""
         
-        prompt = f"""You are the Violations Agent reviewing a proposal.
+        prompt = f"""You are the Violations Agent reviewing a detailed implementation proposal.
         
-Use common sense and these operational rules to identify violations:
+Use these operational rules to identify violations:
 {self.operational_rules}
 
 PROPOSAL (Iteration {proposal.iteration}):
-Plan: {proposal.plan}
+=====================================
 
-Code Samples: {proposal.code_samples or 'None provided'}
+Plan:
+{proposal.plan}
 
-Documentation: {proposal.documentation or 'None provided'}
+Code Samples:
+{proposal.code_samples or 'None provided'}
 
-Test Strategy: {proposal.test_strategy or 'None provided'}
+Documentation:
+{proposal.documentation or 'None provided'}
 
-Evidence: {json.dumps(proposal.evidence) if proposal.evidence else 'None provided'}
+Test Strategy:
+{proposal.test_strategy or 'None provided'}
 
-Context: {proposal.context or 'None provided'}
+Evidence:
+{json.dumps(proposal.evidence) if proposal.evidence else 'None provided'}
+
+Context:
+{proposal.context or 'None provided'}
+
+=====================================
 
 Your job:
-1. Check for violations of operational rules
-2. Identify missing evidence or unsupported claims
-3. Find potential risks or problems
-4. Rate your confidence (0-100%) that this plan is safe and correct
-5. If confidence < 80%, provide a SPECIFIC counter-proposal
+1. Carefully review against ALL operational rules
+2. Identify specific violations with rule references
+3. Check for missing critical elements
+4. Assess security, performance, and maintainability risks
+5. Rate confidence (0-100%) that this plan is safe and correct
+6. If confidence < 80%, provide a DETAILED counter-proposal
+
+Be extremely thorough and specific. Reference exact rules violated.
 
 Respond with JSON:
 {{
     "confidence": <0-100>,
-    "violations": ["list of rule violations found"],
-    "concerns": ["list of concerns about the plan"],
+    "violations": ["list of specific rule violations with references"],
+    "concerns": ["detailed concerns about the plan"],
     "questions": ["specific questions that need answers"],
-    "suggestions": ["how to improve the proposal"],
-    "reasoning": "explain your confidence level",
-    "counter_proposal": "specific actionable counter-proposal if confidence < 80%"
+    "suggestions": ["concrete improvements with examples"],
+    "reasoning": "detailed explanation of confidence level",
+    "counter_proposal": "comprehensive alternative proposal if confidence < 80%"
 }}"""
 
-        response = await self.violations_client.responses_create(
-            messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"},
-        )
-        
-        result = json.loads(response.output[0].content[0].text)
+        try:
+            # Call real OpenAI API
+            response = await self.client.chat.completions.create(
+                model=self.agent_models["violations"],
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a meticulous violations checker. Be thorough and specific."
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                response_format={"type": "json_object"},
+                temperature=0.3,  # Low temperature for consistency
+                max_tokens=2000,
+            )
+            
+            # Parse response
+            result = json.loads(response.choices[0].message.content)
+            
+        except Exception as e:
+            # Fallback on error
+            result = {
+                "confidence": 0,
+                "violations": [f"Failed to review: {str(e)}"],
+                "concerns": ["Agent evaluation failed"],
+                "questions": [],
+                "suggestions": ["Fix agent connection and retry"],
+                "reasoning": f"Agent error: {str(e)}",
+                "counter_proposal": None,
+            }
         
         agent_response = AgentResponse(
             agent_name="Violations",
@@ -246,46 +289,80 @@ Your role:
 5. If confidence < 80%, provide a SPECIFIC counter-proposal
 
 Be specific, not generic. Reference actual details from the proposal."""
-
+        
         prompt = f"""{coach_prompt or default_prompt}
 
 PROPOSAL (Iteration {proposal.iteration}):
-Plan: {proposal.plan}
+=====================================
 
-Code Samples: {proposal.code_samples or 'None provided'}
+Plan:
+{proposal.plan}
 
-Documentation: {proposal.documentation or 'None provided'}
+Code Samples:
+{proposal.code_samples or 'None provided'}
 
-Test Strategy: {proposal.test_strategy or 'None provided'}
+Documentation:
+{proposal.documentation or 'None provided'}
 
-Evidence: {json.dumps(proposal.evidence) if proposal.evidence else 'None provided'}
+Test Strategy:
+{proposal.test_strategy or 'None provided'}
 
-Context: {proposal.context or 'None provided'}
+Evidence:
+{json.dumps(proposal.evidence) if proposal.evidence else 'None provided'}
 
-Your job:
-1. Challenge weak points and assumptions
-2. Suggest better approaches where applicable
-3. Ask probing questions that reveal hidden issues
-4. Provide coaching to improve the proposal
-5. Rate your confidence (0-100%) in this plan
+Context:
+{proposal.context or 'None provided'}
+
+=====================================
+
+Provide a thorough review considering:
+- Technical excellence and best practices
+- Alternative approaches not considered
+- Potential future issues
+- Missing considerations
+- Areas where the proposal could be stronger
 
 Respond with JSON:
 {{
     "confidence": <0-100>,
-    "concerns": ["list of concerns"],
-    "questions": ["probing questions"],
-    "suggestions": ["better approaches"],
-    "coaching": "guidance to improve",
+    "concerns": ["specific concerns with details"],
+    "questions": ["probing questions that reveal gaps"],
+    "suggestions": ["better approaches with rationale"],
+    "coaching": "detailed guidance to improve",
     "reasoning": "explain your confidence level",
     "counter_proposal": "specific actionable counter-proposal if confidence < 80%"
 }}"""
-
-        response = await self.coach_client.responses_create(
-            messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"},
-        )
         
-        result = json.loads(response.output[0].content[0].text)
+        try:
+            # Call real OpenAI API
+            response = await self.client.chat.completions.create(
+                model=self.agent_models["coach"],
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are the Devil's Coach - challenge and guide. Be specific and constructive."
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                response_format={"type": "json_object"},
+                temperature=0.5,  # Moderate temperature for creativity
+                max_tokens=2000,
+            )
+            
+            # Parse response
+            result = json.loads(response.choices[0].message.content)
+            
+        except Exception as e:
+            # Fallback on error
+            result = {
+                "confidence": 0,
+                "concerns": [f"Failed to review: {str(e)}"],
+                "questions": [],
+                "suggestions": ["Fix agent connection and retry"],
+                "coaching": f"Agent error: {str(e)}",
+                "reasoning": f"Agent error: {str(e)}",
+                "counter_proposal": None,
+            }
         
         agent_response = AgentResponse(
             agent_name="Devil's Coach",
@@ -309,11 +386,11 @@ Respond with JSON:
         session_id: str = "default",
         coach_prompt: Optional[str] = None,
     ) -> ConsensusResult:
-        """Review a proposal until consensus is reached"""
+        """Review a proposal and determine consensus"""
         
         start_time = time.time()
         
-        # Initialize session if needed
+        # Initialize or update session
         if session_id not in self.review_sessions:
             self.review_sessions[session_id] = {
                 "iterations": 0,
@@ -333,28 +410,26 @@ Respond with JSON:
                 iteration=session["iterations"],
                 total_time=time.time() - start_time,
                 agents_feedback=[],
-                rejection_reason="Maximum iterations reached without consensus",
+                rejection_reason="Maximum iterations exceeded",
             )
         
         # Run both agents in parallel
-        violations_task = asyncio.create_task(self.review_violations(proposal))
-        coach_task = asyncio.create_task(self.review_coach(proposal, coach_prompt))
+        violations_task = self.review_violations(proposal)
+        coach_task = self.review_coach(proposal, coach_prompt)
         
         violations_response, coach_response = await asyncio.gather(
-            violations_task, coach_task
+            violations_task,
+            coach_task,
         )
         
         # Calculate overall confidence (minimum of both)
         overall_confidence = min(
             violations_response.confidence,
-            coach_response.confidence
+            coach_response.confidence,
         )
         
-        # Check for consensus (both >= 80%)
-        approved = (
-            violations_response.confidence >= 80 and
-            coach_response.confidence >= 80
-        )
+        # Determine if approved (80% threshold)
+        approved = overall_confidence >= 80
         
         # Generate counter-proposal if not approved
         counter_proposal = None
@@ -392,6 +467,7 @@ Respond with JSON:
             if violations_response.violations:
                 next_steps += "\n\nFix these violations:\n" + "\n".join(f"- {v}" for v in violations_response.violations)
         
+        # Create result
         result = ConsensusResult(
             approved=approved,
             overall_confidence=overall_confidence,
@@ -411,13 +487,29 @@ Respond with JSON:
         
         return result
     
-    def reset_session(self, session_id: str = "default"):
+    def get_session_history(self, session_id: str = "default") -> Dict[str, Any]:
+        """Get review history for a session"""
+        
+        if session_id not in self.review_sessions:
+            return {"error": "Session not found"}
+        
+        session = self.review_sessions[session_id]
+        return {
+            "session_id": session_id,
+            "iterations": session["iterations"],
+            "history": [h.dict() for h in session["history"]],
+        }
+    
+    def reset_session(self, session_id: str = "default") -> Dict[str, str]:
         """Reset a review session"""
+        
         if session_id in self.review_sessions:
             del self.review_sessions[session_id]
+        
+        return {"status": "Session reset", "session_id": session_id}
 
 
-# Create FastMCP app
+# Create MCP app
 mcp = FastMCP("sounding-board")
 
 # Create server instance
@@ -474,31 +566,25 @@ async def review_proposal(
 
 @mcp.tool()
 async def reset_review_session(
-    session_id: str = Field("default", description="Session ID to reset")
+    session_id: str = Field("default", description="Session ID to reset"),
 ) -> Dict[str, str]:
-    """Reset a review session to start fresh"""
+    """
+    Reset a review session to start fresh.
+    """
     
-    sounding_board.reset_session(session_id)
-    return {"status": "Session reset", "session_id": session_id}
+    return sounding_board.reset_session(session_id)
 
 
 @mcp.tool()
 async def get_review_history(
-    session_id: str = Field("default", description="Session ID to get history for")
+    session_id: str = Field("default", description="Session ID to get history for"),
 ) -> Dict[str, Any]:
-    """Get the review history for a session"""
+    """
+    Get the review history for a session.
+    """
     
-    if session_id not in sounding_board.review_sessions:
-        return {"error": "Session not found"}
-    
-    session = sounding_board.review_sessions[session_id]
-    return {
-        "session_id": session_id,
-        "iterations": session["iterations"],
-        "history": [h.dict() for h in session["history"]],
-    }
+    return sounding_board.get_session_history(session_id)
 
 
 if __name__ == "__main__":
-    # Run the FastMCP server
     mcp.run()
