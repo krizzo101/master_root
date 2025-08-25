@@ -10,7 +10,7 @@ import json
 import os
 import sys
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 # Set environment variables from .mcp.json BEFORE any imports
 os.environ.setdefault("NEO4J_URI", "bolt://localhost:7687")
@@ -35,6 +35,23 @@ try:
 except ImportError as e:
     print(f"Warning: Knowledge system not available: {e}", file=sys.stderr)
     KNOWLEDGE_AVAILABLE = False
+
+
+class AgentTiming:
+    """Track individual agent timing for performance analysis"""
+
+    def __init__(self):
+        self.start_time: Optional[float] = None
+        self.end_time: Optional[float] = None
+        self.agent_name: str = ""
+
+    def start(self, agent_name: str):
+        self.start_time = time.time()
+        self.agent_name = agent_name
+
+    def end(self):
+        self.end_time = time.time()
+        return self.end_time - self.start_time
 
 
 class MetacognitiveAgent:
@@ -239,6 +256,143 @@ PHASE: REVIEW - Verify completeness
         }
         return phase_rules.get(phase, "")
 
+    def _get_thought_progression_context(
+        self, thought_number: int, total_thoughts: int
+    ) -> str:
+        """Generate context based on thought progression"""
+        progress_ratio = thought_number / max(total_thoughts, 1)
+
+        if progress_ratio <= 0.2:
+            return """
+THOUGHT PHASE: EARLY (0-20% complete)
+- Focus on exploration and discovery
+- Suggest broad approaches and frameworks
+- Encourage thorough analysis before implementation
+- Provide guidance on what to think about next
+"""
+        elif progress_ratio <= 0.6:
+            return """
+THOUGHT PHASE: MIDDLE (20-60% complete)
+- Focus on execution and refinement
+- Suggest optimizations and improvements
+- Help maintain momentum and direction
+- Provide tactical guidance for current approach
+"""
+        elif progress_ratio <= 0.9:
+            return """
+THOUGHT PHASE: LATE (60-90% complete)
+- Focus on completion and validation
+- Suggest final checks and refinements
+- Help ensure quality and completeness
+- Provide final recommendations and warnings
+"""
+        else:
+            return """
+THOUGHT PHASE: FINAL (90-100% complete)
+- Focus on final validation and delivery
+- Suggest last-minute improvements
+- Help ensure nothing is missed
+- Provide final quality assurance
+"""
+
+    def _analyze_performance(self, timing_results: Dict, total_elapsed: float) -> Dict:
+        """Analyze agent performance and identify bottlenecks"""
+
+        # Find slowest agent
+        slowest_agent = max(timing_results.items(), key=lambda x: x[1]["elapsed"])
+
+        # Calculate parallel efficiency
+        sequential_time = sum(t["elapsed"] for t in timing_results.values())
+        parallel_efficiency = (
+            (sequential_time / total_elapsed) if total_elapsed > 0 else 0
+        )
+
+        # Identify bottlenecks
+        bottlenecks = []
+        for agent, timing in timing_results.items():
+            if timing["elapsed"] > 2.0:  # More than 2 seconds
+                bottlenecks.append(
+                    {
+                        "agent": agent,
+                        "time": timing["elapsed"],
+                        "recommendation": self._get_bottleneck_recommendation(
+                            agent, timing["elapsed"]
+                        ),
+                    }
+                )
+
+        return {
+            "slowest_agent": {
+                "name": slowest_agent[0],
+                "time": slowest_agent[1]["elapsed"],
+            },
+            "parallel_efficiency": round(parallel_efficiency, 3),
+            "total_sequential_time": round(sequential_time, 3),
+            "total_parallel_time": round(total_elapsed, 3),
+            "time_saved": round(sequential_time - total_elapsed, 3),
+            "bottlenecks": bottlenecks,
+            "recommendations": self._get_performance_recommendations(
+                timing_results, parallel_efficiency
+            ),
+        }
+
+    def _get_bottleneck_recommendation(self, agent: str, elapsed_time: float) -> str:
+        """Get specific recommendation for bottleneck agent"""
+        if agent == "violations":
+            return "Consider reducing prompt length or using lower reasoning_effort"
+        elif agent == "patterns":
+            return "Pattern analysis is complex - consider reducing pattern window size"
+        elif agent == "progress":
+            return "Progress analysis should be fast - check for API issues"
+        elif agent == "coaching":
+            return "Coaching synthesis is slow - consider simplifying prompt"
+        else:
+            return "Unknown agent bottleneck - investigate API response times"
+
+    def _get_performance_recommendations(
+        self, timing_results: Dict, parallel_efficiency: float
+    ) -> List[str]:
+        """Get performance improvement recommendations"""
+        recommendations = []
+
+        if parallel_efficiency < 0.8:
+            recommendations.append(
+                "Low parallel efficiency - check for blocking operations"
+            )
+
+        slowest_time = max(t["elapsed"] for t in timing_results.values())
+        if slowest_time > 3.0:
+            recommendations.append(
+                f"Slowest agent ({slowest_time}s) exceeds 3s threshold"
+            )
+
+        total_time = sum(t["elapsed"] for t in timing_results.values())
+        if total_time > 10.0:
+            recommendations.append(
+                "Total analysis time exceeds 10s - consider optimization"
+            )
+
+        return recommendations
+
+    def _verify_parallel_execution(self, timing_results: Dict) -> Dict:
+        """Verify that agents are truly running in parallel"""
+
+        # Check if total time is significantly less than sum of individual times
+        total_time = max(t["elapsed"] for t in timing_results.values())
+        sum_time = sum(t["elapsed"] for t in timing_results.values())
+
+        parallel_ratio = total_time / sum_time if sum_time > 0 else 1.0
+
+        return {
+            "is_parallel": parallel_ratio < 1.5,  # Allow some overhead
+            "parallel_ratio": round(parallel_ratio, 3),
+            "expected_sequential_time": round(sum_time, 3),
+            "actual_parallel_time": round(total_time, 3),
+            "overhead": round(
+                total_time - min(t["elapsed"] for t in timing_results.values()), 3
+            ),
+        }
+
     def calculate_risk_score(
         self, violations: List[Dict], patterns: List[Dict], progress: Dict, phase: str
     ) -> Dict:
@@ -358,6 +512,17 @@ PHASE: REVIEW - Verify completeness
         )
         phase_rules = self.get_phase_rules(phase)
 
+        # Get thought progression context
+        thought_number = (
+            getattr(thought_data, "thoughtNumber", 1) if thought_data else 1
+        )
+        total_thoughts = (
+            getattr(thought_data, "totalThoughts", 1) if thought_data else 1
+        )
+        progression_context = self._get_thought_progression_context(
+            thought_number, total_thoughts
+        )
+
         prompt = f"""You are a rule enforcement specialist protecting against cascading failures.
 
 SYSTEM CONTEXT:
@@ -378,6 +543,14 @@ Current thought being analyzed: {thought}
 {f"Assumptions stated: {getattr(thought_data, 'assumptions', 'none')}" if thought_data else ""}
 
 {phase_rules}
+
+{progression_context}
+
+YOUR ROLE ADJUSTMENT: Based on thought progression, adjust your focus:
+- EARLY: Emphasize exploration and framework thinking
+- MIDDLE: Focus on execution quality and efficiency
+- LATE: Prioritize completion and final validation
+- FINAL: Ensure nothing critical is missed
 
 Recent context (for continuity):
 {self._format_thought_history(recent_thoughts)}
@@ -447,6 +620,17 @@ Respond with JSON: {{"violations": [{{"rule": "NO_ASSUMPTIONS|NO_FALLBACKS|THINK
                 thought_text = t.get("thought", "")[:100]
             pattern_summary.append(f"Thought {num}: {thought_text}...")
 
+        # Get thought progression context
+        thought_number = (
+            getattr(thought_data, "thoughtNumber", 1) if thought_data else 1
+        )
+        total_thoughts = (
+            getattr(thought_data, "totalThoughts", 1) if thought_data else 1
+        )
+        progression_context = self._get_thought_progression_context(
+            thought_number, total_thoughts
+        )
+
         prompt = f"""You are a creative pattern analyst discovering hidden opportunities and innovative solutions.
 
 SYSTEM CONTEXT:
@@ -463,6 +647,14 @@ HOW YOUR OUTPUT IS USED: Triggers strategy resets and approach changes in Claude
 Analyzing {len(pattern_window)} recent thoughts for patterns.
 
 Current thought: {thought}
+
+{progression_context}
+
+YOUR ROLE ADJUSTMENT: Based on thought progression, adjust your focus:
+- EARLY: Look for exploration patterns and framework development
+- MIDDLE: Focus on execution patterns and optimization opportunities
+- LATE: Identify completion patterns and final validation needs
+- FINAL: Ensure no critical patterns are missed
 
 Thought sequence:
 {chr(10).join(pattern_summary)}
@@ -522,6 +714,30 @@ Respond with JSON: {{"patterns": [{{"type": "...", "evidence": "...", "impact": 
         thought_data: Any = None,
     ) -> Dict:
         """Intelligent agent for progress tracking"""
+
+        # Get thought progression context
+        progression_context = self._get_thought_progression_context(
+            thought_number, total_thoughts
+        )
+
+        # Add explicit status validation
+        def validate_status(status: str) -> str:
+            valid_statuses = [
+                "on_track",
+                "behind",
+                "stuck",
+                "diverging",
+                "accelerating",
+            ]
+            if status not in valid_statuses:
+                # Log the invalid status for debugging
+                print(
+                    f"⚠️ Progress agent returned invalid status: '{status}'",
+                    file=sys.stderr,
+                )
+                return "unknown"
+            return status
+
         prompt = f"""You are a strategic progress optimizer finding faster, better paths to completion.
 
 SYSTEM CONTEXT:
@@ -539,6 +755,14 @@ Current status: Thought {thought_number} of {total_thoughts} estimated
 Progress ratio: {thought_number}/{total_thoughts} = {thought_number/max(total_thoughts, 1)*100:.0f}% thoughts used
 
 Current thought: {thought}
+
+{progression_context}
+
+YOUR ROLE ADJUSTMENT: Based on thought progression, adjust your focus:
+- EARLY: Focus on planning and framework development progress
+- MIDDLE: Monitor execution efficiency and momentum
+- LATE: Track completion progress and final validation
+- FINAL: Ensure final delivery is on track
 
 Recent progress (last 3 thoughts):
 {chr(10).join(history[-3:]) if history else 'No prior thoughts yet'}
@@ -567,7 +791,7 @@ RESPONSE USAGE: Your findings determine if we need to:
 3. Request more thoughts/time
 4. Abandon current approach and restart
 
-Respond with JSON: {{"status": "on_track|behind|stuck", "reason": "...", "thoughts_remaining": N, "intervention_needed": true/false, "strategic_pivots": ["alternative paths forward"], "parallel_opportunities": ["things to do simultaneously"]}}"""
+Respond with JSON: {{"status": "on_track|behind|stuck|diverging|accelerating", "reason": "...", "thoughts_remaining": N, "intervention_needed": true/false, "strategic_pivots": ["alternative paths forward"], "parallel_opportunities": ["things to do simultaneously"]}}"""
 
         try:
             # Use Responses API without response_format - parse JSON manually
@@ -585,11 +809,15 @@ Respond with JSON: {{"status": "on_track|behind|stuck", "reason": "...", "though
 
             # Extract and parse response
             content = self._extract_response_content(response)
-            return (
-                json.loads(content)
-                if content
-                else {"error": "No content in response", "status": "unknown"}
-            )
+
+            if content:
+                result = json.loads(content)
+                # Validate and fix status
+                if "status" in result:
+                    result["status"] = validate_status(result["status"])
+                return result
+            else:
+                return {"error": "No content in response", "status": "unknown"}
         except Exception as e:
             return {"error": str(e), "status": "unknown"}
 
@@ -597,6 +825,14 @@ Respond with JSON: {{"status": "on_track|behind|stuck", "reason": "...", "though
         self, violations: Dict, patterns: Dict, progress: Dict
     ) -> Dict:
         """Intelligent agent for generating contextual coaching"""
+
+        # Extract thought progression info from progress data if available
+        thought_number = progress.get("thought_number", 1)
+        total_thoughts = progress.get("total_thoughts", 1)
+        progression_context = self._get_thought_progression_context(
+            thought_number, total_thoughts
+        )
+
         context = f"""You are the synthesis coach transforming all feedback into actionable wisdom.
 
 SYSTEM CONTEXT:
@@ -609,6 +845,14 @@ SYSTEM CONTEXT:
 PURPOSE: Convert detection of problems into specific corrective actions that work.
 YOUR IMPACT: Good coaching can reduce task time by 70% by preventing rabbit holes.
 HOW YOUR OUTPUT IS USED: Appears as system-level guidance that redirects Claude's thinking
+
+{progression_context}
+
+YOUR ROLE ADJUSTMENT: Based on thought progression, adjust your coaching style:
+- EARLY: Provide guidance on what to think about next and how to approach the problem
+- MIDDLE: Focus on execution guidance and optimization suggestions
+- LATE: Emphasize completion guidance and final validation steps
+- FINAL: Ensure final delivery guidance and last-minute improvements
 
 ANALYSIS RESULTS REQUIRING COACHING:
 Violations found: {json.dumps(violations.get('violations', []), indent=2)}
@@ -727,13 +971,52 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
         # If token usage becomes an issue, we can add INTELLIGENT skip logic later
         print("🧠 Launching parallel metacognitive analysis...", file=sys.stderr)
 
+        # Individual agent timing
+        timing_results = {}
+
+        # Launch agents with timing
+        async def timed_agent(agent_func, agent_name, *args, **kwargs):
+            timing = AgentTiming()
+            timing.start(agent_name)
+            try:
+                result = await agent_func(*args, **kwargs)
+                elapsed = timing.end()
+                timing_results[agent_name] = {
+                    "elapsed": round(elapsed, 3),
+                    "success": True,
+                    "error": None,
+                }
+                return result
+            except Exception as e:
+                elapsed = timing.end()
+                timing_results[agent_name] = {
+                    "elapsed": round(elapsed, 3),
+                    "success": False,
+                    "error": str(e),
+                }
+                return {"error": str(e)}
+
+        # Parallel execution with timing
         tasks = await asyncio.gather(
-            self.analyze_violations(
-                thought, recent_thoughts, full_context, thought_data
+            timed_agent(
+                self.analyze_violations,
+                "violations",
+                thought,
+                recent_thoughts,
+                full_context,
+                thought_data,
             ),
-            self.analyze_patterns(thought, pattern_window, thought_data),
-            self.analyze_progress(
-                thought_number, total_thoughts, thought, recent_thoughts, thought_data
+            timed_agent(
+                self.analyze_patterns, "patterns", thought, pattern_window, thought_data
+            ),
+            timed_agent(
+                self.analyze_progress,
+                "progress",
+                thought_number,
+                total_thoughts,
+                thought,
+                recent_thoughts,
+                thought_data,
             ),
             return_exceptions=True,
         )
@@ -748,14 +1031,21 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
                 print(f"❌ Task {i} failed: {result}", file=sys.stderr)
                 tasks[i] = {"error": str(result)}
 
-        # Generate coaching based on all analyses
+        # Generate coaching based on all analyses with timing
+        coaching_start = time.time()
         coaching_result = await self.generate_coaching(
             violations_result if not isinstance(violations_result, Exception) else {},
             patterns_result if not isinstance(patterns_result, Exception) else {},
             progress_result if not isinstance(progress_result, Exception) else {},
         )
+        coaching_elapsed = time.time() - coaching_start
+        timing_results["coaching"] = {
+            "elapsed": round(coaching_elapsed, 3),
+            "success": True,
+            "error": None,
+        }
 
-        elapsed = time.time() - start_time
+        total_elapsed = time.time() - start_time
 
         # Extract results
         violations = (
@@ -784,10 +1074,14 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
             violations, patterns, progress, phase
         )
 
+        # Performance analysis
+        performance_analysis = self._analyze_performance(timing_results, total_elapsed)
+        parallel_verification = self._verify_parallel_execution(timing_results)
+
         # Merge all results
         return {
             "thought_number": thought_number,
-            "analysis_time": round(elapsed, 2),
+            "analysis_time": round(total_elapsed, 2),
             "violations": violations,
             "patterns": patterns,
             "progress": progress,
@@ -802,6 +1096,9 @@ Respond with JSON: {{"coaching": "specific instruction", "severity": "critical|i
             if isinstance(coaching_result, dict)
             else None,
             "session_id": session_id,
+            "timing": timing_results,
+            "performance_analysis": performance_analysis,
+            "parallel_verification": parallel_verification,
         }
 
 

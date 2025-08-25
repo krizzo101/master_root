@@ -193,6 +193,7 @@ The system will automatically trigger commits when:
 *   When asked to add enhanced versions of existing tools to the `.cursor/mcp.json` file, ensure the new tools are named distinctly (e.g., `thinking-enhanced`, `knowledge-enhanced`). Also, when the consult suite tool requires a migrated consult suite, create a new entry for that too.
 *   When asked to commit outstanding changes to git, first check the current branch. If the current branch is "main" or "master", create a new feature branch named "feature/enhanced-thinking-prep-(date +%Y%m%d-%H%M%S)". Then, add all changes using `git add -A`. Check if there are any staged changes using `git diff --cached --quiet`. If there are staged changes, commit them with the message "chore: commit outstanding changes before enhanced thinking updates [prep]". Finally, print the current working directory (`pwd`), list all files (`ls -a | cat`), show the git status (`git status`), show the current branch (`git branch --show-current`), show the last 5 commits (`git log --oneline -5`), and list git worktrees (`git worktree list`).
 *   When pre-commit hooks prevent a commit, and the user instructs to proceed, use the `--no-verify` flag with the `git commit` command.
+*   When updating the `.cursor/mcp.json` config to match the `.mcp.json` config in the project root for a specific tool, ensure all relevant environment variables and configurations are included.
 
 ## DEBUGGING
 
@@ -634,9 +635,4 @@ result = response.output_parsed
 
 #### Advanced Role Hierarchy (2025 BEST PRACTICE)
 ```python
-# ✅ PRIORITY ORDER: developer > user > assistant
-messages = [
-    {
-        "role": "developer",  # HIGHEST PRIORITY
-        "content": """
-        ## SYSTEM CONSTRAINTS
+# ✅ PRI
