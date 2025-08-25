@@ -11,7 +11,6 @@ import sys
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-import httpx
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
@@ -19,7 +18,10 @@ from pydantic import BaseModel
 sys.path.insert(0, "/home/opsvi/master_root")
 
 # Direct imports from knowledge system (10-50ms vs 100-500ms for MCP)
-from apps.knowledge_system.mcp_knowledge_tools import KnowledgeManager
+from apps.knowledge_system.mcp_knowledge_tools import (
+    get_enhanced_store,
+    get_enhanced_query,
+)
 from apps.knowledge_system.query_nano_agent import get_smart_executor
 
 # Configure logging
@@ -56,7 +58,8 @@ class IntelligentTriageAnalyzer:
         self.api_key = os.getenv("OPENAI_API_KEY")  # For nano model
 
         # Initialize direct knowledge access
-        self.km = KnowledgeManager()
+        self.store = get_enhanced_store()
+        self.query_tool = get_enhanced_query()
         self.smart_query = get_smart_executor()
 
         # Memory cache
@@ -86,23 +89,31 @@ class IntelligentTriageAnalyzer:
                     instructions["claude_md"] = f.read()
 
             # Direct KB query for operational instructions (FAST!)
-            results = await self.km.query(
+            results = self.query_tool.query(
                 query_type="search",
-                search_text="GLOBAL OPERATIONAL INSTRUCTIONS",
+                query_text="GLOBAL OPERATIONAL INSTRUCTIONS",
                 limit=5,
+                direct_execute=True,
             )
             if results and results.get("results"):
                 instructions["global_rules"] = results["results"]
 
             # Workflow patterns
-            results = await self.km.query(
-                query_type="by_type", knowledge_type="WORKFLOW", limit=5
+            results = self.query_tool.query(
+                query_type="by_type",
+                knowledge_type="WORKFLOW",
+                limit=5,
+                direct_execute=True,
             )
             if results and results.get("results"):
                 instructions["project_rules"] = results["results"]
 
             # High confidence patterns
-            results = await self.km.query(query_type="high_confidence", limit=5)
+            results = self.query_tool.query(
+                query_type="high_confidence",
+                limit=5,
+                direct_execute=True,
+            )
             if results and results.get("results"):
                 instructions["app_rules"] = results["results"]
 
@@ -115,10 +126,11 @@ class IntelligentTriageAnalyzer:
         """Retrieve thought history from KB for this session using direct access"""
         try:
             # Direct query for session thoughts
-            results = await self.km.query(
+            results = self.query_tool.query(
                 query_type="search",
-                search_text=f"session:{session_id} THOUGHT_MEMORY",
+                query_text=f"session:{session_id} THOUGHT_MEMORY",
                 limit=self.memory_window,
+                direct_execute=True,
             )
 
             if results and results.get("results"):
@@ -156,7 +168,7 @@ class IntelligentTriageAnalyzer:
         # Store in KB using direct access (FAST!)
         try:
             content = f"THOUGHT_MEMORY session:{session_id} thought#{thought_number}: {thought}"
-            result = await self.km.store(
+            result = await self.store.store(
                 {
                     "content": content,
                     "knowledge_type": "THOUGHT_MEMORY",
@@ -222,7 +234,7 @@ Recent violation patterns: {', '.join(set(recent_violations)) if recent_violatio
 """
 
         # Build prompt for nano model with coaching capabilities
-        prompt = f"""You are an intelligent thought analyzer and coach for an AI assistant. Analyze thoughts, detect patterns, and provide helpful guidance.
+        prompt = f"""You are a STRICT thought analyzer for an AI assistant. Your job is to FLAG VIOLATIONS aggressively. Be very sensitive to detecting problems.
 
 Current thought being analyzed (Thought #{thought_number}):
 "{thought}"
@@ -234,36 +246,52 @@ Immediate thought history:
 Key instructions the assistant should follow:
 {instruction_summary}
 
+**CRITICAL: FLAG THESE VIOLATIONS IMMEDIATELY:**
+
+1. **REFLEXIVE AGREEMENT** - ANY form of agreement without evaluation:
+   - "You're absolutely right"
+   - "I completely agree"
+   - "Obviously this is correct"
+   - "Definitely the right approach"
+
+2. **UNSUBSTANTIATED CLAIMS** - Claims without evidence:
+   - "This will definitely work"
+   - "Obviously this is the solution"
+   - "This will solve the problem"
+   - "Without any issues"
+
+3. **OVERCONFIDENCE** - Excessive certainty:
+   - "Absolutely certain"
+   - "I'm sure this will work"
+   - "This is obviously correct"
+   - "Definitely the right way"
+
+4. **DESTRUCTIVE INTENT** - Harmful actions:
+   - "Delete everything"
+   - "Rewrite from scratch"
+   - "Start over completely"
+   - "Throw away the old code"
+
+5. **UNVERIFIED ASSUMPTIONS** - Assumptions without checking:
+   - "I'll assume"
+   - "Probably this will work"
+   - "This should be fine"
+   - "I think this is right"
+
+**BE AGGRESSIVE IN FLAGGING. If you see ANY of these patterns, FLAG THEM.**
+
 Analyze this thought and provide:
-1. **Violations**: Is there reflexive agreement, unsubstantiated claims, or rule violations?
-2. **Patterns**: Are there multi-thought patterns? (struggling, going in circles, repeated attempts, frustration)
-3. **Coaching**: What leading questions could help? (e.g., "Have you verified X exists?", "What assumption are you making?")
-4. **Reminders**: What specific instructions is the assistant forgetting?
-5. **Escalation**: Would specialist agents help with this complexity?
+1. **Violations**: List EVERY violation you detect (be thorough)
+2. **Patterns**: Multi-thought patterns observed
+3. **Coaching**: Leading questions to help
+4. **Reminders**: Specific rules being forgotten
+5. **Escalation**: Would specialist agents help?
 
-Detect these patterns FROM THE THOUGHT CONTENT:
-- Shallow thinking (jumping to conclusions without analysis)
-- Overthinking (many thoughts for a simple task - note we're at thought #{thought_number})
-- Circular thinking (repeating same approach across multiple thoughts)
-- Reflexive agreement ("You're right" without evaluation)
-- Repeated error mentions (same problem in multiple thoughts)
-- Accumulating changes ("I've now modified X, Y, Z files")
-- Overconfidence ("this will definitely work", "obviously")
-- Unverified assumptions ("I'll assume", "probably")
-- Scope creep (expanding beyond original task)
-- Frustration/stuck patterns (increasing confusion across thoughts)
-
-Provide coaching questions when you detect:
-- They're stuck (mentioned same issue 3+ times)
-- Making assumptions without verification
-- Overthinking (we're at thought #{thought_number} for what seems simple)
-- Going in circles (revisiting already-tried approaches)
-- Not checking basics (file existence, error details)
-- Forgetting CLAUDE.md rules (especially about agreement)
+**IMPORTANT: If you detect ANY of the violations above, you MUST include them in the violations array. Do not be conservative.**
 
 Respond in JSON format:
 {{
-  "violations": ["list of specific violations detected"],
+  "violations": ["list of specific violations detected - be thorough"],
   "patterns": ["multi-thought patterns observed"],
   "coaching_questions": ["helpful leading questions to unstick the assistant"],
   "needs_escalation": true/false,
@@ -276,28 +304,51 @@ Respond in JSON format:
         try:
             # Use OpenAI Responses API (approved model) with JSON-like output
             from openai import AsyncOpenAI
+
             client = AsyncOpenAI(api_key=self.api_key)
+
+            logger.info(
+                f"Calling OpenAI API with model: {os.getenv('TRIAGE_MODEL', 'gpt-5-nano')}"
+            )
+            logger.info(f"Prompt length: {len(prompt)} characters")
 
             resp = await client.responses.create(
                 model=os.getenv("TRIAGE_MODEL", "gpt-5-nano"),
                 input=prompt,
-                temperature=0.2,
-                max_output_tokens=500
+                max_output_tokens=500,
             )
 
             text = None
+            logger.info(f"Processing OpenAI response...")
+            logger.info(f"Response object type: {type(resp)}")
+            logger.info(f"Response attributes: {dir(resp)}")
+
             for out in getattr(resp, "output", []) or []:
+                logger.info(f"Processing output: {type(out)} - {dir(out)}")
                 if hasattr(out, "content") and out.content:
                     for c in out.content:
+                        logger.info(f"Processing content: {type(c)} - {dir(c)}")
                         if hasattr(c, "text") and c.text:
                             text = c.text
+                            logger.info(f"Found text: {text[:100]}...")
                             break
                     if text:
                         break
+
             if text:
+                logger.info(f"OpenAI response received: {len(text)} characters")
+                logger.info(f"Response text: {text[:500]}...")
+            else:
+                logger.error(f"No text found in response!")
+                logger.error(f"Full response object: {resp}")
                 try:
-                    return json.loads(text)
-                except Exception:
+                    result = json.loads(text)
+                    logger.info(f"Successfully parsed JSON response")
+                    logger.info(f"Parsed result: {json.dumps(result, indent=2)}")
+                    return result
+                except Exception as e:
+                    logger.error(f"Failed to parse JSON response: {e}")
+                    logger.error(f"Raw text: {text}")
                     return {
                         "violations": [],
                         "patterns": [],
@@ -310,8 +361,14 @@ Respond in JSON format:
                     }
         except Exception as e:
             logger.error(f"Failed to analyze with Responses API: {e}")
+            logger.error(f"Exception type: {type(e).__name__}")
+            logger.error(f"Exception details: {str(e)}")
+            import traceback
+
+            logger.error(f"Traceback: {traceback.format_exc()}")
 
         # Fallback analysis if API fails
+        logger.warning("Using fallback analysis due to API failure")
         return {
             "violations": [],
             "patterns": [],
@@ -328,7 +385,7 @@ Respond in JSON format:
     ) -> Optional[str]:
         """Store analysis pattern in KB using direct access (FAST!)"""
         try:
-            result = await self.km.store(
+            result = await self.store.store(
                 {
                     "content": content,
                     "knowledge_type": "THINKING_PATTERN",
@@ -350,13 +407,25 @@ Respond in JSON format:
     async def analyze(self, analysis: ThoughtAnalysis) -> TriageResponse:
         """Main analysis entry point with direct knowledge access"""
 
+        logger.info(f"=== TRIAGE ANALYSIS START ===")
+        logger.info(f"Thought #{analysis.thought_number}: {analysis.thought[:100]}...")
+        logger.info(f"Session: {analysis.session_id}")
+        logger.info(f"History length: {len(analysis.history)}")
+
         # Load instructions from KB (direct access)
+        logger.info("Loading instructions from KB...")
         instructions = await self.load_instructions_from_kb()
+        logger.info(
+            f"Loaded {len(instructions.get('global_rules', []))} global rules, {len(instructions.get('project_rules', []))} project rules"
+        )
 
         # Get extended thought history (direct access)
+        logger.info("Loading thought history...")
         extended_history = await self.get_thought_history(analysis.session_id)
+        logger.info(f"Extended history: {len(extended_history)} entries")
 
         # Analyze with nano model
+        logger.info("Starting AI analysis...")
         ai_analysis = await self.analyze_with_nano_model(
             analysis.thought,
             analysis.thought_number,
@@ -369,6 +438,19 @@ Respond in JSON format:
         await self.store_thought_memory(
             analysis.session_id, analysis.thought, analysis.thought_number, ai_analysis
         )
+
+        # Log analysis results
+        logger.info(f"=== AI ANALYSIS RESULTS ===")
+        logger.info(f"Violations detected: {len(ai_analysis.get('violations', []))}")
+        logger.info(f"Violations: {ai_analysis.get('violations', [])}")
+        logger.info(f"Patterns detected: {len(ai_analysis.get('patterns', []))}")
+        logger.info(f"Patterns: {ai_analysis.get('patterns', [])}")
+        logger.info(
+            f"Coaching questions: {len(ai_analysis.get('coaching_questions', []))}"
+        )
+        logger.info(f"Needs escalation: {ai_analysis.get('needs_escalation', False)}")
+        logger.info(f"Confidence: {ai_analysis.get('confidence', 0.0)}")
+        logger.info(f"Analysis: {ai_analysis.get('analysis', 'No analysis')[:200]}...")
 
         # Build content for KB storage
         kb_content = f"""INTELLIGENT TRIAGE ANALYSIS
@@ -395,9 +477,11 @@ Mode: {self.mode}
 
         # Return response based on mode
         response = TriageResponse(
-            needs_escalation=ai_analysis.get("needs_escalation", False)
-            if self.mode != "shadow"
-            else False,
+            needs_escalation=(
+                ai_analysis.get("needs_escalation", False)
+                if self.mode != "shadow"
+                else False
+            ),
             escalation_reason=ai_analysis.get("escalation_reason"),
             violations_detected=ai_analysis.get("violations", []),
             reminders=ai_analysis.get("reminders", []),
@@ -413,6 +497,7 @@ Mode: {self.mode}
         logger.info(
             f"Triage complete: escalation={response.needs_escalation}, violations={len(response.violations_detected)}, patterns={len(response.patterns_observed)}, coaching={len(response.coaching_questions)}"
         )
+        logger.info(f"=== TRIAGE ANALYSIS END ===")
 
         return response
 
@@ -451,7 +536,7 @@ async def analyze_thought(analysis: ThoughtAnalysis):
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    neo4j_status = "connected" if analyzer.km.neo4j_driver else "disconnected"
+    neo4j_status = "connected" if analyzer.store.neo4j_driver else "disconnected"
 
     return {
         "status": "healthy",
@@ -487,8 +572,8 @@ async def find_similar_patterns(session_id: str, limit: int = 5):
 async def shutdown_event():
     """Clean up direct connections on shutdown"""
     try:
-        if analyzer.km.neo4j_driver:
-            analyzer.km.neo4j_driver.close()
+        if analyzer.store.neo4j_driver:
+            analyzer.store.neo4j_driver.close()
             logger.info("Closed Neo4j connection")
     except:
         pass

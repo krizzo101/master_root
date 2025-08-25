@@ -220,21 +220,29 @@ class MetacognitiveThinkingServer {
       // Optional session id if provided by caller
       const sessionId = (input as any)?.sessionId || "default-session";
 
-      // Call triage API with timeout; ignore failures gracefully
+            // Call triage API with timeout; wait for response or timeout
+      console.error(`🔧 Triage config: URL=${this.triageUrl}, timeout=${this.triageTimeoutMs}ms, mode=${this.triageMode}`);
+
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), this.triageTimeoutMs);
       let triage: any = null;
+      let triageError: string | null = null;
+
       try {
-        // Include recent insights (last 3) for context
+                // Include recent insights (last 3) for context
         const recentInsights = this.metacognitiveInsights.slice(-3);
         const payload = {
           thought: validatedInput.thought,
           thought_number: validatedInput.thoughtNumber,
           session_id: sessionId,
-          context: {},
+          context: { mode: this.triageMode },
           history: recentHistory,
           insights: recentInsights
         };
+
+        console.error(`🔍 Calling triage service at ${this.triageUrl}...`);
+        console.error(`📦 Payload: ${JSON.stringify(payload, null, 2)}`);
+
         // Use global fetch (Node 18+)
         const res = await (globalThis as any).fetch(this.triageUrl, {
           method: "POST",
@@ -242,11 +250,17 @@ class MetacognitiveThinkingServer {
           body: JSON.stringify(payload),
           signal: controller.signal
         } as any);
+
         if (res && res.ok) {
           triage = await res.json();
+          console.error(`✅ Triage response received: ${JSON.stringify(triage, null, 2)}`);
+        } else {
+          triageError = `HTTP ${res?.status}: ${res?.statusText}`;
+          console.error(`❌ Triage HTTP error: ${triageError}`);
         }
       } catch (e) {
-        // swallow triage errors; operate in shadow mode by default
+        triageError = e instanceof Error ? e.message : String(e);
+        console.error(`❌ Triage call failed: ${triageError}`);
         triage = null;
       } finally {
         clearTimeout(timer);
@@ -263,7 +277,8 @@ class MetacognitiveThinkingServer {
         recentInsights: this.metacognitiveInsights.slice(-3),
         insightCount: this.metacognitiveInsights.length,
         // Triage (if available)
-        triage
+        triage,
+        triageError
       };
 
       return {

@@ -191,6 +191,8 @@ The system will automatically trigger commits when:
 *   When presented with a multi-step task, consider using a todo list to keep everything organized. Reconcile the todo list before making any edits.
 *   It is recommended to run smaller tasks in parallel. However, be mindful that asynchronous tool execution can make logging commands harder afterward. Consider running commands in the foreground without background mode if logging is a priority.
 *   When asked to add enhanced versions of existing tools to the `.cursor/mcp.json` file, ensure the new tools are named distinctly (e.g., `thinking-enhanced`, `knowledge-enhanced`). Also, when the consult suite tool requires a migrated consult suite, create a new entry for that too.
+*   When asked to commit outstanding changes to git, first check the current branch. If the current branch is "main" or "master", create a new feature branch named "feature/enhanced-thinking-prep-(date +%Y%m%d-%H%M%S)". Then, add all changes using `git add -A`. Check if there are any staged changes using `git diff --cached --quiet`. If there are staged changes, commit them with the message "chore: commit outstanding changes before enhanced thinking updates [prep]". Finally, print the current working directory (`pwd`), list all files (`ls -a | cat`), show the git status (`git status`), show the current branch (`git branch --show-current`), show the last 5 commits (`git log --oneline -5`), and list git worktrees (`git worktree list`).
+*   When pre-commit hooks prevent a commit, and the user instructs to proceed, use the `--no-verify` flag with the `git commit` command.
 
 ## DEBUGGING
 
@@ -638,35 +640,3 @@ messages = [
         "role": "developer",  # HIGHEST PRIORITY
         "content": """
         ## SYSTEM CONSTRAINTS
-        - Output must be valid Python code
-        - Use type hints for all functions
-        - Include comprehensive error handling
-        - Follow PEP 8 standards strictly
-
-        ## FORBIDDEN ACTIONS
-        - Do not use deprecated libraries
-        - Do not hardcode sensitive data
-        - Do not skip sensitive data
-        - Do not skip input validation
-        """
-    },
-    {
-        "role": "user",       # MEDIUM PRIORITY
-        "content": "Create a FastAPI endpoint for user authentication with JWT tokens"
-    },
-    {
-        "role": "assistant",  # CONTEXT ONLY
-        "content": "I'll help you create a secure authentication endpoint..."
-    }
-]
-
-response = client.responses.create(
-    model="gpt-5-mini",
-    input=messages,
-    text_format=CodeResponseSchema
-)
-```
-
-### Model-Specific Optimization Patterns
-
-#### **For O3/o4-mini Models (Reasoning
