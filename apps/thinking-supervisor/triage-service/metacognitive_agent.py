@@ -70,6 +70,21 @@ class MetacognitiveAgent:
         self._cache_timestamp = None
         self._cache_ttl = 300  # 5 minutes
 
+    def _detect_repetition_quick(self, thought_history: List[Dict]) -> bool:
+        """Quick check for obvious repetitive patterns"""
+        if len(thought_history) < 5:
+            return False
+
+        # Check last 5 thoughts for repetition
+        recent = [t.get("thought", "").lower()[:50] for t in thought_history[-5:]]
+
+        # Look for similar starts (likely repeated searches/attempts)
+        for i in range(len(recent) - 2):
+            if recent[i] and recent[i] in recent[i + 2]:  # Skip 1 to avoid adjacent
+                return True
+
+        return False
+
     async def load_instructions(self) -> str:
         """Load operational instructions with caching"""
         if not self.query_tool:
@@ -287,7 +302,54 @@ Generate:
         # Load instructions (cached)
         instructions = await self.load_instructions()
 
-        # Launch ALL analyses in parallel
+        # Quick exit if not enough history for meaningful analysis
+        if len(thought_history) < 3 and not any(
+            trigger in thought.lower()
+            for trigger in ["probably", "maybe", "i think", "fallback", "workaround"]
+        ):
+            # Not enough context and no red flags - skip analysis
+            return {
+                "thought_number": thought_number,
+                "analysis_time": 0,
+                "skipped": True,
+                "reason": "Insufficient context for meaningful analysis",
+            }
+
+        # Intelligent decision: Should we run full analysis?
+        # Run if: violations likely, patterns emerging, progress issues, or periodic check
+        should_analyze_fully = (
+            thought_number % 5 == 0  # Periodic deep check
+            or thought_number > total_thoughts + 3  # Way over estimate
+            or any(
+                flag in thought.lower()
+                for flag in [
+                    "probably",
+                    "maybe",
+                    "fallback",
+                    "workaround",
+                    "let me try",
+                    "not sure",
+                    "might work",
+                    "hopefully",
+                    "i think",
+                ]
+            )
+            or (
+                len(thought_history) > 10
+                and self._detect_repetition_quick(thought_history)
+            )
+        )
+
+        if not should_analyze_fully:
+            # Quick surface check only
+            return {
+                "thought_number": thought_number,
+                "analysis_time": 0,
+                "skipped": True,
+                "reason": "No intervention needed",
+            }
+
+        # Launch FULL parallel analysis when needed
         print("🧠 Launching parallel metacognitive analysis...", file=sys.stderr)
 
         tasks = await asyncio.gather(

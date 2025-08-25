@@ -82,7 +82,6 @@ class ThinkingServer:
         self.branches: Dict[str, List[ThoughtData]] = {}
         self.metacognitive_insights: List[StoredInsight] = []
         self.metacognitive_counter = 0
-        self.metacognitive_interval = int(os.getenv("METACOGNITIVE_INTERVAL", "5"))
 
         # Initialize metacognitive agent for parallel analysis
         self.metacognitive_agent = MetacognitiveAgent()
@@ -91,19 +90,7 @@ class ThinkingServer:
         )  # shadow|advisory|enforce
         self.session_id = os.getenv("SESSION_ID", "default")
 
-    def generate_metacognitive_prompt(self) -> str:
-        """Generate rotating metacognitive prompts"""
-        prompts = [
-            "Is there redundancy or unnecessary complexity here?",
-            "What assumptions am I making? Should I verify them?",
-            "Is this a pattern I've seen before that needs a systemic fix?",
-            "Am I solving the real problem or just the symptom?",
-            "How could this process or instruction be improved?",
-            "Is there a simpler way to achieve this goal?",
-            "What would happen if I questioned this requirement?",
-            "Could this be automated or abstracted?",
-        ]
-        return prompts[self.metacognitive_counter % len(prompts)]
+    # Metacognitive prompts now come from intelligent agent, not hardcoded
 
     def store_insight(self, insight_type: str, content: str, thought_number: int):
         """Store metacognitive insight"""
@@ -155,9 +142,7 @@ class ThinkingServer:
             "triageError": None,
         }
 
-        # Add metacognitive prompt periodically
-        if self.metacognitive_counter % self.metacognitive_interval == 0:
-            response["metacognitivePrompt"] = self.generate_metacognitive_prompt()
+        # Metacognitive prompts now come from the intelligent agent, not hardcoded intervals
 
         # Get recent insights
         if self.metacognitive_insights:
@@ -166,11 +151,11 @@ class ThinkingServer:
                 for i in self.metacognitive_insights[-3:]
             ]
 
-        # Run metacognitive analysis (every 5 thoughts)
-        if self.triage_mode != "disabled" and data.thoughtNumber % 5 == 0:
+        # Run metacognitive analysis on EVERY thought
+        # The agent will intelligently decide when to provide feedback
+        if self.triage_mode != "disabled":
             try:
-                # Use full thought history for metacognitive agent
-                # It will handle the 15-thought pattern window internally
+                # Let the metacognitive agent decide when to intervene
                 triage_result = await self.metacognitive_agent.analyze(
                     thought=data.thought,
                     thought_number=data.thoughtNumber,
@@ -179,13 +164,21 @@ class ThinkingServer:
                     session_id=self.session_id,
                 )
 
-                # Include triage if it found issues or in advisory mode
-                if (
-                    triage_result.get("violations")
-                    or triage_result.get("patterns")
-                    or self.triage_mode == "advisory"
-                ):
-                    response["triage"] = triage_result
+                # Include results only if analysis was performed and found something
+                if not triage_result.get("skipped"):
+                    # Full analysis was performed
+                    if (
+                        triage_result.get("violations")
+                        or triage_result.get("patterns")
+                        or triage_result.get("coaching")
+                        or triage_result.get("metacognitive_prompt")
+                    ):
+                        response["triage"] = triage_result
+                        # Add metacognitive prompt if provided
+                        if triage_result.get("metacognitive_prompt"):
+                            response["metacognitivePrompt"] = triage_result[
+                                "metacognitive_prompt"
+                            ]
 
             except Exception as e:
                 response["triageError"] = str(e)
