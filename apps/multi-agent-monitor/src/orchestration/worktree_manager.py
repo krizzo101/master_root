@@ -139,35 +139,20 @@ class WorktreeManager:
                     cwd=self.repo_path,
                     capture_output=True,
                 )
-            # Save current branch
-            current_branch = subprocess.run(
-                ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-                cwd=self.repo_path,
-                capture_output=True,
-                text=True,
-            ).stdout.strip()
-
-            # Now create fresh branch
+            # Create branch without checking it out
             subprocess.run(
-                ["git", "checkout", "-b", branch_name, base_branch],
+                ["git", "branch", branch_name, base_branch],
                 cwd=self.repo_path,
                 check=True,
                 capture_output=True,
             )
 
-            # Create worktree
+            # Create worktree with the new branch
             logger.info(f"Creating worktree at {worktree_path}")
             subprocess.run(
                 ["git", "worktree", "add", str(worktree_path), branch_name],
                 cwd=self.repo_path,
                 check=True,
-                capture_output=True,
-            )
-
-            # Switch back to original branch
-            subprocess.run(
-                ["git", "checkout", current_branch],
-                cwd=self.repo_path,
                 capture_output=True,
             )
 
