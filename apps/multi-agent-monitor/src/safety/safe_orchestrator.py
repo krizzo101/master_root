@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional
 
 from ..orchestration.enhanced_orchestrator import EnhancedOrchestrator
 from ..orchestration.team_orchestrator import AgentTeamOrchestrator, ProjectType
+from ..orchestration.worktree_manager import WorktreeManager
 from .git_safety_manager import GitSafetyManager, SafetyLevel
 
 
@@ -28,11 +29,17 @@ class ExecutionMode(Enum):
 class SafeOrchestrator:
     """Safe wrapper for multi-agent orchestration"""
 
-    def __init__(self, project_root: Path = None):
-        """Initialize safe orchestrator"""
+    def __init__(self, project_root: Path = None, use_worktrees: bool = True):
+        """Initialize safe orchestrator with optional worktree support"""
         self.project_root = project_root or Path.cwd()
         self.safety_manager = GitSafetyManager(self.project_root)
         self.orchestrator = AgentTeamOrchestrator()
+
+        # Initialize worktree manager if enabled
+        self.use_worktrees = use_worktrees
+        self.worktree_manager = (
+            WorktreeManager(self.project_root) if use_worktrees else None
+        )
 
         # Safety configuration
         self.safety_config = {
@@ -42,6 +49,8 @@ class SafeOrchestrator:
             "auto_rollback_on_error": True,
             "create_pr": True,
             "protected_branches": ["main", "master", "production"],
+            "use_worktrees": use_worktrees,  # Track worktree usage
+            "parallel_execution": use_worktrees,  # Enable parallel only with worktrees
             "change_limits": {
                 SafetyLevel.LOW: {"files": 50, "lines": 2000},
                 SafetyLevel.MEDIUM: {"files": 30, "lines": 1000},

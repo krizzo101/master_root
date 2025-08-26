@@ -627,6 +627,23 @@ files:
   - apps/knowledge_system/synthesis_results.json
   - apps/knowledge_system/unified_intelligent_search.py
   - apps/knowledge_system/usage_tracking.py
+  - apps/multi-agent-monitor/README.md
+  - apps/multi-agent-monitor/__init__.py
+  - apps/multi-agent-monitor/src/__init__.py
+  - apps/multi-agent-monitor/src/commands/team-orchestrate.py
+  - apps/multi-agent-monitor/src/main.py
+  - apps/multi-agent-monitor/src/monitoring/__init__.py
+  - apps/multi-agent-monitor/src/monitoring/agent_monitor.py
+  - apps/multi-agent-monitor/src/monitoring/session_debugger.py
+  - apps/multi-agent-monitor/src/orchestration/__init__.py
+  - apps/multi-agent-monitor/src/orchestration/enhanced_orchestrator.py
+  - apps/multi-agent-monitor/src/orchestration/job_manager_with_pool.py
+  - apps/multi-agent-monitor/src/orchestration/secrets_manager.py
+  - apps/multi-agent-monitor/src/orchestration/team_orchestrator.py
+  - apps/multi-agent-monitor/src/orchestration/token_pool.py
+  - apps/multi-agent-monitor/src/workflows/app_development.yaml
+  - apps/multi-agent-monitor/src/workflows/project_reorganization.yaml
+  - apps/multi-agent-monitor/src/workflows/system_design.yaml
   - apps/opsvi-assistant/README.md
   - apps/opsvi-assistant/opsvi_assistant/__init__.py
   - apps/opsvi-assistant/opsvi_assistant/__main__.py
@@ -2843,9 +2860,9 @@ files:
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/fractal_integration_example.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/main.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/main.py
-src/applications/oamat/workflows/orchestrator/__init__.py
+  - src/applications/oamat/workflows/orchestrator/__init__.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/main.py
-src/applications/oamat/workflows/orchestrator/graph_builder.py
+  - src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/monitoring/__init__.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/oamat_logging.py
   - libs/opsvi-ecosystem/opsvi_ecosystem/applications/old.ignore.oamat/parallel_executor.py
@@ -3254,6 +3271,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/opsvi_mcp/sequential_thinking_mcp_client.py
   - libs/opsvi-mcp/opsvi_mcp/servers/README.md
   - libs/opsvi-mcp/opsvi_mcp/servers/__init__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/agent_team_orchestrator.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code/__init__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code/__main__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code/config.py
