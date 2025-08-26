@@ -418,18 +418,11 @@ Generated at: {datetime.now().isoformat()}
 
         analysis = self.analyze_parallel_results(results, agent_configs)
 
-        # Step 5: Cleanup (optional)
+        # Step 5: Cleanup (optional) - Skip merging for POC since we're just testing
         if not self.dry_run and analysis["success"]:
-            print("\n📌 Step 5: Merging agent work")
-            for config in agent_configs:
-                try:
-                    success = self.worktree_manager.merge_agent_work(
-                        config["agent_id"], target_branch=base_branch, strategy="merge"
-                    )
-                    if success:
-                        print(f"   ✅ Merged {config['agent_type']} work")
-                except Exception as e:
-                    print(f"   ⚠️  Could not merge {config['agent_type']}: {e}")
+            print("\n📌 Step 5: Collecting results (skipping merge for POC)")
+            print("   ℹ️  Agent work saved in worktree branches for review")
+            # In production, we would selectively merge non-conflicting changes
 
         return analysis
 

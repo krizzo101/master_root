@@ -156,8 +156,12 @@ class WorktreeManager:
                 capture_output=True,
             )
 
-            # Create agent workspace within worktree
-            agent_workspace = worktree_path / "apps/multi-agent-monitor/agent_workspace"
+            # Create agent workspace within worktree with unique path per agent
+            agent_workspace = (
+                worktree_path
+                / "apps/multi-agent-monitor"
+                / f"agent_workspace_{agent_type}"
+            )
             agent_workspace.mkdir(parents=True, exist_ok=True)
 
             # Create agent-specific directories
@@ -214,7 +218,9 @@ class WorktreeManager:
         return {
             "working_directory": str(worktree.worktree_path),
             "agent_workspace": str(
-                worktree.worktree_path / "apps/multi-agent-monitor/agent_workspace"
+                worktree.worktree_path
+                / "apps/multi-agent-monitor"
+                / f"agent_workspace_{worktree.agent_type}"
             ),
             "shared_messages": str(self.shared_space / "messages"),
             "shared_outputs": str(self.shared_space / "outputs"),
