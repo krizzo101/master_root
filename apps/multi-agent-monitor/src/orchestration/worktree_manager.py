@@ -126,6 +126,28 @@ class WorktreeManager:
         try:
             # Create branch from base
             logger.info(f"Creating branch {branch_name} from {base_branch}")
+            # First check if branch exists
+            result = subprocess.run(
+                ["git", "rev-parse", "--verify", branch_name],
+                cwd=self.repo_path,
+                capture_output=True,
+            )
+            if result.returncode == 0:
+                # Branch exists, delete it first
+                subprocess.run(
+                    ["git", "branch", "-D", branch_name],
+                    cwd=self.repo_path,
+                    capture_output=True,
+                )
+            # Save current branch
+            current_branch = subprocess.run(
+                ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+                cwd=self.repo_path,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+
+            # Now create fresh branch
             subprocess.run(
                 ["git", "checkout", "-b", branch_name, base_branch],
                 cwd=self.repo_path,
@@ -139,6 +161,13 @@ class WorktreeManager:
                 ["git", "worktree", "add", str(worktree_path), branch_name],
                 cwd=self.repo_path,
                 check=True,
+                capture_output=True,
+            )
+
+            # Switch back to original branch
+            subprocess.run(
+                ["git", "checkout", current_branch],
+                cwd=self.repo_path,
                 capture_output=True,
             )
 
