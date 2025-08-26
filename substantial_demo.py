@@ -175,7 +175,7 @@ class SubstantialDemo:
             
             stdout, stderr = await asyncio.wait_for(
                 result.communicate(),
-                timeout=60
+                timeout=900  # 15 minutes per agent
             )
             
             duration = time.time() - start_time
