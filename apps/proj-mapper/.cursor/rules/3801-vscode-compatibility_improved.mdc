@@ -1,4 +1,0 @@
-{
-  "description": "MUST ensure compatibility WHEN using VSCode extensions TO maintain seamless functionality",
-  "globs": ["**/vscode/**", "**/*compatibility*/**", "**/*", "**/compatibility/**", "**/*vscode*/**"]
-}

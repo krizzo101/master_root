@@ -1,4 +1,0 @@
-{
-  "description": "MUST maintain deterministic ordering WHEN generating output TO ensure consistent results.",
-  "globs": ["**/*deterministic*/**", "**/ordering/**", "**/*", "**/*ordering*/**", "**/deterministic/**"]
-}
