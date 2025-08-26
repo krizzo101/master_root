@@ -1,9 +1,16 @@
 version: 1
 generator: project-intelligence-fast
 files:
+  - 2025-08-24-knowledge_KB_master_root_migration_etc.txt
   - AGENT_ONBOARDING_SDLC.md
+  - "CLAUDE copy.md"
+  - CLAUDE-ENHANCED.md
   - CLAUDE.local.md
   - CLAUDE.md
+  - CLAUDE.md.backup.20250824_123411
+  - CLAUDE.md.backup.20250825_005017
+  - CLEANUP_PLAN.md
+  - CLEANUP_RESULTS.md
   - CONTEXT_STATE.md
   - Dockerfile
   - KNOWLEDGE_SYSTEM_ANALYSIS.md
@@ -11,8 +18,10 @@ files:
   - KNOWLEDGE_TOOL_ENHANCEMENT_PROPOSAL.md
   - KNOWLEDGE_TOOL_FIX_PLAN.md
   - KNOWLEDGE_TOOL_SOLUTION_SUMMARY.md
+  - MCP_PARAMETER_ANALYSIS.md
   - MCP_SERVER_FIX_REQUIREMENTS.md
   - MERGE_PLAN.md
+  - MONITORING_QUICK_START.md
   - PATTERN_ENGINE_EXTRACTION_SUMMARY.md
   - QUICK_START.md
   - README.md
@@ -25,6 +34,508 @@ files:
   - agents/sdlc_agent_implementation_guide.md
   - agents/sdlc_agent_usage_example.py
   - agents/sdlc_team_prompts.md
+  - amazing_demo.py
+  - apps/ACCF/CHANGELOG.md
+  - apps/ACCF/CLAUDE.md
+  - apps/ACCF/CONSULT_AGENT_ENHANCEMENT.md
+  - apps/ACCF/CONTRIBUTING.md
+  - apps/ACCF/Dockerfile
+  - apps/ACCF/IMPLEMENTATION_COMPLETION_SUMMARY.md
+  - apps/ACCF/Makefile
+  - apps/ACCF/OPTIMIZATION_INTEGRATION_GUIDE.md
+  - apps/ACCF/README.md
+  - apps/ACCF/README_COOKBOOK_INTEGRATION.md
+  - apps/ACCF/REPORT.md
+  - apps/ACCF/__init__.py
+  - apps/ACCF/artifacts/baseline_mypy.txt
+  - apps/ACCF/artifacts/baseline_ruff.txt
+  - apps/ACCF/artifacts/baseline_security.txt
+  - apps/ACCF/artifacts/baseline_tests.txt
+  - apps/ACCF/artifacts/compliance_violations_20250730.txt
+  - apps/ACCF/artifacts/current_requirements.txt
+  - apps/ACCF/artifacts/dep_tree_prod_20250730.txt
+  - apps/ACCF/artifacts/dep_tree_ref_20250730.txt
+  - apps/ACCF/artifacts/loc_stats_20250730.txt
+  - apps/ACCF/artifacts/model_selection_config.json
+  - apps/ACCF/artifacts/performance_results.json
+  - apps/ACCF/artifacts/requirements.txt
+  - apps/ACCF/artifacts/tree_20250730.txt
+  - apps/ACCF/audit_report.md
+  - apps/ACCF/audit_test_script.py
+  - apps/ACCF/batch_ingest_kb.py
+  - apps/ACCF/batch_ingest_kb_v2.py
+  - apps/ACCF/comprehensive_audit_report.md
+  - apps/ACCF/config/mcp_config.yaml
+  - apps/ACCF/config/model_selection_config.json
+  - apps/ACCF/config/production/audit_config.py
+  - apps/ACCF/demo/Dockerfile.gateway
+  - apps/ACCF/demo/README.md
+  - apps/ACCF/demo/api_gateway.py
+  - apps/ACCF/demo/architecture_demo.py
+  - apps/ACCF/demo/check_services.py
+  - apps/ACCF/demo/docker-compose.demo.yml
+  - apps/ACCF/demo/full_demo.py
+  - apps/ACCF/demo/live_microservices_demo.py
+  - apps/ACCF/demo/realistic_demo.py
+  - apps/ACCF/demo/run_demo.py
+  - apps/ACCF/demo/simple_demo.py
+  - apps/ACCF/demo_audit_integration.py
+  - apps/ACCF/demo_streaming.py
+  - apps/ACCF/dir.listing
+  - apps/ACCF/dir.listing.txt
+  - apps/ACCF/dirlisting
+  - apps/ACCF/docker-compose.audit.yml
+  - apps/ACCF/docker-compose.yml
+  - apps/ACCF/docker/agent_base.Dockerfile
+  - apps/ACCF/docker/entrypoint.sh
+  - apps/ACCF/docker/seccomp.json
+  - apps/ACCF/docs/README.md
+  - apps/ACCF/docs/agents/code_review_agent_guide.md
+  - apps/ACCF/docs/agents/coding_agent_guide.md
+  - apps/ACCF/docs/agents/consult_agent_guide.md
+  - apps/ACCF/docs/agents/documentation_agent_guide.md
+  - apps/ACCF/docs/agents/research_agent_guide.md
+  - apps/ACCF/docs/agents/session_analysis_agent_guide.md
+  - apps/ACCF/docs/api/API_COOKBOOK_PATTERNS.md
+  - apps/ACCF/docs/api/README.md
+  - apps/ACCF/docs/api/perplexity_mcp_setup.md
+  - apps/ACCF/docs/api/vector_mcp_setup.md
+  - apps/ACCF/docs/architecture/README.md
+  - apps/ACCF/docs/architecture/architecture.md
+  - apps/ACCF/docs/components/README.md
+  - apps/ACCF/docs/components/audit/README.md
+  - apps/ACCF/docs/components/audit/audit_integration_guide.md
+  - apps/ACCF/docs/components/context-management/README.md
+  - apps/ACCF/docs/components/context-management/context_management_spec.md
+  - apps/ACCF/docs/components/critic/README.md
+  - apps/ACCF/docs/components/critic/critic_spec.md
+  - apps/ACCF/docs/components/gatekeeper/README.md
+  - apps/ACCF/docs/components/gatekeeper/gatekeeper_architecture_diagram.md
+  - apps/ACCF/docs/components/gatekeeper/gatekeeper_comprehensive_documentation.md
+  - apps/ACCF/docs/components/gatekeeper/gatekeeper_context_selection_specification.md
+  - apps/ACCF/docs/components/gatekeeper/gatekeeper_implementation_summary.md
+  - apps/ACCF/docs/components/gatekeeper/gatekeeper_quick_reference.md
+  - apps/ACCF/docs/components/gatekeeper/gatekeeper_specification.md
+  - apps/ACCF/docs/components/gatekeeper/gatekeeper_tools_guide.md
+  - apps/ACCF/docs/getting-started/CONTEXT7_SETUP.md
+  - apps/ACCF/docs/getting-started/README.md
+  - apps/ACCF/docs/getting-started/consult_suite_master_guide.md
+  - apps/ACCF/docs/getting-started/quick-start.md
+  - apps/ACCF/docs/reference/ADR-enhancement-plan.md
+  - apps/ACCF/docs/reference/CHANGELOG.md
+  - apps/ACCF/docs/reference/README.md
+  - apps/ACCF/docs/reference/decision_log.md
+  - apps/ACCF/docs/reference/runbook.md
+  - apps/ACCF/examples/QUICK_REFERENCE.md
+  - apps/ACCF/examples/advanced_usage.py
+  - apps/ACCF/examples/basic_usage.py
+  - apps/ACCF/examples/cli_usage.py
+  - apps/ACCF/examples/comprehensive_rag_workflow.py
+  - apps/ACCF/examples/debug_logging_demo.py
+  - apps/ACCF/examples/enhanced_perplexity_examples.py
+  - apps/ACCF/examples/error_capture_examples.py
+  - apps/ACCF/examples/gatekeeper_demo.py
+  - apps/ACCF/examples/gatekeeper_usage_examples.py
+  - apps/ACCF/examples/perplexity_api_examples.py
+  - apps/ACCF/final_audit_demo.py
+  - apps/ACCF/final_audit_report.md
+  - apps/ACCF/fix_imports.py
+  - apps/ACCF/generate_accf_embeddings.py
+  - apps/ACCF/generate_example_files.py
+  - apps/ACCF/ingest_accf_simple.py
+  - apps/ACCF/ingest_project_to_kb.py
+  - apps/ACCF/k8s/agent-deployment.yaml
+  - apps/ACCF/main.py
+  - apps/ACCF/mcp_server.info.txt
+  - apps/ACCF/mkdocs.yml
+  - apps/ACCF/monitoring/prometheus.yml
+  - apps/ACCF/pyproject.toml
+  - apps/ACCF/quick_ingest.py
+  - apps/ACCF/requirements-mcp.txt
+  - apps/ACCF/requirements.txt
+  - apps/ACCF/scripts/bandit.out
+  - apps/ACCF/scripts/clean_and_show_real_data.py
+  - apps/ACCF/scripts/create_research_schema.py
+  - apps/ACCF/scripts/debug_mcp_responses.py
+  - apps/ACCF/scripts/debug_schema.py
+  - apps/ACCF/scripts/demo_comprehensive_research.py
+  - apps/ACCF/scripts/demo_enhanced_research_agent.py
+  - apps/ACCF/scripts/demo_research_agent_showcase.py
+  - apps/ACCF/scripts/demo_simple_research.py
+  - apps/ACCF/scripts/demo_vector_search.py
+  - apps/ACCF/scripts/dev_start_agent.sh
+  - apps/ACCF/scripts/eda/gate0_schema_lint.sh
+  - apps/ACCF/scripts/eda/gate1_technical.sh
+  - apps/ACCF/scripts/eda/gate2_style_ux.sh
+  - apps/ACCF/scripts/graph_reviewer.py
+  - apps/ACCF/scripts/implement_missing_relationships.py
+  - apps/ACCF/scripts/implement_missing_relationships_fixed.py
+  - apps/ACCF/scripts/import_map.tsv
+  - apps/ACCF/scripts/init_audit_database.py
+  - apps/ACCF/scripts/inspect_saved_data.py
+  - apps/ACCF/scripts/inspect_saved_data_fixed.py
+  - apps/ACCF/scripts/k6_performance_test.js
+  - apps/ACCF/scripts/model_selection_demo.py
+  - apps/ACCF/scripts/neo4j_monitoring_system.py
+  - apps/ACCF/scripts/openai_technologies_research_entry.py
+  - apps/ACCF/scripts/setup_perplexity_mcp.sh
+  - apps/ACCF/scripts/setup_research_env.sh
+  - apps/ACCF/scripts/setup_vector_mcp_servers.sh
+  - apps/ACCF/services/clients/brave_search_client.py
+  - apps/ACCF/services/clients/context7_client.py
+  - apps/ACCF/services/clients/firecrawl_client.py
+  - apps/ACCF/services/database/alembic.ini
+  - apps/ACCF/services/database/migrations/env.py
+  - apps/ACCF/services/database/migrations/script.py.mako
+  - apps/ACCF/services/database/migrations/versions/001_add_vector_constraints.py
+  - apps/ACCF/services/deployments/Dockerfile
+  - apps/ACCF/services/deployments/docker-compose.yml
+  - apps/ACCF/services/infrastructure/nats/consumers.yaml
+  - apps/ACCF/services/infrastructure/nats/nats-server.conf
+  - apps/ACCF/services/infrastructure/nats/streams.yaml
+  - apps/ACCF/services/kubernetes/api-gateway.yaml
+  - apps/ACCF/services/kubernetes/db-init-job.yaml
+  - apps/ACCF/services/kubernetes/extraction-service.yaml
+  - apps/ACCF/services/kubernetes/grafana.yaml
+  - apps/ACCF/services/kubernetes/ingress.yaml
+  - apps/ACCF/services/kubernetes/namespace.yaml
+  - apps/ACCF/services/kubernetes/nats-statefulset.yaml
+  - apps/ACCF/services/kubernetes/otel-collector.yaml
+  - apps/ACCF/services/kubernetes/postgres.yaml
+  - apps/ACCF/services/kubernetes/prometheus.yaml
+  - apps/ACCF/services/kubernetes/redis.yaml
+  - apps/ACCF/services/kubernetes/scraper-service.yaml
+  - apps/ACCF/services/kubernetes/search-service.yaml
+  - apps/ACCF/services/kubernetes/tempo.yaml
+  - apps/ACCF/services/monitoring/alert_rules.yml
+  - apps/ACCF/services/monitoring/prometheus.yaml
+  - apps/ACCF/services/requirements-dev.txt
+  - apps/ACCF/services/requirements.txt
+  - apps/ACCF/services/schemas/EventNotification.json
+  - apps/ACCF/services/schemas/SearchRequest.json
+  - apps/ACCF/services/schemas/SearchResponse.json
+  - apps/ACCF/session_analysis_output/tmpw6o6_n49_session_summary.json
+  - apps/ACCF/session_analysis_test/tmp5_8hnvno_session_summary.json
+  - apps/ACCF/session_analysis_test/tmplxsb0llu_session_summary.json
+  - apps/ACCF/session_analysis_test/tmpykxyagp0_session_summary.json
+  - apps/ACCF/setup.py
+  - apps/ACCF/shorthand_only.py
+  - apps/ACCF/simple_audit_test_fixed.py
+  - apps/ACCF/src/accf/__init__.py
+  - apps/ACCF/src/accf/agents/__init__.py
+  - apps/ACCF/src/accf/agents/base.py
+  - apps/ACCF/src/accf/agents/challenge_agent.py
+  - apps/ACCF/src/accf/agents/check_me_agent.py
+  - apps/ACCF/src/accf/agents/code_review_agent/API.md
+  - apps/ACCF/src/accf/agents/code_review_agent/CONFIGURATION.md
+  - apps/ACCF/src/accf/agents/code_review_agent/QUICKSTART.md
+  - apps/ACCF/src/accf/agents/code_review_agent/README.md
+  - apps/ACCF/src/accf/agents/code_review_agent/__init__.py
+  - apps/ACCF/src/accf/agents/code_review_agent/agent.py
+  - apps/ACCF/src/accf/agents/code_review_agent/ai_service.py
+  - apps/ACCF/src/accf/agents/code_review_agent/integration.py
+  - apps/ACCF/src/accf/agents/code_review_agent/review_engine.py
+  - apps/ACCF/src/accf/agents/code_review_agent/rules/__init__.py
+  - apps/ACCF/src/accf/agents/code_review_agent/rules/base_rule.py
+  - apps/ACCF/src/accf/agents/code_review_agent/schemas.py
+  - apps/ACCF/src/accf/agents/coding_agent/__init__.py
+  - apps/ACCF/src/accf/agents/coding_agent/agent_main.py
+  - apps/ACCF/src/accf/agents/coding_agent/agents/__init__.py
+  - apps/ACCF/src/accf/agents/coding_agent/agents/base_async.py
+  - apps/ACCF/src/accf/agents/coding_agent/agents/code_generation_agent.py
+  - apps/ACCF/src/accf/agents/coding_agent/agents/common.py
+  - apps/ACCF/src/accf/agents/coding_agent/agents/integration_agent.py
+  - apps/ACCF/src/accf/agents/coding_agent/agents/prompt_agent.py
+  - apps/ACCF/src/accf/agents/coding_agent/agents/scaffold_agent.py
+  - apps/ACCF/src/accf/agents/coding_agent/coding_director.py
+  - apps/ACCF/src/accf/agents/coding_agent/monitoring/__init__.py
+  - apps/ACCF/src/accf/agents/coding_agent/monitoring/monitoring_service.py
+  - apps/ACCF/src/accf/agents/coding_agent/monitoring/observability.py
+  - apps/ACCF/src/accf/agents/coding_agent/schemas/__init__.py
+  - apps/ACCF/src/accf/agents/coding_agent/schemas/message_schemas.py
+  - apps/ACCF/src/accf/agents/coding_agent/schemas/task_schemas.py
+  - apps/ACCF/src/accf/agents/coding_agent/utils/__init__.py
+  - apps/ACCF/src/accf/agents/coding_agent/utils/debug_logging.py
+  - apps/ACCF/src/accf/agents/coding_agent/utils/file_utils.py
+  - apps/ACCF/src/accf/agents/coding_agent/utils/logging_utils.py
+  - apps/ACCF/src/accf/agents/coding_agent/utils/schema_validator.py
+  - apps/ACCF/src/accf/agents/coding_agent/utils/secret_manager.py
+  - apps/ACCF/src/accf/agents/coding_agent/utils/security_utils.py
+  - apps/ACCF/src/accf/agents/coding_agent/utils/validators.py
+  - apps/ACCF/src/accf/agents/collaboration_agent.py
+  - apps/ACCF/src/accf/agents/consult_agent_comprehensive.py
+  - apps/ACCF/src/accf/agents/consult_agent_optimized.py
+  - apps/ACCF/src/accf/agents/critic_agent.py
+  - apps/ACCF/src/accf/agents/critique_agent.py
+  - apps/ACCF/src/accf/agents/documentation_agent.py
+  - apps/ACCF/src/accf/agents/documentation_bundle_agent.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/README.md
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/__init__.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/app.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/cli.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/core/eda_orchestrator.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/core/event_bus.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/core/request_schema.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/diagrams/diagram_generator.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/integrations/__init__.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/integrations/base_adapter.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/integrations/code_review_adapter.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/integrations/project_intelligence_adapter.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/integrations/research_adapter.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/metrics.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/qa/gate0_schema_lint.sh
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/schemas/agent_response.json
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/templates/library/agent_docs.md.j2
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/templates/library/api.md.j2
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/templates/library/architecture.md.j2
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/templates/library/technical_spec.md.j2
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/templates/library/user_guide.md.j2
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/templates/template_manager.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/utils/async_tools.py
+  - apps/ACCF/src/accf/agents/enhanced_documentation_agent/utils/mcp_llm_client.py
+  - apps/ACCF/src/accf/agents/enhanced_research_agent.py
+  - apps/ACCF/src/accf/agents/error_capture_agent.py
+  - apps/ACCF/src/accf/agents/execution_agent.py
+  - apps/ACCF/src/accf/agents/feedback_agent.py
+  - apps/ACCF/src/accf/agents/file_saving_system.py
+  - apps/ACCF/src/accf/agents/gatekeeper_agent.py
+  - apps/ACCF/src/accf/agents/integrated_research_agent.py
+  - apps/ACCF/src/accf/agents/knowledge_agent.py
+  - apps/ACCF/src/accf/agents/memory_agent.py
+  - apps/ACCF/src/accf/agents/multi_candidate_tournament.py
+  - apps/ACCF/src/accf/agents/multi_critic_system.py
+  - apps/ACCF/src/accf/agents/research_agent.py
+  - apps/ACCF/src/accf/agents/research_agent_rebuilt.py
+  - apps/ACCF/src/accf/agents/response_format_examples.py
+  - apps/ACCF/src/accf/agents/response_handlers.py
+  - apps/ACCF/src/accf/agents/response_schemas.py
+  - apps/ACCF/src/accf/agents/security_agent.py
+  - apps/ACCF/src/accf/agents/self_reflection_agent.py
+  - apps/ACCF/src/accf/agents/session_analysis_agent/__init__.py
+  - apps/ACCF/src/accf/agents/session_analysis_agent/agent.py
+  - apps/ACCF/src/accf/agents/session_analysis_agent/schemas.py
+  - apps/ACCF/src/accf/agents/session_analysis_agent/scripts/__init__.py
+  - apps/ACCF/src/accf/agents/session_analysis_agent/scripts/batch_analyze.py
+  - apps/ACCF/src/accf/agents/session_analysis_agent/scripts/chat_log_analysis_matrix.csv
+  - apps/ACCF/src/accf/agents/session_analysis_agent/scripts/chat_log_analyzer.py
+  - apps/ACCF/src/accf/agents/session_analysis_agent/scripts/collapse_chat_log.py
+  - apps/ACCF/src/accf/agents/session_analysis_agent/scripts/comprehensive_analyzer.py
+  - apps/ACCF/src/accf/agents/session_analysis_agent/scripts/enhanced_analyzer.py
+  - apps/ACCF/src/accf/agents/session_analysis_agent/scripts/log_stripper.py
+  - apps/ACCF/src/accf/agents/session_analysis_agent/scripts/metrics_matrix.py
+  - apps/ACCF/src/accf/agents/session_analysis_agent/scripts/old.collapse_chat_log.py
+  - apps/ACCF/src/accf/agents/session_analysis_agent/scripts/session_state_extractor.py
+  - apps/ACCF/src/accf/agents/synthesis_agent.py
+  - apps/ACCF/src/accf/agents/testing_agent.py
+  - apps/ACCF/src/accf/agents/unified_optimization_system.py
+  - apps/ACCF/src/accf/api/__init__.py
+  - apps/ACCF/src/accf/api/agent_api.py
+  - apps/ACCF/src/accf/api/app.py
+  - apps/ACCF/src/accf/api/audit/__init__.py
+  - apps/ACCF/src/accf/api/audit/routes.py
+  - apps/ACCF/src/accf/api/endpoints/__init__.py
+  - apps/ACCF/src/accf/api/endpoints/agents.py
+  - apps/ACCF/src/accf/api/endpoints/health.py
+  - apps/ACCF/src/accf/api/endpoints/health_comprehensive.py
+  - apps/ACCF/src/accf/api/endpoints/tasks.py
+  - apps/ACCF/src/accf/cli.py
+  - apps/ACCF/src/accf/consult/tools/perplexity_research.py
+  - apps/ACCF/src/accf/core/__init__.py
+  - apps/ACCF/src/accf/core/agent_base.py
+  - apps/ACCF/src/accf/core/audit/README.md
+  - apps/ACCF/src/accf/core/audit/__init__.py
+  - apps/ACCF/src/accf/core/audit/audit_manager.py
+  - apps/ACCF/src/accf/core/audit/config.py
+  - apps/ACCF/src/accf/core/audit/context.py
+  - apps/ACCF/src/accf/core/audit/decorators.py
+  - apps/ACCF/src/accf/core/audit/event_types.py
+  - apps/ACCF/src/accf/core/audit/integration_example.py
+  - apps/ACCF/src/accf/core/audit/models.py
+  - apps/ACCF/src/accf/core/audit/reporting.py
+  - apps/ACCF/src/accf/core/context_selector.py
+  - apps/ACCF/src/accf/core/critic_loop.py
+  - apps/ACCF/src/accf/core/ensemble.py
+  - apps/ACCF/src/accf/core/intelligent_file_analyzer.py
+  - apps/ACCF/src/accf/core/logging.py
+  - apps/ACCF/src/accf/core/logging_config.py
+  - apps/ACCF/src/accf/core/model_selection_engine.py
+  - apps/ACCF/src/accf/core/monitoring.py
+  - apps/ACCF/src/accf/core/neo4j_integration.py
+  - apps/ACCF/src/accf/core/neo4j_knowledge_graph.py
+  - apps/ACCF/src/accf/core/neo4j_vector.py
+  - apps/ACCF/src/accf/core/orchestrator.py
+  - apps/ACCF/src/accf/core/registry.py
+  - apps/ACCF/src/accf/core/schemas.py
+  - apps/ACCF/src/accf/core/settings.py
+  - apps/ACCF/src/accf/core/technical_knowledge_base.py
+  - apps/ACCF/src/accf/core/technical_research_schema.py
+  - apps/ACCF/src/accf/core/urlutil.py
+  - apps/ACCF/src/accf/core/vector_knowledge_graph.py
+  - apps/ACCF/src/accf/integration/__init__.py
+  - apps/ACCF/src/accf/integration/consult_agent_project_intelligence_integration.py
+  - apps/ACCF/src/accf/integration/intelligent_file_analysis.py
+  - apps/ACCF/src/accf/orchestrator/__init__.py
+  - apps/ACCF/src/accf/orchestrator/core.py
+  - apps/ACCF/src/accf/orchestrator/core/__init__.py
+  - apps/ACCF/src/accf/orchestrator/core/agent_registry.py
+  - apps/ACCF/src/accf/orchestrator/core/help_handler.py
+  - apps/ACCF/src/accf/orchestrator/core/mcp_server_main.py
+  - apps/ACCF/src/accf/orchestrator/core/orchestrator.py
+  - apps/ACCF/src/accf/orchestrator/handlers/__init__.py
+  - apps/ACCF/src/accf/orchestrator/mcp_agent_server.py
+  - apps/ACCF/src/accf/orchestrator/subscription_engine.py
+  - apps/ACCF/src/accf/orchestrator/task_market.py
+  - apps/ACCF/src/accf/orchestrator/tools/__init__.py
+  - apps/ACCF/src/accf/orchestrator/tools/code_review_tool.py
+  - apps/ACCF/src/accf/orchestrator/tools/coding_tool.py
+  - apps/ACCF/src/accf/orchestrator/tools/consult_suite_tool.py
+  - apps/ACCF/src/accf/orchestrator/tools/consult_tool.py
+  - apps/ACCF/src/accf/orchestrator/tools/enhanced_documentation_tool.py
+  - apps/ACCF/src/accf/orchestrator/tools/research_tool.py
+  - apps/ACCF/src/accf/orchestrator/tools/session_analysis_tool.py
+  - apps/ACCF/src/accf/service_core/__init__.py
+  - apps/ACCF/src/accf/service_core/decorators.py
+  - apps/ACCF/src/accf/service_core/instrumentation.py
+  - apps/ACCF/src/accf/service_core/logging.py
+  - apps/ACCF/src/accf/service_core/nats_client.py
+  - apps/ACCF/src/accf/service_core/nats_subjects.py
+  - apps/ACCF/src/accf/service_core/schemas.py
+  - apps/ACCF/src/accf/services/extraction/Dockerfile
+  - apps/ACCF/src/accf/services/extraction/extraction_handler.py
+  - apps/ACCF/src/accf/services/extraction/health_app.py
+  - apps/ACCF/src/accf/services/extraction/main.py
+  - apps/ACCF/src/accf/services/extraction/openai_client.py
+  - apps/ACCF/src/accf/services/extraction/requirements.txt
+  - apps/ACCF/src/accf/services/scraper/Dockerfile
+  - apps/ACCF/src/accf/services/scraper/__init__.py
+  - apps/ACCF/src/accf/services/scraper/firecrawl_client.py
+  - apps/ACCF/src/accf/services/scraper/health_app.py
+  - apps/ACCF/src/accf/services/scraper/main.py
+  - apps/ACCF/src/accf/services/scraper/requirements.txt
+  - apps/ACCF/src/accf/services/scraper/scraper_handler.py
+  - apps/ACCF/src/accf/services/search/Dockerfile
+  - apps/ACCF/src/accf/services/search/__init__.py
+  - apps/ACCF/src/accf/services/search/brave_client.py
+  - apps/ACCF/src/accf/services/search/main.py
+  - apps/ACCF/src/accf/services/search/minimal_main.py
+  - apps/ACCF/src/accf/services/search/query_planner.py
+  - apps/ACCF/src/accf/services/search/requirements.txt
+  - apps/ACCF/src/accf/services/search/search_handler.py
+  - apps/ACCF/src/accf/shared/__init__.py
+  - apps/ACCF/src/accf/shared/mcp/__init__.py
+  - apps/ACCF/src/accf/shared/mcp/arxiv_mcp_client.py
+  - apps/ACCF/src/accf/shared/mcp/brave_mcp_search.py
+  - apps/ACCF/src/accf/shared/mcp/context7_mcp_client.py
+  - apps/ACCF/src/accf/shared/mcp/firecrawl_mcp_client.py
+  - apps/ACCF/src/accf/shared/mcp/mcp_server_template.py
+  - apps/ACCF/src/accf/shared/openai_interfaces/__init__.py
+  - apps/ACCF/src/accf/shared/openai_interfaces/assistants_interface.py
+  - apps/ACCF/src/accf/shared/openai_interfaces/base.py
+  - apps/ACCF/src/accf/shared/openai_interfaces/files_interface.py
+  - apps/ACCF/src/accf/shared/openai_interfaces/model_selector.py
+  - apps/ACCF/src/accf/shared/openai_interfaces/responses_interface.py
+  - apps/ACCF/src/accf/shared/schemas/consult_agent_schemas.py
+  - apps/ACCF/src/accf/tools/arxiv_tool.py
+  - apps/ACCF/src/accf/tools/brave_search_tool.py
+  - apps/ACCF/src/accf/tools/context7_tool.py
+  - apps/ACCF/src/accf/tools/firecrawl_tool.py
+  - apps/ACCF/src/accf/tools/gatekeeper_autogen_integration.py
+  - apps/ACCF/src/accf/tools/gatekeeper_cli.py
+  - apps/ACCF/src/accf/tools/gatekeeper_data_tools.py
+  - apps/ACCF/src/accf/tools/gatekeeper_feature_extractor.py
+  - apps/ACCF/src/accf/tools/gatekeeper_nano_demo.py
+  - apps/ACCF/src/accf/tools/gatekeeper_parameter_mapper.py
+  - apps/ACCF/src/accf/tools/gatekeeper_query_templates.py
+  - apps/ACCF/src/accf/tools/gatekeeper_research_enhancer.py
+  - apps/ACCF/src/accf/tools/gatekeeper_rule_classifier.py
+  - apps/ACCF/src/accf/tools/kb_gatekeeper.py
+  - apps/ACCF/src/accf/utils/__init__.py
+  - apps/ACCF/src/accf/utils/logging.py
+  - apps/ACCF/src/accf/utils/security.py
+  - apps/ACCF/src/accf/utils/validation.py
+  - apps/ACCF/src/eda/__init__.py
+  - apps/ACCF/src/eda/ai_content_generator.py
+  - apps/ACCF/src/eda/analysis/__init__.py
+  - apps/ACCF/src/eda/analysis/ast_parser.py
+  - apps/ACCF/src/eda/analysis/dependency_analyzer.py
+  - apps/ACCF/src/eda/analysis/entrypoint_detector.py
+  - apps/ACCF/src/eda/analysis/project_scanner.py
+  - apps/ACCF/src/eda/analysis/quality_analyzer.py
+  - apps/ACCF/src/eda/cli.py
+  - apps/ACCF/src/eda/config.py
+  - apps/ACCF/src/eda/core/__init__.py
+  - apps/ACCF/src/eda/core/orchestrator.py
+  - apps/ACCF/src/eda/diagrams/__init__.py
+  - apps/ACCF/src/eda/diagrams/mermaid_builder.py
+  - apps/ACCF/src/eda/generation/__init__.py
+  - apps/ACCF/src/eda/generation/document_builder.py
+  - apps/ACCF/src/eda/generation/llm_writer.py
+  - apps/ACCF/src/eda/generation/snippet_extractor.py
+  - apps/ACCF/src/eda/generation/template_engine.py
+  - apps/ACCF/src/eda/qa/__init__.py
+  - apps/ACCF/src/eda/qa/scorer.py
+  - apps/ACCF/src/eda/qa/validator.py
+  - apps/ACCF/src/eda/simple_doc_generator.py
+  - apps/ACCF/src/eda/templates/architecture_doc.md.j2
+  - apps/ACCF/src/eda/templates/design_doc.md.j2
+  - apps/ACCF/src/eda/templates/requirements_doc.md.j2
+  - apps/ACCF/src/perplexity_api/__init__.py
+  - apps/ACCF/src/perplexity_api/client.py
+  - apps/ACCF/src/perplexity_api/config.py
+  - apps/ACCF/src/perplexity_api/exceptions.py
+  - apps/ACCF/src/perplexity_api/models.py
+  - apps/ACCF/src/sitecustomize.py
+  - apps/ACCF/sync_to_qdrant.py
+  - apps/ACCF/test_calculator/Dockerfile
+  - apps/ACCF/test_calculator/Makefile
+  - apps/ACCF/test_calculator/README.md
+  - apps/ACCF/test_calculator/deploy.sh
+  - apps/ACCF/test_calculator/docker-compose.yml
+  - apps/ACCF/test_calculator/pyproject.toml
+  - apps/ACCF/test_calculator/requirements.txt
+  - apps/ACCF/test_calculator/setup.py
+  - apps/ACCF/test_calculator/src/simple_calculator/__init__.py
+  - apps/ACCF/test_session_output/tmpro4alxpf_session_summary.json
+  - apps/ACCF/tests/__init__.py
+  - apps/ACCF/tests/agents/enhanced_documentation_agent/__init__.py
+  - apps/ACCF/tests/agents/enhanced_documentation_agent/qa/test_gates.bats
+  - apps/ACCF/tests/coding_agent/IMPLEMENTATION_SUMMARY.md
+  - apps/ACCF/tests/coding_agent/README_TESTING.md
+  - apps/ACCF/tests/coding_agent/conftest.py
+  - apps/ACCF/tests/coding_agent/fixtures/conftest.py
+  - apps/ACCF/tests/comprehensive_test_agent_integration.py
+  - apps/ACCF/tests/demo_enhanced_research_agent.py
+  - apps/ACCF/tests/demo_working_integration.py
+  - apps/ACCF/tests/example_usage.py
+  - apps/ACCF/tests/execute_research_demo.py
+  - apps/ACCF/tests/final_demo.py
+  - apps/ACCF/tests/research_output_demo.py
+  - apps/ACCF/tests/simple_demo.py
+  - apps/ACCF/token_calculator.py
+  - apps/ACCF/tools/integration/mcp_mocks.md
+  - apps/ACCF/tools/integration/neo4j_local.md
+  - apps/ACCF/tools/metrics/emit.py
+  - apps/ACCF/uv.lock
+  - apps/ACCF/workflow_492d2ec7/Dockerfile
+  - apps/ACCF/workflow_492d2ec7/Makefile
+  - apps/ACCF/workflow_492d2ec7/README.md
+  - apps/ACCF/workflow_492d2ec7/deploy.sh
+  - apps/ACCF/workflow_492d2ec7/docker-compose.yml
+  - apps/ACCF/workflow_492d2ec7/pyproject.toml
+  - apps/ACCF/workflow_492d2ec7/requirements.txt
+  - apps/ACCF/workflow_492d2ec7/setup.py
+  - apps/ACCF/workflow_492d2ec7/src/project_workflow_492d2ec7/__init__.py
+  - apps/ACCF/workflow_492d2ec7/src/project_workflow_492d2ec7/utils.py
+  - apps/ACCF/workflow_7043f25b/Dockerfile
+  - apps/ACCF/workflow_7043f25b/Makefile
+  - apps/ACCF/workflow_7043f25b/README.md
+  - apps/ACCF/workflow_7043f25b/deploy.sh
+  - apps/ACCF/workflow_7043f25b/docker-compose.yml
+  - apps/ACCF/workflow_7043f25b/pyproject.toml
+  - apps/ACCF/workflow_7043f25b/requirements.txt
+  - apps/ACCF/workflow_7043f25b/setup.py
+  - apps/ACCF/workflow_7043f25b/src/project_workflow_7043f25b/__init__.py
+  - apps/ACCF/workflow_7043f25b/src/project_workflow_7043f25b/utils.py
   - apps/README.md
   - apps/auto-forge-factory/DEMONSTRATION_SUMMARY.md
   - apps/auto-forge-factory/Dockerfile
@@ -45,23 +556,11 @@ files:
   - apps/auto-forge-factory/docker-compose.yml
   - apps/auto-forge-factory/models/schemas.py
   - apps/auto-forge-factory/requirements.txt
-  - apps/hello-cli/Dockerfile
-  - apps/hello-cli/docs/1-requirements.md
-  - apps/hello-cli/docs/2-design.md
-  - apps/hello-cli/docs/3-planning.md
-  - apps/hello-cli/docs/5-deployment.md
-  - apps/hello-cli/pyproject.toml
-  - apps/hello-cli/setup.cfg
-  - apps/hello-cli/src/hello_cli/__init__.py
-  - apps/hello-cli/src/hello_cli/__main__.py
-  - apps/hello-cli/src/hello_cli/cli.py
-  - apps/hello-cli/src/hello_cli/config.py
-  - apps/hello-cli/src/hello_cli/errors.py
-  - apps/hello-cli/src/hello_cli/greeter.py
-  - apps/hello-cli/tests/__init__.py
-  - apps/hello-disneyworld/docs/6-postmortem.md
-  - apps/hello-world/docs/design/architecture.md
-  - apps/hello-world/docs/requirements/hello-world-requirements.md
+  - apps/kb-auto-docs/SYSTEM_TRUTH.md
+  - apps/kb-auto-docs/src/auto_documentation.py
+  - apps/kb-auto-docs/src/template_manager.py
+  - apps/kb-auto-docs/template_generated_overview.md
+  - apps/kb-auto-docs/tests/validate_complete_system.py
   - apps/knowledge_system/FUTURE_READY.md
   - apps/knowledge_system/OPERATIONAL_STATUS.md
   - apps/knowledge_system/README.md
@@ -73,24 +572,30 @@ files:
   - apps/knowledge_system/activate_evolution.py
   - apps/knowledge_system/adaptive_learning.py
   - apps/knowledge_system/add_relationships.py
-  - apps/knowledge_system/automated_acquisition_pipeline.py
+  - apps/knowledge_system/advanced/adaptive_learning.py
+  - apps/knowledge_system/advanced/autonomous_evolution.py
+  - apps/knowledge_system/advanced/knowledge_synthesis.py
+  - apps/knowledge_system/advanced/predictive_prefetch.py
+  - apps/knowledge_system/advanced/unified_intelligent_search.py
+  - apps/knowledge_system/analyze_content_lengths.py
+  - apps/knowledge_system/analyze_kb_standards.py
   - apps/knowledge_system/autonomous_evolution.py
   - apps/knowledge_system/claude_knowledge_retrieval.py
-  - apps/knowledge_system/curated_ingestion.py
-  - apps/knowledge_system/demo_rag.py
-  - apps/knowledge_system/direct_acquisition.py
-  - apps/knowledge_system/direct_ingestion.py
+  - apps/knowledge_system/core/claude_knowledge_retrieval.py
+  - apps/knowledge_system/core/embedding_service.py
+  - apps/knowledge_system/core/fast_ingest.py
+  - apps/knowledge_system/core/mcp_knowledge_server.py
+  - apps/knowledge_system/core/mcp_knowledge_tools.py
+  - apps/knowledge_system/core/simple_rag.py
   - apps/knowledge_system/embedding_service.py
   - apps/knowledge_system/enhanced_context.py
+  - apps/knowledge_system/estimate_tokens.py
   - apps/knowledge_system/evaluation.py
-  - apps/knowledge_system/fast_ingest.py
-  - apps/knowledge_system/final_validation.py
-  - apps/knowledge_system/fix_connections.py
-  - apps/knowledge_system/fix_knowledge_query.py
+  - apps/knowledge_system/fast_enrichment.py
   - apps/knowledge_system/generate_embeddings.py
   - apps/knowledge_system/hybrid_search.py
-  - apps/knowledge_system/ingest_with_mcp.py
   - apps/knowledge_system/init_neo4j.py
+  - apps/knowledge_system/kb_intelligent_enrichment.py
   - apps/knowledge_system/knowledge_activation.py
   - apps/knowledge_system/knowledge_learning_neo4j.py
   - apps/knowledge_system/knowledge_nano_agent.py
@@ -98,34 +603,28 @@ files:
   - apps/knowledge_system/knowledge_synthesis.py
   - apps/knowledge_system/knowledge_system.py
   - apps/knowledge_system/learning_feedback_loop.py
-  - apps/knowledge_system/letta_integration.py
   - apps/knowledge_system/mcp_feedback_tools.py
-  - apps/knowledge_system/mcp_knowledge_enhanced.py
   - apps/knowledge_system/mcp_knowledge_server.py
   - apps/knowledge_system/mcp_knowledge_server.py.backup_20250822_095714
   - apps/knowledge_system/mcp_knowledge_tools.py
-  - apps/knowledge_system/mcp_knowledge_tools_auto_embed.py
-  - apps/knowledge_system/mcp_knowledge_tools_v2.py
-  - apps/knowledge_system/memory_crystal.py
   - apps/knowledge_system/migrate_deprecated_property.py
-  - apps/knowledge_system/monitored_ingestion.py
+  - apps/knowledge_system/migrate_kb_standards.py
   - apps/knowledge_system/neo4j_connection.py
+  - apps/knowledge_system/optimized_enrichment.py
   - apps/knowledge_system/predictive_prefetch.py
   - apps/knowledge_system/prefetch_state.pkl
-  - apps/knowledge_system/real_acquisition_pipeline.py
-  - apps/knowledge_system/reference_ingestion_pipeline.py
+  - apps/knowledge_system/query_nano_agent.py
   - apps/knowledge_system/reindex_knowledge.py
-  - apps/knowledge_system/search_reference.py
   - apps/knowledge_system/search_with_feedback.py
   - apps/knowledge_system/semantic_code_analyzer.py
   - apps/knowledge_system/simple_rag.py
+  - apps/knowledge_system/smart_enrichment.py
   - apps/knowledge_system/src/agent_integration.py
   - apps/knowledge_system/src/embedding_service.py
   - apps/knowledge_system/src/hybrid_retrieval.py
   - apps/knowledge_system/src/neo4j_knowledge_store.py
   - apps/knowledge_system/src/self_learning_loop.py
   - apps/knowledge_system/synthesis_results.json
-  - apps/knowledge_system/system_diagnostic.py
   - apps/knowledge_system/unified_intelligent_search.py
   - apps/knowledge_system/usage_tracking.py
   - apps/opsvi-assistant/README.md
@@ -386,6 +885,140 @@ files:
   - apps/proj-mapper/tests/unit/__init__.py
   - apps/proj-mapper/tests/unit/core/__init__.py
   - apps/proj-mapper/tests/unit/models/__init__.py
+  - apps/project-intelligence/CHANGELOG.md
+  - apps/project-intelligence/CLAUDE.md
+  - apps/project-intelligence/README.md
+  - apps/project-intelligence/demo_project_scoping.py
+  - apps/project-intelligence/docs/INTEGRITY_CHECKS.md
+  - apps/project-intelligence/docs/README.md
+  - apps/project-intelligence/docs/README_DEBUG.md
+  - apps/project-intelligence/docs/README_v1_1.md
+  - apps/project-intelligence/docs/architecture/PROJECT_INTELLIGENCE_MODULE_DEPENDENCIES.md
+  - apps/project-intelligence/docs/architecture/project_intelligence_architecture.md
+  - apps/project-intelligence/docs/demos/demo_v1_1.py
+  - apps/project-intelligence/docs/development_rules.md
+  - apps/project-intelligence/docs/git_hook_troubleshooting.md
+  - apps/project-intelligence/docs/integrations/GENFILEMAP_PACKAGE_INTEGRATION.md
+  - apps/project-intelligence/docs/integrations/NEO4J_RAG_IMPLEMENTATION_SUMMARY.md
+  - apps/project-intelligence/docs/legacy/LEGACY_CLEANUP_SUMMARY.md
+  - apps/project-intelligence/docs/proj-intel-enhancements/01-current-solution.md
+  - apps/project-intelligence/docs/proj-intel-enhancements/02-neo4j-architecture.md
+  - apps/project-intelligence/docs/proj-intel-enhancements/03-data-model-and-ddl.md
+  - apps/project-intelligence/docs/proj-intel-enhancements/04-etl-and-sinks.md
+  - apps/project-intelligence/docs/proj-intel-enhancements/05-retrieval-and-apis.md
+  - apps/project-intelligence/docs/proj-intel-enhancements/06-reporting-and-analytics.md
+  - apps/project-intelligence/docs/proj-intel-enhancements/07-operations-and-ci.md
+  - apps/project-intelligence/docs/proj-intel-enhancements/08-acceptance-and-milestones.md
+  - apps/project-intelligence/docs/proj-intel-enhancements/README.md
+  - apps/project-intelligence/docs/project_description.md
+  - apps/project-intelligence/docs/project_intelligence_artifacts.md
+  - apps/project-intelligence/docs/requirements/REQUIREMENTS_README.md
+  - apps/project-intelligence/docs/requirements/requirements_and_specifications.md
+  - apps/project-intelligence/docs/templates/universal_project_description_template.md
+  - apps/project-intelligence/examples/run_inspector_debug.sh
+  - apps/project-intelligence/proto/context_package_v0_9.proto
+  - apps/project-intelligence/pyproject.toml
+  - apps/project-intelligence/requirements-dev.txt
+  - apps/project-intelligence/requirements-minimal.txt
+  - apps/project-intelligence/requirements.txt
+  - apps/project-intelligence/schemas/collector_output.schema.json
+  - apps/project-intelligence/scripts/benchmark.py
+  - apps/project-intelligence/scripts/install_git_hooks.py
+  - apps/project-intelligence/scripts/post-commit
+  - apps/project-intelligence/scripts/post-commit.ps1
+  - apps/project-intelligence/scripts/verify_proj_intel.py
+  - apps/project-intelligence/setup.py
+  - apps/project-intelligence/src/project_intelligence/__init__.py
+  - apps/project-intelligence/src/project_intelligence/__main__.py
+  - apps/project-intelligence/src/project_intelligence/accf/__init__.py
+  - apps/project-intelligence/src/project_intelligence/accf/adapter.py
+  - apps/project-intelligence/src/project_intelligence/accf/exceptions.py
+  - apps/project-intelligence/src/project_intelligence/analyze.py
+  - apps/project-intelligence/src/project_intelligence/analyzers/__init__.py
+  - apps/project-intelligence/src/project_intelligence/analyzers/base.py
+  - apps/project-intelligence/src/project_intelligence/analyzers/file_classification_analyzer.py
+  - apps/project-intelligence/src/project_intelligence/analyzers/registry.py
+  - apps/project-intelligence/src/project_intelligence/cli.py
+  - apps/project-intelligence/src/project_intelligence/cli/modular_cli.py
+  - apps/project-intelligence/src/project_intelligence/collectors/__init__.py
+  - apps/project-intelligence/src/project_intelligence/collectors/agent_architecture_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/api_endpoints_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/base.py
+  - apps/project-intelligence/src/project_intelligence/collectors/call_graph_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/changeset_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/collectors.py
+  - apps/project-intelligence/src/project_intelligence/collectors/common/__init__.py
+  - apps/project-intelligence/src/project_intelligence/collectors/common/ast_utils.py
+  - apps/project-intelligence/src/project_intelligence/collectors/common/file_utils.py
+  - apps/project-intelligence/src/project_intelligence/collectors/common/git_utils.py
+  - apps/project-intelligence/src/project_intelligence/collectors/config_env_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/constraints_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/data_models_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/dependencies_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/deps_extended_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/development_state_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/entry_points_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/file_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/file_elements_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/project_purpose_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/quality_quick_collector.py
+  - apps/project-intelligence/src/project_intelligence/collectors/registry.py
+  - apps/project-intelligence/src/project_intelligence/collectors/tests_topology_collector.py
+  - apps/project-intelligence/src/project_intelligence/context_package_builder.py
+  - apps/project-intelligence/src/project_intelligence/core/__init__.py
+  - apps/project-intelligence/src/project_intelligence/core/config.py
+  - apps/project-intelligence/src/project_intelligence/core/exceptions.py
+  - apps/project-intelligence/src/project_intelligence/core/orchestrator.py
+  - apps/project-intelligence/src/project_intelligence/exporters/__init__.py
+  - apps/project-intelligence/src/project_intelligence/exporters/base.py
+  - apps/project-intelligence/src/project_intelligence/exporters/json_exporter.py
+  - apps/project-intelligence/src/project_intelligence/exporters/registry.py
+  - apps/project-intelligence/src/project_intelligence/file_mapper.py
+  - apps/project-intelligence/src/project_intelligence/hierarchical_scoping.py
+  - apps/project-intelligence/src/project_intelligence/hooks/__init__.py
+  - apps/project-intelligence/src/project_intelligence/hooks/heuristic_updater.py
+  - apps/project-intelligence/src/project_intelligence/hooks/project_description_updater.py
+  - apps/project-intelligence/src/project_intelligence/kb_integration.py
+  - apps/project-intelligence/src/project_intelligence/kb_project_scoped.py
+  - apps/project-intelligence/src/project_intelligence/legacy_parallel_executor.py
+  - apps/project-intelligence/src/project_intelligence/neo4j_rag_integration.py
+  - apps/project-intelligence/src/project_intelligence/package_builder/__init__.py
+  - apps/project-intelligence/src/project_intelligence/package_builder/__main__.py
+  - apps/project-intelligence/src/project_intelligence/package_builder/builders.py
+  - apps/project-intelligence/src/project_intelligence/package_builder/models.py
+  - apps/project-intelligence/src/project_intelligence/package_builder/serializers.py
+  - apps/project-intelligence/src/project_intelligence/parallel_executor.py
+  - apps/project-intelligence/src/project_intelligence/utils/__init__.py
+  - apps/project-intelligence/src/project_intelligence/utils/logging.py
+  - apps/project-intelligence/src/project_intelligence/utils/utils.py
+  - apps/thinking-supervisor/COMPLETE_SYSTEM_DESIGN.md
+  - apps/thinking-supervisor/IMPLEMENTATION_PLAN.md
+  - apps/thinking-supervisor/INTELLIGENT_TRIAGE_DESIGN.md
+  - apps/thinking-supervisor/TRIAGE_MONITORING_SCOPE.md
+  - apps/thinking-supervisor/cognitive_team.py
+  - apps/thinking-supervisor/consult_thinking_integration.py
+  - apps/thinking-supervisor/deploy_intelligent_triage.sh
+  - apps/thinking-supervisor/deploy_phase1.sh
+  - apps/thinking-supervisor/intelligent_triage.py
+  - apps/thinking-supervisor/mcp-integration/thinking_triage_client.ts
+  - apps/thinking-supervisor/mcp_integration.py
+  - apps/thinking-supervisor/metacognitive_supervisor.py
+  - apps/thinking-supervisor/triage-service/devils_advocate.py
+  - apps/thinking-supervisor/triage-service/enhanced_triage_api.py
+  - apps/thinking-supervisor/triage-service/intelligent_triage.py
+  - apps/thinking-supervisor/triage-service/intelligent_triage_direct.py
+  - apps/thinking-supervisor/triage-service/kb_storage.py
+  - apps/thinking-supervisor/triage-service/metacognitive_agent.py
+  - apps/thinking-supervisor/triage-service/metacognitive_agent_lite.py
+  - apps/thinking-supervisor/triage-service/test_module.json
+  - apps/thinking-supervisor/triage-service/test_no_fallback.json
+  - apps/thinking-supervisor/triage-service/test_struggling_thought.json
+  - apps/thinking-supervisor/triage-service/test_thought.json
+  - apps/thinking-supervisor/triage-service/test_violation.json
+  - apps/thinking-supervisor/triage-service/triage_api.py
+  - apps/thinking-supervisor/triage-service/triage_module.py
+  - apps/thinking-supervisor/triage-service/triage_with_mcp.py
+  - auto_pilot_demo.py
   - autonomous_claude_agent/AI_FIRST_IMPLEMENTATION_SUMMARY.md
   - autonomous_claude_agent/ARCHITECTURE.md
   - autonomous_claude_agent/AUTONOMOUS_AI_REDESIGN.md
@@ -544,8 +1177,10 @@ files:
   - autonomous_coder/working_autonomous/src/style.css
   - autonomous_coder/working_autonomous/tsconfig.json
   - autonomous_coder/working_autonomous/vite.config.ts
+  - backup_knowledge_system_20250824_135437.tar.gz
   - chat_improvement_log.txt
   - claude_improvements_chat.txt
+  - configure_tokens.sh
   - docker-compose.yml
   - docs/ADR-001-initial-architecture.md
   - docs/ADR-002-scraper.md
@@ -2586,6 +3221,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/docs/EMERGENT_QUESTIONS_AND_CONSIDERATIONS.md
   - libs/opsvi-mcp/docs/IMPLEMENTATION_ROADMAP.md
   - libs/opsvi-mcp/docs/MCP_INTEGRATION_POINTS.md
+  - libs/opsvi-mcp/docs/MONITORING_SYSTEM.md
   - libs/opsvi-mcp/docs/SESSION_CONCURRENCY_FINDINGS.md
   - libs/opsvi-mcp/docs/UNIFIED_MCP_ARCHITECTURE.md
   - libs/opsvi-mcp/docs/claude-code-api-reference.md
@@ -2630,6 +3266,8 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code/recursion_manager.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code/server.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code/task_tool_solution.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code/token_config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code/token_pool.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/__init__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/__main__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/config.py
@@ -2637,12 +3275,16 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/job_manager.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/job_manager.py.stub_backup
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/job_manager_fixed.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/job_manager_with_pool.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/mcp_manager.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/monitored_job_manager.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/result_collector.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v2/server_monitored.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/README.md
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/__init__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/__main__.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agent_monitor.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/__init__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/critic_agent.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/documentation_agent.py
@@ -2651,9 +3293,11 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/security_agent.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/agents/testing_agent.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/config.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/enhanced_orchestrator.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/server.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/server.py.stub_backup
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/server_fixed.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/session_debugger.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/task_decomposer.py
   - libs/opsvi-mcp/opsvi_mcp/servers/claude_code_v3/timeout_manager.py
   - libs/opsvi-mcp/opsvi_mcp/servers/context_bridge/README.md
@@ -2716,8 +3360,11 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/opsvi_mcp/servers/simple_python/__main__.py
   - libs/opsvi-mcp/opsvi_mcp/servers/simple_python/config.py
   - libs/opsvi-mcp/opsvi_mcp/servers/simple_python/server.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/sounding_board.py
   - libs/opsvi-mcp/opsvi_mcp/servers/testing_qa/config.py
   - libs/opsvi-mcp/opsvi_mcp/servers/testing_qa/models.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/thinking.py
+  - libs/opsvi-mcp/opsvi_mcp/servers/thinking_pure.py
   - libs/opsvi-mcp/opsvi_mcp/servers/unified_config.yaml
   - libs/opsvi-mcp/opsvi_mcp/servers/unified_orchestrator.py
   - libs/opsvi-mcp/opsvi_mcp/tools/mcp_resource_discovery.py
@@ -2732,6 +3379,10 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/opsvi-mcp/setup.py
   - libs/opsvi-mcp/src/agent_profiles.py
   - libs/opsvi-mcp/src/orchestrator_agent_profile.py
+  - libs/opsvi-mcp/src/servers/metacognitive-thinking/index.ts
+  - libs/opsvi-mcp/src/servers/metacognitive-thinking/package-lock.json
+  - libs/opsvi-mcp/src/servers/metacognitive-thinking/package.json
+  - libs/opsvi-mcp/src/servers/metacognitive-thinking/tsconfig.json
   - libs/opsvi-mcp/task2.py
   - libs/opsvi-mcp/task3.py
   - libs/opsvi-mcp/task_function.py
@@ -3099,7 +3750,79 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - libs/recommended_structure.yaml
   - libs/templates.yaml
   - libs/variable_schema.yaml
+  - master_orchestrator.py
   - master_root.txt
+  - master_rules.chat.log.txt
+  - mcp-servers-fork/CODE_OF_CONDUCT.md
+  - mcp-servers-fork/CONTRIBUTING.md
+  - mcp-servers-fork/LICENSE
+  - mcp-servers-fork/README.md
+  - mcp-servers-fork/SECURITY.md
+  - mcp-servers-fork/package-lock.json
+  - mcp-servers-fork/package.json
+  - mcp-servers-fork/scripts/release.py
+  - mcp-servers-fork/src/everything/CLAUDE.md
+  - mcp-servers-fork/src/everything/Dockerfile
+  - mcp-servers-fork/src/everything/README.md
+  - mcp-servers-fork/src/everything/everything.ts
+  - mcp-servers-fork/src/everything/index.ts
+  - mcp-servers-fork/src/everything/instructions.md
+  - mcp-servers-fork/src/everything/package.json
+  - mcp-servers-fork/src/everything/sse.ts
+  - mcp-servers-fork/src/everything/stdio.ts
+  - mcp-servers-fork/src/everything/streamableHttp.ts
+  - mcp-servers-fork/src/everything/tsconfig.json
+  - mcp-servers-fork/src/fetch/Dockerfile
+  - mcp-servers-fork/src/fetch/LICENSE
+  - mcp-servers-fork/src/fetch/README.md
+  - mcp-servers-fork/src/fetch/pyproject.toml
+  - mcp-servers-fork/src/fetch/src/mcp_server_fetch/__init__.py
+  - mcp-servers-fork/src/fetch/src/mcp_server_fetch/__main__.py
+  - mcp-servers-fork/src/fetch/src/mcp_server_fetch/server.py
+  - mcp-servers-fork/src/fetch/uv.lock
+  - mcp-servers-fork/src/filesystem/Dockerfile
+  - mcp-servers-fork/src/filesystem/README.md
+  - mcp-servers-fork/src/filesystem/__tests__/directory-tree.test.ts
+  - mcp-servers-fork/src/filesystem/__tests__/lib.test.ts
+  - mcp-servers-fork/src/filesystem/__tests__/path-utils.test.ts
+  - mcp-servers-fork/src/filesystem/__tests__/path-validation.test.ts
+  - mcp-servers-fork/src/filesystem/__tests__/roots-utils.test.ts
+  - mcp-servers-fork/src/filesystem/index.ts
+  - mcp-servers-fork/src/filesystem/jest.config.cjs
+  - mcp-servers-fork/src/filesystem/lib.ts
+  - mcp-servers-fork/src/filesystem/package.json
+  - mcp-servers-fork/src/filesystem/path-utils.ts
+  - mcp-servers-fork/src/filesystem/path-validation.ts
+  - mcp-servers-fork/src/filesystem/roots-utils.ts
+  - mcp-servers-fork/src/filesystem/tsconfig.json
+  - mcp-servers-fork/src/git/Dockerfile
+  - mcp-servers-fork/src/git/LICENSE
+  - mcp-servers-fork/src/git/README.md
+  - mcp-servers-fork/src/git/pyproject.toml
+  - mcp-servers-fork/src/git/src/mcp_server_git/__init__.py
+  - mcp-servers-fork/src/git/src/mcp_server_git/__main__.py
+  - mcp-servers-fork/src/git/src/mcp_server_git/py.typed
+  - mcp-servers-fork/src/git/src/mcp_server_git/server.py
+  - mcp-servers-fork/src/git/uv.lock
+  - mcp-servers-fork/src/memory/Dockerfile
+  - mcp-servers-fork/src/memory/README.md
+  - mcp-servers-fork/src/memory/index.ts
+  - mcp-servers-fork/src/memory/package.json
+  - mcp-servers-fork/src/memory/tsconfig.json
+  - mcp-servers-fork/src/sequentialthinking/Dockerfile
+  - mcp-servers-fork/src/sequentialthinking/README.md
+  - mcp-servers-fork/src/sequentialthinking/index.ts
+  - mcp-servers-fork/src/sequentialthinking/package.json
+  - mcp-servers-fork/src/sequentialthinking/tsconfig.json
+  - mcp-servers-fork/src/time/Dockerfile
+  - mcp-servers-fork/src/time/README.md
+  - mcp-servers-fork/src/time/pyproject.toml
+  - mcp-servers-fork/src/time/src/mcp_server_time/__init__.py
+  - mcp-servers-fork/src/time/src/mcp_server_time/__main__.py
+  - mcp-servers-fork/src/time/src/mcp_server_time/server.py
+  - mcp-servers-fork/src/time/uv.lock
+  - mcp-servers-fork/tsconfig.json
+  - mcp_e2e_test_20250825.md
   - mypy.ini
   - pattern-engine-service/Dockerfile
   - pattern-engine-service/README.md
@@ -3128,8 +3851,13 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - projects/ctx_intel_001/discovery/requirements.md
   - pyproject.toml
   - pytest.ini
+  - quiet_commit.sh
+  - real_agent_demo.py
+  - real_agent_with_tools.py
+  - real_power_demo.py
   - requirements.txt
   - ruff.toml
+  - run_monitored_sdlc.sh
   - run_tests.sh
   - scripts/README.md
   - scripts/README_auto_attach.md
@@ -3144,6 +3872,9 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - scripts/auto_attach.py
   - scripts/auto_attach_generator.py
   - scripts/auto_cleanup.py
+  - scripts/claude-workflows/code-review.sh
+  - scripts/claude-workflows/deploy-pipeline.sh
+  - scripts/claude-workflows/full-test-suite.sh
   - scripts/cleanup_libraries.sh
   - scripts/connect_claude_code_agent.py
   - scripts/create_setup_py.py
@@ -3152,6 +3883,8 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - scripts/direct_todo_implementation.py
   - scripts/enhanced_critic_accountability.py
   - scripts/execute_real_implementation.py
+  - scripts/fetch-innovative-commands.sh
+  - scripts/fetch-popular-commands.sh
   - scripts/fix_agent_syntax.py
   - scripts/fix_and_embed_remaining.py
   - scripts/fix_proj_mapper_imports.py
@@ -3209,6 +3942,8 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - scripts/wsl_quick_cleanup.sh
   - sdlc_cleanup.chat.txt
   - sdlc_convo_last_backup.txt
+  - setup_six_tokens.py
+  - setup_token_pool.py
   - src/__init__.py
   - src/adapters/__init__.py
   - src/adapters/playwright_scraper.py
@@ -3230,6 +3965,7 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - src/utils/__init__.py
   - src/utils/config.py
   - src/utils/http_client.py
+  - substantial_demo.py
   - systemd/autosave@.service
   - systemd/autosave@.timer
   - systemd/snapshot@.service
@@ -3241,4 +3977,5 @@ src/applications/oamat/workflows/orchestrator/graph_builder.py
   - tools/rag_init.py
   - tools/snapshot.sh
   - tools/template_vars_check.py
+  - true_power_demo.sh
   - uv.lock
