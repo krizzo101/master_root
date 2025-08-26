@@ -9,6 +9,22 @@ intake/
 .archive/
 .specstory/
 
+# Project intelligence and analysis
+.proj-intel/
+
+# Agent worktree directories (temporary workspaces)
+/home/opsvi/agent_worktrees/
+/home/opsvi/agent_shared/
+agent_worktrees/
+agent_shared/
+
+# Multi-agent monitor POC workspaces
+apps/multi-agent-monitor/missions/poc_workspace/
+apps/multi-agent-monitor/missions/outputs/
+
+# Agent safety backups
+.agent_backups/
+
 # Sensitive configuration files
 .cursor/*.json
 .cursor/.env
