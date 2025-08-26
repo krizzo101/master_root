@@ -16,6 +16,7 @@ from typing import Any, Dict, List, Optional
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from src.orchestration.selective_merger import SelectiveMerger
 from src.orchestration.worktree_manager import WorktreeManager
 from src.safety import GitSafetyManager, SafetyLevel
 
@@ -29,6 +30,7 @@ class WorktreePOC:
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.worktree_manager = WorktreeManager(self.repo_path)
         self.safety_manager = GitSafetyManager(self.repo_path)
+        self.merger = SelectiveMerger(self.repo_path)
 
         # Shared communication space
         self.shared_space = Path("/home/opsvi/agent_shared")
@@ -418,11 +420,63 @@ Generated at: {datetime.now().isoformat()}
 
         analysis = self.analyze_parallel_results(results, agent_configs)
 
-        # Step 5: Cleanup (optional) - Skip merging for POC since we're just testing
+        # Step 5: Selective Merge - Only merge agent-generated files
         if not self.dry_run and analysis["success"]:
-            print("\n📌 Step 5: Collecting results (skipping merge for POC)")
-            print("   ℹ️  Agent work saved in worktree branches for review")
-            # In production, we would selectively merge non-conflicting changes
+            print("\n📌 Step 5: Merging agent results (selective merge)")
+
+            merge_success = True
+            for config in agent_configs:
+                try:
+                    agent_type = config["agent_type"]
+                    worktree_path = Path(config["environment"]["working_directory"])
+
+                    # Get files the agent actually changed
+                    changed_files = self.merger.get_agent_changes(
+                        worktree_path, agent_type
+                    )
+
+                    if changed_files:
+                        print(
+                            f"\n   🔍 {agent_type} modified {len(changed_files)} files:"
+                        )
+                        for f in changed_files[:5]:  # Show first 5
+                            print(f"      - {f}")
+                        if len(changed_files) > 5:
+                            print(f"      ... and {len(changed_files) - 5} more")
+
+                        # Cherry-pick specific files to main branch
+                        branch_name = config["environment"]["branch_name"]
+                        success = self.merger.cherry_pick_files(
+                            source_branch=branch_name,
+                            target_branch=base_branch,
+                            files=changed_files,
+                        )
+
+                        if success:
+                            print(f"   ✅ Merged {agent_type} changes")
+                        else:
+                            print(f"   ⚠️  Could not merge {agent_type} changes")
+                            merge_success = False
+                    else:
+                        print(f"   ℹ️  {agent_type} made no changes to merge")
+
+                except Exception as e:
+                    print(f"   ❌ Error merging {config['agent_type']}: {e}")
+                    merge_success = False
+
+            # Merge outputs to shared space
+            print("\n   📦 Collecting outputs to shared space...")
+            output_results = self.merger.merge_agent_outputs(agent_configs)
+            if output_results["success"]:
+                print(f"   ✅ Merged {len(output_results['merged_files'])} output files")
+                for f in output_results["merged_files"][:3]:
+                    print(f"      - {Path(f).name}")
+            else:
+                print(
+                    f"   ⚠️  Some outputs had conflicts: {output_results['conflicts']}"
+                )
+
+            analysis["merge_success"] = merge_success
 
         return analysis
 
