@@ -166,7 +166,21 @@ Remember: Think about how YOU as an agent want to communicate!""",
 
         if self.dry_run:
             print(f"[DRY RUN] Would create worktree for {agent_type}")
-            return {"agent_id": agent_id, "worktree_path": f"/mock/path/{agent_id}"}
+            return {
+                "agent_id": agent_id,
+                "agent_type": agent_type,
+                "worktree_path": f"/mock/path/{agent_id}",
+                "environment": {
+                    "working_directory": f"/mock/path/{agent_id}",
+                    "agent_workspace": f"/mock/path/{agent_id}/agent_workspace",
+                    "shared_messages": str(self.shared_space / "messages"),
+                    "shared_outputs": str(self.shared_space / "outputs"),
+                    "branch_name": f"mock/branch/{agent_type}",
+                    "agent_type": agent_type,
+                    "created_at": datetime.now().isoformat(),
+                },
+                "task": self.create_agent_task(agent_type),
+            }
 
         try:
             # Create worktree
@@ -223,9 +237,13 @@ Remember: Think about how YOU as an agent want to communicate!""",
         # Simulate some work
         await asyncio.sleep(2)
 
-        # Create mock output
-        output_dir = workspace / "outputs"
-        output_dir.mkdir(exist_ok=True)
+        # Create mock output only if not in dry run
+        if not self.dry_run:
+            output_dir = workspace / "outputs"
+            output_dir.mkdir(exist_ok=True)
+        else:
+            output_dir = self.shared_space / "outputs"
+            output_dir.mkdir(exist_ok=True)
 
         if agent_type == "requirements-analyst":
             output = output_dir / "requirements_functional.md"
