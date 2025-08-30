@@ -93,21 +93,24 @@ def read_last_items(transcript_path, k_user=5):
 
 
 def get_output_text(resp):
-    t = getattr(resp, "output_text", None)
-    if t:
-        return t
+    # Extract text from Responses API response
+    # First try direct attribute
+    if hasattr(resp, "output_text") and resp.output_text:
+        return resp.output_text
+    
+    # Try to extract from output structure
     try:
-        d = resp.model_dump() if hasattr(resp, "model_dump") else resp.__dict__
-        out = d.get("output") or d.get("outputs") or []
-        if out and isinstance(out, list):
-            c = out[0].get("content") if isinstance(out[0], dict) else None
-            if c and isinstance(c, list):
-                txt = c[0].get("text")
-                if txt:
-                    return txt
+        if hasattr(resp, "output") and resp.output:
+            for item in resp.output:
+                if hasattr(item, "content") and item.content:
+                    for content_item in item.content:
+                        if hasattr(content_item, "text"):
+                            return content_item.text
     except Exception:
         pass
-    return ""
+    
+    # Last resort - convert to string
+    return str(resp) if resp else ""
 
 
 def call_review(model, assistant_out, prev5):
@@ -144,11 +147,15 @@ def call_review(model, assistant_out, prev5):
             {"role": "system", "content": [{"type": "input_text", "text": system}]},
             {"role": "user", "content": [{"type": "input_text", "text": user}]},
         ],
-        response_format={"type": "json_schema", "json_schema": schema},
-        temperature=TEMP,
-        max_output_tokens=MAX_TOK,
-        seed=SEED,
-        verbosity="low",
+        text={
+            "format": {
+                "type": "json_schema",
+                "name": "ReviewVerdict",
+                "strict": True,
+                "schema": schema["schema"]
+            }
+        },
+        max_output_tokens=MAX_TOK
     )
     out = get_output_text(r)
     try:

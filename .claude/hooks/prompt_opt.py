@@ -12,7 +12,7 @@ from openai import OpenAI
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-MODEL = os.getenv("PROMPT_OPT_MODEL", "gpt-4o-mini")
+MODEL = os.getenv("PROMPT_OPT_MODEL", "gpt-5-nano")
 MAX_TOK = int(os.getenv("PROMPT_OPT_MAX_TOK", "400"))
 TEMP = float(os.getenv("PROMPT_OPT_TEMPERATURE", "0.2"))
 SEED = int(os.getenv("PROMPT_OPT_SEED", "42"))
@@ -88,28 +88,24 @@ def last_user_prompts(transcript_path, k=5):
 
 
 def get_output_text(resp):
-    # Extract text from chat completions response
+    # Extract text from Responses API response
+    # First try direct attribute
+    if hasattr(resp, "output_text") and resp.output_text:
+        return resp.output_text
+    
+    # Try to extract from output structure
     try:
-        # Standard chat completions response
-        if hasattr(resp, "choices") and resp.choices:
-            return resp.choices[0].message.content
-        # Legacy Responses API format
-        t = getattr(resp, "output_text", None)
-        if t:
-            return t
-        # Fallback to dict walk
-        d = resp.model_dump() if hasattr(resp, "model_dump") else resp.__dict__
-        out = d.get("output") or d.get("outputs") or []
-        # Common shape: output[0].content[0].text
-        if out and isinstance(out, list):
-            c = out[0].get("content") if isinstance(out[0], dict) else None
-            if c and isinstance(c, list):
-                txt = c[0].get("text")
-                if txt:
-                    return txt
+        if hasattr(resp, "output") and resp.output:
+            for item in resp.output:
+                if hasattr(item, "content") and item.content:
+                    for content_item in item.content:
+                        if hasattr(content_item, "text"):
+                            return content_item.text
     except Exception:
         pass
-    return ""
+    
+    # Last resort - convert to string
+    return str(resp) if resp else ""
 
 
 def main():
@@ -165,16 +161,21 @@ def main():
         """
         ).strip()
 
-        resp = client.chat.completions.create(
+        resp = client.responses.create(
             model=MODEL,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
+            input=[
+                {"role":"system","content":[{"type":"input_text","text": system}]},
+                {"role":"user","content":[{"type":"input_text","text": user}]}
             ],
-            response_format={"type": "json_schema", "json_schema": schema},
-            temperature=TEMP,
-            max_completion_tokens=MAX_TOK,
-            seed=SEED,
+            text={
+                "format": {
+                    "type": "json_schema",
+                    "name": "OptimizedPrompt",
+                    "strict": True,
+                    "schema": schema["schema"]
+                }
+            },
+            max_output_tokens=MAX_TOK
         )
 
         text = get_output_text(resp)
