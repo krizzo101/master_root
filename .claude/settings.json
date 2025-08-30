@@ -1,6 +1,33 @@
 {
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type":"command", "command":"$CLAUDE_PROJECT_DIR/.claude/hooks/prompt_opt.py", "timeout": 45 }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type":"command", "command":"$CLAUDE_PROJECT_DIR/.claude/hooks/answer_review.py", "timeout": 60 }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          { "type":"command", "command":"$CLAUDE_PROJECT_DIR/.claude/hooks/answer_review.py", "timeout": 60 }
+        ]
+      }
+    ],
     "PreToolUse": [
+      {
+        "matcher": "Edit|Write|Bash",
+        "hooks": [
+          { "type":"command", "command":"$CLAUDE_PROJECT_DIR/.claude/hooks/safety_gate.py", "timeout": 20 }
+        ]
+      },
       {
         "matcher": "Write|Edit|MultiEdit",
         "hooks": [
@@ -12,6 +39,12 @@
       }
     ],
     "PostToolUse": [
+      {
+        "matcher": "Edit|Write|Bash|Task",
+        "hooks": [
+          { "type":"command", "command":"$CLAUDE_PROJECT_DIR/.claude/hooks/answer_review.py", "timeout": 45 }
+        ]
+      },
       {
         "matcher": "Edit|MultiEdit",
         "hooks": [
