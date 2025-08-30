@@ -11,7 +11,7 @@ from openai import OpenAI
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-MODEL_PRIMARY = os.getenv("REVIEW_MODEL", "gpt-5-nano")
+MODEL_PRIMARY = os.getenv("REVIEW_MODEL", "gpt-5-mini")
 MODEL_ESCALATE = os.getenv(
     "REVIEW_MODEL_ESCALATE", "gpt-5-mini"
 )  # optional one-time escalation
@@ -109,8 +109,8 @@ def get_output_text(resp):
     except Exception:
         pass
     
-    # Last resort - convert to string
-    return str(resp) if resp else ""
+    # Return empty string if no text found (don't convert whole response to string)
+    return ""
 
 
 def call_review(model, assistant_out, prev5):

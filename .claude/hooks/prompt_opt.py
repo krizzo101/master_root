@@ -12,7 +12,7 @@ from openai import OpenAI
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-MODEL = os.getenv("PROMPT_OPT_MODEL", "gpt-5-nano")
+MODEL = os.getenv("PROMPT_OPT_MODEL", "gpt-5-mini")
 MAX_TOK = int(os.getenv("PROMPT_OPT_MAX_TOK", "400"))
 TEMP = float(os.getenv("PROMPT_OPT_TEMPERATURE", "0.2"))
 SEED = int(os.getenv("PROMPT_OPT_SEED", "42"))
@@ -104,8 +104,8 @@ def get_output_text(resp):
     except Exception:
         pass
     
-    # Last resort - convert to string
-    return str(resp) if resp else ""
+    # Return empty string if no text found (don't convert whole response to string)
+    return ""
 
 
 def main():
@@ -141,7 +141,7 @@ def main():
                         "description": "True iff research should precede execution.",
                     },
                 },
-                "required": ["optimized_prompt"],
+                "required": ["optimized_prompt", "notes", "research_required"],
                 "additionalProperties": False,
             },
             "strict": True,
