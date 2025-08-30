@@ -1,3 +1,8 @@
+---
+name: research-storage-validation
+description: Agent for validating that all research findings are properly stored and documented
+---
+
 # Research Storage Validation Protocol
 
 ## 🚨 CRITICAL REQUIREMENT

@@ -1,3 +1,8 @@
+---
+name: knowledge-tool-usage-guide
+description: Guide for using knowledge management tools and helper libraries
+---
+
 # Knowledge Tool Usage Guide for All Agents
 
 ## ⚠️ CRITICAL LIMITATIONS (As of 2025-08-21)

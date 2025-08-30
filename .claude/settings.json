@@ -42,12 +42,12 @@
         ]
       }
     ],
-    "SessionStop": [
+    "SessionEnd": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -f \"$CLAUDE_PROJECT_DIR/.claude/hooks/export-session.sh\" ]; then $CLAUDE_PROJECT_DIR/.claude/hooks/export-session.sh $TRANSCRIPT_PATH SessionStop; fi"
+            "command": "if [ -f \"$CLAUDE_PROJECT_DIR/.claude/hooks/export-session.sh\" ]; then $CLAUDE_PROJECT_DIR/.claude/hooks/export-session.sh $TRANSCRIPT_PATH SessionEnd; fi"
           }
         ]
       }

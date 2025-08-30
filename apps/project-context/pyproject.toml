@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "project-context"
+version = "0.1.0"
+description = "MCP server providing semantic access to project intelligence data"
+authors = [{name = "OPSVI Team", email = "team@opsvi.ai"}]
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "fastmcp>=0.5.0",
+    "pydantic>=2.0.0",
+    "aiofiles>=23.0.0",
+    "diskcache>=5.6.0",
+    "structlog>=24.0.0",
+    "prometheus-client>=0.19.0",
+    "watchdog>=3.0.0",
+    "GitPython>=3.1.0",
+    "orjson>=3.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.3.0",
+]
+
+redis = [
+    "redis>=5.0.0",
+    "hiredis>=2.2.0",
+]
+
+[project.scripts]
+project-context = "project_context.server.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["project_context*"]
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "I", "N", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=project_context --cov-report=html --cov-report=term"
+asyncio_mode = "auto"
