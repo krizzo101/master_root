@@ -4,7 +4,7 @@ import os
 import re
 import sys
 import textwrap
-from datetime import datetime
+from datetime import datetime, timezone
 
 # OpenAI Responses API
 from openai import OpenAI
@@ -60,7 +60,7 @@ DEFAULT_UNSTABLE = [
 UNSTABLE_TOPICS = [
     s.strip() for s in os.getenv("RESEARCH_UNSTABLE_TOPICS", "").split(",") if s.strip()
 ] or DEFAULT_UNSTABLE
-CURRENT_DATE = datetime.now(datetime.timezone.utc).date().isoformat()
+CURRENT_DATE = datetime.now(timezone.utc).date().isoformat()
 
 
 def last_user_prompts(transcript_path, k=5):
