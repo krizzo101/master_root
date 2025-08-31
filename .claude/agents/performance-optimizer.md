@@ -20,7 +20,7 @@ assistant: "Let me use the performance-optimizer agent to analyze query performa
 Database optimization requires deep understanding of query planning and indexing strategies.
 </commentary>
 </example>
-model: gpt-5
+model: opus
 color: orange
 tools: ALL
 ---

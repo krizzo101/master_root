@@ -549,21 +549,29 @@ class RealClaudeSubprocessExecutor:
 
             # Add allowed tools (constrain what agents can do)
             if allowed_tools is None:
-                allowed_tools = ["Read", "Write", "Edit"]
+                allowed_tools = ["Read", "Write", "Edit", "Bash(git:*)"]
             if allowed_tools:
                 cmd.extend(["--allowedTools", ",".join(allowed_tools)])
 
             # Add system prompt if provided
             if system_prompt:
-                cmd.extend(["--append-system-prompt", system_prompt])
-            else:
-                # Default concise behavior for speed
-                cmd.extend(
-                    [
-                        "--append-system-prompt",
-                        "Be concise. Focus on the task. Include error handling.",
-                    ]
+                # Always append commit instruction to custom prompts
+                commit_instruction = (
+                    "IMPORTANT: After completing your changes, commit them with a "
+                    "descriptive message using "
+                    "'git add -A && git commit -m \"Your commit message\"'."
                 )
+                full_prompt = f"{system_prompt}\n\n{commit_instruction}"
+                cmd.extend(["--append-system-prompt", full_prompt])
+            else:
+                # Default concise behavior for speed with commit instruction
+                default_prompt = (
+                    "Be concise. Focus on the task. Include error handling.\n\n"
+                    "IMPORTANT: After completing your changes, commit them with a "
+                    "descriptive message using "
+                    "'git add -A && git commit -m \"Your commit message\"'."
+                )
+                cmd.extend(["--append-system-prompt", default_prompt])
 
             print(f"🤖 Starting Claude agent {task_id} in {worktree}")
 
@@ -619,52 +627,63 @@ class RealClaudeSubprocessExecutor:
             agent_role = task.get("agent_type", "unknown")
             sequence = task.get("sequence", 0)
 
-            # Check if there are any changes
+            # Check if there are uncommitted changes
             result = subprocess.run(
                 ["git", "status", "--porcelain"], cwd=worktree, capture_output=True, text=True
             )
 
-            if not result.stdout.strip():
+            has_uncommitted = bool(result.stdout.strip())
+
+            # Check if there are any commits ahead of base branch
+            base_branch = subprocess.run(
+                ["git", "merge-base", "HEAD", "main"], cwd=worktree, capture_output=True, text=True
+            ).stdout.strip()
+
+            commits_ahead = subprocess.run(
+                ["git", "rev-list", f"{base_branch}..HEAD", "--count"],
+                cwd=worktree,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+
+            has_commits = int(commits_ahead) > 0 if commits_ahead.isdigit() else False
+
+            if not has_uncommitted and not has_commits:
                 # No changes to export
                 return None
 
-            # Stage all changes
-            subprocess.run(["git", "add", "-A"], cwd=worktree, check=True, capture_output=True)
+            # If there are uncommitted changes, stage and commit them
+            if has_uncommitted:
+                # Stage all changes
+                subprocess.run(["git", "add", "-A"], cwd=worktree, check=True, capture_output=True)
 
-            # Check if there are staged changes
-            result = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=worktree)
+                # Create commit message
+                task_hash = hashlib.sha256(task.get("prompt", "").encode()).hexdigest()[:8]
 
-            if result.returncode == 0:
-                # No staged changes
-                return None
+                commit_msg = (
+                    f"feat(agent): {agent_role}/{agent_id} - Task completion\n\n"
+                    f"Run-Id: {run_id}\n"
+                    f"Agent-Id: {agent_id}\n"
+                    f"Role: {agent_role}\n"
+                    f"Task-Hash: {task_hash}\n"
+                )
 
-            # Create commit message
-            task_hash = hashlib.sha256(task.get("prompt", "").encode()).hexdigest()[:8]
-
-            commit_msg = (
-                f"feat(agent): {agent_role}/{agent_id} - Task completion\n\n"
-                f"Run-Id: {run_id}\n"
-                f"Agent-Id: {agent_id}\n"
-                f"Role: {agent_role}\n"
-                f"Task-Hash: {task_hash}\n"
-            )
-
-            # Commit with agent identity
-            subprocess.run(
-                [
-                    "git",
-                    "-c",
-                    f"user.name=hecaton/{agent_role}",
-                    "-c",
-                    "user.email=hecaton@local",
-                    "commit",
-                    "-m",
-                    commit_msg,
-                ],
-                cwd=worktree,
-                check=True,
-                capture_output=True,
-            )
+                # Commit with agent identity
+                subprocess.run(
+                    [
+                        "git",
+                        "-c",
+                        f"user.name=hecaton/{agent_role}",
+                        "-c",
+                        "user.email=hecaton@local",
+                        "commit",
+                        "-m",
+                        commit_msg,
+                    ],
+                    cwd=worktree,
+                    check=True,
+                    capture_output=True,
+                )
 
             # Get commit SHA
             result = subprocess.run(

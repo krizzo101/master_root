@@ -250,6 +250,7 @@ class SendAPIOrchestrator:
                     "permission_mode": task.permission_mode,
                     "run_id": state.get("run_id"),  # Pass run_id for patch export
                     "sequence": getattr(task, "sequence", 0),
+                    "export_patch": True,  # Enable patch export for merge-back
                 }
             )
 
