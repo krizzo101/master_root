@@ -1,0 +1,56 @@
+"""
+Unit tests for Token Pool - Phase 1 (5 tokens)
+Updated by Agent-1 during self-amplification
+"""
+
+import os
+import pytest
+import threading
+from unittest.mock import patch
+
+from hecaton.resources.token_pool import TokenPool
+
+
+class TestTokenPoolPhase1:
+    """Test suite for expanded TokenPool (5 tokens)."""
+
+    def test_loads_five_tokens(self, monkeypatch):
+        """Phase 1: System loads exactly 5 tokens"""
+        # Setup environment with 5 tokens
+        for i in range(5):
+            if i == 0:
+                monkeypatch.setenv("CLAUDE_CODE_TOKEN", f"test_token_{i}")
+            else:
+                monkeypatch.setenv(f"CLAUDE_CODE_TOKEN_{i}", f"test_token_{i}")
+
+        pool = TokenPool()
+        assert pool.get_token_count() == 5
+
+        # Verify all 5 tokens are loaded and rotate correctly
+        tokens_seen = []
+        for _ in range(5):
+            token, idx = pool.acquire()
+            tokens_seen.append(idx)
+
+        assert set(tokens_seen) == {0, 1, 2, 3, 4}
+
+    def test_round_robin_with_five(self, monkeypatch):
+        """Phase 1: Round-robin rotation with 5 tokens"""
+        # Setup 5 tokens
+        for i in range(5):
+            if i == 0:
+                monkeypatch.setenv("CLAUDE_CODE_TOKEN", f"token_{i}")
+            else:
+                monkeypatch.setenv(f"CLAUDE_CODE_TOKEN_{i}", f"token_{i}")
+
+        pool = TokenPool()
+
+        # Test two full rotations
+        expected = [0, 1, 2, 3, 4, 0, 1, 2, 3, 4]
+        actual = []
+
+        for _ in range(10):
+            _, idx = pool.acquire()
+            actual.append(idx)
+
+        assert actual == expected

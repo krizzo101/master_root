@@ -1,0 +1,366 @@
+# HECATON Monitoring Dashboard Specification
+# Real-time metrics and observability for enhanced patterns
+
+dashboard:
+  title: "HECATON Enhanced Patterns Monitor"
+  refresh_interval: 5  # seconds
+  layout: "grid"
+
+panels:
+  - id: "system_overview"
+    title: "System Overview"
+    type: "stats"
+    position: { row: 0, col: 0, width: 12, height: 2 }
+    metrics:
+      - name: "Active Agents"
+        query: "hecaton_active_agents_total"
+        format: "number"
+        color_thresholds:
+          - value: 0
+            color: "red"
+          - value: 5
+            color: "yellow"
+          - value: 10
+            color: "green"
+
+      - name: "Tasks Completed"
+        query: "sum(hecaton_tasks_completed_total)"
+        format: "number"
+        sparkline: true
+
+      - name: "Success Rate"
+        query: "hecaton_tasks_success_rate"
+        format: "percentage"
+        color_thresholds:
+          - value: 0.5
+            color: "red"
+          - value: 0.8
+            color: "yellow"
+          - value: 0.95
+            color: "green"
+
+      - name: "Avg Response Time"
+        query: "hecaton_task_duration_seconds_avg"
+        format: "duration"
+        unit: "seconds"
+
+  - id: "pattern_usage"
+    title: "Pattern Usage Statistics"
+    type: "bar_chart"
+    position: { row: 2, col: 0, width: 6, height: 4 }
+    query: |
+      sum by (pattern) (
+        hecaton_pattern_invocations_total
+      )
+    legend:
+      show: true
+      position: "bottom"
+
+  - id: "agent_delegation"
+    title: "Agent Delegation Matrix"
+    type: "heatmap"
+    position: { row: 2, col: 6, width: 6, height: 4 }
+    query: |
+      hecaton_agent_delegation_matrix
+    config:
+      x_axis: "from_agent"
+      y_axis: "to_agent"
+      value: "count"
+      color_scale: "viridis"
+
+  - id: "checkpoint_activity"
+    title: "Checkpoint & Rollback Activity"
+    type: "time_series"
+    position: { row: 6, col: 0, width: 6, height: 3 }
+    queries:
+      - label: "Checkpoints Created"
+        query: "rate(hecaton_checkpoints_created_total[5m])"
+        color: "blue"
+      - label: "Rollbacks Performed"
+        query: "rate(hecaton_rollbacks_total[5m])"
+        color: "red"
+    config:
+      show_area: true
+      stack: false
+
+  - id: "error_boundaries"
+    title: "Error Boundary Triggers"
+    type: "time_series"
+    position: { row: 6, col: 6, width: 6, height: 3 }
+    queries:
+      - label: "Errors Caught"
+        query: "rate(hecaton_errors_caught_total[5m])"
+        color: "orange"
+      - label: "Errors Recovered"
+        query: "rate(hecaton_errors_recovered_total[5m])"
+        color: "green"
+      - label: "Errors Propagated"
+        query: "rate(hecaton_errors_propagated_total[5m])"
+        color: "red"
+
+  - id: "swarm_decomposition"
+    title: "Swarm Task Decomposition"
+    type: "sunburst"
+    position: { row: 9, col: 0, width: 4, height: 4 }
+    query: |
+      hecaton_swarm_task_hierarchy
+    config:
+      hierarchy_levels:
+        - "main_task"
+        - "subtask"
+        - "execution_group"
+
+  - id: "autonomy_progression"
+    title: "Progressive Autonomy Levels"
+    type: "gauge"
+    position: { row: 9, col: 4, width: 4, height: 4 }
+    queries:
+      - agent: "agent_1"
+        query: "hecaton_agent_autonomy_level{agent='agent_1'}"
+      - agent: "agent_2"
+        query: "hecaton_agent_autonomy_level{agent='agent_2'}"
+      - agent: "agent_3"
+        query: "hecaton_agent_autonomy_level{agent='agent_3'}"
+    config:
+      min: 0
+      max: 4
+      thresholds:
+        - value: 1
+          label: "STRICT"
+          color: "red"
+        - value: 2
+          label: "GUIDED"
+          color: "yellow"
+        - value: 3
+          label: "FLEXIBLE"
+          color: "blue"
+        - value: 4
+          label: "AUTONOMOUS"
+          color: "green"
+
+  - id: "quality_gates"
+    title: "SDLC Quality Gates"
+    type: "pipeline"
+    position: { row: 9, col: 8, width: 4, height: 4 }
+    query: |
+      hecaton_quality_gate_status
+    config:
+      phases:
+        - "discovery"
+        - "design"
+        - "development"
+        - "testing"
+        - "deployment"
+      status_colors:
+        passed: "green"
+        failed: "red"
+        pending: "gray"
+
+  - id: "batch_processing"
+    title: "Batch Processing Performance"
+    type: "scatter"
+    position: { row: 13, col: 0, width: 6, height: 3 }
+    query: |
+      hecaton_batch_processing_metrics
+    config:
+      x_axis: "batch_size"
+      y_axis: "throughput"
+      size: "items_processed"
+      color: "duration"
+
+  - id: "resource_pool"
+    title: "Resource Pool Utilization"
+    type: "area_stack"
+    position: { row: 13, col: 6, width: 6, height: 3 }
+    queries:
+      - label: "Available"
+        query: "hecaton_pool_resources_available"
+        color: "green"
+      - label: "In Use"
+        query: "hecaton_pool_resources_in_use"
+        color: "blue"
+      - label: "Pending"
+        query: "hecaton_pool_resources_pending"
+        color: "yellow"
+
+  - id: "agent_performance"
+    title: "Agent Performance Scores"
+    type: "radar"
+    position: { row: 16, col: 0, width: 6, height: 4 }
+    query: |
+      hecaton_agent_performance_score
+    config:
+      dimensions:
+        - "speed"
+        - "accuracy"
+        - "reliability"
+        - "efficiency"
+        - "autonomy"
+      scale:
+        min: 0
+        max: 1
+
+  - id: "handoff_flow"
+    title: "Agent Handoff Flow"
+    type: "sankey"
+    position: { row: 16, col: 6, width: 6, height: 4 }
+    query: |
+      hecaton_agent_handoffs
+    config:
+      source: "from_agent"
+      target: "to_agent"
+      value: "handoff_count"
+
+  - id: "system_health"
+    title: "System Health Indicators"
+    type: "table"
+    position: { row: 20, col: 0, width: 12, height: 3 }
+    query: |
+      hecaton_system_health_checks
+    columns:
+      - name: "Component"
+        field: "component"
+      - name: "Status"
+        field: "status"
+        format: "badge"
+        colors:
+          healthy: "green"
+          degraded: "yellow"
+          unhealthy: "red"
+      - name: "Last Check"
+        field: "last_check"
+        format: "timestamp"
+      - name: "Details"
+        field: "details"
+
+alerts:
+  - name: "High Error Rate"
+    condition: "hecaton_error_rate > 0.1"
+    severity: "warning"
+    message: "Error rate exceeds 10%"
+
+  - name: "Agent Pool Exhausted"
+    condition: "hecaton_pool_resources_available == 0"
+    severity: "critical"
+    message: "No agents available in pool"
+
+  - name: "Quality Gate Failure"
+    condition: "hecaton_quality_gate_failures > 3"
+    severity: "warning"
+    message: "Multiple quality gate failures detected"
+
+  - name: "Checkpoint Storage Full"
+    condition: "hecaton_checkpoint_storage_usage > 0.9"
+    severity: "warning"
+    message: "Checkpoint storage above 90%"
+
+  - name: "Performance Degradation"
+    condition: "hecaton_task_duration_p95 > 30"
+    severity: "warning"
+    message: "95th percentile response time exceeds 30s"
+
+metrics:
+  # Core Metrics
+  - name: "hecaton_active_agents_total"
+    type: "gauge"
+    help: "Number of currently active agents"
+
+  - name: "hecaton_tasks_completed_total"
+    type: "counter"
+    help: "Total number of completed tasks"
+    labels: ["task_type", "status"]
+
+  - name: "hecaton_task_duration_seconds"
+    type: "histogram"
+    help: "Task execution duration in seconds"
+    buckets: [0.1, 0.5, 1, 2, 5, 10, 30, 60]
+
+  # Pattern-specific Metrics
+  - name: "hecaton_pattern_invocations_total"
+    type: "counter"
+    help: "Number of times each pattern has been invoked"
+    labels: ["pattern"]
+
+  - name: "hecaton_checkpoints_created_total"
+    type: "counter"
+    help: "Total number of checkpoints created"
+
+  - name: "hecaton_rollbacks_total"
+    type: "counter"
+    help: "Total number of rollbacks performed"
+    labels: ["reason"]
+
+  - name: "hecaton_errors_caught_total"
+    type: "counter"
+    help: "Total errors caught by error boundaries"
+    labels: ["severity", "error_type"]
+
+  - name: "hecaton_agent_delegation_matrix"
+    type: "counter"
+    help: "Matrix of agent delegation patterns"
+    labels: ["from_agent", "to_agent"]
+
+  - name: "hecaton_agent_autonomy_level"
+    type: "gauge"
+    help: "Current autonomy level of each agent"
+    labels: ["agent"]
+
+  - name: "hecaton_quality_gate_status"
+    type: "gauge"
+    help: "Status of quality gates (0=failed, 1=passed)"
+    labels: ["phase"]
+
+  - name: "hecaton_batch_processing_metrics"
+    type: "summary"
+    help: "Batch processing performance metrics"
+    labels: ["batch_size"]
+
+  - name: "hecaton_pool_resources_available"
+    type: "gauge"
+    help: "Number of available resources in pool"
+
+  - name: "hecaton_pool_resources_in_use"
+    type: "gauge"
+    help: "Number of resources currently in use"
+
+  - name: "hecaton_agent_performance_score"
+    type: "gauge"
+    help: "Performance score for each agent"
+    labels: ["agent", "dimension"]
+
+  - name: "hecaton_agent_handoffs"
+    type: "counter"
+    help: "Count of handoffs between agents"
+    labels: ["from_agent", "to_agent", "phase"]
+
+exporters:
+  prometheus:
+    enabled: true
+    port: 9090
+    path: "/metrics"
+
+  grafana:
+    enabled: true
+    datasource: "prometheus"
+    dashboards:
+      - "system_overview.json"
+      - "pattern_analytics.json"
+      - "agent_performance.json"
+
+  datadog:
+    enabled: false
+    api_key: "${DATADOG_API_KEY}"
+    tags:
+      - "service:hecaton"
+      - "env:${ENVIRONMENT}"
+
+storage:
+  retention: "30d"
+  resolution: "5s"
+  downsampling:
+    - after: "1h"
+      resolution: "1m"
+    - after: "24h"
+      resolution: "5m"
+    - after: "7d"
+      resolution: "1h"

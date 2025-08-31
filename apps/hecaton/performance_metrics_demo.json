@@ -1,0 +1,70 @@
+{
+  "timestamp": "2025-08-27T01:43:12.214916",
+  "statistics": {
+    "total_tasks": 4,
+    "successful_tasks": 3,
+    "failed_tasks": 1,
+    "success_rate": 0.75,
+    "avg_execution_time": 0.6501269139989745,
+    "min_execution_time": 0.3001411829900462,
+    "max_execution_time": 1.0001422649947926,
+    "total_execution_time": 2.600507655995898,
+    "avg_memory_usage": 28479488.0,
+    "peak_memory": 28479488,
+    "total_token_usage": 580,
+    "monitor_uptime": 2.6014162820065394,
+    "current_memory": 28479488,
+    "memory_growth": 0
+  },
+  "active_tasks": {},
+  "completed_tasks": {
+    "task_1": {
+      "task_id": "task_1",
+      "start_time": 200479.487475714,
+      "end_time": 200480.487617979,
+      "execution_time": 1.0001422649947926,
+      "memory_start": 28479488,
+      "memory_peak": 28479488,
+      "memory_end": 28479488,
+      "token_usage": 150,
+      "success": true,
+      "error": null
+    },
+    "task_2": {
+      "task_id": "task_2",
+      "start_time": 200480.487812784,
+      "end_time": 200480.987934305,
+      "execution_time": 0.500121521006804,
+      "memory_start": 28479488,
+      "memory_peak": 28479488,
+      "memory_end": 28479488,
+      "token_usage": 200,
+      "success": true,
+      "error": null
+    },
+    "task_3": {
+      "task_id": "task_3",
+      "start_time": 200480.988130009,
+      "end_time": 200481.288271192,
+      "execution_time": 0.3001411829900462,
+      "memory_start": 28479488,
+      "memory_peak": 28479488,
+      "memory_end": 28479488,
+      "token_usage": 50,
+      "success": false,
+      "error": "Simulated error"
+    },
+    "task_4": {
+      "task_id": "task_4",
+      "start_time": 200481.288428797,
+      "end_time": 200482.088531484,
+      "execution_time": 0.8001026870042551,
+      "memory_start": 28479488,
+      "memory_peak": 28479488,
+      "memory_end": 28479488,
+      "token_usage": 180,
+      "success": true,
+      "error": null
+    }
+  }
+}

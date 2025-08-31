@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "mcp_web_search": {
+      "command": "npx",
+      "args": ["-y", "@mcp/mcp-web-search"]
+    }
+  },
+  "comment": "Research agents only need web search capability"
+}

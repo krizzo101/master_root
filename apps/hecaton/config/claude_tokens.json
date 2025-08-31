@@ -1,0 +1,4 @@
+{
+  "tokens": [],
+  "_comment": "Add your real Claude Code tokens here. Format: ['token1', 'token2', ...] or use CLAUDE_CODE_TOKEN environment variables"
+}
