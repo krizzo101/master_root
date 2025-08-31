@@ -81,15 +81,17 @@ class HecatonApp:
 
             with open(config_path) as f:
                 config = json.load(f)
-                return SecureTokenPool(tokens=config.get("tokens", []))
+                tokens = config.get("tokens", [])
+                if tokens:
+                    return SecureTokenPool(tokens=tokens)
 
-        # Fall back to environment variable
-        token = os.getenv("ANTHROPIC_API_KEY")
+        # Fall back to CLAUDE_CODE_TOKEN environment variable
+        token = os.getenv("CLAUDE_CODE_TOKEN")
         if token:
             return SecureTokenPool(tokens=[token])
 
         raise ValueError(
-            "No tokens found! Set ANTHROPIC_API_KEY or create config/claude_tokens.json"
+            "No tokens found! Set CLAUDE_CODE_TOKEN or add tokens to config/claude_tokens.json"
         )
 
     async def run(self, task: str, agents: int = 2, agent_types: Optional[list] = None):
