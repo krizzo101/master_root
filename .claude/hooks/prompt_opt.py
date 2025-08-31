@@ -113,6 +113,9 @@ def main():
         user_prompt = inp.get("prompt", "")
         transcript = inp.get("transcript_path", "")
         prev5 = last_user_prompts(transcript, 5)
+        # TODO: temporary print-based debug — replace with proper logger before merge/release
+        if os.getenv('DEBUG'):
+            print(f"DEBUG: prompt_opt.py:main() -- user_prompt='{user_prompt[:50]}...'", file=sys.stderr)
 
         system = (
             "Rewrite the user's prompt into a concise, execution-ready instruction for a coding/dev agent (Claude Code). "
@@ -159,6 +162,10 @@ def main():
         {user_prompt}
         """
         ).strip()
+        
+        # TODO: temporary print-based debug — replace with proper logger before merge/release
+        if os.getenv('DEBUG'):
+            print(f"DEBUG: prompt_opt.py:main() -- calling model={MODEL} with max_tokens={MAX_TOK}", file=sys.stderr)
 
         resp = client.responses.create(
             model=MODEL,
@@ -182,6 +189,9 @@ def main():
             data = json.loads(text)
             optimized = data.get("optimized_prompt", "").strip()
             research_flag = bool(data.get("research_required", False))
+            # TODO: temporary print-based debug — replace with proper logger before merge/release
+            if os.getenv('DEBUG'):
+                print(f"DEBUG: prompt_opt.py:main() -- optimized={bool(optimized)}, research_flag={research_flag}", file=sys.stderr)
         except Exception:
             optimized = text.strip()
             research_flag = False
@@ -221,7 +231,10 @@ def main():
             )
         )
         sys.exit(0)
-    except Exception:
+    except Exception as e:
+        # TODO: temporary print-based debug — replace with proper logger before merge/release
+        if os.getenv('DEBUG'):
+            print(f"DEBUG: prompt_opt.py:main() -- exception={e}", file=sys.stderr)
         # Degrade gracefully: no injection, do not block prompt processing
         print(json.dumps({"suppressOutput": True}))
         sys.exit(0)
