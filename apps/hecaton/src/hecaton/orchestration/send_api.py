@@ -9,8 +9,8 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
-from langgraph.constants import Send
 from langgraph.graph import END, START, StateGraph
+from langgraph.types import Send
 
 logger = logging.getLogger(__name__)
 
@@ -89,27 +89,25 @@ class SendAPIOrchestrator:
         Build the LangGraph workflow with Send API pattern.
 
         Graph structure:
-        START -> plan_agents -> fan_out -> [run_agent (parallel)] -> aggregate -> END
+        START -> plan_agents -> run_agent (parallel via Send) -> aggregate -> END
         """
         workflow = StateGraph(OrchestrationState)
 
         # Add nodes
         workflow.add_node("plan_agents", self._plan_agents)
-        workflow.add_node("fan_out", self._fan_out)
         workflow.add_node("run_agent", self._run_agent)
         workflow.add_node("aggregate", self._aggregate_results)
 
         # Define flow
         workflow.add_edge(START, "plan_agents")
-        workflow.add_edge("plan_agents", "fan_out")
-        # Fan-out uses Send API for parallel execution
-        workflow.add_edge("fan_out", "run_agent")
+        # Use conditional edge for Send API pattern
+        workflow.add_conditional_edges("plan_agents", self._route_agents, ["run_agent"])
         workflow.add_edge("run_agent", "aggregate")
         workflow.add_edge("aggregate", END)
 
         return workflow.compile()
 
-    async def _plan_agents(self, state: OrchestrationState) -> OrchestrationState:
+    def _plan_agents(self, state: OrchestrationState) -> OrchestrationState:
         """
         Plan agent tasks based on main task and available resources.
         """
@@ -124,7 +122,13 @@ class SendAPIOrchestrator:
             },
             "test": {
                 "mcp_profile": None,  # No MCP for test agents
-                "allowed_tools": ["Read", "Write", "Edit", "Bash(pytest:*)", "Bash(npm test:*)"],
+                "allowed_tools": [
+                    "Read",
+                    "Write",
+                    "Edit",
+                    "Bash(pytest:*)",
+                    "Bash(npm test:*)",
+                ],
                 "system_prompt": "You create/maintain tests. Never edit non-test code.",
             },
             "research": {
@@ -176,54 +180,71 @@ class SendAPIOrchestrator:
             if self.performance_monitor:
                 self.performance_monitor.start_tracking(agent_id)
 
+        # Store tasks in state for later aggregation
         state.agent_tasks = agent_tasks
         state.phase = "planned"
+
         return state
 
-    async def _fan_out(self, state: OrchestrationState) -> List[Send]:
+    def _route_agents(self, state: OrchestrationState):
         """
-        Create Send objects for parallel execution.
-
-        This is the CRITICAL Send API pattern - returns Send objects
-        that LangGraph uses to route tasks in parallel.
+        Route function that returns Send objects for parallel execution.
+        This is used by conditional edges to trigger parallel processing.
         """
-        sends = []
-
         # Apply parallelism limit
         active_tasks = state.agent_tasks[: state.max_parallel]
 
-        for task in active_tasks:
-            # Each Send carries the task to run_agent node
-            sends.append(Send("run_agent", {"task": task, "executor": self.executor}))
+        # Return list of Send objects - LangGraph will execute these in parallel
+        sends = [
+            Send("run_agent", {"task": task, "executor": self.executor, "state": state})
+            for task in active_tasks
+        ]
 
-        logger.info(f"Fanning out {len(sends)} agents (max_parallel={state.max_parallel})")
+        logger.info(f"Routing {len(sends)} agents for parallel execution")
+
         return sends
 
-    async def _run_agent(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+    def _run_agent(self, inputs: Dict[str, Any]) -> OrchestrationState:
         """
         Execute individual agent task (runs in parallel).
-
         This node is invoked once per Send object in parallel.
         """
         task = inputs["task"]
         executor = inputs["executor"]
+        state = inputs.get(
+            "state",
+            OrchestrationState(
+                main_task="",
+                num_agents=1,
+                agent_tasks=[],
+                results={},
+                phase="executing",
+            ),
+        )
 
         logger.info(f"Running {task.agent_id} ({task.agent_type})")
 
         try:
-            # Build headless Claude command
-            result = await executor.execute_task(
-                {
-                    "id": task.agent_id,
-                    "prompt": task.task_prompt,
-                    "agent_type": task.agent_type,
-                    "worktree": task.worktree_path,
-                    "token_index": task.token_index,
-                    "mcp_profile": task.mcp_profile,
-                    "allowed_tools": task.allowed_tools,
-                    "permission_mode": task.permission_mode,
-                }
+            # Build headless Claude command - using sync for simplicity
+            # Note: In production, this would use async properly
+            import asyncio
+
+            loop = asyncio.new_event_loop()
+            result = loop.run_until_complete(
+                executor.execute_task(
+                    {
+                        "id": task.agent_id,
+                        "prompt": task.task_prompt,
+                        "agent_type": task.agent_type,
+                        "worktree": task.worktree_path,
+                        "token_index": task.token_index,
+                        "mcp_profile": task.mcp_profile,
+                        "allowed_tools": task.allowed_tools,
+                        "permission_mode": task.permission_mode,
+                    }
+                )
             )
+            loop.close()
 
             task.status = "completed"
             task.result = result
@@ -238,9 +259,17 @@ class SendAPIOrchestrator:
             task.status = "failed"
             task.error = str(e)
 
-        return {"task": task}
+        # Update state with results
+        state.results[task.agent_id] = {
+            "status": task.status,
+            "agent_type": task.agent_type,
+            "result": task.result if task.status == "completed" else None,
+            "error": task.error if task.status != "completed" else None,
+        }
 
-    async def _aggregate_results(self, state: OrchestrationState) -> OrchestrationState:
+        return state
+
+    def _aggregate_results(self, state: OrchestrationState) -> OrchestrationState:
         """
         Aggregate results from all parallel agents.
         """
@@ -286,7 +315,9 @@ class SendAPIOrchestrator:
             except Exception as e:
                 logger.warning(f"Worktree cleanup failed for {task.agent_id}: {e}")
 
-        logger.info(f"Completed: {metrics['completed']}/{metrics['total']} agents succeeded")
+        logger.info(
+            f"Completed: {metrics['completed']}/{metrics['total']} agents succeeded"
+        )
         return state
 
     async def execute(self, task: str, num_agents: int = 2) -> Dict[str, Any]:

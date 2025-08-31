@@ -49,7 +49,9 @@ class RealClaudeSubprocessExecutor:
     This spawns actual 'claude' CLI processes with proper tokens.
     """
 
-    def __init__(self, token_pool, worktree_manager, debug_mode: bool = False, debug_logger=None):
+    def __init__(
+        self, token_pool, worktree_manager, debug_mode: bool = False, debug_logger=None
+    ):
         """
         Initialize with token pool and worktree manager.
 
@@ -119,13 +121,16 @@ class RealClaudeSubprocessExecutor:
                 profile = AgentProfile[task["profile"].upper()]
 
             # Build command configuration
+            # Generate proper UUID for Claude session ID
+            session_uuid = str(uuid.uuid4())
+
             config = CommandConfig(
                 model=task.get(
                     "model", "sonnet" if complexity == TaskComplexity.SIMPLE else "opus"
                 ),
                 profile=profile,
                 complexity=complexity,
-                session_id=task["id"],
+                session_id=session_uuid,  # Use proper UUID
                 agent_role=task.get("role", task.get("agent_type")),
                 system_prompt=task.get("system_prompt"),
                 workspace_dirs=[Path(worktree)],
@@ -133,35 +138,35 @@ class RealClaudeSubprocessExecutor:
                     "allowed_tools", ["Write", "Read", "Edit", "Bash", "TodoWrite"]
                 ),
                 debug=self.debug_mode
-                or task.get("debug", False),  # Enable debug if app-wide or task-specific
+                or task.get(
+                    "debug", False
+                ),  # Enable debug if app-wide or task-specific
                 capture_debug_output=self.debug_logger is not None,
             )
 
             # Build optimized command using factory
             cmd = self.command_factory.build_command(process.task, config)
 
-            # Handle long prompts via stdin
+            # Handle long prompts via stdin or file
             use_stdin = len(process.task) > 1000 or "\n" in process.task
             if use_stdin:
-                # Remove the prompt from command if using stdin
-                cmd = [
-                    arg
-                    for arg in cmd
-                    if not arg.startswith("@") and arg != "--" and arg != process.task
-                ]
+                # Remove the prompt/stdin marker from command
+                cmd = [arg for arg in cmd if arg != "@-"]
+                # Will provide prompt via stdin
             else:
-                # Write to file for @ reference
-                task_file = Path(worktree) / "task.txt"
-                with open(task_file, "w") as f:
-                    f.write(process.task)
-                # Update command to use file
-                for i, arg in enumerate(cmd):
-                    if arg == "@-":
-                        cmd[i] = f"@{task_file}"
-                    elif arg == "--" and i + 1 < len(cmd) and cmd[i + 1] == process.task:
-                        cmd[i] = f"@{task_file}"
-                        del cmd[i + 1]
-                        break
+                # Short prompt - ensure it's in the command
+                # Check if prompt is already in command (after --)
+                if "--" in cmd:
+                    idx = cmd.index("--")
+                    if idx + 1 < len(cmd):
+                        # Prompt should be after --
+                        pass
+                    else:
+                        # Add the prompt after --
+                        cmd.append(process.task)
+                else:
+                    # No -- marker, add it with prompt
+                    cmd.extend(["--", process.task])
 
             # Prepare environment
             env = os.environ.copy()
@@ -216,8 +221,12 @@ class RealClaudeSubprocessExecutor:
                     return "".join(output_lines)
 
                 # Read both streams concurrently
-                stdout_task = asyncio.create_task(read_stream(process.process.stdout, "stdout"))
-                stderr_task = asyncio.create_task(read_stream(process.process.stderr, "stderr"))
+                stdout_task = asyncio.create_task(
+                    read_stream(process.process.stdout, "stdout")
+                )
+                stderr_task = asyncio.create_task(
+                    read_stream(process.process.stderr, "stderr")
+                )
 
                 # Wait for process completion with timeout
                 try:
@@ -257,7 +266,8 @@ class RealClaudeSubprocessExecutor:
             else:
                 process.status = "failed"
                 error_msg = (
-                    process.stderr or f"Process exited with code {process.process.returncode}"
+                    process.stderr
+                    or f"Process exited with code {process.process.returncode}"
                 )
                 print(f"❌ Claude process {process.id} failed: {error_msg}")
 
@@ -292,7 +302,9 @@ class RealClaudeSubprocessExecutor:
         # Limit parallel execution to available tokens
         max_parallel = max_parallel or self.token_pool.get_token_count()
 
-        print(f"\n🚀 Starting {len(tasks)} Claude processes with up to {max_parallel} parallel")
+        print(
+            f"\n🚀 Starting {len(tasks)} Claude processes with up to {max_parallel} parallel"
+        )
         print("=" * 60)
 
         # Create semaphore for rate limiting
@@ -351,7 +363,9 @@ class RealClaudeSubprocessExecutor:
             )
             improvement_tasks = improvement_tasks[:max_agents]
 
-        print(f"\n🚀 Starting parallel improvements with {len(improvement_tasks)} Claude agents")
+        print(
+            f"\n🚀 Starting parallel improvements with {len(improvement_tasks)} Claude agents"
+        )
         print("=" * 60)
 
         # Initialize resources if not already done
@@ -422,7 +436,9 @@ class RealClaudeSubprocessExecutor:
                 else:
                     results_dict[task_id] = result
                     status_icon = "✅" if result.get("status") == "completed" else "❌"
-                    print(f"{status_icon} Agent {task_id}: {result.get('status', 'unknown')}")
+                    print(
+                        f"{status_icon} Agent {task_id}: {result.get('status', 'unknown')}"
+                    )
 
         except asyncio.TimeoutError:
             print("⏰ Timeout reached for parallel execution (30 minutes)")
