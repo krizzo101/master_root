@@ -1,0 +1,4 @@
+{
+  "tokens": ["test-token-1", "test-token-2"],
+  "_comment": "Test tokens for dry-run testing of merge-back functionality"
+}

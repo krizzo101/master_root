@@ -106,9 +106,12 @@ class OptimizedPromptSchema(BaseModel):
     """Schema for structured prompt optimization output."""
 
     optimized_prompt: str = Field(description="The optimized prompt")
-    research_required: Optional[bool] = Field(
+    research_required: bool = Field(
         default=False, description="Whether research is required"
     )
+
+    class Config:
+        extra = "forbid"  # This translates to additionalProperties: false
 
 
 def get_output_text(resp):

@@ -25,9 +25,15 @@ from hecaton.resources.worktree import WorktreeManager  # noqa: E402
 class HecatonApp:
     """Main application class with Send API as default orchestration"""
 
-    def __init__(self, mode: str = "send-api", verbose: bool = False, merge_config=None):
+    def __init__(
+        self, mode: str = "send-api", verbose: bool = False, merge_config=None
+    ):
         self.mode = mode
         self.verbose = verbose
+
+        # CRITICAL: Ensure ANTHROPIC_API_KEY is not set (it interferes with CLAUDE_CODE_TOKEN)
+        if "ANTHROPIC_API_KEY" in os.environ:
+            del os.environ["ANTHROPIC_API_KEY"]
 
         # Initialize real components only - no mocks
         self.token_pool = self._init_token_pool()
@@ -74,8 +80,25 @@ class HecatonApp:
 
     def _init_token_pool(self) -> SecureTokenPool:
         """Initialize token pool with real tokens only"""
+        # Check for test mode
+        if os.getenv("HECATON_TEST_MODE") == "1":
+            # Use test tokens for dry-run testing
+            test_config = (
+                Path(__file__).parent.parent.parent / "config" / "test_tokens.json"
+            )
+            if test_config.exists():
+                import json
+
+                with open(test_config) as f:
+                    config = json.load(f)
+                    return SecureTokenPool(
+                        tokens=config.get("tokens", ["test-token-1"])
+                    )
+
         # Load real tokens from config
-        config_path = Path(__file__).parent.parent.parent / "config" / "claude_tokens.json"
+        config_path = (
+            Path(__file__).parent.parent.parent / "config" / "claude_tokens.json"
+        )
         if config_path.exists():
             import json
 
@@ -115,7 +138,9 @@ class HecatonApp:
             # Display results
             for agent_id, agent_result in result["results"].items():
                 status = agent_result.get("status", "unknown")
-                agent_type = agent_result.get("type", "unknown")  # Changed from agent_type to type
+                agent_type = agent_result.get(
+                    "type", "unknown"
+                )  # Changed from agent_type to type
                 if status == "completed":
                     print(f"✅ {agent_type}: Success")
                     if self.verbose and agent_result.get("result"):
@@ -229,6 +254,12 @@ class HecatonApp:
 
 def main():
     """Main entry point with proper argument parsing"""
+    # Ensure clean environment for Claude Code execution
+    if "ANTHROPIC_API_KEY" in os.environ:
+        del os.environ["ANTHROPIC_API_KEY"]
+        if "--verbose" in sys.argv or "-v" in sys.argv:
+            print("ℹ️  Cleared ANTHROPIC_API_KEY (interferes with CLAUDE_CODE_TOKEN)")
+
     parser = argparse.ArgumentParser(
         description="HECATON - Multi-Agent Claude Orchestration System",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -259,14 +290,18 @@ Examples:
     # Run command
     run_parser = subparsers.add_parser("run", help="Run HECATON with a task")
     run_parser.add_argument("task", help="Task to execute")
-    run_parser.add_argument("--agents", type=int, default=2, help="Number of agents (default: 2)")
+    run_parser.add_argument(
+        "--agents", type=int, default=2, help="Number of agents (default: 2)"
+    )
     run_parser.add_argument(
         "--mode",
         choices=["send-api", "simple"],
         default="send-api",
         help="Orchestration mode (default: send-api for parallel execution)",
     )
-    run_parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+    run_parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Verbose output"
+    )
 
     # Merge-back arguments
     run_parser.add_argument(
@@ -277,10 +312,14 @@ Examples:
         help="Enable/disable merge-back of patches (default: enabled)",
     )
     run_parser.add_argument(
-        "--target-branch", default="main", help="Target branch for merge-back (default: main)"
+        "--target-branch",
+        default="main",
+        help="Target branch for merge-back (default: main)",
     )
     run_parser.add_argument(
-        "--dry-run", action="store_true", help="Run merge-back in dry-run mode (no push/PR)"
+        "--dry-run",
+        action="store_true",
+        help="Run merge-back in dry-run mode (no push/PR)",
     )
     run_parser.add_argument(
         "--keep-worktrees", action="store_true", help="Keep worktrees after execution"

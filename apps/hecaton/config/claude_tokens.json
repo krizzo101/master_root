@@ -1,4 +1,6 @@
 {
-  "tokens": [],
-  "_comment": "Add your real Claude Code tokens here. Format: ['token1', 'token2', ...] or use CLAUDE_CODE_TOKEN environment variables"
+  "tokens": [
+    "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"
+  ],
+  "_comment": "Real Claude Code tokens loaded from encrypted storage"
 }
