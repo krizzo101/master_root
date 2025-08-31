@@ -13,8 +13,8 @@ import sys
 sys.path.insert(0, "/home/opsvi/master_root/libs/opsvi-llm")
 # typing imports not used
 
-from opsvi_llm.providers.openai_provider import OpenAIConfig, OpenAIProvider
-from pydantic import BaseModel, Field
+from opsvi_llm.providers.openai_provider import OpenAIConfig, OpenAIProvider  # noqa: E402
+from pydantic import BaseModel, Field  # noqa: E402
 
 # Initialize provider with timeout support
 config = OpenAIConfig(
@@ -116,6 +116,18 @@ class ReviewVerdictSchema(BaseModel):
     guidance: str = Field(
         description="Specific, actionable fixes if failed; otherwise 'OK'."
     )
+
+    class Config:
+        extra = "forbid"  # This translates to additionalProperties: false
+
+    @classmethod
+    def model_json_schema(cls, **kwargs):
+        """Override to ensure all fields are required for OpenAI strict mode."""
+        schema = super().model_json_schema(**kwargs)
+        # OpenAI strict mode requires all fields in 'required' array
+        if "properties" in schema:
+            schema["required"] = list(schema["properties"].keys())
+        return schema
 
 
 def get_output_text(resp):

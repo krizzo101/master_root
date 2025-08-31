@@ -714,8 +714,9 @@ class OpenAIProvider(BaseLLMProvider):
             "text": {"format": text_format},  # Correct parameter for Responses API
         }
 
-        # Add temperature only if not using gpt-5-nano (which doesn't support it)
-        if model != "gpt-5-nano" and temperature is not None:
+        # Add temperature only if the model supports it
+        # Note: gpt-5-nano and gpt-5-mini don't support temperature in Responses API
+        if model not in ["gpt-5-nano", "gpt-5-mini"] and temperature is not None:
             create_params["temperature"] = temperature
 
         # Add optional parameters

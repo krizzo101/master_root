@@ -75,7 +75,7 @@ class OpenAIModelValidator:
         ),
         "gpt-5-mini": ModelProfile(
             api="responses",
-            supports_temperature=True,
+            supports_temperature=False,  # Mini doesn't support temperature in Responses API
             chat_token_param="max_completion_tokens",
             responses_token_param="max_output_tokens",
             supports_reasoning_effort=False,

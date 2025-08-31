@@ -11,10 +11,8 @@ from datetime import datetime, timezone
 # Use shared central AI interface instead of direct OpenAI
 # Replaced direct OpenAI usage with shared central AI interface (automated migration)
 sys.path.insert(0, "/home/opsvi/master_root/libs/opsvi-llm")
-from typing import Optional
-
-from opsvi_llm.providers.openai_provider import OpenAIConfig, OpenAIProvider
-from pydantic import BaseModel, Field
+from opsvi_llm.providers.openai_provider import OpenAIConfig, OpenAIProvider  # noqa: E402
+from pydantic import BaseModel, Field  # noqa: E402
 
 # Initialize provider with timeout support
 config = OpenAIConfig(
@@ -112,6 +110,15 @@ class OptimizedPromptSchema(BaseModel):
 
     class Config:
         extra = "forbid"  # This translates to additionalProperties: false
+
+    @classmethod
+    def model_json_schema(cls, **kwargs):
+        """Override to ensure all fields are required for OpenAI strict mode."""
+        schema = super().model_json_schema(**kwargs)
+        # OpenAI strict mode requires all fields in 'required' array
+        if "properties" in schema:
+            schema["required"] = list(schema["properties"].keys())
+        return schema
 
 
 def get_output_text(resp):

@@ -38,8 +38,6 @@ def get_schema_class():
     """Lazy load schema class."""
     global _schema_class
     if _schema_class is None:
-        from typing import Optional
-
         from pydantic import BaseModel, Field
 
         class OptimizedPromptSchema(BaseModel):
@@ -52,6 +50,15 @@ def get_schema_class():
 
             class Config:
                 extra = "forbid"  # This translates to additionalProperties: false
+
+            @classmethod
+            def model_json_schema(cls, **kwargs):
+                """Override to ensure all fields are required for OpenAI strict mode."""
+                schema = super().model_json_schema(**kwargs)
+                # OpenAI strict mode requires all fields in 'required' array
+                if "properties" in schema:
+                    schema["required"] = list(schema["properties"].keys())
+                return schema
 
         _schema_class = OptimizedPromptSchema
     return _schema_class
