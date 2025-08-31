@@ -1,12 +1,21 @@
 #!/usr/bin/env python3
 import asyncio
+import hashlib
 import json
 import os
+import random
 import re
 import select
 import sys
 import textwrap
 from datetime import datetime, timezone
+
+# Import logger for tracking
+try:
+    from prompt_opt_logger import PromptOptLogger
+    logger = PromptOptLogger()
+except Exception:
+    logger = None  # Fail silently if logger not available
 
 # Use shared central AI interface instead of direct OpenAI
 # Replaced direct OpenAI usage with shared central AI interface (automated migration)
@@ -27,7 +36,7 @@ config = OpenAIConfig(
 )
 provider = OpenAIProvider(config)
 
-MODEL = os.getenv("PROMPT_OPT_MODEL", "gpt-5-mini")
+MODEL = os.getenv("PROMPT_OPT_MODEL", "gpt-4o-mini")
 MAX_TOK = int(os.getenv("PROMPT_OPT_MAX_TOK", "4000"))
 TEMP = float(os.getenv("PROMPT_OPT_TEMPERATURE", "0.2"))
 SEED = int(os.getenv("PROMPT_OPT_SEED", "42"))
@@ -124,6 +133,75 @@ class OptimizedPromptSchema(BaseModel):
         return schema
 
 
+def get_cognitive_guidance(prompt_text):
+    """Generate context-aware cognitive guidance with variation."""
+    prompt_lower = prompt_text.lower()
+    
+    # Context-aware base guidance
+    if any(word in prompt_lower for word in ["fix", "bug", "error", "issue", "broken"]):
+        base_guidance = [
+            "Reproduce issue → Use TodoWrite for tracking → Root cause analysis → Fix → Verify",
+            "First reproduce the bug. Plan fix steps with TodoWrite. Implement systematically. Test thoroughly.",
+            "Debug workflow: Reproduce, TodoWrite for steps, analyze cause, apply fix, validate solution"
+        ]
+    elif any(word in prompt_lower for word in ["implement", "add", "feature", "create", "build"]):
+        base_guidance = [
+            "Architecture planning (TodoWrite) → Research patterns → Build incrementally → Test features",
+            "Design first with TodoWrite. Study existing patterns. Implement step-by-step. Verify functionality.",
+            "Feature flow: Plan structure, research similar code, implement progressively, validate behavior"
+        ]
+    elif any(word in prompt_lower for word in ["refactor", "reorganize", "restructure", "clean"]):
+        base_guidance = [
+            "Map current state → TodoWrite refactor plan → Preserve behavior → Verify with tests",
+            "Understand existing code. Plan changes in TodoWrite. Refactor safely. Confirm behavior unchanged.",
+            "Refactor protocol: Analyze structure, list changes needed, transform carefully, test thoroughly"
+        ]
+    elif any(word in prompt_lower for word in ["research", "find", "search", "analyze", "investigate"]):
+        base_guidance = [
+            "Broad search → Document findings → Narrow focus → Synthesize results",
+            "Cast wide net first. Track discoveries. Focus on relevant. Summarize insights.",
+            "Research method: Explore widely, record findings, refine search, compile conclusions"
+        ]
+    elif any(word in prompt_lower for word in ["test", "verify", "validate", "check"]):
+        base_guidance = [
+            "Identify test scenarios → TodoWrite test plan → Execute tests → Document results",
+            "Plan test coverage with TodoWrite. Write test cases. Run systematically. Report outcomes.",
+            "Testing approach: Define scenarios, organize with todos, execute thoroughly, verify coverage"
+        ]
+    else:
+        # Generic guidance with variety
+        base_guidance = [
+            "Think → Plan with TodoWrite → Execute → Verify",
+            "Understand requirements. Create task breakdown. Work systematically. Validate results.",
+            "Start with todos, research context, implement carefully, confirm success",
+            "Blueprint first (TodoWrite), investigate needs, build methodically, quality check"
+        ]
+    
+    # Select guidance variant based on prompt hash for consistency
+    prompt_hash = int(hashlib.md5(prompt_text.encode()).hexdigest()[:8], 16)
+    selected_base = base_guidance[prompt_hash % len(base_guidance)]
+    
+    # Add emphasis patterns for variety
+    emphasis_patterns = [
+        ("📋 ", ""),  # Emoji prefix
+        ("**Important**: ", ""),  # Bold emphasis
+        ("", " ✓"),  # Checkmark suffix
+        ("→ ", ""),  # Arrow prefix
+        ("Note: ", "."),  # Note format
+        ("", " — this leads to better results."),  # Explanatory suffix
+        ("💡 ", ""),  # Lightbulb
+        ("", " (proven approach)"),  # Parenthetical
+        ("Best practice: ", ""),  # Best practice prefix
+        ("", " for optimal quality"),  # Quality suffix
+    ]
+    
+    # Use different emphasis based on another part of the hash
+    emphasis_index = (prompt_hash >> 8) % len(emphasis_patterns)
+    prefix, suffix = emphasis_patterns[emphasis_index]
+    
+    return f"{prefix}{selected_base}{suffix}"
+
+
 def get_output_text(resp):
     # Extract text from Responses API response or structured output
     # For structured responses from opsvi-llm
@@ -159,9 +237,9 @@ def load_config():
         # Default config if file doesn't exist
         return {
             "mode": "opt-out",
-            "opt_in_triggers": ["!!", "!opt", "!optimize"],
-            "opt_out_triggers": ["!skip", "!noopt", "!pass"],
-            "bypass_triggers": ["!raw", "!exact", "!verbatim"],
+            "opt_in_triggers": ["++", "+opt", "+optimize", "opt:", "optimize:"],
+            "opt_out_triggers": ["--skip", "--noopt", "--pass", "skip:", "noopt:"],
+            "bypass_triggers": ["--raw", "--exact", "--verbatim", "raw:", "exact:"],
         }
 
 
@@ -194,7 +272,7 @@ def should_optimize(prompt: str, config: dict) -> tuple:
                 )
                 return True, cleaned, False
             elif prompt_lower.startswith(trigger) and len(prompt) == len(trigger):
-                # Handle "!!" alone case
+                # Handle "++" or "opt:" alone case
                 return True, "", False
         return False, prompt, False
 
@@ -248,6 +326,8 @@ def main():
 
         if is_bypass:
             # Bypass mode - send raw content
+            if logger:
+                logger.log_skip("bypass_mode", cleaned_prompt)
             output = {
                 "hookSpecificOutput": {
                     "hookEventName": "UserPromptSubmit",
@@ -259,6 +339,8 @@ def main():
 
         if not should_opt:
             # Pass through without optimization
+            if logger:
+                logger.log_skip(f"mode_{config.get('mode')}_no_trigger", user_prompt)
             if os.getenv("DEBUG"):
                 print(
                     f"DEBUG: Skipping optimization (mode={config.get('mode')})",
@@ -267,12 +349,12 @@ def main():
             print(json.dumps({"suppressOutput": False}))
             sys.exit(0)
 
+        # Store original prompt for logging
+        original_prompt = user_prompt
         # Use cleaned prompt for optimization
         user_prompt = cleaned_prompt
 
         # Extract RAW sections
-        import re
-
         raw_pattern = r"\[RAW\](.*?)\[/RAW\]"
         raw_sections = []
         processable_prompt = user_prompt
@@ -390,12 +472,31 @@ def main():
             )
             optimized = f"{preface}\n{optimized}".strip()
 
+        # Add cognitive guidance based on the original prompt
+        cognitive_guidance = get_cognitive_guidance(user_prompt)
+        
         # Add RAW sections back if they exist
         if has_raw:
             raw_content = "\n\n".join(raw_sections)
-            optimized = f"{optimized}\\n\\n[USER EXACT INSTRUCTIONS - PRESERVE AS-IS]\\n{raw_content}\\n[END EXACT INSTRUCTIONS]"
+            optimized = f"{optimized}\n\n[USER EXACT INSTRUCTIONS - PRESERVE AS-IS]\n{raw_content}\n[END EXACT INSTRUCTIONS]"
 
-        injected = f"[PROMPT_OPTIMIZER]\\n{optimized}\\n[END_PROMPT_OPTIMIZER]"
+        # Combine cognitive guidance with optimized prompt
+        injected = f"[COGNITIVE APPROACH]\n{cognitive_guidance}\n\n[OPTIMIZED TASK]\n{optimized}\n[END_PROMPT_OPTIMIZER]"
+
+        # Log the successful optimization
+        if logger:
+            trigger = None
+            for t in config.get("opt_in_triggers", []):
+                if user_prompt.lower().startswith(t):
+                    trigger = t
+                    break
+            logger.log_optimization(
+                original=user_prompt,
+                optimized=optimized,
+                mode=config.get("mode", "unknown"),
+                triggered_by=trigger,
+                cognitive=cognitive_guidance
+            )
 
         print(
             json.dumps(
@@ -409,6 +510,8 @@ def main():
         )
         sys.exit(0)
     except Exception as e:
+        if logger:
+            logger.log_error(e, {"prompt": user_prompt[:100] if user_prompt else None})
         # TODO: temporary print-based debug — replace with proper logger before merge/release
         if os.getenv("DEBUG"):
             print(f"DEBUG: prompt_opt.py:main() -- exception={e}", file=sys.stderr)
