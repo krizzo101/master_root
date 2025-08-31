@@ -20,7 +20,7 @@ assistant: "Let me deploy the security-architect agent to perform threat modelin
 Threat modeling for sensitive features requires specialized security expertise.
 </commentary>
 </example>
-model: o4-mini
+model: opus
 color: red
 tools: ALL
 ---

@@ -3,21 +3,21 @@
     "UserPromptSubmit": [
       {
         "hooks": [
-          { "type":"command", "command":"/home/opsvi/master_root/.claude/hooks/prompt_opt.py", "timeout": 45 }
+          { "type":"command", "command":"/home/opsvi/master_root/.claude/hooks/prompt_opt_wrapper.sh", "timeout": 45 }
         ]
       }
     ],
     "Stop": [
       {
         "hooks": [
-          { "type":"command", "command":"/home/opsvi/master_root/.claude/hooks/answer_review.py", "timeout": 60 }
+          { "type":"command", "command":"/home/opsvi/master_root/.claude/hooks/answer_review_wrapper.sh", "timeout": 60 }
         ]
       }
     ],
     "SubagentStop": [
       {
         "hooks": [
-          { "type":"command", "command":"/home/opsvi/master_root/.claude/hooks/answer_review.py", "timeout": 60 }
+          { "type":"command", "command":"/home/opsvi/master_root/.claude/hooks/answer_review_wrapper.sh", "timeout": 60 }
         ]
       }
     ],
@@ -42,7 +42,7 @@
       {
         "matcher": "Edit|Write|Bash|Task",
         "hooks": [
-          { "type":"command", "command":"/home/opsvi/master_root/.claude/hooks/answer_review.py", "timeout": 45 }
+          { "type":"command", "command":"/home/opsvi/master_root/.claude/hooks/answer_review_wrapper.sh", "timeout": 45 }
         ]
       },
       {

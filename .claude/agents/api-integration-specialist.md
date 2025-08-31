@@ -20,7 +20,7 @@ assistant: "Let me deploy the api-integration-specialist agent to implement resi
 Microservices communication requires understanding of circuit breakers, retries, and service mesh patterns.
 </commentary>
 </example>
-model: gpt-5-mini
+model: opus
 color: blue
 tools: ALL
 ---
