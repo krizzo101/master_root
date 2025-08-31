@@ -2,6 +2,7 @@
 import json
 import os
 import re
+import select
 import sys
 import textwrap
 from datetime import datetime, timezone
@@ -108,6 +109,21 @@ def get_output_text(resp):
 
 
 def main():
+    # Check if stdin has data available (with 2 second timeout)
+    if sys.stdin.isatty():
+        # Terminal is attached but no pipe
+        print(json.dumps({
+            "error": "No input provided. Usage: echo '{\"prompt\": \"...\", \"transcript_path\": \"...\"}' | python3 prompt_opt.py",
+            "suppressOutput": True
+        }))
+        sys.exit(1)
+    
+    # Check if stdin has data within 2 seconds
+    readable, _, _ = select.select([sys.stdin], [], [], 2.0)
+    if not readable:
+        print(json.dumps({"error": "No input received within 2 seconds", "suppressOutput": True}))
+        sys.exit(1)
+        
     try:
         inp = json.load(sys.stdin)
         user_prompt = inp.get("prompt", "")
