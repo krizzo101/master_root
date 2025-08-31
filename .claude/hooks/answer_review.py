@@ -97,7 +97,7 @@ def get_output_text(resp):
     # First try direct attribute
     if hasattr(resp, "output_text") and resp.output_text:
         return resp.output_text
-    
+
     # Try to extract from output structure
     try:
         if hasattr(resp, "output") and resp.output:
@@ -108,12 +108,18 @@ def get_output_text(resp):
                             return content_item.text
     except Exception:
         pass
-    
+
     # Return empty string if no text found (don't convert whole response to string)
     return ""
 
 
 def call_review(model, assistant_out, prev5):
+    # TODO: temporary print-based debug — replace with proper logger before merge/release
+    if os.getenv("DEBUG"):
+        print(
+            f"DEBUG: answer_review.py:call_review() -- calling model={model} with {len(prev5)} previous prompts",
+            file=sys.stderr,
+        )
     system = (
         "You are a strict reviewer for a dev agent's answer. Check for: factual errors, internal contradictions, "
         "unsafe/destructive commands, missing acceptance tests, and mismatches with the prompt/context. "
@@ -152,12 +158,18 @@ def call_review(model, assistant_out, prev5):
                 "type": "json_schema",
                 "name": "ReviewVerdict",
                 "strict": True,
-                "schema": schema["schema"]
+                "schema": schema["schema"],
             }
         },
-        max_output_tokens=MAX_TOK
+        max_output_tokens=MAX_TOK,
     )
     out = get_output_text(r)
+    # TODO: temporary print-based debug — replace with proper logger before merge/release
+    if os.getenv("DEBUG"):
+        print(
+            f"DEBUG: answer_review.py:call_review() -- response received, output_text={bool(out)}",
+            file=sys.stderr,
+        )
     try:
         return json.loads(out)
     except Exception:
@@ -203,6 +215,12 @@ def main():
         session_id = inp.get("session_id", "")
         transcript = inp.get("transcript_path", "")
         stop_hook_active = bool(inp.get("stop_hook_active", False))
+        # TODO: temporary print-based debug — replace with proper logger before merge/release
+        if os.getenv("DEBUG"):
+            print(
+                f"DEBUG: answer_review.py:main() -- session_id={session_id}, stop_hook_active={stop_hook_active}",
+                file=sys.stderr,
+            )
         scope = (
             inp.get("tool_name") or "final"
         ).lower()  # separate counters per tool/final
@@ -264,7 +282,10 @@ def main():
             )
         )
         sys.exit(0)
-    except Exception:
+    except Exception as e:
+        # TODO: temporary print-based debug — replace with proper logger before merge/release
+        if os.getenv("DEBUG"):
+            print(f"DEBUG: answer_review.py:main() -- exception={e}", file=sys.stderr)
         # On reviewer failure, do NOT block delivery
         print(json.dumps({"suppressOutput": True}))
         sys.exit(0)
