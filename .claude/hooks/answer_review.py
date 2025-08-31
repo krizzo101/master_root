@@ -16,7 +16,7 @@ MODEL_ESCALATE = os.getenv(
     "REVIEW_MODEL_ESCALATE", "gpt-5-mini"
 )  # optional one-time escalation
 MAX_ATTEMPTS = int(os.getenv("REVIEW_MAX_ATTEMPTS", "3"))
-MAX_TOK = int(os.getenv("REVIEW_MAX_TOK", "300"))
+MAX_TOK = int(os.getenv("REVIEW_MAX_TOK", "4000"))
 TEMP = float(os.getenv("REVIEW_TEMPERATURE", "0.2"))
 SEED = int(os.getenv("REVIEW_SEED", "42"))
 

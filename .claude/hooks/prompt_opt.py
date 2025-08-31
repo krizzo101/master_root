@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import json
 import os
-import pathlib
 import re
 import sys
 import textwrap
@@ -13,7 +12,7 @@ from openai import OpenAI
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 MODEL = os.getenv("PROMPT_OPT_MODEL", "gpt-5-mini")
-MAX_TOK = int(os.getenv("PROMPT_OPT_MAX_TOK", "400"))
+MAX_TOK = int(os.getenv("PROMPT_OPT_MAX_TOK", "4000"))
 TEMP = float(os.getenv("PROMPT_OPT_TEMPERATURE", "0.2"))
 SEED = int(os.getenv("PROMPT_OPT_SEED", "42"))
 
@@ -61,7 +60,7 @@ DEFAULT_UNSTABLE = [
 UNSTABLE_TOPICS = [
     s.strip() for s in os.getenv("RESEARCH_UNSTABLE_TOPICS", "").split(",") if s.strip()
 ] or DEFAULT_UNSTABLE
-CURRENT_DATE = datetime.utcnow().date().isoformat()
+CURRENT_DATE = datetime.now(datetime.timezone.utc).date().isoformat()
 
 
 def last_user_prompts(transcript_path, k=5):
