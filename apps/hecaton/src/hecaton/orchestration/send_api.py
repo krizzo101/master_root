@@ -72,6 +72,7 @@ class SendAPIOrchestrator:
         worktree_manager,
         performance_monitor=None,
         max_parallel: int = 5,
+        merge_config=None,
     ):
         """
         Initialize Send API orchestrator with required components.
@@ -82,12 +83,22 @@ class SendAPIOrchestrator:
             worktree_manager: WorktreeManager for git isolation
             performance_monitor: Optional PerformanceMonitor for metrics
             max_parallel: Max agents to run in parallel (default 5)
+            merge_config: Optional MergeBackConfig for patch integration
         """
         self.executor = executor
         self.token_pool = token_pool
         self.worktree_manager = worktree_manager
         self.performance_monitor = performance_monitor
         self.max_parallel = max_parallel
+        self.merge_config = merge_config
+        self.merger = None
+
+        # Initialize merger if config provided
+        if merge_config and merge_config.enabled:
+            from .merger import Merger
+
+            self.merger = Merger(merge_config, worktree_manager)
+
         self.workflow = self._build_workflow()
 
         logger.info(f"Send API Orchestrator initialized (max_parallel={max_parallel})")
@@ -126,7 +137,9 @@ class SendAPIOrchestrator:
             "code": {
                 "mcp_profile": None,  # No MCP for code agents
                 "allowed_tools": ["Read", "Write", "Edit"],
-                "system_prompt": "You write code directly with no preamble. Keep diffs minimal and idiomatic.",
+                "system_prompt": (
+                    "You write code directly with no preamble. " "Keep diffs minimal and idiomatic."
+                ),
             },
             "test": {
                 "mcp_profile": None,  # No MCP for test agents
@@ -175,7 +188,10 @@ class SendAPIOrchestrator:
             task = AgentTask(
                 agent_id=agent_id,
                 agent_type=agent_type,
-                task_prompt=f"{state['main_task']}\n\n[{agent_type.upper()} AGENT]: {config['system_prompt']}",
+                task_prompt=(
+                    f"{state['main_task']}\n\n"
+                    f"[{agent_type.upper()} AGENT]: {config['system_prompt']}"
+                ),
                 token_index=token_idx,
                 worktree_path=str(worktree),
                 mcp_profile=config["mcp_profile"],
@@ -251,7 +267,7 @@ class SendAPIOrchestrator:
 
     def _aggregate_results(self, state: OrchestrationState) -> Dict[str, Any]:
         """
-        Aggregate results from all parallel agents.
+        Aggregate results from all parallel agents and merge patches if enabled.
         """
         logger.info("Aggregating results from parallel agents")
 
@@ -287,9 +303,7 @@ class SendAPIOrchestrator:
             except Exception as e:
                 logger.warning(f"Worktree cleanup failed for {task.agent_id}: {e}")
 
-        logger.info(
-            f"Completed: {metrics['completed']}/{metrics['total']} agents succeeded"
-        )
+        logger.info(f"Completed: {metrics['completed']}/{metrics['total']} agents succeeded")
 
         return {
             "results": merged,
