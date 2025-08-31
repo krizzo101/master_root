@@ -1,0 +1,157 @@
+#!/bin/bash
+# Claude Session Management CLI
+# Unified interface for session detection and context extraction
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PYTHON="${PYTHON:-/home/opsvi/miniconda/bin/python}"
+
+show_help() {
+    cat << EOF
+Claude Session Management Tool
+
+Usage: claude-session [command] [options]
+
+Commands:
+  current           Show current session ID and detection method
+  info [ID]         Get detailed session information
+  path [ID]         Get path to session file
+  context           Extract context from current session
+  recent [N]        Show last N entries (default: 50)
+  conversation [N]  Show last N conversation pairs
+  tools             Show tool usage statistics
+  changes           Show recent code changes
+  errors            Show recent errors and resolutions
+  summary           Show session summary
+  export [FILE]     Export full context to file
+
+Options:
+  --session-id ID   Use specific session ID
+  --json           Output in JSON format
+  --lines N        Number of lines to process
+  --help           Show this help message
+
+Examples:
+  claude-session current                    # Show current session
+  claude-session recent 100                 # Show last 100 entries
+  claude-session context --json             # Get context as JSON
+  claude-session export session.json        # Export to file
+
+Environment:
+  CLAUDE_SESSION_UUID   Override session detection
+  DEBUG                 Enable debug output
+EOF
+}
+
+# Parse global options
+JSON_FLAG=""
+SESSION_ID=""
+LINES="200"
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --help|-h)
+            show_help
+            exit 0
+            ;;
+        --json)
+            JSON_FLAG="--json"
+            shift
+            ;;
+        --session-id)
+            SESSION_ID="--session-id $2"
+            shift 2
+            ;;
+        --lines)
+            LINES="$2"
+            shift 2
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+COMMAND="${1:-current}"
+shift
+
+case "$COMMAND" in
+    current)
+        $PYTHON "$SCRIPT_DIR/session_detector.py" current $JSON_FLAG
+        ;;
+
+    info)
+        SESSION="${1:-}"
+        if [ -n "$SESSION" ]; then
+            SESSION_ID="--session-id $SESSION"
+        fi
+        $PYTHON "$SCRIPT_DIR/session_detector.py" info $SESSION_ID $JSON_FLAG
+        ;;
+
+    path)
+        SESSION="${1:-}"
+        if [ -n "$SESSION" ]; then
+            SESSION_ID="--session-id $SESSION"
+        fi
+        $PYTHON "$SCRIPT_DIR/session_detector.py" path $SESSION_ID
+        ;;
+
+    context|recent)
+        N="${1:-50}"
+        $PYTHON "$SCRIPT_DIR/session_context.py" recent --lines "$N" $SESSION_ID $JSON_FLAG
+        ;;
+
+    conversation)
+        $PYTHON "$SCRIPT_DIR/session_context.py" conversation $SESSION_ID $JSON_FLAG
+        ;;
+
+    tools)
+        $PYTHON "$SCRIPT_DIR/session_context.py" tools $SESSION_ID $JSON_FLAG
+        ;;
+
+    changes)
+        $PYTHON "$SCRIPT_DIR/session_context.py" changes $SESSION_ID $JSON_FLAG
+        ;;
+
+    errors)
+        $PYTHON "$SCRIPT_DIR/session_context.py" errors $SESSION_ID $JSON_FLAG
+        ;;
+
+    summary)
+        $PYTHON "$SCRIPT_DIR/session_context.py" summary $SESSION_ID $JSON_FLAG
+        ;;
+
+    export)
+        OUTPUT="${1:-}"
+        if [ -n "$OUTPUT" ]; then
+            $PYTHON "$SCRIPT_DIR/session_context.py" export --output "$OUTPUT" $SESSION_ID
+        else
+            $PYTHON "$SCRIPT_DIR/session_context.py" export $SESSION_ID $JSON_FLAG
+        fi
+        ;;
+
+    test)
+        # Run self-test
+        echo "=== Claude Session Manager Self-Test ==="
+        echo ""
+        echo "1. Detecting current session..."
+        SESSION=$($PYTHON "$SCRIPT_DIR/session_detector.py" current --json | jq -r .session_id)
+        echo "   Session: $SESSION"
+        echo ""
+
+        echo "2. Getting session info..."
+        $PYTHON "$SCRIPT_DIR/session_detector.py" info --json | jq -r '.file_path // "No file found"'
+        echo ""
+
+        echo "3. Extracting summary..."
+        $PYTHON "$SCRIPT_DIR/session_context.py" summary --json | jq -r '.user_prompts // 0' | xargs -I {} echo "   User prompts: {}"
+        echo ""
+
+        echo "Test complete!"
+        ;;
+
+    *)
+        echo "Unknown command: $COMMAND"
+        echo "Run 'claude-session --help' for usage"
+        exit 1
+        ;;
+esac

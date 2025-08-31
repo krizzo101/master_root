@@ -149,6 +149,69 @@ def get_output_text(resp):
     return ""
 
 
+def load_config():
+    """Load configuration from prompt_opt_config.json"""
+    config_path = "/home/opsvi/master_root/.claude/hooks/prompt_opt_config.json"
+    try:
+        with open(config_path, "r") as f:
+            return json.load(f)
+    except:
+        # Default config if file doesn't exist
+        return {
+            "mode": "opt-out",
+            "opt_in_triggers": ["!!", "!opt", "!optimize"],
+            "opt_out_triggers": ["!skip", "!noopt", "!pass"],
+            "bypass_triggers": ["!raw", "!exact", "!verbatim"],
+        }
+
+
+def should_optimize(prompt: str, config: dict) -> tuple:
+    """
+    Determine if prompt should be optimized based on config and triggers.
+    Returns: (should_optimize, cleaned_prompt, is_bypass)
+    """
+    prompt_lower = prompt.lower().strip()
+
+    # Check for bypass triggers (raw content, no optimization)
+    for trigger in config.get("bypass_triggers", []):
+        if prompt_lower.startswith(trigger + " "):
+            cleaned = (
+                prompt.split(" ", 1)[1] if " " in prompt else prompt[len(trigger) :]
+            )
+            return False, cleaned, True
+
+    mode = config.get("mode", "opt-out")
+
+    if mode == "disabled":
+        return False, prompt, False
+
+    elif mode == "opt-in":
+        # Only optimize if explicitly requested
+        for trigger in config.get("opt_in_triggers", []):
+            if prompt_lower.startswith(trigger + " "):
+                cleaned = (
+                    prompt.split(" ", 1)[1] if " " in prompt else prompt[len(trigger) :]
+                )
+                return True, cleaned, False
+            elif prompt_lower.startswith(trigger) and len(prompt) == len(trigger):
+                # Handle "!!" alone case
+                return True, "", False
+        return False, prompt, False
+
+    elif mode == "opt-out":
+        # Optimize unless explicitly skipped
+        for trigger in config.get("opt_out_triggers", []):
+            if prompt_lower.startswith(trigger + " "):
+                cleaned = (
+                    prompt.split(" ", 1)[1] if " " in prompt else prompt[len(trigger) :]
+                )
+                return False, cleaned, False
+        return True, prompt, False
+
+    else:  # mode == "always"
+        return True, prompt, False
+
+
 def main():
     # Check if stdin has data available (with 2 second timeout)
     if sys.stdin.isatty():
@@ -176,6 +239,51 @@ def main():
     try:
         inp = json.load(sys.stdin)
         user_prompt = inp.get("prompt", "")
+
+        # Load configuration
+        config = load_config()
+
+        # Check if we should optimize
+        should_opt, cleaned_prompt, is_bypass = should_optimize(user_prompt, config)
+
+        if is_bypass:
+            # Bypass mode - send raw content
+            output = {
+                "hookSpecificOutput": {
+                    "hookEventName": "UserPromptSubmit",
+                    "additionalContext": f"[USER EXACT INSTRUCTIONS - NO OPTIMIZATION]\\n{cleaned_prompt}\\n[END EXACT INSTRUCTIONS]",
+                }
+            }
+            print(json.dumps(output))
+            sys.exit(0)
+
+        if not should_opt:
+            # Pass through without optimization
+            if os.getenv("DEBUG"):
+                print(
+                    f"DEBUG: Skipping optimization (mode={config.get('mode')})",
+                    file=sys.stderr,
+                )
+            print(json.dumps({"suppressOutput": False}))
+            sys.exit(0)
+
+        # Use cleaned prompt for optimization
+        user_prompt = cleaned_prompt
+
+        # Extract RAW sections
+        import re
+
+        raw_pattern = r"\[RAW\](.*?)\[/RAW\]"
+        raw_sections = []
+        processable_prompt = user_prompt
+
+        for match in re.finditer(raw_pattern, user_prompt, re.DOTALL | re.IGNORECASE):
+            raw_sections.append(match.group(1))
+            processable_prompt = processable_prompt.replace(match.group(0), " ")
+
+        processable_prompt = processable_prompt.strip()
+        has_raw = bool(raw_sections)
+
         transcript = inp.get("transcript_path", "")
         prev5 = last_user_prompts(transcript, 5)
         # TODO: temporary print-based debug — replace with proper logger before merge/release
@@ -208,7 +316,7 @@ def main():
         Heuristic unstable topics: {', '.join(UNSTABLE_TOPICS)}
 
         Current prompt to optimize:
-        {user_prompt}
+        {processable_prompt if has_raw else user_prompt}
         """
         ).strip()
 
@@ -281,6 +389,11 @@ def main():
                 "- Include sources/citations or a 'no recent changes found' note.\n"
             )
             optimized = f"{preface}\n{optimized}".strip()
+
+        # Add RAW sections back if they exist
+        if has_raw:
+            raw_content = "\n\n".join(raw_sections)
+            optimized = f"{optimized}\\n\\n[USER EXACT INSTRUCTIONS - PRESERVE AS-IS]\\n{raw_content}\\n[END EXACT INSTRUCTIONS]"
 
         injected = f"[PROMPT_OPTIMIZER]\\n{optimized}\\n[END_PROMPT_OPTIMIZER]"
 
