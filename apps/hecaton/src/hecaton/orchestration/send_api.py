@@ -7,6 +7,7 @@ import asyncio
 import logging
 import operator
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any, Dict, List, Optional, TypedDict
 from uuid import uuid4
 
@@ -26,6 +27,7 @@ class AgentTask:
     task_prompt: str
     token_index: int
     worktree_path: str
+    sequence: int = 0  # For patch ordering
     mcp_profile: Optional[str] = None
     allowed_tools: List[str] = field(default_factory=list)
     permission_mode: str = "plan"
@@ -49,9 +51,11 @@ class OrchestrationState(TypedDict, total=False):
     # merged artifacts
     results: Annotated[Dict[str, Any], operator.or_]
     errors: Annotated[List[str], operator.add]
+    patch_manifests: Annotated[List[Dict[str, Any]], operator.add]
     phase: str
     performance_metrics: Dict[str, float]
     max_parallel: int
+    run_id: str
 
 
 class SendAPIOrchestrator:
@@ -194,6 +198,7 @@ class SendAPIOrchestrator:
                 ),
                 token_index=token_idx,
                 worktree_path=str(worktree),
+                sequence=i,  # Add sequence for patch ordering
                 mcp_profile=config["mcp_profile"],
                 allowed_tools=config["allowed_tools"],
                 permission_mode="plan",  # Always use plan mode for safety
@@ -232,7 +237,7 @@ class SendAPIOrchestrator:
         logger.info(f"Running {task.agent_id} ({task.agent_type})")
 
         try:
-            # Execute the task with the provided worktree
+            # Execute the task with the provided worktree and run_id
             result = await self.executor.execute_task(
                 {
                     "id": task.agent_id,
@@ -243,11 +248,16 @@ class SendAPIOrchestrator:
                     "mcp_profile": task.mcp_profile,
                     "allowed_tools": task.allowed_tools,
                     "permission_mode": task.permission_mode,
+                    "run_id": state.get("run_id"),  # Pass run_id for patch export
+                    "sequence": getattr(task, "sequence", 0),
                 }
             )
 
-            # Return mergeable partial update
-            return {
+            # Extract patch manifest if present
+            patch_manifest = result.get("patch_manifest")
+
+            # Return mergeable partial update with patch manifest
+            update = {
                 "results": {
                     task.agent_id: {
                         "type": task.agent_type,
@@ -256,6 +266,11 @@ class SendAPIOrchestrator:
                     }
                 }
             }
+
+            if patch_manifest:
+                update["patch_manifests"] = [patch_manifest]
+
+            return update
 
         except asyncio.TimeoutError:
             logger.error(f"{task.agent_id} timed out")
@@ -275,6 +290,8 @@ class SendAPIOrchestrator:
         merged = state.get("results", {}) or {}
         errors = state.get("errors", []) or []
         agent_tasks = state.get("agent_tasks", []) or []
+        patch_manifests = state.get("patch_manifests", []) or []
+        run_id = state.get("run_id")
 
         metrics = {"total": len(agent_tasks), "completed": 0, "failed": 0}
 
@@ -296,21 +313,94 @@ class SendAPIOrchestrator:
             perf_stats = self.performance_monitor.calculate_statistics()
             metrics.update(perf_stats)
 
-        # Cleanup worktrees
-        for task in agent_tasks:
+        # Execute merge-back if enabled and patches exist
+        merge_report = None
+        if (
+            self.merger
+            and self.merge_config
+            and self.merge_config.enabled
+            and patch_manifests
+            and run_id
+        ):
+            logger.info(f"Executing merge-back for {len(patch_manifests)} patches")
+
             try:
-                self.worktree_manager.cleanup(task.agent_id, force=True)
+                # Prepare staging worktree
+                staging_path = self.merger.prepare_staging(run_id, self.merge_config.target_branch)
+
+                # Order patches deterministically
+                ordered_patches = self.merger.order_patches(patch_manifests)
+
+                # Apply patches to staging
+                applied, conflicts = self.merger.apply_patches(staging_path, ordered_patches)
+
+                merge_report = {
+                    "patches_applied": len(applied),
+                    "conflicts": len(conflicts),
+                    "conflict_details": conflicts,
+                }
+
+                if conflicts:
+                    # Generate Fix-It tasks if conflicts exist
+                    from ..orchestration.tasks import create_fixit_tasks
+
+                    fixit_tasks = create_fixit_tasks(conflicts, run_id=run_id)
+                    merge_report["fixit_tasks"] = fixit_tasks
+                    logger.warning(f"Generated {len(fixit_tasks)} Fix-It tasks for conflicts")
+
+                    # Emit conflict reports
+                    self.merger.emit_reports(run_id, applied, conflicts, None, agent_tasks)
+                else:
+                    # Run quality gates
+                    gates_report = self.merger.run_gates(staging_path)
+
+                    if gates_report.success:
+                        # Create PR or land directly
+                        if not self.merge_config.dry_run:
+                            pr_info = self.merger.create_pr_or_land(
+                                staging_path, run_id, applied, agent_tasks
+                            )
+                            merge_report["pr_info"] = pr_info
+                            logger.info(f"Merge-back successful: {pr_info}")
+                    else:
+                        merge_report["gate_failures"] = gates_report.failed_gates
+                        logger.warning(f"Quality gates failed: {gates_report.failed_gates}")
+
+                        # Generate Fix-It tasks for gate failures
+                        from ..orchestration.tasks import create_fixit_tasks
+
+                        fixit_tasks = create_fixit_tasks([], gates_report, run_id)
+                        merge_report["fixit_tasks"] = fixit_tasks
+
+                    # Emit reports
+                    self.merger.emit_reports(run_id, applied, conflicts, gates_report, agent_tasks)
+
             except Exception as e:
-                logger.warning(f"Worktree cleanup failed for {task.agent_id}: {e}")
+                logger.error(f"Merge-back failed: {e}")
+                merge_report = {"error": str(e)}
+                errors.append(f"Merge-back failed: {e}")
+
+        # Cleanup worktrees (unless keeping for debugging)
+        if not (self.merge_config and self.merge_config.keep_worktrees):
+            for task in agent_tasks:
+                try:
+                    self.worktree_manager.cleanup(task.agent_id, force=True)
+                except Exception as e:
+                    logger.warning(f"Worktree cleanup failed for {task.agent_id}: {e}")
 
         logger.info(f"Completed: {metrics['completed']}/{metrics['total']} agents succeeded")
 
-        return {
+        return_data = {
             "results": merged,
             "performance_metrics": metrics,
             "errors": errors,
             "phase": "completed",
         }
+
+        if merge_report:
+            return_data["merge_report"] = merge_report
+
+        return return_data
 
     async def execute(self, task: str, num_agents: int = 2) -> Dict[str, Any]:
         """
@@ -326,6 +416,10 @@ class SendAPIOrchestrator:
         # Cap agents at token pool size
         max_agents = min(num_agents, self.token_pool.get_token_count(), 15)
 
+        # Generate run_id for this execution
+        run_id = f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid4().hex[:8]}"
+        logger.info(f"Starting orchestration with run_id: {run_id}")
+
         # Initialize state as dict
         initial_state = {
             "main_task": task,
@@ -334,7 +428,9 @@ class SendAPIOrchestrator:
             "agent_tasks": [],
             "results": {},
             "errors": [],
+            "patch_manifests": [],
             "phase": "initialized",
+            "run_id": run_id,
         }
 
         try:
