@@ -25,9 +25,7 @@ from hecaton.resources.worktree import WorktreeManager  # noqa: E402
 class HecatonApp:
     """Main application class with Send API as default orchestration"""
 
-    def __init__(
-        self, mode: str = "send-api", verbose: bool = False, merge_config=None
-    ):
+    def __init__(self, mode: str = "send-api", verbose: bool = False, merge_config=None):
         self.mode = mode
         self.verbose = verbose
 
@@ -83,22 +81,16 @@ class HecatonApp:
         # Check for test mode
         if os.getenv("HECATON_TEST_MODE") == "1":
             # Use test tokens for dry-run testing
-            test_config = (
-                Path(__file__).parent.parent.parent / "config" / "test_tokens.json"
-            )
+            test_config = Path(__file__).parent.parent.parent / "config" / "test_tokens.json"
             if test_config.exists():
                 import json
 
                 with open(test_config) as f:
                     config = json.load(f)
-                    return SecureTokenPool(
-                        tokens=config.get("tokens", ["test-token-1"])
-                    )
+                    return SecureTokenPool(tokens=config.get("tokens", ["test-token-1"]))
 
         # Load real tokens from config
-        config_path = (
-            Path(__file__).parent.parent.parent / "config" / "claude_tokens.json"
-        )
+        config_path = Path(__file__).parent.parent.parent / "config" / "claude_tokens.json"
         if config_path.exists():
             import json
 
@@ -132,15 +124,15 @@ class HecatonApp:
             result = await self.orchestrator.execute(task, num_agents=agents)
 
             # Process Send API results
-            successes = result["metrics"].get("successful", 0)
-            total = result["metrics"].get("total_agents", agents)
+            # Get metrics from metrics key (Send API returns it as "metrics")
+            metrics_data = result.get("metrics", {})
+            successes = metrics_data.get("completed", 0)
+            total = metrics_data.get("total", agents)
 
             # Display results
             for agent_id, agent_result in result["results"].items():
                 status = agent_result.get("status", "unknown")
-                agent_type = agent_result.get(
-                    "type", "unknown"
-                )  # Changed from agent_type to type
+                agent_type = agent_result.get("type", "unknown")  # Changed from agent_type to type
                 if status == "completed":
                     print(f"✅ {agent_type}: Success")
                     if self.verbose and agent_result.get("result"):
@@ -290,18 +282,14 @@ Examples:
     # Run command
     run_parser = subparsers.add_parser("run", help="Run HECATON with a task")
     run_parser.add_argument("task", help="Task to execute")
-    run_parser.add_argument(
-        "--agents", type=int, default=2, help="Number of agents (default: 2)"
-    )
+    run_parser.add_argument("--agents", type=int, default=2, help="Number of agents (default: 2)")
     run_parser.add_argument(
         "--mode",
         choices=["send-api", "simple"],
         default="send-api",
         help="Orchestration mode (default: send-api for parallel execution)",
     )
-    run_parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Verbose output"
-    )
+    run_parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
 
     # Merge-back arguments
     run_parser.add_argument(
