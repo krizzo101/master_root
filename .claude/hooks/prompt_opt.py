@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import asyncio
 import json
 import os
 import re
@@ -7,10 +8,23 @@ import sys
 import textwrap
 from datetime import datetime, timezone
 
-# OpenAI Responses API
-from openai import OpenAI
+# Use shared central AI interface instead of direct OpenAI
+# Replaced direct OpenAI usage with shared central AI interface (automated migration)
+sys.path.insert(0, "/home/opsvi/master_root/libs/opsvi-llm")
+from typing import Optional
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+from opsvi_llm.providers.openai_provider import OpenAIConfig, OpenAIProvider
+from pydantic import BaseModel, Field
+
+# Initialize provider with timeout support
+config = OpenAIConfig(
+    provider_name="openai",
+    api_key=os.getenv("OPENAI_API_KEY"),
+    timeout=float(os.getenv("OPENAI_TIMEOUT_SEC", "25.0")),
+    enable_audit_logging=False,
+    enable_sanitization=False,
+)
+provider = OpenAIProvider(config)
 
 MODEL = os.getenv("PROMPT_OPT_MODEL", "gpt-5-mini")
 MAX_TOK = int(os.getenv("PROMPT_OPT_MAX_TOK", "4000"))
@@ -87,12 +101,26 @@ def last_user_prompts(transcript_path, k=5):
     return out
 
 
+# Define schema for structured output
+class OptimizedPromptSchema(BaseModel):
+    """Schema for structured prompt optimization output."""
+
+    optimized_prompt: str = Field(description="The optimized prompt")
+    research_required: Optional[bool] = Field(
+        default=False, description="Whether research is required"
+    )
+
+
 def get_output_text(resp):
-    # Extract text from Responses API response
+    # Extract text from Responses API response or structured output
+    # For structured responses from opsvi-llm
+    if isinstance(resp, OptimizedPromptSchema):
+        return resp.model_dump_json()
+
     # First try direct attribute
     if hasattr(resp, "output_text") and resp.output_text:
         return resp.output_text
-    
+
     # Try to extract from output structure
     try:
         if hasattr(resp, "output") and resp.output:
@@ -103,7 +131,7 @@ def get_output_text(resp):
                             return content_item.text
     except Exception:
         pass
-    
+
     # Return empty string if no text found (don't convert whole response to string)
     return ""
 
@@ -112,26 +140,37 @@ def main():
     # Check if stdin has data available (with 2 second timeout)
     if sys.stdin.isatty():
         # Terminal is attached but no pipe
-        print(json.dumps({
-            "error": "No input provided. Usage: echo '{\"prompt\": \"...\", \"transcript_path\": \"...\"}' | python3 prompt_opt.py",
-            "suppressOutput": True
-        }))
+        print(
+            json.dumps(
+                {
+                    "error": 'No input provided. Usage: echo \'{"prompt": "...", "transcript_path": "..."}\' | python3 prompt_opt.py',
+                    "suppressOutput": True,
+                }
+            )
+        )
         sys.exit(1)
-    
-    # Check if stdin has data within 2 seconds
-    readable, _, _ = select.select([sys.stdin], [], [], 2.0)
+
+    # Check if stdin has data within 5 seconds (hooks sometimes deliver late)
+    readable, _, _ = select.select([sys.stdin], [], [], 5.0)
     if not readable:
-        print(json.dumps({"error": "No input received within 2 seconds", "suppressOutput": True}))
+        print(
+            json.dumps(
+                {"error": "No input received within 2 seconds", "suppressOutput": True}
+            )
+        )
         sys.exit(1)
-        
+
     try:
         inp = json.load(sys.stdin)
         user_prompt = inp.get("prompt", "")
         transcript = inp.get("transcript_path", "")
         prev5 = last_user_prompts(transcript, 5)
         # TODO: temporary print-based debug — replace with proper logger before merge/release
-        if os.getenv('DEBUG'):
-            print(f"DEBUG: prompt_opt.py:main() -- user_prompt='{user_prompt[:50]}...'", file=sys.stderr)
+        if os.getenv("DEBUG"):
+            print(
+                f"DEBUG: prompt_opt.py:main() -- user_prompt='{user_prompt[:50]}...'",
+                file=sys.stderr,
+            )
 
         system = (
             "Rewrite the user's prompt into a concise, execution-ready instruction for a coding/dev agent (Claude Code). "
@@ -144,26 +183,7 @@ def main():
             "Output ONLY the optimized prompt text; no preface."
         ).format(cutoff=KNOWLEDGE_CUTOFF, today=CURRENT_DATE)
 
-        schema = {
-            "name": "OptimizedPrompt",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "optimized_prompt": {
-                        "type": "string",
-                        "description": "Final optimized prompt for the agent.",
-                    },
-                    "notes": {"type": "array", "items": {"type": "string"}},
-                    "research_required": {
-                        "type": "boolean",
-                        "description": "True iff research should precede execution.",
-                    },
-                },
-                "required": ["optimized_prompt", "notes", "research_required"],
-                "additionalProperties": False,
-            },
-            "strict": True,
-        }
+        # Schema now defined as Pydantic model (OptimizedPromptSchema)
 
         user = textwrap.dedent(
             f"""
@@ -178,39 +198,54 @@ def main():
         {user_prompt}
         """
         ).strip()
-        
-        # TODO: temporary print-based debug — replace with proper logger before merge/release
-        if os.getenv('DEBUG'):
-            print(f"DEBUG: prompt_opt.py:main() -- calling model={MODEL} with max_tokens={MAX_TOK}", file=sys.stderr)
 
-        resp = client.responses.create(
-            model=MODEL,
-            input=[
-                {"role":"system","content":[{"type":"input_text","text": system}]},
-                {"role":"user","content":[{"type":"input_text","text": user}]}
-            ],
-            text={
-                "format": {
-                    "type": "json_schema",
-                    "name": "OptimizedPrompt",
-                    "strict": True,
-                    "schema": schema["schema"]
-                }
-            },
-            max_output_tokens=MAX_TOK
+        # TODO: temporary print-based debug — replace with proper logger before merge/release
+        if os.getenv("DEBUG"):
+            print(
+                f"DEBUG: prompt_opt.py:main() -- calling model={MODEL} with max_tokens={MAX_TOK}",
+                file=sys.stderr,
+            )
+
+        # Replaced direct OpenAI usage with shared central AI interface
+        # Provider will automatically use correct parameters based on model
+        resp = asyncio.run(
+            provider.responses_create_with_structured_output(
+                input=[
+                    {
+                        "role": "system",
+                        "content": [{"type": "input_text", "text": system}],
+                    },
+                    {"role": "user", "content": [{"type": "input_text", "text": user}]},
+                ],
+                response_model=OptimizedPromptSchema,
+                model=MODEL,
+                max_tokens=MAX_TOK,  # Will be translated to max_output_tokens
+                temperature=TEMP,
+                # Note: seed parameter may not be supported by all models
+            )
         )
 
-        text = get_output_text(resp)
-        try:
-            data = json.loads(text)
-            optimized = data.get("optimized_prompt", "").strip()
-            research_flag = bool(data.get("research_required", False))
-            # TODO: temporary print-based debug — replace with proper logger before merge/release
-            if os.getenv('DEBUG'):
-                print(f"DEBUG: prompt_opt.py:main() -- optimized={bool(optimized)}, research_flag={research_flag}", file=sys.stderr)
-        except Exception:
-            optimized = text.strip()
-            research_flag = False
+        # Response is now a structured object (OptimizedPromptSchema)
+        if isinstance(resp, OptimizedPromptSchema):
+            optimized = resp.optimized_prompt.strip()
+            research_flag = bool(resp.research_required)
+        else:
+            # Fallback for unexpected response format
+            text = get_output_text(resp)
+            try:
+                data = json.loads(text)
+                optimized = data.get("optimized_prompt", "").strip()
+                research_flag = bool(data.get("research_required", False))
+            except Exception:
+                optimized = text.strip()
+                research_flag = False
+
+        # TODO: temporary print-based debug — replace with proper logger before merge/release
+        if os.getenv("DEBUG"):
+            print(
+                f"DEBUG: prompt_opt.py:main() -- optimized={bool(optimized)}, research_flag={research_flag}",
+                file=sys.stderr,
+            )
 
         def needs_research_heuristic(p: str) -> bool:
             p_lower = (p or "").lower()
@@ -249,7 +284,7 @@ def main():
         sys.exit(0)
     except Exception as e:
         # TODO: temporary print-based debug — replace with proper logger before merge/release
-        if os.getenv('DEBUG'):
+        if os.getenv("DEBUG"):
             print(f"DEBUG: prompt_opt.py:main() -- exception={e}", file=sys.stderr)
         # Degrade gracefully: no injection, do not block prompt processing
         print(json.dumps({"suppressOutput": True}))

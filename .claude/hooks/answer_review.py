@@ -1,17 +1,33 @@
 #!/usr/bin/env python3
+import asyncio
 import json
 import os
 import pathlib
 import re
 import sys
-from datetime import datetime
 
-# OpenAI Responses API
-from openai import OpenAI
+# datetime import removed - not used
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Use shared central AI interface instead of direct OpenAI
+# Replaced direct OpenAI usage with shared central AI interface (automated migration)
+sys.path.insert(0, "/home/opsvi/master_root/libs/opsvi-llm")
+# typing imports not used
 
-MODEL_PRIMARY = os.getenv("REVIEW_MODEL", "gpt-5-mini")
+from opsvi_llm.providers.openai_provider import OpenAIConfig, OpenAIProvider
+from pydantic import BaseModel, Field
+
+# Initialize provider with timeout support
+config = OpenAIConfig(
+    provider_name="openai",
+    api_key=os.getenv("OPENAI_API_KEY"),
+    timeout=float(os.getenv("OPENAI_TIMEOUT_SEC", "25.0")),
+    enable_audit_logging=False,
+    enable_sanitization=False,
+)
+provider = OpenAIProvider(config)
+
+# Default to nano → mini, per README intent
+MODEL_PRIMARY = os.getenv("REVIEW_MODEL", "gpt-5-nano")
 MODEL_ESCALATE = os.getenv(
     "REVIEW_MODEL_ESCALATE", "gpt-5-mini"
 )  # optional one-time escalation
@@ -92,8 +108,22 @@ def read_last_items(transcript_path, k_user=5):
     return assistant, list(reversed(users))[:k_user]
 
 
+# Define schema for structured output
+class ReviewVerdictSchema(BaseModel):
+    """Schema for review verdict output."""
+
+    passed: bool = Field(description="Whether the review passed")
+    guidance: str = Field(
+        description="Specific, actionable fixes if failed; otherwise 'OK'."
+    )
+
+
 def get_output_text(resp):
-    # Extract text from Responses API response
+    # Extract text from Responses API response or structured output
+    # For structured responses from opsvi-llm
+    if isinstance(resp, ReviewVerdictSchema):
+        return resp.model_dump_json()
+
     # First try direct attribute
     if hasattr(resp, "output_text") and resp.output_text:
         return resp.output_text
@@ -125,55 +155,50 @@ def call_review(model, assistant_out, prev5):
         "unsafe/destructive commands, missing acceptance tests, and mismatches with the prompt/context. "
         "Return a verdict and concrete guidance to fix failures."
     )
-    schema = {
-        "name": "ReviewVerdict",
-        "schema": {
-            "type": "object",
-            "properties": {
-                "passed": {"type": "boolean"},
-                "guidance": {
-                    "type": "string",
-                    "description": "Specific, actionable fixes if failed; otherwise 'OK'.",
-                },
-            },
-            "required": ["passed", "guidance"],
-            "additionalProperties": False,
-        },
-        "strict": True,
-    }
+    # Schema now defined as Pydantic model (ReviewVerdictSchema)
     user = (
         "Previous 5 user prompts:\n"
         + "\n".join(f"- {p}" for p in prev5)
         + "\n\nAnswer to review:\n"
         + assistant_out
     )
-    r = client.responses.create(
-        model=model,
-        input=[
-            {"role": "system", "content": [{"type": "input_text", "text": system}]},
-            {"role": "user", "content": [{"type": "input_text", "text": user}]},
-        ],
-        text={
-            "format": {
-                "type": "json_schema",
-                "name": "ReviewVerdict",
-                "strict": True,
-                "schema": schema["schema"],
-            }
-        },
-        max_output_tokens=MAX_TOK,
-    )
-    out = get_output_text(r)
-    # TODO: temporary print-based debug — replace with proper logger before merge/release
-    if os.getenv("DEBUG"):
-        print(
-            f"DEBUG: answer_review.py:call_review() -- response received, output_text={bool(out)}",
-            file=sys.stderr,
+    # Replaced direct OpenAI usage with shared central AI interface
+    # Provider will automatically use correct parameters based on model
+    r = asyncio.run(
+        provider.responses_create_with_structured_output(
+            input=[
+                {"role": "system", "content": [{"type": "input_text", "text": system}]},
+                {"role": "user", "content": [{"type": "input_text", "text": user}]},
+            ],
+            response_model=ReviewVerdictSchema,
+            model=model,
+            max_tokens=MAX_TOK,  # Will be translated to max_output_tokens
+            temperature=TEMP,
+            # Note: seed parameter may not be supported by all models
         )
-    try:
-        return json.loads(out)
-    except Exception:
-        return {"passed": False, "guidance": out}
+    )
+    # Response is now a structured object (ReviewVerdictSchema)
+    if isinstance(r, ReviewVerdictSchema):
+        # TODO: temporary print-based debug — replace with proper logger before merge/release
+        if os.getenv("DEBUG"):
+            print(
+                f"DEBUG: answer_review.py:call_review() -- response received, passed={r.passed}",
+                file=sys.stderr,
+            )
+        return {"passed": r.passed, "guidance": r.guidance}
+    else:
+        # Fallback for unexpected response format
+        out = get_output_text(r)
+        # TODO: temporary print-based debug — replace with proper logger before merge/release
+        if os.getenv("DEBUG"):
+            print(
+                f"DEBUG: answer_review.py:call_review() -- response received, output_text={bool(out)}",
+                file=sys.stderr,
+            )
+        try:
+            return json.loads(out)
+        except Exception:
+            return {"passed": False, "guidance": out}
 
 
 def attempts_file(session_id, scope="global"):
@@ -260,8 +285,8 @@ def main():
         attempts = get_attempts(session_id, scope)
         verdict = call_review(MODEL_PRIMARY, assistant_out, prev5_user)
 
-        # Optional one-time escalation to a larger model if first check fails
-        if not verdict.get("passed", False) and attempts == 0 and MODEL_ESCALATE:
+        # Optional one-time escalation to a larger model if second check fails
+        if not verdict.get("passed", False) and attempts == 1 and MODEL_ESCALATE:
             verdict = call_review(MODEL_ESCALATE, assistant_out, prev5_user)
 
         # Allow stop on pass / cap / already continuing
