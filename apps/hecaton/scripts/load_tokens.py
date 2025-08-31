@@ -72,6 +72,24 @@ def load_real_tokens():
     # Always clear ANTHROPIC_API_KEY as instructed
     os.environ["ANTHROPIC_API_KEY"] = ""
 
+    # Update config/claude_tokens.json with all tokens
+    config_path = Path(__file__).parent.parent / "config" / "claude_tokens.json"
+    token_list = []
+    for key in available:
+        token = os.environ.get(key)
+        if token:
+            token_list.append(token)
+
+    config_data = {
+        "tokens": token_list,
+        "_comment": f"Loaded {len(token_list)} real Claude Code tokens from encrypted storage",
+    }
+
+    with open(config_path, "w") as f:
+        json.dump(config_data, f, indent=2)
+
+    print(f"✅ Updated config/claude_tokens.json with {len(token_list)} tokens")
+
     return token_count
 
 

@@ -13,7 +13,10 @@ import sys
 sys.path.insert(0, "/home/opsvi/master_root/libs/opsvi-llm")
 # typing imports not used
 
-from opsvi_llm.providers.openai_provider import OpenAIConfig, OpenAIProvider  # noqa: E402
+from opsvi_llm.providers.openai_provider import (  # noqa: E402
+    OpenAIConfig,
+    OpenAIProvider,
+)
 from pydantic import BaseModel, Field  # noqa: E402
 
 # Initialize provider with timeout support
@@ -266,7 +269,7 @@ def main():
 
         # If nothing to review, allow stop quietly
         if not (assistant_out and assistant_out.strip()):
-            print(json.dumps({"suppressOutput": True}))
+            print(json.dumps({"suppressOutput": False}))
             sys.exit(0)
 
         # Research enforcement (pre-check before LLM review to save tokens)
@@ -304,7 +307,7 @@ def main():
         # Allow stop on pass / cap / already continuing
         if verdict.get("passed", False) or attempts >= MAX_ATTEMPTS or stop_hook_active:
             set_attempts(session_id, scope, 0)
-            print(json.dumps({"suppressOutput": True}))
+            print(json.dumps({"suppressOutput": False}))
             sys.exit(0)
 
         # Block and request revision with explicit guidance
@@ -324,7 +327,7 @@ def main():
         if os.getenv("DEBUG"):
             print(f"DEBUG: answer_review.py:main() -- exception={e}", file=sys.stderr)
         # On reviewer failure, do NOT block delivery
-        print(json.dumps({"suppressOutput": True}))
+        print(json.dumps({"suppressOutput": False}))
         sys.exit(0)
 
 

@@ -11,7 +11,10 @@ from datetime import datetime, timezone
 # Use shared central AI interface instead of direct OpenAI
 # Replaced direct OpenAI usage with shared central AI interface (automated migration)
 sys.path.insert(0, "/home/opsvi/master_root/libs/opsvi-llm")
-from opsvi_llm.providers.openai_provider import OpenAIConfig, OpenAIProvider  # noqa: E402
+from opsvi_llm.providers.openai_provider import (  # noqa: E402
+    OpenAIConfig,
+    OpenAIProvider,
+)
 from pydantic import BaseModel, Field  # noqa: E402
 
 # Initialize provider with timeout support
@@ -154,7 +157,7 @@ def main():
             json.dumps(
                 {
                     "error": 'No input provided. Usage: echo \'{"prompt": "...", "transcript_path": "..."}\' | python3 prompt_opt.py',
-                    "suppressOutput": True,
+                    "suppressOutput": False,
                 }
             )
         )
@@ -165,7 +168,7 @@ def main():
     if not readable:
         print(
             json.dumps(
-                {"error": "No input received within 2 seconds", "suppressOutput": True}
+                {"error": "No input received within 2 seconds", "suppressOutput": False}
             )
         )
         sys.exit(1)
@@ -297,7 +300,7 @@ def main():
         if os.getenv("DEBUG"):
             print(f"DEBUG: prompt_opt.py:main() -- exception={e}", file=sys.stderr)
         # Degrade gracefully: no injection, do not block prompt processing
-        print(json.dumps({"suppressOutput": True}))
+        print(json.dumps({"suppressOutput": False}))
         sys.exit(0)
 
 
