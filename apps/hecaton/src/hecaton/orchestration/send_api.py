@@ -5,12 +5,14 @@ Enables true parallel multi-agent execution with 3-5x performance improvement
 
 import asyncio
 import logging
+import operator
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TypedDict
 from uuid import uuid4
 
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import Send
+from typing_extensions import Annotated
 
 logger = logging.getLogger(__name__)
 
@@ -32,18 +34,24 @@ class AgentTask:
     error: Optional[str] = None
 
 
-@dataclass
-class OrchestrationState:
-    """Typed state for Send API orchestration"""
+class OrchestrationState(TypedDict, total=False):
+    """
+    Dict-shaped state for LangGraph. Use reducers for parallel-safe merges:
+      - results: dict merged with OR (|)  -> last-write-wins per key
+      - errors:  list concatenated        -> accumulate all
+    """
 
     main_task: str
     num_agents: int
-    agent_tasks: List[AgentTask] = field(default_factory=list)
-    results: Dict[str, Any] = field(default_factory=dict)
-    phase: str = "initialized"
-    errors: List[str] = field(default_factory=list)
-    performance_metrics: Dict[str, float] = field(default_factory=dict)
-    max_parallel: int = 5
+    agent_tasks: List[AgentTask]
+    # substate injected to each parallel 'run_agent' call
+    current_task: AgentTask
+    # merged artifacts
+    results: Annotated[Dict[str, Any], operator.or_]
+    errors: Annotated[List[str], operator.add]
+    phase: str
+    performance_metrics: Dict[str, float]
+    max_parallel: int
 
 
 class SendAPIOrchestrator:
@@ -107,11 +115,11 @@ class SendAPIOrchestrator:
 
         return workflow.compile()
 
-    def _plan_agents(self, state: OrchestrationState) -> OrchestrationState:
+    def _plan_agents(self, state: OrchestrationState) -> Dict[str, Any]:
         """
         Plan agent tasks based on main task and available resources.
         """
-        logger.info(f"Planning {state.num_agents} agents for: {state.main_task}")
+        logger.info(f"Planning {state['num_agents']} agents for: {state['main_task']}")
 
         # Agent role definitions with tool requirements
         agent_configs = {
@@ -150,7 +158,7 @@ class SendAPIOrchestrator:
 
         # Select agent types
         available_types = list(agent_configs.keys())
-        selected_types = available_types[: state.num_agents]
+        selected_types = available_types[: state["num_agents"]]
 
         # Create agent tasks
         agent_tasks = []
@@ -167,7 +175,7 @@ class SendAPIOrchestrator:
             task = AgentTask(
                 agent_id=agent_id,
                 agent_type=agent_type,
-                task_prompt=f"{state.main_task}\n\n[{agent_type.upper()} AGENT]: {config['system_prompt']}",
+                task_prompt=f"{state['main_task']}\n\n[{agent_type.upper()} AGENT]: {config['system_prompt']}",
                 token_index=token_idx,
                 worktree_path=str(worktree),
                 mcp_profile=config["mcp_profile"],
@@ -180,123 +188,91 @@ class SendAPIOrchestrator:
             if self.performance_monitor:
                 self.performance_monitor.start_tracking(agent_id)
 
-        # Store tasks in state for later aggregation
-        state.agent_tasks = agent_tasks
-        state.phase = "planned"
-
-        return state
+        # Return partial state update
+        return {"agent_tasks": agent_tasks, "phase": "planned"}
 
     def _route_agents(self, state: OrchestrationState):
         """
         Route function that returns Send objects for parallel execution.
         This is used by conditional edges to trigger parallel processing.
         """
-        # Apply parallelism limit
-        active_tasks = state.agent_tasks[: state.max_parallel]
+        # Throttle by token count or configured max_parallel
+        limit = min(state.get("max_parallel", 5), self.token_pool.get_token_count())
+        tasks = state["agent_tasks"][:limit]
 
-        # Return list of Send objects - LangGraph will execute these in parallel
-        sends = [
-            Send("run_agent", {"task": task, "executor": self.executor, "state": state})
-            for task in active_tasks
-        ]
+        # Each Send carries a *substate* with only the fields that the target node needs
+        sends = [Send("run_agent", {"current_task": t}) for t in tasks]
 
         logger.info(f"Routing {len(sends)} agents for parallel execution")
-
         return sends
 
-    def _run_agent(self, inputs: Dict[str, Any]) -> OrchestrationState:
+    async def _run_agent(self, state: OrchestrationState) -> Dict[str, Any]:
         """
         Execute individual agent task (runs in parallel).
         This node is invoked once per Send object in parallel.
         """
-        task = inputs["task"]
-        executor = inputs["executor"]
-        state = inputs.get(
-            "state",
-            OrchestrationState(
-                main_task="",
-                num_agents=1,
-                agent_tasks=[],
-                results={},
-                phase="executing",
-            ),
-        )
+        task = state["current_task"]
 
         logger.info(f"Running {task.agent_id} ({task.agent_type})")
 
         try:
-            # Build headless Claude command - using sync for simplicity
-            # Note: In production, this would use async properly
-            import asyncio
-
-            loop = asyncio.new_event_loop()
-            result = loop.run_until_complete(
-                executor.execute_task(
-                    {
-                        "id": task.agent_id,
-                        "prompt": task.task_prompt,
-                        "agent_type": task.agent_type,
-                        "worktree": task.worktree_path,
-                        "token_index": task.token_index,
-                        "mcp_profile": task.mcp_profile,
-                        "allowed_tools": task.allowed_tools,
-                        "permission_mode": task.permission_mode,
-                    }
-                )
+            # Execute the task with the provided worktree
+            result = await self.executor.execute_task(
+                {
+                    "id": task.agent_id,
+                    "prompt": task.task_prompt,
+                    "agent_type": task.agent_type,
+                    "worktree": task.worktree_path,
+                    "token_index": task.token_index,
+                    "mcp_profile": task.mcp_profile,
+                    "allowed_tools": task.allowed_tools,
+                    "permission_mode": task.permission_mode,
+                }
             )
-            loop.close()
 
-            task.status = "completed"
-            task.result = result
+            # Return mergeable partial update
+            return {
+                "results": {
+                    task.agent_id: {
+                        "type": task.agent_type,
+                        "status": "completed",
+                        "result": result,
+                    }
+                }
+            }
 
         except asyncio.TimeoutError:
             logger.error(f"{task.agent_id} timed out")
-            task.status = "timeout"
-            task.error = "Agent execution timed out"
+            return {"errors": [f"{task.agent_id}: Agent execution timed out"]}
 
         except Exception as e:
-            logger.error(f"{task.agent_id} failed: {e}")
-            task.status = "failed"
-            task.error = str(e)
+            logger.exception(f"Agent {task.agent_id} failed: {e}")
+            return {"errors": [f"{task.agent_id}: {e}"]}
 
-        # Update state with results
-        state.results[task.agent_id] = {
-            "status": task.status,
-            "agent_type": task.agent_type,
-            "result": task.result if task.status == "completed" else None,
-            "error": task.error if task.status != "completed" else None,
-        }
-
-        return state
-
-    def _aggregate_results(self, state: OrchestrationState) -> OrchestrationState:
+    def _aggregate_results(self, state: OrchestrationState) -> Dict[str, Any]:
         """
         Aggregate results from all parallel agents.
         """
         logger.info("Aggregating results from parallel agents")
 
-        # Collect results from completed tasks
-        results = {}
-        metrics = {"total": len(state.agent_tasks), "completed": 0, "failed": 0}
+        # Get merged results and errors from state
+        merged = state.get("results", {}) or {}
+        errors = state.get("errors", []) or []
+        agent_tasks = state.get("agent_tasks", []) or []
 
-        for task in state.agent_tasks:
-            results[task.agent_id] = {
-                "type": task.agent_type,
-                "status": task.status,
-                "result": task.result,
-                "error": task.error,
-            }
+        metrics = {"total": len(agent_tasks), "completed": 0, "failed": 0}
 
-            if task.status == "completed":
+        for task in agent_tasks:
+            agent_result = merged.get(task.agent_id, {})
+            if agent_result.get("status") == "completed":
                 metrics["completed"] += 1
             else:
                 metrics["failed"] += 1
-                state.errors.append(f"{task.agent_id}: {task.error}")
 
             # End performance tracking
             if self.performance_monitor:
                 self.performance_monitor.end_tracking(
-                    task.agent_id, success=(task.status == "completed")
+                    task.agent_id, success=(agent_result.get("status") == "completed")
                 )
 
         # Calculate performance stats
@@ -304,12 +280,8 @@ class SendAPIOrchestrator:
             perf_stats = self.performance_monitor.calculate_statistics()
             metrics.update(perf_stats)
 
-        state.results = results
-        state.performance_metrics = metrics
-        state.phase = "completed"
-
         # Cleanup worktrees
-        for task in state.agent_tasks:
+        for task in agent_tasks:
             try:
                 self.worktree_manager.cleanup(task.agent_id, force=True)
             except Exception as e:
@@ -318,7 +290,13 @@ class SendAPIOrchestrator:
         logger.info(
             f"Completed: {metrics['completed']}/{metrics['total']} agents succeeded"
         )
-        return state
+
+        return {
+            "results": merged,
+            "performance_metrics": metrics,
+            "errors": errors,
+            "phase": "completed",
+        }
 
     async def execute(self, task: str, num_agents: int = 2) -> Dict[str, Any]:
         """
@@ -334,20 +312,26 @@ class SendAPIOrchestrator:
         # Cap agents at token pool size
         max_agents = min(num_agents, self.token_pool.get_token_count(), 15)
 
-        # Initialize state
-        initial_state = OrchestrationState(
-            main_task=task, num_agents=max_agents, max_parallel=self.max_parallel
-        )
+        # Initialize state as dict
+        initial_state = {
+            "main_task": task,
+            "num_agents": max_agents,
+            "max_parallel": self.max_parallel,
+            "agent_tasks": [],
+            "results": {},
+            "errors": [],
+            "phase": "initialized",
+        }
 
         try:
             # Execute workflow
             final_state = await self.workflow.ainvoke(initial_state)
 
             return {
-                "results": final_state.results,
-                "metrics": final_state.performance_metrics,
-                "errors": final_state.errors,
-                "phase": final_state.phase,
+                "results": final_state.get("results", {}),
+                "metrics": final_state.get("performance_metrics", {}),
+                "errors": final_state.get("errors", []),
+                "phase": final_state.get("phase", "unknown"),
             }
 
         except Exception as e:

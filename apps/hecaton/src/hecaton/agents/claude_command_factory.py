@@ -207,12 +207,11 @@ class ClaudeCommandFactory:
 
         cmd.append("-p")  # Always use print/headless mode
 
-        # Add prompt (from file or direct)
+        # Prompt: short -> positional after -p; long -> sentinel handled by executor
         if len(prompt) > 1000 or "\n" in prompt:
-            # Use file for long/multiline prompts
-            cmd.append(f"@-")  # Will pipe via stdin
+            cmd.append("@-")  # sentinel; executor strips and pipes stdin
         else:
-            cmd.extend(["--", prompt])
+            cmd.append(prompt)  # Direct prompt as positional arg after -p
 
         # Apply profile optimizations
         profile_settings = self.PERFORMANCE_PROFILES.get(config.profile, {})
@@ -229,7 +228,9 @@ class ClaudeCommandFactory:
                 cmd.extend(["--mcp-config", str(mcp_path)])
 
         # Permission mode (5-15s savings)
-        permission_mode = profile_settings.get("permission_mode", config.permission_mode)
+        permission_mode = profile_settings.get(
+            "permission_mode", config.permission_mode
+        )
         if permission_mode and permission_mode != PermissionMode.DEFAULT:
             if permission_mode == PermissionMode.DANGEROUS_SKIP:
                 cmd.append("--dangerously-skip-permissions")
@@ -303,7 +304,9 @@ class ClaudeCommandFactory:
 
         # Add continuation prompt for retries
         if config.continuation_prompt:
-            prompts.append("Continue from where you left off. Complete any unfinished tasks.")
+            prompts.append(
+                "Continue from where you left off. Complete any unfinished tasks."
+            )
 
         return " ".join(prompts) if prompts else None
 
@@ -339,7 +342,9 @@ class ClaudeCommandFactory:
                 allowed_tools=task.get("allowed_tools", base_config.allowed_tools),
                 workspace_dirs=task.get("workspace_dirs", base_config.workspace_dirs),
                 system_prompt=task.get("system_prompt", base_config.system_prompt),
-                agent_role=task.get("role", task.get("agent_type", base_config.agent_role)),
+                agent_role=task.get(
+                    "role", task.get("agent_type", base_config.agent_role)
+                ),
             )
 
             # Build command
@@ -359,7 +364,9 @@ class ClaudeCommandFactory:
         }
         return profile_times.get(config.profile, "10-30 seconds")
 
-    def create_retry_command(self, original_cmd: List[str], session_id: str) -> List[str]:
+    def create_retry_command(
+        self, original_cmd: List[str], session_id: str
+    ) -> List[str]:
         """Create a retry command that continues from previous attempt"""
         retry_cmd = original_cmd.copy()
 
@@ -411,7 +418,9 @@ def create_speed_demon_command(prompt: str, **kwargs) -> List[str]:
     return factory.build_command(prompt, config)
 
 
-def create_production_command(prompt: str, workspace: Optional[Path] = None, **kwargs) -> List[str]:
+def create_production_command(
+    prompt: str, workspace: Optional[Path] = None, **kwargs
+) -> List[str]:
     """Create balanced production command (5-20s)"""
     factory = ClaudeCommandFactory()
     config = CommandConfig(

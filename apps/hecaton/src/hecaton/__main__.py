@@ -71,7 +71,9 @@ class HecatonApp:
     def _init_token_pool(self) -> SecureTokenPool:
         """Initialize token pool with real tokens only"""
         # Load real tokens from config
-        config_path = Path(__file__).parent.parent.parent / "config" / "claude_tokens.json"
+        config_path = (
+            Path(__file__).parent.parent.parent / "config" / "claude_tokens.json"
+        )
         if config_path.exists():
             import json
 
@@ -109,8 +111,10 @@ class HecatonApp:
 
             # Display results
             for agent_id, agent_result in result["results"].items():
-                status = agent_result["status"]
-                agent_type = agent_result["agent_type"]
+                status = agent_result.get("status", "unknown")
+                agent_type = agent_result.get(
+                    "type", "unknown"
+                )  # Changed from agent_type to type
                 if status == "completed":
                     print(f"✅ {agent_type}: Success")
                     if self.verbose and agent_result.get("result"):
@@ -118,8 +122,8 @@ class HecatonApp:
                         print(f"   Output: {output}...")
                 else:
                     print(f"❌ {agent_type}: Failed")
-                    if self.verbose and agent_result.get("result", {}).get("error"):
-                        print(f"   Error: {agent_result['result']['error']}")
+                    if self.verbose and agent_result.get("error"):
+                        print(f"   Error: {agent_result['error']}")
 
             # Performance metrics from Send API
             metrics = result.get("metrics", {})
@@ -254,14 +258,18 @@ Examples:
     # Run command
     run_parser = subparsers.add_parser("run", help="Run HECATON with a task")
     run_parser.add_argument("task", help="Task to execute")
-    run_parser.add_argument("--agents", type=int, default=2, help="Number of agents (default: 2)")
+    run_parser.add_argument(
+        "--agents", type=int, default=2, help="Number of agents (default: 2)"
+    )
     run_parser.add_argument(
         "--mode",
         choices=["send-api", "simple"],
         default="send-api",
         help="Orchestration mode (default: send-api for parallel execution)",
     )
-    run_parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+    run_parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Verbose output"
+    )
 
     # Benchmark command
     bench_parser = subparsers.add_parser("benchmark", help="Run performance benchmark")

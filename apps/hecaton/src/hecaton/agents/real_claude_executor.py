@@ -81,7 +81,8 @@ class RealClaudeSubprocessExecutor:
 
         # Get resources
         token, token_idx = self.token_pool.acquire()
-        worktree = self.worktree_manager.create(task["id"])
+        # Use provided worktree if available, otherwise create new one
+        worktree = task.get("worktree") or self.worktree_manager.create(task["id"])
 
         # Create process tracking
         process = ClaudeProcess(
@@ -150,23 +151,10 @@ class RealClaudeSubprocessExecutor:
             # Handle long prompts via stdin or file
             use_stdin = len(process.task) > 1000 or "\n" in process.task
             if use_stdin:
-                # Remove the prompt/stdin marker from command
+                # Remove the "@-" sentinel from command - we'll pipe via stdin
                 cmd = [arg for arg in cmd if arg != "@-"]
                 # Will provide prompt via stdin
-            else:
-                # Short prompt - ensure it's in the command
-                # Check if prompt is already in command (after --)
-                if "--" in cmd:
-                    idx = cmd.index("--")
-                    if idx + 1 < len(cmd):
-                        # Prompt should be after --
-                        pass
-                    else:
-                        # Add the prompt after --
-                        cmd.append(process.task)
-                else:
-                    # No -- marker, add it with prompt
-                    cmd.extend(["--", process.task])
+            # else: short prompt already added by command factory
 
             # Prepare environment
             env = os.environ.copy()
@@ -196,6 +184,7 @@ class RealClaudeSubprocessExecutor:
             # Start the subprocess
             process.process = await asyncio.create_subprocess_exec(
                 *cmd,
+                stdin=asyncio.subprocess.PIPE if use_stdin else None,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
                 cwd=str(worktree),
@@ -239,9 +228,15 @@ class RealClaudeSubprocessExecutor:
                     raise TimeoutError(f"Task timed out after 1800s")
             else:
                 # Standard execution without real-time capture
-                stdout, stderr = await asyncio.wait_for(
-                    process.process.communicate(), timeout=1800  # 30 minutes
-                )
+                if use_stdin:
+                    stdout, stderr = await asyncio.wait_for(
+                        process.process.communicate(input=process.task.encode()),
+                        timeout=1800,  # 30 minutes
+                    )
+                else:
+                    stdout, stderr = await asyncio.wait_for(
+                        process.process.communicate(), timeout=1800  # 30 minutes
+                    )
                 process.stdout = stdout.decode() if stdout else ""
                 process.stderr = stderr.decode() if stderr else ""
 
