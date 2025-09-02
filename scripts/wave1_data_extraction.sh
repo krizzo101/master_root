@@ -66,4 +66,3 @@ git add -A
 git commit -m "feat(opsvi-data): extract Neo4j & Chroma adapters (#wave1)"
 
 echo "✅ Wave-1 extraction script completed. Review, run full test-suite, then push PR."
-

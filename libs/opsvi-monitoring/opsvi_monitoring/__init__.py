@@ -7,14 +7,15 @@ __version__ = "0.1.0"
 __author__ = "OPSVI Team"
 __email__ = "team@opsvi.com"
 
+from .config.settings import OpsviMonitoringSettings, get_settings
+
 # Core exports
 from .core.base import BaseComponent, ComponentError
-from .config.settings import LibraryConfig, LibrarySettings
-from .exceptions.base import LibraryError, LibraryConfigurationError
+from .exceptions.base import LibraryConfigurationError, LibraryError
 
 # Service-specific exports
-from .providers.base import True
-from .schemas.models import 
+# from .providers.base import Provider  # Commented out - fix needed
+# from .schemas.models import Model  # Commented out - fix needed
 
 # RAG-specific exports
 
@@ -22,18 +23,20 @@ from .schemas.models import
 
 __all__ = [
     # Core
-    BaseComponent, ComponentError,
-    LibraryConfig, LibrarySettings,
-    LibraryError, LibraryConfigurationError,
-    # Service
-    True,
-    ,
+    "BaseComponent",
+    "ComponentError",
+    "OpsviMonitoringSettings",
+    "get_settings",
+    "LibraryError",
+    "LibraryConfigurationError",
 ]
+
 
 # Version info
 def get_version() -> str:
     """Get the library version."""
     return __version__
+
 
 def get_author() -> str:
     """Get the library author."""

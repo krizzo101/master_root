@@ -3,27 +3,34 @@
 Comprehensive opsvi-monitoring library for the OPSVI ecosystem
 """
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Union
 import asyncio
 import logging
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional, Union
 
 from opsvi_foundation import BaseComponent, ComponentError
 from opsvi_foundation.config.settings import BaseSettings
 
 logger = logging.getLogger(__name__)
 
+
 class Error(ComponentError):
     """Base exception for  errors."""
+
     pass
+
 
 class ConfigurationError(Error):
     """Configuration-related errors in ."""
+
     pass
+
 
 class InitializationError(Error):
     """Initialization-related errors in ."""
+
     pass
+
 
 class Config(BaseSettings):
     """Configuration for ."""
@@ -34,22 +41,15 @@ class Config(BaseSettings):
     log_level: str = "INFO"
 
     # Component-specific configuration
-    
 
-    class Config:
-        env_prefix = "OPSVI_OPSVI_MONITORING__"
 
-class (BaseComponent):
+class BaseComponent:
     """Base class for opsvi-monitoring components.
 
     Provides base functionality for all opsvi-monitoring components
     """
 
-    def __init__(
-        self,
-        config: Optional[Config] = None,
-        **kwargs: Any
-    ) -> None:
+    def __init__(self, config: Optional[Config] = None, **kwargs: Any) -> None:
         """Initialize .
 
         Args:
@@ -62,7 +62,6 @@ class (BaseComponent):
         self._logger = logging.getLogger(f"{__name__}.")
 
         # Component-specific initialization
-        
 
     async def initialize(self) -> None:
         """Initialize the component.
@@ -74,7 +73,6 @@ class (BaseComponent):
             self._logger.info("Initializing ")
 
             # Component-specific initialization logic
-            
 
             self._initialized = True
             self._logger.info(" initialized successfully")
@@ -93,7 +91,6 @@ class (BaseComponent):
             self._logger.info("Shutting down ")
 
             # Component-specific shutdown logic
-            
 
             self._initialized = False
             self._logger.info(" shut down successfully")
@@ -113,7 +110,6 @@ class (BaseComponent):
                 return False
 
             # Component-specific health check logic
-            
 
             return True
 
@@ -122,4 +118,3 @@ class (BaseComponent):
             return False
 
     # Component-specific methods
-    

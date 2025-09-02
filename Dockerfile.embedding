@@ -1,0 +1,24 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+RUN pip install --no-cache-dir \
+    fastapi \
+    uvicorn \
+    sentence-transformers \
+    neo4j \
+    numpy \
+    pydantic
+
+# Copy the embedding service
+COPY apps/knowledge_system/embedding_service.py /app/
+COPY apps/knowledge_system/embedding_api.py /app/
+
+# Create cache directory
+RUN mkdir -p /app/cache
+
+EXPOSE 8000
+
+# Run the FastAPI app
+CMD ["uvicorn", "embedding_api:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

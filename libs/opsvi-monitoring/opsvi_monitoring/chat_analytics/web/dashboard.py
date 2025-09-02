@@ -16,7 +16,11 @@ from pathlib import Path
 
 from flask import Flask, jsonify, render_template, request
 
-app = Flask(__name__)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+template_dir = os.path.join(current_dir, "..", "templates")
+static_dir = os.path.join(current_dir, "..", "static")
+
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 DB_PATH = Path("/home/opsvi/master_root/chat_logs.db")
 CACHE_DIR = Path("/home/opsvi/master_root/.cache")
 CACHE_DIR.mkdir(exist_ok=True)
@@ -24,6 +28,8 @@ CACHE_DIR.mkdir(exist_ok=True)
 # Cache configuration
 SUMMARY_CACHE_TTL = 3600  # 1 hour cache for summaries
 session_summary_cache = {}
+response_time_cache = {}  # Cache for response time metrics
+RESPONSE_TIME_CACHE_TTL = 600  # 10 minutes cache for response times
 
 
 def get_db():
@@ -930,6 +936,154 @@ def _generate_content_aware_summary(session, user_messages, agents_activated):
 def _generate_session_summary(session):
     """Fallback summary generator"""
     return "Session with minimal context available"
+
+
+@app.route("/api/response-times-history")
+def api_response_times_history():
+    """Get response time history over time"""
+    from ..analysis.response_history import get_response_time_history
+
+    session_id = request.args.get("session_id")
+    history = get_response_time_history(session_id)
+
+    return jsonify(history)
+
+
+@app.route("/api/response-times")
+def api_response_times():
+    """Get response time metrics with caching"""
+    import time
+
+    from ..analysis import ResponseTimeAnalyzer, format_duration
+
+    session_id = request.args.get("session_id")
+    cache_key = f"response_times_{session_id or 'all'}"
+
+    # Check cache
+    if cache_key in response_time_cache:
+        cached_data, cached_time = response_time_cache[cache_key]
+        if time.time() - cached_time < RESPONSE_TIME_CACHE_TTL:
+            return jsonify(cached_data)
+
+    # If not in cache or expired, calculate using fast analyzer
+    from ..analysis.response_analyzer_fast import FastResponseTimeAnalyzer
+
+    analyzer = FastResponseTimeAnalyzer()
+    metrics = analyzer.get_response_times_fast(session_id)
+    analyzer.close()
+
+    # Format for display
+    result = {
+        "average": format_duration(metrics["average"]),
+        "average_seconds": metrics["average"],
+        "median": format_duration(metrics["median"]),
+        "median_seconds": metrics["median"],
+        "shortest": {
+            "time": format_duration(metrics["shortest"]["time"]),
+            "seconds": metrics["shortest"]["time"],
+            "prompt": metrics["shortest"]["prompt"],
+            "timestamp": metrics["shortest"]["timestamp"],
+        },
+        "longest": {
+            "time": format_duration(metrics["longest"]["time"]),
+            "seconds": metrics["longest"]["time"],
+            "prompt": metrics["longest"]["prompt"],
+            "timestamp": metrics["longest"]["timestamp"],
+        },
+        "total_prompts": metrics["total_prompts"],
+        "by_session": {},
+    }
+
+    # Format session stats
+    for sid, stats in metrics["by_session"].items():
+        result["by_session"][sid] = {
+            "average": format_duration(stats["average"]),
+            "median": format_duration(stats["median"]),
+            "min": format_duration(stats["min"]),
+            "max": format_duration(stats["max"]),
+            "count": stats["count"],
+        }
+
+    # Cache the result
+    response_time_cache[cache_key] = (result, time.time())
+
+    return jsonify(result)
+
+
+@app.route("/api/activity-timeline/<session_id>")
+def api_activity_timeline(session_id):
+    """Get activity timeline for a session"""
+    from response_time_analyzer import ResponseTimeAnalyzer
+
+    analyzer = ResponseTimeAnalyzer()
+    timeline = analyzer.get_activity_timeline(session_id)
+    analyzer.close()
+
+    return jsonify(timeline)
+
+
+@app.route("/api/activity-summary")
+def api_activity_summary():
+    """Get activity vs dead space summary"""
+    from ..analysis import ResponseTimeAnalyzer, format_duration
+
+    session_id = request.args.get("session_id")
+
+    analyzer = ResponseTimeAnalyzer()
+    summary = analyzer.get_activity_summary(session_id)
+    analyzer.close()
+
+    # Format for display
+    result = {}
+    for sid, stats in summary.items():
+        result[sid] = {
+            "total_nodes": stats["total_nodes"],
+            "active_time": format_duration(stats["active_time_seconds"]),
+            "dead_time": format_duration(stats["dead_time_seconds"]),
+            "total_time": format_duration(stats["total_time_seconds"]),
+            "active_percentage": round(stats["active_percentage"], 1),
+            "dead_percentage": round(stats["dead_percentage"], 1),
+            "max_gap": format_duration(stats["max_gap_seconds"]),
+            "avg_gap": format_duration(stats["avg_gap_seconds"]),
+        }
+
+    return jsonify(result)
+
+
+@app.route("/api/cache/clear", methods=["POST"])
+def api_clear_cache():
+    """Clear the session summary cache"""
+    global session_summary_cache
+    session_summary_cache.clear()
+    return jsonify({"status": "success", "message": "Cache cleared"})
+
+
+@app.route("/api/config")
+def api_config():
+    """Get application configuration and settings"""
+    config = {
+        "database": {
+            "path": str(DB_PATH),
+            "exists": DB_PATH.exists(),
+            "size_mb": DB_PATH.stat().st_size / (1024 * 1024)
+            if DB_PATH.exists()
+            else 0,
+        },
+        "cache": {
+            "directory": str(CACHE_DIR),
+            "summary_ttl_seconds": SUMMARY_CACHE_TTL,
+            "cached_summaries": len(session_summary_cache),
+        },
+        "project": {
+            "root": "/home/opsvi/master_root",
+            "logs_directory": str(
+                Path.home() / ".claude" / "projects" / "-home-opsvi-master-root"
+            ),
+            "proj_intel_exists": Path("/home/opsvi/master_root/.proj-intel").exists(),
+        },
+        "server": {"host": "localhost", "port": 5001, "debug": app.debug},
+    }
+    return jsonify(config)
 
 
 if __name__ == "__main__":

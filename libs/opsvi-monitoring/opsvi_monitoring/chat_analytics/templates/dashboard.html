@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Logs Analytics Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
@@ -38,6 +40,9 @@
                     <button onclick="switchTab('cognitive')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="cognitive">Cognitive</button>
                     <button onclick="switchTab('timeline')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="timeline">Timeline</button>
                     <button onclick="switchTab('sessions')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="sessions">Sessions</button>
+                    <button onclick="switchTab('response')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="response">Response Times</button>
+                    <button onclick="switchTab('activity')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="activity">Activity</button>
+                    <button onclick="switchTab('config')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="config">Config</button>
                 </div>
             </div>
         </div>
@@ -203,6 +208,142 @@
                 </div>
             </div>
         </div>
+
+        <!-- Response Times Tab -->
+        <div id="response-tab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">Response Time Analysis</h3>
+
+                <!-- Metrics Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="stat-card bg-blue-50 p-4 rounded-lg">
+                        <h4 class="text-sm text-gray-600">Average Response Time</h4>
+                        <p class="text-2xl font-bold text-blue-600" id="avgResponseTime">-</p>
+                    </div>
+                    <div class="stat-card bg-green-50 p-4 rounded-lg">
+                        <h4 class="text-sm text-gray-600">Median Response Time</h4>
+                        <p class="text-2xl font-bold text-green-600" id="medianResponseTime">-</p>
+                    </div>
+                    <div class="stat-card bg-yellow-50 p-4 rounded-lg">
+                        <h4 class="text-sm text-gray-600">Shortest Response</h4>
+                        <p class="text-2xl font-bold text-yellow-600" id="shortestResponse">-</p>
+                    </div>
+                    <div class="stat-card bg-red-50 p-4 rounded-lg">
+                        <h4 class="text-sm text-gray-600">Longest Response</h4>
+                        <p class="text-2xl font-bold text-red-600" id="longestResponse">-</p>
+                    </div>
+                </div>
+
+                <!-- Response Time Chart -->
+                <div class="chart-container">
+                    <canvas id="responseTimeChart"></canvas>
+                </div>
+
+                <!-- Details -->
+                <div class="mt-6">
+                    <h4 class="text-md font-semibold mb-3">Response Details</h4>
+                    <div id="responseDetails" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Tab -->
+        <div id="activity-tab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">Activity vs Dead Space Analysis</h3>
+
+                <!-- Activity Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="stat-card bg-green-50 p-4 rounded-lg">
+                        <h4 class="text-sm text-gray-600">Total Active Time</h4>
+                        <p class="text-2xl font-bold text-green-600" id="totalActiveTime">-</p>
+                        <p class="text-sm text-gray-500" id="activePercentage">-</p>
+                    </div>
+                    <div class="stat-card bg-gray-50 p-4 rounded-lg">
+                        <h4 class="text-sm text-gray-600">Total Dead Time</h4>
+                        <p class="text-2xl font-bold text-gray-600" id="totalDeadTime">-</p>
+                        <p class="text-sm text-gray-500" id="deadPercentage">-</p>
+                    </div>
+                    <div class="stat-card bg-blue-50 p-4 rounded-lg">
+                        <h4 class="text-sm text-gray-600">Max Gap</h4>
+                        <p class="text-2xl font-bold text-blue-600" id="maxGap">-</p>
+                    </div>
+                </div>
+
+                <!-- Activity Timeline -->
+                <div class="chart-container">
+                    <canvas id="activityChart"></canvas>
+                </div>
+
+                <!-- Session Selector -->
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Session for Timeline</label>
+                    <select id="sessionSelector" class="w-full p-2 border rounded-lg">
+                        <option value="">Loading sessions...</option>
+                    </select>
+                </div>
+
+                <!-- Timeline Visualization -->
+                <div id="activityTimeline" class="mt-6"></div>
+            </div>
+        </div>
+
+        <!-- Config Tab -->
+        <div id="config-tab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">Application Configuration</h3>
+
+                <!-- Database Info -->
+                <div class="mb-6">
+                    <h4 class="text-md font-semibold mb-3">Database</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="mb-2"><span class="font-medium">Path:</span> <code id="dbPath">-</code></p>
+                        <p class="mb-2"><span class="font-medium">Size:</span> <span id="dbSize">-</span> MB</p>
+                        <p><span class="font-medium">Status:</span> <span id="dbStatus" class="px-2 py-1 rounded text-xs">-</span></p>
+                    </div>
+                </div>
+
+                <!-- Cache Info -->
+                <div class="mb-6">
+                    <h4 class="text-md font-semibold mb-3">Cache</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="mb-2"><span class="font-medium">Directory:</span> <code id="cacheDir">-</code></p>
+                        <p class="mb-2"><span class="font-medium">TTL:</span> <span id="cacheTTL">-</span> seconds</p>
+                        <p><span class="font-medium">Cached Summaries:</span> <span id="cachedCount">-</span></p>
+                    </div>
+                </div>
+
+                <!-- Project Info -->
+                <div class="mb-6">
+                    <h4 class="text-md font-semibold mb-3">Project</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="mb-2"><span class="font-medium">Root:</span> <code id="projRoot">-</code></p>
+                        <p class="mb-2"><span class="font-medium">Logs Directory:</span> <code id="logsDir">-</code></p>
+                        <p><span class="font-medium">Project Intelligence:</span> <span id="projIntel" class="px-2 py-1 rounded text-xs">-</span></p>
+                    </div>
+                </div>
+
+                <!-- Server Info -->
+                <div class="mb-6">
+                    <h4 class="text-md font-semibold mb-3">Server</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="mb-2"><span class="font-medium">Host:</span> <span id="serverHost">-</span></p>
+                        <p class="mb-2"><span class="font-medium">Port:</span> <span id="serverPort">-</span></p>
+                        <p><span class="font-medium">Debug Mode:</span> <span id="debugMode" class="px-2 py-1 rounded text-xs">-</span></p>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex space-x-4">
+                    <button onclick="clearCache()" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                        Clear Cache
+                    </button>
+                    <button onclick="refreshData()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        Refresh Data
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -254,6 +395,15 @@
                     break;
                 case 'sessions':
                     loadSessionSummaries(0);
+                    break;
+                case 'response':
+                    loadResponseTimes();
+                    break;
+                case 'activity':
+                    loadActivityAnalysis();
+                    break;
+                case 'config':
+                    loadConfig();
                     break;
             }
         }
@@ -834,6 +984,366 @@
             } catch (error) {
                 console.error('Error searching:', error);
             }
+        }
+
+        // Load Response Time History as line graph
+        async function loadResponseTimeHistory() {
+            try {
+                const response = await axios.get('/api/response-times-history');
+                const history = response.data;
+
+                if (!history || history.length === 0) return;
+
+                // Group by day and calculate average
+                const dailyData = {};
+                history.forEach(item => {
+                    const date = item.timestamp.split('T')[0];
+                    if (!dailyData[date]) {
+                        dailyData[date] = [];
+                    }
+                    dailyData[date].push(item.response_seconds);
+                });
+
+                // Calculate daily averages
+                const dates = Object.keys(dailyData).sort();
+                const averages = dates.map(date => {
+                    const times = dailyData[date];
+                    return times.reduce((a, b) => a + b, 0) / times.length;
+                });
+
+                if (charts.responseTimeChart) {
+                    charts.responseTimeChart.destroy();
+                }
+
+                const ctx = document.getElementById('responseTimeChart').getContext('2d');
+                charts.responseTimeChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Average Response Time (seconds)',
+                            data: averages,
+                            borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.1,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Response Time Trend Over Time'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'day',
+                                    displayFormats: {
+                                        day: 'MMM dd'
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Response Time (seconds)'
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading response time history:', error);
+            }
+        }
+
+        // Load Response Times
+        async function loadResponseTimes() {
+            try {
+                const response = await axios.get('/api/response-times');
+                const data = response.data;
+
+                // Update metrics
+                document.getElementById('avgResponseTime').textContent = data.average || '-';
+                document.getElementById('medianResponseTime').textContent = data.median || '-';
+                document.getElementById('shortestResponse').textContent = data.shortest.time || '-';
+                document.getElementById('longestResponse').textContent = data.longest.time || '-';
+
+                // Update details
+                const detailsDiv = document.getElementById('responseDetails');
+                detailsDiv.innerHTML = `
+                    <div class="p-3 bg-gray-50 rounded">
+                        <p class="font-medium">Shortest Response:</p>
+                        <p class="text-sm text-gray-600">${data.shortest.prompt || 'N/A'}</p>
+                        <p class="text-xs text-gray-500">${data.shortest.timestamp || ''}</p>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded">
+                        <p class="font-medium">Longest Response:</p>
+                        <p class="text-sm text-gray-600">${data.longest.prompt || 'N/A'}</p>
+                        <p class="text-xs text-gray-500">${data.longest.timestamp || ''}</p>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded">
+                        <p class="font-medium">Total Prompts Analyzed:</p>
+                        <p class="text-lg font-bold">${data.total_prompts || 0}</p>
+                    </div>
+                `;
+
+                // Load response time history for line graph
+                loadResponseTimeHistory();
+            } catch (error) {
+                console.error('Error loading response times:', error);
+            }
+        }
+
+        // Load Activity Analysis
+        async function loadActivityAnalysis() {
+            try {
+                const response = await axios.get('/api/activity-summary');
+                const data = response.data;
+
+                // Calculate totals
+                let totalActive = 0;
+                let totalDead = 0;
+                let maxGapVal = 0;
+
+                Object.values(data).forEach(session => {
+                    totalActive += session.active_time_seconds || 0;
+                    totalDead += session.dead_time_seconds || 0;
+                    maxGapVal = Math.max(maxGapVal, session.max_gap_seconds || 0);
+                });
+
+                const totalTime = totalActive + totalDead;
+
+                // Update summary
+                document.getElementById('totalActiveTime').textContent = formatDuration(totalActive);
+                document.getElementById('activePercentage').textContent =
+                    totalTime > 0 ? `${(totalActive / totalTime * 100).toFixed(1)}%` : '-';
+                document.getElementById('totalDeadTime').textContent = formatDuration(totalDead);
+                document.getElementById('deadPercentage').textContent =
+                    totalTime > 0 ? `${(totalDead / totalTime * 100).toFixed(1)}%` : '-';
+                document.getElementById('maxGap').textContent = formatDuration(maxGapVal);
+
+                // Create activity chart
+                const sessions = Object.keys(data).slice(0, 10);
+                const activeData = sessions.map(s => data[s].active_percentage || 0);
+                const deadData = sessions.map(s => data[s].dead_percentage || 0);
+
+                if (charts.activityChart) {
+                    charts.activityChart.destroy();
+                }
+
+                const ctx = document.getElementById('activityChart').getContext('2d');
+                charts.activityChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: sessions.map(s => s.substring(0, 8) + '...'),
+                        datasets: [
+                            {
+                                label: 'Active %',
+                                data: activeData,
+                                backgroundColor: 'rgba(34, 197, 94, 0.5)',
+                                borderColor: 'rgb(34, 197, 94)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Dead %',
+                                data: deadData,
+                                backgroundColor: 'rgba(156, 163, 175, 0.5)',
+                                borderColor: 'rgb(156, 163, 175)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { stacked: true },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: 'Percentage'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Populate session selector
+                const selector = document.getElementById('sessionSelector');
+                selector.innerHTML = '<option value="">Select a session...</option>' +
+                    sessions.map(s => `<option value="${s}">${s}</option>`).join('');
+
+                selector.addEventListener('change', async (e) => {
+                    if (e.target.value) {
+                        await loadActivityTimeline(e.target.value);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading activity analysis:', error);
+            }
+        }
+
+        // Load activity timeline for a specific session
+        async function loadActivityTimeline(sessionId) {
+            try {
+                const response = await axios.get(`/api/activity-timeline/${sessionId}`);
+                const timeline = response.data;
+
+                const timelineDiv = document.getElementById('activityTimeline');
+
+                if (!timeline || timeline.length === 0) {
+                    timelineDiv.innerHTML = '<p class="text-gray-500">No timeline data available</p>';
+                    return;
+                }
+
+                // Prepare data for timeline chart
+                const activityData = [];
+                const deadSpaceData = [];
+
+                timeline.forEach(item => {
+                    const point = {
+                        x: new Date(item.start),
+                        y: item.type === 'activity' ? 1 : 0
+                    };
+
+                    if (item.type === 'activity') {
+                        activityData.push(point);
+                    } else {
+                        deadSpaceData.push({
+                            x: new Date(item.start),
+                            y: item.duration
+                        });
+                    }
+                });
+
+                // Create timeline chart container
+                timelineDiv.innerHTML = '<canvas id="sessionTimelineChart" style="height: 200px;"></canvas>';
+
+                const ctx = document.getElementById('sessionTimelineChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Activity',
+                                data: activityData,
+                                backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                                pointRadius: 5
+                            },
+                            {
+                                label: 'Dead Space (seconds)',
+                                data: deadSpaceData,
+                                backgroundColor: 'rgba(156, 163, 175, 0.6)',
+                                pointRadius: 3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Session Activity Timeline'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'time',
+                                title: {
+                                    display: true,
+                                    text: 'Time'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Activity (1) / Dead Space Duration (s)'
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading activity timeline:', error);
+            }
+        }
+
+        // Load Config
+        async function loadConfig() {
+            try {
+                const response = await axios.get('/api/config');
+                const config = response.data;
+
+                // Database info
+                document.getElementById('dbPath').textContent = config.database.path;
+                document.getElementById('dbSize').textContent = config.database.size_mb.toFixed(2);
+                const dbStatus = document.getElementById('dbStatus');
+                dbStatus.textContent = config.database.exists ? 'Connected' : 'Not Found';
+                dbStatus.className = config.database.exists ?
+                    'px-2 py-1 rounded text-xs bg-green-100 text-green-800' :
+                    'px-2 py-1 rounded text-xs bg-red-100 text-red-800';
+
+                // Cache info
+                document.getElementById('cacheDir').textContent = config.cache.directory;
+                document.getElementById('cacheTTL').textContent = config.cache.summary_ttl_seconds;
+                document.getElementById('cachedCount').textContent = config.cache.cached_summaries;
+
+                // Project info
+                document.getElementById('projRoot').textContent = config.project.root;
+                document.getElementById('logsDir').textContent = config.project.logs_directory;
+                const projIntel = document.getElementById('projIntel');
+                projIntel.textContent = config.project.proj_intel_exists ? 'Available' : 'Not Found';
+                projIntel.className = config.project.proj_intel_exists ?
+                    'px-2 py-1 rounded text-xs bg-green-100 text-green-800' :
+                    'px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-800';
+
+                // Server info
+                document.getElementById('serverHost').textContent = config.server.host;
+                document.getElementById('serverPort').textContent = config.server.port;
+                const debugMode = document.getElementById('debugMode');
+                debugMode.textContent = config.server.debug ? 'Enabled' : 'Disabled';
+                debugMode.className = config.server.debug ?
+                    'px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-800' :
+                    'px-2 py-1 rounded text-xs bg-gray-100 text-gray-800';
+            } catch (error) {
+                console.error('Error loading config:', error);
+            }
+        }
+
+        // Helper function to format duration
+        function formatDuration(seconds) {
+            if (seconds < 1) return `${(seconds * 1000).toFixed(0)}ms`;
+            if (seconds < 60) return `${seconds.toFixed(1)}s`;
+            if (seconds < 3600) return `${(seconds / 60).toFixed(1)}m`;
+            return `${(seconds / 3600).toFixed(1)}h`;
+        }
+
+        // Clear cache action
+        function clearCache() {
+            if (confirm('Are you sure you want to clear the cache?')) {
+                // In a real implementation, this would call an API endpoint
+                alert('Cache cleared (not implemented yet)');
+            }
+        }
+
+        // Refresh data action
+        function refreshData() {
+            location.reload();
         }
     </script>
 </body>
