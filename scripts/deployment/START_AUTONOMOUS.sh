@@ -24,7 +24,7 @@ CRITICAL: Before implementing ANYTHING, you must:
 Create these components:
 
 1. research_engine.py - Researches current tech info
-2. autonomous_core.py - Main autonomous loop  
+2. autonomous_core.py - Main autonomous loop
 3. state_manager.py - Tracks progress
 4. validator.py - Tests with current tools
 5. knowledge_base.py - Stores research findings

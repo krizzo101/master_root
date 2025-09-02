@@ -175,7 +175,9 @@ class ClaudeSessionMonitor:
             "tool_calls": len(session["tool_calls"]),
             "errors": len(session["errors"]),
             "tools_used": list(set(t["tool"] for t in session["tool_calls"])),
-            "error_summary": [e["error"][:100] for e in session["errors"][:5]],  # First 5 errors
+            "error_summary": [
+                e["error"][:100] for e in session["errors"][:5]
+            ],  # First 5 errors
         }
 
     def get_all_summaries(self) -> List[Dict[str, Any]]:
@@ -247,7 +249,9 @@ class DebugLogCapture:
 
         with open(filepath, "w") as f:
             for entry in self.capture_buffer[agent_id]:
-                f.write(f"[{entry['timestamp']}] [{entry['type']}] {entry['content']}\n")
+                f.write(
+                    f"[{entry['timestamp']}] [{entry['type']}] {entry['content']}\n"
+                )
 
 
 # Performance diagnostics from the headless guide
@@ -324,7 +328,9 @@ async def run_performance_diagnosis(logger: Optional[logging.Logger] = None):
     if baseline_time > 10:
         logger.warning("MCP servers are the issue - use --strict-mcp-config")
     if mcp_time > 5:
-        logger.warning("Permission prompts are the issue - use --permission-mode acceptEdits")
+        logger.warning(
+            "Permission prompts are the issue - use --permission-mode acceptEdits"
+        )
     if full_time > 3:
         logger.warning("Network or API issues detected")
 

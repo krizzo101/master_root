@@ -26,7 +26,7 @@ August 31, 2025
 ```
 .claude/hooks/logs/
 ├── audit/         - Immutable review decisions
-├── operational/   - Application workflow logs  
+├── operational/   - Application workflow logs
 └── metrics/       - Performance measurements
 ```
 

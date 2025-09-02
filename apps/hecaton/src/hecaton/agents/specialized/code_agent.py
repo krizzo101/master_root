@@ -1,7 +1,10 @@
 import re
 from typing import Any, Dict, List, Optional
 
+from ..utils.enhanced_logging import get_logger
 from .base_agent import Agent
+
+logger = get_logger(__name__)
 
 
 class CodeAgent(Agent):
@@ -165,7 +168,9 @@ class CodeAgent(Agent):
             refactored = re.sub(r"//.*$", "", refactored, flags=re.MULTILINE)
 
         if options.get("add_type_hints") and "def " in code:
-            refactored = re.sub(r"def (\w+)\((.*?)\):", r"def \1(\2) -> Any:", refactored)
+            refactored = re.sub(
+                r"def (\w+)\((.*?)\):", r"def \1(\2) -> Any:", refactored
+            )
 
         return {
             "success": True,
@@ -194,7 +199,9 @@ class CodeAgent(Agent):
             if language == "python" and line.strip().startswith("def "):
                 documented.append(line)
                 indent = len(line) - len(line.lstrip())
-                documented.append(" " * (indent + 4) + '"""Auto-generated documentation."""')
+                documented.append(
+                    " " * (indent + 4) + '"""Auto-generated documentation."""'
+                )
             elif language == "javascript" and "function " in line:
                 documented.append(line)
                 documented.append("    // Auto-generated documentation")

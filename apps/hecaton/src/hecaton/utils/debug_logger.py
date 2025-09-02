@@ -49,7 +49,8 @@ class DebugLogger:
         # Detailed format for debug mode
         if self.debug:
             format_str = (
-                "%(asctime)s | %(levelname)-8s | %(name)s:%(funcName)s:%(lineno)d | " "%(message)s"
+                "%(asctime)s | %(levelname)-8s | %(name)s:%(funcName)s:%(lineno)d | "
+                "%(message)s"
             )
         else:
             format_str = "%(asctime)s | %(levelname)-8s | %(message)s"

@@ -7,7 +7,7 @@ Successfully reduced knowledge_system from 61 to 31 files (49% reduction)
 ## Files Organized
 
 ### Core (6 files in `core/`)
-- embedding_service.py - Embedding generation  
+- embedding_service.py - Embedding generation
 - simple_rag.py - Vector search used by ACCF
 - mcp_knowledge_server.py - MCP server
 - mcp_knowledge_tools.py - MCP tool definitions
@@ -23,7 +23,7 @@ Successfully reduced knowledge_system from 61 to 31 files (49% reduction)
 
 ### Archived (25+ files in `.archive/knowledge_experiments/`)
 - All test files (*test*.py)
-- All demo files (*demo*.py)  
+- All demo files (*demo*.py)
 - Memory crystal experiments
 - Various ingestion pipelines
 - Fix scripts and utilities

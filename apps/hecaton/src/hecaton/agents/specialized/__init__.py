@@ -32,7 +32,7 @@ class Agent(ABC):
         Returns:
             Result dictionary with execution details
         """
-        pass
+        raise NotImplementedError(f"Agent {self.name} must implement execute method")
 
     def get_info(self) -> Dict[str, Any]:
         """Get agent information.
@@ -54,9 +54,14 @@ class Agent(ABC):
         self.tasks_completed += 1
 
 
+from ..utils.enhanced_logging import get_logger
+
 # Import specialized agents
 from .code_agent import CodeAgent
 from .research_agent import ResearchAgent
 from .test_agent import TestAgent
+
+logger = get_logger(__name__)
+
 
 __all__ = ["Agent", "CodeAgent", "ResearchAgent", "TestAgent"]

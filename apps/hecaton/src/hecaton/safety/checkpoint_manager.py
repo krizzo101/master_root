@@ -3,13 +3,17 @@ Checkpoint and rollback management for enhanced safety.
 Provides state snapshots and recovery capabilities.
 """
 
+from typing import Any, Dict, List, Optional
+
+from ..utils.enhanced_logging import get_logger, log_agent_event
+
+logger = get_logger(__name__)
 import asyncio
 import json
 import logging
 import pickle
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +21,9 @@ logger = logging.getLogger(__name__)
 class Checkpoint:
     """Represents a saved state checkpoint"""
 
-    def __init__(self, checkpoint_id: str, state: Dict[str, Any], metadata: Dict[str, Any]):
+    def __init__(
+        self, checkpoint_id: str, state: Dict[str, Any], metadata: Dict[str, Any]
+    ):
         self.id = checkpoint_id
         self.state = state
         self.metadata = metadata
@@ -128,7 +134,9 @@ class CheckpointManager:
     async def list_checkpoints(self) -> List[Dict[str, Any]]:
         """List all available checkpoints"""
         async with self._lock:
-            return [self.checkpoints[ckpt_id].to_dict() for ckpt_id in self.checkpoint_order]
+            return [
+                self.checkpoints[ckpt_id].to_dict() for ckpt_id in self.checkpoint_order
+            ]
 
     async def prune_checkpoint_branch(self, checkpoint_id: str):
         """Remove a checkpoint and all its descendants"""

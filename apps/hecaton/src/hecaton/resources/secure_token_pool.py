@@ -13,6 +13,10 @@ from pathlib import Path
 from threading import Lock
 from typing import Dict, List, Optional, Tuple
 
+from ..utils.enhanced_logging import get_logger, log_resource_usage
+
+logger = get_logger(__name__)
+
 logger = logging.getLogger(__name__)
 
 
@@ -57,14 +61,18 @@ class SecureTokenPool:
     def _load_from_environment(self):
         """Load tokens from environment variables or config file"""
         # Try loading from config file first
-        config_path = Path("/home/opsvi/master_root/apps/hecaton/config/claude_tokens.json")
+        config_path = Path(
+            "/home/opsvi/master_root/apps/hecaton/config/claude_tokens.json"
+        )
         if config_path.exists():
             with open(config_path, "r") as f:
                 tokens_data = json.load(f)
                 # Handle both formats: {"tokens": [...]} or {"CLAUDE_CODE_TOKEN1": "..."}
                 if "tokens" in tokens_data and tokens_data["tokens"]:
                     self._add_tokens(tokens_data["tokens"])
-                    logger.info(f"Loaded {len(tokens_data['tokens'])} tokens from config file")
+                    logger.info(
+                        f"Loaded {len(tokens_data['tokens'])} tokens from config file"
+                    )
                     return
                 # Check for numbered token format
                 tokens = []
@@ -139,10 +147,14 @@ class SecureTokenPool:
                 safe_stats[token_id] = stats.copy()
             return safe_stats
 
-    def save_tokens_encrypted(self, filepath: Path, encryption_key: Optional[str] = None):
+    def save_tokens_encrypted(
+        self, filepath: Path, encryption_key: Optional[str] = None
+    ):
         """Save tokens to encrypted file (for persistence)"""
         if not encryption_key:
-            encryption_key = os.environ.get("CLAUDE_ENCRYPTION_KEY", "default-key-change-me")
+            encryption_key = os.environ.get(
+                "CLAUDE_ENCRYPTION_KEY", "default-key-change-me"
+            )
 
         # Simple XOR encryption (replace with proper encryption in production)
         encrypted_tokens = []
@@ -165,14 +177,18 @@ class SecureTokenPool:
         os.chmod(filepath, 0o600)
         logger.info(f"Saved {len(self._tokens)} encrypted tokens to {filepath}")
 
-    def load_tokens_encrypted(self, filepath: Path, encryption_key: Optional[str] = None):
+    def load_tokens_encrypted(
+        self, filepath: Path, encryption_key: Optional[str] = None
+    ):
         """Load tokens from encrypted file"""
         if not filepath.exists():
             logger.warning(f"Token file not found: {filepath}")
             return
 
         if not encryption_key:
-            encryption_key = os.environ.get("CLAUDE_ENCRYPTION_KEY", "default-key-change-me")
+            encryption_key = os.environ.get(
+                "CLAUDE_ENCRYPTION_KEY", "default-key-change-me"
+            )
 
         with open(filepath) as f:
             data = json.load(f)
@@ -279,7 +295,9 @@ def initialize_default_tokens():
     # Add any tokens from environment
     token_pool_manager.pool._load_from_environment()
 
-    logger.info(f"Token pool initialized with {token_pool_manager.pool.get_token_count()} tokens")
+    logger.info(
+        f"Token pool initialized with {token_pool_manager.pool.get_token_count()} tokens"
+    )
 
 
 # Auto-initialize on import

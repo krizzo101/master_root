@@ -18,7 +18,7 @@ echo -e "\n\033[1;33m🚀 Spawning 6 Parallel Claude Agents...\033[0m\n"
 (
     echo -e "\033[91m[Agent 1] Building FastAPI Server...\033[0m"
     mkdir -p agent1_api && cd agent1_api
-    
+
     claude --print --output-format text --dangerously-skip-permissions \
     "Create a complete FastAPI application for a todo list with:
     1. Full CRUD operations for tasks
@@ -27,10 +27,10 @@ echo -e "\n\033[1;33m🚀 Spawning 6 Parallel Claude Agents...\033[0m\n"
     4. Pydantic schemas
     5. Rate limiting
     Write all code in main.py and make it production-ready" > output.log 2>&1
-    
+
     # Extract code from output
     sed -n '/```python/,/```/p' output.log | sed '1d;$d' > main.py
-    
+
     echo -e "\033[91m[Agent 1] ✓ Created main.py ($(wc -l < main.py) lines)\033[0m"
 ) &
 
@@ -38,7 +38,7 @@ echo -e "\n\033[1;33m🚀 Spawning 6 Parallel Claude Agents...\033[0m\n"
 (
     echo -e "\033[92m[Agent 2] Building React Frontend...\033[0m"
     mkdir -p agent2_frontend && cd agent2_frontend
-    
+
     claude --print --output-format text --dangerously-skip-permissions \
     "Create a complete React component for a todo list application with:
     1. Task list display with filtering
@@ -47,9 +47,9 @@ echo -e "\n\033[1;33m🚀 Spawning 6 Parallel Claude Agents...\033[0m\n"
     4. Modern styling with Tailwind
     5. Error handling and loading states
     Write complete component in TodoApp.jsx" > output.log 2>&1
-    
+
     sed -n '/```jsx/,/```/p' output.log | sed '1d;$d' > TodoApp.jsx
-    
+
     echo -e "\033[92m[Agent 2] ✓ Created TodoApp.jsx ($(wc -l < TodoApp.jsx) lines)\033[0m"
 ) &
 
@@ -57,7 +57,7 @@ echo -e "\n\033[1;33m🚀 Spawning 6 Parallel Claude Agents...\033[0m\n"
 (
     echo -e "\033[93m[Agent 3] Building Database Layer...\033[0m"
     mkdir -p agent3_database && cd agent3_database
-    
+
     claude --print --output-format text --dangerously-skip-permissions \
     "Create complete SQLAlchemy database models and migrations for:
     1. Users table with authentication fields
@@ -66,9 +66,9 @@ echo -e "\n\033[1;33m🚀 Spawning 6 Parallel Claude Agents...\033[0m\n"
     4. Proper relationships and indexes
     5. Migration scripts
     Write everything in models.py" > output.log 2>&1
-    
+
     sed -n '/```python/,/```/p' output.log | sed '1d;$d' > models.py
-    
+
     echo -e "\033[93m[Agent 3] ✓ Created models.py ($(wc -l < models.py) lines)\033[0m"
 ) &
 
@@ -76,7 +76,7 @@ echo -e "\n\033[1;33m🚀 Spawning 6 Parallel Claude Agents...\033[0m\n"
 (
     echo -e "\033[94m[Agent 4] Building Auth Service...\033[0m"
     mkdir -p agent4_auth && cd agent4_auth
-    
+
     claude --print --output-format text --dangerously-skip-permissions \
     "Create a complete authentication service with:
     1. JWT token generation and validation
@@ -85,9 +85,9 @@ echo -e "\n\033[1;33m🚀 Spawning 6 Parallel Claude Agents...\033[0m\n"
     4. Role-based access control
     5. Session management
     Write complete code in auth_service.py" > output.log 2>&1
-    
+
     sed -n '/```python/,/```/p' output.log | sed '1d;$d' > auth_service.py
-    
+
     echo -e "\033[94m[Agent 4] ✓ Created auth_service.py ($(wc -l < auth_service.py) lines)\033[0m"
 ) &
 
@@ -95,7 +95,7 @@ echo -e "\n\033[1;33m🚀 Spawning 6 Parallel Claude Agents...\033[0m\n"
 (
     echo -e "\033[95m[Agent 5] Building Docker Configuration...\033[0m"
     mkdir -p agent5_docker && cd agent5_docker
-    
+
     claude --print --output-format text --dangerously-skip-permissions \
     "Create complete Docker setup for microservices:
     1. Multi-stage Dockerfile for Python API
@@ -104,10 +104,10 @@ echo -e "\n\033[1;33m🚀 Spawning 6 Parallel Claude Agents...\033[0m\n"
     4. Include PostgreSQL, Redis, nginx
     5. Environment configuration
     Write docker-compose.yml and Dockerfiles" > output.log 2>&1
-    
+
     sed -n '/```yaml/,/```/p' output.log | sed '1d;$d' > docker-compose.yml
     sed -n '/```dockerfile/,/```/p' output.log | sed '1d;$d' > Dockerfile
-    
+
     echo -e "\033[95m[Agent 5] ✓ Created Docker setup ($(wc -l < docker-compose.yml) lines)\033[0m"
 ) &
 
@@ -115,7 +115,7 @@ echo -e "\n\033[1;33m🚀 Spawning 6 Parallel Claude Agents...\033[0m\n"
 (
     echo -e "\033[96m[Agent 6] Building Test Suite...\033[0m"
     mkdir -p agent6_tests && cd agent6_tests
-    
+
     claude --print --output-format text --dangerously-skip-permissions \
     "Create comprehensive test suite:
     1. Unit tests for all API endpoints
@@ -124,9 +124,9 @@ echo -e "\n\033[1;33m🚀 Spawning 6 Parallel Claude Agents...\033[0m\n"
     4. Performance tests with pytest
     5. Test fixtures and mocks
     Write all tests in test_suite.py" > output.log 2>&1
-    
+
     sed -n '/```python/,/```/p' output.log | sed '1d;$d' > test_suite.py
-    
+
     echo -e "\033[96m[Agent 6] ✓ Created test_suite.py ($(wc -l < test_suite.py) lines)\033[0m"
 ) &
 

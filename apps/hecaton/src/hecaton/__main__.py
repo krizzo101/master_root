@@ -8,36 +8,35 @@ import asyncio
 import os
 import sys
 from pathlib import Path
+
+from hecaton.utils.enhanced_logging import get_logger, log_agent_event
+
+logger = get_logger(__name__)
 from typing import Optional
 
 # Add parent to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from hecaton.agents.agent_registry import AgentRegistry  # noqa: E402
-from hecaton.agents.real_claude_executor import (  # noqa: E402
+from hecaton.agents.agent_registry import AgentRegistry
+from hecaton.agents.real_claude_executor import (
     RealClaudeSubprocessExecutor as RealClaudeExecutor,
 )
-from hecaton.monitoring.performance_monitor import PerformanceMonitor  # noqa: E402
-from hecaton.resources.secure_token_pool import SecureTokenPool  # noqa: E402
-from hecaton.resources.worktree import WorktreeManager  # noqa: E402
+from hecaton.monitoring.performance_monitor import PerformanceMonitor
+from hecaton.resources.secure_token_pool import SecureTokenPool
+from hecaton.resources.worktree import WorktreeManager
 
 
 class HecatonApp:
     """Main application class with Send API as default orchestration"""
 
-    def __init__(self, mode: str = "send-api", verbose: bool = False, merge_config=None):
+    def __init__(self, mode: str = "send-api", verbose: bool = False):
         self.mode = mode
         self.verbose = verbose
-
-        # CRITICAL: Ensure ANTHROPIC_API_KEY is not set (it interferes with CLAUDE_CODE_TOKEN)
-        if "ANTHROPIC_API_KEY" in os.environ:
-            del os.environ["ANTHROPIC_API_KEY"]
 
         # Initialize real components only - no mocks
         self.token_pool = self._init_token_pool()
         self.worktree_manager = WorktreeManager(
-            base_path="/tmp/hecaton_worktrees",  # nosec B108 - Temp dir for isolation
-            repo_path=os.getcwd(),
+            base_path="/tmp/hecaton_worktrees", repo_path=os.getcwd()
         )
         self.agent_registry = AgentRegistry()
         self.performance_monitor = PerformanceMonitor()
@@ -58,7 +57,6 @@ class HecatonApp:
                     token_pool=self.token_pool,
                     worktree_manager=self.worktree_manager,
                     performance_monitor=self.performance_monitor,
-                    merge_config=merge_config,
                 )
                 self.use_send_api = True
             except ImportError as e:
@@ -78,35 +76,24 @@ class HecatonApp:
 
     def _init_token_pool(self) -> SecureTokenPool:
         """Initialize token pool with real tokens only"""
-        # Check for test mode
-        if os.getenv("HECATON_TEST_MODE") == "1":
-            # Use test tokens for dry-run testing
-            test_config = Path(__file__).parent.parent.parent / "config" / "test_tokens.json"
-            if test_config.exists():
-                import json
-
-                with open(test_config) as f:
-                    config = json.load(f)
-                    return SecureTokenPool(tokens=config.get("tokens", ["test-token-1"]))
-
         # Load real tokens from config
-        config_path = Path(__file__).parent.parent.parent / "config" / "claude_tokens.json"
+        config_path = (
+            Path(__file__).parent.parent.parent / "config" / "claude_tokens.json"
+        )
         if config_path.exists():
             import json
 
             with open(config_path) as f:
                 config = json.load(f)
-                tokens = config.get("tokens", [])
-                if tokens:
-                    return SecureTokenPool(tokens=tokens)
+                return SecureTokenPool(tokens=config.get("tokens", []))
 
-        # Fall back to CLAUDE_CODE_TOKEN environment variable
-        token = os.getenv("CLAUDE_CODE_TOKEN")
+        # Fall back to environment variable
+        token = os.getenv("ANTHROPIC_API_KEY")
         if token:
             return SecureTokenPool(tokens=[token])
 
         raise ValueError(
-            "No tokens found! Set CLAUDE_CODE_TOKEN or add tokens to config/claude_tokens.json"
+            "No tokens found! Set ANTHROPIC_API_KEY or create config/claude_tokens.json"
         )
 
     async def run(self, task: str, agents: int = 2, agent_types: Optional[list] = None):
@@ -114,8 +101,9 @@ class HecatonApp:
         print(f"\n{'='*60}")
         print(f"HECATON: Running {agents} agents")
         print(f"Task: {task}")
-        mode_type = "(True Parallel)" if self.use_send_api else "(Sequential/Limited)"
-        print(f"Mode: {self.mode.upper()} {mode_type}")
+        print(
+            f"Mode: {self.mode.upper()} {'(True Parallel)' if self.use_send_api else '(Sequential/Limited)'}"
+        )
         print(f"{'='*60}\n")
 
         # Use Send API orchestrator if available
@@ -124,15 +112,13 @@ class HecatonApp:
             result = await self.orchestrator.execute(task, num_agents=agents)
 
             # Process Send API results
-            # Get metrics from metrics key (Send API returns it as "metrics")
-            metrics_data = result.get("metrics", {})
-            successes = metrics_data.get("completed", 0)
-            total = metrics_data.get("total", agents)
+            successes = result["metrics"].get("successful", 0)
+            total = result["metrics"].get("total_agents", agents)
 
             # Display results
             for agent_id, agent_result in result["results"].items():
-                status = agent_result.get("status", "unknown")
-                agent_type = agent_result.get("type", "unknown")  # Changed from agent_type to type
+                status = agent_result["status"]
+                agent_type = agent_result["agent_type"]
                 if status == "completed":
                     print(f"✅ {agent_type}: Success")
                     if self.verbose and agent_result.get("result"):
@@ -140,8 +126,8 @@ class HecatonApp:
                         print(f"   Output: {output}...")
                 else:
                     print(f"❌ {agent_type}: Failed")
-                    if self.verbose and agent_result.get("error"):
-                        print(f"   Error: {agent_result['error']}")
+                    if self.verbose and agent_result.get("result", {}).get("error"):
+                        print(f"   Error: {agent_result['result']['error']}")
 
             # Performance metrics from Send API
             metrics = result.get("metrics", {})
@@ -204,7 +190,7 @@ class HecatonApp:
             if avg_time:
                 print(f"Performance: Avg time: {avg_time:.2f}s")
             if self.use_send_api:
-                print("Parallelism: True parallel execution via Send API")
+                print(f"Parallelism: True parallel execution via Send API")
                 if metrics.get("success_rate"):
                     print(f"Success Rate: {metrics['success_rate']*100:.1f}%")
 
@@ -246,12 +232,6 @@ class HecatonApp:
 
 def main():
     """Main entry point with proper argument parsing"""
-    # Ensure clean environment for Claude Code execution
-    if "ANTHROPIC_API_KEY" in os.environ:
-        del os.environ["ANTHROPIC_API_KEY"]
-        if "--verbose" in sys.argv or "-v" in sys.argv:
-            print("ℹ️  Cleared ANTHROPIC_API_KEY (interferes with CLAUDE_CODE_TOKEN)")
-
     parser = argparse.ArgumentParser(
         description="HECATON - Multi-Agent Claude Orchestration System",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -282,40 +262,17 @@ Examples:
     # Run command
     run_parser = subparsers.add_parser("run", help="Run HECATON with a task")
     run_parser.add_argument("task", help="Task to execute")
-    run_parser.add_argument("--agents", type=int, default=2, help="Number of agents (default: 2)")
+    run_parser.add_argument(
+        "--agents", type=int, default=2, help="Number of agents (default: 2)"
+    )
     run_parser.add_argument(
         "--mode",
         choices=["send-api", "simple"],
         default="send-api",
         help="Orchestration mode (default: send-api for parallel execution)",
     )
-    run_parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
-
-    # Merge-back arguments
     run_parser.add_argument(
-        "--merge-back/--no-merge-back",
-        dest="merge_back",
-        action="store_true",
-        default=True,
-        help="Enable/disable merge-back of patches (default: enabled)",
-    )
-    run_parser.add_argument(
-        "--target-branch",
-        default="main",
-        help="Target branch for merge-back (default: main)",
-    )
-    run_parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Run merge-back in dry-run mode (no push/PR)",
-    )
-    run_parser.add_argument(
-        "--keep-worktrees", action="store_true", help="Keep worktrees after execution"
-    )
-    run_parser.add_argument(
-        "--land-direct",
-        action="store_true",
-        help="Directly merge to target branch instead of creating PR",
+        "--verbose", "-v", action="store_true", help="Verbose output"
     )
 
     # Benchmark command
@@ -333,24 +290,10 @@ Examples:
         parser.print_help()
         return 1
 
-    # Create merge config if needed
-    merge_config = None
-    if args.command == "run" and getattr(args, "merge_back", True):
-        from hecaton.config.merge_back import MergeBackConfig
-
-        merge_config = MergeBackConfig(
-            enabled=True,
-            target_branch=getattr(args, "target_branch", "main"),
-            dry_run=getattr(args, "dry_run", False),
-            keep_worktrees=getattr(args, "keep_worktrees", False),
-            land_direct=getattr(args, "land_direct", False),
-        )
-
     # Create app instance with configuration
     app = HecatonApp(
         mode=getattr(args, "mode", "send-api"),
         verbose=getattr(args, "verbose", False),
-        merge_config=merge_config,
     )
 
     # Run the appropriate command

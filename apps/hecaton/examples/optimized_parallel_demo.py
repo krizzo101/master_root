@@ -73,7 +73,9 @@ async def demo_optimized_configuration():
     print("=" * 60)
 
     # Initialize optimizer
-    optimizer = AgentEnvironmentOptimizer(base_worktree_path=Path("/tmp/hecaton_optimized_demo"))
+    optimizer = AgentEnvironmentOptimizer(
+        base_worktree_path=Path("/tmp/hecaton_optimized_demo")
+    )
 
     tasks = [
         {
@@ -119,7 +121,9 @@ async def demo_optimized_configuration():
         # Show what was created
         print(f"   📁 Created minimal environment at {worktree}")
         print(f"   📝 MCP servers: {len(optimizer.profiles[task['type']].mcp_servers)}")
-        print(f"   🔧 Tools: {', '.join(optimizer.profiles[task['type']].allowed_tools[:3])}...")
+        print(
+            f"   🔧 Tools: {', '.join(optimizer.profiles[task['type']].allowed_tools[:3])}..."
+        )
 
         # Get optimized command
         cmd = optimizer.get_optimized_command(

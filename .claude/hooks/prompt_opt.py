@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 # Import logger for tracking
 try:
     from prompt_opt_logger import PromptOptLogger
+
     logger = PromptOptLogger()
 except Exception:
     logger = None  # Fail silently if logger not available
@@ -36,7 +37,9 @@ config = OpenAIConfig(
 )
 provider = OpenAIProvider(config)
 
-MODEL = os.getenv("PROMPT_OPT_MODEL", "gpt-4o-mini")
+MODEL = os.getenv(
+    "PROMPT_OPT_MODEL", "gpt-5-nano"
+)  # Fast model for prompt optimization
 MAX_TOK = int(os.getenv("PROMPT_OPT_MAX_TOK", "4000"))
 TEMP = float(os.getenv("PROMPT_OPT_TEMPERATURE", "0.2"))
 SEED = int(os.getenv("PROMPT_OPT_SEED", "42"))
@@ -136,37 +139,46 @@ class OptimizedPromptSchema(BaseModel):
 def get_cognitive_guidance(prompt_text):
     """Generate context-aware cognitive guidance with variation."""
     prompt_lower = prompt_text.lower()
-    
+
     # Context-aware base guidance
     if any(word in prompt_lower for word in ["fix", "bug", "error", "issue", "broken"]):
         base_guidance = [
             "Reproduce issue → Use TodoWrite for tracking → Root cause analysis → Fix → Verify",
             "First reproduce the bug. Plan fix steps with TodoWrite. Implement systematically. Test thoroughly.",
-            "Debug workflow: Reproduce, TodoWrite for steps, analyze cause, apply fix, validate solution"
+            "Debug workflow: Reproduce, TodoWrite for steps, analyze cause, apply fix, validate solution",
         ]
-    elif any(word in prompt_lower for word in ["implement", "add", "feature", "create", "build"]):
+    elif any(
+        word in prompt_lower
+        for word in ["implement", "add", "feature", "create", "build"]
+    ):
         base_guidance = [
             "Architecture planning (TodoWrite) → Research patterns → Build incrementally → Test features",
             "Design first with TodoWrite. Study existing patterns. Implement step-by-step. Verify functionality.",
-            "Feature flow: Plan structure, research similar code, implement progressively, validate behavior"
+            "Feature flow: Plan structure, research similar code, implement progressively, validate behavior",
         ]
-    elif any(word in prompt_lower for word in ["refactor", "reorganize", "restructure", "clean"]):
+    elif any(
+        word in prompt_lower
+        for word in ["refactor", "reorganize", "restructure", "clean"]
+    ):
         base_guidance = [
             "Map current state → TodoWrite refactor plan → Preserve behavior → Verify with tests",
             "Understand existing code. Plan changes in TodoWrite. Refactor safely. Confirm behavior unchanged.",
-            "Refactor protocol: Analyze structure, list changes needed, transform carefully, test thoroughly"
+            "Refactor protocol: Analyze structure, list changes needed, transform carefully, test thoroughly",
         ]
-    elif any(word in prompt_lower for word in ["research", "find", "search", "analyze", "investigate"]):
+    elif any(
+        word in prompt_lower
+        for word in ["research", "find", "search", "analyze", "investigate"]
+    ):
         base_guidance = [
             "Broad search → Document findings → Narrow focus → Synthesize results",
             "Cast wide net first. Track discoveries. Focus on relevant. Summarize insights.",
-            "Research method: Explore widely, record findings, refine search, compile conclusions"
+            "Research method: Explore widely, record findings, refine search, compile conclusions",
         ]
     elif any(word in prompt_lower for word in ["test", "verify", "validate", "check"]):
         base_guidance = [
             "Identify test scenarios → TodoWrite test plan → Execute tests → Document results",
             "Plan test coverage with TodoWrite. Write test cases. Run systematically. Report outcomes.",
-            "Testing approach: Define scenarios, organize with todos, execute thoroughly, verify coverage"
+            "Testing approach: Define scenarios, organize with todos, execute thoroughly, verify coverage",
         ]
     else:
         # Generic guidance with variety
@@ -174,13 +186,13 @@ def get_cognitive_guidance(prompt_text):
             "Think → Plan with TodoWrite → Execute → Verify",
             "Understand requirements. Create task breakdown. Work systematically. Validate results.",
             "Start with todos, research context, implement carefully, confirm success",
-            "Blueprint first (TodoWrite), investigate needs, build methodically, quality check"
+            "Blueprint first (TodoWrite), investigate needs, build methodically, quality check",
         ]
-    
+
     # Select guidance variant based on prompt hash for consistency
     prompt_hash = int(hashlib.md5(prompt_text.encode()).hexdigest()[:8], 16)
     selected_base = base_guidance[prompt_hash % len(base_guidance)]
-    
+
     # Add emphasis patterns for variety
     emphasis_patterns = [
         ("📋 ", ""),  # Emoji prefix
@@ -194,11 +206,11 @@ def get_cognitive_guidance(prompt_text):
         ("Best practice: ", ""),  # Best practice prefix
         ("", " for optimal quality"),  # Quality suffix
     ]
-    
+
     # Use different emphasis based on another part of the hash
     emphasis_index = (prompt_hash >> 8) % len(emphasis_patterns)
     prefix, suffix = emphasis_patterns[emphasis_index]
-    
+
     return f"{prefix}{selected_base}{suffix}"
 
 
@@ -472,9 +484,9 @@ def main():
             )
             optimized = f"{preface}\n{optimized}".strip()
 
-        # Add cognitive guidance based on the original prompt
+        # Add cognitive guidance based on the cleaned prompt (without trigger)
         cognitive_guidance = get_cognitive_guidance(user_prompt)
-        
+
         # Add RAW sections back if they exist
         if has_raw:
             raw_content = "\n\n".join(raw_sections)
@@ -491,11 +503,11 @@ def main():
                     trigger = t
                     break
             logger.log_optimization(
-                original=user_prompt,
+                original=original_prompt,  # Use the original prompt before cleaning
                 optimized=optimized,
                 mode=config.get("mode", "unknown"),
                 triggered_by=trigger,
-                cognitive=cognitive_guidance
+                cognitive=cognitive_guidance,
             )
 
         print(

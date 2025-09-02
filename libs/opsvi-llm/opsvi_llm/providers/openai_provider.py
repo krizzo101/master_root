@@ -191,30 +191,9 @@ class OpenAIProvider(BaseLLMProvider):
             return False
 
     async def complete(self, request: CompletionRequest) -> CompletionResponse:
-        """Generate text completion using OpenAI.
-
-        NOTE: Text Completions API is deprecated for modern models.
-        This method will raise an error for GPT-5 and O-series models.
-        """
+        """Generate text completion using OpenAI."""
         try:
             model = request.model or self.openai_config.default_model
-
-            # Validate model and check if it supports Text Completions
-            OpenAIModelValidator.validate_model(model)
-
-            # All approved 2025 models are chat/responses-only
-            approved_modern_models = {
-                "gpt-5",
-                "gpt-5-mini",
-                "gpt-5-nano",
-                "o3",
-                "o4-mini",
-            }
-            if model in approved_modern_models:
-                raise LLMProviderError(
-                    f"Text Completions API is not supported for model '{model}'. "
-                    "Use chat() or responses_*() instead."
-                )
 
             response = await self._async_client.completions.create(
                 model=model,
@@ -236,18 +215,12 @@ class OpenAIProvider(BaseLLMProvider):
             raise LLMProviderError(f"Completion failed: {e}") from e
 
     async def chat(self, request: ChatRequest) -> ChatResponse:
-        """Generate chat completion using OpenAI with 2025 compliance.
-
-        Automatically adapts parameters based on model capabilities:
-        - Uses max_completion_tokens for reasoning models (GPT-5, O-series)
-        - Only includes temperature when supported
-        """
+        """Generate chat completion using OpenAI with 2025 compliance."""
         try:
             model = request.model or self.openai_config.default_model
 
-            # Validate model compliance and get profile
+            # Validate model compliance
             OpenAIModelValidator.validate_model(model)
-            profile = OpenAIModelValidator.get_profile(model)
 
             # Sanitize messages if security is enabled
             openai_messages = []
@@ -275,31 +248,14 @@ class OpenAIProvider(BaseLLMProvider):
                     temperature=request.temperature,
                 )
 
-            # Build parameters with correct token param name
-            params = {
-                "model": model,
-                "messages": openai_messages,
-                "stream": request.stream,
-            }
-
-            # Add token limit with correct parameter name based on profile
-            max_tokens = request.max_tokens or self.openai_config.max_tokens
-            if max_tokens:
-                if profile.chat_token_param:
-                    params[profile.chat_token_param] = max_tokens
-                else:
-                    # Fallback for models without specific token param
-                    params["max_tokens"] = max_tokens
-
-            # Only add temperature if model supports it
-            if profile.supports_temperature and request.temperature is not None:
-                params["temperature"] = request.temperature
-
-            # Add stop sequences if provided
-            if request.stop:
-                params["stop"] = request.stop
-
-            response = await self._async_client.chat.completions.create(**params)
+            response = await self._async_client.chat.completions.create(
+                model=model,
+                messages=openai_messages,
+                max_tokens=request.max_tokens or self.openai_config.max_tokens,
+                temperature=request.temperature or self.openai_config.temperature,
+                stop=request.stop,
+                stream=request.stream,
+            )
 
             choice = response.choices[0]
             message = Message(
@@ -455,22 +411,16 @@ class OpenAIProvider(BaseLLMProvider):
             )
 
         try:
-            # DEPRECATED: beta.chat.completions.parse is being phased out
-            # Delegate to Responses API structured output instead
-            logger.info(
-                "Delegating structured response to Responses API (recommended path)"
-            )
-
-            # Convert messages to input format for Responses API
-            input_for_responses = [
+            # Convert messages to OpenAI format
+            openai_messages = [
                 {"role": msg.role, "content": msg.content} for msg in messages
             ]
 
-            # Use the Responses API structured output method
-            result = await self.responses_create_with_structured_output(
-                input=input_for_responses,
-                response_model=response_model,
+            # Create the structured response using Responses API
+            response = await self._async_client.beta.chat.completions.parse(
                 model=model,
+                messages=openai_messages,
+                response_format=response_model,
                 temperature=temperature,
                 max_tokens=max_tokens,
                 **kwargs,
@@ -482,13 +432,11 @@ class OpenAIProvider(BaseLLMProvider):
                     provider="openai",
                     model=model,
                     operation="create_structured_response",
-                    response_data={
-                        "status": "success",
-                        "delegated_to": "responses_api",
-                    },
+                    response_data={"status": "success"},
                 )
 
-            return result
+            # Return the parsed response
+            return response.choices[0].message.parsed
 
         except Exception as e:
             logger.error(f"Error creating structured response: {e}")
@@ -714,9 +662,8 @@ class OpenAIProvider(BaseLLMProvider):
             "text": {"format": text_format},  # Correct parameter for Responses API
         }
 
-        # Add temperature only if the model supports it
-        # Note: gpt-5-nano and gpt-5-mini don't support temperature in Responses API
-        if model not in ["gpt-5-nano", "gpt-5-mini"] and temperature is not None:
+        # Add temperature only if not using gpt-5-nano (which doesn't support it)
+        if model != "gpt-5-nano" and temperature is not None:
             create_params["temperature"] = temperature
 
         # Add optional parameters

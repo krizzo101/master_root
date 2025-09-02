@@ -4,7 +4,6 @@ This spawns REAL Claude Code processes using the CLI
 """
 
 import asyncio
-import hashlib
 import json
 import os
 import subprocess
@@ -24,6 +23,7 @@ from .claude_command_factory import (
     AgentProfile,
     ClaudeCommandFactory,
     CommandConfig,
+    PermissionMode,
     TaskComplexity,
 )
 
@@ -49,7 +49,9 @@ class RealClaudeSubprocessExecutor:
     This spawns actual 'claude' CLI processes with proper tokens.
     """
 
-    def __init__(self, token_pool, worktree_manager, debug_mode: bool = False, debug_logger=None):
+    def __init__(
+        self, token_pool, worktree_manager, debug_mode: bool = False, debug_logger=None
+    ):
         """
         Initialize with token pool and worktree manager.
 
@@ -79,8 +81,7 @@ class RealClaudeSubprocessExecutor:
 
         # Get resources
         token, token_idx = self.token_pool.acquire()
-        # Use provided worktree if available, otherwise create new one
-        worktree = task.get("worktree") or self.worktree_manager.create(task["id"])
+        worktree = self.worktree_manager.create(task["id"])
 
         # Create process tracking
         process = ClaudeProcess(
@@ -120,16 +121,13 @@ class RealClaudeSubprocessExecutor:
                 profile = AgentProfile[task["profile"].upper()]
 
             # Build command configuration
-            # Generate proper UUID for Claude session ID
-            session_uuid = str(uuid.uuid4())
-
             config = CommandConfig(
                 model=task.get(
                     "model", "sonnet" if complexity == TaskComplexity.SIMPLE else "opus"
                 ),
                 profile=profile,
                 complexity=complexity,
-                session_id=session_uuid,  # Use proper UUID
+                session_id=task["id"],
                 agent_role=task.get("role", task.get("agent_type")),
                 system_prompt=task.get("system_prompt"),
                 workspace_dirs=[Path(worktree)],
@@ -137,20 +135,39 @@ class RealClaudeSubprocessExecutor:
                     "allowed_tools", ["Write", "Read", "Edit", "Bash", "TodoWrite"]
                 ),
                 debug=self.debug_mode
-                or task.get("debug", False),  # Enable debug if app-wide or task-specific
+                or task.get(
+                    "debug", False
+                ),  # Enable debug if app-wide or task-specific
                 capture_debug_output=self.debug_logger is not None,
             )
 
             # Build optimized command using factory
             cmd = self.command_factory.build_command(process.task, config)
 
-            # Handle long prompts via stdin or file
+            # Handle long prompts via stdin
             use_stdin = len(process.task) > 1000 or "\n" in process.task
             if use_stdin:
-                # Remove the "@-" sentinel from command - we'll pipe via stdin
-                cmd = [arg for arg in cmd if arg != "@-"]
-                # Will provide prompt via stdin
-            # else: short prompt already added by command factory
+                # Remove the prompt from command if using stdin
+                cmd = [
+                    arg
+                    for arg in cmd
+                    if not arg.startswith("@") and arg != "--" and arg != process.task
+                ]
+            else:
+                # Write to file for @ reference
+                task_file = Path(worktree) / "task.txt"
+                with open(task_file, "w") as f:
+                    f.write(process.task)
+                # Update command to use file
+                for i, arg in enumerate(cmd):
+                    if arg == "@-":
+                        cmd[i] = f"@{task_file}"
+                    elif (
+                        arg == "--" and i + 1 < len(cmd) and cmd[i + 1] == process.task
+                    ):
+                        cmd[i] = f"@{task_file}"
+                        del cmd[i + 1]
+                        break
 
             # Prepare environment
             env = os.environ.copy()
@@ -160,12 +177,13 @@ class RealClaudeSubprocessExecutor:
 
             # Log execution details
             print(f"🤖 Starting Claude process for {process.id} with token {token_idx}")
-            est = self.command_factory.get_performance_estimate(config)
-            print(f"   Profile: {config.profile.value} (est. {est})")
+            print(
+                f"   Profile: {config.profile.value} (est. {self.command_factory.get_performance_estimate(config)})"
+            )
             print(f"   Command: {' '.join(cmd)}")
             print(f"   Working directory: {worktree}")
             if config.debug:
-                print("   🐛 Debug mode enabled (30% slower)")
+                print(f"   🐛 Debug mode enabled (30% slower)")
 
             # Log to debug logger if available
             if self.debug_logger:
@@ -179,7 +197,6 @@ class RealClaudeSubprocessExecutor:
             # Start the subprocess
             process.process = await asyncio.create_subprocess_exec(
                 *cmd,
-                stdin=asyncio.subprocess.PIPE if use_stdin else None,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
                 cwd=str(worktree),
@@ -205,8 +222,12 @@ class RealClaudeSubprocessExecutor:
                     return "".join(output_lines)
 
                 # Read both streams concurrently
-                stdout_task = asyncio.create_task(read_stream(process.process.stdout, "stdout"))
-                stderr_task = asyncio.create_task(read_stream(process.process.stderr, "stderr"))
+                stdout_task = asyncio.create_task(
+                    read_stream(process.process.stdout, "stdout")
+                )
+                stderr_task = asyncio.create_task(
+                    read_stream(process.process.stderr, "stderr")
+                )
 
                 # Wait for process completion with timeout
                 try:
@@ -216,18 +237,12 @@ class RealClaudeSubprocessExecutor:
                 except asyncio.TimeoutError:
                     process.process.terminate()
                     await process.process.wait()
-                    raise TimeoutError("Task timed out after 1800s")
+                    raise TimeoutError(f"Task timed out after 1800s")
             else:
                 # Standard execution without real-time capture
-                if use_stdin:
-                    stdout, stderr = await asyncio.wait_for(
-                        process.process.communicate(input=process.task.encode()),
-                        timeout=1800,  # 30 minutes
-                    )
-                else:
-                    stdout, stderr = await asyncio.wait_for(
-                        process.process.communicate(), timeout=1800  # 30 minutes
-                    )
+                stdout, stderr = await asyncio.wait_for(
+                    process.process.communicate(), timeout=1800  # 30 minutes
+                )
                 process.stdout = stdout.decode() if stdout else ""
                 process.stderr = stderr.decode() if stderr else ""
 
@@ -242,23 +257,18 @@ class RealClaudeSubprocessExecutor:
 
                 print(f"✅ Claude process {process.id} completed successfully")
 
-                # Export patch if merge-back is enabled
-                patch_manifest = None
-                if task.get("export_patch", True) and task.get("run_id"):
-                    patch_manifest = await self._export_patch(task, worktree, process)
-
                 return {
                     "task_id": task["id"],
                     "status": "completed",
                     "process_id": process.id,
                     "output": process.stdout,
                     "result": process.result,
-                    "patch_manifest": patch_manifest,
                 }
             else:
                 process.status = "failed"
                 error_msg = (
-                    process.stderr or f"Process exited with code {process.process.returncode}"
+                    process.stderr
+                    or f"Process exited with code {process.process.returncode}"
                 )
                 print(f"❌ Claude process {process.id} failed: {error_msg}")
 
@@ -293,7 +303,9 @@ class RealClaudeSubprocessExecutor:
         # Limit parallel execution to available tokens
         max_parallel = max_parallel or self.token_pool.get_token_count()
 
-        print(f"\n🚀 Starting {len(tasks)} Claude processes with up to {max_parallel} parallel")
+        print(
+            f"\n🚀 Starting {len(tasks)} Claude processes with up to {max_parallel} parallel"
+        )
         print("=" * 60)
 
         # Create semaphore for rate limiting
@@ -352,7 +364,9 @@ class RealClaudeSubprocessExecutor:
             )
             improvement_tasks = improvement_tasks[:max_agents]
 
-        print(f"\n🚀 Starting parallel improvements with {len(improvement_tasks)} Claude agents")
+        print(
+            f"\n🚀 Starting parallel improvements with {len(improvement_tasks)} Claude agents"
+        )
         print("=" * 60)
 
         # Initialize resources if not already done
@@ -377,23 +391,11 @@ class RealClaudeSubprocessExecutor:
             # Add system prompt for specialization if not provided
             if "system_prompt" not in task and "agent_type" in task:
                 agent_prompts = {
-                    "researcher": (
-                        "You are a research specialist. "
-                        "Find and analyze relevant information thoroughly."
-                    ),
-                    "coder": (
-                        "You are an expert developer. "
-                        "Write clean, efficient, production-ready code."
-                    ),
-                    "tester": (
-                        "You are a QA specialist. " "Write comprehensive tests covering edge cases."
-                    ),
-                    "reviewer": (
-                        "You are a senior reviewer. " "Provide detailed, constructive feedback."
-                    ),
-                    "architect": (
-                        "You are a system architect. " "Design scalable, maintainable solutions."
-                    ),
+                    "researcher": "You are a research specialist. Find and analyze relevant information thoroughly.",
+                    "coder": "You are an expert developer. Write clean, efficient, production-ready code.",
+                    "tester": "You are a QA specialist. Write comprehensive tests covering edge cases.",
+                    "reviewer": "You are a senior reviewer. Provide detailed, constructive feedback.",
+                    "architect": "You are a system architect. Design scalable, maintainable solutions.",
                 }
                 task["system_prompt"] = agent_prompts.get(
                     task["agent_type"], "You are an expert assistant."
@@ -411,9 +413,6 @@ class RealClaudeSubprocessExecutor:
                 worktree=worktree,
                 system_prompt=task.get("system_prompt"),
                 model=task.get("model", "sonnet"),
-                permission_mode=task.get("permission_mode", "plan"),
-                mcp_profile=task.get("mcp_profile"),
-                allowed_tools=task.get("allowed_tools"),
             )
             async_tasks.append(async_task)
 
@@ -438,7 +437,9 @@ class RealClaudeSubprocessExecutor:
                 else:
                     results_dict[task_id] = result
                     status_icon = "✅" if result.get("status") == "completed" else "❌"
-                    print(f"{status_icon} Agent {task_id}: {result.get('status', 'unknown')}")
+                    print(
+                        f"{status_icon} Agent {task_id}: {result.get('status', 'unknown')}"
+                    )
 
         except asyncio.TimeoutError:
             print("⏰ Timeout reached for parallel execution (30 minutes)")
@@ -453,7 +454,7 @@ class RealClaudeSubprocessExecutor:
             for task in improvement_tasks:
                 try:
                     self.worktree_manager.cleanup(task["id"])
-                except Exception:
+                except:
                     pass  # Best effort cleanup
 
         # Summary
@@ -490,9 +491,6 @@ class RealClaudeSubprocessExecutor:
         worktree: Path,
         system_prompt: str = None,
         model: str = "sonnet",
-        permission_mode: str = "plan",
-        mcp_profile: str = None,
-        allowed_tools: List[str] = None,
     ) -> Dict[str, Any]:
         """
         Helper method to execute a single Claude subprocess.
@@ -534,9 +532,11 @@ class RealClaudeSubprocessExecutor:
             ]
 
             # Add permission mode (always use plan for safety in headless)
+            permission_mode = task.get("permission_mode", "plan")
             cmd.extend(["--permission-mode", permission_mode])
 
             # Add MCP config if specified (e.g., for research agents)
+            mcp_profile = task.get("mcp_profile")
             if mcp_profile:
                 mcp_config_path = (
                     Path(__file__).parent.parent
@@ -548,30 +548,21 @@ class RealClaudeSubprocessExecutor:
                     cmd.extend(["--mcp-config", str(mcp_config_path)])
 
             # Add allowed tools (constrain what agents can do)
-            if allowed_tools is None:
-                allowed_tools = ["Read", "Write", "Edit", "Bash(git:*)"]
+            allowed_tools = task.get("allowed_tools", ["Read", "Write", "Edit"])
             if allowed_tools:
                 cmd.extend(["--allowedTools", ",".join(allowed_tools)])
 
             # Add system prompt if provided
             if system_prompt:
-                # Always append commit instruction to custom prompts
-                commit_instruction = (
-                    "IMPORTANT: After completing your changes, commit them with a "
-                    "descriptive message using "
-                    "'git add -A && git commit -m \"Your commit message\"'."
-                )
-                full_prompt = f"{system_prompt}\n\n{commit_instruction}"
-                cmd.extend(["--append-system-prompt", full_prompt])
+                cmd.extend(["--append-system-prompt", system_prompt])
             else:
-                # Default concise behavior for speed with commit instruction
-                default_prompt = (
-                    "Be concise. Focus on the task. Include error handling.\n\n"
-                    "IMPORTANT: After completing your changes, commit them with a "
-                    "descriptive message using "
-                    "'git add -A && git commit -m \"Your commit message\"'."
+                # Default concise behavior for speed
+                cmd.extend(
+                    [
+                        "--append-system-prompt",
+                        "Be concise. Focus on the task. Include error handling.",
+                    ]
                 )
-                cmd.extend(["--append-system-prompt", default_prompt])
 
             print(f"🤖 Starting Claude agent {task_id} in {worktree}")
 
@@ -606,167 +597,6 @@ class RealClaudeSubprocessExecutor:
 
         except Exception as e:
             return {"status": "error", "error": str(e), "output": None}
-
-    async def _export_patch(
-        self, task: Dict[str, Any], worktree: Path, process: ClaudeProcess
-    ) -> Optional[Dict[str, Any]]:
-        """
-        Export changes as a patch after successful agent execution
-
-        Args:
-            task: Task dictionary with run_id, agent info
-            worktree: Path to agent's worktree
-            process: Completed Claude process
-
-        Returns:
-            Patch manifest dictionary or None if no changes
-        """
-        try:
-            run_id = task.get("run_id")
-            agent_id = task.get("id", process.id)
-            agent_role = task.get("agent_type", "unknown")
-            sequence = task.get("sequence", 0)
-
-            # Check if there are uncommitted changes
-            result = subprocess.run(
-                ["git", "status", "--porcelain"], cwd=worktree, capture_output=True, text=True
-            )
-
-            has_uncommitted = bool(result.stdout.strip())
-
-            # Check if there are any commits ahead of base branch
-            base_branch = subprocess.run(
-                ["git", "merge-base", "HEAD", "main"], cwd=worktree, capture_output=True, text=True
-            ).stdout.strip()
-
-            commits_ahead = subprocess.run(
-                ["git", "rev-list", f"{base_branch}..HEAD", "--count"],
-                cwd=worktree,
-                capture_output=True,
-                text=True,
-            ).stdout.strip()
-
-            has_commits = int(commits_ahead) > 0 if commits_ahead.isdigit() else False
-
-            if not has_uncommitted and not has_commits:
-                # No changes to export
-                return None
-
-            # If there are uncommitted changes, stage and commit them
-            if has_uncommitted:
-                # Stage all changes
-                subprocess.run(["git", "add", "-A"], cwd=worktree, check=True, capture_output=True)
-
-                # Create commit message
-                task_hash = hashlib.sha256(task.get("prompt", "").encode()).hexdigest()[:8]
-
-                commit_msg = (
-                    f"feat(agent): {agent_role}/{agent_id} - Task completion\n\n"
-                    f"Run-Id: {run_id}\n"
-                    f"Agent-Id: {agent_id}\n"
-                    f"Role: {agent_role}\n"
-                    f"Task-Hash: {task_hash}\n"
-                )
-
-                # Commit with agent identity
-                subprocess.run(
-                    [
-                        "git",
-                        "-c",
-                        f"user.name=hecaton/{agent_role}",
-                        "-c",
-                        "user.email=hecaton@local",
-                        "commit",
-                        "-m",
-                        commit_msg,
-                    ],
-                    cwd=worktree,
-                    check=True,
-                    capture_output=True,
-                )
-
-            # Get commit SHA
-            result = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
-                cwd=worktree,
-                capture_output=True,
-                text=True,
-                check=True,
-            )
-            commit_sha = result.stdout.strip()
-
-            # Create patch directory
-            patch_dir = Path(".hecaton/patches") / run_id
-            patch_dir.mkdir(parents=True, exist_ok=True)
-
-            # Export patch
-            patch_file = patch_dir / f"{sequence:03d}__{agent_role}__{agent_id}.patch"
-
-            with open(patch_file, "w") as f:
-                result = subprocess.run(
-                    ["git", "format-patch", "-1", "--stdout"],
-                    cwd=worktree,
-                    capture_output=True,
-                    text=True,
-                    check=True,
-                )
-                f.write(result.stdout)
-
-            # Get patch statistics
-            result = subprocess.run(
-                ["git", "diff", "--stat", "HEAD^"], cwd=worktree, capture_output=True, text=True
-            )
-
-            # Parse stats to get files and line counts
-            files_changed = []
-            insertions = 0
-            deletions = 0
-
-            if result.stdout:
-                lines = result.stdout.strip().split("\n")
-                for line in lines[:-1]:  # Skip summary line
-                    parts = line.split("|")
-                    if len(parts) >= 2:
-                        files_changed.append(parts[0].strip())
-
-                # Parse summary line
-                summary = lines[-1] if lines else ""
-                if "insertion" in summary:
-                    try:
-                        insertions = int(summary.split("insertion")[0].split()[-1])
-                    except (IndexError, ValueError):
-                        pass
-                if "deletion" in summary:
-                    try:
-                        deletions = int(summary.split("deletion")[0].split()[-1])
-                    except (IndexError, ValueError):
-                        pass
-
-            # Create manifest
-            manifest = {
-                "patch_file": str(patch_file),
-                "agent_id": agent_id,
-                "agent_role": agent_role,
-                "commit_sha": commit_sha,
-                "files_changed": files_changed,
-                "insertions": insertions,
-                "deletions": deletions,
-                "task_hash": task_hash,
-                "run_id": run_id,
-                "sequence": sequence,
-            }
-
-            # Write manifest
-            manifest_file = patch_file.with_suffix(".json")
-            with open(manifest_file, "w") as f:
-                json.dump(manifest, f, indent=2)
-
-            print(f"📦 Exported patch: {patch_file.name} ({len(files_changed)} files)")
-            return manifest
-
-        except Exception as e:
-            print(f"⚠️ Failed to export patch: {e}")
-            return None
 
 
 async def demo_real_claude_execution():

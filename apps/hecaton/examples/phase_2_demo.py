@@ -169,7 +169,9 @@ async def demo_phase_2_features():
 
     metrics_json = orchestrator.export_metrics()
     metrics_data = json.loads(metrics_json)
-    print(f"  Metrics exported with {len(metrics_data.get('completed_tasks', {}))} completed tasks")
+    print(
+        f"  Metrics exported with {len(metrics_data.get('completed_tasks', {}))} completed tasks"
+    )
     print(f"  Monitor uptime: {metrics_data['statistics']['monitor_uptime']:.1f}s")
     print()
 
@@ -237,7 +239,9 @@ async def demo_agent_collaboration():
 
     if research_result.get("status") == "success":
         findings = research_result.get("findings", {})
-        print(f"   Found {len(findings.get('recommendations', []))} optimization opportunities")
+        print(
+            f"   Found {len(findings.get('recommendations', []))} optimization opportunities"
+        )
 
     # Step 2: Code agent implements improvements
     code_task = {
@@ -271,7 +275,9 @@ async def demo_agent_collaboration():
 
     if test_result.get("status") == "success":
         test_data = test_result.get("test_results", {})
-        print(f"   Tests passed: {test_data.get('passed', 0)}/{test_data.get('total_tests', 0)}")
+        print(
+            f"   Tests passed: {test_data.get('passed', 0)}/{test_data.get('total_tests', 0)}"
+        )
         print(f"   Coverage: {test_data.get('coverage_percentage', 0)}%")
 
     await orchestrator.stop_message_broker()

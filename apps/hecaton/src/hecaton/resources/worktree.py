@@ -5,6 +5,10 @@ Handles worktrees outside the main repo directory properly
 
 import logging
 import subprocess
+
+from ..utils.enhanced_logging import get_logger, log_resource_usage
+
+logger = get_logger(__name__)
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -30,7 +34,9 @@ class WorktreeManager:
     Fixed version that handles external worktree directories properly.
     """
 
-    def __init__(self, base_path: Optional[Path] = None, repo_path: Optional[Path] = None):
+    def __init__(
+        self, base_path: Optional[Path] = None, repo_path: Optional[Path] = None
+    ):
         """
         Initialize worktree manager
 
@@ -101,7 +107,9 @@ class WorktreeManager:
 
             # Store worktree info
             self.active_worktrees[agent_id] = WorktreeInfo(
-                worktree_path=worktree_path, branch_name=branch_name, created_at=datetime.now()
+                worktree_path=worktree_path,
+                branch_name=branch_name,
+                created_at=datetime.now(),
             )
 
             logger.info(f"Created worktree for {agent_id} at {worktree_path}")
@@ -138,7 +146,9 @@ class WorktreeManager:
 
             logger.debug_step(f"Removing worktree: {' '.join(cmd)}")
 
-            result = subprocess.run(cmd, cwd=self.repo_path, capture_output=True, text=True)
+            result = subprocess.run(
+                cmd, cwd=self.repo_path, capture_output=True, text=True
+            )
 
             if result.returncode != 0:
                 logger.warning(f"Worktree removal failed: {result.stderr}")
@@ -146,7 +156,9 @@ class WorktreeManager:
                 # Try to prune worktrees first
                 logger.debug_step("Pruning worktrees")
                 subprocess.run(
-                    ["git", "worktree", "prune"], cwd=self.repo_path, capture_output=True
+                    ["git", "worktree", "prune"],
+                    cwd=self.repo_path,
+                    capture_output=True,
                 )
 
                 # If directory still exists, remove it manually

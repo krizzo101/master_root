@@ -22,7 +22,7 @@ cat > "$ENV_FILE" << 'EOF'
 # Token 1
 export CLAUDE_CODE_TOKEN1='token1_placeholder'
 
-# Token 2  
+# Token 2
 export CLAUDE_CODE_TOKEN2='token2_placeholder'
 
 # Token 3

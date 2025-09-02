@@ -128,7 +128,9 @@ class ResearchAgent(Agent):
             "metadata": analysis,
         }
 
-    def generate_documentation(self, code: str, options: Dict[str, Any]) -> Dict[str, Any]:
+    def generate_documentation(
+        self, code: str, options: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Generate documentation for code.
 
         Args:
@@ -218,6 +220,10 @@ pip install {project_name.lower().replace(' ', '-')}
 ```python
 # Usage example here
 from {project_name.lower().replace(' ', '_')} import main
+
+from ..utils.enhanced_logging import get_logger
+logger = get_logger(__name__)
+
 
 main()
 ```
@@ -354,7 +360,9 @@ paths:"""
         404:
           description: Not found"""
         else:
-            api_doc = f"# API Documentation\n\nVersion: {version}\n\nBase URL: {base_url}\n\n"
+            api_doc = (
+                f"# API Documentation\n\nVersion: {version}\n\nBase URL: {base_url}\n\n"
+            )
             api_doc += "## Endpoints\n\n"
             for endpoint in endpoints:
                 api_doc += f"- `GET {endpoint}`\n"

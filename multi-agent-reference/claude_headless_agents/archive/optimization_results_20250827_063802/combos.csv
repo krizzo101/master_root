@@ -1,0 +1,12 @@
+Name,Model,Duration,ExitCode,Flags
+fastest_haiku,haiku,3.288893746,0,"--dangerously-skip-permissions --strict-mcp-config --mcp-config optimization_results_20250827_063802/minimal_mcp.json"
+fastest_sonnet,sonnet,3.183048679,0,"--dangerously-skip-permissions --strict-mcp-config --mcp-config optimization_results_20250827_063802/minimal_mcp.json"
+fastest_opus,opus,3.422018049,0,"--dangerously-skip-permissions --strict-mcp-config --mcp-config optimization_results_20250827_063802/minimal_mcp.json"
+prod_haiku,haiku,11.894068541,0,"--output-format json --permission-mode acceptEdits --session-id a3b23e08-6e10-4be1-88c7-4192fcecba5c"
+prod_sonnet,sonnet,11.637264647,0,"--output-format json --permission-mode acceptEdits --session-id 7572097b-b0a7-4c5b-8f65-97aca9459135"
+prod_opus,opus,11.922044304,0,"--output-format json --permission-mode acceptEdits --session-id 1b986c1d-22f2-411d-8fb0-ff85408d81e1"
+complex_fast_haiku,haiku,22.304977765,0,"--dangerously-skip-permissions --output-format json"
+complex_fast_sonnet,sonnet,18.869606661,0,"--dangerously-skip-permissions --output-format json"
+complex_fast_opus,opus,100.842361587,0,"--dangerously-skip-permissions --output-format json"
+monitor_sonnet,sonnet,10.226435145,0,"--output-format stream-json --verbose"
+monitor_opus,opus,10.858000832,0,"--output-format stream-json --verbose"

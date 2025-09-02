@@ -8,6 +8,10 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 from uuid import UUID, uuid4
 
+from ..utils.enhanced_logging import get_logger
+
+logger = get_logger(__name__)
+
 
 class MessageType(Enum):
     """Types of messages in the system"""

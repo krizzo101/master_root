@@ -7,7 +7,7 @@ Every AI agent that will write code, build solutions, or implement features.
 
 ### Why This Matters
 - **90% of bugs** come from rushed implementation
-- **75% of rework** is due to unclear requirements  
+- **75% of rework** is due to unclear requirements
 - **100% of professionals** follow a process
 
 ## YOUR REQUIRED READING

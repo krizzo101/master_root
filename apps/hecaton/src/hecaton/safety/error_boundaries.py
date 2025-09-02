@@ -3,11 +3,15 @@ Error boundary implementation for fault isolation.
 Provides error handling, retries, and graceful degradation.
 """
 
+from typing import Any, Callable, Dict, Optional, Type, Union
+
+from ..utils.enhanced_logging import get_logger, log_agent_event
+
+logger = get_logger(__name__)
 import asyncio
 import logging
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Callable, Dict, Optional, Type, Union
 
 logger = logging.getLogger(__name__)
 

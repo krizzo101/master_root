@@ -5,7 +5,6 @@ Implements strict model validation per rule 953-openai-api-standards.mdc
 """
 
 import logging
-from dataclasses import dataclass
 from enum import Enum
 from typing import Optional, Set
 
@@ -19,21 +18,6 @@ class ModelType(Enum):
     EXECUTION = "execution"
     FAST_RESPONSE = "fast_response"
     STRUCTURED_OUTPUT = "structured_output"
-
-
-@dataclass(frozen=True)
-class ModelProfile:
-    """Model capability profile for parameter adaptation.
-
-    This profile defines the capabilities and parameter mappings for each model,
-    ensuring correct API calls and parameter names are used.
-    """
-
-    api: str  # "responses" | "chat"
-    supports_temperature: bool  # Whether model supports temperature parameter
-    chat_token_param: Optional[str]  # Token param name for Chat Completions API
-    responses_token_param: Optional[str]  # Token param name for Responses API
-    supports_reasoning_effort: bool  # Whether model supports reasoning_effort parameter
 
 
 class OpenAIModelValidator:
@@ -61,47 +45,6 @@ class OpenAIModelValidator:
         "gpt-4o-2024",
         "gpt-3.5",  # Legacy models prohibited
         "gpt-4",  # Old GPT-4 prohibited (except gpt-4-turbo for specific legacy cases)
-    }
-
-    # Model capability profiles (single source of truth)
-    MODEL_PROFILES = {
-        # GPT-5 series - execution focused models
-        "gpt-5": ModelProfile(
-            api="responses",  # Prefer Responses API
-            supports_temperature=True,
-            chat_token_param="max_completion_tokens",  # For Chat Completions
-            responses_token_param="max_output_tokens",  # For Responses API
-            supports_reasoning_effort=False,
-        ),
-        "gpt-5-mini": ModelProfile(
-            api="responses",
-            supports_temperature=False,  # Mini doesn't support temperature in Responses API
-            chat_token_param="max_completion_tokens",
-            responses_token_param="max_output_tokens",
-            supports_reasoning_effort=False,
-        ),
-        "gpt-5-nano": ModelProfile(
-            api="responses",
-            supports_temperature=False,  # Nano doesn't support temperature
-            chat_token_param="max_completion_tokens",
-            responses_token_param="max_output_tokens",
-            supports_reasoning_effort=False,
-        ),
-        # O-series - reasoning focused models
-        "o4-mini": ModelProfile(
-            api="responses",
-            supports_temperature=False,  # Reasoning models don't use temperature
-            chat_token_param="max_completion_tokens",
-            responses_token_param="max_output_tokens",
-            supports_reasoning_effort=True,
-        ),
-        "o3": ModelProfile(
-            api="responses",
-            supports_temperature=False,
-            chat_token_param="max_completion_tokens",
-            responses_token_param="max_output_tokens",
-            supports_reasoning_effort=True,
-        ),
     }
 
     # Task-based model selection
@@ -242,22 +185,3 @@ class OpenAIModelValidator:
             del config["fallback_model"]
 
         return config
-
-    @classmethod
-    def get_profile(cls, model: str) -> ModelProfile:
-        """Get the capability profile for a model.
-
-        Args:
-            model: The model name
-
-        Returns:
-            ModelProfile with capabilities and parameter mappings
-
-        Raises:
-            ValueError: If model is not approved
-        """
-        # Validate model first
-        cls.validate_model(model)
-
-        # Return profile, with fallback to gpt-5-mini profile if not found
-        return cls.MODEL_PROFILES.get(model, cls.MODEL_PROFILES["gpt-5-mini"])

@@ -11,7 +11,7 @@ graph TB
         MANUAL[Manual operations]
         OVERSPEC[Over-specified prompts]
     end
-    
+
     subgraph "OUR SOLUTION"
         subgraph "1. Session Intelligence"
             DETECT[Session Detector<br/>UUID: 464f3bd5-*]
@@ -19,21 +19,21 @@ graph TB
             JSONL[JSONL Parser<br/>18+ object types]
             CONTEXT[Context Extractor]
         end
-        
+
         subgraph "2. Prompt Optimization"
             HOOKS[Claude Hooks]
             BYPASS[RAW Tag Bypass]
             MODES[Opt-in/out Modes]
             OPTIMIZER[API Optimizer]
         end
-        
+
         subgraph "3. Headless Agents"
             SPEED[Speed Agent 3-5s]
             CODE[Code Agent 20-60s]
             REVIEW[Review Agent 15-40s]
             PARALLEL[Parallel Execution]
         end
-        
+
         subgraph "4. Context Retrieval"
             CIG[Context Intent Graph]
             MULTIMODAL[Multi-Modal Search]
@@ -41,34 +41,34 @@ graph TB
             PACK[Context Packs]
         end
     end
-    
+
     subgraph "THE RESULT"
         FAST[3-60s execution]
         SMART[Intelligent context]
         AUTO[Fully automated]
         PRECISE[User-controlled precision]
     end
-    
+
     SLOW --> DETECT
     NOCONTEXT --> CIG
     MANUAL --> PARALLEL
     OVERSPEC --> BYPASS
-    
+
     DETECT --> FAST
     CIG --> SMART
     PARALLEL --> AUTO
     BYPASS --> PRECISE
-    
+
     style SLOW fill:#f44336,color:#fff
     style NOCONTEXT fill:#f44336,color:#fff
     style MANUAL fill:#f44336,color:#fff
     style OVERSPEC fill:#f44336,color:#fff
-    
+
     style FAST fill:#4caf50,color:#fff
     style SMART fill:#4caf50,color:#fff
     style AUTO fill:#4caf50,color:#fff
     style PRECISE fill:#4caf50,color:#fff
-    
+
     style DETECT fill:#2196f3,color:#fff
     style CIG fill:#2196f3,color:#fff
     style PARALLEL fill:#2196f3,color:#fff
@@ -84,25 +84,25 @@ flowchart LR
         FILES[Code Files]
         HISTORY[Chat History]
     end
-    
+
     subgraph "PROCESSING PIPELINE"
         subgraph "Stage 1: Detection"
             DETECT_SESSION[Detect Session UUID]
             EXTRACT_CTX[Extract Context]
         end
-        
+
         subgraph "Stage 2: Optimization"
             CHECK_BYPASS{RAW tags?}
             OPTIMIZE_PROMPT[Optimize via API]
             ADD_CONTEXT[Add Context]
         end
-        
+
         subgraph "Stage 3: Planning"
             PLAN_CIG[Plan with CIG]
             RETRIEVE[Retrieve Context]
             RANK[Rank Results]
         end
-        
+
         subgraph "Stage 4: Execution"
             SELECT_AGENT{Select Agent}
             EXEC_SPEED[Speed 3-5s]
@@ -110,56 +110,56 @@ flowchart LR
             EXEC_REVIEW[Review 15-40s]
             EXEC_PARALLEL[Parallel Team]
         end
-        
+
         subgraph "Stage 5: Storage"
             LOG_JSONL[Log to JSONL]
             UPDATE_KB[Update Knowledge]
             CACHE[Cache Results]
         end
     end
-    
+
     subgraph "OUTPUTS"
         RESPONSE[Optimized Response]
         ARTIFACTS[Code/Tests/Docs]
         METRICS[Performance Metrics]
         LEARNING[System Learning]
     end
-    
+
     USER --> DETECT_SESSION
     SESSION --> EXTRACT_CTX
     FILES --> RETRIEVE
     HISTORY --> ADD_CONTEXT
-    
+
     DETECT_SESSION --> EXTRACT_CTX
     EXTRACT_CTX --> CHECK_BYPASS
-    
+
     CHECK_BYPASS -->|No| OPTIMIZE_PROMPT
     CHECK_BYPASS -->|Yes| SELECT_AGENT
     OPTIMIZE_PROMPT --> ADD_CONTEXT
     ADD_CONTEXT --> PLAN_CIG
-    
+
     PLAN_CIG --> RETRIEVE
     RETRIEVE --> RANK
     RANK --> SELECT_AGENT
-    
+
     SELECT_AGENT -->|Simple| EXEC_SPEED
     SELECT_AGENT -->|Complex| EXEC_CODE
     SELECT_AGENT -->|Review| EXEC_REVIEW
     SELECT_AGENT -->|Multi| EXEC_PARALLEL
-    
+
     EXEC_SPEED --> LOG_JSONL
     EXEC_CODE --> LOG_JSONL
     EXEC_REVIEW --> LOG_JSONL
     EXEC_PARALLEL --> LOG_JSONL
-    
+
     LOG_JSONL --> UPDATE_KB
     UPDATE_KB --> CACHE
-    
+
     CACHE --> RESPONSE
     CACHE --> ARTIFACTS
     CACHE --> METRICS
     CACHE --> LEARNING
-    
+
     style USER fill:#1976d2,color:#fff
     style RESPONSE fill:#4caf50,color:#fff
     style ARTIFACTS fill:#4caf50,color:#fff
@@ -178,21 +178,21 @@ graph TB
         U[User] --> CLI[Claude CLI]
         U --> API[API Endpoints]
     end
-    
+
     subgraph "Session Management Layer"
         CLI --> SD[Session Detector]
         SD --> SM[Session Manager]
         SM --> SDB[(Session Database)]
         SM --> JSONL[JSONL Logs]
     end
-    
+
     subgraph "Intelligence Layer"
         SM --> CIG[Context Intent Graph]
         CIG --> MR[Multi-Modal Retrieval]
         MR --> RANK[Agent Reranker]
         RANK --> COMP[Context Compressor]
     end
-    
+
     subgraph "Execution Layer"
         COMP --> HA[Headless Agents]
         HA --> SPEED[Speed Agent<br/>3-5s]
@@ -200,14 +200,14 @@ graph TB
         HA --> REVIEW[Review Agent<br/>15-40s]
         HA --> TEST[Test Agent<br/>10-30s]
     end
-    
+
     subgraph "Storage Layer"
         SDB --> PG[(PostgreSQL)]
         SDB --> NEO[(Neo4j Graph)]
         MR --> EMB[(Embeddings)]
         MR --> KNOW[(Knowledge Base)]
     end
-    
+
     style U fill:#1976d2,color:#fff
     style SPEED fill:#4caf50,color:#fff
     style CODE fill:#4caf50,color:#fff
@@ -221,27 +221,27 @@ flowchart TD
     START([Session Detection Start]) --> CHECK_STDIN{Stdin Available?}
     CHECK_STDIN -->|Yes| STDIN[Parse Hook Data - 100% Confidence]
     CHECK_STDIN -->|No| CHECK_ENV{Env Var Set?}
-    
+
     CHECK_ENV -->|Yes| ENV[Use CLAUDE_SESSION_UUID - 100% Confidence]
     CHECK_ENV -->|No| MARKER[Write Marker]
-    
+
     MARKER --> SEARCH[Search JSONL Files]
     SEARCH --> FOUND{Marker Found?}
-    
+
     FOUND -->|Yes| EXTRACT[Extract Session UUID - 95% Confidence]
     FOUND -->|No| STATE{State File Exists?}
-    
+
     STATE -->|Yes| CACHED[Use Cached UUID - 80% Confidence]
     STATE -->|No| RECENT[Find Recent File - 60% Confidence]
-    
+
     RECENT --> SYNTHETIC[Generate Synthetic UUID - 30% Confidence]
-    
+
     STDIN --> RETURN([Return UUID])
     ENV --> RETURN
     EXTRACT --> RETURN
     CACHED --> RETURN
     SYNTHETIC --> RETURN
-    
+
     style START fill:#ff9800,color:#fff
     style RETURN fill:#4caf50,color:#fff
     style STDIN fill:#2196f3,color:#fff
@@ -257,32 +257,32 @@ flowchart LR
         CHECK_RAW -->|Yes| EXTRACT[Extract Raw Content]
         CHECK_RAW -->|No| CHECK_MODE{Check Mode}
     end
-    
+
     subgraph "Mode Decision"
         CHECK_MODE -->|opt-in| CHECK_TRIGGER{Has opt-in trigger?}
         CHECK_MODE -->|opt-out| CHECK_SKIP{Has skip trigger?}
         CHECK_MODE -->|always| OPTIMIZE
         CHECK_MODE -->|disabled| PASS
     end
-    
+
     subgraph "Optimization"
         CHECK_TRIGGER -->|Yes| OPTIMIZE[Optimize via API]
         CHECK_TRIGGER -->|No| PASS[Pass Through]
         CHECK_SKIP -->|No| OPTIMIZE
         CHECK_SKIP -->|Yes| PASS
-        
+
         OPTIMIZE --> CONTEXT[Add Context]
         CONTEXT --> HISTORY[Add History]
         HISTORY --> ENHANCE[Enhance Prompt]
     end
-    
+
     subgraph "Execution"
         EXTRACT --> EXECUTE[Execute Raw]
         PASS --> EXECUTE
         ENHANCE --> EXECUTE
         EXECUTE --> AGENT[Headless Agent]
     end
-    
+
     style PROMPT fill:#1976d2,color:#fff
     style EXECUTE fill:#4caf50,color:#fff
     style EXTRACT fill:#ffa726,color:#fff
@@ -294,24 +294,24 @@ gantt
     title Parallel Agent Team Execution Timeline
     dateFormat HH:mm:ss
     axisFormat %H:%M:%S
-    
+
     section Architecture
     Design System     :active, arch1, 00:00:00, 20s
     Review Design     :arch2, after arch1, 10s
-    
+
     section Development
     Implement Core    :active, dev1, 00:00:00, 30s
     Implement Auth    :active, dev2, 00:00:05, 25s
     Implement API     :active, dev3, 00:00:10, 20s
-    
+
     section Testing
     Unit Tests        :active, test1, 00:00:00, 15s
     Integration Tests :test2, after test1, 20s
-    
+
     section Review
     Security Audit    :active, rev1, 00:00:00, 25s
     Code Review       :rev2, after dev1, 15s
-    
+
     section Integration
     Merge Results     :crit, int1, after dev3, 10s
 ```
@@ -324,7 +324,7 @@ graph TD
         PLANNER --> CIG[Context Intent Graph]
         CIG --> SLOTS[Slot Definition<br/>Files/Symbols/Decisions/Tests]
     end
-    
+
     subgraph "Retrieval Phase"
         SLOTS --> RET[Retriever Agent]
         RET --> SEM[Semantic Search<br/>Embeddings]
@@ -332,7 +332,7 @@ graph TD
         RET --> DEC[Decision Mining<br/>Rationales/Summaries]
         RET --> TRACE[Trace Hooks<br/>Tests/Entry Points]
     end
-    
+
     subgraph "Expansion Phase"
         SEM --> RES[Researcher Agent]
         STRUCT --> RES
@@ -340,14 +340,14 @@ graph TD
         TRACE --> RES
         RES --> SUBQ[3-6 Sub-Questions]
     end
-    
+
     subgraph "Ranking Phase"
         SUBQ --> RERANK[Reranker Agent<br/>Model-Scored]
         RERANK --> CRITIC[Critic Agent<br/>Coverage Check]
         CRITIC -->|Missing| RET
         CRITIC -->|Complete| COMPRESS
     end
-    
+
     subgraph "Compression Phase"
         COMPRESS[Compressor Agent] --> PACK[Context Pack]
         PACK --> CARDS[Decision Cards]
@@ -355,7 +355,7 @@ graph TD
         PACK --> SNIPPETS[Code Snippets]
         PACK --> HOOKS[Entry Hooks]
     end
-    
+
     style TASK fill:#1976d2,color:#fff
     style PACK fill:#4caf50,color:#fff
 ```
@@ -369,51 +369,51 @@ classDiagram
         +timestamp: string
         +type: string
     }
-    
+
     class UserMessage {
         +type: "user"
         +content: string
         +parentUuid: string
     }
-    
+
     class AssistantMessage {
         +type: "assistant"
         +content: array
         +parentUuid: string
     }
-    
+
     class ToolUse {
         +type: "tool_use"
         +name: string
         +input: object
         +tool_use_id: string
     }
-    
+
     class ToolResult {
         +type: "tool_result"
         +tool_use_id: string
         +content: string
         +is_error: boolean
     }
-    
+
     class ThinkingBlock {
         +type: "thinking"
         +thinking: string
         +hash: sha256
     }
-    
+
     class SystemEvent {
         +type: "system"
         +event: string
         +data: object
     }
-    
+
     class Summary {
         +type: "summary"
         +leafUuid: string
         +content: string
     }
-    
+
     JSONLEntry <|-- UserMessage
     JSONLEntry <|-- AssistantMessage
     JSONLEntry <|-- SystemEvent
@@ -429,29 +429,29 @@ graph TD
     ROOT[/home/opsvi/master_root/] --> CLAUDE[.claude/]
     ROOT --> LIBS[libs/]
     ROOT --> DOCS[*.md files]
-    
+
     CLAUDE --> HOOKS[hooks/]
     CLAUDE --> SESSION[session_manager/]
     CLAUDE --> HEADLESS[headless_agents/]
     CLAUDE --> PROJECTS[projects/]
     CLAUDE --> EXPORTS[session-exports/]
-    
+
     HOOKS --> POPT[prompt_opt.py]
     HOOKS --> AREV[answer_review.py]
     HOOKS --> WRAPPER[*_wrapper.sh]
     HOOKS --> CONFIG[*_config.json]
-    
+
     SESSION --> DETECTOR[session_detector.py]
     SESSION --> CONTEXT[session_context.py]
     SESSION --> IDENT[session_identifier.py]
     SESSION --> CLITOOL[claude-session]
-    
+
     HEADLESS --> AGENTS[specialized_agents.py]
     HEADLESS --> CONFIGS[agent_configs.sh]
     HEADLESS --> OPTGUIDE[OPTIMIZATION_GUIDE.md]
-    
+
     PROJECTS --> SESSIONS[{project}/{uuid}.jsonl]
-    
+
     style ROOT fill:#1976d2,color:#fff
     style CLAUDE fill:#ff9800,color:#fff
     style HOOKS fill:#4caf50,color:#fff
@@ -472,11 +472,11 @@ graph TD
     BASE --> OPTIMIZE[OptimizerAgent<br/>25-60s]
     BASE --> SECURITY[SecurityAgent<br/>30-60s]
     BASE --> DOC[DocumentationAgent<br/>15-40s]
-    
+
     SPEED --> PARAMS1[Model: Sonnet<br/>Tokens: 2000<br/>Temp: 0.1]
     CODE --> PARAMS2[Model: Opus<br/>Tokens: 8000<br/>Temp: 0.3]
     REVIEW --> PARAMS3[Model: Opus<br/>Tokens: 6000<br/>Temp: 0.2]
-    
+
     style BASE fill:#9c27b0,color:#fff
     style SPEED fill:#4caf50,color:#fff
     style CODE fill:#2196f3,color:#fff
@@ -492,7 +492,7 @@ erDiagram
     NODES ||--o{ TOOL_RESULTS : receives
     TOOL_CALLS ||--|| TOOL_RESULTS : produces
     SESSIONS ||--o{ AGENT_EXECUTIONS : tracks
-    
+
     SESSIONS {
         text session_id PK
         text cwd
@@ -500,7 +500,7 @@ erDiagram
         text git_branch
         timestamp created_at
     }
-    
+
     NODES {
         text uuid PK
         text session_id FK
@@ -509,21 +509,21 @@ erDiagram
         text type
         timestamp timestamp
     }
-    
+
     TOOL_CALLS {
         text tool_use_id PK
         text node_uuid FK
         text name
         jsonb input_json
     }
-    
+
     TOOL_RESULTS {
         text tool_use_id FK
         text node_uuid FK
         boolean is_error
         jsonb content_json
     }
-    
+
     CONTEXT_PACKS {
         text task_hash PK
         text session_id FK
@@ -532,7 +532,7 @@ erDiagram
         jsonb snippets
         timestamp created_at
     }
-    
+
     AGENT_EXECUTIONS {
         text exec_id PK
         text session_id FK
@@ -553,11 +553,11 @@ sequenceDiagram
     participant Optimizer
     participant Session
     participant Agent
-    
+
     User->>Claude: Submit Prompt
     Claude->>Hook: UserPromptSubmit Event
     Hook->>Hook: Check [RAW] tags
-    
+
     alt Has [RAW] tags
         Hook->>Claude: Return raw content
     else Needs optimization
@@ -567,7 +567,7 @@ sequenceDiagram
         Optimizer-->>Hook: Enhanced prompt
         Hook->>Claude: Return optimized
     end
-    
+
     Claude->>Agent: Execute with prompt
     Agent->>Session: Log execution
     Agent-->>Claude: Results
@@ -580,29 +580,29 @@ sequenceDiagram
 ```mermaid
 graph TD
     START[Task Input] --> COMPLEXITY{Task<br/>Complexity?}
-    
+
     COMPLEXITY -->|Simple| SONNET[Use Sonnet]
     COMPLEXITY -->|Complex| OPUS[Use Opus]
-    
+
     SONNET --> SPEED_CHECK{Speed<br/>Critical?}
     OPUS --> TOOL_CHECK{Tools<br/>Needed?}
-    
+
     SPEED_CHECK -->|Yes| MINIMAL[Minimal MCP<br/>3-5s]
     SPEED_CHECK -->|No| STANDARD[Standard MCP<br/>10-20s]
-    
+
     TOOL_CHECK -->|No| MINIMAL2[Minimal MCP<br/>5-20s]
     TOOL_CHECK -->|Yes| FULL[Full MCP<br/>20-100s]
-    
+
     MINIMAL --> FLAGS1[--strict-mcp-config<br/>--dangerously-skip-permissions<br/>--no-conversation-history]
     STANDARD --> FLAGS2[--strict-mcp-config<br/>--permission-mode acceptEdits]
     MINIMAL2 --> FLAGS3[--strict-mcp-config<br/>--permission-mode acceptEdits]
     FULL --> FLAGS4[--permission-mode acceptEdits]
-    
+
     FLAGS1 --> EXECUTE[Execute Agent]
     FLAGS2 --> EXECUTE
     FLAGS3 --> EXECUTE
     FLAGS4 --> EXECUTE
-    
+
     style START fill:#1976d2,color:#fff
     style EXECUTE fill:#4caf50,color:#fff
     style MINIMAL fill:#00c853,color:#fff
@@ -617,16 +617,16 @@ graph LR
         CTX --> RET[/context/retrieve]
         CTX --> RANK[/context/rerank]
         CTX --> PACK[/context/pack]
-        
+
         SESS[/session/*] --> CURR[/session/current]
         SESS --> CTXT[/session/context/:id]
         SESS --> SUMM[/session/summary/:id]
-        
+
         AGENT[/agent/*] --> EXEC[/agent/execute]
         AGENT --> STAT[/agent/status/:id]
         AGENT --> KILL[/agent/kill/:id]
     end
-    
+
     subgraph "Request Flow"
         CLIENT[Client] --> AUTH[Auth Middleware]
         AUTH --> ROUTER[Router]
@@ -634,13 +634,13 @@ graph LR
         ROUTER --> SESS
         ROUTER --> AGENT
     end
-    
+
     subgraph "Response"
         PLAN --> JSON1[CIG JSON]
         PACK --> JSON2[Context Pack]
         EXEC --> JSON3[Execution ID]
     end
-    
+
     style CLIENT fill:#1976d2,color:#fff
     style JSON1 fill:#4caf50,color:#fff
     style JSON2 fill:#4caf50,color:#fff
@@ -678,7 +678,7 @@ The result is a production-ready system where agents execute in seconds (not min
 ```
 .claude/session_manager/
 ├── session_detector.py      # Multi-method detection
-├── session_identifier.py    # Marker-based identification  
+├── session_identifier.py    # Marker-based identification
 ├── session_context.py       # Context extraction
 ├── find_current_session.py  # Standalone finder
 └── claude-session           # CLI tool
@@ -837,31 +837,31 @@ class UnifiedContextSystem:
         # Our session detection
         self.session_detector = SessionDetector()
         self.session_id = "464f3bd5-9e49-4cc4-8ab3-86700d8633b9"
-        
+
         # Their graph indices
         self.symbol_index = load_proj_intel("symbol_index.json")
         self.project_analysis = load_proj_intel("project_analysis.json")
-        
+
         # Their JSONL normalized tables
         self.db = SessionDatabase()  # 7-table model
         self.graph = Neo4jConnection()  # Relationships
-        
+
     def get_context_for_task(self, task: str):
         # 1. Plan with CIG
         cig = self.plan_context_intent_graph(task)
-        
+
         # 2. Multi-modal retrieval
         candidates = self.retrieve_candidates(cig)
-        
+
         # 3. Agent-scored reranking
         ranked = self.rerank_with_agent(candidates, task)
-        
+
         # 4. Compress to budget
         context_pack = self.compress_context(ranked)
-        
+
         # 5. Execute with headless agent
         return self.execute_with_context(task, context_pack)
-    
+
     def execute_with_context(self, task: str, context: dict):
         # Use our optimized headless agent
         cmd = [
@@ -893,7 +893,7 @@ CREATE TABLE agent_executions(session_id TEXT, agent_type TEXT, duration_ms INT,
 ```typescript
 // Context Resolution
 POST /context/plan        → CIG
-POST /context/retrieve    → Candidates  
+POST /context/retrieve    → Candidates
 POST /context/rerank      → Top-k
 POST /context/pack        → Context Pack
 
@@ -1013,25 +1013,25 @@ disabled: Never optimize
 ```mermaid
 timeline
     title Implementation Phases Timeline
-    
+
     section Phase 1 - Foundation
         Session Detection    : Complete : Marker-based UUID detection
         Headless Optimization : Complete : 85% speed improvement
         Context Extraction : Complete : Basic JSONL parsing
         Bypass Mechanisms : Complete : [RAW] tag support
-    
+
     section Phase 2 - Integration
         JSONL Taxonomy : In Progress : 18+ object types mapped
         Symbol Index : In Progress : Graph-based navigation
         Graph Database : Pending : Neo4j setup required
         Context Intent Graph : Pending : Agent planning system
-    
+
     section Phase 3 - Intelligence
         Semantic Embeddings : Future : Vector search capability
         Agent Reranking : Future : Model-scored relevance
         Decision Cards : Future : Historical context mining
         Cross-Session Learning : Future : Knowledge accumulation
-    
+
     section Phase 4 - Production
         MCP Server : Future : Unified API deployment
         Telemetry : Future : Performance monitoring
@@ -1048,35 +1048,35 @@ graph BT
         CLI[Claude CLI]
         GIT[Git Repository]
     end
-    
+
     subgraph "Core Components"
         ENV --> HOOKS[Hook System]
         PYTHON --> SESSION[Session Manager]
         CLI --> HEADLESS[Headless Agents]
         GIT --> JSONL[JSONL Logs]
     end
-    
+
     subgraph "Intelligence Layer"
         SESSION --> DETECTOR[Session Detector]
         JSONL --> PARSER[JSONL Parser]
         HOOKS --> OPTIMIZER[Prompt Optimizer]
         HEADLESS --> AGENTS[Specialized Agents]
     end
-    
+
     subgraph "Integration Layer"
         DETECTOR --> CONTEXT[Context System]
         PARSER --> TAXONOMY[Object Taxonomy]
         OPTIMIZER --> BYPASS[Bypass Logic]
         AGENTS --> PARALLEL[Parallel Execution]
     end
-    
+
     subgraph "Application Layer"
         CONTEXT --> UNIFIED[Unified System]
         TAXONOMY --> UNIFIED
         BYPASS --> UNIFIED
         PARALLEL --> UNIFIED
     end
-    
+
     style ENV fill:#ff9800,color:#fff
     style PYTHON fill:#ff9800,color:#fff
     style CLI fill:#ff9800,color:#fff
@@ -1093,34 +1093,34 @@ graph LR
         AGENT_CFG[agent_configs.sh]
         MCP_MIN[.claude_minimal.json]
     end
-    
+
     subgraph "Environment Variables"
         SESSION_UUID[CLAUDE_SESSION_UUID]
         API_KEYS[OPENAI_API_KEY<br/>ANTHROPIC_API_KEY]
         PROJECT_DIR[CLAUDE_PROJECT_DIR]
     end
-    
+
     subgraph "Runtime Parameters"
         MODEL[--model opus/sonnet]
         PERMS[--permission-mode]
         TOKENS[--max-tokens]
         TEMP[--temperature]
     end
-    
+
     SETTINGS --> HOOKS[Hook System]
     HOOK_CFG --> OPTIMIZER[Prompt Optimizer]
     AGENT_CFG --> AGENTS[Headless Agents]
     MCP_MIN --> SPEED[Speed Optimization]
-    
+
     SESSION_UUID --> DETECTION[Session Detection]
     API_KEYS --> APIS[API Calls]
     PROJECT_DIR --> PATHS[File Paths]
-    
+
     MODEL --> EXECUTION[Agent Execution]
     PERMS --> EXECUTION
     TOKENS --> EXECUTION
     TEMP --> EXECUTION
-    
+
     style SETTINGS fill:#ff9800,color:#fff
     style SESSION_UUID fill:#1976d2,color:#fff
     style EXECUTION fill:#4caf50,color:#fff
@@ -1130,38 +1130,38 @@ graph LR
 ```mermaid
 stateDiagram-v2
     [*] --> TaskInput
-    
+
     TaskInput --> SessionDetection
-    
+
     SessionDetection --> MarkerMethod: Primary
     SessionDetection --> EnvVarMethod: Fallback 1
     SessionDetection --> StateFile: Fallback 2
     SessionDetection --> SyntheticUUID: Last Resort
-    
+
     MarkerMethod --> PromptProcessing: UUID Found
     EnvVarMethod --> PromptProcessing: UUID Found
     StateFile --> PromptProcessing: UUID Found
     SyntheticUUID --> PromptProcessing: Generated
-    
+
     PromptProcessing --> CheckBypass
     CheckBypass --> RawExecution: [RAW] tags
     CheckBypass --> Optimization: No bypass
-    
+
     Optimization --> APICall
     APICall --> Enhanced: Success
     APICall --> Original: API Error
-    
+
     Enhanced --> AgentExecution
     Original --> AgentExecution
     RawExecution --> AgentExecution
-    
+
     AgentExecution --> Success: Complete
     AgentExecution --> Retry: Timeout
     AgentExecution --> Fallback: Critical Error
-    
+
     Retry --> AgentExecution: Attempt 2-3
     Retry --> Fallback: Max Retries
-    
+
     Success --> [*]
     Fallback --> [*]
 ```
@@ -1174,45 +1174,45 @@ graph TB
         HOOKS[Hook Events]
         API[API Requests]
     end
-    
+
     subgraph "Processing Pipeline"
         USER --> VALIDATE[Validation Layer]
         HOOKS --> VALIDATE
         API --> VALIDATE
-        
+
         VALIDATE --> TRANSFORM[Transformation Layer]
         TRANSFORM --> ENHANCE[Enhancement Layer]
         ENHANCE --> ROUTE[Routing Layer]
     end
-    
+
     subgraph "Storage Systems"
         ROUTE --> JSONL[(JSONL Logs)]
         ROUTE --> PG[(PostgreSQL)]
         ROUTE --> NEO[(Neo4j)]
         ROUTE --> CACHE[(Redis Cache)]
     end
-    
+
     subgraph "Retrieval Systems"
         JSONL --> QUERY[Query Engine]
         PG --> QUERY
         NEO --> GRAPH[Graph Traversal]
         CACHE --> FAST[Fast Lookup]
-        
+
         QUERY --> AGGREGATE[Aggregation Layer]
         GRAPH --> AGGREGATE
         FAST --> AGGREGATE
     end
-    
+
     subgraph "Output Generation"
         AGGREGATE --> FORMAT[Format Layer]
         FORMAT --> COMPRESS[Compression]
         COMPRESS --> DELIVER[Delivery]
-        
+
         DELIVER --> RESPONSE[User Response]
         DELIVER --> WEBHOOK[Webhooks]
         DELIVER --> STREAM[Event Stream]
     end
-    
+
     style USER fill:#1976d2,color:#fff
     style RESPONSE fill:#4caf50,color:#fff
     style WEBHOOK fill:#4caf50,color:#fff
@@ -1229,39 +1229,39 @@ graph LR
         ERROR[Error Rate]
         CACHE[Cache Hits]
     end
-    
+
     subgraph "Aggregation"
         EXEC --> STATS[Statistics Engine]
         MEM --> STATS
         TOKEN --> STATS
         ERROR --> STATS
         CACHE --> STATS
-        
+
         STATS --> P50[P50 Latency]
         STATS --> P95[P95 Latency]
         STATS --> P99[P99 Latency]
     end
-    
+
     subgraph "Alerting"
         P50 --> THRESH[Threshold Check]
         P95 --> THRESH
         P99 --> THRESH
-        
+
         THRESH --> ALERT[Alert Manager]
         ALERT --> SLACK[Slack]
         ALERT --> EMAIL[Email]
         ALERT --> PAGER[PagerDuty]
     end
-    
+
     subgraph "Visualization"
         STATS --> GRAFANA[Grafana]
         STATS --> CUSTOM[Custom Dashboard]
-        
+
         GRAFANA --> PERF[Performance View]
         GRAFANA --> COST[Cost Analysis]
         CUSTOM --> AGENT[Agent Analytics]
     end
-    
+
     style EXEC fill:#ff9800,color:#fff
     style PERF fill:#4caf50,color:#fff
     style COST fill:#4caf50,color:#fff
@@ -1324,7 +1324,7 @@ graph TB
             TOKENPOOL[15-Token Pool Management]
             WORKTREE[Git Worktree Isolation]
         end
-        
+
         subgraph "From ACCF Suite"
             CONSULT[Consult Agent Framework]
             RESEARCH[Research Infrastructure]
@@ -1332,7 +1332,7 @@ graph TB
             REVIEW[Automated Review System]
             SESSION_ANALYSIS[Session Analysis Tools]
         end
-        
+
         subgraph "From Libs Structure"
             OPSVI_LLM[Unified LLM Provider]
             OPSVI_RAG[RAG System Integration]
@@ -1341,7 +1341,7 @@ graph TB
             OPSVI_DOCKER[Container Orchestration]
         end
     end
-    
+
     subgraph "COMBINED POWER"
         MEGA1[Self-Improving Agent Teams]
         MEGA2[Parallel Execution at Scale]
@@ -1349,13 +1349,13 @@ graph TB
         MEGA4[Full-Stack Automation]
         MEGA5[Enterprise-Ready Platform]
     end
-    
+
     AUTONOMOUS --> MEGA1
     LANGGRAPH --> MEGA2
     OPSVI_SECURITY --> MEGA3
     CODING --> MEGA4
     TOKENPOOL --> MEGA5
-    
+
     style MEGA1 fill:#4caf50,color:#fff
     style MEGA2 fill:#4caf50,color:#fff
     style MEGA3 fill:#4caf50,color:#fff
@@ -1372,21 +1372,21 @@ flowchart TB
         API[API Gateway]
         CLI[CLI Interface]
     end
-    
+
     subgraph "Layer 2: Orchestration"
         subgraph "HECATON Core"
             HO[Hecaton Orchestrator]
             SIO[Self-Improving Orchestrator]
             LGO[LangGraph Parallel Engine]
         end
-        
+
         subgraph "Our Session System"
             DETECT[Session Detector]
             CONTEXT[Context Manager]
             HOOKS[Prompt Hooks]
         end
     end
-    
+
     subgraph "Layer 3: Intelligence"
         subgraph "Agent Ecosystem"
             SPEED[Speed Agents 3-5s]
@@ -1395,7 +1395,7 @@ flowchart TB
             RESEARCH[Research Agents]
             CONSULT[Consult Agents]
         end
-        
+
         subgraph "Knowledge Systems"
             CIG[Context Intent Graph]
             RAG[OPSVI-RAG System]
@@ -1403,14 +1403,14 @@ flowchart TB
             META[Meta-Learning]
         end
     end
-    
+
     subgraph "Layer 4: Execution"
         subgraph "Resource Management"
             TOKENPOOL[15-Token Pool]
             WORKTREE[Git Worktrees]
             DOCKER[Container Isolation]
         end
-        
+
         subgraph "Provider Abstraction"
             OPSVI_LLM[OPSVI-LLM Provider]
             OPENAI[OpenAI]
@@ -1418,14 +1418,14 @@ flowchart TB
             LOCAL[Local Models]
         end
     end
-    
+
     subgraph "Layer 5: Infrastructure"
         DB[(PostgreSQL/Neo4j)]
         REDIS[(Redis Cache)]
         S3[(Object Storage)]
         METRICS[(Metrics Store)]
     end
-    
+
     USER --> API
     API --> HO
     HO --> DETECT
@@ -1435,7 +1435,7 @@ flowchart TB
     SPEED --> TOKENPOOL
     TOKENPOOL --> OPSVI_LLM
     OPSVI_LLM --> DB
-    
+
     style HO fill:#9c27b0,color:#fff
     style SPEED fill:#00c853,color:#fff
     style OPSVI_LLM fill:#ff9800,color:#fff
@@ -1479,13 +1479,13 @@ graph LR
     DEV[Development] --> TEST[Testing]
     TEST --> STAGE[Staging]
     STAGE --> PROD[Production]
-    
+
     subgraph "At Each Stage"
         AGENTS[Agent Teams]
         MONITOR[Monitoring]
         ROLLBACK[Rollback]
     end
-    
+
     style PROD fill:#4caf50,color:#fff
 ```
 
@@ -1570,7 +1570,7 @@ class BaseAgent(ABC):
         self.messages = ChatMessages()
         self.tool_manager = ToolManager()
         self.logger = get_logger()
-    
+
     def task(self, user_task: str, tool_call_enabled=True):
         # Handles tool calls, retries, logging
         pass
@@ -1596,7 +1596,7 @@ graph LR
         PROD[sdlc-production]
         POST[sdlc-postmortem]
     end
-    
+
     subgraph "Technical Specialists"
         ARCH[solution-architect]
         SEC[security-architect]
@@ -1605,14 +1605,14 @@ graph LR
         PERF[performance-optimizer]
         DEVOPS[devops-automation]
     end
-    
+
     subgraph "Quality Specialists"
         QA[qa-testing-guru]
         REV[reviewer-critic]
         REFACT[refactoring-master]
         ANALYZER[code-analyzer]
     end
-    
+
     style DISC fill:#2196f3,color:#fff
     style DEV fill:#4caf50,color:#fff
     style QA fill:#ff9800,color:#fff
@@ -1643,28 +1643,28 @@ flowchart TB
         HOOKS[Prompt Hooks<br/>RAW bypass]
         HEADLESS[Headless Agents<br/>3-60s execution]
     end
-    
+
     subgraph "Reference Patterns"
         TEAM[Team Orchestration<br/>Pre-built teams]
         SDLC[SDLC Phases<br/>8 specialized phases]
         BASE[Base Agent<br/>Production architecture]
     end
-    
+
     subgraph "Combined Capabilities"
         SMART[Context-Aware Teams]
         PHASED[Intelligent Phase Execution]
         ROBUST[Production-Ready Agents]
     end
-    
+
     SESSION --> SMART
     TEAM --> SMART
-    
+
     HOOKS --> PHASED
     SDLC --> PHASED
-    
+
     HEADLESS --> ROBUST
     BASE --> ROBUST
-    
+
     style SMART fill:#4caf50,color:#fff
     style PHASED fill:#4caf50,color:#fff
     style ROBUST fill:#4caf50,color:#fff
@@ -1727,7 +1727,7 @@ stateDiagram-v2
     Discovery --> Design: Requirements Complete
     Design --> Planning: Architecture Ready
     Planning --> Development: Tasks Defined
-    
+
     state Development {
         [*] --> Core
         [*] --> CLI
@@ -1736,9 +1736,9 @@ stateDiagram-v2
         CLI --> [*]
         Tests --> [*]
     }
-    
+
     Development --> Testing: Code Complete
-    
+
     state Testing {
         [*] --> Unit
         [*] --> Integration
@@ -1747,7 +1747,7 @@ stateDiagram-v2
         Integration --> [*]
         Coverage --> [*]
     }
-    
+
     Testing --> Deployment: Tests Pass
     Deployment --> Production: Deployed
     Production --> Postmortem: Released
@@ -1858,7 +1858,7 @@ We'll lean on agent reasoning (Planner → Retriever → Reranker → Critic →
 ```python
 import json, hashlib, sys
 
-def hash_thinking(x: str) -> str: 
+def hash_thinking(x: str) -> str:
     return hashlib.sha256(x.encode()).hexdigest()
 
 def normalize_chat(jsonl_paths, turns_out, tools_out, sums_out, index_out):
@@ -1870,17 +1870,17 @@ def normalize_chat(jsonl_paths, turns_out, tools_out, sums_out, index_out):
             with open(p, 'rb') as f:
                 for raw in f:
                     line = raw.decode('utf-8', errors='ignore')
-                    if not line.strip(): 
+                    if not line.strip():
                         continue
                     rec = json.loads(line)
-                    
+
                     # Redact thinking - CRITICAL
                     if rec.get('type') == 'assistant':
                         for c in rec.get('message', {}).get('content', []):
                             if c.get('type') == 'thinking':
                                 c['hash'] = hash_thinking(c.get('thinking', ''))
                                 c['thinking'] = None  # Never persist raw thinking
-                    
+
                     # Process turns, tools, summaries...
                     # [Implementation continues as in blueprint]
 ```
@@ -1956,46 +1956,46 @@ flowchart TB
         PROJ[Proj-Intel Files]
         SESSION[Session JSONL]
     end
-    
+
     subgraph "Processing Layer"
         INGEST[Chat Ingestion]
         NORMALIZE[Normalization]
         EMBED[Embedding Service]
         GRAPH[Graph Builder]
     end
-    
+
     subgraph "Storage Layer"
         SHARDS[Sharded JSONL]
         INDICES[Reverse Indices]
         VECTORS[Vector Store]
         NEO4J[Neo4j Graph]
     end
-    
+
     subgraph "Retrieval Layer"
         CIG[Context Planner]
         RETRIEVE[Multi-Modal Retriever]
         RERANK[Model Reranker]
         PACK[Context Compressor]
     end
-    
+
     subgraph "Agent Layer"
         AGENTS[All Agents]
         HOOKS[Context Hooks]
     end
-    
+
     CHAT --> INGEST
     PROJ --> INGEST
     SESSION --> INGEST
-    
+
     INGEST --> NORMALIZE
     NORMALIZE --> SHARDS
     NORMALIZE --> EMBED
     NORMALIZE --> GRAPH
-    
+
     EMBED --> VECTORS
     GRAPH --> NEO4J
     SHARDS --> INDICES
-    
+
     AGENTS --> CIG
     CIG --> RETRIEVE
     RETRIEVE --> VECTORS
@@ -2005,7 +2005,7 @@ flowchart TB
     RERANK --> PACK
     PACK --> HOOKS
     HOOKS --> AGENTS
-    
+
     style CIG fill:#9c27b0,color:#fff
     style PACK fill:#4caf50,color:#fff
     style AGENTS fill:#ff9800,color:#fff
@@ -2066,18 +2066,18 @@ Based on proj-intel analysis, we discovered 400+ agent classes, but **we should 
 ### Components to ADAPT (Take Best Parts Only)
 
 #### ✓ **Knowledge System** (Selective Integration)
-**Take**: 
+**Take**:
 - Neo4j graph relationships
 - Embedding service for semantic search
-**Skip**: 
+**Skip**:
 - AutonomousEvolutionEngine (too complex, overlaps with HECATON)
 - Multiple learning loops (consolidate to one)
 
 #### ✓ **SDLC Agents** (Cherry-pick Specialists)
-**Take**: 
+**Take**:
 - Specific phase experts (Requirements, Testing, Deployment)
 - Already proven in sdlc-phase-executor-v2.py
-**Skip**: 
+**Skip**:
 - Generic agents (Frontend, Backend - too vague)
 - Duplicate coordinator layers
 
@@ -2092,29 +2092,29 @@ graph LR
         HECATON[HECATON Orchestration]
         CONTEXT[Context Retrieval]
     end
-    
+
     subgraph "Strategic Additions (What We Need)"
         WORKTREE[Git Worktree<br/>Manager]
         SEMANTIC[Semantic<br/>Analyzer]
         META[Metacognitive<br/>Agent]
     end
-    
+
     subgraph "Final Capabilities"
         PARALLEL[Safe Parallel<br/>Execution]
         UNDERSTAND[Deep Code<br/>Understanding]
         REASON[Self-Aware<br/>Reasoning]
     end
-    
+
     SESSION --> CONTEXT
     HECATON --> PARALLEL
     WORKTREE --> PARALLEL
-    
+
     CONTEXT --> UNDERSTAND
     SEMANTIC --> UNDERSTAND
-    
+
     HOOKS --> REASON
     META --> REASON
-    
+
     style WORKTREE fill:#4caf50,color:#fff
     style SEMANTIC fill:#4caf50,color:#fff
     style META fill:#4caf50,color:#fff
@@ -2180,7 +2180,7 @@ if meta.should_proceed("Build user auth system"):
         task="User authentication",
         context=semantic.find_similar_code()
     )
-    
+
     # 2. Safe parallel execution (no conflicts)
     with worktree.isolated_branches(count=3) as branches:
         results = await asyncio.gather(
@@ -2188,7 +2188,7 @@ if meta.should_proceed("Build user auth system"):
             claude_code(plan.frontend, branch=branches[1]),
             claude_test(plan.tests, branch=branches[2])
         )
-    
+
     # 3. Semantic validation (understands intent)
     if semantic.validates_intent(results, plan):
         worktree.merge_all(branches)
@@ -2282,39 +2282,39 @@ graph TB
         HECATON[HECATON Orchestration]
         SAFETY[Git Safety Layer]
     end
-    
+
     subgraph "External Additions"
         SUPER[SuperClaude Framework<br/>Commands & Modes]
         PROXY[Claude Proxy<br/>Provider Routing]
         MONITOR[Usage Monitor<br/>Cost Control]
     end
-    
+
     subgraph "Pattern Libraries"
         FLOW[claude-flow<br/>Memory Patterns]
         HOOKS[Hooks Mastery<br/>Safety Patterns]
         WORK[Workflows<br/>PR Automation]
     end
-    
+
     subgraph "Enhanced Capabilities"
         STRUCT[Structured Commands]
         ROUTE[Multi-Provider]
         OBSERVE[Full Observability]
         MEMORY[Persistent Memory]
     end
-    
+
     UNIFIED --> STRUCT
     SUPER --> STRUCT
-    
+
     HECATON --> ROUTE
     PROXY --> ROUTE
-    
+
     SAFETY --> OBSERVE
     MONITOR --> OBSERVE
-    
+
     FLOW -.->|patterns| MEMORY
     HOOKS -.->|patterns| SAFETY
     WORK -.->|patterns| OBSERVE
-    
+
     style SUPER fill:#4caf50,color:#fff
     style PROXY fill:#4caf50,color:#fff
     style MONITOR fill:#4caf50,color:#fff
@@ -2391,12 +2391,12 @@ class UnifiedSystemV2:
         self.context = UnifiedContextSystem()
         self.hecaton = HECATONOrchestrator()
         self.safety = GitSafetyManager()
-        
+
         # External additions
         self.commands = SuperClaudeFramework.commands  # Structured
         self.proxy = ClaudeCodeProxy()  # Multi-provider
         self.monitor = UsageMonitor()  # Observability
-        
+
         # Pattern-inspired enhancements
         self.memory = SQLiteSessionMemory()  # From claude-flow
         self.hooks = EnhancedHooks()  # From hooks-mastery

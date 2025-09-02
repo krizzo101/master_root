@@ -9,6 +9,10 @@ from typing import Any, Dict, List, Optional
 
 import psutil
 
+from ..utils.enhanced_logging import get_logger
+
+logger = get_logger(__name__)
+
 
 @dataclass
 class TaskMetrics:
@@ -160,22 +164,32 @@ class PerformanceMonitor:
         successful_tasks = [t for t in completed_list if t.success]
         failed_tasks = [t for t in completed_list if not t.success]
 
-        execution_times = [t.execution_time for t in completed_list if t.execution_time is not None]
-        memory_peaks = [t.memory_peak for t in completed_list if t.memory_peak is not None]
-        token_usages = [t.token_usage for t in completed_list if t.token_usage is not None]
+        execution_times = [
+            t.execution_time for t in completed_list if t.execution_time is not None
+        ]
+        memory_peaks = [
+            t.memory_peak for t in completed_list if t.memory_peak is not None
+        ]
+        token_usages = [
+            t.token_usage for t in completed_list if t.token_usage is not None
+        ]
 
         statistics = {
             "total_tasks": len(completed_list),
             "successful_tasks": len(successful_tasks),
             "failed_tasks": len(failed_tasks),
-            "success_rate": len(successful_tasks) / len(completed_list) if completed_list else 0.0,
+            "success_rate": len(successful_tasks) / len(completed_list)
+            if completed_list
+            else 0.0,
             "avg_execution_time": sum(execution_times) / len(execution_times)
             if execution_times
             else 0.0,
             "min_execution_time": min(execution_times) if execution_times else 0.0,
             "max_execution_time": max(execution_times) if execution_times else 0.0,
             "total_execution_time": sum(execution_times) if execution_times else 0.0,
-            "avg_memory_usage": sum(memory_peaks) / len(memory_peaks) if memory_peaks else 0.0,
+            "avg_memory_usage": sum(memory_peaks) / len(memory_peaks)
+            if memory_peaks
+            else 0.0,
             "peak_memory": max(memory_peaks) if memory_peaks else 0.0,
             "total_token_usage": sum(token_usages) if token_usages else 0,
         }
@@ -183,7 +197,9 @@ class PerformanceMonitor:
         # Add monitor uptime
         statistics["monitor_uptime"] = time.perf_counter() - self._monitor_start_time
         statistics["current_memory"] = self._process.memory_info().rss
-        statistics["memory_growth"] = statistics["current_memory"] - self._monitor_start_memory
+        statistics["memory_growth"] = (
+            statistics["current_memory"] - self._monitor_start_memory
+        )
 
         return statistics
 
@@ -210,7 +226,8 @@ class PerformanceMonitor:
                 for task_id, metrics in self._active_tasks.items()
             },
             "completed_tasks": {
-                task_id: asdict(metrics) for task_id, metrics in self._completed_tasks.items()
+                task_id: asdict(metrics)
+                for task_id, metrics in self._completed_tasks.items()
             },
         }
 

@@ -213,7 +213,9 @@ class MessageBroker:
         except asyncio.TimeoutError:
             return None
 
-    async def get_topic_messages(self, topic: str, limit: Optional[int] = None) -> List[Message]:
+    async def get_topic_messages(
+        self, topic: str, limit: Optional[int] = None
+    ) -> List[Message]:
         """
         Get messages from a topic queue without consuming them.
 

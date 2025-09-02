@@ -22,11 +22,11 @@ class MyComponent(BaseComponent):
     async def _initialize_impl(self):
         # Your initialization code
         pass
-    
+
     async def _shutdown_impl(self):
         # Your shutdown code
         pass
-    
+
     async def _health_check_impl(self):
         return True
 

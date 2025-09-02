@@ -3,6 +3,10 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, Dict, List
 
+from ..utils.enhanced_logging import get_logger
+
+logger = get_logger(__name__)
+
 
 class Agent(ABC):
     """Base Agent class for HECATON specialized agents."""
@@ -30,7 +34,7 @@ class Agent(ABC):
         Returns:
             Dictionary containing execution results
         """
-        pass
+        raise NotImplementedError(f"Agent {self.name} must implement execute method")
 
     def log_task(self, task: Dict[str, Any], result: Dict[str, Any]):
         """Log task execution for history tracking.

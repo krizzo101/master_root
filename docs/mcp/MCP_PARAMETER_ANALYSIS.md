@@ -43,7 +43,7 @@
 
 MCP converts parameters as follows:
 1. **Integers** → Sent as strings (e.g., 42 → "42")
-2. **Booleans** → Sent as booleans (true/false) 
+2. **Booleans** → Sent as booleans (true/false)
 3. **Lists** → Sent as JSON strings (e.g., ["a", "b"] → '["a", "b"]')
 4. **None/null** → Sometimes sent as string "None" or omitted
 5. **Strings** → Sent as strings (no change)
@@ -62,7 +62,7 @@ MCP converts parameters as follows:
 ```python
 # Integer fields that need coercion
 - thoughtNumber (required, >= 1)
-- totalThoughts (required, >= 1)  
+- totalThoughts (required, >= 1)
 - confidenceLevel (optional, 0-100)
 - attemptNumber (optional, >= 1, default 1)
 - revisesThought (optional)

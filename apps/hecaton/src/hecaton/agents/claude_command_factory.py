@@ -207,11 +207,12 @@ class ClaudeCommandFactory:
 
         cmd.append("-p")  # Always use print/headless mode
 
-        # Prompt: short -> positional after -p; long -> sentinel handled by executor
+        # Add prompt (from file or direct)
         if len(prompt) > 1000 or "\n" in prompt:
-            cmd.append("@-")  # sentinel; executor strips and pipes stdin
+            # Use file for long/multiline prompts
+            cmd.append(f"@-")  # Will pipe via stdin
         else:
-            cmd.append(prompt)  # Direct prompt as positional arg after -p
+            cmd.extend(["--", prompt])
 
         # Apply profile optimizations
         profile_settings = self.PERFORMANCE_PROFILES.get(config.profile, {})
@@ -267,8 +268,8 @@ class ClaudeCommandFactory:
             cmd.append("--verbose")
 
         if config.timeout:
-            # Note: Claude CLI doesn't have direct timeout, would need wrapper
-            pass
+            # Timeout will be handled by the executor using subprocess timeout
+            logger.debug(f"Timeout of {config.timeout}s will be enforced by executor")
 
         return cmd
 

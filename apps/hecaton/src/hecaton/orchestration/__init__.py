@@ -1,11 +1,5 @@
 """Orchestration components"""
 
+from .send_api import ExecutionGraph, SendAPIOrchestrator
 
-# Placeholder for Phase 0
-class SendAPIOrchestrator:
-    """Send API Orchestrator - will be fully implemented in TASK-004"""
-
-    pass
-
-
-__all__ = ["SendAPIOrchestrator"]
+__all__ = ["SendAPIOrchestrator", "ExecutionGraph"]

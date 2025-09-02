@@ -35,7 +35,9 @@ class AgentEnvironmentOptimizer:
     Each agent gets only what it needs, nothing more.
     """
 
-    def __init__(self, base_worktree_path: Path = Path("/home/opsvi/hecaton_worktrees")):
+    def __init__(
+        self, base_worktree_path: Path = Path("/home/opsvi/hecaton_worktrees")
+    ):
         self.base_path = base_worktree_path
         self.profiles = self._create_agent_profiles()
 
@@ -208,7 +210,9 @@ MODEL={profile.model}
 """
         env_path.write_text(env_content)
 
-        logger.info(f"Created optimized environment for {agent_type} agent at {worktree_path}")
+        logger.info(
+            f"Created optimized environment for {agent_type} agent at {worktree_path}"
+        )
 
         return {
             "mcp_config": str(mcp_config_path),
@@ -299,7 +303,9 @@ class DynamicAgentSpawner:
     Each agent gets exactly what it needs for its specific task.
     """
 
-    def __init__(self, optimizer: AgentEnvironmentOptimizer, token_pool, worktree_manager):
+    def __init__(
+        self, optimizer: AgentEnvironmentOptimizer, token_pool, worktree_manager
+    ):
         self.optimizer = optimizer
         self.token_pool = token_pool
         self.worktree_manager = worktree_manager
@@ -371,7 +377,9 @@ class DynamicAgentSpawner:
             profile = self.optimizer.profiles.get(agent_type)
             timeout = 30 if not profile else (60 if profile.model == "opus" else 30)
 
-            stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=timeout)
+            stdout, stderr = await asyncio.wait_for(
+                process.communicate(), timeout=timeout
+            )
 
             execution_time = time.time() - start_time
 
@@ -379,7 +387,9 @@ class DynamicAgentSpawner:
             if process.returncode == 0:
                 try:
                     result = json.loads(stdout.decode())
-                    logger.info(f"✅ {agent_type} agent completed in {execution_time:.1f}s")
+                    logger.info(
+                        f"✅ {agent_type} agent completed in {execution_time:.1f}s"
+                    )
 
                     return {
                         "agent_id": agent_id,
@@ -389,7 +399,9 @@ class DynamicAgentSpawner:
                         "result": result.get("result"),
                         "cost": result.get("total_cost_usd", 0),
                         "config_overhead": "minimal",
-                        "mcp_servers_loaded": len(profile.mcp_servers if profile else {}),
+                        "mcp_servers_loaded": len(
+                            profile.mcp_servers if profile else {}
+                        ),
                     }
                 except json.JSONDecodeError:
                     return {

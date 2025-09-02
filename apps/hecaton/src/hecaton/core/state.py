@@ -3,6 +3,10 @@
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
+from ..utils.enhanced_logging import get_logger
+
+logger = get_logger(__name__)
+
 
 @dataclass
 class OrchestratorState:

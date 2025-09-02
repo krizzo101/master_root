@@ -12,6 +12,14 @@ from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set
 
+from ..utils.enhanced_logging import (
+    get_logger,
+    log_resource_usage,
+    log_state_transition,
+)
+
+logger = get_logger(__name__)
+
 
 class AgentStatus(Enum):
     """Agent operational status."""
@@ -175,7 +183,9 @@ class AgentRegistry:
             List of healthy agents
         """
         return [
-            agent for agent in self._agents.values() if agent.is_healthy(self._heartbeat_timeout)
+            agent
+            for agent in self._agents.values()
+            if agent.is_healthy(self._heartbeat_timeout)
         ]
 
     def get_unhealthy_agents(self) -> List[Agent]:
@@ -205,7 +215,9 @@ class AgentRegistry:
             return True
         return False
 
-    def get_least_loaded_agent(self, capability: Optional[str] = None) -> Optional[Agent]:
+    def get_least_loaded_agent(
+        self, capability: Optional[str] = None
+    ) -> Optional[Agent]:
         """Get the agent with the lowest task count.
 
         Implements load balancing by selecting the healthy agent
