@@ -111,7 +111,7 @@ class TerminalUI:
             Layout(name="footer", size=3),
         )
 
-        self.layout["main"].split_row(
+        self.layout.get("main").split_row(
             Layout(name="content", ratio=3), Layout(name="sidebar", ratio=1)
         )
 
@@ -934,25 +934,32 @@ class TerminalUI:
         return True
 
     def _get_key_input(self) -> Optional[str]:
-        """Non-blocking keyboard input"""
-        if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+        """Non-blocking keyboard input using select"""
+        # Use select to check if input is available without blocking
+        if select.select([sys.stdin], [], [], 0.0)[0]:
             try:
                 key = sys.stdin.read(1)
-                # Handle special keys
+
+                # Handle special keys (arrow keys, etc.)
                 if key == "\x1b":  # ESC sequence
-                    key += sys.stdin.read(2)
-                    if key == "\x1b[A":
-                        return "up"
-                    elif key == "\x1b[B":
-                        return "down"
-                    elif key == "\x1b[C":
-                        return "right"
-                    elif key == "\x1b[D":
-                        return "left"
+                    # Read the rest of the sequence
+                    if select.select([sys.stdin], [], [], 0.1)[0]:
+                        seq = sys.stdin.read(2)
+                        if seq == "[A":
+                            return "up"
+                        elif seq == "[B":
+                            return "down"
+                        elif seq == "[C":
+                            return "right"
+                        elif seq == "[D":
+                            return "left"
                 elif key == "\t":
                     return "tab"
-                elif key == "\x1b":
-                    return "escape"
+                elif key in ["\r", "\n"]:
+                    return "enter"
+                elif key == "\x03":  # Ctrl+C
+                    return "quit"
+
                 return key
             except:
                 return None
@@ -972,12 +979,9 @@ class TerminalUI:
             # Start WebSocket connection in background
             websocket_task = asyncio.create_task(self._connect_websocket())
 
-            with Live(
-                self._render_ui(),
-                console=self.console,
-                refresh_per_second=1 / self.state.refresh_rate,
-                screen=True,
-            ) as live:
+            # Use a simpler approach without Live screen mode to avoid conflicts
+            console = Console()
+            try:
                 # Simulate some initial data for demo
                 self.data.docker_containers = [
                     {
@@ -1058,18 +1062,36 @@ class TerminalUI:
                     "total_cost": 1250.0,
                 }
 
-                # Main UI loop
+                # Main UI loop without Live screen mode
                 running = True
+                last_render = 0
                 while running:
-                    # Handle keyboard input
+                    # Only render every 2 seconds unless there's input
+                    import time
+
+                    now = time.time()
+                    if now - last_render > 2:
+                        console.clear()
+                        console.print(self._render_ui())
+                        console.print(
+                            "\nPress Tab to switch views, 1-6 for direct view, Q to quit, H for help"
+                        )
+                        last_render = now
+
+                    # Handle keyboard input (non-blocking check)
                     key = self._get_key_input()
                     if key:
                         running = self._handle_key(key)
-
-                    live.update(self._render_ui())
+                        # Re-render immediately after input
+                        console.clear()
+                        console.print(self._render_ui())
+                        console.print(
+                            "\nPress Tab to switch views, 1-6 for direct view, Q to quit, H for help"
+                        )
+                        last_render = now
 
                     # Small delay to prevent excessive CPU usage
-                    await asyncio.sleep(0.1)
+                    await asyncio.sleep(0.2)
 
                     # Check for WebSocket errors
                     if websocket_task.done():
@@ -1081,6 +1103,10 @@ class TerminalUI:
                             websocket_task = asyncio.create_task(
                                 self._connect_websocket()
                             )
+
+            except Exception as e:
+                console.print(f"[red]Error: {e}[/red]")
+                await asyncio.sleep(1)
 
         except KeyboardInterrupt:
             pass

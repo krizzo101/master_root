@@ -1,0 +1,246 @@
+groups:
+  - name: project-context-alerts
+    rules:
+      # High-level service health
+      - alert: ProjectContextServiceDown
+        expr: up{job="project-context-server"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: project-context
+        annotations:
+          summary: "Project Context MCP Server is down"
+          description: "The Project Context MCP Server has been down for more than 1 minute."
+
+      - alert: DatabaseConnectionDown
+        expr: up{job="postgres"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: database
+        annotations:
+          summary: "PostgreSQL database is unreachable"
+          description: "Cannot connect to PostgreSQL database for {{ $labels.instance }}"
+
+      - alert: RedisCacheDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: warning
+          service: cache
+        annotations:
+          summary: "Redis cache is unavailable"
+          description: "Redis cache service is down, falling back to memory cache"
+
+      # Performance alerts
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1.0
+        for: 3m
+        labels:
+          severity: warning
+          service: project-context
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }}s for {{ $labels.instance }}"
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+          service: project-context
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors/sec for {{ $labels.instance }}"
+
+      # Resource usage alerts
+      - alert: HighCPUUsage
+        expr: cpu_usage_percent > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}% on {{ $labels.instance }}"
+
+      - alert: HighMemoryUsage
+        expr: memory_usage_percent > 85
+        for: 3m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value }}% on {{ $labels.instance }}"
+
+      - alert: DiskSpaceLow
+        expr: disk_free_percent < 10
+        for: 5m
+        labels:
+          severity: critical
+          service: system
+        annotations:
+          summary: "Disk space critically low"
+          description: "Disk space is only {{ $value }}% free on {{ $labels.instance }}"
+
+      # Database-specific alerts
+      - alert: DatabaseConnectionsHigh
+        expr: pg_stat_database_numbackends > 150
+        for: 3m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "High number of database connections"
+          description: "Database has {{ $value }} active connections"
+
+      - alert: DatabaseSlowQueries
+        expr: pg_stat_statements_mean_time_ms > 1000
+        for: 5m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "Slow database queries detected"
+          description: "Average query time is {{ $value }}ms"
+
+      - alert: DatabaseLockWaits
+        expr: pg_locks_waiting_count > 5
+        for: 2m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "Database lock waits detected"
+          description: "{{ $value }} queries are waiting for locks"
+
+      # Cache-specific alerts
+      - alert: RedisCacheHitRateLow
+        expr: redis_cache_hit_rate < 0.7
+        for: 5m
+        labels:
+          severity: warning
+          service: cache
+        annotations:
+          summary: "Redis cache hit rate is low"
+          description: "Cache hit rate is {{ $value }}, consider cache optimization"
+
+      - alert: RedisMemoryUsageHigh
+        expr: redis_memory_usage_percent > 90
+        for: 3m
+        labels:
+          severity: warning
+          service: cache
+        annotations:
+          summary: "Redis memory usage is high"
+          description: "Redis memory usage is {{ $value }}%"
+
+      # Application-specific alerts
+      - alert: ToolExecutionFailures
+        expr: rate(mcp_tool_failures_total[5m]) > 0.05
+        for: 3m
+        labels:
+          severity: warning
+          service: project-context
+        annotations:
+          summary: "High tool execution failure rate"
+          description: "Tool failure rate is {{ $value }} failures/sec"
+
+      - alert: LongRunningToolExecution
+        expr: mcp_tool_execution_duration_seconds > 30
+        for: 1m
+        labels:
+          severity: warning
+          service: project-context
+        annotations:
+          summary: "Long-running tool execution detected"
+          description: "Tool {{ $labels.tool_name }} has been running for {{ $value }}s"
+
+      - alert: IntelligenceDataStale
+        expr: time() - project_intel_last_update_timestamp > 3600
+        for: 5m
+        labels:
+          severity: warning
+          service: project-context
+        annotations:
+          summary: "Project intelligence data is stale"
+          description: "Intelligence data hasn't been updated for {{ $value }} seconds"
+
+      # Security alerts
+      - alert: UnauthorizedAccessAttempts
+        expr: rate(http_requests_total{status="401"}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          service: security
+        annotations:
+          summary: "High number of unauthorized access attempts"
+          description: "{{ $value }} unauthorized requests/sec detected"
+
+      - alert: SuspiciousAPIUsage
+        expr: rate(http_requests_total[1m]) > 100
+        for: 1m
+        labels:
+          severity: warning
+          service: security
+        annotations:
+          summary: "Abnormally high API usage detected"
+          description: "{{ $value }} requests/sec, possible abuse"
+
+  - name: infrastructure-alerts
+    rules:
+      # Container health
+      - alert: ContainerRestartLoop
+        expr: increase(container_spec_cpu_period[1h]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: infrastructure
+        annotations:
+          summary: "Container restart loop detected"
+          description: "Container {{ $labels.name }} has restarted {{ $value }} times in the last hour"
+
+      - alert: ContainerHighCPU
+        expr: rate(container_cpu_usage_seconds_total[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          service: infrastructure
+        annotations:
+          summary: "Container CPU usage high"
+          description: "Container {{ $labels.name }} CPU usage is {{ $value }}"
+
+      # Network issues
+      - alert: NetworkLatencyHigh
+        expr: network_latency_ms > 100
+        for: 3m
+        labels:
+          severity: warning
+          service: infrastructure
+        annotations:
+          summary: "Network latency is high"
+          description: "Network latency is {{ $value }}ms"
+
+  - name: business-metrics-alerts
+    rules:
+      # Usage patterns
+      - alert: UnusualTrafficPattern
+        expr: (rate(http_requests_total[5m]) - rate(http_requests_total[5m] offset 1d)) / rate(http_requests_total[5m] offset 1d) > 2
+        for: 10m
+        labels:
+          severity: info
+          service: business
+        annotations:
+          summary: "Unusual traffic pattern detected"
+          description: "Traffic is {{ $value }}x higher than same time yesterday"
+
+      - alert: LowAPIUsage
+        expr: rate(http_requests_total[1h]) < 0.1
+        for: 30m
+        labels:
+          severity: info
+          service: business
+        annotations:
+          summary: "Unusually low API usage"
+          description: "API usage is very low: {{ $value }} requests/hour"

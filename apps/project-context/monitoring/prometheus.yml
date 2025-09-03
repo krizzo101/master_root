@@ -1,0 +1,93 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'project-context'
+    environment: 'production'
+
+rule_files:
+  - "alert.rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Project Context MCP Server
+  - job_name: 'project-context-server'
+    static_configs:
+      - targets: ['project-context:8080']
+    scrape_interval: 10s
+    metrics_path: /metrics
+    params:
+      format: ['prometheus']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'project-context-server'
+
+  # PostgreSQL Database Metrics
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 30s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'postgres-db'
+
+  # Redis Cache Metrics
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 30s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'redis-cache'
+
+  # Node Exporter (System Metrics)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s
+
+  # Docker Container Metrics
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8081']
+    scrape_interval: 30s
+
+  # Nginx Reverse Proxy Metrics
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx-exporter:9113']
+    scrape_interval: 30s
+
+  # Application-specific metrics
+  - job_name: 'mcp-tools-metrics'
+    static_configs:
+      - targets: ['project-context:8080']
+    scrape_interval: 15s
+    metrics_path: /metrics/tools
+    params:
+      detailed: ['true']
+
+  # Custom business metrics
+  - job_name: 'business-metrics'
+    static_configs:
+      - targets: ['project-context:8080']
+    scrape_interval: 60s
+    metrics_path: /metrics/business
+    params:
+      include_trends: ['true']
+
+  # Health check monitoring
+  - job_name: 'health-checks'
+    static_configs:
+      - targets: ['project-context:3000']
+    scrape_interval: 30s
+    metrics_path: /health/prometheus
+    scheme: http
