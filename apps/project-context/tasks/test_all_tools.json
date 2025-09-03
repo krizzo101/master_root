@@ -1,0 +1,12 @@
+{
+  "task_id": "test_all_tools",
+  "task_type": "testing",
+  "prompt": "\n            Create comprehensive tests in /home/opsvi/master_root/apps/project-context/tests/test_tools.py\n            \n            Requirements:\n            1. Test each of the 21 tools with mocked databases\n            2. Use pytest and pytest-asyncio\n            3. Mock asyncpg and neo4j connections\n            4. Test error handling\n            5. Verify response formats\n            ",
+  "context": {},
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "",
+  "start_time": 1756819913.515694,
+  "end_time": 1756820033.453897
+}

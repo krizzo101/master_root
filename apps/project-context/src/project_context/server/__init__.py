@@ -1,5 +1,5 @@
 """MCP server implementation for project context."""
 
-from .main import app
+from .main import mcp
 
-__all__ = ["app"]
+__all__ = ["mcp"]

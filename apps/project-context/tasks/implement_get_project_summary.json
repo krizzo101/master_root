@@ -1,0 +1,49 @@
+{
+  "task_id": "implement_get_project_summary",
+  "task_type": "development",
+  "prompt": "\n            Implement MCP tool 'get_project_summary' in src/project_context/tools/discovery.py:\n            - Description: Overall project statistics from context_items\n            - Query PostgreSQL tables: context_items, code_elements per schema\n            - Query Neo4j for relationships if needed\n            - Return JSON response with proper error handling\n            - Use asyncpg for PostgreSQL queries\n            - Follow the schema in /home/opsvi/master_root/init-scripts/01-create-schema.sql\n            - Import from ..db.connections for database access\n            ",
+  "context": {},
+  "dependencies": [
+    "setup_db_connections"
+  ],
+  "status": "completed",
+  "result": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 51454,
+    "duration_api_ms": 53960,
+    "num_turns": 21,
+    "result": "The `get_project_summary` MCP tool is already fully implemented in `src/project_context/tools/discovery.py` at line 84. \n\n**Implementation Summary:**\n\n\u2705 **Completed Requirements:**\n- \u2705 Description: \"Overall project statistics from context_items\" - implemented with comprehensive statistics\n- \u2705 Queries PostgreSQL tables: context_items, code_elements per schema - implemented with proper async queries\n- \u2705 Uses asyncpg for PostgreSQL queries - uses the connection pool from db.connections\n- \u2705 Returns JSON response with proper error handling - comprehensive error handling with try/catch\n- \u2705 Imports from ..db.connections for database access - correctly imports `get_db()`\n- \u2705 Follows schema structure - queries match the schema defined in init-scripts/01-create-schema.sql\n\n**Key Features:**\n- Comprehensive project statistics including file counts, session data, language distribution\n- Concurrent execution of multiple database queries for performance\n- Proper caching with 5-minute TTL\n- Error handling that preserves partial results\n- Support for monitoring metrics and recent activity analysis\n- Neo4j relationship queries if available (optional fallback)\n\nThe function returns a structured JSON response with:\n- `timestamp` - Analysis timestamp\n- `project_overview` - Context items statistics\n- `file_statistics` - Code elements and complexity metrics  \n- `session_statistics` - Chat session analytics\n- `language_distribution` - Programming language breakdown\n- `token_usage` - Token consumption metrics\n- `monitoring_metrics` - System monitoring data\n- `recent_activity` - Recent cross-table activity",
+    "session_id": "b4184a2f-9e3b-45fb-bcfb-5cf69b5c9db1",
+    "total_cost_usd": 0.22075994999999998,
+    "usage": {
+      "input_tokens": 7,
+      "cache_creation_input_tokens": 267,
+      "cache_read_input_tokens": 37950,
+      "output_tokens": 375,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 267
+      }
+    },
+    "permission_denials": [
+      {
+        "tool_name": "Bash",
+        "tool_use_id": "toolu_01VegSdfaCqAct9bkQtLfjFN",
+        "tool_input": {
+          "command": "python -c \"\nimport asyncio\nimport sys\nsys.path.append('src')\nfrom project_context.tools.discovery import get_project_summary\n\nasync def test_project_summary():\n    try:\n        result = await get_project_summary()\n        print('SUCCESS: get_project_summary returned:')\n        print(f'Keys: {list(result.keys())}')\n        if 'error' in result:\n            print(f'Error: {result[\\\"error\\\"]}')\n        else:\n            print(f'Timestamp: {result.get(\\\"timestamp\\\")}')\n            print(f'Project Overview: {bool(result.get(\\\"project_overview\\\"))}')\n            print(f'File Statistics: {bool(result.get(\\\"file_statistics\\\"))}')\n    except Exception as e:\n        print(f'FAILED: {e}')\n        import traceback\n        traceback.print_exc()\n\nasyncio.run(test_project_summary())\n\"",
+          "description": "Test the get_project_summary function implementation"
+        }
+      }
+    ],
+    "uuid": "b23b64fd-97b4-4f87-9ee9-c498c262b384"
+  },
+  "error": null,
+  "start_time": 1756875471.322907,
+  "end_time": 1756875524.56288
+}

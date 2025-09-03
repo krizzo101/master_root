@@ -165,13 +165,18 @@ class GenericOrchestrator:
         # Try to load tokens from encrypted storage if not provided
         if tokens is None:
             try:
+                # Add parent directory to path for imports
+                import sys
+
+                sys.path.insert(0, str(Path(__file__).parent))
                 from token_loader import load_tokens_from_secrets
 
                 loaded_tokens = load_tokens_from_secrets()
                 if loaded_tokens:
                     tokens = loaded_tokens
                     logger.info(f"Loaded {len(tokens)} tokens from secure storage")
-            except ImportError:
+            except ImportError as e:
+                logger.warning(f"Could not load tokens from secrets: {e}")
                 pass  # Fall back to default TokenPool behavior
 
         self.token_pool = TokenPool(tokens)
