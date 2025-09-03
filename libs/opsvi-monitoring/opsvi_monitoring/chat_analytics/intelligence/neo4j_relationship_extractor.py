@@ -5,11 +5,13 @@ Extracts and builds relationships from PostgreSQL data into Neo4j graph.
 
 import hashlib
 import sys
+import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import psycopg2
 from neo4j import GraphDatabase
+from neo4j.exceptions import ServiceUnavailable, TransientError
 
 # Add project root to path
 sys.path.insert(0, "/home/opsvi/master_root")
@@ -23,21 +25,63 @@ class Neo4jRelationshipExtractor:
         postgres_url: str = "postgresql://opsvi:opsvi_secure_password@localhost:5432/unified_context",
         neo4j_uri: str = "bolt://localhost:7687",
         neo4j_user: str = "neo4j",
-        neo4j_password: str = "neo4j_secure_password",
+        neo4j_password: str = "password",  # Updated to match Docker Compose config
+        batch_size: int = 100,  # Process in batches
+        max_retries: int = 3,  # Retry failed operations
     ):
         self.postgres_url = postgres_url
+        self.batch_size = batch_size
+        self.max_retries = max_retries
 
         # PostgreSQL connection
         self.pg_conn = psycopg2.connect(postgres_url)
         self.pg_conn.autocommit = True
 
-        # Neo4j connection
+        # Neo4j connection with improved config
         self.neo4j_driver = GraphDatabase.driver(
-            neo4j_uri, auth=(neo4j_user, neo4j_password)
+            neo4j_uri,
+            auth=(neo4j_user, neo4j_password),
+            max_connection_lifetime=30 * 60,  # 30 minutes
+            max_connection_pool_size=10,
+            connection_acquisition_timeout=60,  # 60 seconds
+            encrypted=False,  # No encryption for local development
         )
 
         # Statistics
-        self.stats = {"nodes_created": 0, "relationships_created": 0, "errors": 0}
+        self.stats = {
+            "nodes_created": 0,
+            "relationships_created": 0,
+            "errors": 0,
+            "batches_processed": 0,
+            "retries": 0,
+        }
+
+    def _execute_with_retry(
+        self, session, query, parameters=None, operation_name="operation"
+    ):
+        """Execute Neo4j query with retry logic."""
+        for attempt in range(self.max_retries):
+            try:
+                result = session.run(query, parameters or {})
+                return result
+            except (TransientError, ServiceUnavailable) as e:
+                self.stats["retries"] += 1
+                if attempt == self.max_retries - 1:
+                    print(
+                        f"   ❌ Failed {operation_name} after {self.max_retries} attempts: {e}"
+                    )
+                    self.stats["errors"] += 1
+                    raise
+                else:
+                    wait_time = 2**attempt  # Exponential backoff
+                    print(
+                        f"   ⚠️  {operation_name} failed (attempt {attempt + 1}), retrying in {wait_time}s..."
+                    )
+                    time.sleep(wait_time)
+            except Exception as e:
+                print(f"   ❌ Unexpected error in {operation_name}: {e}")
+                self.stats["errors"] += 1
+                raise
 
     def extract_all_relationships(self):
         """Extract all relationships from PostgreSQL to Neo4j."""
@@ -150,80 +194,138 @@ class Neo4jRelationshipExtractor:
         print(f"   Created {len(files)} file nodes")
 
     def _extract_code_element_relationships(self):
-        """Extract code elements and their relationships to files."""
+        """Extract code elements and their relationships to files using batching."""
         print("🔧 Extracting code element relationships...")
 
+        # First, get the total count for progress tracking
         with self.pg_conn.cursor() as pg_cursor:
-            # Get code elements (functions, classes)
             pg_cursor.execute(
                 """
-                SELECT
-                    id::text as element_id,
-                    file_path,
-                    element_type,
-                    element_name,
-                    signature,
-                    line_start,
-                    line_end,
-                    complexity_score
+                SELECT COUNT(*)
                 FROM code_elements
                 WHERE element_type IN ('function', 'class')
                 AND element_name IS NOT NULL
-            """
+                """
             )
+            total_elements = pg_cursor.fetchone()[0]
 
-            elements = pg_cursor.fetchall()
+        if total_elements == 0:
+            print("   No code elements found")
+            return
 
-        # Create code element nodes and relationships
-        with self.neo4j_driver.session() as neo4j_session:
-            for element in elements:
-                (
-                    element_id,
-                    file_path,
-                    element_type,
-                    element_name,
-                    signature,
-                    line_start,
-                    line_end,
-                    complexity_score,
-                ) = element
+        print(
+            f"   Processing {total_elements} code elements in batches of {self.batch_size}"
+        )
 
-                # Create code element node
-                neo4j_session.run(
-                    """
-                    MERGE (c:CodeElement {element_id: $element_id})
-                    SET c.name = $name,
-                        c.element_type = $type,
-                        c.signature = $signature,
-                        c.line_start = $line_start,
-                        c.line_end = $line_end,
-                        c.complexity_score = $complexity,
-                        c.updated_at = datetime()
-                """,
-                    element_id=element_id,
-                    name=element_name,
-                    type=element_type,
-                    signature=signature or "",
-                    line_start=line_start or 0,
-                    line_end=line_end or 0,
-                    complexity=complexity_score or 0,
+        # Process in batches using OFFSET/LIMIT
+        for offset in range(0, total_elements, self.batch_size):
+            try:
+                batch_num = (offset // self.batch_size) + 1
+                total_batches = (
+                    total_elements + self.batch_size - 1
+                ) // self.batch_size
+                print(
+                    f"   Processing batch {batch_num}/{total_batches} (elements {offset + 1}-{min(offset + self.batch_size, total_elements)})"
                 )
 
-                # Create relationship to file
-                neo4j_session.run(
-                    """
-                    MATCH (c:CodeElement {element_id: $element_id})
-                    MATCH (f:File {path: $file_path})
-                    MERGE (c)-[:BELONGS_TO]->(f)
-                """,
-                    element_id=element_id,
-                    file_path=file_path,
-                )
+                # Get batch of elements
+                with self.pg_conn.cursor() as pg_cursor:
+                    pg_cursor.execute(
+                        """
+                        SELECT
+                            id::text as element_id,
+                            file_path,
+                            element_type,
+                            element_name,
+                            signature,
+                            line_start,
+                            line_end,
+                            complexity_score
+                        FROM code_elements
+                        WHERE element_type IN ('function', 'class')
+                        AND element_name IS NOT NULL
+                        ORDER BY id
+                        LIMIT %s OFFSET %s
+                        """,
+                        (self.batch_size, offset),
+                    )
+                    elements_batch = pg_cursor.fetchall()
 
-                self.stats["nodes_created"] += 1
-                self.stats["relationships_created"] += 1
+                # Process batch in Neo4j with retry logic
+                with self.neo4j_driver.session() as neo4j_session:
+                    # Use UNWIND for batch processing in a single transaction
+                    batch_data = []
+                    for element in elements_batch:
+                        (
+                            element_id,
+                            file_path,
+                            element_type,
+                            element_name,
+                            signature,
+                            line_start,
+                            line_end,
+                            complexity_score,
+                        ) = element
 
-        print(f"   Created {len(elements)} code element nodes")
+                        batch_data.append(
+                            {
+                                "element_id": element_id,
+                                "file_path": file_path,
+                                "element_type": element_type,
+                                "element_name": element_name,
+                                "signature": signature or "",
+                                "line_start": line_start or 0,
+                                "line_end": line_end or 0,
+                                "complexity": complexity_score or 0,
+                            }
+                        )
+
+                    # Batch create code element nodes
+                    self._execute_with_retry(
+                        neo4j_session,
+                        """
+                        UNWIND $batch as element
+                        MERGE (c:CodeElement {element_id: element.element_id})
+                        SET c.name = element.element_name,
+                            c.element_type = element.element_type,
+                            c.signature = element.signature,
+                            c.line_start = element.line_start,
+                            c.line_end = element.line_end,
+                            c.complexity_score = element.complexity,
+                            c.updated_at = datetime()
+                        """,
+                        {"batch": batch_data},
+                        f"create code elements batch {batch_num}",
+                    )
+
+                    # Batch create relationships to files
+                    self._execute_with_retry(
+                        neo4j_session,
+                        """
+                        UNWIND $batch as element
+                        MATCH (c:CodeElement {element_id: element.element_id})
+                        MATCH (f:File {path: element.file_path})
+                        MERGE (c)-[:BELONGS_TO]->(f)
+                        """,
+                        {"batch": batch_data},
+                        f"create relationships batch {batch_num}",
+                    )
+
+                    self.stats["nodes_created"] += len(elements_batch)
+                    self.stats["relationships_created"] += len(elements_batch)
+                    self.stats["batches_processed"] += 1
+
+                # Small delay to prevent overwhelming the connections
+                time.sleep(0.1)
+
+            except Exception as e:
+                print(f"   ❌ Error processing batch {batch_num}: {e}")
+                self.stats["errors"] += 1
+                continue  # Continue with next batch
+
+        print(
+            f"   ✅ Created {self.stats['nodes_created']} code element nodes in {self.stats['batches_processed']} batches"
+        )
 
     def _extract_session_relationships(self):
         """Extract chat sessions and their relationships."""
