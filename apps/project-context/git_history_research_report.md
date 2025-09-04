@@ -65,11 +65,11 @@ from typing import Dict, List, Any, Optional
 
 class GitCommitExtractor:
     """Efficient commit data extraction with caching."""
-    
+
     def __init__(self, repo_path: str):
         self.repo = Repo(repo_path)
         self.commit_cache = {}
-    
+
     def extract_commit_metadata(self, commit) -> Dict[str, Any]:
         """Extract comprehensive commit metadata."""
         return {
@@ -87,7 +87,7 @@ class GitCommitExtractor:
             'stats': self.extract_commit_stats(commit),
             'files_changed': self.extract_file_changes(commit),
         }
-    
+
     def extract_commit_stats(self, commit) -> Dict[str, int]:
         """Extract commit statistics safely."""
         try:
@@ -107,33 +107,33 @@ class GitCommitExtractor:
 ```python
 class IncrementalGitProcessor:
     """Process git history incrementally to handle large repositories."""
-    
+
     def __init__(self, repo_path: str, batch_size: int = 100):
         self.repo_path = repo_path
         self.batch_size = batch_size
         self.last_processed_commit = None
-    
+
     async def process_since_last(self, since_commit: Optional[str] = None) -> List[Dict]:
         """Process commits since last run."""
         repo = Repo(self.repo_path)
-        
+
         # Determine starting point
         if since_commit:
             commits = list(repo.iter_commits(f'{since_commit}..HEAD'))
         else:
             # First run - process all commits in batches
             commits = list(repo.iter_commits())
-        
+
         # Process in batches
         results = []
         for i in range(0, len(commits), self.batch_size):
             batch = commits[i:i + self.batch_size]
             batch_results = await self.process_commit_batch(batch)
             results.extend(batch_results)
-            
+
             # Yield control to prevent blocking
             await asyncio.sleep(0.01)
-        
+
         return results
 ```
 
@@ -143,19 +143,19 @@ class IncrementalGitProcessor:
 def stream_commits_memory_efficient(repo_path: str, max_count: int = None):
     """Stream commits without loading all into memory."""
     repo = Repo(repo_path)
-    
+
     count = 0
     for commit in repo.iter_commits():
         if max_count and count >= max_count:
             break
-            
+
         # Process one commit at a time
         yield extract_commit_data(commit)
-        
+
         # Clear commit from memory
         del commit
         count += 1
-        
+
         # Periodic garbage collection for long runs
         if count % 1000 == 0:
             import gc
@@ -169,7 +169,7 @@ def stream_commits_memory_efficient(repo_path: str, max_count: int = None):
 ```python
 class BranchTracker:
     """Track branch relationships and merge patterns."""
-    
+
     def extract_branch_info(self, repo: Repo) -> Dict[str, Any]:
         """Extract comprehensive branch information."""
         branches = {
@@ -177,7 +177,7 @@ class BranchTracker:
             'remote': [b.name for b in repo.remote().refs],
             'active': repo.active_branch.name if repo.active_branch else None,
         }
-        
+
         # Analyze branch relationships
         branch_relationships = {}
         for branch in repo.branches:
@@ -187,16 +187,16 @@ class BranchTracker:
                 'last_commit_date': branch.commit.committed_datetime,
                 'author': branch.commit.author.name,
             }
-        
+
         return {
             'branches': branches,
             'relationships': branch_relationships,
         }
-    
+
     def detect_merge_patterns(self, commits: List) -> Dict[str, Any]:
         """Analyze merge commit patterns."""
         merge_commits = [c for c in commits if len(c.parents) > 1]
-        
+
         return {
             'total_merges': len(merge_commits),
             'merge_frequency': len(merge_commits) / len(commits) if commits else 0,
@@ -212,15 +212,15 @@ def analyze_merge_conflicts(repo: Repo, commit) -> Dict[str, Any]:
     """Analyze potential merge conflicts in commit history."""
     if not commit.parents or len(commit.parents) < 2:
         return {'is_merge': False}
-    
+
     # This is a merge commit
     parent1, parent2 = commit.parents[0], commit.parents[1]
-    
+
     # Find files changed in both branches
     files_p1 = set(item.a_path for item in commit.parents[0].diff(commit))
     files_p2 = set(item.a_path for item in commit.parents[1].diff(commit))
     potential_conflicts = files_p1.intersection(files_p2)
-    
+
     return {
         'is_merge': True,
         'parent_commits': [p.hexsha for p in commit.parents],
@@ -239,20 +239,20 @@ from functools import wraps
 
 class GitDataCache:
     """Persistent caching for git analysis results."""
-    
+
     def __init__(self, cache_dir: str = ".git_analysis_cache"):
         self.cache = dc.Cache(cache_dir)
-    
+
     def cached_commit_analysis(self, expire=3600*24):  # 24 hour cache
         """Decorator for caching commit analysis results."""
         def decorator(func):
             @wraps(func)
             def wrapper(commit_sha: str, *args, **kwargs):
                 cache_key = f"commit:{commit_sha}:{func.__name__}"
-                
+
                 if cache_key in self.cache:
                     return self.cache[cache_key]
-                
+
                 result = func(commit_sha, *args, **kwargs)
                 self.cache.set(cache_key, result, expire=expire)
                 return result
@@ -277,27 +277,27 @@ from multiprocessing import cpu_count
 
 class ParallelGitProcessor:
     """Process git history using multiple cores."""
-    
+
     def __init__(self, max_workers: int = None):
         self.max_workers = max_workers or min(cpu_count(), 8)
-    
+
     async def process_commits_parallel(self, commit_shas: List[str]) -> List[Dict]:
         """Process commits in parallel."""
         loop = asyncio.get_event_loop()
-        
+
         with ProcessPoolExecutor(max_workers=self.max_workers) as executor:
             # Split commits into chunks for each worker
             chunk_size = max(1, len(commit_shas) // self.max_workers)
             chunks = [commit_shas[i:i+chunk_size] for i in range(0, len(commit_shas), chunk_size)]
-            
+
             # Process chunks in parallel
             tasks = [
                 loop.run_in_executor(executor, process_commit_chunk, chunk)
                 for chunk in chunks
             ]
-            
+
             results = await asyncio.gather(*tasks)
-            
+
             # Flatten results
             return [item for sublist in results for item in sublist]
 
@@ -306,14 +306,14 @@ def process_commit_chunk(commit_shas: List[str]) -> List[Dict]:
     # This runs in separate process, so need to create fresh Repo instance
     repo = Repo('.')
     results = []
-    
+
     for sha in commit_shas:
         try:
             commit = repo.commit(sha)
             results.append(extract_commit_data(commit))
         except Exception as e:
             results.append({'error': str(e), 'sha': sha})
-    
+
     return results
 ```
 
@@ -324,14 +324,14 @@ def process_commit_chunk(commit_shas: List[str]) -> List[Dict]:
 ```python
 class GitHistoryAdapter(BaseAdapter):
     """Git history adapter for the ingestion pipeline."""
-    
+
     def __init__(self, config: AdapterConfig):
         super().__init__(config)
         self.repo_path = config.source_config.get('repo_path', '.')
         self.repo = None
         self.last_processed_commit = None
         self.processor = GitCommitProcessor()
-    
+
     async def initialize(self) -> None:
         """Initialize git repository connection."""
         try:
@@ -339,10 +339,10 @@ class GitHistoryAdapter(BaseAdapter):
             self.logger.info(f"Initialized git repo: {self.repo_path}")
         except Exception as e:
             raise Exception(f"Failed to initialize git repo: {e}")
-    
+
     async def fetch_items(
-        self, 
-        since: Optional[datetime] = None, 
+        self,
+        since: Optional[datetime] = None,
         until: Optional[datetime] = None,
         limit: Optional[int] = None
     ) -> AsyncIterator[Dict[str, Any]]:
@@ -353,17 +353,17 @@ class GitHistoryAdapter(BaseAdapter):
             commits = list(self.repo.iter_commits(f'{since_commit}..HEAD'))
         else:
             commits = list(self.repo.iter_commits())
-        
+
         if until:
             commits = [c for c in commits if c.committed_datetime <= until]
-        
+
         if limit:
             commits = commits[:limit]
-        
+
         # Stream commits
         for commit in commits:
             yield self.processor.extract_commit_metadata(commit)
-    
+
     async def transform_item(self, raw_commit: Dict[str, Any]) -> ContextItem:
         """Transform git commit to ContextItem."""
         return ContextItem(
@@ -380,26 +380,26 @@ class GitHistoryAdapter(BaseAdapter):
             source_data=raw_commit,
             tags=self.extract_commit_tags(raw_commit),
         )
-    
+
     def extract_commit_tags(self, commit_data: Dict[str, Any]) -> List[str]:
         """Extract semantic tags from commit."""
         tags = []
         message = commit_data['message'].lower()
-        
+
         # Conventional commit types
         if message.startswith('feat'): tags.append('feature')
-        if message.startswith('fix'): tags.append('bugfix')  
+        if message.startswith('fix'): tags.append('bugfix')
         if message.startswith('docs'): tags.append('documentation')
         if message.startswith('test'): tags.append('testing')
         if message.startswith('refactor'): tags.append('refactor')
-        
+
         # Merge detection
         if commit_data['is_merge']: tags.append('merge')
-        
+
         # Size indicators
         if commit_data['stats']['total_changes'] > 500: tags.append('large-change')
         if commit_data['stats']['files_changed'] > 10: tags.append('wide-impact')
-        
+
         return tags
 ```
 
@@ -421,7 +421,7 @@ CREATE INDEX IF NOT EXISTS idx_context_items_git_author ON context_items(git_aut
 CREATE INDEX IF NOT EXISTS idx_context_items_git_branch ON context_items(git_branch_name);
 
 -- Git-specific relationship types
-INSERT INTO relationship_types (name, description) VALUES 
+INSERT INTO relationship_types (name, description) VALUES
 ('git_parent', 'Git parent-child commit relationship'),
 ('git_merge', 'Git merge relationship'),
 ('git_branch', 'Git branch relationship'),
@@ -433,52 +433,52 @@ INSERT INTO relationship_types (name, description) VALUES
 ```python
 class GitIncrementalSync:
     """Manage incremental git history synchronization."""
-    
+
     def __init__(self, db: IngestionDatabase, repo_path: str):
         self.db = db
         self.repo_path = repo_path
         self.state_table = "git_sync_state"
-    
+
     async def get_last_sync_point(self) -> Optional[str]:
         """Get the last synchronized commit SHA."""
         query = f"SELECT last_commit_sha FROM {self.state_table} WHERE repo_path = $1"
         return await self.db.pool.execute_query(query, self.repo_path, fetch="val")
-    
+
     async def update_sync_point(self, commit_sha: str) -> None:
         """Update the last synchronized commit."""
         query = f"""
         INSERT INTO {self.state_table} (repo_path, last_commit_sha, updated_at)
         VALUES ($1, $2, NOW())
-        ON CONFLICT (repo_path) 
+        ON CONFLICT (repo_path)
         DO UPDATE SET last_commit_sha = $2, updated_at = NOW()
         """
         await self.db.pool.execute_query(query, self.repo_path, commit_sha)
-    
+
     async def sync_incremental(self) -> BatchProcessingResult:
         """Perform incremental sync since last run."""
         last_commit = await self.get_last_sync_point()
-        
+
         adapter = GitHistoryAdapter(AdapterConfig(
             adapter_id="git_incremental",
             source_type="git",
             source_config={'repo_path': self.repo_path}
         ))
-        
+
         await adapter.initialize()
-        
+
         # Fetch new commits
         new_commits = []
         async for commit_data in adapter.fetch_items(since_commit=last_commit):
             context_item = await adapter.transform_item(commit_data)
             new_commits.append(context_item)
-        
+
         # Store in database
         result = await self.db.store_context_items(new_commits)
-        
+
         # Update sync point if successful
         if new_commits and result.processed_items > 0:
             await self.update_sync_point(new_commits[0].source_data['sha'])
-        
+
         return result
 ```
 
@@ -489,11 +489,11 @@ class GitIncrementalSync:
 ```python
 class FileChangeAnalyzer:
     """Analyze file-level changes across commits."""
-    
+
     def analyze_file_evolution(self, repo: Repo, file_path: str) -> Dict[str, Any]:
         """Analyze how a file evolved over time."""
         commits_touching_file = list(repo.iter_commits(paths=file_path))
-        
+
         evolution = {
             'file_path': file_path,
             'total_commits': len(commits_touching_file),
@@ -503,13 +503,13 @@ class FileChangeAnalyzer:
             'change_frequency': self.calculate_change_frequency(commits_touching_file),
             'size_evolution': self.track_file_size_evolution(repo, file_path, commits_touching_file),
         }
-        
+
         return evolution
-    
+
     def track_file_size_evolution(self, repo: Repo, file_path: str, commits: List) -> List[Dict]:
         """Track file size changes over time."""
         size_history = []
-        
+
         for commit in reversed(commits):  # Oldest first
             try:
                 blob = commit.tree[file_path]
@@ -527,26 +527,26 @@ class FileChangeAnalyzer:
                     'size_bytes': 0,
                     'status': 'deleted',
                 })
-        
+
         return size_history
-    
+
     def detect_file_relationships(self, repo: Repo, timeframe_days: int = 7) -> List[Dict]:
         """Detect files frequently changed together."""
         since = datetime.now() - timedelta(days=timeframe_days)
         recent_commits = [c for c in repo.iter_commits(since=since)]
-        
+
         # Track co-changed files
         cochange_matrix = defaultdict(lambda: defaultdict(int))
-        
+
         for commit in recent_commits:
             changed_files = [item.a_path for item in commit.diff(commit.parents[0]) if commit.parents]
-            
+
             # Record all pairs of co-changed files
             for i, file1 in enumerate(changed_files):
                 for file2 in changed_files[i+1:]:
                     cochange_matrix[file1][file2] += 1
                     cochange_matrix[file2][file1] += 1
-        
+
         # Convert to relationship list
         relationships = []
         for file1, related_files in cochange_matrix.items():
@@ -559,7 +559,7 @@ class FileChangeAnalyzer:
                         'relationship_type': 'co_changed',
                         'confidence': min(frequency / len(recent_commits), 1.0),
                     })
-        
+
         return relationships
 ```
 
@@ -568,14 +568,14 @@ class FileChangeAnalyzer:
 ```python
 class CodeImpactAnalyzer:
     """Analyze the impact of code changes."""
-    
+
     def analyze_commit_impact(self, commit) -> Dict[str, Any]:
         """Analyze the impact of a single commit."""
         if not commit.parents:
             return {'type': 'initial_commit'}
-        
+
         diff = commit.diff(commit.parents[0])
-        
+
         impact_analysis = {
             'files_modified': len([item for item in diff if item.change_type == 'M']),
             'files_added': len([item for item in diff if item.change_type == 'A']),
@@ -587,28 +587,28 @@ class CodeImpactAnalyzer:
             'component_impact': self.analyze_component_impact(diff),
             'risk_score': 0.0,
         }
-        
+
         # Analyze line-level changes
         for item in diff:
             if item.a_blob and item.b_blob:
                 # Calculate insertions/deletions (simplified)
                 impact_analysis['total_insertions'] += len(item.b_blob.data_stream.read().decode('utf-8', errors='ignore').splitlines())
                 impact_analysis['total_deletions'] += len(item.a_blob.data_stream.read().decode('utf-8', errors='ignore').splitlines())
-        
+
         # Calculate risk score
         impact_analysis['risk_score'] = self.calculate_risk_score(impact_analysis)
-        
+
         return impact_analysis
-    
+
     def calculate_risk_score(self, impact: Dict[str, Any]) -> float:
         """Calculate risk score based on change impact."""
         score = 0.0
-        
+
         # File count impact
         score += impact['files_modified'] * 0.1
         score += impact['files_deleted'] * 0.3  # Deletions are riskier
         score += impact['files_added'] * 0.05   # Additions are less risky
-        
+
         # Size impact
         total_changes = impact['total_insertions'] + impact['total_deletions']
         if total_changes > 1000:
@@ -617,10 +617,10 @@ class CodeImpactAnalyzer:
             score += 0.3
         elif total_changes > 100:
             score += 0.1
-        
+
         # Component impact (critical files)
         score += impact.get('component_impact', {}).get('critical_files', 0) * 0.4
-        
+
         return min(score, 1.0)  # Cap at 1.0
 ```
 
@@ -631,16 +631,16 @@ class CodeImpactAnalyzer:
 ```python
 class GitPlatformIntegration:
     """Integration with Git platforms for PR/Issue correlation."""
-    
+
     def __init__(self, platform: str = "github", token: str = None):
         self.platform = platform
         self.token = token
         self.client = self.initialize_client()
-    
+
     def correlate_commits_to_prs(self, commits: List[str]) -> Dict[str, Any]:
         """Find PRs associated with commits."""
         correlations = {}
-        
+
         for commit_sha in commits:
             prs = self.find_prs_for_commit(commit_sha)
             if prs:
@@ -648,9 +648,9 @@ class GitPlatformIntegration:
                     'pull_requests': prs,
                     'issues': self.extract_linked_issues(prs),
                 }
-        
+
         return correlations
-    
+
     def extract_pr_metadata(self, pr_data: Dict) -> ContextItem:
         """Convert PR data to ContextItem."""
         return ContextItem(
@@ -682,57 +682,57 @@ from typing import Set
 
 class CommitMessageAnalyzer:
     """Analyze commit messages for references and patterns."""
-    
+
     # Common patterns
     ISSUE_PATTERNS = [
         r'#(\d+)',           # #123
-        r'fixes?\s+#(\d+)',  # fixes #123  
+        r'fixes?\s+#(\d+)',  # fixes #123
         r'closes?\s+#(\d+)', # closes #123
         r'resolves?\s+#(\d+)', # resolves #123
         r'issue[:\s]+(\d+)', # issue: 123
     ]
-    
+
     PR_PATTERNS = [
         r'pr\s+#?(\d+)',     # PR #123
         r'pull\s+request\s+#?(\d+)', # pull request 123
         r'merge\s+#(\d+)',   # merge #123
     ]
-    
+
     def extract_references(self, commit_message: str) -> Dict[str, Set[int]]:
         """Extract issue and PR references from commit message."""
         references = {
             'issues': set(),
             'pull_requests': set(),
         }
-        
+
         message_lower = commit_message.lower()
-        
+
         # Extract issue references
         for pattern in self.ISSUE_PATTERNS:
             matches = re.findall(pattern, message_lower)
             references['issues'].update(int(m) for m in matches)
-        
+
         # Extract PR references
         for pattern in self.PR_PATTERNS:
             matches = re.findall(pattern, message_lower)
             references['pull_requests'].update(int(m) for m in matches)
-        
+
         # Convert sets to lists for JSON serialization
         return {
             'issues': list(references['issues']),
             'pull_requests': list(references['pull_requests']),
         }
-    
+
     def analyze_commit_type(self, commit_message: str) -> Dict[str, Any]:
         """Analyze commit type and semantic information."""
         message_lower = commit_message.lower()
         first_line = commit_message.split('\n')[0].lower()
-        
+
         # Conventional commits
         conventional_types = {
             'feat': 'feature',
             'fix': 'bugfix',
-            'docs': 'documentation', 
+            'docs': 'documentation',
             'style': 'formatting',
             'refactor': 'refactor',
             'test': 'testing',
@@ -741,13 +741,13 @@ class CommitMessageAnalyzer:
             'ci': 'ci_cd',
             'build': 'build',
         }
-        
+
         commit_type = 'other'
         for prefix, ctype in conventional_types.items():
             if first_line.startswith(f'{prefix}:') or first_line.startswith(f'{prefix}('):
                 commit_type = ctype
                 break
-        
+
         # Additional analysis
         analysis = {
             'type': commit_type,
@@ -756,27 +756,27 @@ class CommitMessageAnalyzer:
             'urgency': self.assess_urgency(message_lower),
             'complexity': self.assess_complexity(commit_message),
         }
-        
+
         return analysis
-    
+
     def extract_scope(self, first_line: str) -> Optional[str]:
         """Extract scope from conventional commit format."""
         match = re.match(r'\w+\(([^)]+)\):', first_line)
         return match.group(1) if match else None
-    
+
     def assess_urgency(self, message: str) -> str:
         """Assess commit urgency based on keywords."""
         high_urgency = ['urgent', 'critical', 'hotfix', 'emergency', 'asap']
         medium_urgency = ['important', 'priority', 'needed']
-        
+
         for word in high_urgency:
             if word in message:
                 return 'high'
-        
+
         for word in medium_urgency:
             if word in message:
                 return 'medium'
-        
+
         return 'normal'
 ```
 
@@ -788,7 +788,7 @@ class CommitMessageAnalyzer:
 @dataclass
 class GitContextItem(ContextItem):
     """Extended ContextItem optimized for Git data."""
-    
+
     # Git-specific fields
     commit_sha: str = None
     parent_shas: List[str] = field(default_factory=list)
@@ -799,7 +799,7 @@ class GitContextItem(ContextItem):
     branch_name: str = None
     is_merge_commit: bool = False
     merge_base: Optional[str] = None
-    
+
     # File change tracking
     files_changed: List[Dict[str, Any]] = field(default_factory=list)
     lines_added: int = 0
@@ -807,13 +807,13 @@ class GitContextItem(ContextItem):
     files_added: int = 0
     files_deleted: int = 0
     files_modified: int = 0
-    
+
     # References and correlations
     referenced_issues: List[int] = field(default_factory=list)
     referenced_prs: List[int] = field(default_factory=list)
     commit_type: str = "other"
     risk_score: float = 0.0
-    
+
     # Performance metadata
     build_status: Optional[str] = None
     test_coverage_delta: Optional[float] = None
@@ -837,7 +837,7 @@ class GitContextItem(ContextItem):
             'commit_type': self.commit_type,
             'risk_score': self.risk_score,
         }
-        
+
         # Pack metrics
         git_metrics = {
             'lines_added': self.lines_added,
@@ -846,7 +846,7 @@ class GitContextItem(ContextItem):
             'files_deleted': self.files_deleted,
             'files_modified': self.files_modified,
         }
-        
+
         return ContextItem(
             source_type="git",
             source_id=self.commit_sha,
@@ -872,33 +872,33 @@ class GitContextItem(ContextItem):
 ```python
 class GitRelationshipType:
     """Git-specific relationship types for the knowledge graph."""
-    
+
     # Commit relationships
     PARENT_CHILD = "git_parent"
     MERGE_COMMIT = "git_merge"
     CHERRY_PICK = "git_cherry_pick"
     REVERT = "git_revert"
-    
-    # File relationships  
+
+    # File relationships
     MODIFIES_FILE = "git_modifies"
     CREATES_FILE = "git_creates"
     DELETES_FILE = "git_deletes"
     RENAMES_FILE = "git_renames"
-    
+
     # Branch relationships
     BRANCH_FROM = "git_branch_from"
     MERGES_INTO = "git_merges_into"
-    
+
     # Issue/PR relationships
     FIXES_ISSUE = "git_fixes"
     CLOSES_ISSUE = "git_closes"
     IMPLEMENTS_PR = "git_implements"
-    
+
     # Developer relationships
     AUTHORED_BY = "git_authored"
     COMMITTED_BY = "git_committed"
     REVIEWED_BY = "git_reviewed"
-    
+
     # Temporal relationships
     FOLLOWS_COMMIT = "git_follows"
     BUILDS_UPON = "git_builds_upon"
@@ -907,7 +907,7 @@ class GitRelationshipType:
 def create_git_relationships(git_item: GitContextItem, context_window: List[ContextItem]) -> List[ContextRelationship]:
     """Create relationships for a git commit."""
     relationships = []
-    
+
     # Parent-child relationships
     for parent_sha in git_item.parent_shas:
         parent_item = find_item_by_source_id(context_window, parent_sha)
@@ -919,7 +919,7 @@ def create_git_relationships(git_item: GitContextItem, context_window: List[Cont
                 confidence=1.0,
                 metadata={'parent_sha': parent_sha}
             ))
-    
+
     # Issue relationships
     for issue_num in git_item.referenced_issues:
         issue_item = find_issue_item(context_window, issue_num)
@@ -931,7 +931,7 @@ def create_git_relationships(git_item: GitContextItem, context_window: List[Cont
                 confidence=0.9,
                 metadata={'issue_number': issue_num}
             ))
-    
+
     # File modification relationships
     for file_change in git_item.files_changed:
         file_item = find_file_item(context_window, file_change['path'])
@@ -943,7 +943,7 @@ def create_git_relationships(git_item: GitContextItem, context_window: List[Cont
                 confidence=1.0,
                 metadata=file_change
             ))
-    
+
     return relationships
 ```
 
@@ -972,20 +972,20 @@ class BenchmarkResult:
 
 class GitPerformanceBenchmark:
     """Comprehensive git analysis performance benchmarking."""
-    
+
     def __init__(self, repo_path: str):
         self.repo_path = repo_path
         self.results = []
-    
+
     async def benchmark_function(self, func: Callable, *args, **kwargs) -> BenchmarkResult:
         """Benchmark a single function execution."""
         process = psutil.Process()
-        
+
         # Record initial state
         start_memory = process.memory_info().rss / (1024 * 1024)
         start_cpu = process.cpu_percent()
         start_time = time.time()
-        
+
         # Execute function
         try:
             if asyncio.iscoroutinefunction(func):
@@ -996,15 +996,15 @@ class GitPerformanceBenchmark:
         except Exception as e:
             result = None
             error_count = 1
-        
+
         # Record final state
         end_time = time.time()
         end_memory = process.memory_info().rss / (1024 * 1024)
         end_cpu = process.cpu_percent()
-        
+
         execution_time = end_time - start_time
         items_processed = len(result) if isinstance(result, list) else 1
-        
+
         return BenchmarkResult(
             function_name=func.__name__,
             execution_time_seconds=execution_time,
@@ -1015,11 +1015,11 @@ class GitPerformanceBenchmark:
             cpu_usage_percent=end_cpu,
             error_count=error_count
         )
-    
+
     async def run_comprehensive_benchmark(self) -> Dict[str, BenchmarkResult]:
         """Run comprehensive benchmark suite."""
         repo = Repo(self.repo_path)
-        
+
         # Benchmark different scenarios
         benchmarks = {
             'small_history': (self.benchmark_commit_processing, repo, 100),
@@ -1029,11 +1029,11 @@ class GitPerformanceBenchmark:
             'file_analysis': (self.benchmark_file_analysis, repo, 'README.md'),
             'incremental_sync': (self.benchmark_incremental_sync, repo),
         }
-        
+
         results = {}
         for name, (func, *args) in benchmarks.items():
             results[name] = await self.benchmark_function(func, *args)
-        
+
         return results
 ```
 
@@ -1042,30 +1042,30 @@ class GitPerformanceBenchmark:
 ```python
 class GitOptimizationRecommendations:
     """Generate performance optimization recommendations."""
-    
+
     @staticmethod
     def analyze_repository_characteristics(repo_path: str) -> Dict[str, Any]:
         """Analyze repository to recommend optimizations."""
         repo = Repo(repo_path)
-        
+
         # Repository metrics
         commit_count = len(list(repo.iter_commits()))
         branch_count = len(list(repo.branches))
         tag_count = len(list(repo.tags))
-        
+
         # Repository size estimation
         repo_size_mb = GitOptimizationRecommendations.estimate_repo_size(repo_path)
-        
+
         characteristics = {
             'commit_count': commit_count,
             'branch_count': branch_count,
             'tag_count': tag_count,
             'estimated_size_mb': repo_size_mb,
         }
-        
+
         # Generate recommendations
         recommendations = []
-        
+
         if commit_count > 50000:
             recommendations.append({
                 'type': 'library_upgrade',
@@ -1073,15 +1073,15 @@ class GitOptimizationRecommendations:
                 'impact': 'high',
                 'effort': 'medium'
             })
-        
+
         if commit_count > 10000:
             recommendations.append({
                 'type': 'processing_strategy',
                 'suggestion': 'Enable parallel processing with ProcessPoolExecutor',
-                'impact': 'high', 
+                'impact': 'high',
                 'effort': 'low'
             })
-        
+
         if repo_size_mb > 500:
             recommendations.append({
                 'type': 'caching_strategy',
@@ -1089,7 +1089,7 @@ class GitOptimizationRecommendations:
                 'impact': 'medium',
                 'effort': 'low'
             })
-        
+
         if branch_count > 100:
             recommendations.append({
                 'type': 'scope_limitation',
@@ -1097,14 +1097,14 @@ class GitOptimizationRecommendations:
                 'impact': 'medium',
                 'effort': 'low'
             })
-        
+
         return {
             'characteristics': characteristics,
             'recommendations': recommendations,
             'suggested_batch_size': GitOptimizationRecommendations.recommend_batch_size(commit_count),
             'suggested_parallel_workers': GitOptimizationRecommendations.recommend_worker_count(commit_count),
         }
-    
+
     @staticmethod
     def recommend_batch_size(commit_count: int) -> int:
         """Recommend optimal batch size based on repository size."""
@@ -1116,12 +1116,12 @@ class GitOptimizationRecommendations:
             return 500
         else:
             return 1000
-    
+
     @staticmethod
     def recommend_worker_count(commit_count: int) -> int:
         """Recommend number of parallel workers."""
         cpu_count = psutil.cpu_count()
-        
+
         if commit_count < 1000:
             return 1  # Single threaded for small repos
         elif commit_count < 10000:
@@ -1166,22 +1166,22 @@ git_adapters:
   - adapter_id: "primary_git"
     source_type: "git"
     version: "1.0"
-    
+
     # Repository settings
     source_config:
       repo_path: "."
       branches: ["main", "develop", "feature/*"]
       max_commit_age_days: 365
       include_merge_commits: true
-      
+
     # Performance settings
     batch_mode: "batch"
     batch_size: 200
     max_concurrent_batches: 4
-    
+
     # Rate limiting
     max_items_per_second: 100
-    
+
     # Features
     enabled_features:
       - "commit_analysis"
@@ -1189,7 +1189,7 @@ git_adapters:
       - "issue_correlation"
       - "branch_tracking"
       - "performance_metrics"
-    
+
     # Analysis settings
     analysis_config:
       extract_file_changes: true
@@ -1204,28 +1204,28 @@ git_adapters:
 ```python
 class GitIngestionMonitoring:
     """Monitoring and alerting for git ingestion."""
-    
+
     def __init__(self, metrics_client):
         self.metrics = metrics_client
-    
+
     def record_ingestion_metrics(self, result: BatchProcessingResult):
         """Record metrics for monitoring dashboard."""
         self.metrics.counter('git_commits_processed').inc(result.processed_items)
         self.metrics.counter('git_commits_failed').inc(result.failed_items)
         self.metrics.histogram('git_processing_time').observe(result.processing_time_seconds)
         self.metrics.gauge('git_processing_rate').set(result.items_per_second)
-        
+
     def check_ingestion_health(self) -> Dict[str, Any]:
         """Health check for git ingestion system."""
         # Check recent ingestion activity
         recent_commits = self.get_recent_commit_count(hours=1)
-        
+
         # Check error rates
         error_rate = self.get_error_rate(hours=24)
-        
+
         # Check repository accessibility
         repo_accessible = self.test_repository_access()
-        
+
         health_status = {
             'status': 'healthy',
             'recent_activity': recent_commits > 0,
@@ -1233,16 +1233,16 @@ class GitIngestionMonitoring:
             'repository_accessible': repo_accessible,
             'alerts': []
         }
-        
+
         # Generate alerts
         if error_rate > 0.1:  # 10% error rate
             health_status['alerts'].append('High error rate in git ingestion')
             health_status['status'] = 'degraded'
-        
+
         if not repo_accessible:
             health_status['alerts'].append('Git repository not accessible')
             health_status['status'] = 'unhealthy'
-        
+
         return health_status
 ```
 

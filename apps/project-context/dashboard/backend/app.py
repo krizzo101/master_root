@@ -24,9 +24,9 @@ from pydantic import BaseModel
 sys.path.append("/home/opsvi/master_root/apps/agent-orchestrator/src")
 sys.path.append("/home/opsvi/master_root/apps/project-context")
 
+from database_integration import dashboard_db
 from monitoring_service import MonitoringService
 from websocket_handler import WebSocketManager
-from database_integration import dashboard_db
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -212,9 +212,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         }
                     )
                 except Exception:
-                    logger.info(
-                        f"Client {client_id} connection lost during heartbeat check"
-                    )
+                    logger.info(f"Client {client_id} connection lost during heartbeat check")
                     break
 
             except json.JSONDecodeError as e:
@@ -228,9 +226,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 )
 
             except Exception as e:
-                logger.error(
-                    f"WebSocket message handling error for client {client_id}: {e}"
-                )
+                logger.error(f"WebSocket message handling error for client {client_id}: {e}")
                 break
 
     except WebSocketDisconnect:
@@ -250,7 +246,7 @@ async def websocket_endpoint(websocket: WebSocket):
 async def startup_event():
     """Initialize enhanced background monitoring on startup"""
     logger.info("Starting Enhanced Orchestrator Monitoring Dashboard")
-    
+
     # Initialize database connections
     await dashboard_db.initialize()
 
@@ -368,6 +364,22 @@ async def get_database_status():
     except Exception as e:
         logger.error(f"Error getting database status: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# MCP Server integration endpoints
+@app.get("/api/mcp-project-summary")
+async def get_mcp_project_summary():
+    """Get project summary from MCP server"""
+    try:
+        # Import MCP tools (since the server is running in background)
+        sys.path.append("/home/opsvi/master_root/apps/project-context/src")
+        from project_context.tools.architecture import get_project_summary
+        
+        summary = await get_project_summary()
+        return summary
+    except Exception as e:
+        logger.error(f"Error getting MCP project summary: {e}")
+        return {"error": f"MCP server unavailable: {str(e)}", "fallback": True}
 
 
 @app.get("/api/project-stats")

@@ -35,9 +35,7 @@ class ServerConfig(BaseModel):
     cache_enabled: bool = Field(default=True, description="Enable caching")
     cache_ttl: int = Field(default=300, description="Cache TTL in seconds")
     file_data_ttl: int = Field(default=60, description="File data cache TTL in seconds")
-    project_stats_ttl: int = Field(
-        default=300, description="Project stats cache TTL in seconds"
-    )
+    project_stats_ttl: int = Field(default=300, description="Project stats cache TTL in seconds")
     watch_enabled: bool = Field(
         default=True, description="Enable file watching for cache invalidation"
     )
@@ -67,9 +65,7 @@ def main():
     )
     parser.add_argument("--no-cache", action="store_true", help="Disable caching")
     parser.add_argument("--no-watch", action="store_true", help="Disable file watching")
-    parser.add_argument(
-        "--file-ttl", type=int, default=60, help="File data cache TTL in seconds"
-    )
+    parser.add_argument("--file-ttl", type=int, default=60, help="File data cache TTL in seconds")
     parser.add_argument(
         "--stats-ttl", type=int, default=300, help="Project stats cache TTL in seconds"
     )
@@ -91,16 +87,14 @@ def main():
 
     # Initialize cache if enabled
     if not args.no_cache:
-        cache = CacheManager(
-            file_data_ttl=args.file_ttl, project_stats_ttl=args.stats_ttl
-        )
+        cache = CacheManager(file_data_ttl=args.file_ttl, project_stats_ttl=args.stats_ttl)
         logger.info(
             "Cache manager initialized",
             file_ttl=args.file_ttl,
             stats_ttl=args.stats_ttl,
         )
 
-        # Initialize file watcher if enabled  
+        # Initialize file watcher if enabled
         if not args.no_watch:
             logger.info("File watching requested but disabled for initial startup")
             # TODO: Implement proper async watcher initialization

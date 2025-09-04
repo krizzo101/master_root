@@ -20,11 +20,14 @@ from typing import Dict, List, Optional, Tuple
 sys.path.append("/home/opsvi/master_root/apps/agent-orchestrator/src")
 sys.path.append("/home/opsvi/master_root/apps/project-context")
 
+# Import database integration
+from database_integration import dashboard_db
+
 # Import ChatImportMonitor with error handling
 try:
     from monitor_chat_import import ChatImportMonitor
 except ImportError as e:
-    logger.warning(f"ChatImportMonitor not available: {e}")
+    logging.getLogger(__name__).warning(f"ChatImportMonitor not available: {e}")
     ChatImportMonitor = None
 
 logger = logging.getLogger(__name__)
@@ -105,11 +108,11 @@ class MonitoringService:
     async def _update_cache(self):
         """Update cached data from all sources"""
         try:
-            # Update task data
+            # Update task data from both files and database
             self.cache["tasks"] = await self._scan_task_files()
 
-            # Update system status
-            self.cache["system_status"] = await self._get_system_status()
+            # Update system status from database
+            self.cache["system_status"] = await self._get_database_system_status()
 
             # Update performance metrics
             self.cache[
@@ -120,6 +123,40 @@ class MonitoringService:
 
         except Exception as e:
             logger.error(f"Cache update error: {e}")
+
+    async def _get_database_system_status(self):
+        """Get system status from database instead of files"""
+        try:
+            # Get project stats from database
+            db_status = await dashboard_db.get_status()
+            project_stats = await dashboard_db.get_project_stats()
+            
+            if db_status.get("connected"):
+                # Calculate status from database data
+                total_items = project_stats.get("total_items", 0)
+                breakdown = project_stats.get("breakdown", [])
+                
+                # Calculate task-like metrics from context items
+                completed_items = sum(item["count"] for item in breakdown if item.get("source_type") in ["chat", "code"])
+                active_items = sum(item["count"] for item in breakdown if item.get("source_type") == "system")
+                
+                return {
+                    "overall_progress": min(95.0, (total_items / 100) * 100) if total_items > 0 else 0.0,
+                    "current_phase": "Database Monitoring Active",
+                    "elapsed_minutes": 0.0,  # Could calculate from earliest timestamp
+                    "active_tasks": active_items,
+                    "completed_tasks": completed_items,
+                    "failed_tasks": 0,
+                    "total_tasks": total_items,
+                    "data_source": "database"
+                }
+            else:
+                # Fallback to file-based monitoring
+                return await self._get_file_system_status()
+                
+        except Exception as e:
+            logger.error(f"Database system status error: {e}")
+            return await self._get_file_system_status()
 
     def _should_rescan_files(self) -> bool:
         """Check if files should be rescanned based on modification times"""
@@ -210,7 +247,11 @@ class MonitoringService:
 
         return self.cache["system_status"]
 
-    async def _get_system_status(self) -> Dict:
+    async def _get_file_system_status(self) -> Dict:
+        """Fallback file-based system status for when database is unavailable"""
+        return await self._get_system_status_from_files()
+    
+    async def _get_system_status_from_files(self) -> Dict:
         """Calculate current system status"""
         tasks = self.cache["tasks"]
 

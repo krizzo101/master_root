@@ -49,13 +49,11 @@ class UnifiedContextConnections:
         try:
             self.pg_pool = await asyncpg.create_pool(
                 self.pg_dsn,
-                min_size=10,
-                max_size=50,
+                min_size=5,
+                max_size=20,
                 command_timeout=120,
                 server_settings={
-                    "jit": "off",  # Better performance for analytical queries
-                    "application_name": "unified_context_mcp_server",
-                    "shared_preload_libraries": "timescaledb,pg_stat_statements",
+                    "application_name": "unified_context_dashboard",
                 },
             )
             # Test connection

@@ -1,0 +1,377 @@
+# Enhanced CI/CD Adapter Configuration Example
+# This configuration demonstrates the advanced features including ML-based failure classification,
+# performance analytics, security analysis, deployment health monitoring, and cross-platform intelligence
+
+cicd_adapters:
+  # GitHub Actions Enhanced Configuration
+  github_actions:
+    enabled: true
+    platform: "github_actions"
+    
+    # Basic Configuration
+    base_url: "https://api.github.com"
+    api_token: "${GITHUB_TOKEN}"
+    webhook_secret: "${GITHUB_WEBHOOK_SECRET}"
+    
+    # Repository Tracking
+    repositories:
+      - "company/backend-service"
+      - "company/frontend-app"
+      - "company/infrastructure"
+    
+    # Enhanced Event Types
+    event_types:
+      - "WORKFLOW_STARTED"
+      - "WORKFLOW_COMPLETED"
+      - "JOB_STARTED" 
+      - "JOB_COMPLETED"
+      - "DEPLOYMENT_STARTED"
+      - "DEPLOYMENT_COMPLETED"
+      - "DEPLOYMENT_HEALTH_CHECK"
+      - "SECURITY_SCAN_COMPLETED"
+      - "QUALITY_GATE_PASSED"
+      - "QUALITY_GATE_FAILED"
+      - "WORKFLOW_DISPATCH"
+      - "ARTIFACT_PUBLISHED"
+    
+    # Advanced Intelligence Features
+    enable_ml_failure_classification: true
+    enable_performance_profiling: true
+    enable_security_analysis: true
+    enable_deployment_health_monitoring: true
+    enable_cross_platform_correlation: true
+    enable_build_constellation_tracking: true
+    
+    # ML Configuration
+    failure_classification_model_path: "/models/failure_classifier.pkl"
+    failure_classification_confidence_threshold: 0.75
+    
+    # Performance Analytics
+    performance_baseline_days: 30
+    performance_alert_threshold: 2.0  # Alert if 2x slower than baseline
+    resource_efficiency_threshold: 0.6
+    
+    # Security Integration
+    security_scan_integrations:
+      - "snyk"
+      - "sonarqube" 
+      - "github-security-advisories"
+    compliance_frameworks:
+      - "sox"
+      - "pci"
+      - "gdpr"
+    security_risk_threshold: 0.7
+    
+    # Deployment Health Monitoring
+    health_check_endpoints:
+      - "https://api.company.com/health"
+      - "https://app.company.com/status"
+    canary_monitoring_duration_minutes: 30
+    rollback_trigger_error_rate: 0.05  # 5% error rate triggers rollback alert
+    
+    # Environment Progression
+    environment_promotion_chains:
+      - ["dev", "staging", "prod"]
+      - ["test", "stage", "production"]
+    
+    # Cross-Platform Intelligence
+    constellation_correlation_window_hours: 2
+    constellation_minimum_correlation_score: 0.6
+    
+    # Advanced Analytics
+    enable_pattern_detection: true
+    pattern_detection_window_days: 14
+    enable_predictive_analytics: true
+    
+    # Real-time Processing
+    enable_real_time_alerts: true
+    webhook_processing_timeout_ms: 5000
+    enable_streaming_analytics: false
+
+  # GitLab CI Enhanced Configuration  
+  gitlab_ci:
+    enabled: true
+    platform: "gitlab_ci"
+    
+    base_url: "https://gitlab.com/api/v4"
+    api_token: "${GITLAB_TOKEN}"
+    webhook_secret: "${GITLAB_WEBHOOK_SECRET}"
+    
+    projects:
+      - "12345"  # Project ID
+      - "67890"  # Project ID
+    
+    # Enhanced Intelligence (same options as GitHub Actions)
+    enable_ml_failure_classification: true
+    enable_performance_profiling: true
+    enable_security_analysis: true
+    enable_deployment_health_monitoring: true
+    
+    # GitLab-specific Security Integrations
+    security_scan_integrations:
+      - "gitlab-sast"
+      - "gitlab-dependency-scanning"
+      - "gitlab-container-scanning"
+
+  # Jenkins Enhanced Configuration
+  jenkins:
+    enabled: true
+    platform: "jenkins"
+    
+    base_url: "${JENKINS_URL}"
+    api_token: "${JENKINS_USERNAME}:${JENKINS_API_TOKEN}"  # username:token format
+    
+    projects:  # Job names in Jenkins
+      - "backend-service-build"
+      - "frontend-deploy-pipeline"
+      - "infrastructure-terraform"
+    
+    # Jenkins-specific configurations
+    enable_blue_ocean_integration: true
+    track_pipeline_stages: true
+    analyze_build_logs: true
+    
+    # Enhanced Intelligence
+    enable_ml_failure_classification: true
+    enable_performance_profiling: true
+
+  # Azure DevOps Enhanced Configuration
+  azure_devops:
+    enabled: true
+    platform: "azure_devops"
+    
+    base_url: "https://dev.azure.com"
+    api_token: "${AZURE_DEVOPS_PAT}"
+    
+    projects:
+      - "myorg/myproject"
+      - "myorg/anotherproject"
+    
+    # Enhanced Intelligence
+    enable_ml_failure_classification: true
+    enable_performance_profiling: true
+    enable_security_analysis: true
+
+# Global CI/CD Intelligence Settings
+cicd_intelligence:
+  # Failure Classification Settings
+  failure_classification:
+    enabled: true
+    categories:
+      - "code_quality"
+      - "test_failures"
+      - "dependency_issues"
+      - "infrastructure"
+      - "security_violations"
+      - "configuration"
+      - "performance"
+      - "external_services"
+      - "deployment_issues"
+    
+    # Custom failure patterns (regex-based)
+    custom_patterns:
+      - name: "memory_leak"
+        category: "performance"
+        patterns: 
+          - "out of memory"
+          - "memory leak detected"
+          - "heap space.*exceeded"
+        confidence: 0.9
+        
+      - name: "api_timeout"
+        category: "external_services"
+        patterns:
+          - "api.*timeout"
+          - "connection.*timed out"
+          - "request.*timeout"
+        confidence: 0.85
+
+  # Performance Analytics Settings  
+  performance_analytics:
+    enabled: true
+    baseline_calculation: "rolling_average"  # rolling_average, percentile, median
+    baseline_window_days: 30
+    
+    # Performance thresholds
+    thresholds:
+      warning_multiplier: 1.5  # Warn if 1.5x baseline
+      critical_multiplier: 2.0  # Critical if 2x baseline
+      
+    # Bottleneck detection
+    bottleneck_detection:
+      enabled: true
+      stage_timeout_threshold_minutes: 5
+      job_timeout_threshold_minutes: 15
+      
+    # Resource efficiency tracking
+    resource_tracking:
+      enabled: true
+      efficiency_threshold: 0.6  # 60% minimum efficiency
+
+  # Security Analysis Settings
+  security_analysis:
+    enabled: true
+    
+    # Vulnerability scoring
+    vulnerability_weights:
+      critical: 1.0
+      high: 0.7
+      medium: 0.4
+      low: 0.1
+    
+    # Compliance frameworks
+    compliance:
+      sox:
+        enabled: true
+        requirements:
+          - "security_scan_passed"
+          - "approval_required_for_prod"
+          - "audit_trail_maintained"
+      
+      pci:
+        enabled: true
+        requirements:
+          - "vulnerability_scan_passed"
+          - "secrets_not_exposed"
+          - "encryption_validated"
+    
+    # Security gates
+    security_gates:
+      - name: "vulnerability_check"
+        condition: "critical_vulnerabilities == 0"
+        action: "block_deployment"
+        
+      - name: "compliance_check"  
+        condition: "compliance_score > 0.8"
+        action: "require_approval"
+
+  # Deployment Health Settings
+  deployment_health:
+    enabled: true
+    
+    # Health check configuration
+    health_checks:
+      interval_seconds: 30
+      timeout_seconds: 10
+      failure_threshold: 3
+      
+    # Canary deployment monitoring
+    canary_monitoring:
+      enabled: true
+      duration_minutes: 30
+      success_rate_threshold: 0.95
+      error_rate_threshold: 0.05
+      
+    # Rollback triggers
+    rollback_triggers:
+      - condition: "error_rate > 0.1"  # 10% error rate
+        action: "trigger_rollback_alert"
+      - condition: "health_score < 0.5"
+        action: "trigger_immediate_rollback"
+
+  # Build Constellation Settings
+  build_constellation:
+    enabled: true
+    correlation_window_hours: 2
+    minimum_builds_for_constellation: 2
+    
+    # Correlation strategies
+    correlation_methods:
+      - "commit_sha_exact"
+      - "temporal_proximity"
+      - "branch_correlation"
+      - "tag_correlation"
+    
+    # Constellation lifecycle management
+    lifecycle:
+      max_age_hours: 24
+      cleanup_completed_after_hours: 4
+      cleanup_failed_after_hours: 8
+
+  # Real-time Analytics Settings
+  real_time_analytics:
+    enabled: true
+    
+    # Processing configuration
+    processing:
+      max_processing_time_ms: 5000
+      batch_size: 100
+      queue_max_size: 10000
+      
+    # Metrics collection
+    metrics:
+      webhook_processing_times: true
+      correlation_detection_rate: true
+      failure_classification_accuracy: true
+      performance_degradation_alerts: true
+      
+    # Alerting
+    alerts:
+      - name: "high_failure_rate"
+        condition: "failure_rate_last_hour > 0.3"
+        severity: "critical"
+        channels: ["slack", "email"]
+        
+      - name: "performance_degradation"
+        condition: "avg_build_duration > baseline * 2"
+        severity: "warning" 
+        channels: ["slack"]
+        
+      - name: "security_violation"
+        condition: "security_risk_score > 0.8"
+        severity: "high"
+        channels: ["slack", "email", "pagerduty"]
+
+# Integration with other systems
+integrations:
+  # Observability platforms
+  observability:
+    prometheus:
+      enabled: true
+      metrics_endpoint: "/metrics"
+      
+    datadog:
+      enabled: true
+      api_key: "${DATADOG_API_KEY}"
+      
+    grafana:
+      enabled: true
+      dashboard_url: "https://grafana.company.com"
+  
+  # Communication platforms  
+  communication:
+    slack:
+      enabled: true
+      webhook_url: "${SLACK_WEBHOOK_URL}"
+      channels:
+        alerts: "#cicd-alerts"
+        notifications: "#cicd-notifications"
+        
+    microsoft_teams:
+      enabled: true
+      webhook_url: "${TEAMS_WEBHOOK_URL}"
+  
+  # Incident management
+  incident_management:
+    pagerduty:
+      enabled: true
+      api_key: "${PAGERDUTY_API_KEY}"
+      service_key: "${PAGERDUTY_SERVICE_KEY}"
+
+# Database configuration for enhanced features
+database:
+  # Time-series data for performance analytics
+  timeseries:
+    enabled: true
+    retention_days: 90
+    
+  # Build constellation tracking
+  constellation_storage:
+    enabled: true
+    retention_days: 30
+    
+  # ML model artifacts and training data
+  ml_storage:
+    enabled: true
+    model_retention_versions: 5
+    training_data_retention_days: 180

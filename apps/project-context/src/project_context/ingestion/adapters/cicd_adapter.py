@@ -1,12 +1,20 @@
-"""CI/CD Pipeline Integration Adapter - Unified interface for multiple CI/CD platforms."""
+"""CI/CD Pipeline Integration Adapter - Unified interface for multiple CI/CD platforms.
+
+Enhanced with advanced correlation, ML-based failure classification, real-time performance 
+analytics, cross-platform intelligence, and comprehensive deployment tracking.
+"""
 
 import asyncio
 import hashlib
 import hmac
+import json
+import re
 from abc import abstractmethod
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, AsyncIterator, Dict, List, Optional, Tuple
+from pathlib import Path
+from typing import Any, AsyncIterator, Dict, List, Optional, Set, Tuple, Union
 from urllib.parse import urlparse
 
 import aiohttp
@@ -17,6 +25,70 @@ from ...models.common import ContextItem, ContextRelationship
 from ..base_adapter import AdapterConfig, BaseAdapter
 
 logger = structlog.get_logger(__name__)
+
+
+# Enhanced Data Structures for Advanced CI/CD Intelligence
+
+@dataclass
+class BuildConstellation:
+    """Represents a constellation of related builds across platforms."""
+    primary_build_id: str
+    related_builds: List[Dict[str, Any]] = field(default_factory=list)
+    commit_sha: Optional[str] = None
+    branch_name: Optional[str] = None
+    correlation_strength: float = 0.0
+    lifecycle_stage: str = "unknown"
+    completion_status: str = "pending"
+    total_builds: int = 0
+    successful_builds: int = 0
+    failed_builds: int = 0
+    created_at: datetime = field(default_factory=datetime.utcnow)
+    updated_at: datetime = field(default_factory=datetime.utcnow)
+
+@dataclass
+class FailureClassification:
+    """ML-based failure classification result."""
+    primary_category: str
+    confidence: float
+    subcategory: Optional[str] = None
+    root_cause_indicators: List[str] = field(default_factory=list)
+    suggested_fixes: List[str] = field(default_factory=list)
+    similar_failures: List[Dict[str, Any]] = field(default_factory=list)
+    classification_metadata: Dict[str, Any] = field(default_factory=dict)
+
+@dataclass
+class PerformanceProfile:
+    """Performance profile for builds/deployments."""
+    avg_duration_ms: float
+    p90_duration_ms: float
+    p95_duration_ms: float
+    success_rate: float
+    trend_direction: str  # "improving", "degrading", "stable"
+    bottleneck_stages: List[str] = field(default_factory=list)
+    resource_efficiency: float = 0.0
+    performance_score: float = 0.0
+
+@dataclass
+class SecurityAnalysis:
+    """Security analysis for CI/CD events."""
+    risk_score: float
+    vulnerability_count: int = 0
+    compliance_violations: List[str] = field(default_factory=list)
+    security_gates_passed: bool = True
+    requires_approval: bool = False
+    security_recommendations: List[str] = field(default_factory=list)
+    scan_results: Dict[str, Any] = field(default_factory=dict)
+
+@dataclass
+class DeploymentHealth:
+    """Deployment health tracking."""
+    health_score: float
+    error_rate_change: float = 0.0
+    performance_impact: float = 0.0
+    rollback_indicators: List[str] = field(default_factory=list)
+    canary_metrics: Dict[str, float] = field(default_factory=dict)
+    environment_status: str = "healthy"
+    monitoring_alerts: List[Dict[str, Any]] = field(default_factory=list)
 
 
 class CICDPlatform(Enum):
@@ -30,18 +102,61 @@ class CICDPlatform(Enum):
 
 
 class CICDEventType(Enum):
-    """CI/CD event types."""
+    """CI/CD event types with enhanced coverage."""
 
+    # Core Build Events
     WORKFLOW_STARTED = "workflow_started"
     WORKFLOW_COMPLETED = "workflow_completed"
     JOB_STARTED = "job_started"
     JOB_COMPLETED = "job_completed"
     BUILD_STARTED = "build_started"
     BUILD_COMPLETED = "build_completed"
+    
+    # Deployment Events
     DEPLOYMENT_STARTED = "deployment_started"
     DEPLOYMENT_COMPLETED = "deployment_completed"
+    DEPLOYMENT_HEALTH_CHECK = "deployment_health_check"
+    DEPLOYMENT_ROLLBACK = "deployment_rollback"
+    DEPLOYMENT_PROMOTION = "deployment_promotion"
+    
+    # Release Events
     RELEASE_CREATED = "release_created"
+    RELEASE_PUBLISHED = "release_published"
+    RELEASE_DELETED = "release_deleted"
+    
+    # Quality Gates & Security
     CHECK_RUN_COMPLETED = "check_run_completed"
+    SECURITY_SCAN_COMPLETED = "security_scan_completed"
+    QUALITY_GATE_PASSED = "quality_gate_passed"
+    QUALITY_GATE_FAILED = "quality_gate_failed"
+    COMPLIANCE_CHECK = "compliance_check"
+    
+    # Advanced Events
+    WORKFLOW_DISPATCH = "workflow_dispatch"
+    SCHEDULE_TRIGGER = "schedule_trigger"
+    MANUAL_APPROVAL = "manual_approval"
+    ENVIRONMENT_PROTECTION_RULE = "environment_protection_rule"
+    ARTIFACT_PUBLISHED = "artifact_published"
+    
+    # Monitoring & Analytics
+    PERFORMANCE_ALERT = "performance_alert"
+    FAILURE_PATTERN_DETECTED = "failure_pattern_detected"
+    BUILD_CONSTELLATION_UPDATE = "build_constellation_update"
+
+
+class FailureCategory(Enum):
+    """ML-based failure classification categories."""
+    
+    CODE_QUALITY = "code_quality"          # Lint, type errors, code smells
+    TEST_FAILURES = "test_failures"        # Unit, integration, e2e test failures
+    DEPENDENCY_ISSUES = "dependency_issues" # Library conflicts, version mismatches
+    INFRASTRUCTURE = "infrastructure"       # Resource, network, timeout issues
+    SECURITY_VIOLATIONS = "security_violations" # Security policy failures
+    CONFIGURATION = "configuration"        # Config, environment issues
+    PERFORMANCE = "performance"            # Memory, CPU, timeout issues
+    EXTERNAL_SERVICES = "external_services" # Third-party API issues
+    DEPLOYMENT_ISSUES = "deployment_issues" # Deployment-specific problems
+    UNKNOWN = "unknown"                    # Unclassified failures
 
 
 class CICDAdapterConfig(AdapterConfig):
@@ -118,6 +233,87 @@ class CICDAdapterConfig(AdapterConfig):
             "deployment_frequency_alert_hours", 168
         )  # 1 week
 
+        # Advanced Intelligence Features
+        self.enable_ml_failure_classification: bool = kwargs.get(
+            "enable_ml_failure_classification", True
+        )
+        self.enable_performance_profiling: bool = kwargs.get(
+            "enable_performance_profiling", True
+        )
+        self.enable_security_analysis: bool = kwargs.get(
+            "enable_security_analysis", True
+        )
+        self.enable_deployment_health_monitoring: bool = kwargs.get(
+            "enable_deployment_health_monitoring", True
+        )
+        self.enable_cross_platform_correlation: bool = kwargs.get(
+            "enable_cross_platform_correlation", True
+        )
+        self.enable_build_constellation_tracking: bool = kwargs.get(
+            "enable_build_constellation_tracking", True
+        )
+
+        # ML Model Configuration
+        self.failure_classification_model_path: Optional[str] = kwargs.get(
+            "failure_classification_model_path"
+        )
+        self.failure_classification_confidence_threshold: float = kwargs.get(
+            "failure_classification_confidence_threshold", 0.7
+        )
+
+        # Performance Analytics Configuration
+        self.performance_baseline_days: int = kwargs.get("performance_baseline_days", 30)
+        self.performance_alert_threshold: float = kwargs.get(
+            "performance_alert_threshold", 2.0
+        )  # 2x slower than baseline
+        self.resource_efficiency_threshold: float = kwargs.get(
+            "resource_efficiency_threshold", 0.6
+        )  # 60% efficiency minimum
+
+        # Security Integration
+        self.security_scan_integrations: List[str] = kwargs.get(
+            "security_scan_integrations", ["snyk", "sonarqube", "veracode", "checkmarx"]
+        )
+        self.compliance_frameworks: List[str] = kwargs.get(
+            "compliance_frameworks", ["sox", "pci", "hipaa", "gdpr"]
+        )
+        self.security_risk_threshold: float = kwargs.get("security_risk_threshold", 0.7)
+
+        # Deployment Health Monitoring
+        self.health_check_endpoints: List[str] = kwargs.get("health_check_endpoints", [])
+        self.canary_monitoring_duration_minutes: int = kwargs.get(
+            "canary_monitoring_duration_minutes", 30
+        )
+        self.rollback_trigger_error_rate: float = kwargs.get(
+            "rollback_trigger_error_rate", 0.05
+        )  # 5% error rate
+
+        # Cross-Platform Intelligence
+        self.constellation_correlation_window_hours: int = kwargs.get(
+            "constellation_correlation_window_hours", 2
+        )
+        self.constellation_minimum_correlation_score: float = kwargs.get(
+            "constellation_minimum_correlation_score", 0.6
+        )
+
+        # Advanced Analytics
+        self.enable_pattern_detection: bool = kwargs.get("enable_pattern_detection", True)
+        self.pattern_detection_window_days: int = kwargs.get(
+            "pattern_detection_window_days", 14
+        )
+        self.enable_predictive_analytics: bool = kwargs.get(
+            "enable_predictive_analytics", True
+        )
+        
+        # Real-time Processing
+        self.enable_real_time_alerts: bool = kwargs.get("enable_real_time_alerts", True)
+        self.webhook_processing_timeout_ms: int = kwargs.get(
+            "webhook_processing_timeout_ms", 5000
+        )
+        self.enable_streaming_analytics: bool = kwargs.get(
+            "enable_streaming_analytics", False
+        )
+
 
 class BaseCICDAdapter(BaseAdapter):
     """Base class for CI/CD platform adapters."""
@@ -127,9 +323,31 @@ class BaseCICDAdapter(BaseAdapter):
         self.cicd_config = config
         self.session: Optional[aiohttp.ClientSession] = None
         self.rate_limiter = APIRateLimiter(config.api_rate_limit)
+        
+        # Advanced Intelligence Components
+        self.failure_classifier: Optional['FailureClassifier'] = None
+        self.performance_analyzer: Optional['PerformanceAnalyzer'] = None
+        self.security_analyzer: Optional['SecurityAnalyzer'] = None
+        self.deployment_health_monitor: Optional['DeploymentHealthMonitor'] = None
+        self.build_constellation_manager: Optional['BuildConstellationManager'] = None
+        
+        # Caching and State Management
+        self.performance_baselines: Dict[str, PerformanceProfile] = {}
+        self.active_constellations: Dict[str, BuildConstellation] = {}
+        self.failure_patterns_cache: Dict[str, List[Dict[str, Any]]] = {}
+        self.security_scan_cache: Dict[str, SecurityAnalysis] = {}
+        
+        # Real-time Analytics State
+        self.real_time_metrics: Dict[str, Any] = {
+            "webhook_processing_times": [],
+            "correlation_detection_rate": 0.0,
+            "active_builds_count": 0,
+            "failure_rate_last_hour": 0.0,
+            "average_build_duration": 0.0
+        }
 
     async def start(self) -> None:
-        """Initialize the CI/CD adapter."""
+        """Initialize the CI/CD adapter with advanced intelligence components."""
         await super().start()
 
         # Initialize HTTP session
@@ -139,11 +357,70 @@ class BaseCICDAdapter(BaseAdapter):
             connector=aiohttp.TCPConnector(limit=self.cicd_config.concurrent_requests),
         )
 
+        # Initialize Advanced Intelligence Components
+        await self._initialize_intelligence_components()
+
         self.logger.info(
-            "CI/CD adapter started",
+            "Enhanced CI/CD adapter started",
             platform=self.cicd_config.platform.value,
             repositories=len(self.cicd_config.repositories),
+            ml_classification=self.cicd_config.enable_ml_failure_classification,
+            performance_profiling=self.cicd_config.enable_performance_profiling,
+            security_analysis=self.cicd_config.enable_security_analysis,
+            deployment_health=self.cicd_config.enable_deployment_health_monitoring,
         )
+
+    async def _initialize_intelligence_components(self) -> None:
+        """Initialize advanced intelligence components."""
+        try:
+            # Initialize ML Failure Classification
+            if self.cicd_config.enable_ml_failure_classification:
+                self.failure_classifier = FailureClassifier(
+                    model_path=self.cicd_config.failure_classification_model_path,
+                    confidence_threshold=self.cicd_config.failure_classification_confidence_threshold
+                )
+                await self.failure_classifier.initialize()
+
+            # Initialize Performance Analytics
+            if self.cicd_config.enable_performance_profiling:
+                self.performance_analyzer = PerformanceAnalyzer(
+                    baseline_days=self.cicd_config.performance_baseline_days,
+                    alert_threshold=self.cicd_config.performance_alert_threshold
+                )
+                await self.performance_analyzer.initialize()
+
+            # Initialize Security Analysis
+            if self.cicd_config.enable_security_analysis:
+                self.security_analyzer = SecurityAnalyzer(
+                    scan_integrations=self.cicd_config.security_scan_integrations,
+                    compliance_frameworks=self.cicd_config.compliance_frameworks,
+                    risk_threshold=self.cicd_config.security_risk_threshold
+                )
+                await self.security_analyzer.initialize()
+
+            # Initialize Deployment Health Monitoring
+            if self.cicd_config.enable_deployment_health_monitoring:
+                self.deployment_health_monitor = DeploymentHealthMonitor(
+                    health_endpoints=self.cicd_config.health_check_endpoints,
+                    canary_duration=self.cicd_config.canary_monitoring_duration_minutes,
+                    rollback_threshold=self.cicd_config.rollback_trigger_error_rate
+                )
+                await self.deployment_health_monitor.initialize()
+
+            # Initialize Build Constellation Manager
+            if self.cicd_config.enable_build_constellation_tracking:
+                self.build_constellation_manager = BuildConstellationManager(
+                    correlation_window=self.cicd_config.constellation_correlation_window_hours,
+                    minimum_correlation=self.cicd_config.constellation_minimum_correlation_score
+                )
+                await self.build_constellation_manager.initialize()
+
+            self.logger.info("Advanced intelligence components initialized successfully")
+
+        except Exception as e:
+            self.logger.error("Failed to initialize intelligence components", error=str(e))
+            # Continue without advanced features rather than fail completely
+            self._disable_advanced_features()
 
     async def stop(self) -> None:
         """Stop the CI/CD adapter."""
@@ -193,24 +470,29 @@ class BaseCICDAdapter(BaseAdapter):
         pass
 
     async def transform_item(self, raw_item: Dict[str, Any]) -> ContextItem:
-        """Transform platform-specific data to ContextItem."""
+        """Transform platform-specific data to ContextItem with advanced intelligence."""
+        start_time = datetime.utcnow()
+        
         try:
+            # Basic platform transformation
             item = await self._transform_platform_item(raw_item)
+            
+            # Initialize metrics if not present
+            if not item.metrics:
+                item.metrics = {}
 
-            # Add performance metrics if enabled
-            if (
-                hasattr(self.cicd_config, "calculate_performance_metrics")
-                and self.cicd_config.calculate_performance_metrics
-            ):
-                # This would typically be called with a context window from the ingestion pipeline
-                # For now, we just ensure the item has the structure for metrics
-                if not item.metrics:
-                    item.metrics = {}
+            # Add artifact management metadata
+            item.metrics.update(self._extract_artifact_metadata(raw_item))
 
-                # Add artifact management metadata
-                item.metrics.update(self._extract_artifact_metadata(raw_item))
+            # Apply Advanced Intelligence Analysis
+            await self._apply_advanced_analysis(item, raw_item)
+            
+            # Update real-time metrics
+            processing_time = (datetime.utcnow() - start_time).total_seconds() * 1000
+            self._update_real_time_metrics(processing_time, item)
 
             return item
+            
         except Exception as e:
             self.logger.error(
                 "Failed to transform CI/CD item",
@@ -219,6 +501,128 @@ class BaseCICDAdapter(BaseAdapter):
                 raw_item_keys=list(raw_item.keys()) if raw_item else None,
             )
             raise
+
+    async def _apply_advanced_analysis(self, item: ContextItem, raw_item: Dict[str, Any]) -> None:
+        """Apply advanced intelligence analysis to the context item."""
+        try:
+            # ML-based Failure Classification
+            if self.failure_classifier and self._is_failure_event(item):
+                failure_classification = await self.failure_classifier.classify_failure(item, raw_item)
+                if failure_classification:
+                    item.metrics["failure_classification"] = asdict(failure_classification)
+
+            # Performance Profiling
+            if self.performance_analyzer:
+                performance_profile = await self.performance_analyzer.analyze_performance(item, raw_item)
+                if performance_profile:
+                    item.metrics["performance_profile"] = asdict(performance_profile)
+
+            # Security Analysis
+            if self.security_analyzer and self._has_security_context(item):
+                security_analysis = await self.security_analyzer.analyze_security(item, raw_item)
+                if security_analysis:
+                    item.metrics["security_analysis"] = asdict(security_analysis)
+
+            # Deployment Health Monitoring
+            if self.deployment_health_monitor and self._is_deployment_event(item):
+                health_analysis = await self.deployment_health_monitor.analyze_health(item, raw_item)
+                if health_analysis:
+                    item.metrics["deployment_health"] = asdict(health_analysis)
+
+            # Build Constellation Tracking
+            if self.build_constellation_manager:
+                constellation_info = await self.build_constellation_manager.track_build(item, raw_item)
+                if constellation_info:
+                    item.metrics["build_constellation"] = constellation_info
+
+            # Add intelligence metadata
+            item.metrics["intelligence_applied"] = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "features": self._get_enabled_features(),
+                "processing_version": "v2.0.0"
+            }
+
+        except Exception as e:
+            self.logger.warning(
+                "Advanced analysis failed for item",
+                item_id=getattr(item, 'source_id', 'unknown'),
+                error=str(e)
+            )
+            # Don't fail the entire transformation if advanced analysis fails
+
+    def _is_failure_event(self, item: ContextItem) -> bool:
+        """Check if the item represents a failure event."""
+        if not item.metrics:
+            return False
+            
+        status = item.metrics.get("status", "").lower()
+        conclusion = item.metrics.get("conclusion", "").lower()
+        
+        return any(status_indicator in [status, conclusion] 
+                  for status_indicator in ["failed", "failure", "error", "cancelled", "timeout"])
+
+    def _has_security_context(self, item: ContextItem) -> bool:
+        """Check if the item has security-relevant context."""
+        if not item.content and not item.metrics:
+            return False
+            
+        security_keywords = [
+            "security", "vulnerability", "scan", "audit", "compliance",
+            "sonar", "snyk", "veracode", "checkmarx", "cve"
+        ]
+        
+        content_str = (item.content or "").lower()
+        title_str = (item.title or "").lower()
+        
+        return any(keyword in content_str or keyword in title_str 
+                  for keyword in security_keywords)
+
+    def _is_deployment_event(self, item: ContextItem) -> bool:
+        """Check if the item represents a deployment event."""
+        if not item.entity_type:
+            return False
+            
+        return "deployment" in item.entity_type.lower()
+
+    def _get_enabled_features(self) -> List[str]:
+        """Get list of enabled advanced features."""
+        features = []
+        if self.failure_classifier:
+            features.append("ml_failure_classification")
+        if self.performance_analyzer:
+            features.append("performance_profiling")
+        if self.security_analyzer:
+            features.append("security_analysis")
+        if self.deployment_health_monitor:
+            features.append("deployment_health_monitoring")
+        if self.build_constellation_manager:
+            features.append("build_constellation_tracking")
+        return features
+
+    def _update_real_time_metrics(self, processing_time: float, item: ContextItem) -> None:
+        """Update real-time processing metrics."""
+        # Track webhook processing times
+        self.real_time_metrics["webhook_processing_times"].append(processing_time)
+        
+        # Keep only last 100 processing times
+        if len(self.real_time_metrics["webhook_processing_times"]) > 100:
+            self.real_time_metrics["webhook_processing_times"] = \
+                self.real_time_metrics["webhook_processing_times"][-100:]
+        
+        # Update average processing time
+        if self.real_time_metrics["webhook_processing_times"]:
+            self.real_time_metrics["average_processing_time"] = \
+                sum(self.real_time_metrics["webhook_processing_times"]) / \
+                len(self.real_time_metrics["webhook_processing_times"])
+
+    def _disable_advanced_features(self) -> None:
+        """Disable advanced features if initialization fails."""
+        self.failure_classifier = None
+        self.performance_analyzer = None
+        self.security_analyzer = None
+        self.deployment_health_monitor = None
+        self.build_constellation_manager = None
+        self.logger.warning("Advanced features disabled due to initialization failure")
 
     def _extract_artifact_metadata(self, raw_item: Dict[str, Any]) -> Dict[str, Any]:
         """Extract artifact and build metadata."""
@@ -1667,6 +2071,603 @@ class CircleCIAdapter(BaseCICDAdapter):
             },
             source_data=job,
         )
+
+
+# Advanced Intelligence Components
+
+class FailureClassifier:
+    """ML-based failure classification system."""
+    
+    def __init__(self, model_path: Optional[str] = None, confidence_threshold: float = 0.7):
+        self.model_path = model_path
+        self.confidence_threshold = confidence_threshold
+        self.model = None
+        self.failure_patterns = self._load_failure_patterns()
+        
+    async def initialize(self) -> None:
+        """Initialize the failure classifier."""
+        try:
+            if self.model_path and Path(self.model_path).exists():
+                # Load ML model (placeholder for actual ML model loading)
+                self.model = await self._load_ml_model()
+            else:
+                # Use rule-based classification
+                logger.info("Using rule-based failure classification")
+        except Exception as e:
+            logger.warning(f"Failed to initialize ML model, using rules: {e}")
+    
+    async def classify_failure(self, item: ContextItem, raw_item: Dict[str, Any]) -> Optional[FailureClassification]:
+        """Classify a failure event using ML or rule-based approach."""
+        try:
+            if self.model:
+                return await self._classify_with_ml(item, raw_item)
+            else:
+                return await self._classify_with_rules(item, raw_item)
+        except Exception as e:
+            logger.warning(f"Failure classification failed: {e}")
+            return None
+    
+    async def _classify_with_ml(self, item: ContextItem, raw_item: Dict[str, Any]) -> Optional[FailureClassification]:
+        """Classify failure using ML model."""
+        # Extract features for ML model
+        features = self._extract_failure_features(item, raw_item)
+        
+        # Get prediction (placeholder for actual ML prediction)
+        prediction = await self._predict_failure_category(features)
+        
+        if prediction["confidence"] >= self.confidence_threshold:
+            return FailureClassification(
+                primary_category=prediction["category"],
+                confidence=prediction["confidence"],
+                subcategory=prediction.get("subcategory"),
+                root_cause_indicators=prediction.get("indicators", []),
+                suggested_fixes=self._get_suggested_fixes(prediction["category"]),
+                classification_metadata={"method": "ml", "features_used": list(features.keys())}
+            )
+        
+        return None
+    
+    async def _classify_with_rules(self, item: ContextItem, raw_item: Dict[str, Any]) -> Optional[FailureClassification]:
+        """Classify failure using rule-based approach."""
+        log_content = self._extract_logs(item, raw_item)
+        
+        for pattern in self.failure_patterns:
+            if self._matches_pattern(log_content, pattern):
+                return FailureClassification(
+                    primary_category=pattern["category"],
+                    confidence=pattern["confidence"],
+                    subcategory=pattern.get("subcategory"),
+                    root_cause_indicators=pattern.get("indicators", []),
+                    suggested_fixes=pattern.get("fixes", []),
+                    classification_metadata={"method": "rules", "pattern_matched": pattern["name"]}
+                )
+        
+        return FailureClassification(
+            primary_category=FailureCategory.UNKNOWN.value,
+            confidence=0.5,
+            classification_metadata={"method": "rules", "pattern_matched": "none"}
+        )
+    
+    def _load_failure_patterns(self) -> List[Dict[str, Any]]:
+        """Load predefined failure patterns."""
+        return [
+            {
+                "name": "compilation_error",
+                "category": FailureCategory.CODE_QUALITY.value,
+                "patterns": [r"compilation failed", r"syntax error", r"cannot find symbol"],
+                "confidence": 0.9,
+                "indicators": ["compilation", "syntax"],
+                "fixes": ["Check code syntax", "Verify imports and dependencies"]
+            },
+            {
+                "name": "test_failure",
+                "category": FailureCategory.TEST_FAILURES.value,
+                "patterns": [r"test.*failed", r"assertion.*failed", r"\d+ tests? failed"],
+                "confidence": 0.95,
+                "indicators": ["test", "assertion"],
+                "fixes": ["Review failing tests", "Check test data and expectations"]
+            },
+            {
+                "name": "dependency_conflict",
+                "category": FailureCategory.DEPENDENCY_ISSUES.value,
+                "patterns": [r"dependency conflict", r"version.*incompatible", r"could not resolve"],
+                "confidence": 0.85,
+                "indicators": ["dependency", "version", "conflict"],
+                "fixes": ["Update dependency versions", "Resolve version conflicts"]
+            },
+            {
+                "name": "timeout",
+                "category": FailureCategory.INFRASTRUCTURE.value,
+                "patterns": [r"timeout", r"timed out", r"connection.*timeout"],
+                "confidence": 0.8,
+                "indicators": ["timeout", "connection"],
+                "fixes": ["Increase timeout values", "Check network connectivity"]
+            },
+            {
+                "name": "security_scan_failure",
+                "category": FailureCategory.SECURITY_VIOLATIONS.value,
+                "patterns": [r"security.*violation", r"vulnerability.*found", r"security.*scan.*failed"],
+                "confidence": 0.9,
+                "indicators": ["security", "vulnerability"],
+                "fixes": ["Address security vulnerabilities", "Update vulnerable dependencies"]
+            }
+        ]
+    
+    def _extract_failure_features(self, item: ContextItem, raw_item: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract features for ML classification."""
+        return {
+            "duration_ms": item.metrics.get("duration_ms", 0),
+            "exit_code": item.metrics.get("exit_code", 0),
+            "log_length": len(self._extract_logs(item, raw_item)),
+            "error_keywords_count": self._count_error_keywords(item, raw_item),
+            "platform": item.metrics.get("platform", "unknown"),
+            "job_type": item.entity_type or "unknown"
+        }
+    
+    def _extract_logs(self, item: ContextItem, raw_item: Dict[str, Any]) -> str:
+        """Extract log content from the item."""
+        logs = []
+        
+        # From content
+        if item.content:
+            logs.append(item.content)
+        
+        # From raw data
+        if isinstance(raw_item.get("data"), dict):
+            data = raw_item["data"]
+            if "logs" in data:
+                logs.append(str(data["logs"]))
+            if "error_message" in data:
+                logs.append(str(data["error_message"]))
+        
+        return "\n".join(logs).lower()
+    
+    def _matches_pattern(self, text: str, pattern: Dict[str, Any]) -> bool:
+        """Check if text matches any of the failure patterns."""
+        for regex_pattern in pattern["patterns"]:
+            if re.search(regex_pattern, text, re.IGNORECASE):
+                return True
+        return False
+    
+    def _count_error_keywords(self, item: ContextItem, raw_item: Dict[str, Any]) -> int:
+        """Count error-related keywords in the content."""
+        error_keywords = [
+            "error", "failed", "failure", "exception", "timeout",
+            "denied", "forbidden", "unauthorized", "conflict"
+        ]
+        
+        text = self._extract_logs(item, raw_item)
+        return sum(1 for keyword in error_keywords if keyword in text)
+    
+    def _get_suggested_fixes(self, category: str) -> List[str]:
+        """Get suggested fixes for a failure category."""
+        fixes_map = {
+            FailureCategory.CODE_QUALITY.value: [
+                "Run code linters and fix syntax errors",
+                "Check code formatting and style",
+                "Review type annotations and imports"
+            ],
+            FailureCategory.TEST_FAILURES.value: [
+                "Review failing test cases",
+                "Check test data and mock configurations",
+                "Update test expectations if code behavior changed"
+            ],
+            FailureCategory.DEPENDENCY_ISSUES.value: [
+                "Update dependency versions",
+                "Resolve version conflicts",
+                "Check package registry availability"
+            ],
+            FailureCategory.INFRASTRUCTURE.value: [
+                "Check resource availability",
+                "Verify network connectivity",
+                "Increase timeout values"
+            ],
+            FailureCategory.SECURITY_VIOLATIONS.value: [
+                "Address identified vulnerabilities",
+                "Update security configurations",
+                "Review security scan results"
+            ]
+        }
+        
+        return fixes_map.get(category, ["Review logs and error messages"])
+    
+    async def _load_ml_model(self):
+        """Load ML model (placeholder for actual implementation)."""
+        # This would load an actual ML model like scikit-learn, TensorFlow, etc.
+        return None
+    
+    async def _predict_failure_category(self, features: Dict[str, Any]) -> Dict[str, Any]:
+        """Predict failure category using ML model."""
+        # Placeholder for actual ML prediction
+        return {
+            "category": FailureCategory.UNKNOWN.value,
+            "confidence": 0.5,
+            "subcategory": None,
+            "indicators": []
+        }
+
+
+class PerformanceAnalyzer:
+    """Advanced performance analytics for CI/CD pipelines."""
+    
+    def __init__(self, baseline_days: int = 30, alert_threshold: float = 2.0):
+        self.baseline_days = baseline_days
+        self.alert_threshold = alert_threshold
+        self.baselines: Dict[str, PerformanceProfile] = {}
+        
+    async def initialize(self) -> None:
+        """Initialize performance analyzer."""
+        # Load historical baselines if available
+        await self._load_performance_baselines()
+        
+    async def analyze_performance(self, item: ContextItem, raw_item: Dict[str, Any]) -> Optional[PerformanceProfile]:
+        """Analyze performance metrics for a CI/CD event."""
+        try:
+            if not item.metrics or not item.metrics.get("duration_ms"):
+                return None
+            
+            current_duration = item.metrics["duration_ms"]
+            job_key = self._get_job_key(item)
+            
+            # Get or create baseline
+            baseline = self.baselines.get(job_key)
+            if not baseline:
+                baseline = await self._create_baseline(job_key, item)
+                self.baselines[job_key] = baseline
+            
+            # Calculate performance metrics
+            performance_ratio = current_duration / baseline.avg_duration_ms if baseline.avg_duration_ms > 0 else 1.0
+            
+            # Determine trend
+            trend_direction = self._determine_trend(performance_ratio)
+            
+            # Calculate performance score (0-100, higher is better)
+            performance_score = min(100, max(0, 100 - (performance_ratio - 1) * 50))
+            
+            return PerformanceProfile(
+                avg_duration_ms=baseline.avg_duration_ms,
+                p90_duration_ms=baseline.p90_duration_ms,
+                p95_duration_ms=baseline.p95_duration_ms,
+                success_rate=baseline.success_rate,
+                trend_direction=trend_direction,
+                bottleneck_stages=self._identify_bottlenecks(item, raw_item),
+                resource_efficiency=self._calculate_resource_efficiency(item, raw_item),
+                performance_score=performance_score
+            )
+            
+        except Exception as e:
+            logger.warning(f"Performance analysis failed: {e}")
+            return None
+    
+    def _get_job_key(self, item: ContextItem) -> str:
+        """Generate a key for job performance tracking."""
+        platform = item.metrics.get("platform", "unknown")
+        job_name = item.metrics.get("job_name") or item.metrics.get("workflow_name") or item.entity_type
+        project = item.project_id or "unknown"
+        return f"{platform}:{project}:{job_name}"
+    
+    async def _create_baseline(self, job_key: str, item: ContextItem) -> PerformanceProfile:
+        """Create performance baseline for a job."""
+        # This would typically query historical data
+        return PerformanceProfile(
+            avg_duration_ms=item.metrics.get("duration_ms", 0),
+            p90_duration_ms=item.metrics.get("duration_ms", 0) * 1.5,
+            p95_duration_ms=item.metrics.get("duration_ms", 0) * 2.0,
+            success_rate=1.0,
+            trend_direction="stable"
+        )
+    
+    def _determine_trend(self, performance_ratio: float) -> str:
+        """Determine performance trend based on ratio."""
+        if performance_ratio < 0.9:
+            return "improving"
+        elif performance_ratio > 1.1:
+            return "degrading"
+        else:
+            return "stable"
+    
+    def _identify_bottlenecks(self, item: ContextItem, raw_item: Dict[str, Any]) -> List[str]:
+        """Identify performance bottlenecks."""
+        bottlenecks = []
+        
+        # Check for common bottleneck indicators
+        if item.metrics.get("duration_ms", 0) > 900000:  # 15 minutes
+            bottlenecks.append("long_running_job")
+        
+        # Check for specific stage information
+        if "stages" in item.metrics:
+            stages = item.metrics["stages"]
+            if isinstance(stages, list):
+                for stage in stages:
+                    if isinstance(stage, dict) and stage.get("duration_ms", 0) > 300000:  # 5 minutes
+                        bottlenecks.append(f"slow_stage_{stage.get('name', 'unknown')}")
+        
+        return bottlenecks
+    
+    def _calculate_resource_efficiency(self, item: ContextItem, raw_item: Dict[str, Any]) -> float:
+        """Calculate resource utilization efficiency."""
+        # Placeholder for resource efficiency calculation
+        # This would typically analyze CPU, memory, and I/O usage
+        return 0.75  # Default 75% efficiency
+    
+    async def _load_performance_baselines(self) -> None:
+        """Load performance baselines from storage."""
+        # This would load from database or cache
+        pass
+
+
+class SecurityAnalyzer:
+    """Security analysis for CI/CD events."""
+    
+    def __init__(self, scan_integrations: List[str], compliance_frameworks: List[str], risk_threshold: float = 0.7):
+        self.scan_integrations = scan_integrations
+        self.compliance_frameworks = compliance_frameworks
+        self.risk_threshold = risk_threshold
+        
+    async def initialize(self) -> None:
+        """Initialize security analyzer."""
+        pass
+    
+    async def analyze_security(self, item: ContextItem, raw_item: Dict[str, Any]) -> Optional[SecurityAnalysis]:
+        """Analyze security aspects of a CI/CD event."""
+        try:
+            # Extract security scan results
+            scan_results = self._extract_security_scans(item, raw_item)
+            
+            # Calculate risk score
+            risk_score = self._calculate_risk_score(scan_results, item)
+            
+            # Check compliance violations
+            violations = self._check_compliance_violations(item, raw_item)
+            
+            # Generate recommendations
+            recommendations = self._generate_security_recommendations(scan_results, violations)
+            
+            return SecurityAnalysis(
+                risk_score=risk_score,
+                vulnerability_count=scan_results.get("vulnerability_count", 0),
+                compliance_violations=violations,
+                security_gates_passed=risk_score < self.risk_threshold,
+                requires_approval=risk_score >= self.risk_threshold,
+                security_recommendations=recommendations,
+                scan_results=scan_results
+            )
+            
+        except Exception as e:
+            logger.warning(f"Security analysis failed: {e}")
+            return None
+    
+    def _extract_security_scans(self, item: ContextItem, raw_item: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract security scan results from the event."""
+        # Placeholder for extracting security scan results
+        return {
+            "vulnerability_count": 0,
+            "critical_count": 0,
+            "high_count": 0,
+            "medium_count": 0,
+            "low_count": 0,
+            "scan_tools": []
+        }
+    
+    def _calculate_risk_score(self, scan_results: Dict[str, Any], item: ContextItem) -> float:
+        """Calculate overall security risk score."""
+        base_score = 0.0
+        
+        # Weight vulnerabilities by severity
+        critical = scan_results.get("critical_count", 0)
+        high = scan_results.get("high_count", 0)
+        medium = scan_results.get("medium_count", 0)
+        low = scan_results.get("low_count", 0)
+        
+        weighted_score = (critical * 1.0) + (high * 0.7) + (medium * 0.4) + (low * 0.1)
+        
+        # Normalize to 0-1 scale
+        max_expected_vulnerabilities = 20
+        normalized_score = min(1.0, weighted_score / max_expected_vulnerabilities)
+        
+        return normalized_score
+    
+    def _check_compliance_violations(self, item: ContextItem, raw_item: Dict[str, Any]) -> List[str]:
+        """Check for compliance framework violations."""
+        violations = []
+        
+        # Check for common compliance issues
+        if not item.metrics.get("security_scan_passed", True):
+            violations.append("security_scan_failed")
+        
+        if item.metrics.get("secrets_exposed", False):
+            violations.append("secrets_exposure")
+        
+        return violations
+    
+    def _generate_security_recommendations(self, scan_results: Dict[str, Any], violations: List[str]) -> List[str]:
+        """Generate security recommendations."""
+        recommendations = []
+        
+        if scan_results.get("critical_count", 0) > 0:
+            recommendations.append("Address critical vulnerabilities immediately")
+        
+        if scan_results.get("high_count", 0) > 0:
+            recommendations.append("Review and fix high-severity vulnerabilities")
+        
+        if "secrets_exposure" in violations:
+            recommendations.append("Remove exposed secrets and rotate credentials")
+        
+        return recommendations
+
+
+class DeploymentHealthMonitor:
+    """Monitor deployment health and performance."""
+    
+    def __init__(self, health_endpoints: List[str], canary_duration: int, rollback_threshold: float):
+        self.health_endpoints = health_endpoints
+        self.canary_duration = canary_duration
+        self.rollback_threshold = rollback_threshold
+        
+    async def initialize(self) -> None:
+        """Initialize deployment health monitor."""
+        pass
+    
+    async def analyze_health(self, item: ContextItem, raw_item: Dict[str, Any]) -> Optional[DeploymentHealth]:
+        """Analyze deployment health metrics."""
+        try:
+            # Calculate health score
+            health_score = await self._calculate_health_score(item, raw_item)
+            
+            # Analyze error rate changes
+            error_rate_change = await self._analyze_error_rate_change(item)
+            
+            # Check for rollback indicators
+            rollback_indicators = self._check_rollback_indicators(item, error_rate_change)
+            
+            # Get canary metrics if applicable
+            canary_metrics = await self._get_canary_metrics(item)
+            
+            return DeploymentHealth(
+                health_score=health_score,
+                error_rate_change=error_rate_change,
+                performance_impact=0.0,  # Placeholder
+                rollback_indicators=rollback_indicators,
+                canary_metrics=canary_metrics,
+                environment_status="healthy" if health_score > 0.8 else "degraded",
+                monitoring_alerts=[]
+            )
+            
+        except Exception as e:
+            logger.warning(f"Deployment health analysis failed: {e}")
+            return None
+    
+    async def _calculate_health_score(self, item: ContextItem, raw_item: Dict[str, Any]) -> float:
+        """Calculate overall deployment health score."""
+        # Placeholder for health score calculation
+        if item.metrics.get("status") == "success":
+            return 0.95
+        elif item.metrics.get("status") == "failed":
+            return 0.2
+        else:
+            return 0.7
+    
+    async def _analyze_error_rate_change(self, item: ContextItem) -> float:
+        """Analyze error rate changes post-deployment."""
+        # Placeholder for error rate analysis
+        return 0.0
+    
+    def _check_rollback_indicators(self, item: ContextItem, error_rate_change: float) -> List[str]:
+        """Check for indicators that suggest a rollback might be needed."""
+        indicators = []
+        
+        if error_rate_change > self.rollback_threshold:
+            indicators.append("error_rate_spike")
+        
+        if item.metrics.get("deployment_status") == "failed":
+            indicators.append("deployment_failure")
+        
+        return indicators
+    
+    async def _get_canary_metrics(self, item: ContextItem) -> Dict[str, float]:
+        """Get canary deployment metrics."""
+        # Placeholder for canary metrics
+        return {
+            "success_rate": 0.95,
+            "error_rate": 0.02,
+            "response_time_p95": 150.0
+        }
+
+
+class BuildConstellationManager:
+    """Manage build constellations across platforms."""
+    
+    def __init__(self, correlation_window: int, minimum_correlation: float):
+        self.correlation_window = correlation_window
+        self.minimum_correlation = minimum_correlation
+        self.active_constellations: Dict[str, BuildConstellation] = {}
+        
+    async def initialize(self) -> None:
+        """Initialize build constellation manager."""
+        pass
+    
+    async def track_build(self, item: ContextItem, raw_item: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Track build as part of constellation."""
+        try:
+            # Extract correlation identifiers
+            commit_sha = self._extract_commit_sha(item)
+            if not commit_sha:
+                return None
+            
+            # Find or create constellation
+            constellation = await self._find_or_create_constellation(commit_sha, item)
+            
+            # Add build to constellation
+            build_info = self._create_build_info(item, raw_item)
+            constellation.related_builds.append(build_info)
+            
+            # Update constellation status
+            await self._update_constellation_status(constellation)
+            
+            return {
+                "constellation_id": constellation.primary_build_id,
+                "correlation_strength": constellation.correlation_strength,
+                "total_builds": constellation.total_builds,
+                "completion_status": constellation.completion_status
+            }
+            
+        except Exception as e:
+            logger.warning(f"Build constellation tracking failed: {e}")
+            return None
+    
+    def _extract_commit_sha(self, item: ContextItem) -> Optional[str]:
+        """Extract commit SHA from the item."""
+        if not item.metrics:
+            return None
+        
+        return (item.metrics.get("commit_sha") or 
+                item.metrics.get("sha") or 
+                item.metrics.get("head_sha"))
+    
+    async def _find_or_create_constellation(self, commit_sha: str, item: ContextItem) -> BuildConstellation:
+        """Find existing constellation or create new one."""
+        # Look for existing constellation with same commit SHA
+        for constellation in self.active_constellations.values():
+            if constellation.commit_sha == commit_sha:
+                return constellation
+        
+        # Create new constellation
+        constellation = BuildConstellation(
+            primary_build_id=item.source_id or "unknown",
+            commit_sha=commit_sha,
+            branch_name=item.metrics.get("branch_name") if item.metrics else None
+        )
+        
+        self.active_constellations[constellation.primary_build_id] = constellation
+        return constellation
+    
+    def _create_build_info(self, item: ContextItem, raw_item: Dict[str, Any]) -> Dict[str, Any]:
+        """Create build information for constellation tracking."""
+        return {
+            "build_id": item.source_id,
+            "platform": raw_item.get("type", "unknown"),
+            "status": item.metrics.get("status") if item.metrics else None,
+            "duration_ms": item.metrics.get("duration_ms") if item.metrics else None,
+            "timestamp": item.timestamp.isoformat() if item.timestamp else None
+        }
+    
+    async def _update_constellation_status(self, constellation: BuildConstellation) -> None:
+        """Update constellation status based on all builds."""
+        constellation.total_builds = len(constellation.related_builds)
+        constellation.successful_builds = sum(1 for build in constellation.related_builds 
+                                            if build.get("status") == "success")
+        constellation.failed_builds = sum(1 for build in constellation.related_builds 
+                                        if build.get("status") in ["failed", "error"])
+        
+        # Determine completion status
+        if constellation.failed_builds > 0:
+            constellation.completion_status = "failed"
+        elif constellation.successful_builds == constellation.total_builds:
+            constellation.completion_status = "completed"
+        else:
+            constellation.completion_status = "in_progress"
+        
+        constellation.updated_at = datetime.utcnow()
 
 
 # Factory function for creating platform adapters

@@ -10,11 +10,11 @@ from ..db.connections import get_db
 
 async def get_project_summary() -> Dict[str, Any]:
     """Get overall project statistics and summary.
-    
+
     Returns:
         Dictionary containing project overview with:
         - file_count: Number of files in the project
-        - language_breakdown: Files by programming language  
+        - language_breakdown: Files by programming language
         - directory_structure: High-level directory overview
         - total_lines: Estimated lines of code
         - last_modified: Most recent modification timestamp
@@ -22,7 +22,7 @@ async def get_project_summary() -> Dict[str, Any]:
     try:
         # For now, return a simple summary based on the .proj-intel directory
         proj_intel_path = Path.cwd() / ".proj-intel"
-        
+
         summary = {
             "project_name": Path.cwd().name,
             "intel_directory": str(proj_intel_path),
@@ -30,9 +30,9 @@ async def get_project_summary() -> Dict[str, Any]:
             "summary_generated": True,
             "timestamp": "now",
             "tool_count": 21,  # We have 21 semantic tools planned
-            "status": "MCP Server running - basic monitoring active"
+            "status": "MCP Server running - basic monitoring active",
         }
-        
+
         # Try to get basic database stats if available
         try:
             db = await get_db()
@@ -43,14 +43,14 @@ async def get_project_summary() -> Dict[str, Any]:
                 summary["context_items"] = result["total"]
         except Exception:
             summary["context_items"] = "Database not available"
-            
+
         return summary
-        
+
     except Exception as e:
         return {
             "error": f"Failed to generate project summary: {str(e)}",
             "project_name": Path.cwd().name,
-            "status": "MCP Server running with errors"
+            "status": "MCP Server running with errors",
         }
 
 
@@ -129,9 +129,7 @@ async def get_api_endpoints() -> List[Dict[str, Any]]:
                     elif len(match.groups()) > 1 and match.group(2):
                         # Parse methods from Flask route decorator
                         methods_str = match.group(2)
-                        methods = [
-                            m.strip().strip("'\"") for m in methods_str.split(",")
-                        ]
+                        methods = [m.strip().strip("'\"") for m in methods_str.split(",")]
                     else:
                         methods = ["GET"]  # Default for Flask routes
 
@@ -372,9 +370,7 @@ async def get_dependencies() -> Dict[str, Any]:
         print(f"Error querying PostgreSQL for imports: {e}")
 
     # Convert nodes set to list
-    result["nodes"] = [
-        {"id": node[0], "name": node[1], "type": node[2]} for node in nodes_set
-    ]
+    result["nodes"] = [{"id": node[0], "name": node[1], "type": node[2]} for node in nodes_set]
 
     result["edges"] = edges_list
 
@@ -412,9 +408,7 @@ async def get_dependencies() -> Dict[str, Any]:
         if start in graph:
             for neighbor in graph[start]:
                 if neighbor not in visited:
-                    cycles.extend(
-                        detect_cycles(graph, neighbor, visited, rec_stack, path)
-                    )
+                    cycles.extend(detect_cycles(graph, neighbor, visited, rec_stack, path))
                 elif neighbor in rec_stack:
                     # Found a cycle
                     cycle_start_idx = path.index(neighbor)
@@ -596,13 +590,9 @@ async def get_entry_points() -> List[Dict[str, Any]]:
 
                 # Try to extract program name or description
                 prog_match = re.search(r'prog\s*=\s*["\']([^"\']+)["\']', content)
-                desc_match = re.search(
-                    r'description\s*=\s*["\']([^"\']+)["\']', content
-                )
+                desc_match = re.search(r'description\s*=\s*["\']([^"\']+)["\']', content)
 
-                name = (
-                    prog_match.group(1) if prog_match else Path(row["file_path"]).stem
-                )
+                name = prog_match.group(1) if prog_match else Path(row["file_path"]).stem
                 description = (
                     desc_match.group(1)
                     if desc_match
@@ -727,9 +717,7 @@ async def get_entry_points() -> List[Dict[str, Any]]:
             content = row["content"]
 
             # Extract entry points from setup.py
-            entry_points_match = re.search(
-                r"entry_points\s*=\s*\{([^}]+)\}", content, re.DOTALL
-            )
+            entry_points_match = re.search(r"entry_points\s*=\s*\{([^}]+)\}", content, re.DOTALL)
             if entry_points_match:
                 entry_points_text = entry_points_match.group(1)
 
@@ -741,9 +729,7 @@ async def get_entry_points() -> List[Dict[str, Any]]:
                     scripts_text = console_scripts_match.group(1)
 
                     # Extract individual script definitions
-                    script_matches = re.findall(
-                        r'["\']([^=]+)=([^"\']+)["\']', scripts_text
-                    )
+                    script_matches = re.findall(r'["\']([^=]+)=([^"\']+)["\']', scripts_text)
 
                     for script_name, script_target in script_matches:
                         entry_points.append(
@@ -898,9 +884,7 @@ async def find_agents(
     neo4j_data = []
     if any(row.get("neo4j_node_id") for row in agent_data):
         # Get unique Neo4j node IDs from the agent data
-        neo4j_node_ids = [
-            row["neo4j_node_id"] for row in agent_data if row.get("neo4j_node_id")
-        ]
+        neo4j_node_ids = [row["neo4j_node_id"] for row in agent_data if row.get("neo4j_node_id")]
 
         if neo4j_node_ids:
             # Query Neo4j for relationship data
@@ -924,9 +908,7 @@ async def find_agents(
             """
 
             try:
-                neo4j_results = await db.run_cypher(
-                    cypher_query, node_ids=neo4j_node_ids
-                )
+                neo4j_results = await db.run_cypher(cypher_query, node_ids=neo4j_node_ids)
                 neo4j_data = neo4j_results
             except Exception as e:
                 # Neo4j is optional, log but don't fail
@@ -1076,9 +1058,7 @@ async def get_data_models() -> List[Dict[str, Any]]:
 
             for record in neo4j_results:
                 # Create model info from Neo4j data
-                model_type = _determine_model_type_from_base(
-                    record.get("base_class", "")
-                )
+                model_type = _determine_model_type_from_base(record.get("base_class", ""))
                 decorators = record.get("decorators", [])
                 if "dataclass" in decorators:
                     model_type = "dataclass"
@@ -1089,9 +1069,7 @@ async def get_data_models() -> List[Dict[str, Any]]:
                     "file": record["file_path"],
                     "line": record["line_start"],
                     "fields": _parse_neo4j_fields(record.get("class_fields", [])),
-                    "base_classes": [record.get("base_class")]
-                    if record.get("base_class")
-                    else [],
+                    "base_classes": [record.get("base_class")] if record.get("base_class") else [],
                     "decorators": decorators,
                 }
 
@@ -1100,8 +1078,7 @@ async def get_data_models() -> List[Dict[str, Any]]:
                     (
                         m
                         for m in models
-                        if m["name"] == model_info["name"]
-                        and m["file"] == model_info["file"]
+                        if m["name"] == model_info["name"] and m["file"] == model_info["file"]
                     ),
                     None,
                 )
@@ -1161,17 +1138,13 @@ async def _extract_pydantic_model_info(row: Dict[str, Any]) -> Optional[Dict[str
         return None
 
 
-async def _extract_sqlalchemy_model_info(
-    row: Dict[str, Any]
-) -> Optional[Dict[str, Any]]:
+async def _extract_sqlalchemy_model_info(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Extract information from a SQLAlchemy model class definition."""
     try:
         content = row["content"]
 
         # Check if this looks like a SQLAlchemy model
-        if not any(
-            marker in content for marker in ["__tablename__", "Column(", "Base"]
-        ):
+        if not any(marker in content for marker in ["__tablename__", "Column(", "Base"]):
             return None
 
         # Extract class name
@@ -1301,9 +1274,7 @@ def _extract_base_classes(content: str, class_name: str) -> List[str]:
             # Split by comma and clean up
             bases = [base.strip() for base in bases_str.split(",")]
             # Filter out empty strings and remove generic brackets
-            bases = [
-                re.sub(r"\[.*\]", "", base).strip() for base in bases if base.strip()
-            ]
+            bases = [re.sub(r"\[.*\]", "", base).strip() for base in bases if base.strip()]
             return bases
 
         return []
@@ -1325,12 +1296,7 @@ def _extract_pydantic_fields(content: str) -> List[Dict[str, Any]]:
         lines = content.split("\n")
         for line in lines:
             line = line.strip()
-            if (
-                not line
-                or line.startswith("#")
-                or line.startswith('"""')
-                or line.startswith("'''")
-            ):
+            if not line or line.startswith("#") or line.startswith('"""') or line.startswith("'''"):
                 continue
 
             for pattern in field_patterns:
@@ -1347,8 +1313,7 @@ def _extract_pydantic_fields(content: str) -> List[Dict[str, Any]]:
                     field_info = {
                         "name": field_name,
                         "type": field_type,
-                        "required": default_value is None
-                        or "Field()" in str(default_value),
+                        "required": default_value is None or "Field()" in str(default_value),
                         "description": _extract_field_description(
                             str(default_value) if default_value else ""
                         ),
@@ -1387,9 +1352,7 @@ def _extract_sqlalchemy_fields(content: str) -> List[Dict[str, Any]]:
             field_type = type_match.group(1) if type_match else "Unknown"
 
             # Check for primary key, nullable, etc.
-            required = (
-                "nullable=False" in column_def or "primary_key=True" in column_def
-            )
+            required = "nullable=False" in column_def or "primary_key=True" in column_def
             is_primary = "primary_key=True" in column_def
 
             field_info = {
@@ -1560,9 +1523,7 @@ def _parse_neo4j_fields(fields_data: List[Any]) -> List[Dict[str, Any]]:
                         "name": field.get("name", "unknown"),
                         "type": field.get("type", "unknown"),
                         "required": field.get("required", False),
-                        "description": field.get(
-                            "description", "Field from graph data"
-                        ),
+                        "description": field.get("description", "Field from graph data"),
                     }
                 )
 

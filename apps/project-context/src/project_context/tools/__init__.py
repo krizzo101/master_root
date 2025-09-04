@@ -47,9 +47,7 @@ def register_all_tools(mcp: FastMCP, reader=None, cache=None):
         ) -> dict:
             """Get complexity metrics from code elements."""
             try:
-                return await get_complexity(
-                    file_path, element_type, language, threshold
-                )
+                return await get_complexity(file_path, element_type, language, threshold)
             except Exception as e:
                 logger.error("Error in get_complexity_tool", error=str(e))
                 return {"error": f"Failed to get complexity metrics: {str(e)}"}
@@ -86,9 +84,7 @@ def register_all_tools(mcp: FastMCP, reader=None, cache=None):
         ) -> dict:
             """Find files matching patterns in the codebase."""
             try:
-                return await find_files(
-                    pattern, file_type, exclude_patterns, max_results
-                )
+                return await find_files(pattern, file_type, exclude_patterns, max_results)
             except Exception as e:
                 logger.error("Error in find_files_tool", error=str(e))
                 return {"error": f"Failed to find files: {str(e)}"}
@@ -104,9 +100,7 @@ def register_all_tools(mcp: FastMCP, reader=None, cache=None):
         ) -> dict:
             """Find symbols (functions, classes, etc.) in the codebase."""
             try:
-                return await find_symbols(
-                    symbol_name, symbol_type, file_filter, exact_match
-                )
+                return await find_symbols(symbol_name, symbol_type, file_filter, exact_match)
             except Exception as e:
                 logger.error("Error in find_symbols_tool", error=str(e))
                 return {"error": f"Failed to find symbols: {str(e)}"}
@@ -130,9 +124,7 @@ def register_all_tools(mcp: FastMCP, reader=None, cache=None):
                 duration_seconds: How long to run pipeline (default: run until stopped)
             """
             try:
-                return await start_ingestion_pipeline(
-                    adapter_ids, config_path, duration_seconds
-                )
+                return await start_ingestion_pipeline(adapter_ids, config_path, duration_seconds)
             except Exception as e:
                 logger.error("Error in start_ingestion_pipeline_tool", error=str(e))
                 return {"error": f"Failed to start ingestion pipeline: {str(e)}"}
@@ -196,12 +188,8 @@ def register_all_tools(mcp: FastMCP, reader=None, cache=None):
                     time_window_hours, relationship_types
                 )
             except Exception as e:
-                logger.error(
-                    "Error in analyze_cross_adapter_relationships_tool", error=str(e)
-                )
-                return {
-                    "error": f"Failed to analyze cross-adapter relationships: {str(e)}"
-                }
+                logger.error("Error in analyze_cross_adapter_relationships_tool", error=str(e))
+                return {"error": f"Failed to analyze cross-adapter relationships: {str(e)}"}
 
         registered_tools.append("analyze_cross_adapter_relationships_tool")
 
@@ -230,12 +218,8 @@ def register_all_tools(mcp: FastMCP, reader=None, cache=None):
             try:
                 return await get_integration_health_report()
             except Exception as e:
-                logger.error(
-                    "Error in get_integration_health_report_tool", error=str(e)
-                )
-                return {
-                    "error": f"Failed to generate integration health report: {str(e)}"
-                }
+                logger.error("Error in get_integration_health_report_tool", error=str(e))
+                return {"error": f"Failed to generate integration health report: {str(e)}"}
 
         registered_tools.append("get_integration_health_report_tool")
 

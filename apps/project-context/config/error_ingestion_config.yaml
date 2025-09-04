@@ -27,17 +27,17 @@ adapter:
   batch_mode: "streaming"  # streaming, micro_batch, batch, bulk
   max_items_per_second: 2000
   max_concurrent_batches: 10
-  
+
   # Retry configuration
   max_retries: 3
   retry_delay_seconds: 2.0
   retry_backoff_factor: 2.0
-  
+
   # Health monitoring
   health_check_interval_seconds: 60
   error_threshold_count: 100
   error_threshold_window_seconds: 300
-  
+
   # Memory management
   max_memory_mb: 1024
   memory_check_interval_seconds: 30
@@ -53,7 +53,7 @@ input_sources:
       - "./logs"
       - "./error-logs"
       - "/var/log/containers"
-    
+
     file_patterns:
       - "*.log"
       - "error*.log"
@@ -61,17 +61,17 @@ input_sources:
       - "application*.log"
       - "service-*.log"
       - "*-error.log"
-    
+
     # File monitoring
     watch_directories: true
     follow_symlinks: false
     recursive_search: true
     max_file_size_mb: 100
-    
+
     # Processing settings
     read_buffer_size_kb: 64
     max_lines_per_batch: 1000
-    
+
   # Real-time streaming
   realtime:
     enabled: false  # Enable for production real-time processing
@@ -87,11 +87,11 @@ input_sources:
           stream_name: "error-stream"
           consumer_group: "error-processors"
           consumer_name: "processor-1"
-    
+
     # Stream processing
     batch_timeout_seconds: 5
     max_pending_messages: 10000
-    
+
   # API endpoints
   api:
     enabled: false  # Enable for API-based error reporting
@@ -104,7 +104,7 @@ input_sources:
         method: "POST"
         authentication: "api_key"
         rate_limit_per_minute: 500
-    
+
     # API server settings
     port: 8080
     host: "0.0.0.0"
@@ -118,7 +118,7 @@ parsing:
     confidence_threshold: 0.7
     cache_detection_results: true
     cache_ttl_minutes: 60
-    
+
     # Custom format patterns
     custom_formats:
       - name: "nginx_error"
@@ -130,7 +130,7 @@ parsing:
           - pid
           - connection_id
           - message
-      
+
       - name: "apache_error"
         patterns:
           - '^\[\w{3} \w{3} \d{2} \d{2}:\d{2}:\d{2}\.\d+ \d{4}\] \[\w+:\w+\] \[pid \d+\] .+'
@@ -140,7 +140,7 @@ parsing:
           - level
           - pid
           - message
-  
+
   # Parser settings
   parsers:
     json:
@@ -151,7 +151,7 @@ parsing:
         - "%Y-%m-%dT%H:%M:%S.%fZ"
         - "%Y-%m-%d %H:%M:%S.%f"
         - "%d/%m/%Y %H:%M:%S"
-      
+
       # Field mapping for non-standard JSON logs
       field_mapping:
         "@timestamp": "timestamp"
@@ -160,7 +160,7 @@ parsing:
         "error_message": "message"
         "stacktrace": "stack_trace"
         "exception_class": "exception_type"
-    
+
     structured_text:
       enabled: true
       patterns:
@@ -170,20 +170,20 @@ parsing:
           regex: '\[(?P<timestamp>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}[^\]]*)\]\s+(?P<level>\w+)\s+(?P<logger>[^\s]+)?\s*[-:]?\s*(?P<message>.*?)$'
         - name: "java_spring"
           regex: '(?P<timestamp>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}[^\s]*)\s+(?P<level>\w+)\s+\[(?P<thread>[^\]]+)\]\s+(?P<logger>[^\s]+)?\s*[-:]?\s*(?P<message>.*?)$'
-      
+
       multiline_support: true
       multiline_patterns:
         - '^\s+at\s+'  # Java stack traces
         - '^\s+File\s+".*",\s+line\s+\d+'  # Python stack traces
         - '^\s+Caused\s+by:'  # Exception chains
         - '^\s*\w+Error:'  # Error types
-    
+
     plain_text:
       enabled: true
       fallback_parser: true
       timestamp_extraction: true
       level_extraction: true
-      
+
     # Binary log support
     binary:
       enabled: false
@@ -195,26 +195,26 @@ parsing:
 # Error classification configuration
 classification:
   enabled: true
-  
+
   # Classification engines
   engines:
     rule_based:
       enabled: true
       confidence_weight: 0.4
-    
+
     pattern_based:
-      enabled: true  
+      enabled: true
       confidence_weight: 0.3
-    
+
     keyword_based:
       enabled: true
       confidence_weight: 0.3
-    
+
     ml_based:
       enabled: false  # Enable when ML models are available
       model_path: "./models/error_classifier.pkl"
       confidence_weight: 0.6
-  
+
   # Error categories and patterns
   categories:
     network:
@@ -234,7 +234,7 @@ classification:
         - dns_failure
         - ssl_error
         - proxy_error
-    
+
     database:
       keywords: ["database", "sql", "query", "connection", "deadlock", "constraint", "transaction", "rollback"]
       patterns:
@@ -252,7 +252,7 @@ classification:
         - deadlock
         - constraint_violation
         - schema_error
-    
+
     memory:
       keywords: ["memory", "heap", "oom", "outofmemory", "allocation", "gc", "garbage", "leak"]
       patterns:
@@ -268,7 +268,7 @@ classification:
         - heap_exhaustion
         - allocation_failure
         - memory_leak
-    
+
     security:
       keywords: ["unauthorized", "forbidden", "authentication", "permission", "access", "denied", "security", "auth"]
       patterns:
@@ -285,7 +285,7 @@ classification:
         - authorization_error
         - access_denied
         - security_violation
-    
+
     performance:
       keywords: ["slow", "performance", "latency", "cpu", "disk", "io", "throughput", "bottleneck", "degradation"]
       patterns:
@@ -301,7 +301,7 @@ classification:
         - high_cpu
         - disk_io_error
         - latency_issue
-    
+
     application:
       keywords: ["exception", "error", "null", "undefined", "assertion", "runtime", "crash"]
       patterns:
@@ -317,11 +317,11 @@ classification:
         - assertion_failure
         - runtime_error
         - unhandled_exception
-  
+
   # Severity scoring
   severity_scoring:
     enabled: true
-    
+
     # Level-based multipliers
     level_multipliers:
       FATAL: 1.5
@@ -332,7 +332,7 @@ classification:
       INFO: 0.8
       DEBUG: 0.6
       TRACE: 0.5
-    
+
     # Additional factors
     stack_trace_multiplier: 1.3
     exception_type_multiplier: 1.2
@@ -342,30 +342,30 @@ classification:
 # Pattern detection configuration
 pattern_detection:
   enabled: true
-  
+
   # Detection algorithms
   algorithms:
     exact_match:
       enabled: true
       threshold: 1.0
-    
+
     semantic_similarity:
       enabled: true
       threshold: 0.8
       vectorizer: "tfidf"  # tfidf, word2vec, fasttext
       max_features: 1000
       ngram_range: [1, 3]
-    
+
     structural_similarity:
       enabled: true
       threshold: 0.75
       algorithm: "edit_distance"  # edit_distance, jaccard, cosine
-    
+
     temporal_pattern:
       enabled: true
       time_window_hours: 24
       min_occurrences: 3
-  
+
   # Pattern management
   pattern_lifecycle:
     min_pattern_occurrences: 2
@@ -373,7 +373,7 @@ pattern_detection:
     auto_merge_similar_patterns: true
     merge_similarity_threshold: 0.9
     max_patterns_per_category: 1000
-  
+
   # Performance optimization
   batch_size: 100
   max_text_length: 10000
@@ -383,7 +383,7 @@ pattern_detection:
 # Correlation detection configuration
 correlation:
   enabled: true
-  
+
   # Time windows for correlation analysis
   time_windows:
     default: 2  # hours
@@ -391,73 +391,73 @@ correlation:
     chat_conversations: 6  # hours
     code_changes: 1  # hours
     deployment: 2  # hours
-  
+
   # Correlation engines
   git_correlation:
     enabled: true
     confidence_threshold: 0.3
-    
+
     # File path correlation
     file_path_weights:
       exact_match: 0.6
       directory_match: 0.4
       parent_directory_match: 0.2
-    
+
     # Temporal correlation
     temporal_weights:
       within_1_hour: 0.4
       within_4_hours: 0.3
       within_24_hours: 0.1
-    
+
     # Author correlation
     author_weights:
       same_author: 0.3
       team_member: 0.2
       frequent_contributor: 0.1
-    
+
     # Change type correlation
     change_type_weights:
       new_file: 0.2
       deleted_file: 0.4
       modified_file: 0.3
       renamed_file: 0.1
-  
+
   chat_correlation:
     enabled: true
     confidence_threshold: 0.2
-    
+
     # Keyword matching
     error_keywords: ["error", "bug", "issue", "problem", "fail", "exception", "crash", "broken"]
     keyword_match_weight: 0.3
-    
+
     # File reference detection
     file_reference_weight: 0.4
     function_reference_weight: 0.3
     exception_reference_weight: 0.4
-    
+
     # Semantic similarity
     semantic_similarity_enabled: true
     semantic_similarity_threshold: 0.7
     semantic_similarity_weight: 0.3
-    
+
     # Temporal proximity
     temporal_proximity_weight: 0.2
-  
+
   code_correlation:
     enabled: true
     confidence_threshold: 0.3
-    
+
     # Direct file correlation
     file_match_weight: 0.6
     line_proximity_threshold: 10
     line_proximity_weight: 0.3
-    
+
     # Function correlation
     function_match_weight: 0.5
-    
+
     # Class correlation
     class_match_weight: 0.4
-  
+
   # Performance settings
   max_correlations_per_error: 50
   correlation_cache_enabled: true
@@ -476,24 +476,24 @@ filtering:
     - '.*cache.*warming.*'
     - '.*backup.*started.*'
     - '.*maintenance.*mode.*'
-  
+
   # Include patterns (if specified, only matching logs are processed)
   include_patterns: []
-  
+
   # Severity filters
   severity_filters: []  # empty = all severities, specify: ["error", "fatal", "critical"]
-  
+
   # Level filters
   level_filters: []  # empty = all levels, specify: ["ERROR", "FATAL", "CRITICAL"]
-  
+
   # Time-based filtering
   max_error_age_days: 90
   min_error_age_hours: 0
-  
+
   # Content filtering
   min_content_length: 10
   max_content_length: 100000
-  
+
   # File-based filtering
   exclude_file_patterns:
     - "*/test/*"
@@ -501,7 +501,7 @@ filtering:
     - "*/.git/*"
     - "*/node_modules/*"
     - "*/vendor/*"
-  
+
   # Deduplication
   deduplication:
     enabled: true
@@ -516,46 +516,46 @@ performance:
   parallel_processing: true
   max_worker_threads: 16
   worker_queue_size: 10000
-  
+
   # Memory management
   object_pooling: true
   buffer_reuse: true
   gc_optimization: true
   memory_monitoring: true
   memory_threshold_mb: 1536
-  
+
   # I/O optimization
   async_file_reading: true
   read_buffer_size_kb: 128
   write_buffer_size_kb: 256
   connection_pooling: true
-  
+
   # Caching
   caching:
     enabled: true
-    
+
     # Cache levels
     l1_memory:
       size_mb: 256
       ttl_minutes: 15
       items: ["format_detection", "classification_results"]
-    
+
     l2_redis:
       size_mb: 1024
       ttl_minutes: 60
       items: ["pattern_matching", "correlations", "embeddings"]
-    
+
     l3_database:
       materialized_views: true
       refresh_interval_minutes: 5
       items: ["trend_analysis", "correlation_patterns"]
-  
+
   # Batch optimization
   adaptive_batching: true
   min_batch_size: 10
   max_batch_size: 1000
   batch_timeout_seconds: 30
-  
+
   # Database optimization
   bulk_inserts: true
   prepared_statements: true
@@ -565,66 +565,66 @@ performance:
 # Monitoring and alerting
 monitoring:
   enabled: true
-  
+
   # Metrics collection
   metrics:
     enabled: true
     collection_interval_seconds: 30
-    
+
     # Prometheus integration
     prometheus:
       enabled: true
       port: 9090
       path: "/metrics"
-    
+
     # Custom metrics
     custom_metrics:
       - name: "error_processing_rate"
         type: "counter"
         description: "Rate of error processing per second"
-      
+
       - name: "classification_accuracy"
         type: "gauge"
         description: "Accuracy of error classification"
-      
+
       - name: "pattern_detection_rate"
         type: "counter"
         description: "Rate of new pattern detection"
-      
+
       - name: "correlation_detection_rate"
         type: "counter"
         description: "Rate of correlation detection"
-  
+
   # Health checks
   health_checks:
     enabled: true
     interval_seconds: 60
     timeout_seconds: 10
-    
+
     checks:
       - name: "database_connectivity"
         type: "database"
         critical: true
-      
+
       - name: "memory_usage"
         type: "memory"
         critical: false
         threshold_mb: 1536
-      
+
       - name: "processing_lag"
         type: "processing"
         critical: true
         threshold_seconds: 300
-      
+
       - name: "error_rate"
         type: "error_rate"
         critical: true
         threshold_rate: 0.1
-  
+
   # Alerting
   alerting:
     enabled: true
-    
+
     # Alert rules
     rules:
       - name: "high_error_rate"
@@ -632,31 +632,31 @@ monitoring:
         severity: "critical"
         cooldown_minutes: 15
         channels: ["slack", "email", "pagerduty"]
-      
+
       - name: "memory_pressure"
         condition: "memory_usage > 1536 MB"
         severity: "warning"
         cooldown_minutes: 30
         channels: ["slack", "email"]
-      
+
       - name: "processing_lag"
         condition: "processing_lag > 300 seconds"
         severity: "critical"
         cooldown_minutes: 10
         channels: ["slack", "pagerduty"]
-      
+
       - name: "new_critical_error_pattern"
         condition: "new_error_pattern AND severity = critical"
         severity: "high"
         cooldown_minutes: 5
         channels: ["slack", "email"]
-      
+
       - name: "correlation_spike"
         condition: "correlation_rate > 50 per minute"
         severity: "info"
         cooldown_minutes: 60
         channels: ["slack"]
-    
+
     # Notification channels
     channels:
       slack:
@@ -664,7 +664,7 @@ monitoring:
         webhook_url: "${SLACK_WEBHOOK_URL}"
         channel: "#error-alerts"
         username: "Error Ingestion System"
-      
+
       email:
         enabled: true
         smtp_host: "${SMTP_HOST}"
@@ -673,11 +673,11 @@ monitoring:
         smtp_password: "${SMTP_PASSWORD}"
         from_email: "alerts@unified-context.com"
         to_emails: ["team@company.com", "devops@company.com"]
-      
+
       pagerduty:
         enabled: false
         integration_key: "${PAGERDUTY_INTEGRATION_KEY}"
-      
+
       webhook:
         enabled: false
         url: "${WEBHOOK_URL}"
@@ -695,49 +695,49 @@ storage:
       strategy: "time"  # time, hash, range
       interval: "1 hour"  # for time-based partitioning
       retention_days: 90
-    
+
     # Indexing
     indexing:
       auto_create_indexes: true
       analyze_query_performance: true
-      
+
       # Custom indexes
       custom_indexes:
         - name: "idx_error_timestamp_category"
           table: "context_items"
           columns: ["timestamp", "source_type", "entity_type"]
           where: "source_type = 'error'"
-        
+
         - name: "idx_error_file_path_timestamp"
-          table: "context_items" 
+          table: "context_items"
           columns: ["file_path", "timestamp"]
           where: "source_type = 'error' AND file_path IS NOT NULL"
-        
+
         - name: "idx_error_content_gin"
           table: "context_items"
           type: "gin"
           columns: ["to_tsvector('english', content)"]
           where: "source_type = 'error'"
-    
+
     # Compression
     compression:
       enabled: true
       algorithm: "zstd"  # zstd, gzip, lz4
       level: 3
-      
+
     # Archival
     archival:
       enabled: true
       archive_after_days: 90
       archive_location: "cold_storage"
       delete_after_archive: false
-  
+
   # File system storage (for logs and temporary data)
   filesystem:
     temp_directory: "/tmp/error-ingestion"
     log_directory: "/var/log/error-ingestion"
     archive_directory: "/var/archive/error-logs"
-    
+
     # Cleanup policies
     cleanup:
       temp_files_max_age_hours: 24
@@ -754,30 +754,30 @@ integrations:
         name: "main-application"
         branch: "main"
         poll_interval_minutes: 5
-      
+
       - path: "/opt/repositories/services"
         name: "microservices"
         branch: "develop"
         poll_interval_minutes: 10
-    
+
     # Git operations
     operations:
       fetch_commits: true
       analyze_diffs: true
       track_authors: true
       include_merge_commits: false
-    
+
     # Correlation settings
     correlation:
       time_window_hours: 4
       file_path_matching: true
       author_matching: true
       commit_message_analysis: true
-  
+
   # Chat systems integration
   chat_systems:
     enabled: true
-    
+
     # Slack integration
     slack:
       enabled: false
@@ -785,30 +785,30 @@ integrations:
       channels: ["#development", "#alerts", "#debugging"]
       include_private_channels: false
       poll_interval_minutes: 2
-    
+
     # Discord integration
     discord:
       enabled: false
       bot_token: "${DISCORD_BOT_TOKEN}"
       guild_id: "${DISCORD_GUILD_ID}"
       channels: ["development", "alerts"]
-    
+
     # Microsoft Teams integration
     teams:
       enabled: false
       webhook_url: "${TEAMS_WEBHOOK_URL}"
       poll_interval_minutes: 5
-    
+
     # Claude conversations
     claude:
       enabled: true
       conversation_patterns: ["*.claude.conversation", "*.claude.chat"]
       include_metadata: true
-  
+
   # CI/CD integration
   cicd:
     enabled: true
-    
+
     # Jenkins integration
     jenkins:
       enabled: false
@@ -816,21 +816,21 @@ integrations:
       username: "${JENKINS_USER}"
       api_token: "${JENKINS_TOKEN}"
       jobs: ["deploy-main", "test-suite"]
-    
+
     # GitHub Actions integration
     github_actions:
       enabled: false
       token: "${GITHUB_TOKEN}"
       repositories: ["owner/repo1", "owner/repo2"]
       workflow_events: ["workflow_run", "deployment"]
-    
+
     # GitLab CI integration
     gitlab_ci:
       enabled: false
       base_url: "${GITLAB_URL}"
       token: "${GITLAB_TOKEN}"
       projects: [123, 456]
-    
+
     # Generic webhook integration
     generic:
       enabled: true
@@ -847,31 +847,31 @@ security:
     method: "bearer_token"  # bearer_token, api_key, basic_auth, oauth2
     token_header: "Authorization"
     token_prefix: "Bearer "
-    
+
     # API keys (for API endpoint access)
     api_keys:
       - name: "internal_services"
         key_hash: "${API_KEY_HASH_1}"
         permissions: ["read", "write"]
-      
+
       - name: "monitoring_tools"
         key_hash: "${API_KEY_HASH_2}"
         permissions: ["read"]
-  
+
   # Input validation
   input_validation:
     enabled: true
     max_request_size_mb: 50
     sanitize_inputs: true
     validate_json_schema: true
-    
+
     # Rate limiting
     rate_limiting:
       enabled: true
       global_rate_per_minute: 10000
       per_source_rate_per_minute: 1000
       per_ip_rate_per_minute: 100
-  
+
   # Data protection
   data_protection:
     # PII detection and masking
@@ -881,25 +881,25 @@ security:
       - name: "email"
         pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
         replacement: "[EMAIL]"
-      
+
       - name: "ssn"
         pattern: '\b\d{3}-\d{2}-\d{4}\b'
         replacement: "[SSN]"
-      
+
       - name: "phone"
         pattern: '\b\d{3}-\d{3}-\d{4}\b'
         replacement: "[PHONE]"
-      
+
       - name: "credit_card"
         pattern: '\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b'
         replacement: "[CARD]"
-    
+
     # Encryption
     encryption:
       at_rest: true
       in_transit: true
       key_rotation_days: 90
-  
+
   # Access control
   access_control:
     # Role-based access control
@@ -908,18 +908,18 @@ security:
       roles:
         - name: "admin"
           permissions: ["*"]
-        
+
         - name: "operator"
           permissions: ["read", "process", "correlate"]
-        
+
         - name: "viewer"
           permissions: ["read"]
-    
+
     # IP whitelisting
     ip_whitelist:
       enabled: false
       allowed_ips: []
-  
+
   # Audit logging
   audit_logging:
     enabled: true
@@ -934,70 +934,70 @@ environments:
     adapter:
       batch_size: 50
       max_items_per_second: 100
-    
+
     input_sources:
       realtime:
         enabled: false
       api:
         enabled: false
-    
+
     classification:
       engines:
         ml_based:
           enabled: false
-    
+
     correlation:
       git_correlation:
         enabled: false
-    
+
     monitoring:
       alerting:
         enabled: false
-    
+
     performance:
       max_worker_threads: 4
       caching:
         l2_redis:
           size_mb: 128
-  
+
   staging:
     adapter:
       batch_size: 250
       max_items_per_second: 1000
-    
+
     input_sources:
       realtime:
         enabled: true
-    
+
     monitoring:
       alerting:
         channels:
           pagerduty:
             enabled: false
-    
+
     performance:
       max_worker_threads: 8
-  
+
   production:
     adapter:
       batch_size: 500
       max_items_per_second: 2000
-    
+
     input_sources:
       realtime:
         enabled: true
       api:
         enabled: true
-    
+
     classification:
       engines:
         ml_based:
           enabled: true
-    
+
     monitoring:
       alerting:
         enabled: true
-    
+
     security:
       authentication:
         enabled: true

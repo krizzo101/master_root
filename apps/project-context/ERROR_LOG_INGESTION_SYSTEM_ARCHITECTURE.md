@@ -1,9 +1,9 @@
 # Error Log Ingestion System Architecture
 ## Phase 2 Unified Context System - Comprehensive Design
 
-**Date**: 2025-01-04  
-**Phase**: 2 - Temporal Knowledge Graph Extension  
-**Status**: Architecture Design Complete  
+**Date**: 2025-01-04
+**Phase**: 2 - Temporal Knowledge Graph Extension
+**Status**: Architecture Design Complete
 
 ---
 
@@ -13,7 +13,7 @@ This document presents a comprehensive architecture for the Error Log Ingestion 
 
 ### Key Capabilities
 - **Multi-format log parsing** with intelligent format detection
-- **Real-time error classification** and severity scoring  
+- **Real-time error classification** and severity scoring
 - **Correlation detection** linking errors to code changes and discussions
 - **Pattern recognition** and frequency tracking
 - **Temporal analysis** for error trends and prediction
@@ -120,7 +120,7 @@ This document presents a comprehensive architecture for the Error Log Ingestion 
 ```python
 class FormatDetectionEngine:
     """Intelligent log format detection with confidence scoring."""
-    
+
     SUPPORTED_FORMATS = {
         'json': JSONLogFormat,
         'structured_text': StructuredTextFormat,
@@ -132,7 +132,7 @@ class FormatDetectionEngine:
         'application_specific': CustomFormat,
         'plain_text': PlainTextFormat
     }
-    
+
     async def detect_format(self, log_line: str) -> FormatDetectionResult:
         """
         Detect log format using multiple detection strategies:
@@ -169,7 +169,7 @@ class FormatDetectionEngine:
 ```python
 class ErrorClassificationSystem:
     """ML-powered error classification with rule-based fallbacks."""
-    
+
     ERROR_CATEGORIES = {
         'network': {
             'subcategories': ['timeout', 'connection_refused', 'dns', 'ssl'],
@@ -192,7 +192,7 @@ class ErrorClassificationSystem:
             'severity_weights': {'slow_query': 0.6, 'high_cpu': 0.8}
         }
     }
-    
+
     async def classify_error(self, parsed_log: ParsedLog) -> ClassificationResult:
         """
         Multi-stage classification:
@@ -207,7 +207,7 @@ class ErrorClassificationSystem:
 ```python
 class SeverityScorer:
     """Dynamic severity scoring based on multiple factors."""
-    
+
     SCORING_FACTORS = {
         'error_type': 0.3,        # Type-based base score
         'frequency': 0.2,         # Recent frequency impact
@@ -215,7 +215,7 @@ class SeverityScorer:
         'stack_trace': 0.15,      # Stack trace analysis
         'correlation': 0.15       # Related error correlation
     }
-    
+
     async def calculate_severity(self, error: ParsedError) -> SeverityScore:
         """
         Calculate weighted severity score (0.0 - 1.0):
@@ -232,7 +232,7 @@ class SeverityScorer:
 ```python
 class GitCommitCorrelator:
     """Correlate errors with recent Git commits."""
-    
+
     CORRELATION_STRATEGIES = {
         'temporal': {
             'time_window': timedelta(hours=2),
@@ -255,9 +255,9 @@ class GitCommitCorrelator:
             'weight': 0.1
         }
     }
-    
+
     async def find_correlations(
-        self, 
+        self,
         error: ContextItem,
         time_window: timedelta = timedelta(hours=2)
     ) -> List[CorrelationResult]:
@@ -268,7 +268,7 @@ class GitCommitCorrelator:
 ```python
 class ChatConversationLinker:
     """Link errors to relevant chat discussions."""
-    
+
     LINKING_STRATEGIES = {
         'keyword_matching': {
             'error_keywords': ['error', 'bug', 'fail', 'issue'],
@@ -285,7 +285,7 @@ class ChatConversationLinker:
             'weight': 0.3
         }
     }
-    
+
     async def link_conversations(
         self,
         error: ContextItem
@@ -299,7 +299,7 @@ class ChatConversationLinker:
 ```python
 class ErrorPatternDetector:
     """Detect recurring error patterns using ML and statistical analysis."""
-    
+
     PATTERN_TYPES = {
         'exact_match': {
             'algorithm': 'hash_based',
@@ -318,7 +318,7 @@ class ErrorPatternDetector:
             'window': timedelta(hours=24)
         }
     }
-    
+
     async def detect_patterns(
         self,
         error_batch: List[ContextItem]
@@ -330,14 +330,14 @@ class ErrorPatternDetector:
 ```python
 class FrequencyTracker:
     """Track error frequency with sliding windows."""
-    
+
     TIME_WINDOWS = {
         'real_time': timedelta(minutes=5),
-        'short_term': timedelta(hours=1), 
+        'short_term': timedelta(hours=1),
         'medium_term': timedelta(hours=24),
         'long_term': timedelta(days=7)
     }
-    
+
     async def update_frequency(
         self,
         pattern_id: str,
@@ -345,7 +345,7 @@ class FrequencyTracker:
         count: int = 1
     ):
         """Update frequency counters for all time windows."""
-    
+
     async def get_trending_patterns(
         self,
         limit: int = 20
@@ -363,18 +363,18 @@ class FrequencyTracker:
 ```python
 class IngestionStage:
     """First stage: ingest logs and detect format."""
-    
+
     async def process(self, raw_log: str) -> ProcessingContext:
         # 1. Format detection
         format_result = await self.format_detector.detect_format(raw_log)
-        
+
         # 2. Parse based on detected format
         parser = self.get_parser(format_result.format_type)
         parsed_log = await parser.parse(raw_log, format_result.schema)
-        
+
         # 3. Basic validation
         validation_result = await self.validator.validate(parsed_log)
-        
+
         return ProcessingContext(
             raw_log=raw_log,
             format_type=format_result.format_type,
@@ -387,30 +387,30 @@ class IngestionStage:
 ```python
 class ClassificationStage:
     """Second stage: classify and analyze errors."""
-    
+
     async def process(self, context: ProcessingContext) -> ProcessingContext:
         # 1. Error classification
         classification = await self.classifier.classify_error(context.parsed_log)
-        
+
         # 2. Severity scoring
         severity = await self.severity_scorer.calculate_severity(
             context.parsed_log, classification
         )
-        
+
         # 3. Stack trace analysis
         if context.parsed_log.stack_trace:
             stack_analysis = await self.stack_analyzer.analyze(
                 context.parsed_log.stack_trace
             )
-        
+
         # 4. Pattern detection
         pattern_result = await self.pattern_detector.detect_patterns([context.parsed_log])
-        
+
         context.classification = classification
         context.severity = severity
         context.stack_analysis = stack_analysis
         context.pattern_result = pattern_result
-        
+
         return context
 ```
 
@@ -418,37 +418,37 @@ class ClassificationStage:
 ```python
 class CorrelationStage:
     """Third stage: detect correlations and enrich data."""
-    
+
     async def process(self, context: ProcessingContext) -> ProcessingContext:
         correlations = []
-        
+
         # 1. Git commit correlation
         if context.parsed_log.file_path:
             git_correlations = await self.git_correlator.find_correlations(
                 context.parsed_log
             )
             correlations.extend(git_correlations)
-        
-        # 2. Chat conversation linking  
+
+        # 2. Chat conversation linking
         chat_links = await self.chat_linker.link_conversations(
             context.parsed_log
         )
         correlations.extend(chat_links)
-        
+
         # 3. Code change tracking
         code_changes = await self.code_tracker.track_changes(
             context.parsed_log
         )
         correlations.extend(code_changes)
-        
+
         # 4. Historical pattern matching
         historical_matches = await self.pattern_matcher.find_historical_matches(
             context.parsed_log
         )
-        
+
         context.correlations = correlations
         context.historical_matches = historical_matches
-        
+
         return context
 ```
 
@@ -456,33 +456,33 @@ class CorrelationStage:
 ```python
 class StorageStage:
     """Final stage: store in database with proper indexing."""
-    
+
     async def process(self, context: ProcessingContext) -> ContextItem:
         # 1. Create ContextItem
         context_item = await self.transformer.create_context_item(context)
-        
+
         # 2. Generate embeddings
         if self.config.generate_embeddings:
             embedding = await self.embedding_service.generate_embedding(
                 context_item.content
             )
             context_item.embedding = embedding
-        
+
         # 3. Store in database
         await self.database.store_context_item(context_item)
-        
+
         # 4. Store correlations
         if context.correlations:
             await self.database.store_correlations(
                 context_item.id, context.correlations
             )
-        
+
         # 5. Update frequency tracking
         if context.pattern_result.patterns:
             await self.frequency_tracker.update_patterns(
                 context.pattern_result.patterns, context_item.timestamp
             )
-        
+
         return context_item
 ```
 
@@ -500,33 +500,33 @@ CREATE TABLE error_clusters (
     representative_error_id UUID REFERENCES context_items(id),
     error_type VARCHAR(100),
     severity_level VARCHAR(20),
-    
+
     -- Clustering metrics
     total_occurrences INTEGER DEFAULT 1,
     unique_files INTEGER DEFAULT 0,
     unique_functions INTEGER DEFAULT 0,
     first_seen TIMESTAMPTZ DEFAULT NOW(),
     last_seen TIMESTAMPTZ DEFAULT NOW(),
-    
+
     -- Pattern analysis
     common_stack_trace TEXT,
     common_keywords TEXT[],
     similarity_threshold FLOAT DEFAULT 0.8,
-    
+
     -- Lifecycle
     status VARCHAR(20) DEFAULT 'active', -- active, resolved, ignored
     resolution_notes TEXT,
-    
+
     metadata JSONB DEFAULT '{}'
 );
 
 -- Hypertable for time-based queries
-SELECT create_hypertable('error_clusters', 'first_seen', 
+SELECT create_hypertable('error_clusters', 'first_seen',
     chunk_time_interval => INTERVAL '1 day',
     if_not_exists => TRUE);
 ```
 
-#### Error Pattern Frequency Table  
+#### Error Pattern Frequency Table
 ```sql
 CREATE TABLE error_pattern_frequency (
     pattern_id UUID NOT NULL,
@@ -535,7 +535,7 @@ CREATE TABLE error_pattern_frequency (
     occurrence_count INTEGER DEFAULT 0,
     unique_sources INTEGER DEFAULT 0,
     severity_distribution JSONB DEFAULT '{}',
-    
+
     PRIMARY KEY (pattern_id, time_window, window_type)
 );
 
@@ -550,26 +550,26 @@ SELECT create_hypertable('error_pattern_frequency', 'time_window',
 CREATE TABLE stack_trace_analysis (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     error_id UUID NOT NULL REFERENCES context_items(id),
-    
+
     -- Raw data
     raw_stack_trace TEXT NOT NULL,
     language VARCHAR(50),
-    
+
     -- Parsed components
     function_calls JSONB, -- Array of {function, file, line}
     exception_chain JSONB, -- Nested exception structure
     root_cause_function VARCHAR(255),
     root_cause_file TEXT,
     root_cause_line INTEGER,
-    
+
     -- Analysis metrics
     stack_depth INTEGER,
     unique_files INTEGER,
     complexity_score FLOAT,
-    
+
     -- Embeddings for similarity
     stack_embedding vector(1536),
-    
+
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 ```
@@ -581,26 +581,26 @@ CREATE TABLE error_correlations (
     source_error_id UUID NOT NULL REFERENCES context_items(id),
     target_item_id UUID NOT NULL REFERENCES context_items(id),
     target_item_type VARCHAR(50), -- 'git_commit', 'chat_message', 'code_change'
-    
+
     -- Correlation metrics
     correlation_type VARCHAR(50), -- 'temporal', 'causal', 'contextual'
     confidence_score FLOAT NOT NULL CHECK (confidence_score BETWEEN 0.0 AND 1.0),
     correlation_method VARCHAR(50), -- 'file_path', 'keyword', 'semantic', 'temporal'
-    
+
     -- Temporal context
     time_delta_seconds INTEGER,
     temporal_relationship VARCHAR(20), -- 'before', 'after', 'concurrent'
-    
+
     -- Evidence
     matching_keywords TEXT[],
     file_path_overlap TEXT[],
     semantic_similarity FLOAT,
-    
+
     -- Lifecycle
     validation_status VARCHAR(20) DEFAULT 'pending',
     validated_by VARCHAR(50),
     validated_at TIMESTAMPTZ,
-    
+
     created_at TIMESTAMPTZ DEFAULT NOW(),
     metadata JSONB DEFAULT '{}'
 );
@@ -613,31 +613,31 @@ CREATE TABLE error_correlations (
 CREATE TABLE error_trends (
     time_bucket TIMESTAMPTZ NOT NULL,
     bucket_size INTERVAL NOT NULL, -- '1 hour', '1 day', etc.
-    
+
     -- Aggregation keys
     error_type VARCHAR(100),
     severity_level VARCHAR(20),
     source_component VARCHAR(100),
-    
+
     -- Metrics
     error_count INTEGER DEFAULT 0,
     unique_error_patterns INTEGER DEFAULT 0,
     new_error_patterns INTEGER DEFAULT 0,
     resolved_error_patterns INTEGER DEFAULT 0,
-    
+
     -- Statistical measures
     avg_severity_score FLOAT,
     max_severity_score FLOAT,
     error_rate_per_minute FLOAT,
-    
+
     -- Trending indicators
     growth_rate FLOAT, -- Percentage change from previous period
     is_trending BOOLEAN DEFAULT FALSE,
     anomaly_score FLOAT,
-    
-    PRIMARY KEY (time_bucket, bucket_size, 
-                COALESCE(error_type, ''), 
-                COALESCE(severity_level, ''), 
+
+    PRIMARY KEY (time_bucket, bucket_size,
+                COALESCE(error_type, ''),
+                COALESCE(severity_level, ''),
                 COALESCE(source_component, ''))
 );
 
@@ -673,19 +673,19 @@ BEGIN
     FROM context_items ci
     LEFT JOIN stack_trace_analysis sta ON ci.id = sta.error_id
     WHERE ci.id = error1_id;
-    
-    SELECT ci.content, ci.file_path, sta.stack_embedding  
+
+    SELECT ci.content, ci.file_path, sta.stack_embedding
     INTO error2_data
     FROM context_items ci
     LEFT JOIN stack_trace_analysis sta ON ci.id = sta.error_id
     WHERE ci.id = error2_id;
-    
+
     -- Calculate content similarity (using full-text search ranking)
     SELECT ts_rank(
         to_tsvector('english', error1_data.content),
         plainto_tsquery('english', error2_data.content)
     ) INTO content_similarity;
-    
+
     -- Calculate stack trace similarity (cosine similarity of embeddings)
     IF error1_data.stack_embedding IS NOT NULL AND error2_data.stack_embedding IS NOT NULL THEN
         SELECT (1 - (error1_data.stack_embedding <=> error2_data.stack_embedding))
@@ -693,14 +693,14 @@ BEGIN
     ELSE
         stack_similarity := 0.0;
     END IF;
-    
+
     -- Calculate file path similarity
     IF error1_data.file_path IS NOT NULL AND error2_data.file_path IS NOT NULL THEN
         IF error1_data.file_path = error2_data.file_path THEN
             file_similarity := 1.0;
         ELSE
             -- Directory-level similarity
-            file_similarity := CASE 
+            file_similarity := CASE
                 WHEN dirname(error1_data.file_path) = dirname(error2_data.file_path) THEN 0.7
                 ELSE 0.0
             END;
@@ -708,12 +708,12 @@ BEGIN
     ELSE
         file_similarity := 0.0;
     END IF;
-    
+
     -- Weighted average
-    similarity_score := (content_similarity * 0.4 + 
-                        stack_similarity * 0.4 + 
+    similarity_score := (content_similarity * 0.4 +
+                        stack_similarity * 0.4 +
                         file_similarity * 0.2);
-    
+
     RETURN similarity_score;
 END;
 $$;
@@ -746,18 +746,18 @@ BEGIN
     INTO error_record
     FROM context_items ci
     WHERE ci.id = error_id;
-    
+
     -- Define time window
     time_window_start := error_record.timestamp - INTERVAL '1 hour' * time_window_hours;
     time_window_end := error_record.timestamp + INTERVAL '1 hour' * time_window_hours;
-    
+
     -- Find Git commit correlations
     RETURN QUERY
-    SELECT 
+    SELECT
         gen_random_uuid() as correlation_id,
         'git_commit'::VARCHAR(50) as target_type,
         ci.id as target_id,
-        CASE 
+        CASE
             WHEN ci.file_path = error_record.file_path THEN 0.9
             WHEN dirname(ci.file_path) = dirname(error_record.file_path) THEN 0.7
             ELSE 0.5
@@ -770,19 +770,19 @@ BEGIN
     FROM context_items ci
     WHERE ci.source_type = 'git'
       AND ci.timestamp BETWEEN time_window_start AND time_window_end
-      AND (ci.file_path = error_record.file_path OR 
+      AND (ci.file_path = error_record.file_path OR
            dirname(ci.file_path) = dirname(error_record.file_path))
     ORDER BY confidence_score DESC
     LIMIT max_results;
-    
+
     -- Find chat conversation correlations
-    RETURN QUERY  
+    RETURN QUERY
     SELECT
         gen_random_uuid() as correlation_id,
         'chat_message'::VARCHAR(50) as target_type,
         ci.id as target_id,
         GREATEST(
-            ts_rank(to_tsvector('english', ci.content), 
+            ts_rank(to_tsvector('english', ci.content),
                     plainto_tsquery('english', error_record.content)),
             0.3
         ) as confidence_score,
@@ -812,7 +812,7 @@ $$;
 ```python
 class HighVolumeIngestionOptimizer:
     """Optimizations for processing 10,000+ logs/minute."""
-    
+
     OPTIMIZATION_STRATEGIES = {
         'batch_processing': {
             'min_batch_size': 100,
@@ -836,7 +836,7 @@ class HighVolumeIngestionOptimizer:
             'async_commits': True
         }
     }
-    
+
     async def optimize_ingestion_pipeline(self):
         """Apply performance optimizations to the ingestion pipeline."""
 ```
@@ -845,7 +845,7 @@ class HighVolumeIngestionOptimizer:
 ```python
 class IntelligentCachingSystem:
     """Multi-level caching for optimal performance."""
-    
+
     CACHE_LEVELS = {
         'l1_memory': {
             'type': 'LRU',
@@ -855,7 +855,7 @@ class IntelligentCachingSystem:
         },
         'l2_redis': {
             'type': 'Distributed',
-            'size': '1GB', 
+            'size': '1GB',
             'ttl': timedelta(hours=1),
             'items': ['pattern_matching', 'embeddings']
         },
@@ -872,18 +872,18 @@ class IntelligentCachingSystem:
 #### Specialized Indexes
 ```sql
 -- Error pattern search optimization
-CREATE INDEX CONCURRENTLY idx_error_content_gin 
+CREATE INDEX CONCURRENTLY idx_error_content_gin
 ON context_items USING gin(to_tsvector('english', content))
 WHERE source_type = 'error';
 
--- Temporal correlation optimization  
+-- Temporal correlation optimization
 CREATE INDEX CONCURRENTLY idx_error_temporal_correlation
 ON context_items (timestamp, file_path, source_type)
 WHERE source_type IN ('error', 'git', 'chat');
 
 -- Stack trace similarity optimization
 CREATE INDEX CONCURRENTLY idx_stack_trace_similarity
-ON stack_trace_analysis 
+ON stack_trace_analysis
 USING hnsw (stack_embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 
@@ -891,7 +891,7 @@ WITH (m = 16, ef_construction = 64);
 CREATE INDEX CONCURRENTLY idx_error_cluster_lookup
 ON error_clusters (cluster_signature, status, last_seen DESC);
 
--- Frequency analysis optimization  
+-- Frequency analysis optimization
 CREATE INDEX CONCURRENTLY idx_pattern_frequency_analysis
 ON error_pattern_frequency (pattern_id, window_type, time_window DESC)
 INCLUDE (occurrence_count, unique_sources);
@@ -917,17 +917,17 @@ SET timescaledb.max_concurrent_chunks_per_query = 100;
 ```python
 class GitIntegrationManager:
     """Integrate with Git repositories for correlation analysis."""
-    
+
     async def setup_git_hooks(self, repo_path: str):
         """Setup Git hooks to automatically ingest commit data."""
-        
+
     async def analyze_recent_commits(
         self,
         since: datetime,
         file_patterns: List[str] = None
     ) -> List[GitCommitContext]:
         """Analyze recent commits for error correlation."""
-        
+
     async def correlate_with_errors(
         self,
         commit: GitCommitContext,
@@ -940,14 +940,14 @@ class GitIntegrationManager:
 ```python
 class ChatSystemIntegrator:
     """Integrate with chat systems for contextual analysis."""
-    
+
     SUPPORTED_PLATFORMS = {
         'slack': SlackIntegration,
-        'discord': DiscordIntegration, 
+        'discord': DiscordIntegration,
         'teams': TeamsIntegration,
         'claude_conversations': ClaudeIntegration
     }
-    
+
     async def analyze_error_discussions(
         self,
         error: ContextItem,
@@ -956,18 +956,18 @@ class ChatSystemIntegrator:
         """Find chat discussions related to an error."""
 ```
 
-### CI/CD Pipeline Integration  
+### CI/CD Pipeline Integration
 ```python
 class CICDIntegration:
     """Integrate with CI/CD systems for deployment correlation."""
-    
+
     async def track_deployment_errors(
         self,
         deployment_id: str,
         post_deployment_window: timedelta = timedelta(hours=1)
     ) -> DeploymentErrorAnalysis:
         """Track errors following a deployment."""
-        
+
     async def correlate_build_failures(
         self,
         build_log: str,
@@ -986,7 +986,7 @@ class CICDIntegration:
 ```python
 class ErrorTrendDashboard:
     """Real-time error trend visualization."""
-    
+
     VISUALIZATIONS = {
         'error_volume_timeline': {
             'type': 'line_chart',
@@ -1015,7 +1015,7 @@ class ErrorTrendDashboard:
 ```python
 class AlertManagementSystem:
     """Intelligent alerting with noise reduction."""
-    
+
     ALERT_RULES = {
         'error_spike': {
             'condition': 'error_rate > baseline * 3',
@@ -1033,7 +1033,7 @@ class AlertManagementSystem:
             'cooldown': timedelta(minutes=10)
         }
     }
-    
+
     async def evaluate_alert_conditions(self):
         """Evaluate all alert conditions and send notifications."""
 ```
@@ -1052,7 +1052,7 @@ error_ingestion:
     batch_size: 1000
     processing_threads: 16
     buffer_size_mb: 512
-    
+
   parsers:
     json:
       enabled: true
@@ -1063,24 +1063,24 @@ error_ingestion:
       custom_patterns: []
     binary:
       enabled: false
-      
+
   classification:
     enable_ml_classifier: true
     fallback_to_rules: true
     confidence_threshold: 0.6
-    
+
   correlation:
     git_integration: true
     chat_integration: true
     time_window_hours: 2
     max_correlations_per_error: 20
-    
+
   performance:
     enable_caching: true
     cache_ttl_minutes: 30
     parallel_processing: true
     async_io: true
-    
+
   monitoring:
     enable_metrics: true
     metrics_interval_seconds: 30
@@ -1089,7 +1089,7 @@ error_ingestion:
       - "https://hooks.slack.com/services/..."
 ```
 
-#### Development Configuration  
+#### Development Configuration
 ```yaml
 # config/development.yaml
 error_ingestion:
@@ -1097,18 +1097,18 @@ error_ingestion:
     batch_size: 50
     processing_threads: 4
     buffer_size_mb: 128
-    
+
   classification:
     enable_ml_classifier: false
     fallback_to_rules: true
     confidence_threshold: 0.5
-    
+
   correlation:
     git_integration: false
     chat_integration: false
     time_window_hours: 1
     max_correlations_per_error: 10
-    
+
   monitoring:
     enable_metrics: true
     metrics_interval_seconds: 60
@@ -1119,13 +1119,13 @@ error_ingestion:
 ```python
 class DynamicConfigurationManager:
     """Manage configuration with hot-reloading capabilities."""
-    
+
     async def watch_config_changes(self):
         """Watch for configuration file changes and reload."""
-        
+
     async def update_runtime_config(self, config_path: str, new_values: dict):
         """Update configuration values at runtime."""
-        
+
     async def validate_config_change(self, config_change: dict) -> bool:
         """Validate configuration changes before applying."""
 ```
@@ -1191,7 +1191,7 @@ spec:
             memory: "512Mi"
             cpu: "500m"
           limits:
-            memory: "2Gi" 
+            memory: "2Gi"
             cpu: "2000m"
         env:
         - name: DATABASE_URL
@@ -1224,7 +1224,7 @@ spec:
 ```yaml
 # k8s/error-ingestion-hpa.yaml
 apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler  
+kind: HorizontalPodAutoscaler
 metadata:
   name: error-ingestion-hpa
   namespace: unified-context
@@ -1264,11 +1264,11 @@ spec:
 ### Phase 1: Core Infrastructure (Weeks 1-2)
 - [ ] **Multi-format log parser implementation**
 - [ ] **Database schema extensions**
-- [ ] **Basic error classification system** 
+- [ ] **Basic error classification system**
 - [ ] **Ingestion pipeline foundation**
 - [ ] **Unit test suite development**
 
-### Phase 2: Intelligence Features (Weeks 3-4)  
+### Phase 2: Intelligence Features (Weeks 3-4)
 - [ ] **ML-powered error classification**
 - [ ] **Stack trace analysis engine**
 - [ ] **Pattern detection algorithms**
@@ -1277,7 +1277,7 @@ spec:
 
 ### Phase 3: Correlation System (Weeks 5-6)
 - [ ] **Git commit correlator**
-- [ ] **Chat conversation linker** 
+- [ ] **Chat conversation linker**
 - [ ] **Code change tracker**
 - [ ] **Temporal correlation analysis**
 - [ ] **Correlation confidence scoring**
@@ -1306,7 +1306,7 @@ spec:
 - **Memory Usage**: <2GB per instance under normal load
 - **Query Performance**: <50ms for trend analysis queries
 
-### Intelligence Metrics  
+### Intelligence Metrics
 - **Classification Accuracy**: >85% correct error categorization
 - **Correlation Precision**: >80% relevant correlations detected
 - **Pattern Detection**: >90% accuracy in similar error clustering

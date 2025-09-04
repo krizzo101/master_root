@@ -214,9 +214,7 @@ class CodeAdapter(BaseAdapter):
         # Enhanced symbol extraction for detailed analysis
         if self.config.source_config.get("enable_advanced_analysis", True):
             try:
-                detailed_symbols = self.extract_symbols(
-                    item.content, file_path, language
-                )
+                detailed_symbols = self.extract_symbols(item.content, file_path, language)
                 code_metadata["detailed_symbols"] = detailed_symbols
 
                 # Merge complexity metrics
@@ -230,9 +228,7 @@ class CodeAdapter(BaseAdapter):
                         if imp.get("module") or imp.get("name")
                     ]
             except Exception as e:
-                self.logger.warning(
-                    f"Advanced symbol analysis failed for {file_path}: {e}"
-                )
+                self.logger.warning(f"Advanced symbol analysis failed for {file_path}: {e}")
 
         if item.metrics:
             item.metrics.update(code_metadata)
@@ -240,9 +236,7 @@ class CodeAdapter(BaseAdapter):
             item.metrics = code_metadata
 
         # Set entity type based on content
-        item.entity_type = self._determine_entity_type(
-            file_path, item.content, language
-        )
+        item.entity_type = self._determine_entity_type(file_path, item.content, language)
 
         # Add language-based tags
         tags = [language] if language else []
@@ -372,9 +366,7 @@ class CodeAdapter(BaseAdapter):
         # Use enhanced relationship detection if advanced analysis is enabled
         if self.config.source_config.get("enable_advanced_analysis", False):
             try:
-                enhanced_relationships = self.detect_enhanced_relationships(
-                    item, context_window
-                )
+                enhanced_relationships = self.detect_enhanced_relationships(item, context_window)
                 relationships.extend(enhanced_relationships)
                 return relationships
             except Exception as e:
@@ -388,9 +380,7 @@ class CodeAdapter(BaseAdapter):
                 await self._detect_intelligence_relationships(item, context_window)
             )
         else:
-            relationships.extend(
-                await self._detect_code_relationships(item, context_window)
-            )
+            relationships.extend(await self._detect_code_relationships(item, context_window))
 
         return relationships
 
@@ -482,14 +472,8 @@ class CodeAdapter(BaseAdapter):
                         else:
                             import_module = str(import_data)
 
-                        if (
-                            import_module
-                            and context_path
-                            and import_module in context_path
-                        ):
-                            relationships.append(
-                                ("imports_analysis", context_item.id, 0.8)
-                            )
+                        if import_module and context_path and import_module in context_path:
+                            relationships.append(("imports_analysis", context_item.id, 0.8))
 
             elif intel_data_type == "project_analysis":
                 # Link project analysis to relevant code files
@@ -503,14 +487,8 @@ class CodeAdapter(BaseAdapter):
                 # Link symbols to files that contain them
                 if context_item.source_type == "code":
                     symbol_name = item.metrics.get("symbol_name", "")
-                    if (
-                        symbol_name
-                        and context_item.content
-                        and symbol_name in context_item.content
-                    ):
-                        relationships.append(
-                            ("symbol_defined_in", context_item.id, 0.85)
-                        )
+                    if symbol_name and context_item.content and symbol_name in context_item.content:
+                        relationships.append(("symbol_defined_in", context_item.id, 0.85))
 
             # Same project relationships
             if context_item.source_type == "code_intelligence" and item.metrics.get(
@@ -520,9 +498,7 @@ class CodeAdapter(BaseAdapter):
 
         return relationships
 
-    def _analysis_mentions_file(
-        self, analysis_data: Dict[str, Any], file_path: str
-    ) -> bool:
+    def _analysis_mentions_file(self, analysis_data: Dict[str, Any], file_path: str) -> bool:
         """Check if analysis data mentions a specific file."""
         if not analysis_data or not file_path:
             return False
@@ -545,9 +521,7 @@ class CodeAdapter(BaseAdapter):
 
     async def _initialize_proj_intel(self) -> None:
         """Initialize .proj-intel data sources."""
-        proj_intel_paths = self.config.source_config.get(
-            "proj_intel_paths", [".proj-intel"]
-        )
+        proj_intel_paths = self.config.source_config.get("proj_intel_paths", [".proj-intel"])
 
         for intel_path in proj_intel_paths:
             intel_dir = Path(intel_path)
@@ -571,9 +545,7 @@ class CodeAdapter(BaseAdapter):
                         error=str(e),
                     )
             else:
-                self.logger.warning(
-                    "Project intel directory not found", path=str(intel_dir)
-                )
+                self.logger.warning("Project intel directory not found", path=str(intel_dir))
 
     async def _load_proj_intel_manifest(self, intel_dir: Path) -> None:
         """Load .proj-intel manifest and cache key files."""
@@ -590,9 +562,7 @@ class CodeAdapter(BaseAdapter):
             await self._cache_proj_intel_files(intel_dir)
 
         except Exception as e:
-            self.logger.error(
-                "Failed to load manifest", path=str(manifest_path), error=str(e)
-            )
+            self.logger.error("Failed to load manifest", path=str(manifest_path), error=str(e))
 
     async def _cache_proj_intel_files(self, intel_dir: Path) -> None:
         """Cache important .proj-intel files for faster access."""
@@ -631,9 +601,7 @@ class CodeAdapter(BaseAdapter):
         generated_at_str = self._proj_intel_manifest.get("generated_at")
         if generated_at_str:
             try:
-                generated_at = datetime.fromisoformat(
-                    generated_at_str.replace("Z", "+00:00")
-                )
+                generated_at = datetime.fromisoformat(generated_at_str.replace("Z", "+00:00"))
                 age_days = (datetime.now().astimezone() - generated_at).days
                 if age_days > max_age_days:
                     self.logger.warning(
@@ -643,9 +611,7 @@ class CodeAdapter(BaseAdapter):
                     )
                     return
             except Exception as e:
-                self.logger.warning(
-                    "Failed to parse generated_at timestamp", error=str(e)
-                )
+                self.logger.warning("Failed to parse generated_at timestamp", error=str(e))
 
         # Process different .proj-intel data types
         if self.config.source_config.get("ingest_file_elements", True):
@@ -665,24 +631,17 @@ class CodeAdapter(BaseAdapter):
         shards = self._proj_intel_manifest.get("shards", [])
 
         for shard in shards:
-            if (
-                shard.get("record_kind") == "min_file"
-                and shard.get("name") == "file_elements.min"
-            ):
+            if shard.get("record_kind") == "min_file" and shard.get("name") == "file_elements.min":
                 file_path = shard.get("path")
                 if file_path:
-                    async for item in self._process_jsonl_file(
-                        file_path, "file_element"
-                    ):
+                    async for item in self._process_jsonl_file(file_path, "file_element"):
                         yield item
 
     async def _fetch_project_analysis(self) -> AsyncIterator[Dict[str, Any]]:
         """Fetch project analysis data from .proj-intel."""
         primary_file = self._proj_intel_manifest.get("primary")
         if primary_file:
-            async for item in self._process_jsonl_file(
-                primary_file, "project_analysis"
-            ):
+            async for item in self._process_jsonl_file(primary_file, "project_analysis"):
                 yield item
 
     async def _fetch_symbol_data(self) -> AsyncIterator[Dict[str, Any]]:
@@ -701,9 +660,7 @@ class CodeAdapter(BaseAdapter):
                             "symbol_type": symbol_type,
                             "symbol_name": symbol_name,
                             "symbol_data": symbol_data,
-                            "generated_at": self._proj_intel_manifest.get(
-                                "generated_at"
-                            ),
+                            "generated_at": self._proj_intel_manifest.get("generated_at"),
                         }
 
     async def _process_jsonl_file(
@@ -713,9 +670,7 @@ class CodeAdapter(BaseAdapter):
         try:
             # Find the actual file path
             actual_path = None
-            proj_intel_paths = self.config.source_config.get(
-                "proj_intel_paths", [".proj-intel"]
-            )
+            proj_intel_paths = self.config.source_config.get("proj_intel_paths", [".proj-intel"])
 
             for intel_path in proj_intel_paths:
                 test_path = Path(intel_path) / file_path.replace(".proj-intel/", "")
@@ -748,10 +703,7 @@ class CodeAdapter(BaseAdapter):
                         data = json.loads(line)
 
                         # Extract relevant information based on data type
-                        if (
-                            data_type == "file_element"
-                            and data.get("type") == "collector_item"
-                        ):
+                        if data_type == "file_element" and data.get("type") == "collector_item":
                             yield await self._transform_file_element(data)
                         elif data_type == "project_analysis":
                             yield await self._transform_project_analysis(data)
@@ -772,9 +724,7 @@ class CodeAdapter(BaseAdapter):
                         )
 
         except Exception as e:
-            self.logger.error(
-                "Failed to process JSONL file", file_path=file_path, error=str(e)
-            )
+            self.logger.error("Failed to process JSONL file", file_path=file_path, error=str(e))
 
     async def _transform_file_element(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Transform .proj-intel file element data into context item format."""
@@ -993,9 +943,7 @@ class CodeAdapter(BaseAdapter):
                     continue
 
             if content is None:
-                self.logger.warning(
-                    f"Could not read file with any encoding: {file_path}"
-                )
+                self.logger.warning(f"Could not read file with any encoding: {file_path}")
                 return None
 
             # Get file stats
@@ -1075,9 +1023,7 @@ class CodeAdapter(BaseAdapter):
 
         return "unknown"
 
-    def _determine_entity_type(
-        self, file_path: str, content: str, language: str
-    ) -> str:
+    def _determine_entity_type(self, file_path: str, content: str, language: str) -> str:
         """Determine the entity type based on file content."""
         # Check for specific patterns
         if "test" in file_path.lower():
@@ -1141,9 +1087,7 @@ class CodeAdapter(BaseAdapter):
             )
 
         # JavaScript functions
-        for match in re.finditer(
-            r"function\s+(\w+)\s*\([^)]*\)", content, re.MULTILINE
-        ):
+        for match in re.finditer(r"function\s+(\w+)\s*\([^)]*\)", content, re.MULTILINE):
             functions.append(
                 {
                     "name": match.group(1),
@@ -1161,9 +1105,7 @@ class CodeAdapter(BaseAdapter):
         classes = []
 
         # Python classes
-        for match in re.finditer(
-            r"^class\s+(\w+)(?:\([^)]*\))?:", content, re.MULTILINE
-        ):
+        for match in re.finditer(r"^class\s+(\w+)(?:\([^)]*\))?:", content, re.MULTILINE):
             classes.append(
                 {
                     "name": match.group(1),
@@ -1181,15 +1123,11 @@ class CodeAdapter(BaseAdapter):
         imports = []
 
         # Python imports
-        for match in re.finditer(
-            r"^(?:from\s+[\w.]+\s+)?import\s+(.+)$", content, re.MULTILINE
-        ):
+        for match in re.finditer(r"^(?:from\s+[\w.]+\s+)?import\s+(.+)$", content, re.MULTILINE):
             imports.append(match.group(0).strip())
 
         # JavaScript imports
-        for match in re.finditer(
-            r'^import\s+.+from\s+[\'"]([^\'"]+)[\'"]', content, re.MULTILINE
-        ):
+        for match in re.finditer(r'^import\s+.+from\s+[\'"]([^\'"]+)[\'"]', content, re.MULTILINE):
             imports.append(match.group(0).strip())
 
         return imports
@@ -1366,9 +1304,7 @@ class CodeAdapter(BaseAdapter):
                             "imported": match.group(1).strip(),
                             "module": match.group(2),
                             "statement": match.group(0).strip(),
-                            "type": "require"
-                            if "require" in match.group(0)
-                            else "import",
+                            "type": "require" if "require" in match.group(0) else "import",
                         }
                     )
                 else:
@@ -1397,17 +1333,13 @@ class CodeAdapter(BaseAdapter):
         pattern = r"/\*(.*?)\*/"
         for match in re.finditer(pattern, content, re.DOTALL):
             line_no = content[: match.start()].count("\n") + 1
-            comments.append(
-                {"line": line_no, "text": match.group(0), "type": "block_comment"}
-            )
+            comments.append({"line": line_no, "text": match.group(0), "type": "block_comment"})
 
         return comments
 
     # Python AST-based extractors
 
-    def _extract_python_functions_ast(
-        self, tree: ast.AST, content: str
-    ) -> List[Dict[str, Any]]:
+    def _extract_python_functions_ast(self, tree: ast.AST, content: str) -> List[Dict[str, Any]]:
         """Extract Python functions using AST."""
         functions = []
         lines = content.splitlines()
@@ -1420,9 +1352,7 @@ class CodeAdapter(BaseAdapter):
                     value = node.body[0].value
                     if hasattr(value, "s"):  # Python < 3.8
                         docstring = value.s
-                    elif hasattr(value, "value") and isinstance(
-                        value.value, str
-                    ):  # Python 3.8+
+                    elif hasattr(value, "value") and isinstance(value.value, str):  # Python 3.8+
                         docstring = value.value
 
                 # Extract arguments
@@ -1445,17 +1375,13 @@ class CodeAdapter(BaseAdapter):
                         "docstring": docstring,
                         "args": args,
                         "is_async": isinstance(node, ast.AsyncFunctionDef),
-                        "decorators": [
-                            self._ast_node_to_string(d) for d in node.decorator_list
-                        ],
+                        "decorators": [self._ast_node_to_string(d) for d in node.decorator_list],
                     }
                 )
 
         return functions
 
-    def _extract_python_classes_ast(
-        self, tree: ast.AST, content: str
-    ) -> List[Dict[str, Any]]:
+    def _extract_python_classes_ast(self, tree: ast.AST, content: str) -> List[Dict[str, Any]]:
         """Extract Python classes using AST."""
         classes = []
 
@@ -1467,9 +1393,7 @@ class CodeAdapter(BaseAdapter):
                     value = node.body[0].value
                     if hasattr(value, "s"):  # Python < 3.8
                         docstring = value.s
-                    elif hasattr(value, "value") and isinstance(
-                        value.value, str
-                    ):  # Python 3.8+
+                    elif hasattr(value, "value") and isinstance(value.value, str):  # Python 3.8+
                         docstring = value.value
 
                 # Extract base classes
@@ -1574,9 +1498,7 @@ class CodeAdapter(BaseAdapter):
 
     # Advanced Symbol Extraction and Indexing
 
-    def extract_symbols(
-        self, content: str, file_path: str, language: str
-    ) -> Dict[str, Any]:
+    def extract_symbols(self, content: str, file_path: str, language: str) -> Dict[str, Any]:
         """Extract comprehensive symbol information from code."""
         symbols = {
             "file_path": file_path,
@@ -1597,29 +1519,21 @@ class CodeAdapter(BaseAdapter):
             if language == "python":
                 symbols.update(self._extract_python_symbols(content, file_path))
             elif language in ["javascript", "typescript"]:
-                symbols.update(
-                    self._extract_js_ts_symbols(content, file_path, language)
-                )
+                symbols.update(self._extract_js_ts_symbols(content, file_path, language))
             elif language == "java":
                 symbols.update(self._extract_java_symbols(content, file_path))
             elif language in ["cpp", "c"]:
-                symbols.update(
-                    self._extract_c_cpp_symbols(content, file_path, language)
-                )
+                symbols.update(self._extract_c_cpp_symbols(content, file_path, language))
             elif language == "go":
                 symbols.update(self._extract_go_symbols(content, file_path))
             elif language == "rust":
                 symbols.update(self._extract_rust_symbols(content, file_path))
             else:
                 # Generic symbol extraction for unsupported languages
-                symbols.update(
-                    self._extract_generic_symbols(content, file_path, language)
-                )
+                symbols.update(self._extract_generic_symbols(content, file_path, language))
 
             # Calculate complexity metrics
-            symbols["complexity_metrics"] = self._calculate_complexity_metrics(
-                symbols, content
-            )
+            symbols["complexity_metrics"] = self._calculate_complexity_metrics(symbols, content)
 
         except Exception as e:
             self.logger.error(f"Symbol extraction failed for {file_path}: {e}")
@@ -1650,9 +1564,7 @@ class CodeAdapter(BaseAdapter):
                         "return_annotation": self._ast_node_to_string(node.returns)
                         if node.returns
                         else None,
-                        "decorators": [
-                            self._ast_node_to_string(d) for d in node.decorator_list
-                        ],
+                        "decorators": [self._ast_node_to_string(d) for d in node.decorator_list],
                         "docstring": self._extract_docstring(node),
                         "calls": self._extract_function_calls(node),
                         "variables_used": self._extract_variables_used(node),
@@ -1670,12 +1582,8 @@ class CodeAdapter(BaseAdapter):
                         "name": node.name,
                         "line_start": node.lineno,
                         "line_end": getattr(node, "end_lineno", None),
-                        "base_classes": [
-                            self._ast_node_to_string(base) for base in node.bases
-                        ],
-                        "decorators": [
-                            self._ast_node_to_string(d) for d in node.decorator_list
-                        ],
+                        "base_classes": [self._ast_node_to_string(base) for base in node.bases],
+                        "decorators": [self._ast_node_to_string(d) for d in node.decorator_list],
                         "docstring": self._extract_docstring(node),
                         "methods": self._extract_class_methods(node),
                         "properties": self._extract_class_properties(node),
@@ -1704,9 +1612,7 @@ class CodeAdapter(BaseAdapter):
 
         return symbols
 
-    def _extract_python_parameters(
-        self, func_node: ast.FunctionDef
-    ) -> List[Dict[str, Any]]:
+    def _extract_python_parameters(self, func_node: ast.FunctionDef) -> List[Dict[str, Any]]:
         """Extract detailed parameter information from Python function."""
         parameters = []
 
@@ -1748,9 +1654,7 @@ class CodeAdapter(BaseAdapter):
         if func_node.args.vararg:
             param = {
                 "name": func_node.args.vararg.arg,
-                "type_annotation": self._ast_node_to_string(
-                    func_node.args.vararg.annotation
-                )
+                "type_annotation": self._ast_node_to_string(func_node.args.vararg.annotation)
                 if func_node.args.vararg.annotation
                 else None,
                 "kind": "var_positional",
@@ -1761,9 +1665,7 @@ class CodeAdapter(BaseAdapter):
         if func_node.args.kwarg:
             param = {
                 "name": func_node.args.kwarg.arg,
-                "type_annotation": self._ast_node_to_string(
-                    func_node.args.kwarg.annotation
-                )
+                "type_annotation": self._ast_node_to_string(func_node.args.kwarg.annotation)
                 if func_node.args.kwarg.annotation
                 else None,
                 "kind": "var_keyword",
@@ -1778,9 +1680,7 @@ class CodeAdapter(BaseAdapter):
             value = node.body[0].value
             if hasattr(value, "s"):  # Python < 3.8
                 return value.s
-            elif hasattr(value, "value") and isinstance(
-                value.value, str
-            ):  # Python 3.8+
+            elif hasattr(value, "value") and isinstance(value.value, str):  # Python 3.8+
                 return value.value
         return None
 
@@ -1792,9 +1692,7 @@ class CodeAdapter(BaseAdapter):
                 if hasattr(child.func, "id"):
                     calls.append(child.func.id)
                 elif hasattr(child.func, "attr"):
-                    calls.append(
-                        f"{self._ast_node_to_string(child.func.value)}.{child.func.attr}"
-                    )
+                    calls.append(f"{self._ast_node_to_string(child.func.value)}.{child.func.attr}")
         return list(set(calls))  # Remove duplicates
 
     def _extract_variables_used(self, node) -> List[str]:
@@ -1831,16 +1729,13 @@ class CodeAdapter(BaseAdapter):
                     "line": child.lineno,
                     "is_async": isinstance(child, ast.AsyncFunctionDef),
                     "is_classmethod": any(
-                        self._ast_node_to_string(d) == "classmethod"
-                        for d in child.decorator_list
+                        self._ast_node_to_string(d) == "classmethod" for d in child.decorator_list
                     ),
                     "is_staticmethod": any(
-                        self._ast_node_to_string(d) == "staticmethod"
-                        for d in child.decorator_list
+                        self._ast_node_to_string(d) == "staticmethod" for d in child.decorator_list
                     ),
                     "is_property": any(
-                        self._ast_node_to_string(d) == "property"
-                        for d in child.decorator_list
+                        self._ast_node_to_string(d) == "property" for d in child.decorator_list
                     ),
                     "parameters": self._extract_python_parameters(child),
                     "docstring": self._extract_docstring(child),
@@ -1849,17 +1744,12 @@ class CodeAdapter(BaseAdapter):
                 methods.append(method_info)
         return methods
 
-    def _extract_class_properties(
-        self, class_node: ast.ClassDef
-    ) -> List[Dict[str, Any]]:
+    def _extract_class_properties(self, class_node: ast.ClassDef) -> List[Dict[str, Any]]:
         """Extract properties from a class."""
         properties = []
         for child in class_node.body:
             if isinstance(child, ast.FunctionDef):
-                if any(
-                    self._ast_node_to_string(d) == "property"
-                    for d in child.decorator_list
-                ):
+                if any(self._ast_node_to_string(d) == "property" for d in child.decorator_list):
                     properties.append(
                         {
                             "name": child.name,
@@ -1872,9 +1762,7 @@ class CodeAdapter(BaseAdapter):
                     )
         return properties
 
-    def _extract_class_variables(
-        self, class_node: ast.ClassDef
-    ) -> List[Dict[str, Any]]:
+    def _extract_class_variables(self, class_node: ast.ClassDef) -> List[Dict[str, Any]]:
         """Extract class variables."""
         variables = []
         for child in class_node.body:
@@ -1889,9 +1777,7 @@ class CodeAdapter(BaseAdapter):
                                 "is_constant": target.id.isupper(),
                             }
                         )
-            elif isinstance(child, ast.AnnAssign) and isinstance(
-                child.target, ast.Name
-            ):
+            elif isinstance(child, ast.AnnAssign) and isinstance(child.target, ast.Name):
                 variables.append(
                     {
                         "name": child.target.id,
@@ -1979,15 +1865,9 @@ class CodeAdapter(BaseAdapter):
         metrics = {
             "total_lines": len(lines),
             "code_lines": len(
-                [
-                    line
-                    for line in lines
-                    if line.strip() and not line.strip().startswith("#")
-                ]
+                [line for line in lines if line.strip() and not line.strip().startswith("#")]
             ),
-            "comment_lines": len(
-                [line for line in lines if line.strip().startswith("#")]
-            ),
+            "comment_lines": len([line for line in lines if line.strip().startswith("#")]),
             "blank_lines": len([line for line in lines if not line.strip()]),
             "function_count": len(symbols.get("functions", [])),
             "class_count": len(symbols.get("classes", [])),
@@ -2065,9 +1945,7 @@ class CodeAdapter(BaseAdapter):
 
             # Inheritance relationships
             relationships.extend(
-                self._detect_inheritance_relationships(
-                    item, symbols, context_item, context_symbols
-                )
+                self._detect_inheritance_relationships(item, symbols, context_item, context_symbols)
             )
 
             # Import usage relationships
@@ -2079,16 +1957,12 @@ class CodeAdapter(BaseAdapter):
 
             # Interface/Protocol relationships
             relationships.extend(
-                self._detect_interface_relationships(
-                    item, symbols, context_item, context_symbols
-                )
+                self._detect_interface_relationships(item, symbols, context_item, context_symbols)
             )
 
             # Data flow relationships
             relationships.extend(
-                self._detect_data_flow_relationships(
-                    item, symbols, context_item, context_symbols
-                )
+                self._detect_data_flow_relationships(item, symbols, context_item, context_symbols)
             )
 
         return relationships
@@ -2181,10 +2055,7 @@ class CodeAdapter(BaseAdapter):
             imported_name = import_info.get("name", "")
 
             # Check for direct module import
-            if (
-                context_module_name in imported_module
-                or imported_module in context_module_name
-            ):
+            if context_module_name in imported_module or imported_module in context_module_name:
                 relationships.append(
                     (
                         "imports_module",
@@ -2352,15 +2223,11 @@ class CodeAdapter(BaseAdapter):
             ):
                 continue
 
-            context_complexity = context_item.metrics.get(
-                "total_cyclomatic_complexity", 0
-            )
+            context_complexity = context_item.metrics.get("total_cyclomatic_complexity", 0)
 
             # Files with similar complexity might be related
             if abs(item_complexity - context_complexity) <= 2 and item_complexity > 5:
-                confidence = max(
-                    0.3, 0.7 - abs(item_complexity - context_complexity) * 0.1
-                )
+                confidence = max(0.3, 0.7 - abs(item_complexity - context_complexity) * 0.1)
                 relationships.append(
                     (
                         "similar_complexity",
@@ -2369,9 +2236,7 @@ class CodeAdapter(BaseAdapter):
                         {
                             "item_complexity": item_complexity,
                             "context_complexity": context_complexity,
-                            "complexity_difference": abs(
-                                item_complexity - context_complexity
-                            ),
+                            "complexity_difference": abs(item_complexity - context_complexity),
                         },
                     )
                 )
@@ -2450,8 +2315,7 @@ class CodeAdapter(BaseAdapter):
 
             # Check for observer pattern
             if any(
-                "observer" in c["name"].lower() or "listener" in c["name"].lower()
-                for c in classes
+                "observer" in c["name"].lower() or "listener" in c["name"].lower() for c in classes
             ):
                 return "observer"
 
@@ -2466,9 +2330,7 @@ class CodeAdapter(BaseAdapter):
 
         self._watch_directories = watch_directories
         self._incremental_enabled = True
-        self.logger.info(
-            f"Incremental analysis enabled for directories: {watch_directories}"
-        )
+        self.logger.info(f"Incremental analysis enabled for directories: {watch_directories}")
 
     def get_changed_files_since(self, since: datetime) -> List[str]:
         """Get list of files that have changed since the given timestamp."""
@@ -2547,6 +2409,4 @@ class CodeAdapter(BaseAdapter):
                     yield item
                     count += 1
             except Exception as e:
-                self.logger.error(
-                    f"Error processing changed file: {file_path}", error=str(e)
-                )
+                self.logger.error(f"Error processing changed file: {file_path}", error=str(e))

@@ -16,35 +16,35 @@ CREATE EXTENSION IF NOT EXISTS "fuzzystrmatch";
 CREATE TABLE IF NOT EXISTS error_patterns (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     pattern_id VARCHAR(32) NOT NULL UNIQUE, -- MD5 hash of pattern signature
-    
+
     -- Pattern identification
     signature TEXT NOT NULL, -- Normalized pattern signature
     pattern_type VARCHAR(50) NOT NULL, -- 'exact', 'semantic', 'structural', 'temporal'
     similarity_threshold FLOAT NOT NULL DEFAULT 0.8,
-    
+
     -- Pattern metadata
     primary_category VARCHAR(100),
     subcategory VARCHAR(100),
     common_keywords TEXT[],
     representative_message TEXT,
-    
+
     -- Occurrence tracking
     first_seen TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     last_seen TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     total_occurrences INTEGER NOT NULL DEFAULT 1,
     unique_files INTEGER DEFAULT 0,
     unique_functions INTEGER DEFAULT 0,
-    
+
     -- Files and locations affected
     files_affected TEXT[],
     functions_affected TEXT[],
     most_common_file TEXT,
     most_common_function TEXT,
-    
+
     -- Pattern lifecycle
     pattern_status VARCHAR(20) DEFAULT 'active', -- 'active', 'merged', 'deprecated', 'archived'
     merged_into_pattern_id VARCHAR(32), -- If pattern was merged
-    
+
     -- Analysis metadata
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS error_patterns (
 );
 
 -- Create hypertable for time-based queries
-SELECT create_hypertable('error_patterns', 'first_seen', 
+SELECT create_hypertable('error_patterns', 'first_seen',
     chunk_time_interval => INTERVAL '1 day',
     if_not_exists => TRUE);
 
@@ -61,25 +61,25 @@ CREATE TABLE IF NOT EXISTS error_pattern_frequency (
     pattern_id VARCHAR(32) NOT NULL,
     time_bucket TIMESTAMPTZ NOT NULL,
     bucket_size VARCHAR(20) NOT NULL, -- '5min', '1hour', '1day', '1week'
-    
+
     -- Frequency metrics
     occurrence_count INTEGER DEFAULT 0,
     unique_sources INTEGER DEFAULT 0, -- Different files/services
     unique_sessions INTEGER DEFAULT 0, -- Different user sessions
     error_rate_per_minute FLOAT DEFAULT 0.0,
-    
+
     -- Severity distribution
     critical_count INTEGER DEFAULT 0,
     high_count INTEGER DEFAULT 0,
     medium_count INTEGER DEFAULT 0,
     low_count INTEGER DEFAULT 0,
     avg_severity_score FLOAT DEFAULT 0.0,
-    
+
     -- Trending metrics
     growth_rate FLOAT DEFAULT 0.0, -- Percentage change from previous period
     is_trending BOOLEAN DEFAULT FALSE,
     trend_direction VARCHAR(10) DEFAULT 'stable', -- 'increasing', 'decreasing', 'stable', 'spike'
-    
+
     PRIMARY KEY (pattern_id, time_bucket, bucket_size),
     FOREIGN KEY (pattern_id) REFERENCES error_patterns(pattern_id) ON DELETE CASCADE
 );
@@ -97,45 +97,45 @@ SELECT create_hypertable('error_pattern_frequency', 'time_bucket',
 CREATE TABLE IF NOT EXISTS error_clusters (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     cluster_id VARCHAR(32) NOT NULL UNIQUE, -- Deterministic cluster identifier
-    
+
     -- Cluster signature
     cluster_signature VARCHAR(64) NOT NULL, -- Hash of normalized error characteristics
     representative_error_id UUID, -- Reference to context_items
-    
+
     -- Cluster characteristics
     error_type VARCHAR(100),
     primary_category VARCHAR(100),
     severity_level VARCHAR(20),
-    
+
     -- Clustering algorithm metadata
     algorithm_used VARCHAR(50) DEFAULT 'semantic_similarity',
     similarity_threshold FLOAT DEFAULT 0.8,
     cluster_confidence FLOAT DEFAULT 0.0,
-    
+
     -- Cluster statistics
     total_errors INTEGER DEFAULT 1,
     unique_files INTEGER DEFAULT 0,
     unique_functions INTEGER DEFAULT 0,
     unique_sessions INTEGER DEFAULT 0,
-    
+
     -- Time range
     first_occurrence TIMESTAMPTZ DEFAULT NOW(),
     last_occurrence TIMESTAMPTZ DEFAULT NOW(),
     most_active_hour INTEGER, -- Hour of day (0-23) with most occurrences
     most_active_day INTEGER, -- Day of week (0-6) with most occurrences
-    
+
     -- Common characteristics
     common_stack_trace TEXT,
     common_keywords TEXT[],
     common_file_paths TEXT[],
     common_functions TEXT[],
-    
+
     -- Cluster lifecycle
     status VARCHAR(20) DEFAULT 'active', -- 'active', 'resolved', 'ignored', 'merged'
     resolution_notes TEXT,
     resolution_timestamp TIMESTAMPTZ,
     resolved_by VARCHAR(100),
-    
+
     -- Metadata
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -151,18 +151,18 @@ SELECT create_hypertable('error_clusters', 'first_occurrence',
 CREATE TABLE IF NOT EXISTS error_cluster_membership (
     error_id UUID NOT NULL, -- References context_items(id)
     cluster_id VARCHAR(32) NOT NULL,
-    
+
     -- Membership metadata
     similarity_score FLOAT NOT NULL,
     assignment_timestamp TIMESTAMPTZ DEFAULT NOW(),
     assignment_method VARCHAR(50) DEFAULT 'automatic', -- 'automatic', 'manual', 'ml_model'
     assignment_confidence FLOAT DEFAULT 0.0,
-    
+
     -- Verification
     human_verified BOOLEAN DEFAULT FALSE,
     verification_timestamp TIMESTAMPTZ,
     verified_by VARCHAR(100),
-    
+
     PRIMARY KEY (error_id, cluster_id),
     FOREIGN KEY (cluster_id) REFERENCES error_clusters(cluster_id) ON DELETE CASCADE
 );
@@ -175,55 +175,55 @@ CREATE TABLE IF NOT EXISTS error_cluster_membership (
 CREATE TABLE IF NOT EXISTS stack_trace_analysis (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     error_id UUID NOT NULL, -- References context_items(id)
-    
+
     -- Raw stack trace data
     raw_stack_trace TEXT NOT NULL,
     normalized_stack_trace TEXT, -- Cleaned and normalized
     language VARCHAR(50), -- 'python', 'java', 'javascript', 'csharp', etc.
-    
+
     -- Parsed components
     function_calls JSONB, -- Ordered array of {function, file, line, class}
     exception_chain JSONB, -- Nested exception structure
-    
+
     -- Root cause analysis
     root_cause_function VARCHAR(255),
     root_cause_file TEXT,
     root_cause_line INTEGER,
     root_cause_class VARCHAR(255),
     root_cause_confidence FLOAT DEFAULT 0.0,
-    
+
     -- Stack trace metrics
     stack_depth INTEGER NOT NULL DEFAULT 0,
     unique_files INTEGER DEFAULT 0,
     unique_classes INTEGER DEFAULT 0,
     library_frames INTEGER DEFAULT 0, -- Frames in external libraries
     application_frames INTEGER DEFAULT 0, -- Frames in application code
-    
+
     -- Complexity analysis
     complexity_score FLOAT DEFAULT 0.0, -- Based on depth, branching, recursion
     recursion_detected BOOLEAN DEFAULT FALSE,
     recursion_depth INTEGER DEFAULT 0,
-    
+
     -- Common patterns
     framework_detected VARCHAR(100)[], -- Detected frameworks/libraries
     design_patterns_detected VARCHAR(100)[], -- Detected design patterns
-    
+
     -- Similarity vectors for clustering
     stack_embedding vector(1536), -- For semantic similarity
     function_signature_hash VARCHAR(64), -- For exact matching
-    
+
     -- Analysis metadata
     analysis_timestamp TIMESTAMPTZ DEFAULT NOW(),
     analysis_version VARCHAR(20) DEFAULT '1.0',
     analyzer_confidence FLOAT DEFAULT 0.0,
-    
+
     created_at TIMESTAMPTZ DEFAULT NOW(),
     metadata JSONB DEFAULT '{}'
 );
 
 -- Create index for vector similarity
-CREATE INDEX IF NOT EXISTS idx_stack_trace_embedding 
-ON stack_trace_analysis 
+CREATE INDEX IF NOT EXISTS idx_stack_trace_embedding
+ON stack_trace_analysis
 USING hnsw (stack_embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 
@@ -234,63 +234,63 @@ WITH (m = 16, ef_construction = 64);
 -- Enhanced error correlations with multiple correlation types
 CREATE TABLE IF NOT EXISTS error_correlations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    
+
     -- Primary correlation data
     source_error_id UUID NOT NULL, -- References context_items(id)
     target_item_id UUID NOT NULL, -- References context_items(id) or external ID
     target_item_type VARCHAR(50) NOT NULL, -- 'git_commit', 'chat_message', 'code_change', 'deployment', 'user_action'
-    
+
     -- Correlation classification
     correlation_type VARCHAR(50) NOT NULL, -- 'temporal', 'causal', 'contextual', 'file_path', 'semantic'
     correlation_subtype VARCHAR(50), -- More specific classification
     confidence_score FLOAT NOT NULL CHECK (confidence_score BETWEEN 0.0 AND 1.0),
-    
+
     -- Detection method
     detection_method VARCHAR(50) NOT NULL, -- 'file_path_match', 'keyword_match', 'semantic_similarity', 'temporal_proximity', 'ml_model'
     detection_algorithm VARCHAR(100), -- Specific algorithm used
     detection_version VARCHAR(20) DEFAULT '1.0',
-    
+
     -- Temporal analysis
     time_delta_seconds INTEGER, -- Time difference between items
     temporal_relationship VARCHAR(20), -- 'before', 'after', 'concurrent', 'overlapping'
     time_window_used INTERVAL, -- Time window used for correlation
-    
+
     -- Evidence supporting the correlation
     evidence JSONB NOT NULL DEFAULT '{}', -- Structured evidence data
-    
+
     -- File and code correlation details
     file_path_overlap TEXT[], -- Common file paths
     function_overlap TEXT[], -- Common function names
     class_overlap TEXT[], -- Common class names
     line_proximity_score FLOAT, -- How close the line numbers are
-    
+
     -- Content correlation details
     matching_keywords TEXT[], -- Keywords that matched
     semantic_similarity FLOAT, -- Semantic similarity score (0-1)
     content_overlap_ratio FLOAT, -- Percentage of content overlap
-    
+
     -- Author and context correlation
     author_correlation BOOLEAN DEFAULT FALSE,
     session_correlation BOOLEAN DEFAULT FALSE,
     user_correlation BOOLEAN DEFAULT FALSE,
-    
+
     -- Correlation validation
     validation_status VARCHAR(20) DEFAULT 'pending', -- 'pending', 'confirmed', 'rejected', 'disputed'
     validation_confidence FLOAT, -- Human or system validation confidence
     validated_by VARCHAR(100), -- User or system that validated
     validated_at TIMESTAMPTZ,
     validation_method VARCHAR(50), -- 'manual', 'automated', 'ml_model'
-    
+
     -- Correlation impact and importance
     impact_score FLOAT DEFAULT 0.0, -- Impact on debugging/resolution (0-1)
     importance_score FLOAT DEFAULT 0.0, -- Overall importance of this correlation
     user_feedback_score FLOAT, -- User rating of correlation usefulness
-    
+
     -- Lifecycle tracking
     correlation_strength VARCHAR(20) DEFAULT 'weak', -- 'weak', 'moderate', 'strong', 'very_strong'
     correlation_status VARCHAR(20) DEFAULT 'active', -- 'active', 'deprecated', 'superseded'
     superseded_by UUID, -- If this correlation was superseded by a better one
-    
+
     -- Metadata
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -304,11 +304,11 @@ CREATE TABLE IF NOT EXISTS error_correlations (
 -- Comprehensive error trend analysis with statistical measures
 CREATE TABLE IF NOT EXISTS error_trends (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    
+
     -- Time bucketing
     time_bucket TIMESTAMPTZ NOT NULL,
     bucket_size INTERVAL NOT NULL, -- '5 minutes', '1 hour', '1 day', '1 week'
-    
+
     -- Aggregation dimensions
     error_category VARCHAR(100), -- Primary error category
     error_subcategory VARCHAR(100), -- Error subcategory
@@ -316,57 +316,57 @@ CREATE TABLE IF NOT EXISTS error_trends (
     source_component VARCHAR(100), -- Component/service that generated error
     file_path TEXT, -- Specific file path
     function_name VARCHAR(255), -- Specific function
-    
+
     -- Basic error metrics
     error_count INTEGER DEFAULT 0,
     unique_error_types INTEGER DEFAULT 0,
     new_error_patterns INTEGER DEFAULT 0,
     resolved_error_patterns INTEGER DEFAULT 0,
-    
+
     -- Error distribution
     critical_errors INTEGER DEFAULT 0,
     high_errors INTEGER DEFAULT 0,
     medium_errors INTEGER DEFAULT 0,
     low_errors INTEGER DEFAULT 0,
-    
+
     -- Statistical measures
     avg_severity_score FLOAT DEFAULT 0.0,
     max_severity_score FLOAT DEFAULT 0.0,
     std_dev_severity FLOAT DEFAULT 0.0,
     median_severity_score FLOAT DEFAULT 0.0,
-    
+
     -- Rate calculations
     error_rate_per_minute FLOAT DEFAULT 0.0,
     error_rate_per_request FLOAT DEFAULT 0.0, -- If request volume is tracked
-    
+
     -- Trending analysis
     trend_direction VARCHAR(20) DEFAULT 'stable', -- 'increasing', 'decreasing', 'stable', 'volatile'
     growth_rate FLOAT DEFAULT 0.0, -- Percentage change from previous period
     growth_acceleration FLOAT DEFAULT 0.0, -- Rate of change in growth rate
     volatility_score FLOAT DEFAULT 0.0, -- Measure of error count volatility
-    
+
     -- Predictive indicators
     is_anomalous BOOLEAN DEFAULT FALSE,
     anomaly_score FLOAT DEFAULT 0.0, -- Statistical anomaly detection score
     seasonal_component FLOAT DEFAULT 0.0, -- Seasonal trend component
-    
+
     -- Comparative analysis
     vs_previous_period_change FLOAT DEFAULT 0.0,
     vs_same_period_last_week FLOAT DEFAULT 0.0,
     vs_same_period_last_month FLOAT DEFAULT 0.0,
-    
+
     -- Error lifecycle tracking
     mean_time_to_detection FLOAT DEFAULT 0.0, -- Average time to detect error
     mean_time_to_resolution FLOAT DEFAULT 0.0, -- Average time to resolve error
     resolution_rate FLOAT DEFAULT 0.0, -- Percentage of errors resolved
-    
+
     -- Quality metrics
     false_positive_rate FLOAT DEFAULT 0.0,
     correlation_accuracy FLOAT DEFAULT 0.0,
     pattern_detection_accuracy FLOAT DEFAULT 0.0,
-    
+
     PRIMARY KEY (
-        time_bucket, 
+        time_bucket,
         bucket_size,
         COALESCE(error_category, ''),
         COALESCE(error_subcategory, ''),
@@ -389,18 +389,18 @@ SELECT create_hypertable('error_trends', 'time_bucket',
 -- Performance tracking for error processing pipeline
 CREATE TABLE IF NOT EXISTS error_processing_metrics (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    
+
     -- Time and batch information
     measurement_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     batch_id VARCHAR(100), -- Batch identifier if processing in batches
     processing_stage VARCHAR(50) NOT NULL, -- 'parsing', 'classification', 'correlation', 'storage'
-    
+
     -- Processing volume
     items_processed INTEGER DEFAULT 0,
     items_failed INTEGER DEFAULT 0,
     items_skipped INTEGER DEFAULT 0,
     batch_size INTEGER DEFAULT 0,
-    
+
     -- Timing metrics (in milliseconds)
     total_processing_time FLOAT DEFAULT 0.0,
     avg_item_processing_time FLOAT DEFAULT 0.0,
@@ -408,43 +408,43 @@ CREATE TABLE IF NOT EXISTS error_processing_metrics (
     max_item_processing_time FLOAT DEFAULT 0.0,
     p95_processing_time FLOAT DEFAULT 0.0,
     p99_processing_time FLOAT DEFAULT 0.0,
-    
+
     -- Throughput metrics
     items_per_second FLOAT DEFAULT 0.0,
     bytes_per_second FLOAT DEFAULT 0.0,
-    
+
     -- Resource usage
     memory_usage_mb FLOAT DEFAULT 0.0,
     peak_memory_usage_mb FLOAT DEFAULT 0.0,
     cpu_usage_percent FLOAT DEFAULT 0.0,
     io_wait_percent FLOAT DEFAULT 0.0,
-    
+
     -- Error and quality metrics
     error_rate FLOAT DEFAULT 0.0,
     success_rate FLOAT DEFAULT 0.0,
     classification_accuracy FLOAT DEFAULT 0.0,
     correlation_detection_rate FLOAT DEFAULT 0.0,
-    
+
     -- Specific processing metrics
     format_detection_accuracy FLOAT DEFAULT 0.0,
     parsing_success_rate FLOAT DEFAULT 0.0,
     pattern_detection_rate FLOAT DEFAULT 0.0,
     deduplication_rate FLOAT DEFAULT 0.0,
-    
+
     -- System metrics
     active_connections INTEGER DEFAULT 0,
     queue_depth INTEGER DEFAULT 0,
     worker_utilization FLOAT DEFAULT 0.0,
-    
+
     -- Cache performance
     cache_hit_rate FLOAT DEFAULT 0.0,
     cache_miss_rate FLOAT DEFAULT 0.0,
     cache_size_mb FLOAT DEFAULT 0.0,
-    
+
     -- Alert and notification metrics
     alerts_generated INTEGER DEFAULT 0,
     notifications_sent INTEGER DEFAULT 0,
-    
+
     -- Metadata
     host_name VARCHAR(255),
     process_id INTEGER,
@@ -465,65 +465,65 @@ SELECT create_hypertable('error_processing_metrics', 'measurement_timestamp',
 -- Alert management for error processing system
 CREATE TABLE IF NOT EXISTS error_processing_alerts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    
+
     -- Alert identification
     alert_id VARCHAR(100) NOT NULL UNIQUE,
     alert_name VARCHAR(255) NOT NULL,
     alert_type VARCHAR(50) NOT NULL, -- 'threshold', 'anomaly', 'pattern', 'system'
     severity VARCHAR(20) NOT NULL, -- 'info', 'warning', 'error', 'critical'
-    
+
     -- Alert conditions
     condition_expression TEXT NOT NULL, -- Human-readable condition
     threshold_value FLOAT,
     threshold_operator VARCHAR(10), -- '>', '<', '>=', '<=', '==', '!='
     evaluation_window INTERVAL, -- Time window for evaluation
-    
+
     -- Alert status
     status VARCHAR(20) DEFAULT 'active', -- 'active', 'acknowledged', 'resolved', 'suppressed'
     is_firing BOOLEAN DEFAULT FALSE,
     first_fired_at TIMESTAMPTZ,
     last_fired_at TIMESTAMPTZ,
     resolved_at TIMESTAMPTZ,
-    
+
     -- Alert details
     current_value FLOAT,
     deviation_from_baseline FLOAT,
     confidence_score FLOAT DEFAULT 0.0,
-    
+
     -- Context information
     affected_components TEXT[],
     related_errors TEXT[], -- Array of error IDs or patterns
     correlation_ids UUID[], -- Related correlation IDs
-    
+
     -- Alert metadata
     description TEXT,
     resolution_suggestion TEXT,
     documentation_link TEXT,
     runbook_link TEXT,
-    
+
     -- Notification tracking
     notifications_sent INTEGER DEFAULT 0,
     last_notification_sent TIMESTAMPTZ,
     notification_channels TEXT[], -- 'email', 'slack', 'pagerduty', etc.
     suppressed_until TIMESTAMPTZ,
-    
+
     -- Escalation
     escalation_level INTEGER DEFAULT 0,
     escalated_to TEXT[],
     escalation_timestamp TIMESTAMPTZ,
-    
+
     -- Resolution tracking
     acknowledged_by VARCHAR(100),
     acknowledged_at TIMESTAMPTZ,
     resolved_by VARCHAR(100),
     resolution_notes TEXT,
     auto_resolved BOOLEAN DEFAULT FALSE,
-    
+
     -- Alert performance
     false_positive BOOLEAN DEFAULT FALSE,
     feedback_score INTEGER, -- 1-5 rating from users
     useful_rating FLOAT DEFAULT 0.0,
-    
+
     -- Metadata
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -648,7 +648,7 @@ RETURNS TABLE (
 LANGUAGE SQL STABLE
 AS $$
     WITH recent_patterns AS (
-        SELECT 
+        SELECT
             ep.pattern_id,
             ep.signature,
             ep.total_occurrences,
@@ -668,11 +668,11 @@ AS $$
             ) as severity_distribution,
             -- Get most recent error example
             (
-                SELECT ci.id 
-                FROM context_items ci 
-                WHERE ci.source_type = 'error' 
+                SELECT ci.id
+                FROM context_items ci
+                WHERE ci.source_type = 'error'
                   AND ci.metrics->>'pattern_id' = ep.pattern_id
-                ORDER BY ci.timestamp DESC 
+                ORDER BY ci.timestamp DESC
                 LIMIT 1
             ) as most_recent_example
         FROM error_patterns ep
@@ -689,7 +689,7 @@ AS $$
           AND ep.total_occurrences >= min_occurrences
           AND ep.last_seen >= NOW() - INTERVAL '1 hour' * time_window_hours
     )
-    SELECT 
+    SELECT
         rp.pattern_id,
         rp.signature as pattern_signature,
         rp.total_occurrences,
@@ -701,8 +701,8 @@ AS $$
         rp.last_seen,
         rp.most_recent_example
     FROM recent_patterns rp
-    ORDER BY 
-        CASE rp.trend_direction 
+    ORDER BY
+        CASE rp.trend_direction
             WHEN 'increasing' THEN 3
             WHEN 'spike' THEN 4
             WHEN 'stable' THEN 2
@@ -735,7 +735,7 @@ RETURNS TABLE (
 )
 LANGUAGE SQL STABLE
 AS $$
-    SELECT 
+    SELECT
         ec.cluster_id,
         ec.error_type,
         ec.total_errors,
@@ -743,8 +743,8 @@ AS $$
         ec.severity_level,
         ec.first_occurrence,
         ec.last_occurrence,
-        CASE 
-            WHEN ec.most_active_hour IS NOT NULL 
+        CASE
+            WHEN ec.most_active_hour IS NOT NULL
             THEN CONCAT(ec.most_active_hour, ':00-', ec.most_active_hour + 1, ':00')
             ELSE 'Unknown'
         END as most_active_period,
@@ -756,7 +756,7 @@ AS $$
     WHERE ec.total_errors >= min_cluster_size
       AND ec.last_occurrence >= NOW() - INTERVAL '1 hour' * time_window_hours
       AND ec.status = 'active'
-    ORDER BY 
+    ORDER BY
         ec.total_errors DESC,
         ec.last_occurrence DESC
     LIMIT max_results;
@@ -781,17 +781,17 @@ RETURNS TABLE (
 )
 LANGUAGE SQL STABLE
 AS $$
-    SELECT 
+    SELECT
         ec.id as correlation_id,
         ec.target_item_id,
         ec.target_item_type as target_type,
         ec.correlation_type,
         ec.confidence_score,
         ec.time_delta_seconds,
-        CASE 
+        CASE
             WHEN ec.evidence ? 'file_path_match' AND (ec.evidence->>'file_path_match')::boolean = true
                 THEN 'File path match'
-            WHEN ec.evidence ? 'semantic_similarity' 
+            WHEN ec.evidence ? 'semantic_similarity'
                 THEN CONCAT('Semantic similarity: ', ROUND((ec.evidence->>'semantic_similarity')::numeric, 2))
             WHEN ec.evidence ? 'keyword_match'
                 THEN CONCAT('Keyword matches: ', array_length(ec.matching_keywords, 1))
@@ -804,7 +804,7 @@ AS $$
     WHERE ec.source_error_id = error_id_input
       AND ec.confidence_score >= min_confidence
       AND ec.correlation_status = 'active'
-    ORDER BY 
+    ORDER BY
         ec.confidence_score DESC,
         CASE ec.validation_status
             WHEN 'confirmed' THEN 3
@@ -834,7 +834,7 @@ RETURNS TABLE (
 LANGUAGE SQL STABLE
 AS $$
     WITH baseline_stats AS (
-        SELECT 
+        SELECT
             et.error_category,
             AVG(et.error_rate_per_minute) as baseline_avg,
             STDDEV(et.error_rate_per_minute) as baseline_stddev
@@ -847,7 +847,7 @@ AS $$
         HAVING COUNT(*) >= 10 -- Minimum data points for statistics
     ),
     current_stats AS (
-        SELECT 
+        SELECT
             et.error_category,
             AVG(et.error_rate_per_minute) as current_rate,
             AVG(et.growth_rate) as avg_growth_rate
@@ -857,23 +857,23 @@ AS $$
           AND et.error_category IS NOT NULL
         GROUP BY et.error_category
     )
-    SELECT 
+    SELECT
         bs.error_category,
         cs.current_rate,
         bs.baseline_avg,
         bs.baseline_stddev,
-        CASE 
-            WHEN bs.baseline_stddev > 0 
+        CASE
+            WHEN bs.baseline_stddev > 0
             THEN ABS(cs.current_rate - bs.baseline_avg) / bs.baseline_stddev
             ELSE 0
         END as anomaly_score,
-        CASE 
-            WHEN bs.baseline_stddev > 0 
+        CASE
+            WHEN bs.baseline_stddev > 0
                 AND ABS(cs.current_rate - bs.baseline_avg) / bs.baseline_stddev > anomaly_threshold
             THEN true
             ELSE false
         END as is_anomalous,
-        CASE 
+        CASE
             WHEN cs.avg_growth_rate > 0.1 THEN 'increasing'
             WHEN cs.avg_growth_rate < -0.1 THEN 'decreasing'
             ELSE 'stable'
@@ -881,9 +881,9 @@ AS $$
     FROM baseline_stats bs
     JOIN current_stats cs ON bs.error_category = cs.error_category
     WHERE bs.baseline_stddev > 0 -- Avoid division by zero
-    ORDER BY 
-        CASE 
-            WHEN bs.baseline_stddev > 0 
+    ORDER BY
+        CASE
+            WHEN bs.baseline_stddev > 0
             THEN ABS(cs.current_rate - bs.baseline_avg) / bs.baseline_stddev
             ELSE 0
         END DESC;
@@ -895,7 +895,7 @@ $$;
 
 -- Real-time error pattern summary view
 CREATE MATERIALIZED VIEW IF NOT EXISTS error_pattern_summary AS
-SELECT 
+SELECT
     ep.pattern_id,
     ep.primary_category,
     ep.subcategory,
@@ -915,7 +915,7 @@ SELECT
     GREATEST(ep.updated_at, COALESCE(recent_freq.last_update, ep.updated_at)) as last_updated
 FROM error_patterns ep
 LEFT JOIN (
-    SELECT 
+    SELECT
         pattern_id,
         SUM(occurrence_count) as total_recent,
         AVG(growth_rate) as avg_growth_rate,
@@ -927,7 +927,7 @@ LEFT JOIN (
     GROUP BY pattern_id
 ) recent_freq ON ep.pattern_id = recent_freq.pattern_id
 LEFT JOIN (
-    SELECT 
+    SELECT
         ep.pattern_id,
         COUNT(DISTINCT ec.cluster_id) as cluster_count
     FROM error_patterns ep
@@ -937,7 +937,7 @@ LEFT JOIN (
     GROUP BY ep.pattern_id
 ) cluster_info ON ep.pattern_id = cluster_info.pattern_id
 LEFT JOIN (
-    SELECT 
+    SELECT
         ep.pattern_id,
         array_agg(DISTINCT sta.root_cause_function) FILTER (WHERE sta.root_cause_function IS NOT NULL) as common_root_causes
     FROM error_patterns ep
@@ -948,43 +948,43 @@ LEFT JOIN (
 WHERE ep.pattern_status = 'active';
 
 -- Create unique index for concurrent refresh
-CREATE UNIQUE INDEX IF NOT EXISTS idx_error_pattern_summary_id 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_error_pattern_summary_id
 ON error_pattern_summary(pattern_id);
 
 -- Error processing health dashboard view
 CREATE MATERIALIZED VIEW IF NOT EXISTS error_processing_health AS
-SELECT 
+SELECT
     -- Time bucket for grouping
     date_trunc('hour', measurement_timestamp) as hour_bucket,
-    
+
     -- Processing performance
     AVG(items_per_second) as avg_throughput,
     MAX(items_per_second) as peak_throughput,
     AVG(avg_item_processing_time) as avg_processing_time_ms,
     PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY p95_processing_time) as p95_processing_time_ms,
-    
+
     -- Quality metrics
     AVG(success_rate) as avg_success_rate,
     AVG(classification_accuracy) as avg_classification_accuracy,
     AVG(correlation_detection_rate) as avg_correlation_rate,
     AVG(pattern_detection_rate) as avg_pattern_detection_rate,
-    
+
     -- Resource usage
     AVG(memory_usage_mb) as avg_memory_usage,
     MAX(peak_memory_usage_mb) as peak_memory_usage,
     AVG(cpu_usage_percent) as avg_cpu_usage,
-    
+
     -- Error rates
     AVG(error_rate) as avg_error_rate,
     MAX(error_rate) as max_error_rate,
-    
+
     -- Cache performance
     AVG(cache_hit_rate) as avg_cache_hit_rate,
-    
+
     -- Processing volume
     SUM(items_processed) as total_items_processed,
     SUM(items_failed) as total_items_failed,
-    
+
     -- Health score (composite metric)
     (
         AVG(success_rate) * 0.3 +
@@ -993,7 +993,7 @@ SELECT
         AVG(cache_hit_rate) * 0.1 +
         LEAST(AVG(items_per_second) / 1000.0, 1.0) * 100 * 0.1
     ) as health_score,
-    
+
     -- Data freshness
     MAX(measurement_timestamp) as last_measurement
 FROM error_processing_metrics
@@ -1002,7 +1002,7 @@ GROUP BY date_trunc('hour', measurement_timestamp)
 ORDER BY hour_bucket DESC;
 
 -- Create unique index for concurrent refresh
-CREATE UNIQUE INDEX IF NOT EXISTS idx_error_processing_health_hour 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_error_processing_health_hour
 ON error_processing_health(hour_bucket);
 
 -- ============================================
@@ -1020,10 +1020,10 @@ DECLARE
 BEGIN
     -- Extract pattern ID from the error's metrics
     pattern_id_val := NEW.metrics->>'pattern_id';
-    
+
     IF pattern_id_val IS NOT NULL THEN
         current_hour := date_trunc('hour', NEW.timestamp);
-        
+
         -- Update hourly frequency
         INSERT INTO error_pattern_frequency (
             pattern_id,
@@ -1041,18 +1041,18 @@ BEGIN
         ON CONFLICT (pattern_id, time_bucket, bucket_size)
         DO UPDATE SET
             occurrence_count = error_pattern_frequency.occurrence_count + 1,
-            unique_sources = error_pattern_frequency.unique_sources + 
+            unique_sources = error_pattern_frequency.unique_sources +
                 CASE WHEN NEW.file_path IS DISTINCT FROM OLD.file_path THEN 1 ELSE 0 END;
-        
+
         -- Update pattern last_seen timestamp
-        UPDATE error_patterns 
-        SET 
+        UPDATE error_patterns
+        SET
             last_seen = NEW.timestamp,
             total_occurrences = total_occurrences + 1,
             updated_at = NOW()
         WHERE pattern_id = pattern_id_val;
     END IF;
-    
+
     RETURN NEW;
 END;
 $$;
@@ -1080,7 +1080,7 @@ BEGIN
         NEW.metrics->'error_details'->>'stack_trace',
         NEW.source_data->'parsed_log'->>'stack_trace'
     );
-    
+
     IF stack_trace_content IS NOT NULL AND LENGTH(stack_trace_content) > 50 THEN
         -- Simple language detection
         language_detected := CASE
@@ -1090,10 +1090,10 @@ BEGIN
             WHEN stack_trace_content ~ 'at\s+[\w.]+\.[\w.]+\([^)]*\.cs:\d+\)' THEN 'csharp'
             ELSE 'unknown'
         END;
-        
+
         -- Count stack depth
         depth_count := array_length(string_to_array(stack_trace_content, E'\n'), 1);
-        
+
         -- Insert stack trace analysis
         INSERT INTO stack_trace_analysis (
             error_id,
@@ -1109,7 +1109,7 @@ BEGIN
             NOW()
         );
     END IF;
-    
+
     RETURN NEW;
 END;
 $$;
@@ -1138,12 +1138,12 @@ DECLARE
     cutoff_date TIMESTAMPTZ;
 BEGIN
     cutoff_date := NOW() - INTERVAL '1 day' * retention_days;
-    
+
     -- Archive error patterns
     WITH archived_patterns AS (
-        UPDATE error_patterns 
+        UPDATE error_patterns
         SET pattern_status = 'archived'
-        WHERE last_seen < cutoff_date 
+        WHERE last_seen < cutoff_date
           AND pattern_status = 'active'
           AND id IN (
               SELECT id FROM error_patterns
@@ -1154,30 +1154,30 @@ BEGIN
     )
     SELECT COUNT(*) INTO batch_count FROM archived_patterns;
     archived_count := archived_count + batch_count;
-    
+
     -- Clean up old frequency data
     DELETE FROM error_pattern_frequency
     WHERE time_bucket < cutoff_date;
-    
+
     GET DIAGNOSTICS batch_count = ROW_COUNT;
     archived_count := archived_count + batch_count;
-    
+
     -- Clean up old processing metrics
     DELETE FROM error_processing_metrics
     WHERE measurement_timestamp < cutoff_date;
-    
+
     GET DIAGNOSTICS batch_count = ROW_COUNT;
     archived_count := archived_count + batch_count;
-    
+
     -- Archive resolved error clusters
     UPDATE error_clusters
     SET status = 'archived'
     WHERE last_occurrence < cutoff_date
       AND status = 'resolved';
-    
+
     GET DIAGNOSTICS batch_count = ROW_COUNT;
     archived_count := archived_count + batch_count;
-    
+
     RETURN archived_count;
 END;
 $$ LANGUAGE plpgsql;
@@ -1188,10 +1188,10 @@ RETURNS void AS $$
 BEGIN
     -- Refresh pattern summary
     REFRESH MATERIALIZED VIEW CONCURRENTLY error_pattern_summary;
-    
+
     -- Refresh processing health
     REFRESH MATERIALIZED VIEW CONCURRENTLY error_processing_health;
-    
+
     -- Log refresh completion
     INSERT INTO error_processing_metrics (
         measurement_timestamp,
@@ -1206,7 +1206,7 @@ BEGIN
         0,
         jsonb_build_object('views_refreshed', array['error_pattern_summary', 'error_processing_health'])
     );
-    
+
     RAISE NOTICE 'Error analytics materialized views refreshed successfully';
 END;
 $$ LANGUAGE plpgsql;
@@ -1226,12 +1226,12 @@ BEGIN
     ANALYZE error_correlations;
     ANALYZE stack_trace_analysis;
     ANALYZE error_trends;
-    
+
     -- Reindex critical indexes if needed
     REINDEX INDEX CONCURRENTLY idx_error_patterns_frequency;
     REINDEX INDEX CONCURRENTLY idx_pattern_frequency_trending;
     REINDEX INDEX CONCURRENTLY idx_error_correlations_confidence;
-    
+
     RAISE NOTICE 'Error storage optimization completed';
 END;
 $$ LANGUAGE plpgsql;

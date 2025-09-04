@@ -75,14 +75,14 @@ print(f"Stored {result.processed_items} commits")
 all_commits = []
 async for raw_commit in git_adapter.fetch_items():
     context_item = await git_adapter.transform_item(raw_commit)
-    
+
     # Detect relationships with existing commits
     relationships = await git_adapter.detect_relationships(
         context_item, all_commits[-50:]  # Use sliding window
     )
-    
+
     all_commits.append(context_item)
-    
+
     # Store relationships
     if relationships:
         rel_objects = [
@@ -105,35 +105,35 @@ async for raw_commit in git_adapter.fetch_items():
 # git_adapter_config.yaml
 git_adapters:
   - adapter_id: "primary_git"
-    source_type: "git" 
+    source_type: "git"
     batch_mode: "batch"
     batch_size: 200
-    
+
     source_config:
       # Repository settings
       repository_path: "/path/to/repo"
       max_commit_age_days: 365
-      
+
       # Processing options
       enable_incremental: true
       checkpoint_interval: 100
       max_commits_per_batch: 1000
-      
+
       # Analysis features
       enable_semantic_analysis: true
-      enable_impact_scoring: true  
+      enable_impact_scoring: true
       enable_relationship_detection: true
       enable_branch_detection: true
-      
+
       # Correlation settings
       correlate_with_chat: true
       correlate_with_errors: true
       temporal_window_hours: 48
-      
+
       # Performance settings
       parallel_processing: true
       max_parallel_workers: 4
-      
+
       # Content settings
       include_commits: true
       include_branches: true
@@ -141,7 +141,7 @@ git_adapters:
       include_file_changes: true
       include_diff_content: true
       max_diff_size_kb: 100
-      
+
       # Filtering
       branch_filters: ["main", "develop", "feature/*"]
       author_filters: []
@@ -207,7 +207,7 @@ from project_context.ingestion.adapters.git_adapter import CommitProcessor
 
 class CustomCommitProcessor(CommitProcessor):
     """Custom commit processor with domain-specific analysis."""
-    
+
     def _classify_commit_type(self, message: str, changed_files: List[Dict]) -> CommitType:
         """Custom commit classification logic."""
         # Add your domain-specific patterns
@@ -215,20 +215,20 @@ class CustomCommitProcessor(CommitProcessor):
             return CommitType.DEPLOYMENT
         elif any("config" in f["file"] for f in changed_files):
             return CommitType.CONFIGURATION
-        
+
         return super()._classify_commit_type(message, changed_files)
-    
+
     async def _calculate_impact_score(self, commit_data: Dict) -> float:
         """Custom impact scoring."""
         base_score = await super()._calculate_impact_score(commit_data)
-        
+
         # Boost score for critical files
         critical_files = ["main.py", "app.py", "server.py"]
         changed_files = [f["file"] for f in commit_data.get("changed_files", [])]
-        
+
         if any(cf in file for cf in critical_files for file in changed_files):
             base_score += 0.3
-        
+
         return min(base_score, 1.0)
 
 # Use custom processor
@@ -239,19 +239,19 @@ config.source_config["processor_class"] = CustomCommitProcessor
 
 ```python
 async def detect_custom_relationships(
-    item: ContextItem, 
+    item: ContextItem,
     context_window: List[ContextItem]
 ) -> List[tuple]:
     """Custom relationship detection logic."""
     relationships = []
-    
+
     # Detect code review relationships
     if item.source_type == "git" and "review" in item.title.lower():
         for context_item in context_window:
-            if (context_item.source_type == "chat" and 
+            if (context_item.source_type == "chat" and
                 "review" in context_item.content.lower()):
                 relationships.append(("code_review_discussion", str(context_item.id), 0.8))
-    
+
     # Detect deployment relationships
     if item.metrics and item.metrics.get("commit_type") == "deployment":
         for context_item in context_window:
@@ -260,7 +260,7 @@ async def detect_custom_relationships(
                 if time_diff < 7200:  # Within 2 hours
                     confidence = max(0.4, 1.0 - (time_diff / 7200))
                     relationships.append(("deployment_error", str(context_item.id), confidence))
-    
+
     return relationships
 
 # Override relationship detection
@@ -296,7 +296,7 @@ cache = Cache("/tmp/git_analysis_cache")
 async def cached_analysis(commit_sha: str):
     if commit_sha in cache:
         return cache[commit_sha]
-    
+
     # Perform analysis...
     result = await analyze_commit(commit_sha)
     cache[commit_sha] = result
@@ -308,37 +308,37 @@ async def cached_analysis(commit_sha: str):
 ```python
 async def incremental_git_processing():
     """Example of incremental Git processing."""
-    
+
     # Get last processed commit
     checkpoint_manager = GitCheckpointManager(config, db_pool)
     last_commit = await checkpoint_manager.get_last_processed_commit("main")
-    
+
     if last_commit:
         print(f"Resuming from commit: {last_commit[:8]}")
-    
+
     # Process only new commits
     since = None
     if last_commit:
         # Find timestamp of last processed commit
         since = await get_commit_timestamp(last_commit)
-    
+
     processed_count = 0
     async for raw_commit in git_adapter.fetch_items(since=since):
         context_item = await git_adapter.transform_item(raw_commit)
         await db.store_context_items([context_item])
-        
+
         processed_count += 1
-        
+
         # Save checkpoint every 100 commits
         if processed_count % 100 == 0:
             await checkpoint_manager.save_checkpoint(
-                "main", 
-                raw_commit["hash"], 
+                "main",
+                raw_commit["hash"],
                 context_item.timestamp,
                 processed_count
             )
             print(f"Checkpoint saved at commit {processed_count}")
-    
+
     print(f"Processed {processed_count} new commits")
 ```
 
@@ -403,19 +403,19 @@ import psutil
 
 async def process_with_memory_monitoring():
     process = psutil.Process()
-    
+
     batch_count = 0
     async for raw_commit in git_adapter.fetch_items():
         context_item = await git_adapter.transform_item(raw_commit)
         # Process item...
-        
+
         batch_count += 1
-        
+
         # Check memory every 100 items
         if batch_count % 100 == 0:
             memory_mb = process.memory_info().rss / (1024 * 1024)
             print(f"Memory usage: {memory_mb:.1f} MB")
-            
+
             if memory_mb > 1000:  # 1GB limit
                 print("Memory usage high, forcing garbage collection")
                 import gc
@@ -452,10 +452,10 @@ import pstats
 def profile_git_processing():
     profiler = cProfile.Profile()
     profiler.enable()
-    
+
     # Run your Git processing
     asyncio.run(process_git_history())
-    
+
     profiler.disable()
     stats = pstats.Stats(profiler)
     stats.sort_stats('cumulative')
@@ -470,11 +470,11 @@ async def test_database():
     try:
         db_pool = DatabaseConnectionPool(database_url)
         await db_pool.initialize()
-        
+
         # Test query
         result = await db_pool.execute_query("SELECT 1", fetch="val")
         print(f"Database test result: {result}")
-        
+
         await db_pool.close()
         print("Database connection successful")
     except Exception as e:
@@ -490,20 +490,20 @@ import asyncio
 
 async def debug_memory():
     tracemalloc.start()
-    
+
     # Take snapshot before processing
     snapshot1 = tracemalloc.take_snapshot()
-    
+
     # Process commits
     async for commit in git_adapter.fetch_items(limit=1000):
         await git_adapter.transform_item(commit)
-    
+
     # Take snapshot after processing
     snapshot2 = tracemalloc.take_snapshot()
-    
+
     # Compare snapshots
     top_stats = snapshot2.compare_to(snapshot1, 'lineno')
-    
+
     print("Top 10 memory allocations:")
     for stat in top_stats[:10]:
         print(stat)
@@ -514,40 +514,40 @@ async def debug_memory():
 ```python
 class GitProcessingMonitor:
     """Monitor Git processing performance."""
-    
+
     def __init__(self):
         self.start_time = None
         self.commits_processed = 0
         self.errors = 0
         self.memory_samples = []
-    
+
     async def monitor_processing(self, git_adapter):
         """Monitor the processing pipeline."""
         self.start_time = asyncio.get_event_loop().time()
         process = psutil.Process()
-        
+
         async for raw_commit in git_adapter.fetch_items():
             try:
                 context_item = await git_adapter.transform_item(raw_commit)
                 self.commits_processed += 1
-                
+
                 # Sample memory every 50 commits
                 if self.commits_processed % 50 == 0:
                     memory_mb = process.memory_info().rss / (1024 * 1024)
                     self.memory_samples.append(memory_mb)
-                    
+
                     rate = self.commits_processed / (asyncio.get_event_loop().time() - self.start_time)
                     print(f"Processed: {self.commits_processed}, Rate: {rate:.1f}/s, Memory: {memory_mb:.1f}MB")
-                
+
             except Exception as e:
                 self.errors += 1
                 print(f"Error processing commit: {e}")
-    
+
     def get_report(self):
         """Generate performance report."""
         duration = asyncio.get_event_loop().time() - self.start_time if self.start_time else 0
         rate = self.commits_processed / duration if duration > 0 else 0
-        
+
         return {
             'duration_seconds': duration,
             'commits_processed': self.commits_processed,
@@ -568,7 +568,7 @@ Main adapter class for Git history processing.
 ```python
 class GitAdapter(BaseAdapter):
     def __init__(self, config: AdapterConfig, database_connection=None)
-    
+
     async def initialize(self) -> None
     async def fetch_items(self, since=None, until=None, limit=None) -> AsyncIterator[Dict]
     async def transform_item(self, raw_item: Dict) -> ContextItem
@@ -583,7 +583,7 @@ Advanced commit analysis and semantic understanding.
 ```python
 class CommitProcessor:
     def __init__(self, config: AdapterConfig)
-    
+
     async def analyze_commit(self, commit_data: Dict) -> CommitAnalysis
     def _classify_commit_type(self, message: str, changed_files: List[Dict]) -> CommitType
     async def _calculate_impact_score(self, commit_data: Dict) -> float
@@ -597,7 +597,7 @@ Manages incremental processing checkpoints.
 ```python
 class GitCheckpointManager:
     def __init__(self, config: AdapterConfig, database_connection=None)
-    
+
     async def get_last_processed_commit(self, branch: str) -> Optional[str]
     async def save_checkpoint(self, branch: str, commit_hash: str, timestamp: datetime, commit_count: int = 0)
 ```
@@ -619,7 +619,7 @@ class CommitAnalysis:
     related_patterns: List[str]
     author_patterns: Dict[str, Any]
 
-@dataclass  
+@dataclass
 class BranchInfo:
     name: str
     head_commit: str
@@ -639,16 +639,16 @@ class BranchInfo:
 ```python
 async def correlate_git_with_chat():
     """Correlate Git commits with chat conversations."""
-    
+
     # Get recent commits
     commits = []
     async for raw_commit in git_adapter.fetch_items(limit=100):
         context_item = await git_adapter.transform_item(raw_commit)
         commits.append(context_item)
-    
+
     # Get recent chat messages
     chat_messages = await get_recent_chat_messages()
-    
+
     # Find correlations
     correlations = []
     for commit in commits:
@@ -656,7 +656,7 @@ async def correlate_git_with_chat():
             # Time-based correlation
             time_diff = abs((commit.timestamp - chat_msg.timestamp).total_seconds())
             if time_diff < 3600:  # Within 1 hour
-                
+
                 # Content-based correlation
                 commit_files = commit.metrics.get('changed_files', [])
                 if any(file_path in chat_msg.content for file_path in commit_files):
@@ -669,7 +669,7 @@ async def correlate_git_with_chat():
                         time_delta_seconds=int(time_diff)
                     )
                     correlations.append(correlation)
-    
+
     await db.store_relationships(correlations)
     print(f"Found {len(correlations)} Git-Chat correlations")
 ```
@@ -679,18 +679,18 @@ async def correlate_git_with_chat():
 ```python
 async def correlate_git_with_errors():
     """Correlate Git commits with error occurrences."""
-    
+
     # Get high-risk commits
     high_risk_commits = []
     async for raw_commit in git_adapter.fetch_items(limit=200):
         context_item = await git_adapter.transform_item(raw_commit)
-        
+
         if context_item.metrics.get('risk_score', 0) > 0.6:
             high_risk_commits.append(context_item)
-    
+
     # Get recent errors
     recent_errors = await get_recent_errors(hours=48)
-    
+
     # Find potential causation relationships
     causation_relationships = []
     for commit in high_risk_commits:
@@ -698,16 +698,16 @@ async def correlate_git_with_errors():
             # Errors occurring after high-risk commits
             if error.timestamp > commit.timestamp:
                 time_diff = (error.timestamp - commit.timestamp).total_seconds()
-                
+
                 if time_diff < 7200:  # Within 2 hours
                     # Check if error involves files changed in commit
                     changed_files = set(commit.metrics.get('changed_files', []))
-                    
+
                     if any(file_path in error.content for file_path in changed_files):
                         confidence = 0.8
                     else:
                         confidence = 0.3 + (commit.metrics.get('risk_score', 0) * 0.4)
-                    
+
                     relationship = ContextRelationship(
                         source_id=commit.id,
                         target_id=error.id,
@@ -717,7 +717,7 @@ async def correlate_git_with_errors():
                         time_delta_seconds=int(time_diff)
                     )
                     causation_relationships.append(relationship)
-    
+
     await db.store_relationships(causation_relationships)
     print(f"Found {len(causation_relationships)} potential Git-Error causation relationships")
 ```
