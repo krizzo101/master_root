@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Output directories
+output/
+output_*/
+*_output/
+*.log
+*.jsonl
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+*.coverage
+test_results.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Archives
+.archive/
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
