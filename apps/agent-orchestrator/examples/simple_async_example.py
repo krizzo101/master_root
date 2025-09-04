@@ -9,10 +9,10 @@ import random
 import sys
 from pathlib import Path
 
-from simple_async_system import AsyncQueue, AsyncTask, AsyncTimer, SimpleAsyncExecutor
-
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+from simple_async_system import AsyncQueue, AsyncTask, AsyncTimer, SimpleAsyncExecutor
 
 
 async def fetch_data(url: str, delay: float = None) -> dict:

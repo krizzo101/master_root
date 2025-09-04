@@ -1,32 +1,195 @@
-# Agent Orchestrator Architecture
+# Agent Orchestrator - Architecture Documentation
 
-## System Overview
+## Table of Contents
 
+- [System Architecture](#system-architecture)
+- [Component Design](#component-design)
+- [Data Flow](#data-flow)
+- [Communication Patterns](#communication-patterns)
+- [State Management](#state-management)
+- [Scalability Design](#scalability-design)
+
+## System Architecture
+
+### High-Level Architecture
+
+```mermaid
+graph TB
+    subgraph "Client Layer"
+        CLI[CLI Interface]
+        API[API Interface]
+        SDK[Python SDK]
+    end
+
+    subgraph "Orchestration Core"
+        OM[Orchestration Manager]
+        TM[Task Manager]
+        DM[Dependency Manager]
+        SM[State Manager]
+    end
+
+    subgraph "Resource Layer"
+        TP[Token Pool]
+        AM[Agent Manager]
+        QM[Queue Manager]
+    end
+
+    subgraph "Quality Layer"
+        QG[Quality Gates]
+        VAL[Validators]
+        ESC[Escalation Engine]
+    end
+
+    subgraph "Execution Layer"
+        AE[Agent Executor]
+        PC[Process Controller]
+        TH[Thread Handler]
+    end
+
+    subgraph "Monitoring Layer"
+        MON[Monitor]
+        MET[Metrics]
+        LOG[Logger]
+        TR[Tracer]
+    end
+
+    subgraph "Storage Layer"
+        FS[File System]
+        CACHE[Cache]
+        DB[Database]
+    end
+
+    CLI --> OM
+    API --> OM
+    SDK --> OM
+
+    OM --> TM
+    OM --> DM
+    OM --> SM
+
+    TM --> TP
+    TM --> AM
+    TM --> QM
+
+    AM --> AE
+    AE --> PC
+    AE --> TH
+
+    QG --> VAL
+    QG --> ESC
+
+    AE --> QG
+
+    OM --> MON
+    TM --> MET
+    AE --> LOG
+    AM --> TR
+
+    SM --> FS
+    SM --> CACHE
+    SM --> DB
+
+    style CLI fill:#e1f5fe
+    style API fill:#e1f5fe
+    style SDK fill:#e1f5fe
+    style OM fill:#c8e6c9
+    style QG fill:#fff3e0
+    style AE fill:#f3e5f5
+    style MON fill:#ffebee
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        User Application                         │
-│                    (Your orchestration logic)                   │
-└──────────────────────┬──────────────────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    GenericOrchestrator                          │
-│  ┌─────────────┐  ┌──────────────┐  ┌────────────────┐        │
-│  │  Task Queue │  │ Dep. Manager │  │  Message Bus   │        │
-│  └─────────────┘  └──────────────┘  └────────────────┘        │
-│  ┌─────────────┐  ┌──────────────┐  ┌────────────────┐        │
-│  │ Token Pool  │  │   Executor   │  │    Metrics     │        │
-│  └─────────────┘  └──────────────┘  └────────────────┘        │
-└──────────────────────┬──────────────────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                        Claude CLI Layer                         │
-│                   (Headless execution mode)                     │
-└─────────────────────────────────────────────────────────────────┘
+
+### Component Hierarchy
+
+```mermaid
+classDiagram
+    class GenericOrchestrator {
+        +output_dir: Path
+        +max_parallel: int
+        +use_optimizations: bool
+        +execute_batch()
+        +process_task()
+        +validate_result()
+    }
+
+    class EnhancedOrchestrator {
+        +quality_gates: QualityGates
+        +escalation_manager: EscalationManager
+        +execute_with_quality()
+        +handle_escalation()
+    }
+
+    class AgentTeamManager {
+        +team_size: int
+        +roles: Dict
+        +assign_role()
+        +coordinate_team()
+        +aggregate_results()
+    }
+
+    class TokenPool {
+        +tokens: List
+        +max_size: int
+        +acquire_token()
+        +release_token()
+        +get_available_count()
+    }
+
+    class DynamicTokenPool {
+        +min_size: int
+        +max_size: int
+        +scale_up()
+        +scale_down()
+        +auto_adjust()
+    }
+
+    class SharedTokenPool {
+        +tenants: Dict
+        +priorities: Dict
+        +allocate_by_priority()
+        +share_tokens()
+    }
+
+    class QualityGates {
+        +rules: List
+        +validators: List
+        +validate()
+        +check_quality()
+        +enforce_standards()
+    }
+
+    class EscalationManager {
+        +thresholds: Dict
+        +senior_agents: List
+        +escalate_task()
+        +check_complexity()
+        +assign_senior()
+    }
+
+    class AgentMonitor {
+        +metrics: Dict
+        +alerts: List
+        +track_performance()
+        +detect_issues()
+        +report_status()
+    }
+
+    GenericOrchestrator <|-- EnhancedOrchestrator
+    EnhancedOrchestrator <|-- AgentTeamManager
+
+    GenericOrchestrator --> TokenPool
+    EnhancedOrchestrator --> DynamicTokenPool
+    AgentTeamManager --> SharedTokenPool
+
+    EnhancedOrchestrator --> QualityGates
+    EnhancedOrchestrator --> EscalationManager
+
+    GenericOrchestrator --> AgentMonitor
+
+    TokenPool <|-- DynamicTokenPool
+    TokenPool <|-- SharedTokenPool
 ```
 
-## Component Architecture
+## Component Design
 
 ### Core Components
 

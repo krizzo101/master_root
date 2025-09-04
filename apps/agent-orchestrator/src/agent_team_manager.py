@@ -15,8 +15,6 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, AsyncGenerator, Dict, Iterator, List, Optional
 
-from agent_monitor import AgentStatus, AgentStatusMonitor
-
 # Import specialist components
 from enhanced_orchestrator import EnhancedAgentTask, EnhancedOrchestrator
 from escalation_integration import (
@@ -25,6 +23,8 @@ from escalation_integration import (
     EscalationConfig,
 )
 from quality_gates import GateStatus, QualityGateManager, ValidationResult
+
+from .agent_monitor import AgentStatus, AgentStatusMonitor
 
 logger = logging.getLogger(__name__)
 

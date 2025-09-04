@@ -16,8 +16,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from agent_monitor import AgentStatus, AgentStatusMonitor
-
 # Import base orchestrator components
 from generic_orchestrator import (
     AgentTask,
@@ -27,6 +25,8 @@ from generic_orchestrator import (
     TokenPool,
 )
 from quality_gates import GateStatus, QualityGateManager, ValidationResult
+
+from .agent_monitor import AgentStatus, AgentStatusMonitor
 
 logger = logging.getLogger(__name__)
 

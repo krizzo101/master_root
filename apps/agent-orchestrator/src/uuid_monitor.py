@@ -12,10 +12,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
-from agent_monitor import AgentStatus, AgentStatusMonitor
-from log_parser import AgentLogParser
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
+
+from .agent_monitor import AgentStatus, AgentStatusMonitor
+from .log_parser import AgentLogParser
 
 
 class UUIDLogHandler(FileSystemEventHandler):

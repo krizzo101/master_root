@@ -13,8 +13,9 @@ from typing import Any, Dict, List, Optional
 
 # Add chat-search to path
 sys.path.append(str(Path(__file__).parent.parent.parent / "chat-search"))
-from agent_monitor import ErrorInfo, ProgressStatus
 from chat_search import ChatSearcher
+
+from .agent_monitor import ErrorInfo, ProgressStatus
 
 
 class AgentLogParser:
