@@ -210,6 +210,179 @@ class ChatSearcher:
 
         return files
 
+    def extract_files_used(self, file_path: str) -> Dict[str, List[Dict]]:
+        """
+        Extract all file operations from a chat log file
+        
+        Args:
+            file_path: Path to the JSONL chat log file
+            
+        Returns:
+            Dictionary with file operations categorized by type
+        """
+        file_operations = {
+            'read': [],
+            'write': [],
+            'edit': [],
+            'delete': [],
+            'list': [],
+            'other': []
+        }
+        
+        # Map tool names to operation types
+        tool_operation_map = {
+            'read_file': 'read',
+            'read': 'read',
+            'Read': 'read',
+            'write': 'write',
+            'write_file': 'write',
+            'Write': 'write',
+            'search_replace': 'edit',
+            'MultiEdit': 'edit',
+            'Edit': 'edit',
+            'delete_file': 'delete',
+            'Delete': 'delete',
+            'list_dir': 'list',
+            'glob_file_search': 'list',
+            'List': 'list',
+        }
+        
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                for line_num, line in enumerate(f, 1):
+                    try:
+                        message_data = json.loads(line.strip())
+                        
+                        # Look for assistant tool calls
+                        if message_data.get("type") == "assistant":
+                            content = message_data.get("message", {}).get("content", "")
+                            timestamp = message_data.get("timestamp", "")
+                            
+                            if isinstance(content, list):
+                                for item in content:
+                                    if isinstance(item, dict) and item.get("type") == "tool_use":
+                                        tool_name = item.get("name", "")
+                                        tool_input = item.get("input", {})
+                                        
+                                        # Determine operation type
+                                        operation_type = tool_operation_map.get(tool_name, 'other')
+                                        
+                                        # Extract file path from tool input
+                                        file_path_key = None
+                                        for key in ['file_path', 'target_file', 'target_directory']:
+                                            if key in tool_input:
+                                                file_path_key = key
+                                                break
+                                        
+                                        if file_path_key:
+                                            file_path_value = tool_input[file_path_key]
+                                            file_operations[operation_type].append({
+                                                'timestamp': timestamp,
+                                                'tool_name': tool_name,
+                                                'file_path': file_path_value,
+                                                'line': line_num,
+                                                'full_input': tool_input if operation_type != 'other' else None
+                                            })
+                        
+                    except json.JSONDecodeError:
+                        continue
+                    except Exception as e:
+                        continue
+                        
+        except Exception as e:
+            print(f"Error reading {file_path}: {e}", file=sys.stderr)
+            return file_operations
+            
+        return file_operations
+
+    def extract_conversation_flow(self, file_path: str, response_chars: int = 200) -> List[Dict]:
+        """
+        Extract user prompts and agent responses from a chat session
+        
+        Args:
+            file_path: Path to the JSONL chat log file
+            response_chars: Number of characters to show from agent responses
+            
+        Returns:
+            List of conversation turns with user prompts and agent response previews
+        """
+        conversation_turns = []
+        
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                for line_num, line in enumerate(f, 1):
+                    try:
+                        message_data = json.loads(line.strip())
+                        
+                        # Extract user messages
+                        if message_data.get("type") == "user":
+                            user_content = message_data.get("message", {}).get("content", "")
+                            timestamp = message_data.get("timestamp", "")
+                            
+                            # Skip empty, system messages, or tool results
+                            if (
+                                user_content
+                                and isinstance(user_content, str)
+                                and not user_content.startswith("<local-command-stdout>")
+                                and not user_content.startswith("<command-name>")
+                                and not user_content.startswith("Caveat:")
+                                and len(user_content.strip()) > 10
+                            ):  # Skip very short messages
+                                
+                                conversation_turns.append({
+                                    "turn": len(conversation_turns) + 1,
+                                    "type": "user",
+                                    "timestamp": timestamp,
+                                    "content": user_content,
+                                    "line": line_num,
+                                })
+                        
+                        # Extract assistant messages
+                        elif message_data.get("type") == "assistant":
+                            assistant_content = message_data.get("message", {}).get("content", "")
+                            timestamp = message_data.get("timestamp", "")
+                            
+                            if assistant_content:
+                                # Handle both string and array content
+                                if isinstance(assistant_content, list):
+                                    text_parts = []
+                                    for item in assistant_content:
+                                        if isinstance(item, dict):
+                                            if item.get("type") == "text":
+                                                text_parts.append(item.get("text", ""))
+                                            elif item.get("type") == "tool_use":
+                                                tool_name = item.get("name", "unknown")
+                                                text_parts.append(f"[Used {tool_name}]")
+                                
+                                    full_content = " ".join(text_parts)
+                                else:
+                                    full_content = assistant_content
+                                
+                                # Truncate response if too long
+                                preview_content = full_content
+                                if len(full_content) > response_chars:
+                                    preview_content = full_content[:response_chars] + "..."
+                                
+                                conversation_turns.append({
+                                    "turn": len(conversation_turns) + 1,
+                                    "type": "assistant",
+                                    "timestamp": timestamp,
+                                    "content": preview_content,
+                                    "full_length": len(full_content),
+                                    "line": line_num,
+                                })
+                        
+                    except json.JSONDecodeError:
+                        continue
+                    except Exception as e:
+                        continue
+                        
+        except Exception as e:
+            print(f"Error reading {file_path}: {e}", file=sys.stderr)
+            return []
+        
+        return conversation_turns
+
 
 def main():
     parser = argparse.ArgumentParser(description="Search chat logs quickly")
@@ -240,6 +413,27 @@ def main():
         "--verbose",
         action="store_true",
         help="Show full verbose output (default is concise)",
+    )
+    parser.add_argument(
+        "--list-files-used",
+        action="store_true",
+        help="Extract and list all files referenced in the session",
+    )
+    parser.add_argument(
+        "--conversation-flow",
+        action="store_true",
+        help="Extract conversation flow (user prompts + agent response previews)",
+    )
+    parser.add_argument(
+        "--response-chars",
+        type=int,
+        default=200,
+        help="Number of characters to show from agent responses (default: 200)",
+    )
+    parser.add_argument(
+        "--stats-only",
+        action="store_true",
+        help="Show only conversation statistics (use with --conversation-flow)",
     )
 
     args = parser.parse_args()

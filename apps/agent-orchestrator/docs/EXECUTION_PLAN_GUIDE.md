@@ -8,8 +8,89 @@ The agent orchestrator uses **Execution Plans** to define:
 - **Tasks**: Individual agent operations with dependencies
 - **Quality Gates**: Validation checkpoints that tasks must satisfy
 - **Execution Phases**: Logical groupings of related tasks
+- **Validation System**: Advanced validation with circular dependency detection
 - **Monitoring**: Real-time tracking of agent progress
 - **Resource Management**: Token allocation and parallel execution limits
+
+## 🛡️ Validation & Error Handling (NEW)
+
+**ExecutionPlan now includes comprehensive validation to prevent common errors and ensure reliable execution.**
+
+### Automatic Validation
+
+All ExecutionPlans are validated by default when created:
+
+```python
+from execution_plan_template import ExecutionPlanBuilder
+from execution_plan_schema import TaskType
+
+builder = ExecutionPlanBuilder("My Project")
+builder.add_task("task1", TaskType.RESEARCH_GENIUS, "Research task")
+plan = builder.build()  # ✅ Validates automatically
+```
+
+### Circular Dependency Detection
+
+**Prevents infinite loops by detecting dependency cycles:**
+
+```python
+# This will raise CircularDependencyError
+builder = ExecutionPlanBuilder("Circular Test")
+builder.add_task("A", TaskType.GENERAL_PURPOSE, "Task A", dependencies=["B"])
+builder.add_task("B", TaskType.GENERAL_PURPOSE, "Task B", dependencies=["A"])  # Creates cycle
+
+try:
+    plan = builder.build()
+except CircularDependencyError as e:
+    print(f"Circular dependency detected: {e.dependency_chain}")
+    # Output: ['A', 'B', 'A']
+```
+
+### Validation Error Types
+
+The system detects these validation errors:
+
+| Error Type | Description | Example |
+|------------|-------------|---------|
+| `circular_dependency` | Tasks form dependency cycles | A→B→C→A |
+| `duplicate_task_id` | Multiple tasks with same ID | Two tasks named "test" |
+| `invalid_dependency_reference` | Task depends on non-existent task | Task A depends on "missing_task" |
+| `self_dependency` | Task depends on itself | Task A depends on "A" |
+| `empty_task_id` | Task has no identifier | task_id="" |
+| `empty_task_list` | ExecutionPlan has no tasks | tasks=[] |
+| `max_dependency_depth_exceeded` | Dependency chain too deep | 20+ levels |
+| `orphaned_task` | Task unreachable due to missing dependencies | Isolated task |
+
+### Error Handling Best Practices
+
+```python
+from execution_plan_validation import CircularDependencyError, ValidationError
+
+try:
+    plan = builder.build()
+    print("✅ Plan validated successfully")
+except CircularDependencyError as e:
+    print(f"❌ Circular dependency: {e.dependency_chain}")
+except ValidationError as e:
+    print(f"❌ Validation failed: {e}")
+    print(f"   Error type: {e.error_type}")
+    print(f"   Task involved: {e.task_id}")
+```
+
+### Testing Mode (Validation Disabled)
+
+For testing scenarios, you can disable validation:
+
+```python
+# Skip validation for testing
+plan = builder.build(validate=False)
+
+# Manual validation later
+from execution_plan_validation import validate_execution_plan
+result = validate_execution_plan(plan)
+if not result.success:
+    print(f"Validation errors found: {result.errors}")
+```
 
 ## Quick Start
 

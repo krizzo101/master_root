@@ -156,3 +156,63 @@ After getting up to speed, you'll likely need to search chat logs for ongoing wo
 - **Think about context clues**: What words or phrases would naturally appear near your target information?
 - **Use progressive refinement**: Start with broad concepts, then add constraints based on what you find
 - **Leverage message structure**: Users make requests, assistants report progress, tools return data - each has patterns
+
+## ⚠️ CRITICAL: File Metadata Reliability
+
+**IMPORTANT DISCOVERY**: Session file headers and summaries cannot be trusted and may contain completely inaccurate information.
+
+### The Problem
+- **File headers** may claim sessions are about one topic when they're actually about something completely different
+- **Session summaries** in file metadata can be misleading or outdated
+- **Search-based analysis** that relies on file metadata can lead to incorrect conclusions
+
+### Real Example
+- **File Header Claimed**: "Debugging Complex Web App Authentication and Performance Issues"
+- **Actual Session Content**: Analysis of opsvi-llm library and OpenAI interface validation
+- **Impact**: Complete mischaracterization of session purpose
+
+### Best Practices for Reliable Analysis
+
+**1. Always Verify File Metadata**
+- Don't trust session summaries or headers
+- Cross-check file metadata against actual content
+- Use search tools to find the real user requests and session purpose
+
+**2. Hybrid Analysis Approach**
+- **Search tools**: Excellent for finding specific technical content quickly
+- **Full file review**: Essential for understanding true context and purpose
+- **Combined approach**: Most effective for comprehensive analysis
+
+**3. Verification Protocol**
+```bash
+# Step 1: Check file header/summary
+head -5 chat_logs/session_id.jsonl
+
+# Step 2: Find actual user requests
+python apps/chat-search/chat_search.py "user" --type user --file-filter session_id --limit 3
+
+# Step 3: Verify session purpose matches header
+python apps/chat-search/chat_search.py "analyze\|debug\|implement" --file-filter session_id --limit 5
+```
+
+**4. Red Flags to Watch For**
+- Session summaries that seem generic or vague
+- Headers that don't match the technical content found
+- Discrepancies between file metadata and search results
+- Multiple conflicting descriptions of the same session
+
+### Impact on Handoff Process
+
+**For Session Handoff**:
+1. **Never rely solely on file headers** for understanding session purpose
+2. **Always search for actual user requests** to understand true intent
+3. **Verify context** by checking multiple sources within the session
+4. **Flag discrepancies** when file metadata doesn't match content
+
+**For Chat Search Usage**:
+- Search tools are highly reliable for **technical content** and **specific information**
+- Search tools are **unreliable for contextual understanding** when file metadata is wrong
+- Always **verify session purpose** through actual content, not file headers
+
+### Recommendation
+**Trust the content, not the metadata.** Always verify file headers and summaries against actual session content before making any conclusions about session purpose or context.

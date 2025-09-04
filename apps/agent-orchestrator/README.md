@@ -22,6 +22,7 @@ Agent Orchestrator is a comprehensive framework for managing multiple AI agents 
 
 - **Parallel Execution**: Run up to 100+ agents simultaneously
 - **Smart Dependencies**: Automatic task scheduling based on dependencies
+- **🛡️ Advanced Validation**: Circular dependency detection and comprehensive error handling
 - **Resource Management**: Token pooling and intelligent allocation
 - **Quality Control**: Built-in quality gates and validation
 - **Escalation System**: Automatic escalation for complex tasks
@@ -246,6 +247,42 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 ```
+
+### ExecutionPlan with Advanced Validation
+
+**NEW**: Enhanced ExecutionPlan system with comprehensive validation:
+
+```python
+from execution_plan_template import ExecutionPlanBuilder
+from execution_plan_schema import TaskType
+from execution_plan_validation import CircularDependencyError
+
+# Create validated ExecutionPlan
+builder = ExecutionPlanBuilder("Production Pipeline")
+builder.add_task("research", TaskType.RESEARCH_GENIUS, "Research requirements")
+builder.add_task("design", TaskType.SOLUTION_ARCHITECT, "Create design", 
+                dependencies=["research"])
+builder.add_task("implement", TaskType.DEVELOPMENT_SPECIALIST, "Build solution",
+                dependencies=["design"])
+
+try:
+    plan = builder.build()  # ✅ Automatically validates for circular dependencies
+    print(f"✅ Plan created with {len(plan.tasks)} tasks")
+    
+    # Execute with orchestrator
+    orchestrator = GenericOrchestrator(output_dir=Path("./output"))
+    results = await orchestrator.execute_batch(plan.tasks)
+    
+except CircularDependencyError as e:
+    print(f"❌ Circular dependency detected: {e.dependency_chain}")
+```
+
+**Key Validation Features:**
+- **Circular Dependency Detection**: Prevents infinite loops
+- **Data Integrity**: Validates all task references
+- **Flexible Modes**: Production validation or testing mode
+- **Clear Error Messages**: Actionable error reporting
+- **Performance Optimized**: Validates 100+ tasks in milliseconds
 
 ## 🔧 Core Components
 
