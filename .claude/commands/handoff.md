@@ -80,6 +80,35 @@ TECHNICAL_BLOCKER: None - all dependencies understood
 
 This protocol ensures **complete context transfer** with **minimal token usage** and **fast agent onboarding**.
 
+## Chat Search Tool
+
+**Location**: `/home/opsvi/master_root/apps/chat-search/chat_search.py`
+
+**Purpose**: Search and monitor real-time `.jsonl` chat log archives in `chat_logs/` directory. These files contain live session data from active agents.
+
+**Key Usage**:
+```bash
+# Basic search
+python apps/chat-search/chat_search.py "search term"
+
+# List available log files with session counts
+python apps/chat-search/chat_search.py --files
+
+# Search specific content types
+python apps/chat-search/chat_search.py "error" --type tools --limit 5
+python apps/chat-search/chat_search.py "request" --type user
+
+# Filter by date or files
+python apps/chat-search/chat_search.py "parallel" --date-from 2025-01-01
+python apps/chat-search/chat_search.py "orchestrator" --file-filter session_123
+```
+
+**Why Use It**:
+- Monitor what other agents are currently doing
+- Understand session context and progress
+- Find specific errors, completions, or user requests
+- Track real-time agent activity across parallel sessions
+
 ## Using Chat Search Effectively
 
 After getting up to speed, you'll likely need to search chat logs for ongoing work. Here's how to think strategically about search:

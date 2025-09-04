@@ -11,7 +11,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from generic_orchestrator import AgentTask
+try:
+    from .generic_orchestrator import AgentTask
+except ImportError:
+    from generic_orchestrator import AgentTask
 
 logger = logging.getLogger(__name__)
 

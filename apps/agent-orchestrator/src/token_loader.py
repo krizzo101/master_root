@@ -56,9 +56,9 @@ class TokenLoader:
             except (json.JSONDecodeError, IOError):
                 pass
 
-        # Filter out empty strings and duplicates
+        # Filter out empty strings but allow duplicates for parallel execution
         tokens = list(filter(None, tokens))
-        tokens = list(dict.fromkeys(tokens))  # Remove duplicates while preserving order
+        # NOTE: Allow same token multiple times for parallel orchestration
 
         return tokens
 
