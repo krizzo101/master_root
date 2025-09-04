@@ -293,25 +293,47 @@ def get_docker_containers() -> List[DockerContainer]:
                 # Get container stats
                 stats = container.stats(stream=False)
 
-                # Calculate CPU percentage
-                cpu_delta = (
-                    stats["cpu_stats"]["cpu_usage"]["total_usage"]
-                    - stats["precpu_stats"]["cpu_usage"]["total_usage"]
-                )
-                system_delta = (
-                    stats["cpu_stats"]["system_cpu_usage"]
-                    - stats["precpu_stats"]["system_cpu_usage"]
-                )
-                cpu_percent = (
-                    (cpu_delta / system_delta)
-                    * len(stats["cpu_stats"]["cpu_usage"]["percpu_usage"])
-                    * 100.0
-                )
+                # Calculate CPU percentage with robust error handling
+                cpu_percent = 0.0
+                try:
+                    cpu_usage = stats.get("cpu_stats", {}).get("cpu_usage", {})
+                    precpu_usage = stats.get("precpu_stats", {}).get("cpu_usage", {})
 
-                # Memory usage
-                memory_usage = stats["memory_stats"]["usage"]
-                memory_limit = stats["memory_stats"]["limit"]
-                memory_percent = (memory_usage / memory_limit) * 100.0
+                    if cpu_usage.get("total_usage") and precpu_usage.get("total_usage"):
+                        cpu_delta = (
+                            cpu_usage["total_usage"] - precpu_usage["total_usage"]
+                        )
+                        system_cpu = stats.get("cpu_stats", {}).get(
+                            "system_cpu_usage", 0
+                        )
+                        presystem_cpu = stats.get("precpu_stats", {}).get(
+                            "system_cpu_usage", 0
+                        )
+                        system_delta = system_cpu - presystem_cpu
+
+                        if system_delta > 0 and cpu_usage.get("percpu_usage"):
+                            cpu_percent = (
+                                (cpu_delta / system_delta)
+                                * len(cpu_usage["percpu_usage"])
+                                * 100.0
+                            )
+                except (KeyError, TypeError, ZeroDivisionError):
+                    cpu_percent = 0.0
+
+                # Memory usage with robust error handling
+                memory_usage = 0
+                memory_limit = 1
+                memory_percent = 0.0
+                try:
+                    memory_stats = stats.get("memory_stats", {})
+                    memory_usage = memory_stats.get("usage", 0)
+                    memory_limit = memory_stats.get("limit", 1)
+                    if memory_limit > 0:
+                        memory_percent = (memory_usage / memory_limit) * 100.0
+                except (KeyError, TypeError, ZeroDivisionError):
+                    memory_usage = 0
+                    memory_limit = 1
+                    memory_percent = 0.0
 
                 # Check if this might be a Claude-related container
                 is_claude_related = any(

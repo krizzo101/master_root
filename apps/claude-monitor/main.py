@@ -134,20 +134,43 @@ class ClaudeMonitor:
         # Stop backend process if running
         if self.backend_process:
             try:
-                if self.backend_process.is_alive():
-                    logger.info("Stopping backend service...")
-                    self.backend_process.terminate()
-                    self.backend_process.join(timeout=5)
-
+                # Check if process is valid and alive before attempting shutdown
+                if (
+                    hasattr(self.backend_process, "_popen")
+                    and self.backend_process._popen is not None
+                ):
                     if self.backend_process.is_alive():
-                        logger.warning(
-                            "Backend service did not stop gracefully, forcing termination..."
-                        )
-                        self.backend_process.kill()
-            except (AttributeError, OSError):
-                # Process already terminated or never started properly
-                pass
-                self.backend_process.join()
+                        logger.info("Stopping backend service...")
+                        self.backend_process.terminate()
+
+                        # Wait for graceful termination with timeout
+                        try:
+                            self.backend_process.join(timeout=5)
+                        except (OSError, ValueError) as e:
+                            logger.warning(f"Error during graceful shutdown: {e}")
+
+                        # Force kill if still alive
+                        if self.backend_process.is_alive():
+                            logger.warning(
+                                "Backend service did not stop gracefully, forcing termination..."
+                            )
+                            try:
+                                self.backend_process.kill()
+                                self.backend_process.join(timeout=2)
+                            except (OSError, ValueError) as e:
+                                logger.error(f"Error during force kill: {e}")
+                    else:
+                        logger.info("Backend process already terminated")
+                else:
+                    logger.info(
+                        "Backend process not properly initialized, skipping shutdown"
+                    )
+
+            except (AttributeError, OSError, ValueError) as e:
+                logger.warning(f"Process shutdown error (non-critical): {e}")
+            finally:
+                # Always reset the process reference
+                self.backend_process = None
 
         self.shutdown_event.set()
         logger.info("Shutdown complete")

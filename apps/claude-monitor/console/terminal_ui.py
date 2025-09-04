@@ -1059,49 +1059,49 @@ class TerminalUI:
             # Start WebSocket connection in background
             websocket_task = asyncio.create_task(self._connect_websocket())
 
-            # Use a simpler approach without Live screen mode to avoid conflicts
+            # Use Rich Live for stable screen updates
             console = Console()
-            try:
-                # Initialize empty data - will be populated from WebSocket
-                self.data.docker_containers = []
-                self.data.agent_tasks = []
-                self.data.token_usage = {}
-                self.data.system_resources = {}
-                self.data.cost_analysis = {}
 
-                # Give WebSocket a moment to connect and send initial data
-                await asyncio.sleep(1)
+            # Initialize empty data - will be populated from WebSocket
+            self.data.docker_containers = []
+            self.data.agent_tasks = []
+            self.data.token_usage = {}
+            self.data.system_resources = {}
+            self.data.cost_analysis = {}
 
-                # Main UI loop without Live screen mode
+            # Give WebSocket a moment to connect and send initial data
+            await asyncio.sleep(1)
+
+            # Use Rich Live for stable rendering
+            with Live(
+                self._render_ui(),
+                console=console,
+                screen=True,
+                auto_refresh=False,
+                refresh_per_second=2,
+            ) as live:
                 running = True
-                last_render = 0
+                last_refresh = time.time()
+
                 while running:
-                    # Only render every 2 seconds unless there's input
-                    import time
-
-                    now = time.time()
-                    if now - last_render > 2:
-                        console.clear()
-                        console.print(self._render_ui())
-                        console.print(
-                            "\nPress Tab to switch views, 1-7 for direct view (5=Tools), Q to quit, H for help"
-                        )
-                        last_render = now
-
                     # Handle keyboard input (non-blocking check)
                     key = self._get_key_input()
                     if key:
                         running = self._handle_key(key)
-                        # Re-render immediately after input
-                        console.clear()
-                        console.print(self._render_ui())
-                        console.print(
-                            "\nPress Tab to switch views, 1-7 for direct view (5=Tools), Q to quit, H for help"
-                        )
-                        last_render = now
+                        # Force immediate refresh on input
+                        live.update(self._render_ui())
+                        live.refresh()
+                        last_refresh = time.time()
+
+                    # Periodic refresh
+                    now = time.time()
+                    if now - last_refresh > 2.0:  # Refresh every 2 seconds
+                        live.update(self._render_ui())
+                        live.refresh()
+                        last_refresh = now
 
                     # Small delay to prevent excessive CPU usage
-                    await asyncio.sleep(0.2)
+                    await asyncio.sleep(0.1)
 
                     # Check for WebSocket errors
                     if websocket_task.done():
@@ -1114,12 +1114,10 @@ class TerminalUI:
                                 self._connect_websocket()
                             )
 
-            except Exception as e:
-                console.print(f"[red]Error: {e}[/red]")
-                await asyncio.sleep(1)
-
         except KeyboardInterrupt:
             pass
+        except Exception as e:
+            console.print(f"[red]UI Error: {e}[/red]")
         finally:
             if self.websocket:
                 await self.websocket.close()

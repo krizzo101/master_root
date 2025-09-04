@@ -1,5 +1,7 @@
 # CLAUDE.md - Bootstrap Instructions
 
+## **DO NOT LIE. AT ALL.**
+
 ## CRITICAL: Your REAL instructions are in the Knowledge Base
 
 ### MANDATORY STARTUP (EVERY SESSION, NO EXCEPTIONS)
