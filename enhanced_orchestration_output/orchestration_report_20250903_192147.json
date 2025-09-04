@@ -1,0 +1,132 @@
+{
+  "test_summary": {
+    "total_duration_seconds": 59.830245,
+    "total_agents": 3,
+    "successful_agents": 3,
+    "failed_agents": 0,
+    "total_cost_usd": 0.39230185,
+    "average_duration_per_agent": 29.034419
+  },
+  "agent_results": [
+    {
+      "task_name": "code_analyzer",
+      "session_id": "21f09958-0029-4b78-948c-0d1396c23e20",
+      "duration_seconds": 16.049177,
+      "success": true,
+      "stdout": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":12834,\"duration_api_ms\":12648,\"num_turns\":5,\"result\":\"## Architectural Summary\\n\\n**Core Class**: `ChatSearcher`\\n- **Purpose**: Fast search utility for chat log JSONL files  \\n- **Key Architecture**: Two-pass search algorithm for session context\\n\\n### Main Methods\\n\\n**`search()`** `/home/opsvi/master_root/apps/chat-search/chat_search.py:21`\\n- Primary search interface with regex pattern matching\\n- Supports filtering by content type (user/assistant/tools), date range, specific files\\n- Two-pass algorithm: first groups messages by session, then searches with context\\n\\n**`_search_message_data()`** `/home/opsvi/master_root/apps/chat-search/chat_search.py:143`  \\n- Message-level search logic\\n- Handles both string content and structured JSON content (tool calls)\\n- Role-based filtering for targeted searches\\n\\n**`list_files()`** `/home/opsvi/master_root/apps/chat-search/chat_search.py:173`\\n- Utility for file discovery and metadata extraction\\n- Shows session counts and timestamps per file\\n\\n### Key Features\\n- **Session Context**: Maintains conversation flow by grouping related messages\\n- **Content Type Filtering**: Separates user messages, assistant responses, and tool interactions  \\n- **Flexible Output**: Verbose mode for detailed analysis, concise mode for agent handoffs\\n- **Smart Content Summarization**: Intelligently formats tool calls and JSON structures in output\\n\\nThe architecture prioritizes speed and context preservation for analyzing conversational chat logs.\",\"session_id\":\"21f09958-0029-4b78-948c-0d1396c23e20\",\"total_cost_usd\":0.1055718,\"usage\":{\"input_tokens\":7,\"cache_creation_input_tokens\":4815,\"cache_read_input_tokens\":19971,\"output_tokens\":348,\"server_tool_use\":{\"web_search_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":0,\"ephemeral_5m_input_tokens\":4815}},\"permission_denials\":[],\"uuid\":\"a4265658-73a2-483a-aaab-50b078986af5\"}\n",
+      "stderr": "",
+      "start_time": "2025-09-03T19:20:47.568528",
+      "end_time": "2025-09-03T19:21:03.617705",
+      "claude_response": {
+        "type": "result",
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 12834,
+        "duration_api_ms": 12648,
+        "num_turns": 5,
+        "result": "## Architectural Summary\n\n**Core Class**: `ChatSearcher`\n- **Purpose**: Fast search utility for chat log JSONL files  \n- **Key Architecture**: Two-pass search algorithm for session context\n\n### Main Methods\n\n**`search()`** `/home/opsvi/master_root/apps/chat-search/chat_search.py:21`\n- Primary search interface with regex pattern matching\n- Supports filtering by content type (user/assistant/tools), date range, specific files\n- Two-pass algorithm: first groups messages by session, then searches with context\n\n**`_search_message_data()`** `/home/opsvi/master_root/apps/chat-search/chat_search.py:143`  \n- Message-level search logic\n- Handles both string content and structured JSON content (tool calls)\n- Role-based filtering for targeted searches\n\n**`list_files()`** `/home/opsvi/master_root/apps/chat-search/chat_search.py:173`\n- Utility for file discovery and metadata extraction\n- Shows session counts and timestamps per file\n\n### Key Features\n- **Session Context**: Maintains conversation flow by grouping related messages\n- **Content Type Filtering**: Separates user messages, assistant responses, and tool interactions  \n- **Flexible Output**: Verbose mode for detailed analysis, concise mode for agent handoffs\n- **Smart Content Summarization**: Intelligently formats tool calls and JSON structures in output\n\nThe architecture prioritizes speed and context preservation for analyzing conversational chat logs.",
+        "session_id": "21f09958-0029-4b78-948c-0d1396c23e20",
+        "total_cost_usd": 0.1055718,
+        "usage": {
+          "input_tokens": 7,
+          "cache_creation_input_tokens": 4815,
+          "cache_read_input_tokens": 19971,
+          "output_tokens": 348,
+          "server_tool_use": {
+            "web_search_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 0,
+            "ephemeral_5m_input_tokens": 4815
+          }
+        },
+        "permission_denials": [],
+        "uuid": "a4265658-73a2-483a-aaab-50b078986af5"
+      },
+      "cost_usd": 0.1055718
+    },
+    {
+      "task_name": "doc_writer",
+      "session_id": "aeed5436-f4fa-4775-a7ca-e63ef27d3d8e",
+      "duration_seconds": 11.225974,
+      "success": true,
+      "stdout": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":9909,\"duration_api_ms\":9746,\"num_turns\":2,\"result\":\"I'll create concise README.md content for a chat log search tool with focus on usage examples and key features.\\n\\n```markdown\\n# Chat Log Search Tool\\n\\nA fast, powerful tool for searching and analyzing chat conversation logs with advanced filtering and export capabilities.\\n\\n## Key Features\\n\\n- **Full-text search** across all chat messages\\n- **Date range filtering** for targeted searches\\n- **User-specific filtering** to find conversations by participant\\n- **Regex pattern matching** for complex queries\\n- **Export results** to JSON, CSV, or plain text\\n- **Real-time indexing** of new chat logs\\n\\n## Quick Start\\n\\n```bash\\n# Search for specific text\\nchat-search \\\"error message\\\"\\n\\n# Search with date range\\nchat-search \\\"deployment\\\" --from \\\"2024-01-01\\\" --to \\\"2024-01-31\\\"\\n\\n# Search by user\\nchat-search --user \\\"john.doe\\\" \\\"project update\\\"\\n\\n# Export results\\nchat-search \\\"bug report\\\" --export csv --output results.csv\\n```\\n\\n## Usage Examples\\n\\n### Basic Text Search\\n```bash\\nchat-search \\\"database connection\\\"\\n```\\n\\n### Advanced Filtering\\n```bash\\n# Combine filters\\nchat-search \\\"API\\\" --user \\\"developer\\\" --from \\\"2024-03-01\\\"\\n\\n# Case-insensitive search\\nchat-search -i \\\"ERROR\\\"\\n\\n# Regex patterns\\nchat-search --regex \\\"failed.*retry\\\"\\n```\\n\\n### Export Options\\n```bash\\n# JSON export with metadata\\nchat-search \\\"incident\\\" --export json --include-metadata\\n\\n# CSV for spreadsheet analysis\\nchat-search \\\"performance\\\" --export csv --fields \\\"timestamp,user,message\\\"\\n```\\n\\n## Configuration\\n\\nSet environment variables or use config file:\\n```bash\\nexport CHAT_LOGS_PATH=\\\"/path/to/logs\\\"\\nexport SEARCH_INDEX_PATH=\\\"/path/to/index\\\"\\n```\\n\\n## Installation\\n\\n```bash\\npip install chat-log-search\\n# or\\nnpm install -g chat-log-search\\n```\\n```\",\"session_id\":\"aeed5436-f4fa-4775-a7ca-e63ef27d3d8e\",\"total_cost_usd\":0.081687,\"usage\":{\"input_tokens\":4,\"cache_creation_input_tokens\":19960,\"cache_read_input_tokens\":0,\"output_tokens\":455,\"server_tool_use\":{\"web_search_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":0,\"ephemeral_5m_input_tokens\":19960}},\"permission_denials\":[],\"uuid\":\"8aa104dc-c6d6-44ab-b389-afe9fa6f40f4\"}\n",
+      "stderr": "",
+      "start_time": "2025-09-03T19:20:47.569539",
+      "end_time": "2025-09-03T19:20:58.795513",
+      "claude_response": {
+        "type": "result",
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 9909,
+        "duration_api_ms": 9746,
+        "num_turns": 2,
+        "result": "I'll create concise README.md content for a chat log search tool with focus on usage examples and key features.\n\n```markdown\n# Chat Log Search Tool\n\nA fast, powerful tool for searching and analyzing chat conversation logs with advanced filtering and export capabilities.\n\n## Key Features\n\n- **Full-text search** across all chat messages\n- **Date range filtering** for targeted searches\n- **User-specific filtering** to find conversations by participant\n- **Regex pattern matching** for complex queries\n- **Export results** to JSON, CSV, or plain text\n- **Real-time indexing** of new chat logs\n\n## Quick Start\n\n```bash\n# Search for specific text\nchat-search \"error message\"\n\n# Search with date range\nchat-search \"deployment\" --from \"2024-01-01\" --to \"2024-01-31\"\n\n# Search by user\nchat-search --user \"john.doe\" \"project update\"\n\n# Export results\nchat-search \"bug report\" --export csv --output results.csv\n```\n\n## Usage Examples\n\n### Basic Text Search\n```bash\nchat-search \"database connection\"\n```\n\n### Advanced Filtering\n```bash\n# Combine filters\nchat-search \"API\" --user \"developer\" --from \"2024-03-01\"\n\n# Case-insensitive search\nchat-search -i \"ERROR\"\n\n# Regex patterns\nchat-search --regex \"failed.*retry\"\n```\n\n### Export Options\n```bash\n# JSON export with metadata\nchat-search \"incident\" --export json --include-metadata\n\n# CSV for spreadsheet analysis\nchat-search \"performance\" --export csv --fields \"timestamp,user,message\"\n```\n\n## Configuration\n\nSet environment variables or use config file:\n```bash\nexport CHAT_LOGS_PATH=\"/path/to/logs\"\nexport SEARCH_INDEX_PATH=\"/path/to/index\"\n```\n\n## Installation\n\n```bash\npip install chat-log-search\n# or\nnpm install -g chat-log-search\n```\n```",
+        "session_id": "aeed5436-f4fa-4775-a7ca-e63ef27d3d8e",
+        "total_cost_usd": 0.081687,
+        "usage": {
+          "input_tokens": 4,
+          "cache_creation_input_tokens": 19960,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 455,
+          "server_tool_use": {
+            "web_search_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 0,
+            "ephemeral_5m_input_tokens": 19960
+          }
+        },
+        "permission_denials": [],
+        "uuid": "8aa104dc-c6d6-44ab-b389-afe9fa6f40f4"
+      },
+      "cost_usd": 0.081687
+    },
+    {
+      "task_name": "test_creator",
+      "session_id": "9b3327e7-f5f6-4661-81d5-40667260ed36",
+      "duration_seconds": 59.828106,
+      "success": true,
+      "stdout": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":56431,\"duration_api_ms\":51711,\"num_turns\":18,\"result\":\"Perfect! I've successfully created and executed a comprehensive unit test suite for the chat search functionality. The test file `/home/opsvi/master_root/tests/test_chat_search.py` includes:\\n\\n## Test Coverage\\n\\n\u2705 **Required Field Validation**: Verifies search results contain `timestamp`, `session_id`, and `content` fields\\n\u2705 **Field Type Checking**: Ensures fields are proper data types (strings)\\n\u2705 **Timestamp Format**: Validates ISO format timestamps\\n\u2705 **Content Type Filtering**: Tests filtering by user/assistant messages  \\n\u2705 **Context Information**: Verifies context inclusion/exclusion behavior\\n\u2705 **Search Limits**: Tests result limit functionality\\n\u2705 **Case Insensitivity**: Confirms case-insensitive search behavior\\n\u2705 **Empty Results**: Tests no-match scenarios\\n\u2705 **Complete Structure**: Validates all expected result fields\\n\\nThe test suite uses temporary files with mock chat log data and runs completely isolated. All 8 tests passed successfully, confirming the chat search functionality works as expected with proper field validation.\",\"session_id\":\"9b3327e7-f5f6-4661-81d5-40667260ed36\",\"total_cost_usd\":0.20504305,\"usage\":{\"input_tokens\":6,\"cache_creation_input_tokens\":802,\"cache_read_input_tokens\":30485,\"output_tokens\":250,\"server_tool_use\":{\"web_search_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":0,\"ephemeral_5m_input_tokens\":802}},\"permission_denials\":[],\"uuid\":\"ecaba51f-2d6d-447a-96db-f9718d65dad8\"}\n",
+      "stderr": "",
+      "start_time": "2025-09-03T19:20:47.570325",
+      "end_time": "2025-09-03T19:21:47.398431",
+      "claude_response": {
+        "type": "result",
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 56431,
+        "duration_api_ms": 51711,
+        "num_turns": 18,
+        "result": "Perfect! I've successfully created and executed a comprehensive unit test suite for the chat search functionality. The test file `/home/opsvi/master_root/tests/test_chat_search.py` includes:\n\n## Test Coverage\n\n\u2705 **Required Field Validation**: Verifies search results contain `timestamp`, `session_id`, and `content` fields\n\u2705 **Field Type Checking**: Ensures fields are proper data types (strings)\n\u2705 **Timestamp Format**: Validates ISO format timestamps\n\u2705 **Content Type Filtering**: Tests filtering by user/assistant messages  \n\u2705 **Context Information**: Verifies context inclusion/exclusion behavior\n\u2705 **Search Limits**: Tests result limit functionality\n\u2705 **Case Insensitivity**: Confirms case-insensitive search behavior\n\u2705 **Empty Results**: Tests no-match scenarios\n\u2705 **Complete Structure**: Validates all expected result fields\n\nThe test suite uses temporary files with mock chat log data and runs completely isolated. All 8 tests passed successfully, confirming the chat search functionality works as expected with proper field validation.",
+        "session_id": "9b3327e7-f5f6-4661-81d5-40667260ed36",
+        "total_cost_usd": 0.20504305,
+        "usage": {
+          "input_tokens": 6,
+          "cache_creation_input_tokens": 802,
+          "cache_read_input_tokens": 30485,
+          "output_tokens": 250,
+          "server_tool_use": {
+            "web_search_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 0,
+            "ephemeral_5m_input_tokens": 802
+          }
+        },
+        "permission_denials": [],
+        "uuid": "ecaba51f-2d6d-447a-96db-f9718d65dad8"
+      },
+      "cost_usd": 0.20504305
+    }
+  ],
+  "session_ids": {
+    "code_analyzer": "21f09958-0029-4b78-948c-0d1396c23e20",
+    "doc_writer": "aeed5436-f4fa-4775-a7ca-e63ef27d3d8e",
+    "test_creator": "9b3327e7-f5f6-4661-81d5-40667260ed36"
+  },
+  "generated_at": "2025-09-03T19:21:47.398568"
+}

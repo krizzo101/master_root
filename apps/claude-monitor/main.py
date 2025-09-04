@@ -132,16 +132,21 @@ class ClaudeMonitor:
                 pass
 
         # Stop backend process if running
-        if self.backend_process and self.backend_process.is_alive():
-            logger.info("Stopping backend service...")
-            self.backend_process.terminate()
-            self.backend_process.join(timeout=5)
+        if self.backend_process:
+            try:
+                if self.backend_process.is_alive():
+                    logger.info("Stopping backend service...")
+                    self.backend_process.terminate()
+                    self.backend_process.join(timeout=5)
 
-            if self.backend_process.is_alive():
-                logger.warning(
-                    "Backend service did not stop gracefully, forcing termination..."
-                )
-                self.backend_process.kill()
+                    if self.backend_process.is_alive():
+                        logger.warning(
+                            "Backend service did not stop gracefully, forcing termination..."
+                        )
+                        self.backend_process.kill()
+            except (AttributeError, OSError):
+                # Process already terminated or never started properly
+                pass
                 self.backend_process.join()
 
         self.shutdown_event.set()

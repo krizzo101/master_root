@@ -1,0 +1,156 @@
+{
+  "total_tools": 21,
+  "successful": 15,
+  "with_data": 13,
+  "failed": 6,
+  "avg_execution_time": 1.303573619047619,
+  "results": [
+    {
+      "tool": "get_project_summary",
+      "success": true,
+      "has_data": true,
+      "time": 0.218927,
+      "error": null
+    },
+    {
+      "tool": "get_file_info",
+      "success": true,
+      "has_data": true,
+      "time": 0.009117,
+      "error": null
+    },
+    {
+      "tool": "find_files",
+      "success": false,
+      "has_data": false,
+      "time": 7e-06,
+      "error": "find_files() got an unexpected keyword argument 'max_results'"
+    },
+    {
+      "tool": "find_symbols",
+      "success": false,
+      "has_data": false,
+      "time": 4e-06,
+      "error": "find_symbols() got an unexpected keyword argument 'max_results'"
+    },
+    {
+      "tool": "get_complexity",
+      "success": true,
+      "has_data": true,
+      "time": 0.032875,
+      "error": null
+    },
+    {
+      "tool": "get_call_graph",
+      "success": true,
+      "has_data": true,
+      "time": 12.156295,
+      "error": null
+    },
+    {
+      "tool": "get_imports",
+      "success": true,
+      "has_data": true,
+      "time": 0.001336,
+      "error": null
+    },
+    {
+      "tool": "get_documentation",
+      "success": false,
+      "has_data": false,
+      "time": 0.001009,
+      "error": "syntax error at or near \".\""
+    },
+    {
+      "tool": "get_api_endpoints",
+      "success": true,
+      "has_data": false,
+      "time": 0.003593,
+      "error": null
+    },
+    {
+      "tool": "get_dependencies",
+      "success": true,
+      "has_data": true,
+      "time": 0.000857,
+      "error": null
+    },
+    {
+      "tool": "get_entry_points",
+      "success": true,
+      "has_data": false,
+      "time": 0.001737,
+      "error": null
+    },
+    {
+      "tool": "find_agents",
+      "success": false,
+      "has_data": false,
+      "time": 0.003836,
+      "error": "the server expects 1 argument for this query, 2 were passed\nHINT:  Check the query against the passed list of arguments."
+    },
+    {
+      "tool": "get_data_models",
+      "success": true,
+      "has_data": true,
+      "time": 0.000821,
+      "error": null
+    },
+    {
+      "tool": "get_tests",
+      "success": true,
+      "has_data": true,
+      "time": 14.934589,
+      "error": null
+    },
+    {
+      "tool": "get_config",
+      "success": true,
+      "has_data": true,
+      "time": 0.001222,
+      "error": null
+    },
+    {
+      "tool": "get_quality_metrics",
+      "success": true,
+      "has_data": true,
+      "time": 0.0008,
+      "error": null
+    },
+    {
+      "tool": "get_recent_changes",
+      "success": false,
+      "has_data": false,
+      "time": 0.004451,
+      "error": "cannot access local variable 'file_activity' where it is not associated with a value"
+    },
+    {
+      "tool": "search_code",
+      "success": false,
+      "has_data": false,
+      "time": 6e-06,
+      "error": "search_code() got an unexpected keyword argument 'max_results'"
+    },
+    {
+      "tool": "get_todos",
+      "success": true,
+      "has_data": true,
+      "time": 0.003513,
+      "error": null
+    },
+    {
+      "tool": "validate_intelligence",
+      "success": true,
+      "has_data": true,
+      "time": 3.9e-05,
+      "error": null
+    },
+    {
+      "tool": "get_security_issues",
+      "success": true,
+      "has_data": true,
+      "time": 1.2e-05,
+      "error": null
+    }
+  ]
+}

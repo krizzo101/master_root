@@ -54,7 +54,7 @@ class SystemMetrics(BaseModel):
     disk_used: int
     disk_total: int
     load_average: List[float]
-    timestamp: datetime
+    timestamp: str
 
 
 class TokenUsage(BaseModel):
@@ -63,7 +63,7 @@ class TokenUsage(BaseModel):
     total_cost: float
     sessions_count: int
     avg_tokens_per_session: float
-    timestamp: datetime
+    timestamp: str  # Store as ISO string instead of datetime
 
 
 class DockerContainer(BaseModel):
@@ -81,6 +81,7 @@ class DockerContainer(BaseModel):
 class DashboardData(BaseModel):
     system_metrics: SystemMetrics
     token_usage: TokenUsage
+    tool_usage: dict
     docker_containers: List[DockerContainer]
     active_sessions: int
     recent_tool_calls: int
@@ -164,7 +165,7 @@ def get_token_usage() -> TokenUsage:
                     ) as total_output_tokens
                 FROM nodes
                 WHERE raw_json IS NOT NULL
-                    AND datetime(timestamp) >= datetime('now', '-24 hours')
+                    AND datetime(timestamp) >= datetime('now', '-7 days')
             """
             )
 
@@ -186,7 +187,7 @@ def get_token_usage() -> TokenUsage:
                     total_cost=round(total_cost, 4),
                     sessions_count=sessions,
                     avg_tokens_per_session=round(avg_tokens, 2),
-                    timestamp=datetime.now(),
+                    timestamp=datetime.now().isoformat(),
                 )
 
     except sqlite3.Error as e:
@@ -201,7 +202,7 @@ def get_token_usage() -> TokenUsage:
         total_cost=0.0,
         sessions_count=0,
         avg_tokens_per_session=0.0,
-        timestamp=datetime.now(),
+        timestamp=datetime.now().isoformat(),
     )
 
 
@@ -272,7 +273,7 @@ def get_system_metrics() -> SystemMetrics:
             disk_used=disk.used,
             disk_total=disk.total,
             load_average=load_avg,
-            timestamp=datetime.now(),
+            timestamp=datetime.now().isoformat(),
         )
     except Exception as e:
         logger.error(f"Error getting system metrics: {e}")
@@ -356,6 +357,7 @@ async def get_dashboard():
     try:
         system_metrics = get_system_metrics()
         token_usage = get_token_usage()
+        tool_usage_data = await get_tool_usage()  # Get tool usage data
         docker_containers = get_docker_containers()
         active_sessions = get_active_sessions()
         recent_tool_calls = get_recent_tool_calls()
@@ -363,6 +365,7 @@ async def get_dashboard():
         return DashboardData(
             system_metrics=system_metrics,
             token_usage=token_usage,
+            tool_usage=tool_usage_data,
             docker_containers=docker_containers,
             active_sessions=active_sessions,
             recent_tool_calls=recent_tool_calls,
@@ -376,6 +379,112 @@ async def get_dashboard():
 async def get_tokens():
     """Get token usage statistics."""
     return get_token_usage()
+
+
+@app.get("/api/tools")
+async def get_tool_usage():
+    """Get tool usage statistics."""
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+
+            # Get top tools by usage count
+            cursor.execute(
+                """
+                SELECT
+                    tool_name,
+                    COUNT(*) as usage_count,
+                    COUNT(DISTINCT node_uuid) as unique_sessions,
+                    datetime(MIN(timestamp)) as first_used,
+                    datetime(MAX(timestamp)) as last_used
+                FROM tool_calls
+                WHERE datetime(timestamp) >= datetime('now', '-7 days')
+                GROUP BY tool_name
+                ORDER BY usage_count DESC
+                LIMIT 20
+            """
+            )
+
+            tools = [dict(row) for row in cursor.fetchall()]
+
+            # Get total tool usage stats
+            cursor.execute(
+                """
+                SELECT
+                    COUNT(*) as total_calls,
+                    COUNT(DISTINCT tool_name) as unique_tools,
+                    COUNT(DISTINCT node_uuid) as sessions_with_tools
+                FROM tool_calls
+                WHERE datetime(timestamp) >= datetime('now', '-7 days')
+            """
+            )
+
+            stats = dict(cursor.fetchone())
+
+            return {
+                "summary": stats,
+                "top_tools": tools,
+                "timestamp": datetime.now().isoformat(),
+            }
+
+    except Exception as e:
+        logger.error(f"Error fetching tool usage: {e}")
+        return {"error": str(e)}
+
+
+@app.get("/api/sessions")
+async def get_session_analytics():
+    """Get session analytics and statistics."""
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+
+            # Get recent session summary
+            cursor.execute(
+                """
+                SELECT
+                    COUNT(*) as total_sessions,
+                    COUNT(DISTINCT cwd) as unique_directories,
+                    COUNT(DISTINCT git_branch) as unique_branches,
+                    datetime(MIN(created_at)) as first_session,
+                    datetime(MAX(created_at)) as latest_session
+                FROM sessions
+                WHERE datetime(created_at) >= datetime('now', '-7 days')
+            """
+            )
+
+            session_stats = dict(cursor.fetchone())
+
+            # Get most active sessions (by node count)
+            cursor.execute(
+                """
+                SELECT
+                    s.session_id,
+                    s.cwd,
+                    s.git_branch,
+                    COUNT(n.uuid) as node_count,
+                    datetime(s.created_at) as created_at,
+                    datetime(MAX(n.timestamp)) as last_activity
+                FROM sessions s
+                LEFT JOIN nodes n ON s.session_id = n.session_id
+                WHERE datetime(s.created_at) >= datetime('now', '-7 days')
+                GROUP BY s.session_id
+                ORDER BY node_count DESC
+                LIMIT 10
+            """
+            )
+
+            active_sessions = [dict(row) for row in cursor.fetchall()]
+
+            return {
+                "summary": session_stats,
+                "most_active_sessions": active_sessions,
+                "timestamp": datetime.now().isoformat(),
+            }
+
+    except Exception as e:
+        logger.error(f"Error fetching session analytics: {e}")
+        return {"error": str(e)}
 
 
 @app.get("/api/docker", response_model=List[DockerContainer])

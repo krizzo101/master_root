@@ -165,10 +165,12 @@ class GenericOrchestrator:
         # Try to load tokens from encrypted storage if not provided
         if tokens is None:
             try:
-                # Add parent directory to path for imports
+                # Add current directory to path for imports
                 import sys
 
-                sys.path.insert(0, str(Path(__file__).parent))
+                current_dir = str(Path(__file__).parent)
+                if current_dir not in sys.path:
+                    sys.path.insert(0, current_dir)
                 from token_loader import load_tokens_from_secrets
 
                 loaded_tokens = load_tokens_from_secrets()

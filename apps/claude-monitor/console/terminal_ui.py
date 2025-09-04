@@ -48,6 +48,7 @@ class ViewMode(Enum):
     DOCKER = "docker"
     AGENTS = "agents"
     TOKENS = "tokens"
+    TOOLS = "tools"
     SYSTEM = "system"
     COSTS = "costs"
 
@@ -59,6 +60,7 @@ class MonitoringData:
     docker_containers: List[Dict] = field(default_factory=list)
     agent_tasks: List[Dict] = field(default_factory=list)
     token_usage: Dict[str, Any] = field(default_factory=dict)
+    tool_usage: Dict[str, Any] = field(default_factory=dict)
     system_resources: Dict[str, Any] = field(default_factory=dict)
     cost_analysis: Dict[str, Any] = field(default_factory=dict)
     last_updated: datetime = field(default_factory=datetime.now)
@@ -464,6 +466,62 @@ class TerminalUI:
 
         return Panel(content, title="Token Usage Analysis", box=DOUBLE_EDGE)
 
+    def _create_tools_view(self) -> Panel:
+        """Create tool usage focused view"""
+        content = Layout()
+        content.split_column(Layout(name="summary", size=6), Layout(name="top_tools"))
+
+        # Tools summary
+        summary_table = Table(
+            show_header=True, header_style=f"bold {self.colors['primary']}"
+        )
+        summary_table.add_column("Metric", style=self.colors["secondary"])
+        summary_table.add_column("Value", justify="right")
+
+        tool_stats = self.data.tool_usage.get("summary", {})
+        summary_metrics = [
+            ("Total Tool Calls", f"{tool_stats.get('total_calls', 0):,}"),
+            ("Unique Tools", f"{tool_stats.get('unique_tools', 0):,}"),
+            ("Sessions with Tools", f"{tool_stats.get('sessions_with_tools', 0):,}"),
+        ]
+
+        for metric, value in summary_metrics:
+            summary_table.add_row(metric, value)
+
+        content.get("summary").update(
+            Panel(summary_table, title="Tool Usage Summary", box=ROUNDED)
+        )
+
+        # Top tools breakdown
+        tools_table = Table(
+            show_header=True, header_style=f"bold {self.colors['primary']}"
+        )
+        tools_table.add_column("Tool", style=self.colors["secondary"])
+        tools_table.add_column("Usage Count", justify="right")
+        tools_table.add_column("Sessions", justify="right")
+        tools_table.add_column("Last Used", justify="center")
+
+        top_tools = self.data.tool_usage.get("top_tools", [])
+        for tool in top_tools[:15]:  # Show top 15 tools
+            tool_name = tool.get("tool_name", "unknown")
+            usage_count = f"{tool.get('usage_count', 0):,}"
+            unique_sessions = f"{tool.get('unique_sessions', 0):,}"
+            last_used = tool.get("last_used", "unknown")
+            if last_used != "unknown" and len(last_used) > 10:
+                # Format datetime to show just date
+                last_used = last_used.split()[0]
+
+            tools_table.add_row(tool_name, usage_count, unique_sessions, last_used)
+
+        if not top_tools:
+            tools_table.add_row("No tool data available", "", "", "")
+
+        content.get("top_tools").update(
+            Panel(tools_table, title="Top Tools by Usage", box=ROUNDED)
+        )
+
+        return Panel(content, title="Tool Usage Analytics", box=DOUBLE_EDGE)
+
     def _create_system_view(self) -> Panel:
         """Create system resources focused view"""
         content = Layout()
@@ -636,6 +694,7 @@ class TerminalUI:
             ViewMode.DOCKER: self._create_docker_view,
             ViewMode.AGENTS: self._create_agents_view,
             ViewMode.TOKENS: self._create_tokens_view,
+            ViewMode.TOOLS: self._create_tools_view,
             ViewMode.SYSTEM: self._create_system_view,
             ViewMode.COSTS: self._create_costs_view,
         }
@@ -871,16 +930,36 @@ class TerminalUI:
 
     async def _update_data(self, data: Dict):
         """Update monitoring data from WebSocket"""
-        if "docker_containers" in data:
-            self.data.docker_containers = data["docker_containers"]
-        if "agent_tasks" in data:
-            self.data.agent_tasks = data["agent_tasks"]
-        if "token_usage" in data:
-            self.data.token_usage = data["token_usage"]
-        if "system_resources" in data:
-            self.data.system_resources = data["system_resources"]
-        if "cost_analysis" in data:
-            self.data.cost_analysis = data["cost_analysis"]
+        # Handle the dashboard_update message format
+        if data.get("type") == "dashboard_update" and "data" in data:
+            dashboard_data = data["data"]
+
+            if "docker_containers" in dashboard_data:
+                self.data.docker_containers = dashboard_data["docker_containers"]
+            if "agent_tasks" in dashboard_data:
+                self.data.agent_tasks = dashboard_data["agent_tasks"]
+            if "token_usage" in dashboard_data:
+                self.data.token_usage = dashboard_data["token_usage"]
+            if "system_resources" in dashboard_data:
+                self.data.system_resources = dashboard_data["system_resources"]
+            if "cost_analysis" in dashboard_data:
+                self.data.cost_analysis = dashboard_data["cost_analysis"]
+            if "tool_usage" in dashboard_data:
+                self.data.tool_usage = dashboard_data["tool_usage"]
+        else:
+            # Fallback for direct data format
+            if "docker_containers" in data:
+                self.data.docker_containers = data["docker_containers"]
+            if "agent_tasks" in data:
+                self.data.agent_tasks = data["agent_tasks"]
+            if "token_usage" in data:
+                self.data.token_usage = data["token_usage"]
+            if "tool_usage" in data:
+                self.data.tool_usage = data["tool_usage"]
+            if "system_resources" in data:
+                self.data.system_resources = data["system_resources"]
+            if "cost_analysis" in data:
+                self.data.cost_analysis = data["cost_analysis"]
 
         self.data.last_updated = datetime.now()
 
@@ -904,15 +983,16 @@ class TerminalUI:
             next_idx = (current_idx + 1) % len(views)
             self.state.current_view = views[next_idx]
             self.state.selected_row = 0
-        elif key in "123456":
+        elif key in "1234567":
             # Quick view switch
             view_map = {
                 "1": ViewMode.MASTER,
                 "2": ViewMode.DOCKER,
                 "3": ViewMode.AGENTS,
                 "4": ViewMode.TOKENS,
-                "5": ViewMode.SYSTEM,
-                "6": ViewMode.COSTS,
+                "5": ViewMode.TOOLS,
+                "6": ViewMode.SYSTEM,
+                "7": ViewMode.COSTS,
             }
             if key in view_map:
                 self.state.current_view = view_map[key]
@@ -982,85 +1062,15 @@ class TerminalUI:
             # Use a simpler approach without Live screen mode to avoid conflicts
             console = Console()
             try:
-                # Simulate some initial data for demo
-                self.data.docker_containers = [
-                    {
-                        "name": "claude-app-1",
-                        "status": "running",
-                        "cpu_percent": 15.2,
-                        "memory_usage": 268435456,  # 256MB
-                        "network_rx": 1024,
-                        "has_claude_process": True,
-                        "id": "abc123def456",
-                        "image": "claude-monitor:latest",
-                        "created": "2024-01-15 10:30:00",
-                        "ports": ["8000:8000", "9000:9000"],
-                        "volumes": ["/data:/app/data"],
-                        "env_vars": ["ENV=production", "DEBUG=false"],
-                        "command": "python app.py",
-                        "working_dir": "/app",
-                    },
-                    {
-                        "name": "claude-app-2",
-                        "status": "running",
-                        "cpu_percent": 8.1,
-                        "memory_usage": 134217728,  # 128MB
-                        "network_rx": 512,
-                        "has_claude_process": True,
-                        "id": "def456ghi789",
-                        "image": "claude-worker:latest",
-                        "created": "2024-01-15 10:35:00",
-                        "ports": ["8001:8000"],
-                        "volumes": ["/logs:/app/logs"],
-                        "env_vars": ["ENV=production"],
-                        "command": "python worker.py",
-                        "working_dir": "/app",
-                    },
-                ]
+                # Initialize empty data - will be populated from WebSocket
+                self.data.docker_containers = []
+                self.data.agent_tasks = []
+                self.data.token_usage = {}
+                self.data.system_resources = {}
+                self.data.cost_analysis = {}
 
-                self.data.agent_tasks = [
-                    {
-                        "task_id": "backend_service",
-                        "task_type": "development",
-                        "status": "running",
-                        "progress": 75,
-                        "duration": "2m 30s",
-                        "prompt": "Create a comprehensive monitoring backend service with FastAPI and WebSocket support...",
-                        "dependencies": [],
-                    },
-                    {
-                        "task_id": "console_ui",
-                        "task_type": "development",
-                        "status": "completed",
-                        "progress": 100,
-                        "duration": "4m 15s",
-                        "prompt": "Create a beautiful Rich-based terminal UI for monitoring with multiple view modes...",
-                        "dependencies": ["backend_service"],
-                    },
-                ]
-
-                self.data.token_usage = {
-                    "total_tokens": 125000,
-                    "input_tokens": 75000,
-                    "output_tokens": 50000,
-                    "total_requests": 248,
-                    "avg_tokens_per_request": 504,
-                }
-
-                self.data.system_resources = {
-                    "cpu_percent": 35.2,
-                    "memory_percent": 62.8,
-                    "disk_percent": 41.5,
-                    "network_rx": 2048,
-                    "network_tx": 1536,
-                }
-
-                self.data.cost_analysis = {
-                    "daily_cost": 7.0,
-                    "weekly_cost": 50.0,
-                    "monthly_cost": 350.0,
-                    "total_cost": 1250.0,
-                }
+                # Give WebSocket a moment to connect and send initial data
+                await asyncio.sleep(1)
 
                 # Main UI loop without Live screen mode
                 running = True
@@ -1074,7 +1084,7 @@ class TerminalUI:
                         console.clear()
                         console.print(self._render_ui())
                         console.print(
-                            "\nPress Tab to switch views, 1-6 for direct view, Q to quit, H for help"
+                            "\nPress Tab to switch views, 1-7 for direct view (5=Tools), Q to quit, H for help"
                         )
                         last_render = now
 
@@ -1086,7 +1096,7 @@ class TerminalUI:
                         console.clear()
                         console.print(self._render_ui())
                         console.print(
-                            "\nPress Tab to switch views, 1-6 for direct view, Q to quit, H for help"
+                            "\nPress Tab to switch views, 1-7 for direct view (5=Tools), Q to quit, H for help"
                         )
                         last_render = now
 
