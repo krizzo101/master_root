@@ -100,27 +100,11 @@ def main():
             stats_ttl=args.stats_ttl,
         )
 
-        # Initialize file watcher if enabled
+        # Initialize file watcher if enabled  
         if not args.no_watch:
-            cache_watcher = CacheWatcher(
-                cache_manager=cache,
-                watch_paths={str(Path.cwd()), str(intel_path)},
-                invalidation_callback=project_invalidation_callback,
-            )
-
-            # Start the cache watcher in the background
-            async def start_watcher():
-                try:
-                    await cache_watcher.start()
-                    logger.info("Cache watcher started")
-                except Exception as e:
-                    logger.error("Failed to start cache watcher", error=str(e))
-
-            # Register cleanup function
-            atexit.register(lambda: asyncio.run(cleanup_on_exit()))
-
-            # Start watcher
-            asyncio.create_task(start_watcher())
+            logger.info("File watching requested but disabled for initial startup")
+            # TODO: Implement proper async watcher initialization
+            cache_watcher = None
 
     # Register all tools with the MCP server and enhanced database
     register_all_tools(mcp, reader, cache)

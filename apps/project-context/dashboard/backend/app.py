@@ -26,6 +26,7 @@ sys.path.append("/home/opsvi/master_root/apps/project-context")
 
 from monitoring_service import MonitoringService
 from websocket_handler import WebSocketManager
+from database_integration import dashboard_db
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -249,6 +250,9 @@ async def websocket_endpoint(websocket: WebSocket):
 async def startup_event():
     """Initialize enhanced background monitoring on startup"""
     logger.info("Starting Enhanced Orchestrator Monitoring Dashboard")
+    
+    # Initialize database connections
+    await dashboard_db.initialize()
 
     # Initialize WebSocket manager statistics
     websocket_manager.initialize_stats()
@@ -351,6 +355,40 @@ async def get_websocket_stats():
         return stats
     except Exception as e:
         logger.error(f"Error getting WebSocket stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Database endpoints
+@app.get("/api/database-status")
+async def get_database_status():
+    """Get database connection status"""
+    try:
+        status = await dashboard_db.get_status()
+        return status
+    except Exception as e:
+        logger.error(f"Error getting database status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/project-stats")
+async def get_project_stats():
+    """Get project statistics from database"""
+    try:
+        stats = await dashboard_db.get_project_stats()
+        return stats
+    except Exception as e:
+        logger.error(f"Error getting project stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/search-context")
+async def search_context(q: str, limit: int = 10):
+    """Search context items in database"""
+    try:
+        results = await dashboard_db.search_context(q, limit)
+        return results
+    except Exception as e:
+        logger.error(f"Error searching context: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

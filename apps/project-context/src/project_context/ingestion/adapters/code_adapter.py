@@ -1,5 +1,6 @@
 """Code source adapter for file system and IDE integration."""
 
+import ast
 import asyncio
 import hashlib
 import json

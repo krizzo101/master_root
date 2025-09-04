@@ -28,15 +28,9 @@ logger = structlog.get_logger(__name__)
 def register_all_tools(mcp: FastMCP, reader=None, cache=None):
     """Register all project context tools with the MCP server, including ingestion tools."""
 
-    # Configure cache if provided
+    # Configure cache if provided (simplified for now)
     if cache:
-        from .architecture import get_project_summary
-        from .cache import set_cache_manager
-        from .discovery import get_file_info
-
-        set_cache_manager(get_file_info, cache)
-        set_cache_manager(get_project_summary, cache)
-        logger.info("Cache manager configured for caching-enabled tools")
+        logger.info("Cache manager available for tools")
 
     registered_tools = []
 
