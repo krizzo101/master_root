@@ -176,8 +176,12 @@ class GenericOrchestrator:
                 if parent_dir not in sys.path:
                     sys.path.insert(0, parent_dir)
 
-                from .token_loader import TokenLoader
-                
+                try:
+                    from .token_loader import TokenLoader
+                except ImportError:
+                    # Fall back to direct import when not running as package
+                    from token_loader import TokenLoader
+
                 loader = TokenLoader()
                 loaded_tokens = loader.load_tokens()
                 if (

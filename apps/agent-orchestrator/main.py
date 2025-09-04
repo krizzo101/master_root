@@ -77,8 +77,39 @@ async def main():
 
     args = parser.parse_args()
 
-    # Prepare tasks
-    if args.example:
+    # Prepare tasks and orchestrator
+    orchestrator = None
+    tasks = None
+    execution_plan = None
+
+    if args.execution_plan:
+        # ExecutionPlan mode
+        if not ENHANCED_AVAILABLE:
+            print("Error: ExecutionPlan requires enhanced orchestrator features")
+            print("Install missing dependencies: execution_plan package")
+            return 1
+
+        try:
+            execution_plan = create_execution_plan_from_json(args.execution_plan)
+            print(f"Loaded ExecutionPlan: {execution_plan.name}")
+            print(
+                f"Tasks: {len(execution_plan.tasks)}, Mode: {execution_plan.execution_mode.value}"
+            )
+
+            # Create enhanced orchestrator
+            orchestrator = EnhancedOrchestrator(
+                output_dir=Path(args.output_dir),
+                max_parallel=args.max_parallel,
+                enable_quality_gates=execution_plan.enable_quality_gates,
+                enable_monitoring=execution_plan.enable_monitoring,
+                use_optimizations=execution_plan.use_optimizations,
+            )
+
+        except Exception as e:
+            print(f"Error loading ExecutionPlan: {e}")
+            return 1
+
+    elif args.example:
         # Example tasks with dependencies
         tasks = [
             AgentTask(
@@ -102,36 +133,67 @@ async def main():
     elif args.tasks_file:
         tasks = load_tasks_from_file(args.tasks_file)
     else:
-        print("Error: Either --tasks-file or --example must be specified")
+        print(
+            "Error: Must specify one of: --execution-plan, --tasks-file, or --example"
+        )
         parser.print_help()
         return 1
 
-    # Initialize orchestrator
-    orchestrator = GenericOrchestrator(
-        output_dir=Path(args.output_dir),
-        max_parallel=args.max_parallel,
-        use_optimizations=True,
-    )
+    # Initialize orchestrator if not already created
+    if not orchestrator:
+        if args.use_enhanced and ENHANCED_AVAILABLE:
+            orchestrator = EnhancedOrchestrator(
+                output_dir=Path(args.output_dir),
+                max_parallel=args.max_parallel,
+                use_optimizations=True,
+            )
+        else:
+            orchestrator = GenericOrchestrator(
+                output_dir=Path(args.output_dir),
+                max_parallel=args.max_parallel,
+                use_optimizations=True,
+            )
 
     # Execute tasks
-    print(
-        f"Executing {len(tasks)} tasks with max {args.max_parallel} parallel agents..."
-    )
-    results = await orchestrator.execute_batch(tasks)
+    if execution_plan:
+        # Execute ExecutionPlan
+        print(f"Executing ExecutionPlan: {execution_plan.name}")
+        result = await orchestrator.execute_plan(execution_plan)
+        results = result["results"]
+
+        # Additional ExecutionPlan reporting
+        print(f"Execution Mode: {result['execution_mode']}")
+        if result.get("quality_metrics"):
+            print(f"Quality Gates: {result['quality_metrics']}")
+    else:
+        # Execute regular tasks
+        print(
+            f"Executing {len(tasks)} tasks with max {args.max_parallel} parallel agents..."
+        )
+        results = await orchestrator.execute_batch(tasks)
 
     # Report results
     print("\n=== Execution Results ===")
     successful = 0
     failed = 0
 
-    for task_id, result in results.items():
+    # Handle both dict and list result formats
+    if isinstance(results, dict):
+        result_items = results.items()
+    else:
+        result_items = [
+            (r.get("task_id", f"task_{i}"), r) for i, r in enumerate(results)
+        ]
+
+    for task_id, result in result_items:
         status = result.get("status", "unknown")
         if status == "completed":
             successful += 1
             print(f"✓ {task_id}: SUCCESS")
         else:
             failed += 1
-            print(f"✗ {task_id}: {status.upper()}")
+            error = result.get("error", "")
+            print(f"✗ {task_id}: {status.upper()}" + (f" - {error}" if error else ""))
 
     print(f"\nSummary: {successful} successful, {failed} failed")
     print(f"Results saved to: {args.output_dir}")
