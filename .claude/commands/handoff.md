@@ -139,6 +139,88 @@ python apps/chat-search/chat_search.py "parallel" --date-from 2025-01-01
 python apps/chat-search/chat_search.py "orchestrator" --file-filter session_123
 ```
 
+### Advanced Search with Regex Patterns
+
+The chat_search tool supports **full regex patterns** for complex keyword searches. This is particularly useful for finding sessions with multiple related terms.
+
+#### OR Logic (Any of the terms)
+```bash
+# Find sessions containing any of these terms
+python apps/chat-search/chat_search.py "unified|context|project-context|orchestrator"
+
+# With word boundaries for exact matches
+python apps/chat-search/chat_search.py "\b(unified|context|project-context|orchestrator)\b"
+
+# Combined with date filtering
+python apps/chat-search/chat_search.py "unified|context|orchestrator" --date-from 2025-09-03 --date-to 2025-09-03
+```
+
+#### AND Logic (All terms must be present)
+```bash
+# Find sessions containing ALL terms (in same message)
+python apps/chat-search/chat_search.py "(?=.*unified)(?=.*context)(?=.*orchestrator)"
+
+# Complex AND/OR combinations
+python apps/chat-search/chat_search.py "(?=.*unified)(?=.*(context|project-context))(?=.*orchestrator)"
+```
+
+#### Common Regex Patterns for Session Discovery
+```bash
+# Find sessions about specific topics
+python apps/chat-search/chat_search.py "\b(agent|orchestrat|parallel|multi-agent)\b"
+
+# Find sessions with specific tools or technologies
+python apps/chat-search/chat_search.py "\b(docker|kubernetes|fastapi|websocket)\b"
+
+# Find sessions with specific outcomes
+python apps/chat-search/chat_search.py "\b(completed|success|failed|error|blocked)\b"
+
+# Find sessions with specific file types or patterns
+python apps/chat-search/chat_search.py "\b(\.py|\.json|\.yaml|\.md)\b"
+```
+
+#### When to Use Regex vs Simple Search
+
+**Use Regex When:**
+- **Multiple keywords**: Need to find sessions with any of several related terms
+- **Complex patterns**: Looking for specific combinations of terms
+- **Precise matching**: Need exact word boundaries or specific patterns
+- **Session discovery**: Finding sessions by topic across multiple related terms
+
+**Use Simple Search When:**
+- **Single concept**: Looking for one specific term or phrase
+- **Exact phrases**: Need to find specific quoted text
+- **Quick lookup**: Simple, straightforward searches
+
+#### Regex Search Best Practices
+
+**1. Start Simple, Then Refine**
+```bash
+# Start with basic OR pattern
+python apps/chat-search/chat_search.py "unified|context|orchestrator"
+
+# Refine based on results
+python apps/chat-search/chat_search.py "unified.*context|project-context.*orchestrator"
+```
+
+**2. Use Word Boundaries for Precision**
+```bash
+# Avoid partial matches
+python apps/chat-search/chat_search.py "\bcontext\b"  # Matches "context" but not "contextual"
+```
+
+**3. Combine with Other Filters**
+```bash
+# Regex + date + content type
+python apps/chat-search/chat_search.py "unified|context" --date-from 2025-09-01 --type user --limit 10
+```
+
+**4. Test Your Patterns**
+```bash
+# Test regex pattern with a small limit first
+python apps/chat-search/chat_search.py "your_regex_pattern" --limit 3
+```
+
 ### NEW: Session Analysis Features
 
 #### 1. File Operations Extraction
@@ -410,3 +492,125 @@ python apps/chat-search/chat_search.py "analyze\|debug\|implement" --file-filter
 
 ### Recommendation
 **Trust the content, not the metadata.** Always verify file headers and summaries against actual session content before making any conclusions about session purpose or context.
+
+## JSONL to Markdown Converter
+
+**Location**: `/home/opsvi/master_root/apps/chat-search/jsonl_to_markdown.py`
+
+**Purpose**: Convert JSONL chat log files into readable markdown format for documentation, sharing, and human-readable analysis.
+
+### Basic Usage
+```bash
+# Convert single file
+python apps/chat-search/jsonl_to_markdown.py session_123.jsonl
+
+# Convert with custom output name
+python apps/chat-search/jsonl_to_markdown.py session_123.jsonl -o session_summary.md
+
+# Convert all JSONL files in directory
+python apps/chat-search/jsonl_to_markdown.py -d chat_logs/ -o markdown_output/
+
+# Convert with options
+python apps/chat-search/jsonl_to_markdown.py session_123.jsonl --no-metadata --no-tools --max-length 1000
+
+# Convert only user messages
+python apps/chat-search/jsonl_to_markdown.py session_123.jsonl --filter user
+```
+
+### Output Features
+
+**Structured Markdown Format**:
+- **Session header** with metadata (session ID, working directory, git branch)
+- **Message numbering** for easy reference
+- **Role-based formatting** (User Message, Assistant Response, Tool Use/Result)
+- **Timestamp formatting** in human-readable format
+- **Tool call formatting** with JSON syntax highlighting
+- **Content truncation** for large responses
+
+**Content Options**:
+- `--no-metadata`: Exclude timestamps and session metadata
+- `--no-tools`: Exclude tool calls and results
+- `--max-length N`: Truncate content longer than N characters
+- `--filter TYPE`: Only include specific content types (user/assistant/tools)
+
+### When to Use
+
+**Documentation**:
+- **Session summaries**: Create readable documentation of important sessions
+- **Sharing**: Convert sessions to markdown for easy sharing and review
+- **Archives**: Create human-readable archives of completed work
+
+**Analysis**:
+- **Manual review**: Read through sessions in a more natural format
+- **Pattern analysis**: Look for patterns across multiple sessions
+- **Training**: Use converted sessions for training or examples
+
+**Integration**:
+- **Reports**: Include session content in reports or documentation
+- **Presentations**: Use markdown format for presentations or demos
+- **Collaboration**: Share session content with team members
+
+### Example Output Structure
+```markdown
+# Chat Session: session_123.jsonl
+
+**Generated**: 2025-09-04 06:21:19
+**Total Messages**: 10
+**Session ID**: `63744462-cc0f-4210-9e6b-e319ea97b1af`
+**Working Directory**: `/home/opsvi/master_root`
+**Git Branch**: `fix/safety-gate-import-os`
+
+---
+
+## 1. Session Summary
+**Summary**: Coding Project: Resolving Complex Implementation Challenge
+
+## 2. User Message
+**Timestamp**: 2025-09-03 23:15:10 UTC
+<session-start-hook>Session started: 2025-09-03 19:15:10</session-start-hook>
+
+## 3. Assistant Response
+**Timestamp**: 2025-09-03 23:15:43 UTC
+**Tool Used**: `mcp__thinking__metacognitivethinking`
+**Tool Input**:
+```json
+{
+  "thought": "User is running handoff command...",
+  "triggerContext": "session start with handoff command"
+}
+```
+```
+
+### Performance Benefits
+
+**Readability**:
+- **Human-friendly format**: Easy to read and navigate
+- **Structured layout**: Clear separation of messages and metadata
+- **Syntax highlighting**: Tool calls and JSON properly formatted
+
+**Flexibility**:
+- **Customizable output**: Control what content to include
+- **Size management**: Truncate large responses for focused analysis
+- **Batch processing**: Convert multiple files at once
+
+**Integration**:
+- **Documentation ready**: Perfect for including in reports or wikis
+- **Version control friendly**: Markdown format works well with git
+- **Platform agnostic**: Works with any markdown viewer or editor
+
+### Best Practices
+
+**For Documentation**:
+- Use `--no-tools` for cleaner, more readable output
+- Use `--max-length 1000` to keep files manageable
+- Include metadata for context and traceability
+
+**For Analysis**:
+- Use `--filter user` to focus on user requests
+- Use `--filter assistant` to focus on agent responses
+- Use full output for comprehensive session review
+
+**For Sharing**:
+- Use `--no-metadata` for cleaner sharing
+- Use `--max-length 500` for concise summaries
+- Consider converting multiple related sessions for comparison

@@ -11,7 +11,7 @@ import re
 import sys
 from collections import defaultdict
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class ChatSearcher:
