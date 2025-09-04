@@ -252,6 +252,8 @@ python apps/chat-search/chat_search.py --handoff --file-filter session_id.jsonl 
 - **Token efficiency**: Analyze large sessions without token limits
 - **Real-time monitoring**: Track agent activity across parallel sessions
 
+**Note**: The chat_search tool has been updated with improved code formatting and enhanced error handling for better reliability and maintainability.
+
 ### When to Use Each Feature
 
 #### Use `--list-files-used` When:
