@@ -176,9 +176,10 @@ class GenericOrchestrator:
                 if parent_dir not in sys.path:
                     sys.path.insert(0, parent_dir)
 
-                from token_loader import load_tokens_from_secrets
-
-                loaded_tokens = load_tokens_from_secrets()
+                from .token_loader import TokenLoader
+                
+                loader = TokenLoader()
+                loaded_tokens = loader.load_tokens()
                 if (
                     loaded_tokens and len(loaded_tokens) > 1
                 ):  # Ensure we got multiple tokens

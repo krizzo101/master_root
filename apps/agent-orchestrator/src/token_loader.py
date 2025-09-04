@@ -1,99 +1,84 @@
 #!/usr/bin/env python3
 """
 Token Loader for Agent Orchestrator
-Integrates with multi-agent-monitor's encrypted token storage
+Simple token management without external dependencies
 """
 
 import os
-import sys
+import json
 from pathlib import Path
 from typing import List, Optional
 
 
-def load_tokens_from_secrets() -> List[str]:
-    """Load tokens from the encrypted secrets storage"""
-
-    tokens = []
-
-    # Try to load from multi-agent-monitor's secrets
-    try:
-        # Add multi-agent-monitor to path if not already there
-        monitor_path = Path("/home/opsvi/master_root/apps/multi-agent-monitor")
-        if monitor_path.exists():
-            sys.path.insert(0, str(monitor_path))  # Add root path
-
-            # Import the secrets manager
-            from src.orchestration.secrets_manager import TokenSecretsManager
-
-            # Load encrypted tokens
-            secrets_mgr = TokenSecretsManager(monitor_path)
-            token_dict = secrets_mgr.load_tokens()
-
-            # Extract token values in order
-            for i in range(1, 100):  # Check up to 100 tokens
-                key = f"CLAUDE_CODE_TOKEN{i}"
-                if key in token_dict:
-                    value = token_dict[key]
-                    if value and len(value) > 20:  # Basic validation
-                        tokens.append(value)
-
-            if tokens:
-                print(f"✅ Loaded {len(tokens)} tokens from encrypted storage")
-                return tokens
-    except ImportError as e:
-        print(f"⚠️  Could not import secrets manager: {e}")
-    except Exception as e:
-        print(f"⚠️  Could not load from encrypted storage: {e}")
-
-    # Fallback: Check environment variables
-    # Primary token
-    primary = os.environ.get("CLAUDE_CODE_TOKEN")
-    if primary:
-        tokens.append(primary)
-
-    # Additional numbered tokens
-    for i in range(1, 10):
-        # Check both formats
-        for key in [f"CLAUDE_CODE_TOKEN{i}", f"CLAUDE_CODE_TOKEN_{i}"]:
-            token = os.environ.get(key)
-            if token:
-                tokens.append(token)
-
-    if tokens:
-        print(f"✅ Loaded {len(tokens)} tokens from environment")
-    else:
-        print("❌ No tokens found in encrypted storage or environment")
-        print("\nTo set up tokens:")
-        print("1. Set CLAUDE_CODE_TOKEN environment variable, OR")
-        print("2. Use multi-agent-monitor's token management:")
-        print("   cd /home/opsvi/master_root/apps/multi-agent-monitor")
-        print("   python3 src/orchestration/secrets_manager.py")
-
-    return tokens
-
-
-def get_token_pool():
-    """Get a configured token pool with all available tokens"""
-    from generic_orchestrator import TokenPool
-
-    # Load tokens from all sources
-    tokens = load_tokens_from_secrets()
-
-    if not tokens:
-        # Last resort: try to use default environment token
-        return TokenPool()  # Will use CLAUDE_CODE_TOKEN if set
-
-    return TokenPool(tokens)
+class TokenLoader:
+    """Simple token loader that reads from environment or file"""
+    
+    def __init__(self, tokens_file: Optional[str] = None):
+        self.tokens_file = tokens_file or os.environ.get('TOKENS_FILE')
+        
+    def load_tokens(self) -> List[str]:
+        """Load tokens from various sources"""
+        tokens = []
+        
+        # 1. Try environment variable
+        env_token = os.environ.get('CLAUDE_API_TOKEN')
+        if env_token:
+            tokens.append(env_token)
+        
+        # 2. Try environment variable with multiple tokens
+        env_tokens = os.environ.get('CLAUDE_API_TOKENS')
+        if env_tokens:
+            tokens.extend(env_tokens.split(','))
+        
+        # 3. Try tokens file
+        if self.tokens_file and Path(self.tokens_file).exists():
+            try:
+                with open(self.tokens_file, 'r') as f:
+                    data = json.load(f)
+                    if isinstance(data, list):
+                        tokens.extend(data)
+                    elif isinstance(data, dict):
+                        # Support {"tokens": [...]} format
+                        tokens.extend(data.get('tokens', []))
+            except (json.JSONDecodeError, IOError):
+                pass
+        
+        # 4. Try default tokens file
+        default_file = Path.home() / '.claude' / 'tokens.json'
+        if default_file.exists():
+            try:
+                with open(default_file, 'r') as f:
+                    data = json.load(f)
+                    if isinstance(data, list):
+                        tokens.extend(data)
+                    elif isinstance(data, dict):
+                        tokens.extend(data.get('tokens', []))
+            except (json.JSONDecodeError, IOError):
+                pass
+        
+        # Filter out empty strings and duplicates
+        tokens = list(filter(None, tokens))
+        tokens = list(dict.fromkeys(tokens))  # Remove duplicates while preserving order
+        
+        return tokens
+    
+    @staticmethod
+    def save_tokens(tokens: List[str], tokens_file: Optional[str] = None):
+        """Save tokens to a file"""
+        file_path = tokens_file or str(Path.home() / '.claude' / 'tokens.json')
+        
+        # Ensure directory exists
+        Path(file_path).parent.mkdir(parents=True, exist_ok=True)
+        
+        # Save tokens
+        with open(file_path, 'w') as f:
+            json.dump({"tokens": tokens}, f, indent=2)
+        
+        return file_path
 
 
-if __name__ == "__main__":
-    # Test token loading
-    tokens = load_tokens_from_secrets()
-    print(f"\nFound {len(tokens)} tokens")
-
-    if tokens:
-        print("Token sources validated (not showing actual tokens for security)")
-        for i, token in enumerate(tokens, 1):
-            print(f"  Token {i}: {'*' * 10}{token[-4:] if len(token) > 4 else '****'}")
-    else:
-        print("No tokens available - please configure tokens first")
+# Convenience function
+def load_tokens(tokens_file: Optional[str] = None) -> List[str]:
+    """Load tokens from all available sources"""
+    loader = TokenLoader(tokens_file)
+    return loader.load_tokens()
