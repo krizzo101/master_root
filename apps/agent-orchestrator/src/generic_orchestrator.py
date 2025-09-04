@@ -9,7 +9,6 @@ import asyncio
 import json
 import logging
 import os
-import subprocess
 import uuid
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
@@ -191,7 +190,8 @@ class GenericOrchestrator:
                     logger.info(f"Loaded {len(tokens)} tokens from secure storage")
                 else:
                     logger.warning(
-                        f"Only got {len(loaded_tokens) if loaded_tokens else 0} tokens from secure storage, using fallback"
+                        f"Only got {len(loaded_tokens) if loaded_tokens else 0} "
+                        f"tokens from secure storage, using fallback"
                     )
 
             except Exception as e:
@@ -333,7 +333,6 @@ class GenericOrchestrator:
         self.metrics["start_time"] = datetime.now().isoformat()
 
         results = []
-        task_map = {t.task_id: t for t in tasks}
 
         while len(results) < len(tasks):
             # Find tasks ready to run
@@ -472,8 +471,10 @@ async def example_usage():
             print(f"  {r['task_id']}: {r['status']}")
 
     # Create and run orchestrator
+    import tempfile
+
     orchestrator = GenericOrchestrator(
-        output_dir=Path("/tmp/orchestrator_test"), max_parallel=3
+        output_dir=Path(tempfile.mkdtemp(prefix="orchestrator_test_")), max_parallel=3
     )
 
     await orchestrator.run(

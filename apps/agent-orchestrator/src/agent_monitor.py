@@ -4,10 +4,9 @@ Agent Monitor - Minimal Implementation
 Simple monitoring system for agent status tracking
 """
 
-import asyncio
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 
 
 class AgentStatus(Enum):

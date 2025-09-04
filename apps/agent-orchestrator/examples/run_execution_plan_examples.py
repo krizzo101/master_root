@@ -13,7 +13,6 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from src.enhanced_orchestrator import EnhancedOrchestrator
 from src.execution_plan import (
     ExecutionMode,
     ExecutionPlanBuilder,
