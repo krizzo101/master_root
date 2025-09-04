@@ -359,24 +359,41 @@ class ExecutionPlan:
         if self.resource_requirements is None:
             self.resource_requirements = ResourceRequirements()
 
-        # Validate task dependencies exist
-        self.validate_dependencies()
+        # Only do basic validation in __post_init__ - comprehensive validation is optional
+        self._validate_basic_structure()
+
+    def _validate_basic_structure(self):
+        """Basic structural validation without dependency analysis"""
+        # Only validate that tasks have proper structure, not dependencies
+        for task in self.tasks:
+            if not hasattr(task, "task_id") or not task.task_id:
+                raise ValueError("All tasks must have a valid task_id")
 
     def validate_dependencies(self) -> List[str]:
         """Validate all task dependencies exist and return any issues"""
-        issues = []
-        task_ids = {task.task_id for task in self.tasks}
+        # Import validation here to avoid circular imports
+        try:
+            from .execution_plan_validation import validate_execution_plan_strict
+        except ImportError:
+            from execution_plan_validation import validate_execution_plan_strict
 
-        for task in self.tasks:
-            for dep in task.dependencies:
-                if dep not in task_ids:
-                    issues.append(
-                        f"Task '{task.task_id}' depends on non-existent task '{dep}'"
-                    )
+        # Use the comprehensive validation system
+        try:
+            validate_execution_plan_strict(self)
+            return []  # No issues found
+        except Exception as e:
+            # Convert validation errors to list format for backward compatibility
+            error_message = str(e)
+            raise ValueError(f"ExecutionPlan validation failed: {error_message}")
 
-        if issues:
-            raise ValueError(f"Dependency validation failed: {'; '.join(issues)}")
-        return issues
+    def validate_comprehensive(self):
+        """Comprehensive validation using the advanced validation system"""
+        try:
+            from .execution_plan_validation import validate_execution_plan
+        except ImportError:
+            from execution_plan_validation import validate_execution_plan
+
+        return validate_execution_plan(self, strict=True)
 
     def get_task_by_id(self, task_id: str) -> Optional[TaskDefinition]:
         """Get task by ID"""

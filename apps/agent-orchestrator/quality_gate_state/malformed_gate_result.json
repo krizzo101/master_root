@@ -1,0 +1,9 @@
+{
+  "gate_id": "malformed_gate",
+  "status": "failed",
+  "message": "No paths or patterns specified",
+  "details": {
+    "error": "At least one path or pattern is required"
+  },
+  "timestamp": 1756975597.6220195
+}

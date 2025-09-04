@@ -152,6 +152,13 @@ class ExecutionPlanBuilder:
     ) -> "ExecutionPlanBuilder":
         """Add task to the plan"""
 
+        # Check for duplicate task IDs
+        existing_task_ids = {task.task_id for task in self._tasks}
+        if task_id in existing_task_ids:
+            raise ValueError(
+                f"Duplicate task ID '{task_id}' - task IDs must be unique within a plan"
+            )
+
         # Convert context dict to TaskContext if needed
         if isinstance(context, dict):
             context = TaskContext(
@@ -287,8 +294,8 @@ class ExecutionPlanBuilder:
 
         return self
 
-    def build(self) -> ExecutionPlan:
-        """Build the final ExecutionPlan"""
+    def build(self, validate: bool = True) -> ExecutionPlan:
+        """Build the final ExecutionPlan with optional validation"""
 
         # Estimate resource requirements
         resource_requirements = ResourceRequirements(
@@ -300,7 +307,7 @@ class ExecutionPlanBuilder:
             ),
         )
 
-        return ExecutionPlan(
+        plan = ExecutionPlan(
             plan_id=self.plan_id,
             name=self.name,
             description=self.description,
@@ -320,6 +327,51 @@ class ExecutionPlanBuilder:
             tags=self._tags,
             metadata=self._metadata,
         )
+
+        # Perform comprehensive validation if requested
+        if validate:
+            try:
+                validation_result = plan.validate_comprehensive()
+                if not validation_result.is_valid:
+                    # Log warnings but don't fail for non-critical errors
+                    import logging
+
+                    logger = logging.getLogger(__name__)
+
+                    critical_errors = [
+                        e
+                        for e in validation_result.errors
+                        if e.error_type.value
+                        in [
+                            "circular_dependency",
+                            "invalid_dependency_reference",
+                            "empty_task_list",
+                        ]
+                    ]
+
+                    if critical_errors:
+                        error_messages = [str(e) for e in critical_errors]
+                        raise ValueError(
+                            f"Critical validation errors in ExecutionPlan:\n"
+                            + "\n".join(error_messages)
+                        )
+                    else:
+                        # Log non-critical errors as warnings
+                        for error in validation_result.errors:
+                            logger.warning(f"ExecutionPlan validation warning: {error}")
+
+                    for warning in validation_result.warnings:
+                        logger.info(f"ExecutionPlan optimization suggestion: {warning}")
+
+            except ImportError:
+                # Validation module not available, skip validation
+                import logging
+
+                logging.getLogger(__name__).warning(
+                    "Advanced validation not available - skipping comprehensive validation"
+                )
+
+        return plan
 
 
 # Pre-built template functions
