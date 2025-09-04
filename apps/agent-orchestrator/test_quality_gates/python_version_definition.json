@@ -1,0 +1,13 @@
+{
+  "name": "Python Version Check",
+  "description": "Verify Python version",
+  "type": "custom",
+  "config": {
+    "type": "command",
+    "command": "python3 --version",
+    "expected_exit_code": 0
+  },
+  "dependencies": [],
+  "status": "pending",
+  "last_checked": null
+}

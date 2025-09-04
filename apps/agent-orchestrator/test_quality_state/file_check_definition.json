@@ -1,0 +1,13 @@
+{
+  "name": "File Check",
+  "description": "Check that required files exist",
+  "type": "file_exists",
+  "config": {
+    "required_files": [
+      "/home/opsvi/master_root/apps/agent-orchestrator/test_execution_plan_integration.py"
+    ]
+  },
+  "dependencies": [],
+  "status": "pending",
+  "last_checked": null
+}

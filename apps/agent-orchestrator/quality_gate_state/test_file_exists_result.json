@@ -1,0 +1,13 @@
+{
+  "gate_id": "test_file_exists",
+  "status": "passed",
+  "message": "All file/directory checks passed (1 items verified)",
+  "details": {
+    "found_/home/opsvi/master_root/README.md": true,
+    "pattern_matches": {},
+    "found_items": [
+      "/home/opsvi/master_root/README.md"
+    ]
+  },
+  "timestamp": 1756975441.8576105
+}

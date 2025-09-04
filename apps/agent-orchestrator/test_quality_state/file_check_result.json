@@ -1,0 +1,13 @@
+{
+  "gate_id": "file_check",
+  "status": "passed",
+  "message": "All file/directory checks passed (1 items verified)",
+  "details": {
+    "found_/home/opsvi/master_root/apps/agent-orchestrator/test_execution_plan_integration.py": true,
+    "pattern_matches": {},
+    "found_items": [
+      "/home/opsvi/master_root/apps/agent-orchestrator/test_execution_plan_integration.py"
+    ]
+  },
+  "timestamp": 1756974909.2110333
+}

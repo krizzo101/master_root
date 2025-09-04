@@ -23,7 +23,7 @@ echo ""
 
 # Generate unique session IDs for each agent
 AGENT_1_SESSION=$(uuidgen)
-AGENT_2_SESSION=$(uuidgen) 
+AGENT_2_SESSION=$(uuidgen)
 AGENT_3_SESSION=$(uuidgen)
 AGENT_4_SESSION=$(uuidgen)
 AGENT_5_SESSION=$(uuidgen)
@@ -143,7 +143,7 @@ echo ""
 echo "3. Session Log Analysis:"
 echo "  Session logs location: ~/.claude/projects/"
 echo "  Agent 1 session: $AGENT_1_SESSION"
-echo "  Agent 2 session: $AGENT_2_SESSION" 
+echo "  Agent 2 session: $AGENT_2_SESSION"
 echo "  Agent 3 session: $AGENT_3_SESSION"
 echo "  Agent 4 session: $AGENT_4_SESSION"
 echo "  Agent 5 session: $AGENT_5_SESSION"

@@ -1,0 +1,21 @@
+{
+  "gate_id": "test_http_pass",
+  "status": "passed",
+  "message": "HTTP GET https://httpbin.org/status/200 validation successful",
+  "details": {
+    "url": "https://httpbin.org/status/200",
+    "method": "GET",
+    "status_code": 200,
+    "response_time_seconds": 1.383,
+    "response_headers": {
+      "Date": "Thu, 04 Sep 2025 08:43:49 GMT",
+      "Content-Type": "text/html; charset=utf-8",
+      "Content-Length": "0",
+      "Connection": "keep-alive",
+      "Server": "gunicorn/19.9.0",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": "true"
+    }
+  },
+  "timestamp": 1756975429.2970922
+}

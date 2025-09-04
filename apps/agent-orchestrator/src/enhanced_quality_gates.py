@@ -13,6 +13,9 @@ Built on top of the existing working_quality_gates.py system for backward compat
 import asyncio
 import json
 import logging
+
+# Use built-in statistics instead of numpy to avoid dependency
+import statistics
 import time
 import uuid
 from abc import ABC, abstractmethod
@@ -20,9 +23,6 @@ from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
-
-# Use built-in statistics instead of numpy to avoid dependency
-import statistics
 
 try:
     from .enhanced_orchestrator import EnhancedAgentTask

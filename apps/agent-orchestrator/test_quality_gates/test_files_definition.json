@@ -1,0 +1,16 @@
+{
+  "name": "Test Files Exist",
+  "description": "Check that required test files exist",
+  "type": "file_exists",
+  "config": {
+    "required_files": [
+      "/home/opsvi/master_root/apps/agent-orchestrator/enhanced_quality_gates_implementation.py"
+    ],
+    "file_patterns": [
+      "*.py"
+    ]
+  },
+  "dependencies": [],
+  "status": "pending",
+  "last_checked": null
+}

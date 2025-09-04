@@ -1,0 +1,13 @@
+{
+  "name": "HTTP Connectivity",
+  "description": "Test HTTP endpoint availability",
+  "type": "http",
+  "config": {
+    "url": "https://httpbin.org/status/200",
+    "expected_status": 200,
+    "timeout_seconds": 10
+  },
+  "dependencies": [],
+  "status": "pending",
+  "last_checked": null
+}

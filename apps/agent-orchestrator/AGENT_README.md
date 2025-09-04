@@ -8,7 +8,7 @@
 ```python
 # Run this on session start to get current project context
 mcp__knowledge__knowledge_query(
-    query_type="recent", 
+    query_type="recent",
     limit=5
 )
 
@@ -30,8 +30,8 @@ mcp__time__current_time("YYYY-MM-DD HH:mm:ss")
 ## 🎯 KEY SYSTEMS AVAILABLE
 
 ### **🔧 Multi-Agent Orchestrator** (PRODUCTION READY)
-**Location**: `apps/agent-orchestrator/` (you are here)  
-**Status**: ✅ 100% validated, parallel execution confirmed  
+**Location**: `apps/agent-orchestrator/` (you are here)
+**Status**: ✅ 100% validated, parallel execution confirmed
 **Purpose**: Coordinate multiple specialized agents in parallel
 
 **Quick Test**:
@@ -55,7 +55,7 @@ print('✅ Orchestrator imports working')
 - `docs/TUTORIALS.md` - Step-by-step examples
 
 ### **📊 Knowledge Base** (ACTIVE)
-**Status**: ✅ Online and responsive  
+**Status**: ✅ Online and responsive
 **Purpose**: Project memory and context sharing between agents
 
 **Key Queries**:
@@ -63,23 +63,23 @@ print('✅ Orchestrator imports working')
 # Get recent project work
 mcp__knowledge__knowledge_query(query_type="recent", limit=5)
 
-# Find specific topics  
+# Find specific topics
 mcp__knowledge__knowledge_query(
-    query_type="search", 
-    search_text="your topic here", 
+    query_type="search",
+    search_text="your topic here",
     limit=3
 )
 
 # Store your findings
 mcp__knowledge__knowledge_store(
     content="Your important findings or solutions",
-    knowledge_type="WORKFLOW", 
+    knowledge_type="WORKFLOW",
     tags="relevant,tags,here"
 )
 ```
 
-### **🔍 Chat Log Search** 
-**Location**: `apps/chat-search/chat_search.py`  
+### **🔍 Chat Log Search**
+**Location**: `apps/chat-search/chat_search.py`
 **Purpose**: Search previous agent sessions and find context
 
 ```bash
@@ -165,7 +165,7 @@ mcp__knowledge__knowledge_store(
 Before starting major work, validate your environment:
 
 - [ ] **Knowledge Base responds** to queries
-- [ ] **Current time/date** retrieved  
+- [ ] **Current time/date** retrieved
 - [ ] **Project structure** confirmed at `/home/opsvi/master_root/`
 - [ ] **Orchestrator available** if doing multi-agent work
 - [ ] **Previous session context** understood (if continuation)
@@ -176,16 +176,16 @@ Before starting major work, validate your environment:
 ## 🎯 DECISION FRAMEWORKS
 
 ### **When to Use Multi-Agent Orchestrator**
-✅ **YES**: Task needs 2+ specialized roles (research + coding + testing)  
-✅ **YES**: Work can be parallelized (multiple independent parts)  
-✅ **YES**: Complex enough to benefit from specialization  
-❌ **NO**: Simple single-agent task  
-❌ **NO**: Only 1 token available  
+✅ **YES**: Task needs 2+ specialized roles (research + coding + testing)
+✅ **YES**: Work can be parallelized (multiple independent parts)
+✅ **YES**: Complex enough to benefit from specialization
+❌ **NO**: Simple single-agent task
+❌ **NO**: Only 1 token available
 
 ### **When to Search Previous Sessions**
-✅ **YES**: Continuing previous agent's work  
-✅ **YES**: Understanding project context  
-✅ **YES**: Finding solutions to similar problems  
+✅ **YES**: Continuing previous agent's work
+✅ **YES**: Understanding project context
+✅ **YES**: Finding solutions to similar problems
 ❌ **NO**: Completely new unrelated task
 
 ---

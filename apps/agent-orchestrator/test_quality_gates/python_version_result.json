@@ -1,0 +1,13 @@
+{
+  "gate_id": "python_version",
+  "status": "passed",
+  "message": "Custom command validation passed",
+  "details": {
+    "command": "python3 --version",
+    "return_code": 0,
+    "expected_exit_code": 0,
+    "stdout": "Python 3.13.5\n",
+    "stderr": ""
+  },
+  "timestamp": 1756974838.2782886
+}

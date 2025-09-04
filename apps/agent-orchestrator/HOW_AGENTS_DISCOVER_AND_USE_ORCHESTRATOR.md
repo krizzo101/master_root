@@ -11,8 +11,8 @@ When agents start a session, they should query the knowledge base for orchestrat
 ```python
 # Essential startup queries every agent should run
 mcp__knowledge__knowledge_query(
-    query_type="search", 
-    search_text="orchestrator parallel agent coordination", 
+    query_type="search",
+    search_text="orchestrator parallel agent coordination",
     limit=5
 )
 ```
@@ -42,7 +42,7 @@ Once found, agents should read key documentation files in priority order:
 apps/agent-orchestrator/ORCHESTRATOR_USAGE_README.md
 apps/agent-orchestrator/HOW_AGENTS_DISCOVER_AND_USE_ORCHESTRATOR.md (this file)
 
-# Priority 2: Examples and tutorials  
+# Priority 2: Examples and tutorials
 apps/agent-orchestrator/docs/TUTORIALS.md
 apps/agent-orchestrator/examples/README.md
 
@@ -74,20 +74,20 @@ from generic_orchestrator import GenericOrchestrator, AgentTask
 
 async def basic_orchestrator_test():
     """Test if orchestrator is working with minimal setup"""
-    
+
     # 1. Initialize orchestrator
     orchestrator = GenericOrchestrator(
         output_dir=Path("./test_output"),
         max_parallel=2  # Start small
     )
-    
+
     # 2. Create simple test task
     task = AgentTask(
         task_id="validation_test",
-        task_type="general-purpose", 
+        task_type="general-purpose",
         prompt="Say 'Hello from orchestrator!' and confirm you are working"
     )
-    
+
     # 3. Execute and validate
     try:
         results = await orchestrator.execute_batch([task])
@@ -110,10 +110,10 @@ Check if you have sufficient tokens for parallel execution:
 async def check_token_pool():
     """Validate token pool configuration"""
     from token_loader import TokenLoader
-    
+
     loader = TokenLoader()
     tokens = loader.load_tokens()
-    
+
     print(f"Token pool size: {len(tokens)}")
     if len(tokens) >= 2:
         print("✅ Sufficient tokens for parallel execution")
@@ -130,12 +130,12 @@ Once validated, test multi-agent coordination:
 ```python
 async def multi_agent_test():
     """Test coordinating multiple specialized agents"""
-    
+
     orchestrator = GenericOrchestrator(
         output_dir=Path("./multi_agent_test"),
         max_parallel=3
     )
-    
+
     # Create diverse agent tasks
     tasks = [
         AgentTask(
@@ -144,23 +144,23 @@ async def multi_agent_test():
             prompt="Research the benefits of multi-agent systems"
         ),
         AgentTask(
-            task_id="analyzer", 
+            task_id="analyzer",
             task_type="solution-architect",
             prompt="Analyze coordination patterns in distributed systems"
         ),
         AgentTask(
             task_id="documenter",
-            task_type="technical-writer", 
+            task_type="technical-writer",
             prompt="Create a brief summary of agent coordination principles"
         )
     ]
-    
+
     # Execute parallel coordination
     results = await orchestrator.execute_batch(tasks)
-    
+
     print(f"✅ Multi-agent coordination complete!")
     print(f"Agents executed: {len(results)}")
-    
+
     return results
 ```
 
@@ -176,7 +176,7 @@ Use this when tasks can run simultaneously without dependencies:
 # Example: Parallel research on different topics
 tasks = [
     AgentTask("research_ai", "research-genius", "Research AI trends"),
-    AgentTask("research_cloud", "research-genius", "Research cloud computing"),  
+    AgentTask("research_cloud", "research-genius", "Research cloud computing"),
     AgentTask("research_security", "research-genius", "Research cybersecurity")
 ]
 
@@ -212,18 +212,18 @@ tasks = [
     AgentTask("research_frontend", "research-genius", "Research UI frameworks"),
     AgentTask("research_backend", "research-genius", "Research API patterns"),
     AgentTask("research_database", "research-genius", "Research data models"),
-    
+
     # Phase 2: Coordinated implementation (depends on research)
-    AgentTask("implement_ui", "development-specialist", 
-              "Implement UI based on research", 
+    AgentTask("implement_ui", "development-specialist",
+              "Implement UI based on research",
               dependencies=["research_frontend"]),
     AgentTask("implement_api", "development-specialist",
-              "Implement API based on research", 
+              "Implement API based on research",
               dependencies=["research_backend"]),
     AgentTask("implement_db", "database-specialist",
-              "Implement database based on research", 
+              "Implement database based on research",
               dependencies=["research_database"]),
-    
+
     # Phase 3: Integration (depends on implementations)
     AgentTask("integration", "solution-architect",
               "Integrate all components",
@@ -242,46 +242,46 @@ results = await orchestrator.execute_batch(tasks)
 ```python
 async def comprehensive_testing():
     """Full parallel execution testing with timing analysis"""
-    
+
     class OrchestatorTester:
         def __init__(self):
             self.orchestrator = GenericOrchestrator(
                 output_dir=Path("./comprehensive_test"),
                 max_parallel=3
             )
-        
+
         def create_test_tasks(self):
             """Create diverse tasks for testing"""
             return [
-                AgentTask("code_analysis", "research-genius", 
+                AgentTask("code_analysis", "research-genius",
                          "Analyze the orchestrator codebase structure"),
                 AgentTask("file_count", "development-specialist",
-                         "Count and categorize all Python files"),  
+                         "Count and categorize all Python files"),
                 AgentTask("git_history", "solution-architect",
                          "Analyze git history and recent changes"),
-                AgentTask("test_generation", "qa-testing-guru", 
+                AgentTask("test_generation", "qa-testing-guru",
                          "Generate unit tests for key components"),
                 AgentTask("documentation", "technical-writer",
                          "Create usage documentation summary")
             ]
-        
+
         async def run_comprehensive_test(self):
             """Execute comprehensive parallel test"""
             tasks = self.create_test_tasks()
-            
+
             print(f"🚀 Testing {len(tasks)} agents in parallel...")
             start_time = time.time()
-            
+
             results = await self.orchestrator.execute_batch(tasks)
-            
+
             end_time = time.time()
             duration = end_time - start_time
-            
+
             print(f"✅ Test complete in {duration:.2f}s")
             print(f"Success rate: {len(results)}/{len(tasks)} agents")
-            
+
             return results
-    
+
     tester = OrchestatorTester()
     return await tester.run_comprehensive_test()
 ```
@@ -291,12 +291,12 @@ async def comprehensive_testing():
 ```python
 async def edge_case_testing():
     """Test edge cases: more agents than tokens"""
-    
+
     orchestrator = GenericOrchestrator(
         output_dir=Path("./edge_test"),
         max_parallel=3
     )
-    
+
     # Create more tasks than max_parallel (tests batching)
     edge_tasks = []
     for i in range(7):  # More than max_parallel=3
@@ -305,10 +305,10 @@ async def edge_case_testing():
             task_type="general-purpose",
             prompt=f"Task {i+1}: Generate {(i+1)*5} random words"
         ))
-    
+
     print(f"🧪 Testing {len(edge_tasks)} agents with batching...")
     results = await orchestrator.execute_batch(edge_tasks)
-    
+
     print(f"✅ Edge case handled: {len(results)} agents completed")
     return results
 ```
@@ -356,7 +356,7 @@ if results['results']:
 
 **✅ USE ORCHESTRATOR when**:
 - Task requires 2+ specialized agents (research + implementation)
-- Work can be parallelized (multiple independent subtasks)  
+- Work can be parallelized (multiple independent subtasks)
 - Task has clear dependencies (research → design → implement)
 - Need coordination between different agent types
 - Task is complex enough to benefit from specialization
@@ -385,7 +385,7 @@ For any new agent discovering the orchestrator:
 
 - [ ] **1. Run knowledge base query** for orchestrator info
 - [ ] **2. Find orchestrator directory** (`apps/agent-orchestrator/`)
-- [ ] **3. Read core documentation** (usage guides, tutorials)  
+- [ ] **3. Read core documentation** (usage guides, tutorials)
 - [ ] **4. Validate basic functionality** (single task test)
 - [ ] **5. Check token pool** (need 2+ tokens)
 - [ ] **6. Test multi-agent coordination** (2-3 agents)
