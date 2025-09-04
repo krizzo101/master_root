@@ -1,0 +1,90 @@
+# Testing dependencies for Unified Context System
+
+# Core testing framework
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+pytest-html>=3.2.0
+pytest-json-report>=1.5.0
+pytest-timeout>=2.1.0
+pytest-xdist>=3.3.0
+
+# Test utilities and mocking
+pytest-mock>=3.11.0
+responses>=0.23.0
+freezegun>=1.2.0
+factory-boy>=3.3.0
+faker>=19.0.0
+
+# Performance testing
+pytest-benchmark>=4.0.0
+memory-profiler>=0.61.0
+psutil>=5.9.0
+
+# Database testing
+pytest-postgresql>=5.0.0
+alembic>=1.12.0
+
+# Code quality
+black>=23.7.0
+isort>=5.12.0
+flake8>=6.0.0
+mypy>=1.5.0
+bandit>=1.7.0
+safety>=2.3.0
+
+# Pre-commit hooks
+pre-commit>=3.3.0
+
+# Async testing utilities
+asyncio-mqtt>=0.16.0  # For async testing utilities
+aioresponses>=0.7.4   # For aiohttp mocking
+
+# Documentation testing
+sphinx>=7.1.0         # For doc testing
+doctest>=0.6.0        # Python doctest support
+
+# Load testing
+locust>=2.16.0        # For load testing scenarios
+
+# API testing
+httpx>=0.24.0         # For async HTTP client testing
+
+# Time and date testing utilities
+python-dateutil>=2.8.0
+pytz>=2023.3
+
+# Data generation and validation
+pydantic>=2.0.0       # For data validation in tests
+hypothesis>=6.82.0    # Property-based testing
+
+# Logging and monitoring in tests
+structlog>=23.1.0     # Structured logging
+rich>=13.5.0          # Rich console output for test reports
+
+# Serialization testing
+msgpack>=1.0.0        # For binary serialization testing
+orjson>=3.9.0         # Fast JSON for performance testing
+
+# Development utilities
+ipdb>=0.13.0          # Debugging in tests
+pudb>=2023.1          # Full-screen debugger
+
+# Container testing (optional)
+testcontainers>=3.7.0 # For integration testing with containers
+
+# Visualization and reporting
+matplotlib>=3.7.0     # For performance graphs in reports
+seaborn>=0.12.0       # Statistical plotting
+plotly>=5.15.0        # Interactive plots in HTML reports
+
+# Network testing
+moto>=4.2.0           # AWS services mocking
+wiremock>=2.6.0       # HTTP service mocking
+
+# Security testing
+semgrep>=1.32.0       # Static analysis security scanner
+
+# Performance profiling
+py-spy>=0.3.0         # Python profiler for performance testing
+pympler>=0.9          # Memory profiling

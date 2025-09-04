@@ -1,0 +1,21 @@
+{
+  "total_tasks": 1,
+  "completed_tasks": 0,
+  "failed_tasks": 0,
+  "average_duration": 0.0,
+  "tasks_by_type": {
+    "development-specialist": 1
+  },
+  "tasks_by_phase": {
+    "test": 1
+  },
+  "tasks_by_priority": {
+    "normal": 1
+  },
+  "files_created_total": 0,
+  "files_modified_total": 0,
+  "commands_run_total": 0,
+  "fastest_task": null,
+  "slowest_task": null,
+  "success_rate": 0.0
+}

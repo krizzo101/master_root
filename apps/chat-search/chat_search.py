@@ -18,6 +18,30 @@ class ChatSearcher:
     def __init__(self, log_dir="chat_logs"):
         self.log_dir = log_dir
 
+        # Content patterns for structured detection
+        self.CONTENT_PATTERNS = {
+            "phases": r"Phase\s+\d+:|phases?\s*\d+|Phase\s+(?:One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten)",
+            "roadmap": r"roadmap|implementation\s+plan|development\s+plan|\d+.*week.*plan|project\s+roadmap",
+            "next_steps": r"next\s+steps?|what.*next|ready.*for|should.*build|need.*implement|future\s+work",
+            "architecture": r"architecture|system\s+design|technical\s+design|unified.*system|design\s+document",
+            "planning": r"Phase\s+\d+|Week\s+\d+|implementation.*plan|roadmap|strategy|planning",
+            "numbered_lists": r"^\s*\d+\.\s+|\n\s*\d+\.\s+|^\s*-\s+\d+\.|^\s*\*\s+\d+\.",
+            "implementation_phases": r"Phase\s+\d+.*Foundation|Phase\s+\d+.*Core|Phase\s+\d+.*Integration|Phase\s+\d+.*Testing",
+            "timeline": r"Week\s+\d+-\d+|Month\s+\d+|Q[1-4]|quarter|timeline|schedule",
+            "milestones": r"milestone|deliverable|checkpoint|gate|review|completion",
+            "decisions": r"decision|decided|chose|selected|recommend|conclusion|agreed",
+        }
+
+        # Temporal search patterns
+        self.TEMPORAL_PATTERNS = {
+            "beginning": (0.0, 0.25),  # First 25% of messages
+            "middle": (0.25, 0.75),  # Middle 50% of messages
+            "end": (0.75, 1.0),  # Final 25% of messages
+            "conclusion": (0.9, 1.0),  # Final 10% of messages
+            "final_quarter": (0.75, 1.0),  # Final quarter
+            "session_end": (0.8, 1.0),  # Last 20% of session
+        }
+
     def search(
         self,
         query: str,
@@ -139,6 +163,265 @@ class ChatSearcher:
                         return results
 
         return results
+
+    def detect_structured_content(
+        self, pattern_type: str, files_filter: List[str] = None
+    ) -> List[Dict]:
+        """
+        Detect structured content patterns in chat logs
+
+        Args:
+            pattern_type: Type of pattern to detect ('phases', 'roadmap', 'planning', etc.)
+            files_filter: List of specific files to search
+        """
+        if pattern_type not in self.CONTENT_PATTERNS:
+            available = ", ".join(self.CONTENT_PATTERNS.keys())
+            raise ValueError(
+                f"Unknown pattern type '{pattern_type}'. Available: {available}"
+            )
+
+        pattern = re.compile(
+            self.CONTENT_PATTERNS[pattern_type], re.IGNORECASE | re.MULTILINE
+        )
+        return self.search(pattern.pattern, files_filter=files_filter, limit=20)
+
+    def temporal_search(
+        self,
+        query: str,
+        temporal_range: str,
+        files_filter: List[str] = None,
+        limit: int = 10,
+    ) -> List[Dict]:
+        """
+        Search within specific temporal ranges of sessions
+
+        Args:
+            query: Search term
+            temporal_range: Temporal range ('beginning', 'middle', 'end', 'conclusion', etc.)
+            files_filter: List of specific files to search
+            limit: Max results to return
+        """
+        if temporal_range not in self.TEMPORAL_PATTERNS:
+            available = ", ".join(self.TEMPORAL_PATTERNS.keys())
+            raise ValueError(
+                f"Unknown temporal range '{temporal_range}'. Available: {available}"
+            )
+
+        start_ratio, end_ratio = self.TEMPORAL_PATTERNS[temporal_range]
+        results = []
+        pattern = re.compile(query, re.IGNORECASE)
+
+        # Get files to search
+        jsonl_files = glob.glob(f"{self.log_dir}/*.jsonl")
+        if files_filter:
+            jsonl_files = [
+                f for f in jsonl_files if any(fname in f for fname in files_filter)
+            ]
+
+        for file_path in jsonl_files:
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    lines = f.readlines()
+
+                total_lines = len(lines)
+                start_line = int(total_lines * start_ratio)
+                end_line = int(total_lines * end_ratio)
+
+                # Search within the temporal range
+                for line_num in range(start_line, min(end_line, total_lines)):
+                    try:
+                        message_data = json.loads(lines[line_num].strip())
+                        match = self._search_message_data(message_data, pattern, "all")
+
+                        if match:
+                            results.append(
+                                {
+                                    "file": file_path,
+                                    "line": line_num + 1,
+                                    "temporal_position": f"{temporal_range} ({line_num/total_lines:.1%})",
+                                    "match": match,
+                                    "data": message_data,
+                                }
+                            )
+
+                            if len(results) >= limit:
+                                break
+                    except json.JSONDecodeError:
+                        continue
+
+            except Exception as e:
+                print(f"Error reading {file_path}: {e}", file=sys.stderr)
+                continue
+
+        return results[:limit]
+
+    def analyze_content_types(self, files_filter: List[str] = None) -> Dict[str, Any]:
+        """
+        Analyze content types in a session
+
+        Returns:
+            Dictionary with content type analysis
+        """
+        analysis = {
+            "implementation": 0,
+            "planning": 0,
+            "discussion": 0,
+            "documentation": 0,
+            "total_messages": 0,
+            "content_breakdown": {},
+        }
+
+        # Get files to analyze
+        jsonl_files = glob.glob(f"{self.log_dir}/*.jsonl")
+        if files_filter:
+            jsonl_files = [
+                f for f in jsonl_files if any(fname in f for fname in files_filter)
+            ]
+
+        for file_path in jsonl_files:
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    for line in f:
+                        try:
+                            message_data = json.loads(line.strip())
+                            message_obj = message_data.get("message", {})
+                            content = message_obj.get("content", "")
+
+                            if isinstance(content, str):
+                                content_lower = content.lower()
+
+                                # Categorize content
+                                if any(
+                                    word in content_lower
+                                    for word in [
+                                        "implement",
+                                        "code",
+                                        "function",
+                                        "class",
+                                        "method",
+                                    ]
+                                ):
+                                    analysis["implementation"] += 1
+                                elif any(
+                                    word in content_lower
+                                    for word in [
+                                        "plan",
+                                        "phase",
+                                        "roadmap",
+                                        "strategy",
+                                        "next steps",
+                                    ]
+                                ):
+                                    analysis["planning"] += 1
+                                elif any(
+                                    word in content_lower
+                                    for word in [
+                                        "document",
+                                        "write",
+                                        "create",
+                                        "design doc",
+                                    ]
+                                ):
+                                    analysis["documentation"] += 1
+                                else:
+                                    analysis["discussion"] += 1
+
+                                analysis["total_messages"] += 1
+
+                        except json.JSONDecodeError:
+                            continue
+
+            except Exception as e:
+                print(f"Error reading {file_path}: {e}", file=sys.stderr)
+                continue
+
+        # Calculate percentages
+        if analysis["total_messages"] > 0:
+            for key in ["implementation", "planning", "discussion", "documentation"]:
+                percentage = (analysis[key] / analysis["total_messages"]) * 100
+                analysis["content_breakdown"][key] = f"{percentage:.1f}%"
+
+        return analysis
+
+    def enhanced_handoff_analysis(
+        self, files_filter: List[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Enhanced handoff analysis with planning detection
+
+        Returns:
+            Dictionary with comprehensive handoff analysis
+        """
+        analysis = {
+            "planning_discussions": [],
+            "architecture_discussions": [],
+            "future_work": [],
+            "implementation_roadmaps": [],
+            "decision_points": [],
+            "confidence_scores": {},
+        }
+
+        # Search for planning discussions
+        planning_patterns = [
+            r"Phase\s+\d+.*Foundation|Phase\s+\d+.*Core|Phase\s+\d+.*Integration",
+            r"implementation\s+plan|roadmap|development\s+strategy",
+            r"next\s+steps|what.*next|ready.*for|should.*build",
+        ]
+
+        for pattern in planning_patterns:
+            results = self.search(pattern, files_filter=files_filter, limit=10)
+            analysis["planning_discussions"].extend(results)
+
+        # Search for architecture discussions
+        arch_results = self.search(
+            r"architecture|system\s+design|technical\s+design|unified.*system",
+            files_filter=files_filter,
+            limit=10,
+        )
+        analysis["architecture_discussions"] = arch_results
+
+        # Search for future work
+        future_results = self.search(
+            r"future\s+work|next\s+phase|upcoming|planned|roadmap",
+            files_filter=files_filter,
+            limit=10,
+        )
+        analysis["future_work"] = future_results
+
+        # Search for implementation roadmaps
+        roadmap_results = self.search(
+            r"Phase\s+\d+.*Week\s+\d+|implementation.*timeline|development.*plan",
+            files_filter=files_filter,
+            limit=10,
+        )
+        analysis["implementation_roadmaps"] = roadmap_results
+
+        # Search for decision points
+        decision_results = self.search(
+            r"decision|decided|chose|selected|recommend|conclusion",
+            files_filter=files_filter,
+            limit=10,
+        )
+        analysis["decision_points"] = decision_results
+
+        # Calculate confidence scores
+        total_planning = len(analysis["planning_discussions"])
+        total_arch = len(analysis["architecture_discussions"])
+        total_future = len(analysis["future_work"])
+
+        analysis["confidence_scores"] = {
+            "planning_confidence": (
+                min(100, (total_planning / 5) * 100) if total_planning > 0 else 0
+            ),
+            "architecture_confidence": (
+                min(100, (total_arch / 3) * 100) if total_arch > 0 else 0
+            ),
+            "future_work_confidence": (
+                min(100, (total_future / 3) * 100) if total_future > 0 else 0
+            ),
+        }
+
+        return analysis
 
     def _search_message_data(
         self, message_data: Dict, pattern: re.Pattern, content_type: str

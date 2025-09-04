@@ -60,98 +60,185 @@ async def get_complexity(
 
     where_clause = " AND ".join(where_conditions) if where_conditions else "1=1"
 
-    # Query for complexity statistics
-    stats_query = f"""
-        SELECT
-            COUNT(*) as total_elements,
-            AVG(complexity_score) as avg_complexity,
-            MIN(complexity_score) as min_complexity,
-            MAX(complexity_score) as max_complexity,
-            PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY complexity_score) as median_complexity,
-            PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY complexity_score) as p75_complexity,
-            PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY complexity_score) as p95_complexity,
-            COUNT(CASE WHEN complexity_score > ${param_counter} THEN 1 END) as high_complexity_count
-        FROM code_elements
-        WHERE {where_clause}
-    """
-    params.append(threshold)
+    # Search for code elements with complexity data from unified context
+    search_params = {"source_types": ["code"], "limit": 10000}
 
-    stats = await db.fetch_one(stats_query, *params)
+    if file_path:
+        search_params["file_path"] = file_path
+    if element_type:
+        search_params["entity_types"] = [element_type]
 
-    # Query for complexity distribution (bucketed)
-    distribution_query = f"""
-        SELECT
-            CASE
-                WHEN complexity_score <= 5 THEN '1-5 (Low)'
-                WHEN complexity_score <= 10 THEN '6-10 (Medium)'
-                WHEN complexity_score <= 20 THEN '11-20 (High)'
-                ELSE '21+ (Very High)'
-            END as complexity_bucket,
-            COUNT(*) as count,
-            ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
-        FROM code_elements
-        WHERE {where_clause}
-        GROUP BY
-            CASE
-                WHEN complexity_score <= 5 THEN '1-5 (Low)'
-                WHEN complexity_score <= 10 THEN '6-10 (Medium)'
-                WHEN complexity_score <= 20 THEN '11-20 (High)'
-                ELSE '21+ (Very High)'
-            END
-        ORDER BY MIN(complexity_score)
-    """
-    # Remove the threshold parameter for distribution query
-    distribution_params = params[:-1]
-    distribution = await db.fetch_many(distribution_query, *distribution_params)
+    context_items = await db.search_context_items(**search_params)
 
-    # Query for high-complexity hotspots
-    hotspots_query = f"""
-        SELECT
-            file_path,
-            element_type,
-            element_name as name,
-            complexity_score as complexity,
-            language,
-            line_start,
-            line_end
-        FROM code_elements
-        WHERE {where_clause} AND complexity_score > ${param_counter}
-        ORDER BY complexity_score DESC
-        LIMIT 20
-    """
-    hotspots = await db.fetch_many(hotspots_query, *params)
+    # Extract complexity scores from unified context items
+    complexity_scores = []
+    elements_data = []
 
-    # Query for complexity by file (aggregated)
-    file_complexity_query = f"""
-        SELECT
-            file_path,
-            language,
-            COUNT(*) as element_count,
-            AVG(complexity_score) as avg_complexity,
-            MAX(complexity_score) as max_complexity,
-            SUM(complexity_score) as total_complexity
-        FROM code_elements
-        WHERE {where_clause}
-        GROUP BY file_path, language
-        ORDER BY avg_complexity DESC
-        LIMIT 10
-    """
-    file_complexity = await db.fetch_many(file_complexity_query, *distribution_params)
+    for item in context_items:
+        metrics = item.get("metrics", {})
+        if isinstance(metrics, dict) and "complexity_score" in metrics:
+            try:
+                score = float(metrics["complexity_score"])
+                if score > 0:  # Only include valid positive scores
+                    complexity_scores.append(score)
+                    elements_data.append(
+                        {
+                            "file_path": item.get("file_path"),
+                            "entity_type": item.get("entity_type"),
+                            "complexity_score": score,
+                            "title": item.get("title"),
+                            "function_name": item.get("function_name"),
+                            "class_name": item.get("class_name"),
+                        }
+                    )
+            except (ValueError, TypeError):
+                continue
 
-    # Query for complexity by element type
-    type_complexity_query = f"""
-        SELECT
-            element_type,
-            COUNT(*) as element_count,
-            AVG(complexity_score) as avg_complexity,
-            MIN(complexity_score) as min_complexity,
-            MAX(complexity_score) as max_complexity
-        FROM code_elements
-        WHERE {where_clause}
-        GROUP BY element_type
-        ORDER BY avg_complexity DESC
-    """
-    type_complexity = await db.fetch_many(type_complexity_query, *distribution_params)
+    # Calculate statistics
+    if complexity_scores:
+        complexity_scores.sort()
+        total_elements = len(complexity_scores)
+        avg_complexity = sum(complexity_scores) / total_elements
+        min_complexity = min(complexity_scores)
+        max_complexity = max(complexity_scores)
+
+        # Calculate percentiles
+        def percentile(data, p):
+            k = (len(data) - 1) * p
+            f = int(k)
+            c = f + 1
+            if c >= len(data):
+                return data[-1]
+            return data[f] + (data[c] - data[f]) * (k - f)
+
+        median_complexity = percentile(complexity_scores, 0.5)
+        p75_complexity = percentile(complexity_scores, 0.75)
+        p95_complexity = percentile(complexity_scores, 0.95)
+        high_complexity_count = sum(
+            1 for score in complexity_scores if score > threshold
+        )
+
+        stats = {
+            "total_elements": total_elements,
+            "avg_complexity": avg_complexity,
+            "min_complexity": min_complexity,
+            "max_complexity": max_complexity,
+            "median_complexity": median_complexity,
+            "p75_complexity": p75_complexity,
+            "p95_complexity": p95_complexity,
+            "high_complexity_count": high_complexity_count,
+        }
+    else:
+        stats = {
+            "total_elements": 0,
+            "avg_complexity": None,
+            "min_complexity": None,
+            "max_complexity": None,
+            "median_complexity": None,
+            "p75_complexity": None,
+            "p95_complexity": None,
+            "high_complexity_count": 0,
+        }
+
+    # Calculate complexity distribution from unified context data
+    distribution_buckets = {
+        "1-5 (Low)": 0,
+        "6-10 (Medium)": 0,
+        "11-20 (High)": 0,
+        "21+ (Very High)": 0,
+    }
+
+    for score in complexity_scores:
+        if score <= 5:
+            distribution_buckets["1-5 (Low)"] += 1
+        elif score <= 10:
+            distribution_buckets["6-10 (Medium)"] += 1
+        elif score <= 20:
+            distribution_buckets["11-20 (High)"] += 1
+        else:
+            distribution_buckets["21+ (Very High)"] += 1
+
+    total_for_dist = sum(distribution_buckets.values())
+    distribution = []
+    for bucket, count in distribution_buckets.items():
+        percentage = (
+            round(count * 100.0 / total_for_dist, 2) if total_for_dist > 0 else 0
+        )
+        distribution.append(
+            {"complexity_bucket": bucket, "count": count, "percentage": percentage}
+        )
+
+    # Find high-complexity hotspots from unified context data
+    high_complexity_elements = [
+        elem for elem in elements_data if elem["complexity_score"] > threshold
+    ]
+    high_complexity_elements.sort(key=lambda x: x["complexity_score"], reverse=True)
+
+    hotspots = []
+    for elem in high_complexity_elements[:20]:  # Top 20 hotspots
+        hotspots.append(
+            {
+                "file_path": elem["file_path"],
+                "element_type": elem["entity_type"],
+                "name": elem["function_name"] or elem["class_name"] or elem["title"],
+                "complexity": elem["complexity_score"],
+            }
+        )
+
+    # Calculate complexity by file (aggregated) from unified context data
+    file_stats = {}
+    for elem in elements_data:
+        file_path = elem["file_path"]
+        if file_path not in file_stats:
+            file_stats[file_path] = {
+                "file_path": file_path,
+                "element_count": 0,
+                "complexity_scores": [],
+            }
+        file_stats[file_path]["element_count"] += 1
+        file_stats[file_path]["complexity_scores"].append(elem["complexity_score"])
+
+    file_complexity = []
+    for file_path, data in file_stats.items():
+        scores = data["complexity_scores"]
+        file_complexity.append(
+            {
+                "file_path": file_path,
+                "element_count": data["element_count"],
+                "avg_complexity": sum(scores) / len(scores),
+                "max_complexity": max(scores),
+                "total_complexity": sum(scores),
+            }
+        )
+    file_complexity.sort(key=lambda x: x["avg_complexity"], reverse=True)
+    file_complexity = file_complexity[:10]  # Top 10 files
+
+    # Calculate complexity by element type from unified context data
+    type_stats = {}
+    for elem in elements_data:
+        entity_type = elem["entity_type"] or "unknown"
+        if entity_type not in type_stats:
+            type_stats[entity_type] = {
+                "element_type": entity_type,
+                "element_count": 0,
+                "complexity_scores": [],
+            }
+        type_stats[entity_type]["element_count"] += 1
+        type_stats[entity_type]["complexity_scores"].append(elem["complexity_score"])
+
+    type_complexity = []
+    for entity_type, data in type_stats.items():
+        scores = data["complexity_scores"]
+        type_complexity.append(
+            {
+                "element_type": entity_type,
+                "element_count": data["element_count"],
+                "avg_complexity": sum(scores) / len(scores),
+                "min_complexity": min(scores),
+                "max_complexity": max(scores),
+            }
+        )
+    type_complexity.sort(key=lambda x: x["avg_complexity"], reverse=True)
 
     # Format results
     result = {

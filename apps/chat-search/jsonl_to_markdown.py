@@ -173,8 +173,10 @@ class JSONLToMarkdownConverter:
 
         # Skip summary messages
         if message_type == "summary":
-            return (f"## {message_num}. Session Summary\n\n"
-                    f"**Summary**: {message.get('summary', 'N/A')}\n\n")
+            return (
+                f"## {message_num}. Session Summary\n\n"
+                f"**Summary**: {message.get('summary', 'N/A')}\n\n"
+            )
 
         # Handle regular messages
         message_obj = message.get("message", {})

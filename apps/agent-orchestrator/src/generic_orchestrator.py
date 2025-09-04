@@ -181,13 +181,17 @@ class GenericOrchestrator:
                     # Fall back to direct import when not running as package
                     from token_loader import TokenLoader
 
-                loader = TokenLoader()
+                # Determine orchestrator type from context
+                orchestrator_type = getattr(self, "_orchestrator_type", None)
+                loader = TokenLoader(orchestrator_type=orchestrator_type)
                 loaded_tokens = loader.load_tokens()
                 if (
-                    loaded_tokens and len(loaded_tokens) > 1
-                ):  # Ensure we got multiple tokens
+                    loaded_tokens and len(loaded_tokens) > 0
+                ):  # Any tokens are good for coordinated execution
                     tokens = loaded_tokens
-                    logger.info(f"Loaded {len(tokens)} tokens from secure storage")
+                    logger.info(
+                        f"Loaded {len(tokens)} tokens from secure storage (type: {orchestrator_type})"
+                    )
                 else:
                     logger.warning(
                         f"Only got {len(loaded_tokens) if loaded_tokens else 0} "

@@ -13,13 +13,47 @@ from typing import List, Optional
 class TokenLoader:
     """Simple token loader that reads from environment or file"""
 
-    def __init__(self, tokens_file: Optional[str] = None):
-        self.tokens_file = tokens_file or os.environ.get("TOKENS_FILE")
+    def __init__(
+        self, tokens_file: Optional[str] = None, orchestrator_type: Optional[str] = None
+    ):
+        self.orchestrator_type = orchestrator_type
+
+        # Use specific token file based on orchestrator type
+        if orchestrator_type == "chat_import":
+            self.tokens_file = str(Path.home() / ".claude" / "tokens_chat_import.json")
+        elif orchestrator_type == "dashboard":
+            self.tokens_file = str(Path.home() / ".claude" / "tokens_dashboard.json")
+        elif orchestrator_type == "phase2":
+            self.tokens_file = str(Path.home() / ".claude" / "tokens_phase2.json")
+        else:
+            self.tokens_file = tokens_file or os.environ.get("TOKENS_FILE")
 
     def load_tokens(self) -> List[str]:
         """Load tokens from various sources"""
         tokens = []
 
+        # If orchestrator type is specified, ONLY use the dedicated token file
+        if (
+            self.orchestrator_type
+            and self.tokens_file
+            and Path(self.tokens_file).exists()
+        ):
+            try:
+                with open(self.tokens_file, "r") as f:
+                    data = json.load(f)
+                    if isinstance(data, list):
+                        tokens.extend(data)
+                    elif isinstance(data, dict):
+                        # Support {"tokens": [...]} format
+                        tokens.extend(data.get("tokens", []))
+
+                # Filter out empty strings
+                tokens = list(filter(None, tokens))
+                return tokens
+            except (json.JSONDecodeError, IOError):
+                pass
+
+        # Fallback to original behavior for untyped orchestrators
         # 1. Try primary environment variable (Claude Code format ONLY)
         env_token = os.environ.get("CLAUDE_CODE_TOKEN")
         if env_token:

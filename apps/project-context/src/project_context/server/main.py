@@ -122,7 +122,7 @@ def main():
             # Start watcher
             asyncio.create_task(start_watcher())
 
-    # Register all tools with the MCP server
+    # Register all tools with the MCP server and enhanced database
     register_all_tools(mcp, reader, cache)
 
     # Run the server

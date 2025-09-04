@@ -40,8 +40,8 @@ async def get_file_info(file_path: str) -> Dict[str, Any]:
         # Get code elements for this file
         code_elements = await _get_code_elements(db, normalized_path)
 
-        # Get context items related to this file
-        context_items = await _get_context_items(db, normalized_path)
+        # Get context items related to this file using enhanced unified context
+        context_data = await db.get_file_context(normalized_path)
 
         # Get monitoring metrics for this file
         monitoring_data = await _get_monitoring_metrics(db, normalized_path)
@@ -61,11 +61,7 @@ async def get_file_info(file_path: str) -> Dict[str, Any]:
                 "by_type": _group_elements_by_type(code_elements),
                 "complexity": complexity_summary,
             },
-            "context_items": {
-                "total_count": len(context_items),
-                "items": context_items,
-                "by_type": _group_context_by_type(context_items),
-            },
+            "context_items": context_data,
             "monitoring": monitoring_data,
             "relationships": relationships,
             "analysis_timestamp": datetime.utcnow().isoformat(),
@@ -94,10 +90,13 @@ async def get_project_summary() -> Dict[str, Any]:
     try:
         db = await get_db()
 
+        # Use enhanced project stats from unified context
+        project_stats = await db.get_project_stats()
+
         # Initialize results structure
         summary = {
             "timestamp": datetime.utcnow().isoformat(),
-            "project_overview": {},
+            "project_overview": project_stats,
             "file_statistics": {},
             "session_statistics": {},
             "language_distribution": {},
@@ -425,81 +424,95 @@ async def find_files(
     try:
         db = await get_db()
 
-        # Build SQL query with filters
-        conditions = []
-        params = []
-        param_count = 0
+        # Use unified context search for enhanced file discovery
+        search_params = {"limit": limit}
 
         # Pattern matching for file paths
         if pattern and pattern != "*":
-            param_count += 1
-            # Convert glob pattern to SQL LIKE pattern
-            sql_pattern = pattern.replace("*", "%").replace("?", "_")
-            conditions.append(f"file_path LIKE ${param_count}")
-            params.append(sql_pattern)
+            # Convert glob pattern for unified context search
+            sql_pattern = pattern.replace("*", "").replace("?", "_")
+            search_params["file_path"] = sql_pattern
 
         # File type filter
         if file_type:
-            param_count += 1
-            conditions.append(f"file_path LIKE ${param_count}")
-            params.append(f"%.{file_type}")
+            if "file_path" in search_params:
+                search_params["file_path"] += f".{file_type}"
+            else:
+                search_params["file_path"] = f".{file_type}"
 
-        # Element type filter
+        # Entity type filter for code elements
+        entity_types = []
         if element_type:
-            param_count += 1
-            conditions.append(f"element_type = ${param_count}")
-            params.append(element_type)
+            entity_types.append(element_type)
+        if entity_types:
+            search_params["entity_types"] = entity_types
 
-        # Language filter
+        # Language filtering (handled via source_types in unified context)
+        source_types = ["code"]  # Focus on code-related items
         if language:
-            param_count += 1
-            conditions.append(f"language = ${param_count}")
-            params.append(language)
+            # Could extend this to filter by language in metrics/tags
+            search_params["source_types"] = source_types
+        else:
+            search_params["source_types"] = source_types
 
-        # Build WHERE clause
-        where_clause = " AND ".join(conditions) if conditions else "1=1"
+        # Search unified context for file-related items
+        context_items = await db.search_context_items(**search_params)
 
-        # Query for files with their metadata
-        query = f"""
-        SELECT DISTINCT
-            file_path,
-            language,
-            COUNT(*) as element_count,
-            array_agg(DISTINCT element_type) as element_types,
-            MAX(complexity_score) as max_complexity,
-            AVG(complexity_score) as avg_complexity
-        FROM code_elements
-        WHERE {where_clause}
-        GROUP BY file_path, language
-        ORDER BY file_path
-        LIMIT ${param_count + 1}
-        """
-        params.append(limit)
+        # Process unified context results to extract file information
+        file_map = {}
+        for item in context_items:
+            file_path = item.get("file_path")
+            if not file_path:
+                continue
 
-        async with db.pg_pool.acquire() as conn:
-            rows = await conn.fetch(query, *params)
-
-            # Convert to list of dictionaries
-            files = []
-            for row in rows:
-                file_data = {
-                    "file_path": row["file_path"],
-                    "language": row["language"],
-                    "element_count": row["element_count"],
-                    "element_types": row["element_types"] or [],
-                    "max_complexity": float(row["max_complexity"])
-                    if row["max_complexity"]
-                    else None,
-                    "avg_complexity": float(row["avg_complexity"])
-                    if row["avg_complexity"]
-                    else None,
+            if file_path not in file_map:
+                file_map[file_path] = {
+                    "file_path": file_path,
+                    "entity_types": set(),
+                    "source_types": set(),
+                    "items": [],
+                    "complexity_scores": [],
                 }
-                files.append(file_data)
+
+            file_info = file_map[file_path]
+            file_info["entity_types"].add(item.get("entity_type", "unknown"))
+            file_info["source_types"].add(item.get("source_type", "unknown"))
+            file_info["items"].append(item)
+
+            # Extract complexity from metrics if available
+            metrics = item.get("metrics", {})
+            if isinstance(metrics, dict) and "complexity_score" in metrics:
+                try:
+                    score = float(metrics["complexity_score"])
+                    file_info["complexity_scores"].append(score)
+                except (ValueError, TypeError):
+                    pass
+
+        # Convert to final format
+        files = []
+        for file_path, file_info in file_map.items():
+            complexity_scores = file_info["complexity_scores"]
+            file_data = {
+                "file_path": file_path,
+                "entity_count": len(file_info["items"]),
+                "entity_types": list(file_info["entity_types"]),
+                "source_types": list(file_info["source_types"]),
+                "max_complexity": max(complexity_scores) if complexity_scores else None,
+                "avg_complexity": sum(complexity_scores) / len(complexity_scores)
+                if complexity_scores
+                else None,
+                "item_count": len(file_info["items"]),
+            }
+            files.append(file_data)
+
+        # Sort by file path
+        files.sort(key=lambda x: x["file_path"])
 
         # Summary statistics
         total_files = len(files)
-        languages = list(set(f["language"] for f in files if f["language"]))
-        total_elements = sum(f["element_count"] for f in files)
+        entity_types = list(set(et for f in files for et in f["entity_types"]))
+        source_types = list(set(st for f in files for st in f["source_types"]))
+        total_items = sum(f["item_count"] for f in files)
 
         return {
             "success": True,
@@ -511,8 +524,9 @@ async def find_files(
             },
             "summary": {
                 "total_files": total_files,
-                "total_elements": total_elements,
-                "languages": languages,
+                "total_items": total_items,
+                "entity_types": entity_types,
+                "source_types": source_types,
                 "limit_applied": total_files == limit,
             },
             "files": files,

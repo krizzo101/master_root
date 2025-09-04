@@ -32,49 +32,53 @@ async def get_api_endpoints() -> List[Dict[str, Any]]:
         r'@.*\.route\s*\(\s*["\']([^"\']+)["\'](?:.*methods\s*=\s*\[([^\]]+)\])?',
     ]
 
-    # Query code_elements for route decorator patterns
+    # Search unified context for API route patterns
+    search_params = {
+        "source_types": ["code"],
+        "entity_types": ["function", "method"],
+        "limit": 1000,
+    }
+
+    # Get all code elements that might contain route decorators
+    context_items = await db.search_context_items(**search_params)
+
+    # Process each route pattern
     for pattern in route_patterns:
         try:
-            # Search in PostgreSQL code_elements table
-            query = """
-            SELECT file_path, content, line_start, line_end, element_name
-            FROM code_elements
-            WHERE content ~ %s
-            AND element_type IN ('function', 'method')
-            ORDER BY file_path, line_start
-            """
+            compiled_pattern = re.compile(pattern, re.IGNORECASE | re.MULTILINE)
 
-            results = await db.fetch_many(query, pattern)
+            for item in context_items:
+                content = item.get("content", "")
+                if not content:
+                    continue
 
-            for row in results:
-                file_path = row["file_path"]
-                content = row["content"]
-                line_start = row["line_start"]
-                function_name = row["element_name"]
-
-                # Extract route information from content
-                matches = re.finditer(pattern, content, re.MULTILINE | re.IGNORECASE)
-
+                matches = compiled_pattern.finditer(content)
                 for match in matches:
+                    file_path = item.get("file_path", "")
+                    function_name = item.get("function_name") or item.get("title", "")
+                    line_start = item.get("line_start")
+
                     endpoint_path = match.group(1)
 
-                    # Extract HTTP methods
+                    # Extract HTTP methods from the matched pattern
                     methods = []
-                    if "get(" in match.group(0).lower():
+                    match_str = match.group(0).lower()
+
+                    if "get(" in match_str:
                         methods = ["GET"]
-                    elif "post(" in match.group(0).lower():
+                    elif "post(" in match_str:
                         methods = ["POST"]
-                    elif "put(" in match.group(0).lower():
+                    elif "put(" in match_str:
                         methods = ["PUT"]
-                    elif "delete(" in match.group(0).lower():
+                    elif "delete(" in match_str:
                         methods = ["DELETE"]
-                    elif "patch(" in match.group(0).lower():
+                    elif "patch(" in match_str:
                         methods = ["PATCH"]
-                    elif "head(" in match.group(0).lower():
+                    elif "head(" in match_str:
                         methods = ["HEAD"]
-                    elif "options(" in match.group(0).lower():
+                    elif "options(" in match_str:
                         methods = ["OPTIONS"]
-                    elif "trace(" in match.group(0).lower():
+                    elif "trace(" in match_str:
                         methods = ["TRACE"]
                     elif len(match.groups()) > 1 and match.group(2):
                         # Parse methods from Flask route decorator

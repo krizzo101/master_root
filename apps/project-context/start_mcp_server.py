@@ -22,10 +22,14 @@ async def main():
     )
     print("  - Neo4j: bolt://localhost:7687")
 
-    # Initialize database connections
+    # Initialize enhanced database connections with unified context
     try:
         await initialize_connections()
-        print("✅ Database connections established")
+        print("✅ Enhanced database connections with unified context established")
+        print("  - PostgreSQL with optimized connection pooling")
+        print("  - Ingestion database for high-performance operations")
+        print("  - Neo4j for relationship queries (optional)")
+        print("  - Redis for context bridge integration (optional)")
     except Exception as e:
         print(f"❌ Database connection failed: {e}")
         sys.exit(1)

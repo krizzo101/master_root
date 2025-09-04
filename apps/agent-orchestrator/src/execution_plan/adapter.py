@@ -8,14 +8,22 @@ Handles type conversions, validation, and mapping between systems.
 """
 
 import logging
+import os
+
+# Import orchestrator components
+import sys
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-# Import orchestrator components
-from ..enhanced_orchestrator import EnhancedAgentTask
-from ..quality_gates import QualityGateManager
-from .schema import (
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
+from enhanced_orchestrator import EnhancedAgentTask
+from quality_gates import QualityGateManager
+
+# Add parent directory for execution_plan_schema
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+from execution_plan_schema import (
     ExecutionMode,
     ExecutionPhase,
     ExecutionPlan,
@@ -107,7 +115,7 @@ class ExecutionPlanAdapter:
         """Convert TaskDefinition to EnhancedAgentTask"""
 
         # Generate deterministic UUID if not provided
-        agent_uuid = task_def.agent_uuid
+        agent_uuid = getattr(task_def, "agent_uuid", None)
         if not agent_uuid:
             agent_uuid = self.generate_deterministic_uuid(task_def.task_id, plan_id)
 
@@ -115,13 +123,19 @@ class ExecutionPlanAdapter:
         task_type_str = self.convert_task_type(task_def.task_type)
 
         # Build enhanced context
-        enhanced_context = dict(task_def.context)
-        if task_def.working_directory:
-            enhanced_context["working_directory"] = task_def.working_directory
-        if task_def.output_files:
-            enhanced_context["output_files"] = task_def.output_files
-        if task_def.resource_requirements:
-            enhanced_context.update(task_def.resource_requirements)
+        enhanced_context = task_def.context.to_dict() if task_def.context else {}
+
+        working_dir = getattr(task_def, "working_directory", None)
+        if working_dir:
+            enhanced_context["working_directory"] = working_dir
+
+        output_files = getattr(task_def, "output_files", None)
+        if output_files:
+            enhanced_context["output_files"] = output_files
+
+        resource_reqs = getattr(task_def, "resource_requirements", None)
+        if resource_reqs:
+            enhanced_context.update(resource_reqs)
 
         # Create enhanced agent task
         enhanced_task = EnhancedAgentTask(
@@ -131,15 +145,15 @@ class ExecutionPlanAdapter:
             dependencies=task_def.dependencies,
             context=enhanced_context,
             # Enhanced features
-            quality_gates=task_def.quality_gates,
+            quality_gates=getattr(task_def, "quality_gates", []),
             validation_required=self.convert_validation_level(
-                task_def.validation_level
+                getattr(task_def, "validation_level", ValidationLevel.STANDARD)
             ),
-            phase_id=task_def.phase_id,
+            phase_id=getattr(task_def, "phase_id", None),
             agent_uuid=agent_uuid,
-            team_id=task_def.team_id,
-            monitoring_enabled=task_def.monitoring_enabled,
-            background_execution=task_def.background_execution,
+            team_id=getattr(task_def, "team_id", None),
+            monitoring_enabled=getattr(task_def, "monitoring_enabled", True),
+            background_execution=getattr(task_def, "background_execution", False),
         )
 
         return enhanced_task
@@ -159,18 +173,21 @@ class ExecutionPlanAdapter:
             "config": gate.config,
             "dependencies": gate.dependencies,
             "timeout_seconds": gate.timeout_seconds,
-            "retry_interval": gate.retry_interval,
-            "max_retries": gate.max_retries,
+            "retry_interval": getattr(gate, "retry_interval", 30),
+            "max_retries": getattr(gate, "max_retries", 3),
             "enabled": gate.enabled,
+            "critical": getattr(gate, "critical", False),
         }
 
     def convert_execution_plan(self, execution_plan: ExecutionPlan) -> Dict[str, Any]:
         """Convert complete ExecutionPlan to orchestrator-compatible format"""
 
         # Validate plan first
-        errors = execution_plan.validate()
-        if errors:
-            raise ValueError(f"Invalid execution plan: {', '.join(errors)}")
+        validation_result = execution_plan.validate_comprehensive()
+        if not validation_result.is_valid:
+            raise ValueError(
+                f"Invalid execution plan: {', '.join(validation_result.errors)}"
+            )
 
         # Convert tasks
         enhanced_tasks = []
@@ -197,7 +214,11 @@ class ExecutionPlanAdapter:
             "enable_monitoring": execution_plan.enable_monitoring,
             "use_optimizations": execution_plan.use_optimizations,
             "output_directory": execution_plan.output_directory,
-            "token_requirements": execution_plan.token_requirements,
+            "token_requirements": getattr(
+                execution_plan.resource_requirements, "estimated_tokens", 5
+            )
+            if execution_plan.resource_requirements
+            else 5,
             "estimated_duration": execution_plan.estimated_total_duration_minutes,
             "fallback_strategy": execution_plan.fallback_strategy,
         }

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard API Test</title>
+</head>
+<body>
+    <h1>Dashboard API Test</h1>
+    <div id="status">Loading...</div>
+    <div id="tasks">Loading tasks...</div>
+
+    <script>
+    // Test API connection
+    fetch('http://localhost:8002/api/status')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('status').innerHTML = `
+                <h2>System Status</h2>
+                <p>Progress: ${data.overall_progress}%</p>
+                <p>Completed Tasks: ${data.completed_tasks}</p>
+                <p>Total Tasks: ${data.total_tasks}</p>
+            `;
+        })
+        .catch(error => {
+            document.getElementById('status').innerHTML = `
+                <h2>Error</h2>
+                <p style="color: red;">${error}</p>
+            `;
+        });
+
+    // Test tasks API
+    fetch('http://localhost:8002/api/tasks')
+        .then(response => response.json())
+        .then(data => {
+            const taskList = data.slice(0, 5).map(task =>
+                `<li>${task.task_id}: ${task.status} (${task.task_type})</li>`
+            ).join('');
+            document.getElementById('tasks').innerHTML = `
+                <h2>Recent Tasks</h2>
+                <ul>${taskList}</ul>
+            `;
+        })
+        .catch(error => {
+            document.getElementById('tasks').innerHTML = `
+                <h2>Tasks Error</h2>
+                <p style="color: red;">${error}</p>
+            `;
+        });
+    </script>
+</body>
+</html>

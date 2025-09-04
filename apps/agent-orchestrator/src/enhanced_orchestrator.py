@@ -10,13 +10,17 @@ import asyncio
 import json
 import logging
 import os
+
+# Import base orchestrator components
+import sys
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-# Import base orchestrator components
+sys.path.append(os.path.dirname(__file__))
+
 from generic_orchestrator import (
     AgentTask,
     DependencyManager,
@@ -27,7 +31,7 @@ from generic_orchestrator import (
 from quality_gates import GateStatus, QualityGateManager, ValidationResult
 
 try:
-    from .agent_monitor import AgentStatus, AgentStatusMonitor
+    from agent_monitor import AgentStatus, AgentStatusMonitor
 except ImportError:
     # Fallback for missing agent_monitor
     AgentStatus = None
