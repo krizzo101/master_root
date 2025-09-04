@@ -94,7 +94,7 @@ class PerformanceMetrics(BaseModel):
 @app.get("/")
 async def serve_dashboard():
     """Serve the main dashboard HTML"""
-    return FileResponse("frontend/index.html")
+    return FileResponse("../frontend/index.html")
 
 
 @app.get("/api/status")
@@ -265,7 +265,7 @@ async def startup_event():
 
     # Mount static files (with error handling)
     try:
-        app.mount("/static", StaticFiles(directory="frontend"), name="static")
+        app.mount("/static", StaticFiles(directory="../frontend"), name="static")
     except Exception as e:
         logger.warning(f"Could not mount static files: {e}")
 
@@ -374,7 +374,7 @@ async def get_mcp_project_summary():
         # Import MCP tools (since the server is running in background)
         sys.path.append("/home/opsvi/master_root/apps/project-context/src")
         from project_context.tools.architecture import get_project_summary
-        
+
         summary = await get_project_summary()
         return summary
     except Exception as e:

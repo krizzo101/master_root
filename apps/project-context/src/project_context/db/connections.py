@@ -191,9 +191,7 @@ class UnifiedContextConnections:
             param_idx += 1
 
         if content_search:
-            conditions.append(
-                f"(content ILIKE ${param_idx} OR title ILIKE ${param_idx})"
-            )
+            conditions.append(f"(content ILIKE ${param_idx} OR title ILIKE ${param_idx + 1})")
             params.extend([f"%{content_search}%", f"%{content_search}%"])
             param_idx += 2
 
@@ -246,9 +244,7 @@ class UnifiedContextConnections:
 
         # Aggregate stats
         total_items = sum(row["count"] for row in rows)
-        unique_projects = len(
-            set(row["project_id"] for row in rows if row.get("project_id"))
-        )
+        unique_projects = len(set(row["project_id"] for row in rows if row.get("project_id")))
 
         return {
             "total_items": total_items,
