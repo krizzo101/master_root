@@ -1,0 +1,11 @@
+{
+  "name": "Security Requirements Check",
+  "description": "Ensure security requirements are met",
+  "type": "http",
+  "config": {
+    "url": "https://httpbin.org/status/200"
+  },
+  "dependencies": [],
+  "status": "pending",
+  "last_checked": null
+}

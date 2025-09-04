@@ -12,7 +12,7 @@ from execution_plan_schema import TaskType
 # This works - valid plan
 builder = ExecutionPlanBuilder("Valid Plan")
 builder.add_task("research", TaskType.RESEARCH_GENIUS, "Research task")
-builder.add_task("design", TaskType.SOLUTION_ARCHITECT, "Design task", 
+builder.add_task("design", TaskType.SOLUTION_ARCHITECT, "Design task",
                 dependencies=["research"])
 plan = builder.build()  # ✅ Validates successfully
 print(f"Created plan with {len(plan.tasks)} tasks")
@@ -93,12 +93,12 @@ def create_execution_plan_safely(name, task_configs):
         builder = ExecutionPlanBuilder(name)
         for config in task_configs:
             builder.add_task(**config)
-        
+
         return builder.build()  # May raise ValueError
-        
+
     except ValueError as e:
         error_msg = str(e)
-        
+
         if "circular_dependency" in error_msg:
             print(f"❌ Circular dependency detected in '{name}'")
         elif "invalid_dependency_reference" in error_msg:
@@ -107,7 +107,7 @@ def create_execution_plan_safely(name, task_configs):
             print(f"❌ Duplicate task IDs in '{name}'")
         else:
             print(f"❌ Validation error in '{name}': {e}")
-            
+
         return None
 
 # Usage
@@ -146,7 +146,7 @@ def create_production_plan():
     builder.add_task("research", TaskType.RESEARCH_GENIUS, "Research task")
     builder.add_task("develop", TaskType.DEVELOPMENT_SPECIALIST, "Build solution",
                     dependencies=["research"])
-    
+
     try:
         return builder.build()  # Validates automatically
     except ValueError as e:

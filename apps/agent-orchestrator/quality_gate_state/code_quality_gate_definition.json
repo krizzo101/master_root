@@ -1,0 +1,13 @@
+{
+  "name": "Code Quality Validation",
+  "description": "Validate code meets quality standards",
+  "type": "code_quality",
+  "config": {
+    "max_complexity": 10,
+    "min_coverage": 85,
+    "check_formatting": true
+  },
+  "dependencies": [],
+  "status": "pending",
+  "last_checked": null
+}
