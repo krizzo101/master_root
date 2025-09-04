@@ -21,7 +21,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-import numpy as np
+# Use built-in statistics instead of numpy to avoid dependency
+import statistics
 
 try:
     from .enhanced_orchestrator import EnhancedAgentTask
@@ -410,9 +411,9 @@ class ResourcePredictor:
             )
 
         # Calculate predictions based on similar tasks
-        tokens = int(np.mean([t["tokens_used"] for t in similar_tasks]))
-        duration = np.mean([t["actual_duration"] for t in similar_tasks])
-        memory = int(np.mean([t["memory_used"] for t in similar_tasks]))
+        tokens = int(statistics.mean([t["tokens_used"] for t in similar_tasks]))
+        duration = statistics.mean([t["actual_duration"] for t in similar_tasks])
+        memory = int(statistics.mean([t["memory_used"] for t in similar_tasks]))
 
         # Calculate parallel compatibility
         parallel_score = self._calculate_parallel_compatibility(task, similar_tasks)
