@@ -3,7 +3,7 @@
  * Handles real-time communication with the dashboard backend
  */
 class WebSocketManager {
-    constructor(url = 'ws://localhost:8004/ws', options = {}) {
+    constructor(url = `ws://${window.location.host}/ws`, options = {}) {
         this.url = url;
         this.ws = null;
         this.isConnected = false;

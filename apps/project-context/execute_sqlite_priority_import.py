@@ -8,13 +8,14 @@ import asyncio
 import json
 import sqlite3
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 # Add orchestrator path
 sys.path.append("/home/opsvi/master_root/apps/agent-orchestrator/src")
 sys.path.append("/home/opsvi/master_root/apps/project-context")
 
+# Import after path modification  # noqa: E402
 from practical_orchestrator import PracticalAgentTask, PracticalOrchestrator
 
 
@@ -40,35 +41,35 @@ async def analyze_sqlite_priorities():
         total_sessions = cursor.fetchone()["total_sessions"]
 
         cursor.execute(
-            "SELECT COUNT(*) as total_messages FROM nodes WHERE type LIKE '%message%'"
+            "SELECT COUNT(*) as total_messages FROM nodes WHERE node_type LIKE '%message%'"
         )
         total_messages = cursor.fetchone()["total_messages"]
 
-        cursor.execute(
-            "SELECT COUNT(*) as total_tools FROM nodes WHERE type = 'tool_call'"
-        )
+        cursor.execute("SELECT COUNT(*) as total_tools FROM nodes WHERE node_type = 'tool_call'")
         total_tools = cursor.fetchone()["total_tools"]
 
         # Get priority sessions (recent, with tool usage, substantial conversations)
         cursor.execute(
             """
-            SELECT s.id, s.name, s.created_at, s.updated_at,
-                   COUNT(n.id) as message_count,
-                   COUNT(CASE WHEN n.type = 'tool_call' THEN 1 END) as tool_count,
-                   MAX(n.created_at) as last_activity,
+            SELECT s.session_id, s.cwd, s.git_branch, s.created_at,
+                   COUNT(n.uuid) as message_count,
+                   COUNT(CASE WHEN n.node_type = 'tool_call' THEN 1 END) as tool_count,
+                   MAX(n.timestamp) as last_activity,
                    CASE
-                       WHEN s.updated_at > datetime('now', '-30 days') AND COUNT(n.id) > 10 THEN 'high'
-                       WHEN s.updated_at > datetime('now', '-90 days') AND COUNT(n.id) > 5 THEN 'medium'
+                       WHEN s.created_at > datetime('now', '-30 days') AND
+                            COUNT(n.uuid) > 10 THEN 'high'
+                       WHEN s.created_at > datetime('now', '-90 days') AND
+                            COUNT(n.uuid) > 5 THEN 'medium'
                        ELSE 'low'
                    END as priority
             FROM sessions s
-            JOIN nodes n ON s.id = n.session_id
-            GROUP BY s.id, s.name, s.created_at, s.updated_at
+            JOIN nodes n ON s.session_id = n.session_id
+            GROUP BY s.session_id, s.cwd, s.git_branch, s.created_at
             ORDER BY
                 CASE priority WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END,
                 tool_count DESC,
                 message_count DESC,
-                s.updated_at DESC
+                s.created_at DESC
         """
         )
 
@@ -93,7 +94,7 @@ async def analyze_sqlite_priorities():
             "sample_sessions": prioritized_sessions[:10],
         }
 
-        print(f"📈 Analysis complete:")
+        print("📈 Analysis complete:")
         print(f"   • Total Sessions: {total_sessions}")
         print(f"   • Total Messages: {total_messages}")
         print(f"   • Total Tool Calls: {total_tools}")
@@ -247,7 +248,8 @@ TASK: Test integration with MCP server and prepare for full import.
 
 CONTEXT:
 - Priority import completed: {analysis['priority_breakdown']['high']} sessions
-- Remaining data: {analysis['priority_breakdown']['medium']} medium + {analysis['priority_breakdown']['low']} low priority
+- Remaining data: {analysis['priority_breakdown']['medium']} medium + "
+                + f"{analysis['priority_breakdown']['low']} low priority
 - Production system integration required
 
 REQUIREMENTS:
@@ -317,20 +319,21 @@ DELIVERABLES: Integration test results and comprehensive plan for full-scale imp
         summary_file = Path("sqlite_priority_import_summary.json")
         summary_file.write_text(json.dumps(summary, indent=2, default=str))
 
-        print(f"\n📊 EXECUTION SUMMARY")
+        print("\n📊 EXECUTION SUMMARY")
         print(f"⏱️  Duration: {duration/60:.1f} minutes")
         print(
-            f"✅ Success Rate: {successful_tasks}/{len(import_tasks)} ({summary['success_rate']:.1f}%)"
+            f"✅ Success Rate: {successful_tasks}/{len(import_tasks)} "
+            f"({summary['success_rate']:.1f}%)"
         )
         print(f"📄 Summary saved: {summary_file}")
 
         if successful_tasks == len(import_tasks):
-            print(f"\n🎉 PRIORITY IMPORT COMPLETED SUCCESSFULLY!")
-            print(f"📈 Ready for medium/low priority import phases")
+            print("\n🎉 PRIORITY IMPORT COMPLETED SUCCESSFULLY!")
+            print("📈 Ready for medium/low priority import phases")
             return 0
         else:
             print(f"\n⚠️  PARTIAL SUCCESS - {failed_tasks} tasks failed")
-            print(f"🔄 Review failed tasks and re-execute as needed")
+            print("🔄 Review failed tasks and re-execute as needed")
             return 1
 
     except Exception as e:

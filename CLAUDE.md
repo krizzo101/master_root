@@ -32,6 +32,7 @@ git status && git add -A && git commit -m "checkpoint: session start"
 - Check .mcp.json for ALL MCP configuration before coding MCP tools.
 - NO FALLBACKS, NO WORKAROUNDS. Fix root causes.
 - NO ASSUMPTIONS. Check facts, don't guess.
+- BE CONCISE. Communicate all pertinent information in minimal tokens. Avoid filler content.
 
 Then retry loading KB instructions every 30 seconds until available.
 

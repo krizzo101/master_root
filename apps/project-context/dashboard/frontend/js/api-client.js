@@ -3,7 +3,7 @@
  * Handles all HTTP requests to the dashboard backend
  */
 class ApiClient {
-    constructor(baseUrl = 'http://localhost:8004', options = {}) {
+    constructor(baseUrl = window.location.origin, options = {}) {
         this.baseUrl = baseUrl.replace(/\/$/, ''); // Remove trailing slash
         this.timeout = options.timeout || 10000;
         this.retryAttempts = options.retryAttempts || 3;

@@ -36,11 +36,13 @@ class Dashboard {
         try {
             console.log('Initializing dashboard...');
 
-            // Initialize API client
-            this.apiClient = new DashboardApiClient('http://localhost:8004');
+            // Initialize API client - use current host instead of hardcoded port
+            const currentHost = window.location.protocol + '//' + window.location.host;
+            this.apiClient = new ApiClient(currentHost);
 
-            // Initialize WebSocket manager
-            this.wsManager = new WebSocketManager('ws://localhost:8004/ws');
+            // Initialize WebSocket manager - use current host
+            const wsHost = window.location.host;
+            this.wsManager = new WebSocketManager(`ws://${wsHost}/ws`);
 
             // Set up WebSocket event listeners
             this.setupWebSocketListeners();
@@ -457,11 +459,16 @@ class Dashboard {
 
     async refreshData() {
         try {
-            const data = await this.apiClient.getDashboardData();
+            // Use individual API endpoints instead of getDashboardData
+            const [status, tasks, performance] = await Promise.all([
+                this.apiClient.getStatus(),
+                this.apiClient.getTasks(),
+                this.apiClient.getPerformance()
+            ]);
 
-            this.cache.status = data.status;
-            this.cache.tasks = data.tasks || [];
-            this.cache.performance = data.performance;
+            this.cache.status = status;
+            this.cache.tasks = tasks || [];
+            this.cache.performance = performance;
             this.cache.lastFetchTime = Date.now();
 
             this.updateExecutiveSummary();

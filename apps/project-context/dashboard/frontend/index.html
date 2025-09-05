@@ -7,14 +7,14 @@
     <title>Orchestrator Monitoring Dashboard</title>
 
     <!-- External Stylesheets -->
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="components.css">
-    <link rel="stylesheet" href="charts.css">
-    <link rel="stylesheet" href="animations.css">
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="static/components.css">
+    <link rel="stylesheet" href="static/charts.css">
+    <link rel="stylesheet" href="static/animations.css">
 
     <!-- Preload critical resources -->
-    <link rel="preload" href="styles.css" as="style">
-    <link rel="preload" href="components.css" as="style">
+    <link rel="preload" href="static/styles.css" as="style">
+    <link rel="preload" href="static/components.css" as="style">
 
     <!-- Theme Toggle Support -->
     <script>
@@ -406,11 +406,20 @@
     </script>
 
     <!-- JavaScript Modules -->
-    <script src="js/dom-utils.js"></script>
-    <script src="js/api-client.js"></script>
-    <script src="js/websocket-manager.js"></script>
-    <script src="js/chart-manager.js"></script>
-    <script src="js/notification-system.js"></script>
-    <script src="js/dashboard.js"></script>
+    <script src="static/js/dom-utils.js"></script>
+    <script src="static/js/api-client.js"></script>
+    <script src="static/js/websocket-manager.js"></script>
+    <script src="static/js/chart-manager.js"></script>
+    <script src="static/js/notification-system.js"></script>
+    <script src="static/js/dashboard.js"></script>
+
+    <!-- Initialize Dashboard -->
+    <script>
+        // Initialize dashboard when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing dashboard...');
+            window.dashboard = new Dashboard();
+        });
+    </script>
 </body>
 </html>
