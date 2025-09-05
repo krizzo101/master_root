@@ -3,9 +3,9 @@
 Provides deterministic, pure functions for string normalization,
 identifier validation, middle truncation, and boolean parsing.
 """
-from typing import Any, Optional
 import re
 import unicodedata
+from typing import Any, Optional
 
 __all__ = [
     "normalize_string",
@@ -32,5 +32,4 @@ def _to_ascii(text: str) -> str:
 def normalize_string(s: Optional[str]) -> str:
     """Normalize a string to lowercase ASCII with collapsed whitespace.
 
-    Parameters:
-"""
+    Parameters:"""

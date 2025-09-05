@@ -24,5 +24,5 @@ underlying utils contains functions that perform such actions, they will only
 be invoked if explicitly delegated to and with provided arguments.
 """
 
-from typing import Any, Dict, Optional, Sequence
 import logging
+from typing import Any, Dict, Optional, Sequence
