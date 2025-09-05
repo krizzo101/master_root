@@ -45,7 +45,9 @@ async def analyze_sqlite_priorities():
         )
         total_messages = cursor.fetchone()["total_messages"]
 
-        cursor.execute("SELECT COUNT(*) as total_tools FROM nodes WHERE node_type = 'tool_call'")
+        cursor.execute(
+            "SELECT COUNT(*) as total_tools FROM nodes WHERE node_type = 'tool_call'"
+        )
         total_tools = cursor.fetchone()["total_tools"]
 
         # Get priority sessions (recent, with tool usage, substantial conversations)
