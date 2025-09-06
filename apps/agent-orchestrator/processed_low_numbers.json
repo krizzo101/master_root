@@ -1,0 +1,15 @@
+{
+  "processed_data": [
+    7,
+    15,
+    21,
+    33,
+    47
+  ],
+  "count": 5,
+  "processing_info": {
+    "filter_condition": "<= 50",
+    "sort_order": "ascending",
+    "processed_timestamp": "2025-09-06T10:48:47-04:00"
+  }
+}

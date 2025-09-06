@@ -16,10 +16,17 @@ mcp__time__current_time("YYYY-MM-DD HH:mm:ss")
 mcp__knowledge__knowledge_query(query_type="search", search_text="GLOBAL OPERATIONAL INSTRUCTIONS MASTER", limit=1)
 # ↑ THIS CONTAINS YOUR ACTUAL OPERATIONAL RULES
 
-# 4. CHECK RECENT WORK
+# 4. UPDATE WORKSPACE INTELLIGENCE
+python3 .claude/knowledge/scripts/env_profiler.py
+
+# 5. CHECK RECENT WORK
 mcp__knowledge__knowledge_query(query_type="recent", limit=5)
 
-# 5. COMMIT CHECKPOINT
+# 6. UNDERSTAND PROJECT CONTEXT
+# Read .claude/knowledge/PROJECT_CONTEXT.md - WHY you're working on this
+# Read .claude/knowledge/VERIFIED_CAPABILITIES.md - WHAT works right now
+
+# 7. COMMIT CHECKPOINT
 git status && git add -A && git commit -m "checkpoint: session start"
 ```
 
@@ -50,3 +57,50 @@ Then retry loading KB instructions every 30 seconds until available.
 - Python: /home/opsvi/miniconda/bin/python
 
 **NOW GO EXECUTE THE STARTUP SEQUENCE ABOVE**
+
+# CLAUDE KNOWLEDGE WORKSPACE
+
+## What It Is
+`.claude/knowledge/` is YOUR personal workspace - separate from project deliverables. It contains your operational intelligence, reference materials, and tools for maintaining context across sessions.
+
+**Key Distinction:**
+- `.claude/knowledge/` = YOUR private workspace (not for humans)
+- Project docs = Human-facing deliverables (goes WITH the project)
+
+## How to Use It
+
+### Daily Startup
+The startup sequence automatically:
+1. Runs `env_profiler.py` to capture current environment state
+2. Updates `session_reference.md` with what actually works
+3. Loads recent knowledge from KB for context
+
+### During Work
+- Store learnings and patterns in appropriate subdirectories
+- Reference `session_reference.md` when unsure what works
+- Use KB tools to persist insights across sessions
+
+### Key Files Created
+- `docs/environment_profile.json` - Current system state (auto-generated)
+- `docs/session_reference.md` - Daily workflow guidance
+- `scripts/env_profiler.py` - Environment data collection tool
+
+# FILE ORGANIZATION RULES
+
+## Claude Knowledge Space Structure
+**MANDATORY**: All Claude-generated documentation, guides, and analysis files MUST go in `.claude/knowledge/` subdirectories.
+
+### Directory Structure:
+- `.claude/knowledge/docs/` - Project documentation and state files
+- `.claude/knowledge/guides/` - How-to guides and comprehensive documentation
+- `.claude/knowledge/architecture/` - System design, architecture docs
+- `.claude/knowledge/workflows/` - Process documentation and workflows
+- `.claude/knowledge/templates/` - Reusable templates and patterns
+- `.claude/knowledge/analysis/` - Analysis reports and findings
+
+### Rules:
+1. **NEVER create documentation files in project root** - Always use `.claude/knowledge/`
+2. **Choose appropriate subdirectory** based on content type
+3. **Use descriptive filenames** with prefixes: `claude_`, `analysis_`, `guide_`, etc.
+4. **Store KB entries** for persistent knowledge using `mcp__knowledge__knowledge_store`
+5. **Reference location** in KB entries for easy retrieval

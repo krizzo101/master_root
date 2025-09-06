@@ -1,0 +1,38 @@
+{
+  "task_id": "test_001_math",
+  "task_type": "simple_calculation",
+  "prompt": "**MISSION: Quick Math Test**\n            \n            Perform this simple calculation and provide the answer:\n            \n            Calculate: (15 + 27) \u00d7 3 - 8\n            \n            **DELIVERABLES:**\n            1. Show your work step by step\n            2. Provide the final answer\n            3. Verify the result by working backwards\n            \n            Keep this brief - should take less than 30 seconds.",
+  "context": {},
+  "dependencies": [],
+  "status": "completed",
+  "result": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 4735,
+    "duration_api_ms": 4698,
+    "num_turns": 1,
+    "result": "I'll perform this calculation step by step.\n\n**Step-by-step calculation:**\n1. (15 + 27) \u00d7 3 - 8\n2. 42 \u00d7 3 - 8\n3. 126 - 8\n4. 118\n\n**Final answer:** 118\n\n**Verification (working backwards):**\n- Start with 118\n- Add 8: 118 + 8 = 126\n- Divide by 3: 126 \u00f7 3 = 42\n- Check: 15 + 27 = 42 \u2713\n\nThe answer is **118**.",
+    "session_id": "e2233093-d66e-4ed0-8424-6f0350c98c2e",
+    "total_cost_usd": 0.0269694,
+    "usage": {
+      "input_tokens": 4,
+      "cache_creation_input_tokens": 5132,
+      "cache_read_input_tokens": 18258,
+      "output_tokens": 149,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 5132
+      }
+    },
+    "permission_denials": [],
+    "uuid": "97167094-3a71-42cc-8c49-427174cda047"
+  },
+  "error": null,
+  "start_time": 1757170282.190807,
+  "end_time": 1757170289.294898
+}

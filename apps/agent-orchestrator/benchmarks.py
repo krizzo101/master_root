@@ -214,9 +214,10 @@ class MessageBusBenchmark:
         message_size_bytes: int = 100,
     ) -> BenchmarkResult:
         """Benchmark point-to-point message delivery"""
-        print(f"\n📡 Point-to-Point Messaging Benchmark")
+        print("\n📡 Point-to-Point Messaging Benchmark")
         print(
-            f"   Agents: {agent_count}, Duration: {duration_seconds}s, Message Size: {message_size_bytes}B"
+            f"   Agents: {agent_count}, Duration: {duration_seconds}s, "
+            f"Message Size: {message_size_bytes}B"
         )
 
         # Reset tracking
@@ -290,9 +291,10 @@ class MessageBusBenchmark:
         message_size_bytes: int = 100,
     ) -> BenchmarkResult:
         """Benchmark broadcast message delivery"""
-        print(f"\n📢 Broadcast Messaging Benchmark")
+        print("\n📢 Broadcast Messaging Benchmark")
         print(
-            f"   Agents: {agent_count}, Duration: {duration_seconds}s, Message Size: {message_size_bytes}B"
+            f"   Agents: {agent_count}, Duration: {duration_seconds}s, "
+            f"Message Size: {message_size_bytes}B"
         )
 
         # Reset tracking
@@ -357,7 +359,7 @@ class MessageBusBenchmark:
         topic_count: int = 5,
     ) -> BenchmarkResult:
         """Benchmark topic-based messaging"""
-        print(f"\n🏷️  Topic-Based Messaging Benchmark")
+        print("\n🏷️  Topic-Based Messaging Benchmark")
         print(
             f"   Agents: {agent_count}, Duration: {duration_seconds}s, Topics: {topic_count}"
         )
@@ -498,11 +500,11 @@ class MessageBusBenchmark:
     ) -> List[BenchmarkResult]:
         """Run complete benchmark suite"""
 
-        print(f"\n{'='*60}")
-        print(f"🏁 STARTING MESSAGE BUS BENCHMARKS")
-        print(f"{'='*60}")
+        print("\n" + "=" * 60)
+        print("🏁 STARTING MESSAGE BUS BENCHMARKS")
+        print("=" * 60)
         print(f"Target: {agent_count} agents, {duration}s duration")
-        print(f"Requirements: >1000 msg/s, <100ms avg latency")
+        print("Requirements: >1000 msg/s, <100ms avg latency")
 
         results = []
 
@@ -630,9 +632,9 @@ async def main():
         )
 
         # Print final summary
-        print(f"\n{'='*60}")
-        print(f"📈 BENCHMARK SUMMARY")
-        print(f"{'='*60}")
+        print("\n" + "=" * 60)
+        print("📈 BENCHMARK SUMMARY")
+        print("=" * 60)
 
         for result in results:
             throughput_status = "✅" if result.messages_per_second >= 1000 else "❌"
@@ -644,7 +646,7 @@ async def main():
         if args.save_results:
             benchmark.save_results(results)
 
-        print(f"\n🎉 Benchmarking complete!")
+        print("\n🎉 Benchmarking complete!")
 
     except KeyboardInterrupt:
         print("\n⏹️  Benchmark interrupted by user")

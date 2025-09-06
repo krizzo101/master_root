@@ -1,0 +1,220 @@
+# Production Configuration for Chat Monitoring System
+# Environment: production
+# Version: 1.0
+
+service:
+  name: "chat-monitoring-prod"
+  log_level: "INFO"
+  enable_monitoring: true
+  enable_fault_tolerance: true
+  workers: 4
+  max_connections: 100
+
+  # Service discovery
+  discovery:
+    enabled: true
+    redis_url: "${REDIS_URL}"
+    ttl_seconds: 60
+    health_check_interval: 30
+
+# File watcher configuration
+watcher:
+  enabled: true
+  batch_size: 20
+  queue_size: 2000
+  max_files_per_minute: 500
+  file_extensions: [".jsonl"]
+
+  # Watch directories
+  watch_directories:
+    - "/home/app/.claude/projects"
+    - "/app/additional_logs"
+
+  exclude_patterns:
+    - "*.tmp"
+    - "*.lock"
+    - "*/__pycache__/*"
+    - "*/.git/*"
+
+# Ingestion pipeline
+ingestion:
+  buffer_max_size: 200
+  buffer_max_age_seconds: 10
+  max_concurrent_files: 50
+  batch_commit_size: 100
+
+  # Performance tuning
+  performance:
+    use_uvloop: true
+    max_workers: 8
+    queue_timeout: 30
+    connection_pool_size: 20
+
+# Database configuration
+database:
+  postgres:
+    url: "${POSTGRES_URL}"
+    max_connections: 20
+    min_connections: 5
+    connection_timeout: 10
+    command_timeout: 30
+
+  sqlite:
+    path: "/app/data/chat_logs.db"
+    journal_mode: "WAL"
+    synchronous: "NORMAL"
+    cache_size: 10000
+
+# Fault tolerance
+fault_tolerance:
+  enabled: true
+  retry_max_attempts: 5
+  retry_backoff_factor: 2.0
+  retry_max_wait: 300
+
+  circuit_breaker:
+    failure_threshold: 10
+    recovery_timeout: 60
+    expected_exception_rate: 0.1
+
+  failure_store:
+    enabled: true
+    max_failed_operations: 10000
+    cleanup_interval_hours: 24
+
+# Monitoring and observability
+monitoring:
+  enabled: true
+  port: 8080
+
+  metrics:
+    enabled: true
+    prometheus_enabled: true
+    export_interval_seconds: 15
+
+  health_checks:
+    enabled: true
+    interval_seconds: 30
+    timeout_seconds: 10
+
+    endpoints:
+      - name: "postgres"
+        type: "database"
+        url: "${POSTGRES_URL}"
+
+      - name: "redis"
+        type: "cache"
+        url: "${REDIS_URL}"
+
+      - name: "system"
+        type: "resources"
+        thresholds:
+          cpu_percent: 85
+          memory_percent: 85
+          disk_percent: 90
+
+  alerts:
+    enabled: true
+    webhook_url: "${ALERT_WEBHOOK_URL}"
+
+    rules:
+      - name: "high_queue_size"
+        condition: "queue_size > 1800"
+        severity: "warning"
+
+      - name: "processing_stopped"
+        condition: "files_processed_per_minute == 0"
+        duration_minutes: 10
+        severity: "critical"
+
+      - name: "high_error_rate"
+        condition: "error_rate > 0.05"
+        duration_minutes: 5
+        severity: "warning"
+
+      - name: "circuit_breaker_open"
+        condition: "circuit_breaker_status == 'open'"
+        severity: "critical"
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "json"
+
+  handlers:
+    console:
+      enabled: true
+      level: "INFO"
+
+    file:
+      enabled: true
+      level: "DEBUG"
+      path: "/app/logs/chat-monitoring.log"
+      max_size_mb: 100
+      backup_count: 5
+
+    syslog:
+      enabled: false
+      host: "localhost"
+      port: 514
+      facility: "local0"
+
+# Security settings
+security:
+  cors:
+    enabled: true
+    allowed_origins: ["http://localhost:3000", "https://grafana.domain.com"]
+
+  authentication:
+    enabled: true
+    type: "token"
+    token: "${API_TOKEN}"
+
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 1000
+    burst_size: 100
+
+# Backup and recovery
+backup:
+  enabled: true
+  interval_hours: 6
+  retention_days: 30
+
+  targets:
+    - type: "database"
+      format: "sql_dump"
+      path: "/app/backups/postgres"
+
+    - type: "configuration"
+      path: "/app/backups/config"
+
+    - type: "logs"
+      path: "/app/backups/logs"
+      compression: "gzip"
+
+# Environment-specific overrides
+environment:
+  production:
+    service:
+      log_level: "WARNING"
+
+    monitoring:
+      alerts:
+        enabled: true
+
+  staging:
+    service:
+      log_level: "DEBUG"
+
+    monitoring:
+      alerts:
+        enabled: false
+
+  development:
+    service:
+      log_level: "DEBUG"
+
+    watcher:
+      batch_size: 5
+      queue_size: 100

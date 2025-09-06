@@ -26,13 +26,13 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-# Add src to Python path
-sys.path.insert(0, str(Path(__file__).parent / "src"))
-
 from src.message_bus.admin.admin_interface import MessageBusAdmin
 from src.message_bus.core.message_bus import MessageBus
 from src.message_bus.gateway.websocket_gateway import WebSocketGateway
 from src.message_bus.routing.message_router import MessageRouter
+
+# Add src to Python path
+sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 # Setup logging
 logging.basicConfig(

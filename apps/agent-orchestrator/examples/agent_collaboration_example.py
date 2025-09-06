@@ -13,7 +13,6 @@ Usage:
 """
 
 import asyncio
-import json
 import logging
 import random
 import sys
@@ -22,10 +21,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from src.message_bus.simple_client import SimpleMessageClient
+
 # Add src to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-
-from src.message_bus.simple_client import SimpleMessageClient
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
