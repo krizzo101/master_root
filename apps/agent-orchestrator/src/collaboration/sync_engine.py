@@ -112,7 +112,7 @@ class SyncEngine:
             self.server.close()
             await self.server.wait_closed()
 
-    async def handle_connection(self, websocket: WebSocketServerProtocol, path: str):
+    async def handle_connection(self, websocket: WebSocketServerProtocol):
         """Handle a new WebSocket connection"""
         agent_id = None
 

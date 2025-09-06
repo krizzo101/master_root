@@ -84,8 +84,15 @@ class WorkspaceManager:
     def _load_workspaces(self):
         """Load existing workspace configurations"""
         for config_file in self.config_path.glob("*.json"):
+            if config_file.name.endswith("_permissions.json"):
+                continue  # Skip permission files
             try:
                 config_data = json.loads(config_file.read_text())
+                # Convert datetime string back to datetime object
+                if "created_at" in config_data:
+                    config_data["created_at"] = datetime.fromisoformat(
+                        config_data["created_at"]
+                    )
                 config = WorkspaceConfig(**config_data)
                 self.active_workspaces[config.workspace_id] = config
 
@@ -93,10 +100,18 @@ class WorkspaceManager:
                 perm_file = self.config_path / f"{config.workspace_id}_permissions.json"
                 if perm_file.exists():
                     perm_data = json.loads(perm_file.read_text())
-                    self.workspace_permissions[config.workspace_id] = {
-                        user_id: WorkspacePermissions(**perm)
-                        for user_id, perm in perm_data.items()
-                    }
+                    permissions = {}
+                    for user_id, perm in perm_data.items():
+                        # Convert datetime and set back to datetime object
+                        if "granted_at" in perm:
+                            perm["granted_at"] = datetime.fromisoformat(
+                                perm["granted_at"]
+                            )
+                        # Convert permissions list back to set
+                        if "permissions" in perm:
+                            perm["permissions"] = set(perm["permissions"])
+                        permissions[user_id] = WorkspacePermissions(**perm)
+                    self.workspace_permissions[config.workspace_id] = permissions
             except Exception as e:
                 print(f"Failed to load workspace config {config_file}: {e}")
 

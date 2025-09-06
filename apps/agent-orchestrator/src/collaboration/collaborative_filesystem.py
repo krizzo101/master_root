@@ -91,7 +91,7 @@ class CollaborativeFileSystem:
 
         # Locks for thread safety
         self.lock = asyncio.Lock()
-        self.file_locks_lock = asyncio.RLock()
+        self.file_locks_lock = asyncio.Lock()
 
         # Load existing state
         self._load_file_state()

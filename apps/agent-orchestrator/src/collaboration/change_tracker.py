@@ -239,7 +239,7 @@ class ChangeTracker:
             # Update branch head
             if current_branch:
                 current_branch.head_commit = commit_id
-                await self._save_branch(current_branch)
+                self._save_branch(current_branch)
 
             # Clear pending changes
             self.pending_changes.clear()
@@ -285,7 +285,7 @@ class ChangeTracker:
             )
 
             self.branches[branch_name] = branch
-            await self._save_branch(branch)
+            self._save_branch(branch)
 
             return True
 
@@ -564,6 +564,9 @@ class ChangeTracker:
 
     async def _save_commit(self, commit: Commit):
         """Save commit to disk"""
+        # Ensure commits directory exists
+        self.commits_path.mkdir(parents=True, exist_ok=True)
+
         commit_file = self.commits_path / f"{commit.commit_id}.json"
         commit_dict = asdict(commit)
         commit_dict["timestamp"] = commit.timestamp.isoformat()
