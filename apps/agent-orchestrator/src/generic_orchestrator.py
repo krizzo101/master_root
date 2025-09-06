@@ -237,6 +237,8 @@ class GenericOrchestrator:
                     "--mcp-config",
                     str(research_config),
                     "--dangerously-skip-permissions",
+                    "--allowedTools",
+                    "mcp__mcp_web_search__brave_web_search,mcp__research_papers__search_papers,mcp__firecrawl__firecrawl_search,WebSearch,Read,Write,Bash",
                     "--output-format",
                     "json",
                 ]
