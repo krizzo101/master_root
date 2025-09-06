@@ -1,0 +1,694 @@
+openapi: 3.0.3
+info:
+  title: Agent Collaboration API
+  version: 1.0.0
+  description: |
+    Real-time communication system for multi-agent collaboration.
+
+    This API enables AI agents to communicate, coordinate tasks, share knowledge,
+    and collaborate on shared workspaces in real-time.
+
+    ## Features
+    - **Real-time Communication**: WebSocket support for instant messaging
+    - **Task Coordination**: Hand-off tasks between specialized agents
+    - **Knowledge Sharing**: Share discoveries and insights
+    - **Workspace Collaboration**: Collaborative editing and artifact sharing
+    - **Security**: API key authentication, message signing, rate limiting
+
+  contact:
+    name: Agent Orchestrator Team
+    url: https://github.com/agent-orchestrator/collaboration
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://api.agent-collab.com
+    description: Production server
+
+security:
+  - ApiKeyAuth: []
+  - BearerAuth: []
+
+paths:
+  /api/v1/health:
+    get:
+      summary: Health check
+      description: Check API health status
+      tags: [System]
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  timestamp:
+                    type: string
+                    format: date-time
+                  active_agents:
+                    type: integer
+                  active_websockets:
+                    type: integer
+
+  /api/v1/agents/register:
+    post:
+      summary: Register new agent
+      description: Register a new agent in the collaboration system
+      tags: [Agent Management]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentRegistrationRequest'
+      responses:
+        '200':
+          description: Agent registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  agent_id:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v1/agents/active:
+    get:
+      summary: List active agents
+      description: Get list of all active collaborating agents
+      tags: [Agent Management]
+      responses:
+        '200':
+          description: List of active agents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ActiveAgent'
+
+  /api/v1/agents/{agent_id}/status:
+    post:
+      summary: Update agent status
+      description: Update agent status and metadata
+      tags: [Agent Management]
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique agent identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentStatusUpdate'
+      responses:
+        '200':
+          description: Status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/messages/send:
+    post:
+      summary: Send message
+      description: Send message to agent(s) through the collaboration system
+      tags: [Messaging]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '200':
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message_id:
+                    type: string
+                    format: uuid
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/v1/agents/{agent_id}/messages:
+    get:
+      summary: Get messages for agent
+      description: Retrieve messages queued for a specific agent
+      tags: [Messaging]
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: max_messages
+          in: query
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Messages retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Message'
+
+  /api/v1/coordination/task-handoff:
+    post:
+      summary: Request task handoff
+      description: Hand off a task from one agent to another
+      tags: [Coordination]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskHandoffRequest'
+      responses:
+        '200':
+          description: Task handoff initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/v1/coordination/help-request:
+    post:
+      summary: Request help
+      description: Broadcast help request to available agents
+      tags: [Coordination]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HelpRequest'
+      responses:
+        '200':
+          description: Help request broadcast
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/v1/workspace/share:
+    post:
+      summary: Share workspace artifact
+      description: Share artifact with agents in workspace
+      tags: [Workspace]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkspaceArtifactRequest'
+      responses:
+        '200':
+          description: Artifact shared successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  artifact_id:
+                    type: string
+                    format: uuid
+
+  /api/v1/workspace/{workspace_id}/status:
+    get:
+      summary: Get workspace status
+      description: Get status and info about shared workspace
+      tags: [Workspace]
+      parameters:
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Workspace status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceStatus'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/schema/message-types:
+    get:
+      summary: Get message schema information
+      description: Get available message types, priorities, and status values
+      tags: [Schema]
+      responses:
+        '200':
+          description: Schema information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message_types:
+                    type: array
+                    items:
+                      type: string
+                    example: ["task_handoff", "help_request", "discovery_share"]
+                  priorities:
+                    type: array
+                    items:
+                      type: string
+                    example: ["low", "normal", "high", "urgent"]
+                  agent_statuses:
+                    type: array
+                    items:
+                      type: string
+                    example: ["online", "busy", "idle", "offline"]
+
+  /ws/collaboration/{agent_id}:
+    get:
+      summary: WebSocket endpoint for real-time collaboration
+      description: |
+        Establish WebSocket connection for real-time bidirectional communication.
+
+        ## Message Types
+        - **heartbeat**: Keep connection alive
+        - **message**: Send collaboration message
+
+        ## Example Messages
+        ```json
+        // Heartbeat
+        {
+          "type": "heartbeat",
+          "agent_id": "agent_001",
+          "timestamp": "2024-12-05T10:30:00Z"
+        }
+
+        // Send message
+        {
+          "type": "message",
+          "message_type": "discovery_share",
+          "to_agent": null,
+          "content": {...}
+        }
+        ```
+      tags: [WebSocket]
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique agent identifier
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for agent authentication
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for agent authentication
+
+  schemas:
+    AgentRegistrationRequest:
+      type: object
+      required: [agent_id, agent_type, capabilities]
+      properties:
+        agent_id:
+          type: string
+          description: Unique identifier for the agent
+          example: "research_agent_001"
+        agent_type:
+          type: string
+          description: Type/role of the agent
+          example: "research_specialist"
+        capabilities:
+          type: array
+          items:
+            type: string
+          description: List of agent capabilities
+          example: ["web_research", "data_analysis", "report_generation"]
+        workspace_id:
+          type: string
+          nullable: true
+          description: Initial workspace ID to join
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Additional agent metadata
+
+    ActiveAgent:
+      type: object
+      properties:
+        agent_id:
+          type: string
+        agent_type:
+          type: string
+        capabilities:
+          type: array
+          items:
+            type: string
+        status:
+          $ref: '#/components/schemas/AgentStatus'
+        last_seen:
+          type: string
+          format: date-time
+        workspace_id:
+          type: string
+          nullable: true
+
+    AgentStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: '#/components/schemas/AgentStatus'
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Additional status metadata
+
+    SendMessageRequest:
+      type: object
+      required: [message_type, from_agent, content]
+      properties:
+        message_type:
+          $ref: '#/components/schemas/MessageType'
+        from_agent:
+          type: string
+          description: Sending agent ID
+        to_agent:
+          type: string
+          nullable: true
+          description: Recipient agent ID, null for broadcast
+        content:
+          type: object
+          additionalProperties: true
+          description: Message payload
+        priority:
+          $ref: '#/components/schemas/Priority'
+        workspace_id:
+          type: string
+          nullable: true
+        correlation_id:
+          type: string
+          nullable: true
+          description: For request-response correlation
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    TaskHandoffRequest:
+      type: object
+      required: [task_id, task_type, task_description, from_agent, to_agent]
+      properties:
+        task_id:
+          type: string
+          description: Unique task identifier
+        task_type:
+          type: string
+          description: Type of task
+        task_description:
+          type: string
+          description: Detailed task description
+        from_agent:
+          type: string
+          description: Agent handing off the task
+        to_agent:
+          type: string
+          description: Agent receiving the task
+        context:
+          type: object
+          additionalProperties: true
+          description: Task context and state
+        dependencies:
+          type: array
+          items:
+            type: string
+          description: List of dependency task IDs
+        deadline:
+          type: string
+          format: date-time
+          nullable: true
+        resources:
+          type: object
+          additionalProperties: true
+          description: Required resources
+
+    HelpRequest:
+      type: object
+      required: [request_id, requesting_agent, help_type, description]
+      properties:
+        request_id:
+          type: string
+          description: Unique help request ID
+        requesting_agent:
+          type: string
+          description: Agent requesting help
+        help_type:
+          type: string
+          enum: [expertise, resource, validation, escalation]
+        description:
+          type: string
+          description: Description of help needed
+        context:
+          type: object
+          additionalProperties: true
+        urgency:
+          $ref: '#/components/schemas/Priority'
+        skills_needed:
+          type: array
+          items:
+            type: string
+
+    WorkspaceArtifactRequest:
+      type: object
+      required: [workspace_id, artifact_type, name, content, author]
+      properties:
+        workspace_id:
+          type: string
+        artifact_type:
+          type: string
+          description: Type of artifact being shared
+        name:
+          type: string
+          description: Artifact name
+        content:
+          type: object
+          additionalProperties: true
+          description: Artifact content
+        author:
+          type: string
+          description: Agent sharing the artifact
+        description:
+          type: string
+          description: Optional description
+
+    Message:
+      type: object
+      required: [message_id, message_type, from_agent, content, timestamp]
+      properties:
+        message_id:
+          type: string
+          format: uuid
+        message_type:
+          $ref: '#/components/schemas/MessageType'
+        from_agent:
+          type: string
+        to_agent:
+          type: string
+          nullable: true
+        content:
+          type: object
+          additionalProperties: true
+        priority:
+          $ref: '#/components/schemas/Priority'
+        timestamp:
+          type: string
+          format: date-time
+        workspace_id:
+          type: string
+          nullable: true
+        correlation_id:
+          type: string
+          nullable: true
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
+
+    WorkspaceStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        workspace_id:
+          type: string
+        participants:
+          type: array
+          items:
+            type: object
+            properties:
+              agent_id:
+                type: string
+              agent_type:
+                type: string
+              status:
+                $ref: '#/components/schemas/AgentStatus'
+        artifacts_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        last_activity:
+          type: string
+          format: date-time
+
+    SuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+
+    MessageType:
+      type: string
+      enum:
+        - task_handoff
+        - help_request
+        - status_update
+        - coordination_request
+        - discovery_share
+        - insight_share
+        - research_finding
+        - knowledge_update
+        - file_update
+        - workspace_sync
+        - collaborative_edit
+        - artifact_share
+        - agent_registration
+        - heartbeat
+        - error_notification
+        - system_alert
+
+    Priority:
+      type: string
+      enum: [low, normal, high, urgent]
+      default: normal
+
+    AgentStatus:
+      type: string
+      enum: [online, busy, idle, offline, error]
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            status: error
+            error: Invalid request parameters
+            code: BAD_REQUEST
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            status: error
+            error: Resource not found
+            code: NOT_FOUND
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            status: error
+            error: Internal server error
+            code: INTERNAL_ERROR
+
+tags:
+  - name: System
+    description: System health and status operations
+  - name: Agent Management
+    description: Agent registration and lifecycle management
+  - name: Messaging
+    description: Message sending and retrieval operations
+  - name: Coordination
+    description: Task coordination and help request operations
+  - name: Workspace
+    description: Collaborative workspace operations
+  - name: WebSocket
+    description: Real-time WebSocket communication
+  - name: Schema
+    description: API schema and metadata operations
