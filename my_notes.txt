@@ -1,3 +1,178 @@
+Local improvements:
+- add hooks to each mcp tool
+- add hooks to read, write, edit, etc tools
+- add 'mode' commands to set agent focus and operating behavior
+      - design, develop,
+
+At startup:
+
+- Who you are and the role you play
+- Operating Rules + Behavior
+      - How much can we insert at runtime when applicable
+      - What things need to be known to make good decisions?
+- project structure and contents
+    - directory tree
+    - configs
+    - virtual env's
+    -
+- Running config
+    - .claude/
+    - hooks
+    - commands
+    - CLAUDE.md
+    -
+- Env details
+    - env variables
+    - terminal settings
+    - path awareness
+    - system resource usage
+    - available cli commands
+
+- Tools available
+  - Use cases for tools
+
+- Operating rules and behavior
+   -
+
+
+Sources of Knowledge / Information
+- KB + context pool
+- .claude/knowledge
+      - core knowledge
+      - env details
+- proj-intel/
+- docs/
+- mcp tools
+- session logs
+- Internet
+
+
+Maximize capabilities:
+- THINK rather than just reacting.  Context matters.
+- Seek validation via KB, web, or other sources
+   - KB is a faster option for known good info
+   - Context7 is 2nd option, fast and comprehensive
+   - Web should always be used if no other option to confirm
+- <add storage of knowledge>
+
+Cognitive Methods
+- CoT, ToT, self refinement, etc
+- determine which to apply and when
+- THINKING tool
+
+
+
+
+At a high level:
+- know that you are an AI agent operating within a development environment
+- understand the overall project purpose and goals
+- understand current state of development, outstanding tasks
+- understand the long term goals and vision
+
+Tools:
+- MCP
+- custom local
+- native
+- custom
+- cli
+- IDE
+- Tool Chains
+- Use Cases
+
+
+
+1. startup - know who you are, where, why, how
+2. user prompt
+      - consume the content
+      - determine what is being communicated and for what purpose?
+            - question (What does X do?)
+            - instructions (commit the changes to git)
+            - permission (proceed, stop)
+            - information ()
+            -
+
+
+
+ORCHESTRATOR GUIDANCE:
+- maximize parallel workstreams, not 3 max, up to 7
+- plan out the tasks to be completed, identify dependencies, identify which can run at the same time
+- for longest workflows, identify if further parallel actions can shorten the time
+
+PLAN GUIDANCE:
+First stage:
+- research general topic (mcp tools)
+- develop requirements
+- determine the stack
+- research stack and methods
+- present plan + get signoff from user
+
+Second stage:
+Rules: python, modules, contracts, independent functions, DRY principle, best practice
+- design and create architecture
+      - research each component/technology
+      - create knowledge pack for each
+      - document
+- refine design
+- build specs
+- build the dev and test plan for agents
+- present design and plan, get sign off from user
+
+Third stage:
+- execute dev plan
+- scaffold and skeletons
+- build
+      - builders must be given applicable knowledge packs
+- testing
+      - testers + knowledge?
+      - linters, other tools
+- remediation loop
+- documentation
+- package for delivery to user
+
+
+AGENTS CONFIG
+
+MCP TOOLS:
+Master config is .mcp.json: thinking, time, web_search, firecrawl, tech_docs, consult_suite, knowledge
+- agents get custom mcp.json configs based on their access and needs
+
+Agents:
+- manager?
+- system: config env, scaffold, package install, etc
+- researchers: time, web_search, firecrawl, tech_docs
+- architect: thinking, consult_suite, knowledge + knowledge packs + templates?
+- builders: tech_docs + knowledge pacs + build specs + dev best practices
+- testers: tech_docs + tools (what's our feedback loop to dev?)
+- documenters: ?? + templates
+- what else?
+---------
+- optimize the headless agents:
+      - which tools?
+      - system message append option - Yes
+      - @claude-headless-agents
+      - deterministic session id's for monitoring
+      - configure orchestrator to create x-forward 'chat-monitor' for swarm and start it
+            /home/opsvi/master_root/apps/chat-monitor
+
+            /home/opsvi/master_root/multi-agent-reference/claude_headless_agents/claude_headless_complete_guide.md
+            /home/opsvi/master_root/multi-agent-reference/claude_headless_agents/claude_headless_guide.md
+            /home/opsvi/master_root/multi-agent-reference/claude_headless_agents/claude_testing_report.md
+            /home/opsvi/master_root/multi-agent-reference/claude_headless_agents/PROJECT_STRUCTURE.md
+            /home/opsvi/master_root/multi-agent-reference/claude_headless_agents/readme.md
+
+      - dangerously = YES, let them run :)
+      - custom system message
+      - tool access as needed
+      - model: sonnet or opus
+      - session-id: required for monitoring
+      - git worktrees: need to discuss
+
+
+
+
+
+
+
 User's note: I tend to take small ideas and run with them and before you know it we're talking about huge complex solutions because my brain wants to
 constantly improve and design and automate things. Even though we've dramatically expanded the scope, don't forget we need to also figure
 out what we have today, and how to incrementally add things and what we can do NOW quickly and easily to make it better while working on the

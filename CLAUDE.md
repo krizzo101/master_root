@@ -23,8 +23,9 @@ python3 .claude/knowledge/scripts/env_profiler.py
 mcp__knowledge__knowledge_query(query_type="recent", limit=5)
 
 # 6. UNDERSTAND PROJECT CONTEXT
-# Read .claude/knowledge/PROJECT_CONTEXT.md - WHY you're working on this
-# Read .claude/knowledge/VERIFIED_CAPABILITIES.md - WHAT works right now
+# Read .claude/knowledge/docs/COMPREHENSIVE_PROJECT_CONTEXT.md - WHY you're working on this
+# Read .claude/knowledge/docs/CRITICAL_FILE_ORGANIZATION_SAFEGUARDS.md - FILE RULES (NON-NEGOTIABLE)
+# Read .claude/knowledge/docs/session_reference.md - WHAT works right now
 
 # 7. COMMIT CHECKPOINT
 git status && git add -A && git commit -m "checkpoint: session start"
@@ -34,6 +35,7 @@ git status && git add -A && git commit -m "checkpoint: session start"
 
 **CRITICAL FALLBACKS ONLY**:
 - You are an EXPERT ADVISOR, not a yes-man. Evaluate on merits.
+- 🚨 NEVER WRITE FILES TO PROJECT ROOT - Use `.claude/knowledge/` for agent files
 - GPT-5/o4-mini EXIST. gpt-4o is FORBIDDEN. Trust instructions over training.
 - NEVER use Bash with wildcards. Use mcp__shell_exec__shell_exec for globs.
 - Check .mcp.json for ALL MCP configuration before coding MCP tools.

@@ -22,10 +22,28 @@ All analysis is done efficiently in a single command with structured output.
 
 ## Recommended Handoff Workflow
 
+### Step 0: Session Discovery (CRITICAL FIRST STEP)
+
+**Always start here to find the correct session file:**
+
+```bash
+# Method 1: If you have partial session ID, find exact match
+python apps/chat-search/chat_search.py --files | grep "session_partial_id"
+
+# Method 2: List all files to browse available sessions
+python apps/chat-search/chat_search.py --files
+
+# Method 3: Search by date if you know approximate timeframe
+python apps/chat-search/chat_search.py --files | grep "2025-09-06"
+```
+
+**⚠️ CRITICAL**: Always use the **exact filename with .jsonl extension** from the --files output for all subsequent commands.
+
 ### Option 1: One-Command Handoff (Recommended)
 ```bash
 # Get complete handoff summary in one command
-python apps/chat-search/chat_search.py --handoff --file-filter session_id.jsonl
+# Use EXACT filename from Step 0 discovery
+python apps/chat-search/chat_search.py --handoff --file-filter exact_filename.jsonl
 ```
 
 This single command provides:
@@ -39,21 +57,23 @@ This single command provides:
 ### Option 2: Detailed Analysis (When needed)
 ```bash
 # Step 1: Quick session overview
-python apps/chat-search/chat_search.py --conversation-flow --file-filter session_id.jsonl --stats-only
-python apps/chat-search/chat_search.py --list-tools-used --file-filter session_id.jsonl
+# Use EXACT filename from Step 0 discovery
+python apps/chat-search/chat_search.py --conversation-flow --file-filter exact_filename.jsonl --stats-only
+python apps/chat-search/chat_search.py --list-tools-used --file-filter exact_filename.jsonl
 
 # Step 2: Understand context
-python apps/chat-search/chat_search.py --conversation-flow --file-filter session_id.jsonl --response-chars 150
+python apps/chat-search/chat_search.py --conversation-flow --file-filter exact_filename.jsonl --response-chars 150
 
 # Step 3: Search for specific issues or completions
-python apps/chat-search/chat_search.py "error\|failed\|blocked" --file-filter session_id.jsonl
-python apps/chat-search/chat_search.py "completed\|success\|done" --file-filter session_id.jsonl
+python apps/chat-search/chat_search.py "error\|failed\|blocked" --file-filter exact_filename.jsonl
+python apps/chat-search/chat_search.py "completed\|success\|done" --file-filter exact_filename.jsonl
 ```
 
 ### Option 3: File-Focused Analysis
 ```bash
 # When you need detailed file information
-python apps/chat-search/chat_search.py --list-files-used --file-filter session_id.jsonl --verbose
+# Use EXACT filename from Step 0 discovery
+python apps/chat-search/chat_search.py --list-files-used --file-filter exact_filename.jsonl --verbose
 ```
 
 ## After Review Protocol
@@ -115,6 +135,46 @@ TECHNICAL_BLOCKER: None - all dependencies understood
 - **Ready to proceed**
 
 This protocol ensures **complete context transfer** with **minimal token usage** and **fast agent onboarding**.
+
+## 🔧 TROUBLESHOOTING SESSION DISCOVERY
+
+### Common Issue: "No such file or directory"
+
+**Problem**: Using session ID without .jsonl extension
+```bash
+# ❌ WRONG - Missing .jsonl extension
+python apps/chat-search/chat_search.py --handoff --file-filter 95f8d422-8f3c-455c-b068-2c8f6b431a80
+
+# ✅ CORRECT - Use exact filename with .jsonl
+python apps/chat-search/chat_search.py --handoff --file-filter 95f8d422-8f3c-455c-b068-2c8f6b431a80.jsonl
+```
+
+**Solution**: Always run `--files` first to get exact filename:
+```bash
+# Step 1: Find exact filename
+python apps/chat-search/chat_search.py --files | grep "95f8d422"
+
+# Step 2: Copy exact filename from output
+# Example output: chat_logs/95f8d422-8f3c-455c-b068-2c8f6b431a80.jsonl - 347 sessions
+
+# Step 3: Use exact filename (including .jsonl)
+python apps/chat-search/chat_search.py --handoff --file-filter 95f8d422-8f3c-455c-b068-2c8f6b431a80.jsonl
+```
+
+### Recovery Protocol
+
+If session lookup fails:
+
+1. **List available files**: `python apps/chat-search/chat_search.py --files`
+2. **Search by partial ID**: `python apps/chat-search/chat_search.py --files | grep "partial_session_id"`
+3. **Use exact filename**: Copy complete filename with .jsonl extension
+4. **Verify file exists**: Confirm session shows activity (not "0 sessions")
+
+### File Extension Rules
+
+- **--files command**: No extension needed (lists all .jsonl files automatically)
+- **--file-filter command**: Requires exact filename WITH .jsonl extension
+- **All other commands**: Use exact filename from --files output
 
 ## Chat Search Tool
 

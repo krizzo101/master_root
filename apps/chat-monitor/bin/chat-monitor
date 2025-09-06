@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+"""
+Enhanced Chat Monitor - Executable Entry Point
+
+Agent Collaboration Observatory for Claude Code agent swarms.
+Provides real-time visibility into agent collaboration, communication patterns,
+and shared workspace coordination.
+"""
+
+import os
+import sys
+from pathlib import Path
+
+# Add the src directory to Python path
+script_dir = Path(__file__).parent
+src_dir = script_dir.parent / "src"
+sys.path.insert(0, str(src_dir))
+
+try:
+    import asyncio
+
+    from monitor import main
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+
+except ImportError as e:
+    print(f"❌ Import error: {e}")
+    print(f"Make sure you're running from the correct directory: {script_dir.parent}")
+    print("Required modules:")
+    print("  - monitor.py")
+    print("  - collaboration/ (detector.py, network.py, workspace.py)")
+    print("  - display/ (dashboard.py)")
+    print("  - analysis/ (metrics.py)")
+    print("  - config/ (settings.py)")
+    sys.exit(1)
+except Exception as e:
+    print(f"❌ Error starting enhanced chat monitor: {e}")
+    sys.exit(1)

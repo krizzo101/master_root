@@ -1,0 +1,116 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '💡 TIP: Query knowledge base if this relates to existing work or capabilities'"
+          }
+        ]
+      }
+    ],
+    "Stop": [],
+    "SubagentStop": [],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import json,sys; d=json.load(sys.stdin); p=d.get('tool_input',{}).get('file_path',''); sys.exit(2 if any(x in p for x in ['.env','secrets','credentials','password']) else 0)\""
+          },
+          {
+            "type": "command",
+            "command": "python3 /home/opsvi/master_root/.claude/hooks/guidance_injector.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🔧 REMINDER: Consider using mcp__shell_exec__shell_exec for complex commands with globs'"
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '📋 REMINDER: Update TodoWrite with task progress and status changes'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f \"/home/opsvi/master_root/.claude/hooks/post-edit.sh\" ]; then /home/opsvi/master_root/.claude/hooks/post-edit.sh; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '✅ File created. Was the location appropriate? (.claude/knowledge/ for agent files, apps/*/docs/ for project deliverables)'"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🧪 Command executed. Did it work as expected? Test before claiming success.'"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Session started: '$(date '+%Y-%m-%d %H:%M:%S')"
+          },
+          {
+            "type": "command",
+            "command": "echo '📚 STARTUP: Read .claude/knowledge/docs/COMPREHENSIVE_PROJECT_CONTEXT.md for essential context'"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/opsvi/master_root/.claude/hooks/pre-compact-export-v2.sh"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f \"/home/opsvi/master_root/.claude/hooks/export-session.sh\" ]; then /home/opsvi/master_root/.claude/hooks/export-session.sh $TRANSCRIPT_PATH SessionEnd; fi"
+          },
+          {
+            "type": "command",
+            "command": "echo '💾 SESSION ENDING: Consider storing valuable insights in knowledge base before terminating'"
+          }
+        ]
+      }
+    ]
+  }
+}

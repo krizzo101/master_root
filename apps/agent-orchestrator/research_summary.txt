@@ -1,0 +1,16 @@
+Python Error Handling Best Practices - Research Summary
+
+1. Be Specific with Exception Handling
+   - Catch specific exception types (ValueError, KeyError, FileNotFoundError) rather than generic Exception
+   - Use multiple except blocks to handle different error types appropriately
+   - This enables precise error handling and prevents masking unexpected issues
+
+2. Follow the EAFP Principle (Easier to Ask for Forgiveness than Permission)
+   - Use try/except blocks instead of pre-checking conditions with if statements
+   - Let functions handle and report their own errors naturally
+   - Allow recoverable errors to be fixed at the appropriate level, non-recoverable errors to bubble up
+
+3. Implement Proper Resource Management and Context
+   - Use context managers (with statements) for automatic resource cleanup
+   - Add contextual information to exceptions using add_note() method (Python 3.11+)
+   - Keep try blocks focused and small to pinpoint error locations accurately
