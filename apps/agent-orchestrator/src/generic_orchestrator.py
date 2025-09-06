@@ -15,7 +15,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -157,6 +157,15 @@ class GenericOrchestrator:
         # Ensure subdirectories exist
         (self.output_dir / "tasks").mkdir(exist_ok=True)
         (self.output_dir / "logs").mkdir(exist_ok=True)
+        
+        # Setup debug file logging
+        self.log_file = self.output_dir / "logs" / f"orchestrator_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+        file_handler = logging.FileHandler(self.log_file)
+        file_handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+        logger.debug(f"Debug logging initialized: {self.log_file}")
 
         # Handle None and invalid values
         self.max_parallel = max(1, max_parallel if max_parallel is not None else 10)

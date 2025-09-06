@@ -12,6 +12,10 @@ declare -A SESSION_SYMBOL_MAP
 declare -A SESSION_NAMES
 declare -A ACTIVE_SESSIONS
 NEXT_COLOR_INDEX=0
+VERBOSE_LEVEL=0  # 0=off, 1=basic, 2=detailed, 3=debug
+VIEW_LOGGING_LEVEL=0  # 0=off, 1=messages only, 2=+metadata, 3=+raw JSON
+VIEW_LOG_FILE="/tmp/chat-monitor-view.log"
+VIEW_RAW_LOG_FILE="/tmp/chat-monitor-raw.log"
 
 # Color and symbol palettes
 SESSION_COLORS=(
@@ -44,6 +48,46 @@ assign_session_style() {
     fi
 }
 
+# Enhanced verbose logging with levels
+verbose_log() {
+    local level=${1:-1}  # Default to level 1
+    shift
+    [[ $VERBOSE_LEVEL -lt $level ]] && return
+    
+    local level_names=("" "INFO" "DETAIL" "DEBUG")
+    local level_colors=("" "${GREEN}" "${CYAN}" "${MAGENTA}")
+    local level_name="${level_names[$level]}"
+    local level_color="${level_colors[$level]}"
+    
+    echo -e "${DIM}[${level_color}${level_name}${RESET}${DIM} $(date '+%H:%M:%S')] $*${RESET}" >&2
+}
+
+# Enhanced view logging with levels
+log_view_output() {
+    local level=${1:-1}  # Default to level 1 (messages only)
+    shift
+    [[ $VIEW_LOGGING_LEVEL -lt $level ]] && return
+    
+    case $level in
+        1) # Messages only
+            echo "$(date '+%Y-%m-%d %H:%M:%S') | $*" >> "$VIEW_LOG_FILE"
+            ;;
+        2) # Messages + metadata
+            echo "$(date '+%Y-%m-%d %H:%M:%S') | [L$level] $*" >> "$VIEW_LOG_FILE"
+            ;;
+        3) # Raw JSON logging
+            echo "$(date '+%Y-%m-%d %H:%M:%S') | [RAW] $*" >> "$VIEW_RAW_LOG_FILE"
+            ;;
+    esac
+}
+
+# Display current logging status
+show_logging_status() {
+    local verbose_desc=("OFF" "BASIC" "DETAILED" "DEBUG")
+    local view_desc=("OFF" "MESSAGES" "+METADATA" "+RAW_JSON")
+    echo -e "${DIM}[STATUS] Verbose: ${verbose_desc[$VERBOSE_LEVEL]} | View Logging: ${view_desc[$VIEW_LOGGING_LEVEL]}${RESET}"
+}
+
 # Format and display log entry
 display_log_entry() {
     local session_id="$1"
@@ -54,15 +98,25 @@ display_log_entry() {
     [[ ! "$line" =~ ^[[:space:]]*\{ ]] && return
     [[ "$line" =~ ^=\>.*\<==$ ]] && return
 
+    verbose_log 1 "Processing log entry for session $session_id"
+    verbose_log 3 "Raw JSON line: $line"
+
     if command -v jq >/dev/null 2>&1; then
         local timestamp=$(echo "$line" | jq -r '.timestamp // empty' 2>/dev/null)
         local message_type=$(echo "$line" | jq -r '.type // empty' 2>/dev/null)
         local time_display="${timestamp:11:8}"
 
+        verbose_log 2 "Parsed: timestamp=$timestamp, type=$message_type"
+
+        # Log raw JSON if level 3 view logging enabled
+        log_view_output 3 "$line"
+
         # Assign session style
         assign_session_style "$session_id"
         local session_color="${SESSION_COLOR_MAP[$session_id]}"
         local session_symbol="${SESSION_SYMBOL_MAP[$session_id]}"
+
+        verbose_log 2 "Session style: color=${session_color}, symbol=${session_symbol}"
 
         local session_prefix=""
         if [[ "$show_session" == "true" ]]; then
@@ -73,10 +127,16 @@ display_log_entry() {
             "user")
                 local content=$(echo "$line" | jq -r '.message.content[0].content // .message.content // empty' 2>/dev/null)
                 if [[ "$content" != "null" && -n "$content" ]]; then
+                    local original_length=${#content}
                     if [[ ${#content} -gt 80 ]]; then
                         content="${content:0:77}..."
                     fi
-                    echo -e "${DIM}[$time_display]${RESET}$session_prefix ${session_color}USER:${RESET} $content"
+                    local output="${DIM}[$time_display]${RESET}$session_prefix ${session_color}USER:${RESET} $content"
+                    echo -e "$output"
+                    log_view_output 1 "USER [$session_id] $content"
+                    log_view_output 2 "USER [$session_id] chars:$original_length truncated:$([ $original_length -gt 80 ] && echo "YES" || echo "NO") | $content"
+                    verbose_log 1 "Displayed USER message from session $session_id: $original_length chars"
+                    verbose_log 2 "USER content preview: ${content:0:50}..."
                 fi
                 ;;
             "assistant")
@@ -84,12 +144,25 @@ display_log_entry() {
                 local content=$(echo "$line" | jq -r '.message.content[0].text // empty' 2>/dev/null)
 
                 if [[ "$tool_name" != "null" && -n "$tool_name" ]]; then
-                    echo -e "${DIM}[$time_display]${RESET}$session_prefix ${session_color}TOOL:${RESET} $tool_name"
+                    # Extract tool parameters for detailed logging
+                    local tool_params=$(echo "$line" | jq -r '.message.content[0].input // empty' 2>/dev/null)
+                    local tool_output="${DIM}[$time_display]${RESET}$session_prefix ${session_color}TOOL:${RESET} $tool_name"
+                    echo -e "$tool_output"
+                    log_view_output 1 "TOOL [$session_id] $tool_name"
+                    log_view_output 2 "TOOL [$session_id] name:$tool_name params:${tool_params:0:100}..."
+                    verbose_log 1 "Displayed TOOL usage from session $session_id: $tool_name"
+                    verbose_log 2 "TOOL parameters preview: ${tool_params:0:100}..."
                 elif [[ "$content" != "null" && -n "$content" ]]; then
+                    local original_length=${#content}
                     if [[ ${#content} -gt 80 ]]; then
                         content="${content:0:77}..."
                     fi
-                    echo -e "${DIM}[$time_display]${RESET}$session_prefix ${session_color}ASST:${RESET} $content"
+                    local asst_output="${DIM}[$time_display]${RESET}$session_prefix ${session_color}ASST:${RESET} $content"
+                    echo -e "$asst_output"
+                    log_view_output 1 "ASST [$session_id] $content"
+                    log_view_output 2 "ASST [$session_id] chars:$original_length truncated:$([ $original_length -gt 80 ] && echo "YES" || echo "NO") | $content"
+                    verbose_log 1 "Displayed ASST message from session $session_id: $original_length chars"
+                    verbose_log 2 "ASST content preview: ${content:0:50}..."
                 fi
                 ;;
         esac
@@ -185,6 +258,9 @@ cmd_basic() {
                 echo "  -a, --all           Show all historical logs"
                 echo "  -r, --recent        Show last 10 lines from each file"
                 echo "  -s, --session [ID]  Monitor specific session"
+                echo "  -v, --verbose [LVL] Verbose logging: 1=basic, 2=detailed, 3=debug (default: 1)"
+                echo "  -l, --log-view [LVL] View logging: 1=messages, 2=+metadata, 3=+raw JSON (default: 1)"
+                echo "Log files: $VIEW_LOG_FILE, $VIEW_RAW_LOG_FILE"
                 exit 0
                 ;;
             -n|--lines)
@@ -208,6 +284,24 @@ cmd_basic() {
                     shift
                 fi
                 ;;
+            -v|--verbose)
+                if [[ -n "$2" && "$2" =~ ^[1-3]$ ]]; then
+                    VERBOSE_LEVEL="$2"
+                    shift 2
+                else
+                    VERBOSE_LEVEL=1  # Default to level 1
+                    shift
+                fi
+                ;;
+            -l|--log-view)
+                if [[ -n "$2" && "$2" =~ ^[1-3]$ ]]; then
+                    VIEW_LOGGING_LEVEL="$2"
+                    shift 2
+                else
+                    VIEW_LOGGING_LEVEL=1  # Default to level 1
+                    shift
+                fi
+                ;;
             *)
                 echo "Unknown option: $1"
                 exit 1
@@ -219,7 +313,12 @@ cmd_basic() {
     echo "📂 Directory: $CHAT_LOGS_DIR"
     echo "⏰ Started: $(date)"
     [[ -n "$session_filter" ]] && echo "🎯 Session: $session_filter"
+    show_logging_status
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    
+    verbose_log 1 "Basic monitor started with tail_lines=$tail_lines, session_filter='$session_filter'"
+    verbose_log 2 "Verbose level: $VERBOSE_LEVEL, View logging level: $VIEW_LOGGING_LEVEL"
+    log_view_output 1 "SESSION START - Basic Monitor - Filter: ${session_filter:-ALL}"
 
     # Monitor files
     if [[ -n "$session_filter" ]]; then
@@ -239,6 +338,42 @@ cmd_basic() {
 
 # Lazy monitoring (efficient inotify-based)
 cmd_lazy() {
+    # Parse options for global flags
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -v|--verbose)
+                if [[ -n "$2" && "$2" =~ ^[1-3]$ ]]; then
+                    VERBOSE_LEVEL="$2"
+                    shift 2
+                else
+                    VERBOSE_LEVEL=1
+                    shift
+                fi
+                ;;
+            -l|--log-view)
+                if [[ -n "$2" && "$2" =~ ^[1-3]$ ]]; then
+                    VIEW_LOGGING_LEVEL="$2"
+                    shift 2
+                else
+                    VIEW_LOGGING_LEVEL=1
+                    shift
+                fi
+                ;;
+            -h|--help)
+                echo "Usage: $SCRIPT_NAME lazy [options]"
+                echo "Options:"
+                echo "  -v, --verbose [LVL] Verbose logging: 1=basic, 2=detailed, 3=debug"
+                echo "  -l, --log-view [LVL] View logging: 1=messages, 2=+metadata, 3=+raw JSON"
+                echo "Log files: $VIEW_LOG_FILE, $VIEW_RAW_LOG_FILE"
+                exit 0
+                ;;
+            *)
+                echo "Unknown option: $1"
+                exit 1
+                ;;
+        esac
+    done
+
     if ! command -v inotifywait >/dev/null 2>&1; then
         echo "❌ inotifywait required: sudo apt-get install inotify-tools"
         exit 1
@@ -246,7 +381,12 @@ cmd_lazy() {
 
     echo "⚡ Lazy Chat Monitor - Zero overhead until activity"
     echo "📂 Directory: $CHAT_LOGS_DIR"
+    show_logging_status
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+    verbose_log 1 "Lazy monitor started - waiting for file modifications"
+    verbose_log 2 "inotifywait monitoring: $CHAT_LOGS_DIR"
+    log_view_output 1 "SESSION START - Lazy Monitor"
 
     # Monitor for file changes
     inotifywait -m -q --format '%w%f %e' -e modify "$CHAT_LOGS_DIR" | while read filepath event; do
@@ -328,12 +468,35 @@ cmd_interactive() {
                 clear
                 echo -e "${GREEN}Monitoring session: $selected_session${RESET}"
                 ;;
+            v)
+                # Cycle through verbose levels: 0 -> 1 -> 2 -> 3 -> 0
+                VERBOSE_LEVEL=$(((VERBOSE_LEVEL + 1) % 4))
+                local verbose_desc=("OFF" "BASIC" "DETAILED" "DEBUG")
+                echo -e "${GREEN}Verbose level: ${verbose_desc[$VERBOSE_LEVEL]}${RESET}"
+                verbose_log 1 "User cycled verbose level to $VERBOSE_LEVEL"
+                ;;
+            l)
+                # Cycle through view logging levels: 0 -> 1 -> 2 -> 3 -> 0  
+                VIEW_LOGGING_LEVEL=$(((VIEW_LOGGING_LEVEL + 1) % 4))
+                local view_desc=("OFF" "MESSAGES" "+METADATA" "+RAW_JSON")
+                echo -e "${GREEN}View logging level: ${view_desc[$VIEW_LOGGING_LEVEL]}${RESET}"
+                if [[ $VIEW_LOGGING_LEVEL -gt 0 ]]; then
+                    echo -e "${DIM}Logging to: $VIEW_LOG_FILE$([ $VIEW_LOGGING_LEVEL -eq 3 ] && echo " & $VIEW_RAW_LOG_FILE")${RESET}"
+                fi
+                verbose_log 1 "User cycled view logging level to $VIEW_LOGGING_LEVEL"
+                ;;
             h)
                 clear
                 echo -e "${BOLD}Interactive Monitor Help${RESET}"
                 echo "c - Consolidated view (all sessions)"
                 echo "s - Session selector"
+                echo "v - Cycle verbose level (0=OFF, 1=BASIC, 2=DETAILED, 3=DEBUG)"
+                echo "l - Cycle view logging (0=OFF, 1=MESSAGES, 2=+METADATA, 3=+RAW)"
                 echo "q - Quit"
+                echo ""
+                show_logging_status
+                echo ""
+                echo "Log files: $VIEW_LOG_FILE, $VIEW_RAW_LOG_FILE"
                 echo ""
                 echo "Press any key to continue..."
                 read -n 1
@@ -836,12 +999,18 @@ ${BOLD}Subcommands:${RESET}
   ${GREEN}cleanup${RESET}         Kill all chat monitor processes and cleanup
 
 ${BOLD}Examples:${RESET}
-  $SCRIPT_NAME basic -r               # Basic monitor with recent history
-  $SCRIPT_NAME basic -s              # Basic monitor with session selector
-  $SCRIPT_NAME lazy                  # Efficient background monitoring
-  $SCRIPT_NAME interactive           # Full-featured TUI
+  $SCRIPT_NAME basic -r -v 2         # Basic monitor + detailed verbose logging
+  $SCRIPT_NAME basic -s -l 3         # Basic monitor + full view logging (with raw JSON)
+  $SCRIPT_NAME lazy -v 1 -l 2        # Lazy monitor + basic verbose + metadata logging
+  $SCRIPT_NAME interactive           # TUI (v/l keys cycle through 0-3 levels)
   $SCRIPT_NAME triple-pane           # 3-pane layout for 27" portrait
   $SCRIPT_NAME quad-pane             # 2x2 grid for multiple agents
+
+${BOLD}Enhanced Logging Features:${RESET}
+  ${CYAN}Verbose Levels:${RESET}    0=OFF, 1=BASIC info, 2=DETAILED analysis, 3=DEBUG with raw JSON
+  ${CYAN}View Log Levels:${RESET}   0=OFF, 1=Messages only, 2=+Metadata, 3=+Raw JSON to separate file
+  ${CYAN}Runtime Control:${RESET}   Interactive mode: 'v' cycles verbose 0→1→2→3→0, 'l' cycles view logging
+  ${CYAN}Log Files:${RESET}         $VIEW_LOG_FILE (formatted), $VIEW_RAW_LOG_FILE (JSON)
 
 ${BOLD}Global Options:${RESET}
   -h, --help         Show help for subcommand
