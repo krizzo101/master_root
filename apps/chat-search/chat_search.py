@@ -759,6 +759,320 @@ class ChatSearcher:
 
         return tool_usage
 
+    async def get_ai_handoff_review(
+        self, dialogue_data: Dict, handoff_data: Dict
+    ) -> str:
+        """
+        Generate AI-powered handoff review using OpenAI GPT-5-nano
+
+        Args:
+            dialogue_data: Full dialogue content and stats
+            handoff_data: Structured handoff summary data
+
+        Returns:
+            Formatted review text for the next agent
+        """
+        import os
+        import sys
+
+        # Add libs to Python path
+        sys.path.insert(0, "/home/opsvi/master_root/libs/opsvi-llm")
+
+        try:
+            from opsvi_llm.providers.base import Message
+            from opsvi_llm.providers.openai_provider import OpenAIConfig, OpenAIProvider
+        except ImportError as e:
+            return f"Failed to import OpenAI provider: {e}\nEnsure libs/opsvi-llm is properly installed."
+
+        # Check for API key
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            return "OpenAI API key not found. Set OPENAI_API_KEY environment variable."
+
+        # Create OpenAI client
+        config = OpenAIConfig(
+            api_key=api_key,
+            default_model="gpt-5-nano",  # Fast, cheap model perfect for this task
+            enable_audit_logging=False,
+            enable_sanitization=False,
+        )
+
+        provider = OpenAIProvider(config)
+        await provider._create_client()
+
+        # Prepare session summary for the AI
+        session_summary = f"""
+SESSION OVERVIEW:
+- Duration: {handoff_data['session_stats']['total_turns']} turns
+- User requests: {handoff_data['session_stats']['user_prompts']}
+- Agent responses: {handoff_data['session_stats']['agent_responses']}
+- Files modified: {sum(handoff_data['file_operations'].values()) if handoff_data['file_operations'] else 0}
+- Tools used: {len(handoff_data['tool_usage'])} unique tools
+- Total tool calls: {handoff_data['total_tool_calls']}
+- Estimated tokens: {dialogue_data['estimated_tokens']}
+
+DIALOGUE TRANSCRIPT:
+{dialogue_data['full_transcript']}
+        """.strip()
+
+        # Create review prompt
+        messages = [
+            Message(
+                role="system",
+                content="You are a specialized agent handoff reviewer. Analyze agent sessions to provide actionable guidance for incoming agents.",
+            ),
+            Message(
+                role="user",
+                content=f"""
+Review this agent handoff session and provide comprehensive guidance for the next agent:
+
+{session_summary}
+
+Provide a structured analysis covering:
+
+1. **COMPLETION STATUS** - Was the session likely completed, in-progress, or abandoned?
+
+2. **KEY ACCOMPLISHMENTS** - What specific work was completed successfully?
+
+3. **INCOMPLETE TASKS** - What work remains unfinished or was left in progress?
+
+4. **BLOCKERS & ISSUES** - Any problems, errors, or obstacles encountered?
+
+5. **CONTEXT FOR NEXT AGENT** - Critical information the new agent needs to know
+
+6. **RECOMMENDED NEXT ACTIONS** - Specific steps the new agent should take
+
+7. **CONFIDENCE ASSESSMENT** - Rate your confidence in this analysis (1-10) and explain why
+
+Be specific and actionable. Focus on helping the next agent understand exactly where things stand and what to do next.
+                """.strip(),
+            ),
+        ]
+
+        try:
+            # Use responses API for GPT-5-nano (no temperature parameter)
+            response = await provider.responses_create(
+                input=[{"role": msg.role, "content": msg.content} for msg in messages],
+                model="gpt-5-nano",
+                max_tokens=2000,
+            )
+
+            # Extract response text
+            if hasattr(response, "output") and response.output:
+                for output_item in response.output:
+                    if hasattr(output_item, "content") and output_item.content:
+                        for content_item in output_item.content:
+                            if hasattr(content_item, "text"):
+                                return content_item.text
+
+            return "Failed to extract response from AI review"
+
+        except Exception as e:
+            return f"AI review request failed: {e}"
+        finally:
+            await provider._close_client()
+
+    def extract_dialogue_content(self, file_path: str) -> Dict:
+        """
+        Extract just the user/agent dialogue content for analysis
+
+        Returns:
+            Dictionary with dialogue statistics and content
+        """
+        conversation_turns = self.extract_conversation_flow(
+            file_path, response_chars=999999
+        )  # No truncation
+
+        user_content = []
+        agent_content = []
+        total_chars = 0
+
+        for turn in conversation_turns:
+            content = turn.get("content", "")
+            timestamp = turn.get("timestamp", "")
+
+            if turn["type"] == "user":
+                user_content.append(
+                    {
+                        "timestamp": timestamp,
+                        "content": content,
+                        "char_count": len(content),
+                    }
+                )
+                total_chars += len(content)
+            else:  # assistant
+                # For assistant responses, get full content if available
+                full_content = content
+                if "full_length" in turn:
+                    # This was truncated, we need to get the full content
+                    # For now, use what we have since extract_conversation_flow handles this
+                    pass
+
+                agent_content.append(
+                    {
+                        "timestamp": timestamp,
+                        "content": full_content,
+                        "char_count": len(full_content),
+                    }
+                )
+                total_chars += len(full_content)
+
+        # Create a clean dialogue transcript
+        dialogue_transcript = []
+        all_turns = sorted(
+            [(turn, "USER") for turn in user_content]
+            + [(turn, "AGENT") for turn in agent_content],
+            key=lambda x: x[0]["timestamp"],
+        )
+
+        for turn_data, role in all_turns:
+            dialogue_transcript.append(f"{role}: {turn_data['content']}\n")
+
+        full_transcript = "\n".join(dialogue_transcript)
+
+        return {
+            "user_messages": len(user_content),
+            "agent_messages": len(agent_content),
+            "total_chars": total_chars,
+            "user_chars": sum(m["char_count"] for m in user_content),
+            "agent_chars": sum(m["char_count"] for m in agent_content),
+            "estimated_tokens": total_chars // 4,  # Rough estimate: 4 chars per token
+            "full_transcript": full_transcript,
+            "transcript_size_mb": len(full_transcript.encode("utf-8")) / (1024 * 1024),
+            "user_content": user_content,
+            "agent_content": agent_content,
+        }
+
+    def _analyze_agent_responses(
+        self, agent_responses: List[Dict], user_prompts: List[Dict]
+    ) -> Dict:
+        """
+        Analyze agent responses to provide handoff insights
+
+        Returns:
+            Dictionary with response analysis and handoff context
+        """
+        if not agent_responses:
+            return {
+                "completion_status": "unknown",
+                "task_progress": "No agent responses found",
+                "key_accomplishments": [],
+                "incomplete_tasks": [],
+                "last_responses": [],
+                "session_trajectory": "Unknown",
+            }
+
+        # Get last 2 full responses for context
+        last_responses = []
+        for response in agent_responses[-2:]:
+            last_responses.append(
+                {
+                    "timestamp": response.get("timestamp", ""),
+                    "content": response.get(
+                        "content", ""
+                    ),  # Full content, not truncated
+                    "full_length": response.get(
+                        "full_length", len(response.get("content", ""))
+                    ),
+                    "turn": response.get("turn", 0),
+                }
+            )
+
+        # Analyze session trajectory
+        total_responses = len(agent_responses)
+        if total_responses < 3:
+            trajectory = "Brief session"
+        elif total_responses < 10:
+            trajectory = "Short session"
+        elif total_responses < 30:
+            trajectory = "Medium session"
+        else:
+            trajectory = "Extended session"
+
+        # Analyze completion patterns in recent responses
+        recent_content = " ".join(
+            [r.get("content", "")[-500:] for r in agent_responses[-3:]]
+        )
+
+        completion_indicators = [
+            "completed",
+            "finished",
+            "done",
+            "successfully",
+            "all tasks",
+            "implementation complete",
+            "ready for",
+            "next steps",
+        ]
+
+        incomplete_indicators = [
+            "need to",
+            "should",
+            "will",
+            "plan to",
+            "next we",
+            "still working",
+            "in progress",
+            "continuing",
+            "let me",
+            "I'll",
+        ]
+
+        completion_score = sum(
+            1
+            for indicator in completion_indicators
+            if indicator in recent_content.lower()
+        )
+        incomplete_score = sum(
+            1
+            for indicator in incomplete_indicators
+            if indicator in recent_content.lower()
+        )
+
+        if completion_score > incomplete_score and completion_score > 2:
+            status = "likely_complete"
+        elif incomplete_score > completion_score:
+            status = "in_progress"
+        else:
+            status = "unclear"
+
+        # Extract key accomplishments from responses
+        accomplishments = []
+        for i, response in enumerate(agent_responses):
+            content = response.get("content", "")
+            if any(
+                word in content.lower()
+                for word in [
+                    "created",
+                    "implemented",
+                    "fixed",
+                    "added",
+                    "updated",
+                    "built",
+                ]
+            ):
+                # Extract a meaningful snippet
+                accomplishment = (
+                    content[:200] + "..." if len(content) > 200 else content
+                )
+                accomplishments.append(
+                    {
+                        "turn": response.get("turn", i + 1),
+                        "accomplishment": accomplishment,
+                        "timestamp": response.get("timestamp", ""),
+                    }
+                )
+
+        return {
+            "completion_status": status,
+            "task_progress": f"{trajectory} with {completion_score} completion indicators, {incomplete_score} incomplete indicators",
+            "key_accomplishments": accomplishments[-5:],  # Last 5 accomplishments
+            "last_responses": last_responses,
+            "session_trajectory": trajectory,
+            "completion_score": completion_score,
+            "incomplete_score": incomplete_score,
+        }
+
     def extract_handoff_summary(
         self, file_path: str, response_chars: int = 150
     ) -> Dict:
@@ -810,6 +1124,9 @@ class ChatSearcher:
             tool_summary[tool_name] = usage["count"]
             total_tool_calls += usage["count"]
 
+        # Analyze agent response patterns for handoff insights
+        handoff_insights = self._analyze_agent_responses(agent_responses, user_prompts)
+
         return {
             "file_path": file_path,
             "session_stats": {
@@ -826,10 +1143,11 @@ class ChatSearcher:
             "tool_usage": tool_summary,
             "total_tool_calls": total_tool_calls,
             "unique_tools": len(tool_usage),
+            "handoff_insights": handoff_insights,
         }
 
 
-def main():
+async def main():
     parser = argparse.ArgumentParser(description="Search chat logs quickly")
     parser.add_argument("query", nargs="?", help="Search query (regex supported)")
     parser.add_argument(
@@ -889,6 +1207,16 @@ def main():
         "--handoff",
         action="store_true",
         help="Generate comprehensive handoff summary (combines all analysis features)",
+    )
+    parser.add_argument(
+        "--dialogue-stats",
+        action="store_true",
+        help="Analyze dialogue content size and statistics for review agent feasibility",
+    )
+    parser.add_argument(
+        "--ai-review",
+        action="store_true",
+        help="Generate AI-powered handoff review using GPT-5-nano (requires OpenAI API key)",
     )
 
     args = parser.parse_args()
@@ -1066,6 +1394,108 @@ def main():
         )
         return
 
+    # Handle dialogue statistics mode
+    if args.dialogue_stats:
+        if not args.file_filter or len(args.file_filter) != 1:
+            print(
+                "Error: --dialogue-stats requires exactly one file specified with --file-filter"
+            )
+            print(
+                "Example: python3 chat_search.py --dialogue-stats --file-filter 0678c5b6-69e0-41bb-9232-61b098314ad6.jsonl"
+            )
+            return
+
+        file_path = f"{args.dir}/{args.file_filter[0]}"
+        print(f"Analyzing dialogue content from: {file_path}")
+        print("=" * 60)
+
+        dialogue_data = searcher.extract_dialogue_content(file_path)
+
+        print("=== DIALOGUE CONTENT ANALYSIS ===")
+        print(f"User messages: {dialogue_data['user_messages']}")
+        print(f"Agent messages: {dialogue_data['agent_messages']}")
+        print(f"Total characters: {dialogue_data['total_chars']:,}")
+        print(f"User characters: {dialogue_data['user_chars']:,}")
+        print(f"Agent characters: {dialogue_data['agent_chars']:,}")
+        print(f"Estimated tokens: {dialogue_data['estimated_tokens']:,}")
+        print(f"Transcript size: {dialogue_data['transcript_size_mb']:.2f} MB")
+        print()
+
+        # Token analysis for common model limits
+        tokens = dialogue_data["estimated_tokens"]
+        print("=== MODEL CONTEXT FEASIBILITY ===")
+        print(f"GPT-3.5 Turbo (16K): {'✓ Fits' if tokens < 14000 else '✗ Too large'}")
+        print(f"GPT-4 (8K): {'✓ Fits' if tokens < 6000 else '✗ Too large'}")
+        print(f"GPT-4 (32K): {'✓ Fits' if tokens < 30000 else '✗ Too large'}")
+        print(f"GPT-4 Turbo (128K): {'✓ Fits' if tokens < 120000 else '✗ Too large'}")
+        print(f"Claude-3 (200K): {'✓ Fits' if tokens < 180000 else '✗ Too large'}")
+        print()
+
+        # Character breakdown per message
+        if dialogue_data["user_messages"] > 0:
+            avg_user_chars = (
+                dialogue_data["user_chars"] // dialogue_data["user_messages"]
+            )
+            print(f"Average user message: {avg_user_chars} chars")
+        if dialogue_data["agent_messages"] > 0:
+            avg_agent_chars = (
+                dialogue_data["agent_chars"] // dialogue_data["agent_messages"]
+            )
+            print(f"Average agent message: {avg_agent_chars} chars")
+
+        # Show sample of dialogue structure (first few exchanges)
+        print("\n=== SAMPLE DIALOGUE STRUCTURE ===")
+        lines = dialogue_data["full_transcript"].split("\n")[:10]
+        for line in lines:
+            if line.strip():
+                print(line[:100] + ("..." if len(line) > 100 else ""))
+
+        if args.verbose:
+            print("\n=== FULL TRANSCRIPT FOR REVIEW AGENT ===")
+            print(dialogue_data["full_transcript"])
+
+        return
+
+    # Handle AI review mode
+    if args.ai_review:
+        if not args.file_filter or len(args.file_filter) != 1:
+            print(
+                "Error: --ai-review requires exactly one file specified with --file-filter"
+            )
+            print(
+                "Example: python3 chat_search.py --ai-review --file-filter 0678c5b6-69e0-41bb-9232-61b098314ad6.jsonl"
+            )
+            return
+
+        file_path = f"{args.dir}/{args.file_filter[0]}"
+        print(f"Generating AI-powered handoff review for: {file_path}")
+        print("=" * 60)
+
+        # Get dialogue content and session data
+        dialogue_data = searcher.extract_dialogue_content(file_path)
+        handoff_data = searcher.extract_handoff_summary(file_path)
+
+        # Check if session is suitable for review
+        if dialogue_data["estimated_tokens"] > 100000:
+            print("⚠ Session too large for review agent (>100K tokens)")
+            print("Consider using regular --handoff mode for very large sessions")
+            return
+
+        print("=== AI HANDOFF REVIEW ===")
+        print(
+            f"Analyzing {dialogue_data['estimated_tokens']} tokens with GPT-5-nano..."
+        )
+
+        try:
+            review = await searcher.get_ai_handoff_review(dialogue_data, handoff_data)
+            print(review)
+        except Exception as e:
+            print(f"AI review failed: {e}")
+            print("Falling back to standard handoff analysis...")
+            # Could fall back to regular handoff here
+
+        return
+
     # Handle comprehensive handoff mode
     if args.handoff:
         if not args.file_filter or len(args.file_filter) != 1:
@@ -1114,18 +1544,45 @@ def main():
             print(f"{i}. {content}")
         print()
 
-        # Agent accomplishments (first few responses)
+        # Agent accomplishments (key accomplishments + last responses)
         print("=== AGENT ACCOMPLISHMENTS ===")
-        for i, response in enumerate(handoff_data["agent_responses"][:5], 1):
-            content = (
-                response["content"][:150] + "..."
-                if len(response["content"]) > 150
-                else response["content"]
-            )
-            print(f"{i}. {content}")
+        insights = handoff_data["handoff_insights"]
 
-        if len(handoff_data["agent_responses"]) > 5:
-            print(f"... and {len(handoff_data['agent_responses']) - 5} more responses")
+        # Show key accomplishments throughout session
+        if insights["key_accomplishments"]:
+            print("Key accomplishments during session:")
+            for i, accomplishment in enumerate(insights["key_accomplishments"], 1):
+                timestamp = (
+                    accomplishment["timestamp"][:19]
+                    if accomplishment["timestamp"]
+                    else ""
+                )
+                turn = accomplishment["turn"]
+                content = accomplishment["accomplishment"]
+                print(f"{i}. [Turn {turn}] {content}")
+        else:
+            # Fallback to first few responses if no accomplishments detected
+            print("Agent responses (first few):")
+            for i, response in enumerate(handoff_data["agent_responses"][:3], 1):
+                content = (
+                    response["content"][:150] + "..."
+                    if len(response["content"]) > 150
+                    else response["content"]
+                )
+                print(f"{i}. {content}")
+        print()
+
+        # Show last 1-2 full responses for immediate context
+        print("=== LAST AGENT RESPONSES (FULL CONTEXT) ===")
+        for i, response in enumerate(insights["last_responses"], 1):
+            timestamp = response["timestamp"][:19] if response["timestamp"] else ""
+            turn = response["turn"]
+            print(
+                f"Response {len(insights['last_responses']) + 1 - len(insights['last_responses']) + i - 1} (Turn {turn}) - {timestamp}:"
+            )
+            print(response["content"])
+            if i < len(insights["last_responses"]):
+                print("-" * 40)
         print()
 
         # Files modified
@@ -1152,21 +1609,32 @@ def main():
         print(f"Files touched: {sum(handoff_data['file_operations'].values())}")
         print()
 
-        # Next steps assessment
-        print("=== NEXT STEPS ===")
-        if handoff_data["user_prompts"] and handoff_data["agent_responses"]:
-            last_user_prompt = handoff_data["user_prompts"][-1]
-            last_agent_response = handoff_data["agent_responses"][-1]
+        # Enhanced next steps assessment
+        print("=== NEXT STEPS ASSESSMENT ===")
+        insights = handoff_data["handoff_insights"]
 
-            # Simple heuristic: if last response is much longer, likely completed
-            if len(last_agent_response["content"]) > 200:
-                print("Previous agent appears to have completed the requested tasks.")
-            else:
-                print(
-                    "Previous agent may have been in progress. Review last responses for context."
-                )
+        print(f"Session Trajectory: {insights['session_trajectory']}")
+        print(f"Completion Status: {insights['completion_status']}")
+        print(f"Task Progress: {insights['task_progress']}")
+        print()
+
+        if insights["completion_status"] == "likely_complete":
+            print("✓ Previous agent appears to have completed the requested tasks.")
+            print("  The session shows strong completion indicators.")
+        elif insights["completion_status"] == "in_progress":
+            print("⚠ Previous agent was likely in progress on tasks.")
+            print(
+                "  Review the last responses above for current state and next actions."
+            )
         else:
-            print("Unable to determine session completion status.")
+            print("? Session completion status is unclear.")
+            print("  Manual review of the last responses is recommended.")
+
+        if handoff_data["user_prompts"]:
+            last_request = handoff_data["user_prompts"][-1]["content"]
+            print(
+                f"\nLast user request: {last_request[:200]}{'...' if len(last_request) > 200 else ''}"
+            )
 
         return
 
@@ -1283,4 +1751,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import asyncio
+
+    asyncio.run(main())

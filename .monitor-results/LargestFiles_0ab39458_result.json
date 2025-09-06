@@ -1,0 +1,12 @@
+{
+  "job_id": "LargestFiles_0ab39458",
+  "name": "LargestFiles",
+  "task": "Find top 10 largest files in project using find and sort commands",
+  "status": "completed",
+  "return_code": 0,
+  "duration_seconds": 1.022708,
+  "stdout": "=== LARGEST FILES ===\n969M\t./.venv/lib/python3.13/site-packages/torch/lib/libtorch_cuda.so\n717M\t./.venv/lib/python3.13/site-packages/nvidia/cublas/lib/libcublasLt.so.12\n523M\t./.venv/lib/python3.13/site-packages/nvidia/cudnn/lib/libcudnn_engines_precompiled.so.9\n432M\t./.venv/lib/python3.13/site-packages/nvidia/cusparselt/lib/libcusparseLt.so.0\n411M\t./.venv/lib/python3.13/site-packages/torch/lib/libtorch_cpu.so\n410M\t./.venv/lib/python3.13/site-packages/nvidia/nccl/lib/libnccl.so.2\n371M\t./.venv/lib/python3.13/site-packages/nvidia/cusparse/lib/libcusparse.so.12\n337M\t./.venv/lib/python3.13/site-packages/triton/_C/libtriton.so\n315M\t./external-projects/claude-flow/.git/objects/pack/pack-78bf90a102eaf9623d1dc9e63c4b005af9c38af7.pack\n273M\t./.venv/lib/python3.13/site-packages/nvidia/cudnn/lib/libcudnn_adv.so.9\n267M\t./.venv/lib/python3.13/site-packages/nvidia/cufft/lib/libcufft.so.11\n233M\t./.venv/lib/python3.13/site-packages/nvidia/cusolver/lib/libcusolver.so.11\n155M\t./.venv/lib/python3.13/site-packages/nvidia/cusolver/lib/libcusolverMg.so.11\n131M\t./.venv/lib/python3.13/site-packages/nvidia/curand/lib/libcurand.so.10\n128M\t./chat_logs.db",
+  "stderr": "",
+  "started_at": "2025-09-05T19:25:34.848171",
+  "completed_at": "2025-09-05T19:25:35.870891"
+}

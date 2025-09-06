@@ -210,20 +210,33 @@ class GenericOrchestrator:
         self.claude_cmd = ["claude", "-p"]
 
         if use_optimizations:
-            # Apply performance optimizations
-            minimal_config = Path.home() / ".claude_minimal.json"
-            if not minimal_config.exists():
-                minimal_config.write_text('{"mcpServers": {}}')
+            # Apply performance optimizations with research tools
+            research_config = Path.home() / ".claude_research.json"
+            if not research_config.exists():
+                # Include essential MCP servers for research while optimizing startup
+                research_mcp_config = {
+                    "mcpServers": {
+                        "mcp_web_search": {
+                            "command": "python",
+                            "args": ["-m", "mcp_web_search"],
+                        },
+                        "research_papers": {
+                            "command": "python",
+                            "args": ["-m", "research_papers"],
+                        },
+                        "firecrawl": {"command": "python", "args": ["-m", "firecrawl"]},
+                    }
+                }
+                research_config.write_text(json.dumps(research_mcp_config, indent=2))
 
             self.claude_cmd.extend(
                 [
                     "--model",
-                    "sonnet",  # Fast model
+                    "opus",  # Better for research quality
                     "--strict-mcp-config",
                     "--mcp-config",
-                    str(minimal_config),
-                    "--permission-mode",
-                    "acceptEdits",
+                    str(research_config),
+                    "--dangerously-skip-permissions",
                     "--output-format",
                     "json",
                 ]
@@ -259,15 +272,31 @@ class GenericOrchestrator:
         else:
             prompt = task.prompt
 
-        # Prepare command
-        cmd = self.claude_cmd + [
-            "--session-id",
-            session_id,
-            "--add-dir",
-            str(self.output_dir),
-            "--",  # Important: separator before prompt
-            prompt,
-        ]
+        # Prepare command with role-specific system prompt
+        cmd = self.claude_cmd.copy()
+
+        # Add system prompt based on task type for better specialization
+        system_prompts = {
+            "analysis": "You are a specialized analysis agent. Focus on thorough, data-driven analysis. Provide clear, structured summaries with key metrics.",
+            "monitoring": "You are a system monitoring agent. Focus on performance metrics, resource usage, and system health indicators. Be concise and actionable.",
+            "research": "You are a research specialist. Focus on comprehensive information gathering, accurate citations, and structured findings.",
+            "strategic_research_lead": "You are a strategic research commander. Plan and coordinate research operations. Focus on leadership, strategy, and optimal orchestration patterns.",
+        }
+
+        if task.task_type in system_prompts:
+            cmd.extend(["--append-system-prompt", system_prompts[task.task_type]])
+
+        # Add session and workspace parameters
+        cmd.extend(
+            [
+                "--session-id",
+                session_id,
+                "--add-dir",
+                str(self.output_dir),
+                "--",  # Important: separator before prompt
+                prompt,
+            ]
+        )
 
         # Get token
         token, token_idx = await self.token_pool.acquire()
