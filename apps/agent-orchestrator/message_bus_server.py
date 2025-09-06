@@ -18,8 +18,8 @@ Usage:
     python message_bus_server.py [--redis-url REDIS_URL] [--websocket-port PORT] [--admin-port PORT]
 """
 
-import asyncio
 import argparse
+import asyncio
 import logging
 import signal
 import sys
@@ -29,10 +29,10 @@ from typing import Optional
 # Add src to Python path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
+from src.message_bus.admin.admin_interface import MessageBusAdmin
 from src.message_bus.core.message_bus import MessageBus
 from src.message_bus.gateway.websocket_gateway import WebSocketGateway
 from src.message_bus.routing.message_router import MessageRouter
-from src.message_bus.admin.admin_interface import MessageBusAdmin
 
 # Setup logging
 logging.basicConfig(
@@ -121,16 +121,16 @@ class MessageBusServer:
 
             self.running = True
             logger.info("MessageBusServer started successfully!")
-            
+
             # Print startup summary
-            print("\n" + "="*60)
+            print("\n" + "=" * 60)
             print("🚀 MESSAGE BUS SERVER STARTED")
-            print("="*60)
+            print("=" * 60)
             print(f"📡 WebSocket Gateway: ws://localhost:{self.websocket_port}")
             print(f"🔧 Admin Interface: http://localhost:{self.admin_port}")
             print(f"🗄️  Redis Backend: {self.redis_url}")
             print(f"⚡ Max Connections: {self.max_connections}")
-            print("="*60)
+            print("=" * 60)
             print("\nReady to handle agent connections!")
             print("Press Ctrl+C to stop the server\n")
 
@@ -189,7 +189,7 @@ class MessageBusServer:
                 "websocket_gateway": bool(self.websocket_gateway),
                 "message_router": bool(self.message_router),
                 "admin_interface": bool(self.admin_interface),
-            }
+            },
         }
 
         # Add component-specific status if available
@@ -204,7 +204,9 @@ class MessageBusServer:
 
 async def main():
     """Main server entry point"""
-    parser = argparse.ArgumentParser(description="Agent Collaboration Message Bus Server")
+    parser = argparse.ArgumentParser(
+        description="Agent Collaboration Message Bus Server"
+    )
     parser.add_argument(
         "--redis-url",
         default="redis://localhost:6379/0",

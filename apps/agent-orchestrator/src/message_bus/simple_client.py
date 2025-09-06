@@ -7,20 +7,20 @@ Provides simple methods for common messaging patterns while abstracting away com
 
 Usage:
     from src.message_bus.simple_client import SimpleMessageClient
-    
+
     async def main():
         client = SimpleMessageClient("my_agent_id")
         await client.connect()
-        
+
         # Send direct message
         await client.send_to_agent("other_agent", {"action": "process_data", "data": [1,2,3]})
-        
+
         # Broadcast to all agents
         await client.broadcast({"announcement": "Hello everyone!"})
-        
+
         # Subscribe to topics
         await client.subscribe_topic("alerts", handle_alert)
-        
+
         await client.disconnect()
 """
 
@@ -28,18 +28,19 @@ import asyncio
 import json
 import logging
 import time
-from typing import Any, Callable, Dict, List, Optional, Set, Union
 from dataclasses import dataclass
+from typing import Any, Callable, Dict, List, Optional, Set, Union
 
-from .client.agent_client import AgentMessageClient, AgentClientConfig
-from .core.message_types import Message, MessageType, MessagePriority
+from .client.agent_client import AgentClientConfig, AgentMessageClient
+from .core.message_types import Message, MessagePriority, MessageType
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass 
+@dataclass
 class MessageResponse:
     """Response wrapper for sent messages"""
+
     success: bool
     message_id: str
     error: Optional[str] = None
@@ -58,7 +59,7 @@ class SimpleMessageClient:
     ):
         """
         Initialize simple message client
-        
+
         Args:
             agent_id: Unique identifier for this agent
             websocket_url: WebSocket URL for message bus server
@@ -67,7 +68,7 @@ class SimpleMessageClient:
         """
         self.agent_id = agent_id
         self.capabilities = capabilities or []
-        
+
         # Configure underlying client
         config = AgentClientConfig(
             agent_id=agent_id,
@@ -78,18 +79,18 @@ class SimpleMessageClient:
             max_reconnect_attempts=10,
             heartbeat_interval_seconds=30,
         )
-        
+
         self._client = AgentMessageClient(config)
         self._connected = False
-        
+
         # Message handling
         self._message_handlers: Dict[str, Callable] = {}
         self._topic_handlers: Dict[str, Callable] = {}
         self._group_handlers: Dict[str, Callable] = {}
-        
+
         # Setup default message router
         self._client.register_default_handler(self._route_incoming_message)
-        
+
         logger.info(f"SimpleMessageClient initialized for agent: {agent_id}")
 
     async def connect(self) -> bool:
@@ -124,8 +125,8 @@ class SimpleMessageClient:
     # === SENDING MESSAGES ===
 
     async def send_to_agent(
-        self, 
-        recipient_id: str, 
+        self,
+        recipient_id: str,
         data: Dict[str, Any],
         priority: MessagePriority = MessagePriority.NORMAL,
         requires_ack: bool = False,
@@ -133,14 +134,14 @@ class SimpleMessageClient:
     ) -> MessageResponse:
         """
         Send direct message to specific agent
-        
+
         Args:
             recipient_id: ID of target agent
             data: Message payload
             priority: Message priority level
             requires_ack: Whether delivery confirmation is required
             timeout_seconds: Timeout for response
-        
+
         Returns:
             MessageResponse indicating success/failure
         """
@@ -156,32 +157,34 @@ class SimpleMessageClient:
                 priority=priority,
                 requires_ack=requires_ack,
             )
-            
+
             success = await self._client.send_message(message)
-            
+
             if success:
                 return MessageResponse(True, message.message_id)
             else:
-                return MessageResponse(False, message.message_id, "Failed to send message")
-                
+                return MessageResponse(
+                    False, message.message_id, "Failed to send message"
+                )
+
         except Exception as e:
             logger.error(f"Error sending message to {recipient_id}: {e}")
             return MessageResponse(False, "", str(e))
 
     async def broadcast(
-        self, 
+        self,
         data: Dict[str, Any],
         priority: MessagePriority = MessagePriority.NORMAL,
         required_capabilities: Optional[List[str]] = None,
     ) -> MessageResponse:
         """
         Broadcast message to all connected agents
-        
+
         Args:
             data: Message payload
             priority: Message priority level
             required_capabilities: Filter by agent capabilities
-        
+
         Returns:
             MessageResponse indicating success/failure
         """
@@ -199,14 +202,16 @@ class SimpleMessageClient:
                 payload=payload,
                 priority=priority,
             )
-            
+
             success = await self._client.send_message(message)
-            
+
             if success:
                 return MessageResponse(True, message.message_id)
             else:
-                return MessageResponse(False, message.message_id, "Failed to broadcast message")
-                
+                return MessageResponse(
+                    False, message.message_id, "Failed to broadcast message"
+                )
+
         except Exception as e:
             logger.error(f"Error broadcasting message: {e}")
             return MessageResponse(False, "", str(e))
@@ -219,12 +224,12 @@ class SimpleMessageClient:
     ) -> MessageResponse:
         """
         Send message to topic subscribers
-        
+
         Args:
             topic: Topic name
             data: Message payload
             priority: Message priority level
-        
+
         Returns:
             MessageResponse indicating success/failure
         """
@@ -239,14 +244,16 @@ class SimpleMessageClient:
                 payload=data,
                 priority=priority,
             )
-            
+
             success = await self._client.send_message(message)
-            
+
             if success:
                 return MessageResponse(True, message.message_id)
             else:
-                return MessageResponse(False, message.message_id, "Failed to send to topic")
-                
+                return MessageResponse(
+                    False, message.message_id, "Failed to send to topic"
+                )
+
         except Exception as e:
             logger.error(f"Error sending to topic {topic}: {e}")
             return MessageResponse(False, "", str(e))
@@ -259,12 +266,12 @@ class SimpleMessageClient:
     ) -> MessageResponse:
         """
         Send message to group members
-        
+
         Args:
             group_id: Group identifier
             data: Message payload
             priority: Message priority level
-        
+
         Returns:
             MessageResponse indicating success/failure
         """
@@ -279,28 +286,32 @@ class SimpleMessageClient:
                 payload=data,
                 priority=priority,
             )
-            
+
             success = await self._client.send_message(message)
-            
+
             if success:
                 return MessageResponse(True, message.message_id)
             else:
-                return MessageResponse(False, message.message_id, "Failed to send to group")
-                
+                return MessageResponse(
+                    False, message.message_id, "Failed to send to group"
+                )
+
         except Exception as e:
             logger.error(f"Error sending to group {group_id}: {e}")
             return MessageResponse(False, "", str(e))
 
     # === MESSAGE SUBSCRIPTIONS ===
 
-    async def subscribe_topic(self, topic: str, handler: Callable[[Dict[str, Any]], None]) -> bool:
+    async def subscribe_topic(
+        self, topic: str, handler: Callable[[Dict[str, Any]], None]
+    ) -> bool:
         """
         Subscribe to topic messages
-        
+
         Args:
             topic: Topic name to subscribe to
             handler: Function to call when topic message received
-        
+
         Returns:
             True if subscription successful
         """
@@ -317,10 +328,10 @@ class SimpleMessageClient:
     async def unsubscribe_topic(self, topic: str) -> bool:
         """
         Unsubscribe from topic messages
-        
+
         Args:
             topic: Topic name to unsubscribe from
-        
+
         Returns:
             True if unsubscription successful
         """
@@ -334,14 +345,16 @@ class SimpleMessageClient:
             logger.error(f"Error unsubscribing from topic {topic}: {e}")
             return False
 
-    async def join_group(self, group_id: str, handler: Callable[[Dict[str, Any]], None]) -> bool:
+    async def join_group(
+        self, group_id: str, handler: Callable[[Dict[str, Any]], None]
+    ) -> bool:
         """
         Join a message group
-        
+
         Args:
             group_id: Group to join
             handler: Function to call when group message received
-        
+
         Returns:
             True if join successful
         """
@@ -358,10 +371,10 @@ class SimpleMessageClient:
     async def leave_group(self, group_id: str) -> bool:
         """
         Leave a message group
-        
+
         Args:
             group_id: Group to leave
-        
+
         Returns:
             True if leave successful
         """
@@ -375,19 +388,23 @@ class SimpleMessageClient:
             logger.error(f"Error leaving group {group_id}: {e}")
             return False
 
-    def register_direct_handler(self, handler: Callable[[str, Dict[str, Any]], None]) -> None:
+    def register_direct_handler(
+        self, handler: Callable[[str, Dict[str, Any]], None]
+    ) -> None:
         """
         Register handler for direct messages
-        
+
         Args:
             handler: Function(sender_id, data) to call for direct messages
         """
         self._message_handlers["direct"] = handler
 
-    def register_broadcast_handler(self, handler: Callable[[str, Dict[str, Any]], None]) -> None:
+    def register_broadcast_handler(
+        self, handler: Callable[[str, Dict[str, Any]], None]
+    ) -> None:
         """
         Register handler for broadcast messages
-        
+
         Args:
             handler: Function(sender_id, data) to call for broadcast messages
         """
@@ -400,27 +417,27 @@ class SimpleMessageClient:
         try:
             sender_id = message.sender_id
             data = message.payload
-            
+
             if message.message_type == MessageType.POINT_TO_POINT:
                 # Direct message
                 if "direct" in self._message_handlers:
                     self._message_handlers["direct"](sender_id, data)
-                    
+
             elif message.message_type == MessageType.BROADCAST:
                 # Broadcast message
                 if "broadcast" in self._message_handlers:
                     self._message_handlers["broadcast"](sender_id, data)
-                    
+
             elif message.message_type == MessageType.TOPIC and message.topic:
                 # Topic message
                 if message.topic in self._topic_handlers:
                     self._topic_handlers[message.topic](data)
-                    
+
             elif message.message_type == MessageType.GROUP and message.group_id:
                 # Group message
                 if message.group_id in self._group_handlers:
                     self._group_handlers[message.group_id](data)
-                    
+
         except Exception as e:
             logger.error(f"Error routing message: {e}")
 
@@ -449,11 +466,11 @@ class SimpleMessageClient:
 def create_agent_client(agent_id: str, **kwargs) -> SimpleMessageClient:
     """
     Create a simple message client for an agent
-    
+
     Args:
         agent_id: Unique agent identifier
         **kwargs: Additional configuration options
-    
+
     Returns:
         Configured SimpleMessageClient
     """

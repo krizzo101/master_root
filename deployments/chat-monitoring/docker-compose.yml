@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  chat-monitoring:
+    build: .
+    container_name: chat-monitoring
+    restart: unless-stopped
+    environment:
+      - POSTGRES_URL=${POSTGRES_URL:-postgresql://opsvi:password@postgres:5432/unified_context}
+      - CHAT_INGESTION_LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - CHAT_WATCHER_ENABLED=true
+      - PYTHONPATH=/app
+    volumes:
+      - chat_logs:/home/app/.claude/projects:ro
+      - config:/app/config
+      - logs:/app/logs
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - chat-monitoring
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: chat-monitoring-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: unified_context
+      POSTGRES_USER: opsvi
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U opsvi -d unified_context"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - chat-monitoring
+
+  redis:
+    image: redis:7-alpine
+    container_name: chat-monitoring-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - chat-monitoring
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: chat-monitoring-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - chat-monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: chat-monitoring-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - chat-monitoring
+
+volumes:
+  chat_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/opsvi/.claude/projects
+  config:
+  logs:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  chat-monitoring:
+    driver: bridge
