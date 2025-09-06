@@ -210,30 +210,37 @@ class GenericOrchestrator:
         self.claude_cmd = ["claude", "-p"]
 
         if use_optimizations:
-            # Apply performance optimizations with research tools
-            research_config = Path.home() / ".claude_research.json"
-            if not research_config.exists():
-                # Include essential MCP servers for research while optimizing startup
-                research_mcp_config = {
-                    "mcpServers": {
-                        "mcp_web_search": {
-                            "command": "python",
-                            "args": ["-m", "mcp_web_search"],
+            # Create minimal research-only MCP config to avoid 20-second startup delays
+            research_config = Path(self.output_dir) / "research_mcp.json"
+
+            # Only include essential research tools (not all 15+ MCP servers)
+            minimal_research_config = {
+                "mcpServers": {
+                    "mcp_web_search": {
+                        "command": "npx",
+                        "args": ["-y", "brave-search-mcp"],
+                        "env": {"BRAVE_API_KEY": "BSAqv6fii19i_ZRARk67Gs5udOHgxSN"},
+                    },
+                    "research_papers": {
+                        "command": "/home/opsvi/miniconda/bin/python",
+                        "args": ["-m", "arxiv_mcp_server"],
+                    },
+                    "firecrawl": {
+                        "command": "npx",
+                        "args": ["-y", "firecrawl-mcp"],
+                        "env": {
+                            "FIRECRAWL_API_KEY": "fc-a9cc6620c7b24c9c90bd010c73deb51f"
                         },
-                        "research_papers": {
-                            "command": "python",
-                            "args": ["-m", "research_papers"],
-                        },
-                        "firecrawl": {"command": "python", "args": ["-m", "firecrawl"]},
-                    }
+                    },
                 }
-                research_config.write_text(json.dumps(research_mcp_config, indent=2))
+            }
+
+            research_config.write_text(json.dumps(minimal_research_config, indent=2))
 
             self.claude_cmd.extend(
                 [
                     "--model",
                     "opus",  # Better for research quality
-                    "--strict-mcp-config",
                     "--mcp-config",
                     str(research_config),
                     "--dangerously-skip-permissions",
