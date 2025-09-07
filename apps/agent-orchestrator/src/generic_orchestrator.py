@@ -33,35 +33,50 @@ class AgentTask:
     error: Optional[str] = None
     start_time: Optional[float] = None
     end_time: Optional[float] = None
-    quality_gates: List[str] = field(default_factory=list)  # Quality gates for enhanced orchestrator
+    quality_gates: List[str] = field(
+        default_factory=list
+    )  # Quality gates for enhanced orchestrator
 
     def to_dict(self) -> Dict:
         return asdict(self)
 
 
 class TokenPool:
-    """Manages Claude API tokens for parallel execution"""
+    """
+    Manages Claude API tokens for parallel execution
+
+    CRITICAL SAFETY REQUIREMENT:
+    This TokenPool MUST fail catastrophically if token distribution fails.
+    NO FALLBACK to single tokens from environment variables is allowed.
+    Agents are FORBIDDEN from adding fallback mechanisms to this class.
+    """
 
     def __init__(self, tokens: List[str] = None):
-        # Handle None, empty list, or list with empty strings
-        if tokens is not None:
-            self.tokens = [t for t in tokens if t]  # Filter empty strings
-        else:
-            # Fall back to environment variable
-            env_token = os.environ.get("CLAUDE_CODE_TOKEN", "")
-            self.tokens = [env_token] if env_token else []
+        # CRITICAL: NO FALLBACK ALLOWED - Must fail if no tokens provided
+        if tokens is None or not tokens:
+            raise RuntimeError(
+                "CATASTROPHIC FAILURE: TokenPool requires explicit token list. "
+                "NO FALLBACK to environment variables allowed. "
+                "This is a critical safety requirement to prevent token conflicts."
+            )
+
+        # Filter empty strings but ensure we still have valid tokens
+        self.tokens = [t for t in tokens if t and t.strip()]
+
+        if not self.tokens:
+            raise RuntimeError(
+                "CATASTROPHIC FAILURE: No valid tokens provided to TokenPool. "
+                "All tokens were empty or invalid. "
+                "This system requires explicit token management - NO FALLBACKS."
+            )
 
         self.current_index = 0
         self.lock = asyncio.Lock()
         self.in_use = set()  # Track tokens in use
 
-        # Ensure we have at least one valid token
-        if not self.tokens:
-            raise ValueError(
-                "No Claude tokens available. Please set CLAUDE_CODE_TOKEN environment variable"
-            )
-
-        logger.info(f"Token pool initialized with {len(self.tokens)} tokens")
+        logger.info(
+            f"Token pool initialized with {len(self.tokens)} tokens - NO FALLBACKS ENABLED"
+        )
 
     async def acquire(self) -> Tuple[str, int]:
         """Get next available token (round-robin)"""
@@ -166,12 +181,18 @@ class GenericOrchestrator:
         # Ensure subdirectories exist
         (self.output_dir / "tasks").mkdir(exist_ok=True)
         (self.output_dir / "logs").mkdir(exist_ok=True)
-        
+
         # Setup debug file logging
-        self.log_file = self.output_dir / "logs" / f"orchestrator_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+        self.log_file = (
+            self.output_dir
+            / "logs"
+            / f"orchestrator_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+        )
         file_handler = logging.FileHandler(self.log_file)
         file_handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
         logger.debug(f"Debug logging initialized: {self.log_file}")
@@ -179,46 +200,16 @@ class GenericOrchestrator:
         # Handle None and invalid values
         self.max_parallel = max(1, max_parallel if max_parallel is not None else 10)
 
-        # Try to load tokens from encrypted storage if not provided
+        # CRITICAL SAFETY: NO FALLBACK MECHANISMS ALLOWED
+        # TokenPool MUST receive explicit tokens or fail catastrophically
+        # Agents are FORBIDDEN from adding fallback mechanisms here
+
         if tokens is None:
-            try:
-                # Add both current and parent directory to path for imports
-                import sys
-
-                current_dir = str(Path(__file__).parent)
-                parent_dir = str(Path(__file__).parent.parent)
-
-                if current_dir not in sys.path:
-                    sys.path.insert(0, current_dir)
-                if parent_dir not in sys.path:
-                    sys.path.insert(0, parent_dir)
-
-                try:
-                    from .token_loader import TokenLoader
-                except ImportError:
-                    # Fall back to direct import when not running as package
-                    from token_loader import TokenLoader
-
-                # Determine orchestrator type from context
-                orchestrator_type = getattr(self, "_orchestrator_type", None)
-                loader = TokenLoader(orchestrator_type=orchestrator_type)
-                loaded_tokens = loader.load_tokens()
-                if (
-                    loaded_tokens and len(loaded_tokens) > 0
-                ):  # Any tokens are good for coordinated execution
-                    tokens = loaded_tokens
-                    logger.info(
-                        f"Loaded {len(tokens)} tokens from secure storage (type: {orchestrator_type})"
-                    )
-                else:
-                    logger.warning(
-                        f"Only got {len(loaded_tokens) if loaded_tokens else 0} "
-                        f"tokens from secure storage, using fallback"
-                    )
-
-            except Exception as e:
-                logger.warning(f"Could not load tokens from secrets: {e}")
-                pass  # Fall back to default TokenPool behavior
+            raise RuntimeError(
+                "CATASTROPHIC FAILURE: GenericOrchestrator requires explicit tokens. "
+                "NO FALLBACK to token loading or environment variables allowed. "
+                "This is a critical safety requirement to prevent token conflicts."
+            )
 
         self.token_pool = TokenPool(tokens)
         self.dep_manager = DependencyManager()
@@ -327,7 +318,7 @@ class GenericOrchestrator:
 
         # Get token
         token, token_idx = await self.token_pool.acquire()
-        
+
         try:
             env = os.environ.copy()
             env["CLAUDE_CODE_TOKEN"] = token
@@ -376,10 +367,10 @@ class GenericOrchestrator:
                 self.metrics["failed"] += 1
 
                 logger.error(f"✗ {task.task_id} exception: {e}")
-        
+
         finally:
             # Always release the token
-            if hasattr(self.token_pool, 'release'):
+            if hasattr(self.token_pool, "release"):
                 self.token_pool.release(token_idx)
 
         # Post-execution hook

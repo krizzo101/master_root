@@ -98,10 +98,11 @@ class TokenCoordinator:
         try:
             with open(lock_path, "w") as lock_f:
                 if not self._acquire_file_lock(lock_f):
-                    logger.warning(
-                        "Could not acquire coordination lock, using fallback"
+                    raise RuntimeError(
+                        "CATASTROPHIC FAILURE: Could not acquire coordination lock. "
+                        "Token coordination is REQUIRED - NO FALLBACKS allowed. "
+                        "Fix the coordination system instead of using fallbacks."
                     )
-                    return self._fallback_token_assignment(all_tokens, max_parallel)
 
                 # Read current state
                 state = self._read_coordination_state()
@@ -143,8 +144,11 @@ class TokenCoordinator:
                 return my_tokens
 
         except Exception as e:
-            logger.error(f"Error in coordination: {e}")
-            return self._fallback_token_assignment(all_tokens, max_parallel)
+            raise RuntimeError(
+                f"CATASTROPHIC FAILURE: Token coordination error: {e}. "
+                "Token coordination is REQUIRED - NO FALLBACKS allowed. "
+                "Fix the coordination system instead of using fallbacks."
+            )
 
     def _distribute_tokens(
         self, all_tokens: List[str], instances: Dict
@@ -194,19 +198,18 @@ class TokenCoordinator:
     def _fallback_token_assignment(
         self, all_tokens: List[str], max_parallel: int
     ) -> List[str]:
-        """Fallback token assignment when coordination fails"""
-        logger.warning("Using fallback token assignment")
+        """
+        CATASTROPHIC FAILURE: Fallback token assignment is FORBIDDEN
 
-        # Simple hash-based assignment
-        instance_hash = hash(self.instance_id) % len(all_tokens)
-        tokens_needed = min(max_parallel, len(all_tokens))
-
-        assigned = []
-        for i in range(tokens_needed):
-            token_index = (instance_hash + i) % len(all_tokens)
-            assigned.append(all_tokens[token_index])
-
-        return assigned
+        This method is kept for compatibility but will ALWAYS fail.
+        Agents are FORBIDDEN from using fallback mechanisms.
+        Token coordination MUST work properly or the system MUST fail.
+        """
+        raise RuntimeError(
+            "CATASTROPHIC FAILURE: Token coordination failed and fallback is FORBIDDEN. "
+            "This system requires proper token coordination - NO FALLBACKS allowed. "
+            "Fix the coordination system instead of using fallbacks."
+        )
 
     def unregister_instance(self):
         """Unregister this instance from coordination"""

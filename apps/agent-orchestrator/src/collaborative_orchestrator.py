@@ -22,6 +22,11 @@ from generic_orchestrator import (
     TokenPool,
 )
 
+# CRITICAL SAFETY WARNING:
+# TokenPool in this system MUST fail catastrophically if token distribution fails.
+# NO FALLBACK to single tokens from environment variables is allowed.
+# Agents are FORBIDDEN from adding fallback mechanisms to TokenPool usage.
+
 logger = logging.getLogger(__name__)
 
 
@@ -442,7 +447,7 @@ class CollaborativeOrchestrator(GenericOrchestrator):
 
         # Get token
         token, token_idx = await self.token_pool.acquire()
-        
+
         try:
             env = os.environ.copy()
             env["CLAUDE_CODE_TOKEN"] = token
@@ -513,10 +518,10 @@ class CollaborativeOrchestrator(GenericOrchestrator):
                 await self.dep_manager.mark_failed(task.task_id)
                 self.metrics["failed"] += 1
                 logger.error(f"✗ Collaborative task {task.task_id} exception: {e}")
-        
+
         finally:
             # Always release the token
-            if hasattr(self.token_pool, 'release'):
+            if hasattr(self.token_pool, "release"):
                 self.token_pool.release(token_idx)
 
         # Save collaborative task state

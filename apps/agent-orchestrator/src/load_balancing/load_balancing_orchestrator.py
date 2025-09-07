@@ -2,6 +2,7 @@
 Load Balancing Orchestrator
 Main coordinator for intelligent load balancing, task scheduling, and resource management
 """
+
 import asyncio
 import logging
 import time
@@ -17,6 +18,11 @@ except ImportError:
 
     sys.path.append(str(Path(__file__).parent.parent))
     from generic_orchestrator import AgentTask, GenericOrchestrator
+
+# CRITICAL SAFETY WARNING:
+# TokenPool in this system MUST fail catastrophically if token distribution fails.
+# NO FALLBACK to single tokens from environment variables is allowed.
+# Agents are FORBIDDEN from adding fallback mechanisms to TokenPool usage.
 
 from .load_balancer import (
     AgentPerformanceMetrics,
@@ -202,9 +208,9 @@ class LoadBalancingOrchestrator:
             resource_utilization={
                 "cpu": current_resources.cpu_percent if current_resources else 0,
                 "memory": current_resources.memory_percent if current_resources else 0,
-                "available_capacity": current_resources.available_capacity
-                if current_resources
-                else 0,
+                "available_capacity": (
+                    current_resources.available_capacity if current_resources else 0
+                ),
             },
             performance_metrics={
                 "load_balancer_stats": performance_stats,

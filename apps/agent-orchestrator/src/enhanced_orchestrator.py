@@ -28,6 +28,11 @@ from generic_orchestrator import (
     MessageBus,
     TokenPool,
 )
+
+# CRITICAL SAFETY WARNING:
+# TokenPool in this system MUST fail catastrophically if token distribution fails.
+# NO FALLBACK to single tokens from environment variables is allowed.
+# Agents are FORBIDDEN from adding fallback mechanisms to TokenPool usage.
 from quality_gates import GateStatus, QualityGateManager, ValidationResult
 
 try:
@@ -162,7 +167,7 @@ class EnhancedOrchestrator(GenericOrchestrator):
         # Enhanced features flags
         self.enable_quality_gates = enable_quality_gates
         self.enable_monitoring = enable_monitoring
-        
+
         # Initialize task tracking for cleanup
         self._quality_gate_init_task = None
 
@@ -374,7 +379,7 @@ class EnhancedOrchestrator(GenericOrchestrator):
 
         # Get token
         token, token_idx = await self.token_pool.acquire()
-        
+
         try:
             env = os.environ.copy()
             env["CLAUDE_CODE_TOKEN"] = token
@@ -428,12 +433,12 @@ class EnhancedOrchestrator(GenericOrchestrator):
                 task.error = str(e)
                 await self.dep_manager.mark_failed(task.task_id)
                 self.metrics["failed"] += 1
-                
+
                 logger.error(f"✗ {task.task_id} exception: {e}")
-        
+
         finally:
             # Always release the token
-            if hasattr(self.token_pool, 'release'):
+            if hasattr(self.token_pool, "release"):
                 self.token_pool.release(token_idx)
 
         # Validate deliverable if enabled
@@ -508,9 +513,9 @@ class EnhancedOrchestrator(GenericOrchestrator):
                 result["quality_metrics"] = self.quality_metrics
 
                 if self.quality_gate_manager:
-                    result[
-                        "quality_status"
-                    ] = await self.quality_gate_manager.get_status_report()
+                    result["quality_status"] = (
+                        await self.quality_gate_manager.get_status_report()
+                    )
 
             return result
 
@@ -745,18 +750,20 @@ class EnhancedOrchestrator(GenericOrchestrator):
             execution_result = {
                 "plan_id": execution_plan.plan_id,
                 "plan_name": execution_plan.name,
-                "execution_mode": execution_mode.value
-                if hasattr(execution_mode, "value")
-                else str(execution_mode),
+                "execution_mode": (
+                    execution_mode.value
+                    if hasattr(execution_mode, "value")
+                    else str(execution_mode)
+                ),
                 "total_tasks": len(enhanced_tasks),
                 "results": results,
                 "metrics": self.metrics,
-                "quality_metrics": self.quality_metrics
-                if self.enable_quality_gates
-                else None,
-                "monitoring_metrics": self.monitoring_metrics
-                if self.enable_monitoring
-                else None,
+                "quality_metrics": (
+                    self.quality_metrics if self.enable_quality_gates else None
+                ),
+                "monitoring_metrics": (
+                    self.monitoring_metrics if self.enable_monitoring else None
+                ),
             }
 
             # Save execution report

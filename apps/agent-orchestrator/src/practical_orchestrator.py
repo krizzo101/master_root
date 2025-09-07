@@ -31,6 +31,11 @@ from src.generic_orchestrator import (
     TokenPool,
 )
 
+# CRITICAL SAFETY WARNING:
+# TokenPool in this system MUST fail catastrophically if token distribution fails.
+# NO FALLBACK to single tokens from environment variables is allowed.
+# Agents are FORBIDDEN from adding fallback mechanisms to TokenPool usage.
+
 logger = logging.getLogger(__name__)
 
 
