@@ -10,7 +10,7 @@ This document provides a comprehensive map of all code dependencies within the a
 The agent-orchestrator follows a layered architecture with clear separation of concerns:
 
 1. **Core Orchestrator Layer** - Base orchestration functionality
-2. **Enhancement Layers** - Extended features and capabilities  
+2. **Enhancement Layers** - Extended features and capabilities
 3. **Specialized Modules** - Domain-specific functionality
 4. **Support Systems** - Utility and infrastructure components
 
@@ -20,7 +20,7 @@ The agent-orchestrator follows a layered architecture with clear separation of c
 
 #### `generic_orchestrator.py` (Foundation)
 - **Role**: Base orchestrator implementation
-- **Internal Dependencies**: 
+- **Internal Dependencies**:
   - `token_loader.py` (TokenLoader)
   - `simple_async_system.py` (AsyncTask, AsyncQueue, AsyncTimer)
 - **External Dependencies**: asyncio, json, logging, uuid, dataclasses, datetime, pathlib, typing

@@ -1,0 +1,62 @@
+{
+  "test_name": "Error Handling Validation",
+  "start_time": "2025-09-07T11:58:48.776960",
+  "tests_run": 6,
+  "failures_handled": 3,
+  "successes_completed": 4,
+  "system_crashes": 0,
+  "graceful_failures": 3,
+  "error_details": [],
+  "task_results": [
+    {
+      "task_id": "fail_task_1",
+      "expected": "failure",
+      "actual": "failure",
+      "error": "Task prompt cannot be None",
+      "handled_gracefully": true,
+      "execution_time": 6.9141387939453125e-06
+    },
+    {
+      "task_id": "success_task_1",
+      "expected": "success",
+      "actual": "success",
+      "error": null,
+      "handled_gracefully": true,
+      "execution_time": 2.288818359375e-05
+    },
+    {
+      "task_id": "fail_task_2",
+      "expected": "failure",
+      "actual": "failure",
+      "error": "Task prompt must be a string, not dict",
+      "handled_gracefully": true,
+      "execution_time": 3.0517578125e-05
+    },
+    {
+      "task_id": "success_task_2",
+      "expected": "success",
+      "actual": "success",
+      "error": null,
+      "handled_gracefully": true,
+      "execution_time": 1.8596649169921875e-05
+    },
+    {
+      "task_id": "fail_task_3",
+      "expected": "failure",
+      "actual": "failure",
+      "error": "Task prompt cannot be empty",
+      "handled_gracefully": true,
+      "execution_time": 2.384185791015625e-05
+    },
+    {
+      "task_id": "success_task_3",
+      "expected": "success",
+      "actual": "success",
+      "error": null,
+      "handled_gracefully": true,
+      "execution_time": 2.1696090698242188e-05
+    }
+  ],
+  "recovery_successful": true,
+  "end_time": "2025-09-07T11:58:51.777670"
+}

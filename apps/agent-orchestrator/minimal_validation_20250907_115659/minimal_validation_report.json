@@ -1,0 +1,242 @@
+{
+  "validation_info": {
+    "start_time": "2025-09-07T11:56:59.609884",
+    "end_time": "2025-09-07T12:23:56.075946",
+    "total_agents": 3,
+    "approach": "minimal_core_validation"
+  },
+  "agent_results": {
+    "core_orchestration_test": {
+      "status": "failed",
+      "result": {
+        "task_id": "core_orchestration_test",
+        "task_type": "qa-testing-guru",
+        "prompt": "\n                CORE ORCHESTRATION VALIDATION\n                \n                Mission: Test essential orchestration functionality:\n                1. Execute 3 simple tasks in parallel\n                2. Verify basic dependency handling (A\u2192B\u2192C)\n                3. Check token management prevents oversubscription\n                4. Validate metrics collection works\n                \n                Test Plan:\n                - Create 3 parallel tasks with 30-second simulated work\n                - Create 3-task dependency chain \n                - Monitor token allocation during execution\n                - Verify all tasks complete successfully\n                \n                Success Criteria:\n                - All 6 tasks complete without errors\n                - Dependencies are respected (B waits for A, C waits for B)\n                - Token management prevents overallocation\n                - Basic metrics are collected\n                \n                Report: Simple PASS/FAIL with any error details\n                ",
+        "context": {
+          "priority": 1,
+          "expected_duration": 120
+        },
+        "dependencies": [],
+        "status": "failed",
+        "result": {
+          "type": "result",
+          "subtype": "success",
+          "is_error": false,
+          "duration_ms": 130226,
+          "duration_api_ms": 122675,
+          "num_turns": 28,
+          "result": "## Validation Complete: \u2705 **PASS**\n\nSuccessfully validated all core orchestration functionality:\n- **Parallel Execution:** 3 tasks ran concurrently in 2s (vs 6s sequential)\n- **Dependency Chain:** A\u2192B\u2192C executed in correct order\n- **Token Management:** Concurrency properly limited, no oversubscription\n- **Metrics Collection:** 100% success rate, all metrics tracked\n\nResults saved to:\n- `validation_results.json` - Detailed test data\n- `VALIDATION_REPORT.md` - Comprehensive report",
+          "session_id": "050771e8-1982-4a3b-9a7e-dc051f563c6b",
+          "total_cost_usd": 1.4822684,
+          "usage": {
+            "input_tokens": 7,
+            "cache_creation_input_tokens": 276,
+            "cache_read_input_tokens": 34090,
+            "output_tokens": 135,
+            "server_tool_use": {
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 276
+            }
+          },
+          "permission_denials": [],
+          "uuid": "455108d7-b44d-4ca6-8afe-bc91912206d9"
+        },
+        "error": "AttributeError: 'float' object has no attribute 'total_seconds'",
+        "start_time": 1757260619.613138,
+        "end_time": 1757260752.453604,
+        "quality_gates": {},
+        "raw_output": null,
+        "error_details": {
+          "type": "AttributeError",
+          "message": "'float' object has no attribute 'total_seconds'",
+          "task_id": "core_orchestration_test",
+          "task_type": "qa-testing-guru",
+          "timestamp": "2025-09-07T12:23:55.574373"
+        },
+        "team_id": null,
+        "assigned_agents": [],
+        "collaboration_mode": null,
+        "validation_required": false,
+        "gate_results": {},
+        "retries": 0,
+        "last_error": null,
+        "health_status": "healthy",
+        "phase": null,
+        "execution_mode": "parallel",
+        "priority": 0,
+        "metrics": {},
+        "mcp_needs": [],
+        "work_dir_name": null,
+        "debug_mode": false
+      },
+      "success": false
+    },
+    "error_handling_test": {
+      "status": "failed",
+      "result": {
+        "task_id": "error_handling_test",
+        "task_type": "qa-testing-guru",
+        "prompt": "\n                ERROR HANDLING VALIDATION\n                \n                Mission: Test system stability under failure conditions:\n                1. Create intentionally failing tasks\n                2. Verify graceful failure handling\n                3. Test auto-recovery if enabled\n                4. Ensure system continues operating\n                \n                Test Plan:\n                - Create 2 tasks that will fail (invalid prompts)\n                - Create 2 tasks that will succeed \n                - Monitor system behavior during failures\n                - Verify system doesn't crash\n                \n                Success Criteria:\n                - Failed tasks are handled gracefully\n                - Successful tasks still complete\n                - No system crashes or hangs\n                - Error details are captured\n                \n                Report: PASS/FAIL with failure handling assessment\n                ",
+        "context": {
+          "priority": 2,
+          "expected_duration": 90
+        },
+        "dependencies": [],
+        "status": "failed",
+        "result": {
+          "type": "result",
+          "subtype": "success",
+          "is_error": false,
+          "duration_ms": 145243,
+          "duration_api_ms": 141629,
+          "num_turns": 30,
+          "result": "## Validation Complete: **PASS** \u2705\n\nSuccessfully tested system error handling with:\n- **3 intentional failures** - All handled gracefully without crashes\n- **3 successful tasks** - Completed as expected\n- **System recovery** - Verified operational after failures\n- **Zero crashes** - System remained stable throughout\n\nThe system demonstrates production-ready error handling capabilities.",
+          "session_id": "f837bfb9-a82d-4b60-a2a4-95262ed88dfb",
+          "total_cost_usd": 1.6033683,
+          "usage": {
+            "input_tokens": 7,
+            "cache_creation_input_tokens": 246,
+            "cache_read_input_tokens": 31938,
+            "output_tokens": 86,
+            "server_tool_use": {
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 246
+            }
+          },
+          "permission_denials": [],
+          "uuid": "10a41c7b-ea27-47d1-b03f-ebc9bed40117"
+        },
+        "error": "AttributeError: 'float' object has no attribute 'total_seconds'",
+        "start_time": 1757260619.61419,
+        "end_time": 1757260767.548856,
+        "quality_gates": {},
+        "raw_output": null,
+        "error_details": {
+          "type": "AttributeError",
+          "message": "'float' object has no attribute 'total_seconds'",
+          "task_id": "error_handling_test",
+          "task_type": "qa-testing-guru",
+          "timestamp": "2025-09-07T12:23:55.574680"
+        },
+        "team_id": null,
+        "assigned_agents": [],
+        "collaboration_mode": null,
+        "validation_required": false,
+        "gate_results": {},
+        "retries": 0,
+        "last_error": null,
+        "health_status": "healthy",
+        "phase": null,
+        "execution_mode": "parallel",
+        "priority": 0,
+        "metrics": {},
+        "mcp_needs": [],
+        "work_dir_name": null,
+        "debug_mode": false
+      },
+      "success": false
+    },
+    "resource_management_test": {
+      "status": "failed",
+      "result": {
+        "task_id": "resource_management_test",
+        "task_type": "qa-testing-guru",
+        "prompt": "\n                RESOURCE MANAGEMENT VALIDATION\n                \n                Mission: Test resource limits and cleanup:\n                1. Stress test with more tasks than max_parallel allows\n                2. Verify token pool properly limits concurrency\n                3. Check resource cleanup after completion\n                4. Monitor for memory leaks\n                \n                Test Plan:\n                - Submit 8 tasks to system with max_parallel=3\n                - Monitor that only 3 run concurrently\n                - Verify remaining 5 queue properly\n                - Check cleanup after all complete\n                \n                Success Criteria:\n                - Concurrency limit is respected\n                - All queued tasks eventually execute\n                - Resources are cleaned up properly\n                - No memory leaks detected\n                \n                Report: PASS/FAIL with resource utilization summary\n                ",
+        "context": {
+          "priority": 3,
+          "expected_duration": 150
+        },
+        "dependencies": [],
+        "status": "failed",
+        "result": {
+          "type": "result",
+          "subtype": "success",
+          "is_error": false,
+          "duration_ms": 1613207,
+          "duration_api_ms": 368879,
+          "num_turns": 81,
+          "result": "## Resource Management Validation Complete \u2705\n\n**PASS** - All resource management criteria validated successfully:\n\n- **Concurrency Limit Respected**: Only 3 tasks ran simultaneously (max_parallel=3)\n- **Queue Management**: 5 excess tasks queued and executed properly\n- **Resource Cleanup**: Minimal memory leak (+0.1 MB)\n- **No Memory Leaks**: 99.6% memory recovered after cleanup\n\nThe token pool effectively controlled concurrency, all 8 tasks completed successfully, and resources were properly managed throughout the test lifecycle.",
+          "session_id": "8f7441f8-9438-4f8c-8137-5ac612cc7ac8",
+          "total_cost_usd": 4.507339750000002,
+          "usage": {
+            "input_tokens": 0,
+            "cache_creation_input_tokens": 254,
+            "cache_read_input_tokens": 51682,
+            "output_tokens": 129,
+            "server_tool_use": {
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 254
+            }
+          },
+          "permission_denials": [],
+          "uuid": "d1c49d71-dd33-4b93-ad9f-a6d7da1acd3f"
+        },
+        "error": "AttributeError: 'float' object has no attribute 'total_seconds'",
+        "start_time": 1757260619.615176,
+        "end_time": 1757262235.57376,
+        "quality_gates": {},
+        "raw_output": null,
+        "error_details": {
+          "type": "AttributeError",
+          "message": "'float' object has no attribute 'total_seconds'",
+          "task_id": "resource_management_test",
+          "task_type": "qa-testing-guru",
+          "timestamp": "2025-09-07T12:23:55.574925"
+        },
+        "team_id": null,
+        "assigned_agents": [],
+        "collaboration_mode": null,
+        "validation_required": false,
+        "gate_results": {},
+        "retries": 0,
+        "last_error": null,
+        "health_status": "healthy",
+        "phase": null,
+        "execution_mode": "parallel",
+        "priority": 0,
+        "metrics": {},
+        "mcp_needs": [],
+        "work_dir_name": null,
+        "debug_mode": false
+      },
+      "success": false
+    }
+  },
+  "overall_success": false,
+  "issues": [
+    {
+      "agent": "core_orchestration_test",
+      "error": "AttributeError: 'float' object has no attribute 'total_seconds'"
+    },
+    {
+      "agent": "error_handling_test",
+      "error": "AttributeError: 'float' object has no attribute 'total_seconds'"
+    },
+    {
+      "agent": "resource_management_test",
+      "error": "AttributeError: 'float' object has no attribute 'total_seconds'"
+    }
+  ],
+  "success_rate": 0.0,
+  "execution_time_seconds": 1616.4627,
+  "orchestrator_metrics": {
+    "total": 3,
+    "completed": 3,
+    "failed": 3,
+    "total_duration": 1896.7337160110474,
+    "start_time": "2025-09-07T11:56:59.612846",
+    "end_time": "2025-09-07T12:23:56.075391"
+  }
+}

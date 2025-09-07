@@ -1,6 +1,7 @@
 """LLM adapter for Claude Code Clone.
 
 Provides a unified interface to the opsvi-llm library for Claude Code-like functionality.
+Enforces OpenAI API Standards 2025 compliance.
 """
 
 import logging
@@ -16,6 +17,16 @@ from opsvi_llm import (
     LLMProviderError,
 )
 from opsvi_llm.providers.openai_unified_interface import OpenAIUnifiedInterface
+
+# OpenAI API Standards 2025 Compliance
+from ..compliance import (
+    OpenAIComplianceLayer,
+    OpenAIComplianceError,
+    ComplianceRequest,
+    ReasoningEffort,
+    create_simple_request,
+    create_reasoning_request,
+)
 
 # Import optional providers
 try:
@@ -50,14 +61,18 @@ class LLMAdapter(BaseComponent):
         """Initialize the LLM adapter."""
         super().__init__(name="LLMAdapter")
         self.config = config
-        
+
         # ✅ MANDATORY: Validate model before initialization
         try:
             ModelValidator.validate_config(config)
         except ModelValidationError as e:
             logger.error(f"Model validation failed: {e}")
             raise LLMAdapterError(f"Configuration validation failed: {e}") from e
-        
+
+        # ✅ Initialize OpenAI API Standards 2025 Compliance Layer
+        self._compliance = OpenAIComplianceLayer()
+        logger.info("🔐 OpenAI API Standards 2025 compliance enforced")
+
         self._provider = None
         self._unified_interface = None
         self._setup_provider()
@@ -96,7 +111,9 @@ class LLMAdapter(BaseComponent):
                     enable_audit_logging=False,  # Disable audit logging for now
                 )
                 self._unified_interface = OpenAIUnifiedInterface(provider_config)
-                self._provider = self._unified_interface.provider  # Keep reference for compatibility
+                self._provider = (
+                    self._unified_interface.provider
+                )  # Keep reference for compatibility
 
             elif self.config.provider.lower() == "anthropic":
                 if AnthropicProvider is None or AnthropicConfig is None:
@@ -137,6 +154,74 @@ class LLMAdapter(BaseComponent):
             logger.error(f"Failed to setup provider: {e}")
             raise LLMAdapterError(f"Provider setup failed: {e}") from e
 
+    async def compliant_request(
+        self,
+        prompt: str,
+        max_tokens: int = 1000,
+        schema: Optional[Dict[str, Any]] = None,
+        reasoning: Optional[ReasoningEffort] = None,
+        stream: bool = False,
+        **kwargs: Any
+    ) -> Union[str, AsyncGenerator[str, None]]:
+        """Make a compliant request using OpenAI API Standards 2025."""
+        try:
+            # Build compliance request
+            compliance_req = ComplianceRequest(
+                prompt=prompt,
+                max_tokens=max_tokens,
+                schema=schema,
+                reasoning=reasoning,
+                model_override=self.config.model,
+                extras=kwargs
+            )
+            
+            # Get compliant request
+            compliance_resp = self._compliance.build_compliant_request(compliance_req)
+            
+            # Log compliance proof
+            logger.info(f"🔐 Compliance proof: {compliance_resp.proof_blob}")
+            
+            # Convert compliance request to messages format for existing infrastructure
+            messages = [Message(role="user", content=prompt)]
+            
+            # Use existing chat_completion with validated parameters
+            if stream:
+                return self._stream_compliance_response(messages, compliance_resp)
+            else:
+                response = await self.chat_completion(messages, stream=False)
+                validation = self._compliance.validate_response(response)
+                
+                if not validation["compliant"]:
+                    logger.warning("Response format not fully compliant with Responses API")
+                
+                return validation["content"]
+                
+        except OpenAIComplianceError as e:
+            logger.error(f"OpenAI compliance violation: {e}")
+            raise LLMAdapterError(f"Compliance violation: {e}") from e
+        except Exception as e:
+            logger.error(f"Compliant request failed: {e}")
+            raise LLMAdapterError(f"Compliant request failed: {e}") from e
+
+    async def _stream_compliance_response(
+        self, messages: List[Message], compliance_resp
+    ) -> AsyncGenerator[str, None]:
+        """Stream compliant response."""
+        try:
+            async for chunk in await self.chat_completion(messages, stream=True):
+                # Handle new OpenAI API streaming response format
+                if hasattr(chunk, "delta") and chunk.delta:
+                    yield chunk.delta
+                elif hasattr(chunk, "output_text") and chunk.output_text:
+                    yield chunk.output_text
+                elif hasattr(chunk, "choices") and chunk.choices:
+                    content = chunk.choices[0].delta.content
+                    if content:
+                        yield content
+        except Exception as e:
+            logger.error(f"Streaming compliance failed: {e}")
+            yield f"Error: {e}"
+
     async def chat_completion(
         self, messages: List[Message], stream: bool = False, **kwargs: Any
     ) -> Union[ChatResponse, AsyncGenerator[ChatResponse, None]]:
@@ -149,13 +234,11 @@ class LLMAdapter(BaseComponent):
                         messages=messages,
                         model=self.config.model,
                         stream=True,
-                        **kwargs
+                        **kwargs,
                     )
                 else:
                     return await self._unified_interface.responses_from_messages(
-                        messages=messages,
-                        model=self.config.model,
-                        **kwargs
+                        messages=messages, model=self.config.model, **kwargs
                     )
             else:
                 # Fallback to direct provider (for non-OpenAI providers)
@@ -188,7 +271,13 @@ class LLMAdapter(BaseComponent):
         ]
 
         response = await self.chat_completion(messages)
-        return response.choices[0].message.content
+        # Handle new OpenAI API response format
+        if hasattr(response, "output_text"):
+            return response.output_text
+        elif hasattr(response, "choices") and response.choices:
+            return response.choices[0].message.content
+        else:
+            raise LLMAdapterError(f"Unexpected response format: {type(response)}")
 
     async def generate_code(
         self,
@@ -206,7 +295,13 @@ class LLMAdapter(BaseComponent):
         ]
 
         response = await self.chat_completion(messages)
-        return response.choices[0].message.content
+        # Handle new OpenAI API response format
+        if hasattr(response, "output_text"):
+            return response.output_text
+        elif hasattr(response, "choices") and response.choices:
+            return response.choices[0].message.content
+        else:
+            raise LLMAdapterError(f"Unexpected response format: {type(response)}")
 
     async def refactor_code(
         self,
@@ -227,7 +322,13 @@ class LLMAdapter(BaseComponent):
         ]
 
         response = await self.chat_completion(messages)
-        return response.choices[0].message.content
+        # Handle new OpenAI API response format
+        if hasattr(response, "output_text"):
+            return response.output_text
+        elif hasattr(response, "choices") and response.choices:
+            return response.choices[0].message.content
+        else:
+            raise LLMAdapterError(f"Unexpected response format: {type(response)}")
 
     def _build_analysis_prompt(
         self, language: str, analysis_type: str, context: Optional[str]

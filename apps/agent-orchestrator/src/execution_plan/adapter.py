@@ -22,7 +22,7 @@ from enhanced_orchestrator import EnhancedAgentTask
 from quality_gates import QualityGateManager
 
 # Add parent directory for execution_plan_schema
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from execution_plan_schema import (
     ExecutionMode,
     ExecutionPhase,

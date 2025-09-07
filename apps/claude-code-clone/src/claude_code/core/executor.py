@@ -75,7 +75,15 @@ class ClaudeCodeExecutor(BaseComponent):
                 return self._stream_response(messages)
             else:
                 response = await self.llm_adapter.chat_completion(messages)
-                return response.choices[0].message.content
+                # Handle new OpenAI API response format
+                if hasattr(response, "output_text"):
+                    return response.output_text
+                elif hasattr(response, "choices") and response.choices:
+                    return response.choices[0].message.content
+                else:
+                    raise ClaudeCodeExecutorError(
+                        f"Unexpected response format: {type(response)}"
+                    )
 
         except Exception as e:
             logger.error(f"Failed to execute prompt: {e}")
@@ -330,7 +338,15 @@ Allowed file extensions: {allowed_extensions}
             async for chunk in await self.llm_adapter.chat_completion(
                 messages, stream=True
             ):
-                if hasattr(chunk, "choices") and chunk.choices:
+                # Handle new OpenAI API streaming response format
+                if hasattr(chunk, "delta") and chunk.delta:
+                    # ResponseTextDeltaEvent - contains the actual text delta
+                    yield chunk.delta
+                elif hasattr(chunk, "output_text") and chunk.output_text:
+                    # Direct output text
+                    yield chunk.output_text
+                elif hasattr(chunk, "choices") and chunk.choices:
+                    # Legacy format
                     content = chunk.choices[0].delta.content
                     if content:
                         yield content
