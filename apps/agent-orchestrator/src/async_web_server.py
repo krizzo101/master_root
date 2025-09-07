@@ -40,10 +40,10 @@ class APIRequest:
     Based on architectural design specifications
     """
 
-    request_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     request_type: str  # GET, POST, PUT, DELETE
     endpoint: str
     method_handler: str  # Handler method name
+    request_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     payload: Optional[Dict] = None
     headers: Dict[str, str] = field(default_factory=dict)
     query_params: Dict[str, str] = field(default_factory=dict)
@@ -263,7 +263,8 @@ class RequestOrchestrator:
     def __init__(self, max_parallel: int = 50):
         self.max_parallel = max_parallel
         self.semaphore = asyncio.Semaphore(max_parallel)
-        self.orchestrator = GenericOrchestrator(max_parallel=max_parallel)
+        # Note: GenericOrchestrator requires output_dir, so we'll use semaphore pattern directly
+        # self.orchestrator = GenericOrchestrator(max_parallel=max_parallel)
         self.logger = logging.getLogger(f"{__name__}.Orchestrator")
 
     async def execute_request(

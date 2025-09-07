@@ -8,6 +8,7 @@ conflicts between agents working on the same resources.
 import time
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
@@ -221,11 +222,23 @@ class WorkspaceTracker:
                     self.detected_conflicts.append(conflict)
                     self.conflict_patterns[conflict.conflict_type] += 1
 
-                    # Log high-severity conflicts
+                    # Log high-severity conflicts (rate-limited)
                     if conflict.severity in ["high", "critical"]:
-                        print(
-                            f"⚠️  Workspace conflict detected: {conflict.description}"
+                        # Rate limit: max 1 message per file per 5 seconds
+                        current_time = datetime.now().timestamp()
+                        rate_limit_key = f"conflict_{conflict.file_path}"
+
+                        if not hasattr(self, "_last_conflict_warnings"):
+                            self._last_conflict_warnings = {}
+
+                        last_warning = self._last_conflict_warnings.get(
+                            rate_limit_key, 0
                         )
+                        if current_time - last_warning > 5.0:  # 5 second cooldown
+                            self._last_conflict_warnings[rate_limit_key] = current_time
+                            print(
+                                f"⚠️  Workspace conflict detected: {conflict.description}"
+                            )
 
     async def _analyze_potential_conflict(
         self, access1: FileAccess, access2: FileAccess

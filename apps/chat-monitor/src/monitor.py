@@ -71,7 +71,9 @@ class EnhancedChatMonitor:
         self.metrics_calculator = MetricsCalculator(settings)
 
         # Enhanced swarm intelligence system
-        self.swarm_intelligence = SwarmIntelligenceEngine(settings.chat_logs_dir.replace('/-home-opsvi-master-root', ''))
+        self.swarm_intelligence = SwarmIntelligenceEngine(
+            settings.chat_logs_dir.replace("/-home-opsvi-master-root", "")
+        )
 
         # Display and user interface
         self.dashboard = Dashboard(settings)
@@ -100,14 +102,16 @@ class EnhancedChatMonitor:
         signal.signal(signal.SIGINT, self._handle_shutdown)
         signal.signal(signal.SIGTERM, self._handle_shutdown)
 
-        # Initialize dashboard
+        # Initialize dashboard and swarm intelligence
         await self.dashboard.initialize()
+        await self.swarm_intelligence.initialize()
 
         try:
             # Start concurrent monitoring tasks
             await asyncio.gather(
                 self._monitor_log_files(),
                 self._update_collaboration_analysis(),
+                self._monitor_swarm_intelligence(),
                 self._refresh_dashboard(),
                 self._cleanup_inactive_sessions(),
             )
@@ -251,14 +255,14 @@ class EnhancedChatMonitor:
     async def _handle_collaboration_event(self, session: AgentSession, event):
         """Handle detected collaboration event."""
         # Convert CollaborationEvent object to dict if needed
-        if hasattr(event, 'event_type'):
+        if hasattr(event, "event_type"):
             event_dict = {
-                'type': event.event_type,
-                'timestamp': event.timestamp,
-                'partner_session_id': event.partner_session,
-                'significance': event.significance,
-                'details': event.details,
-                'evidence': event.evidence
+                "type": event.event_type,
+                "timestamp": event.timestamp,
+                "partner_session_id": event.partner_session,
+                "significance": event.significance,
+                "details": event.details,
+                "evidence": event.evidence,
             }
         else:
             event_dict = event
@@ -278,7 +282,10 @@ class EnhancedChatMonitor:
                     )
 
         # Log significant collaboration events
-        if event_dict.get("significance", 0) >= self.settings.collaboration_log_threshold:
+        if (
+            event_dict.get("significance", 0)
+            >= self.settings.collaboration_log_threshold
+        ):
             self.logger.info(
                 f"Collaboration event: {event_dict['type']} between {session.session_id} "
                 f"and {event_dict.get('partner_session_id', 'unknown')}"
@@ -356,17 +363,47 @@ class EnhancedChatMonitor:
                 self.logger.error(f"Analysis update error: {e}")
                 await asyncio.sleep(1)
 
+    async def _monitor_swarm_intelligence(self):
+        """Monitor enhanced swarm intelligence metrics."""
+        while self.is_running:
+            try:
+                # Collect comprehensive swarm snapshot
+                swarm_snapshot = await self.swarm_intelligence.collect_swarm_snapshot()
+
+                # Log significant events
+                if swarm_snapshot["swarm_metrics"].conflicts_detected > 0:
+                    self.logger.warning(
+                        f"Swarm conflicts detected: {swarm_snapshot['swarm_metrics'].conflicts_detected}"
+                    )
+
+                # Check system health
+                health = swarm_snapshot["system_health"]
+                if health["status"] != "healthy":
+                    self.logger.warning(
+                        f"Swarm health: {health['status']} - {health['issues']}"
+                    )
+
+                await asyncio.sleep(self.settings.analysis_update_interval)
+
+            except Exception as e:
+                self.logger.error(f"Swarm intelligence error: {e}")
+                await asyncio.sleep(5)
+
     async def _refresh_dashboard(self):
         """Periodically refresh the dashboard display."""
         while self.is_running:
             try:
                 # Gather current state for dashboard
+                swarm_snapshot = await self.swarm_intelligence.collect_swarm_snapshot()
                 dashboard_data = {
                     "active_sessions": self.active_sessions,
                     "network_analysis": await self.network_analyzer.get_current_analysis(),
                     "workspace_status": await self.workspace_tracker.get_current_status(),
                     "metrics": await self.metrics_calculator.get_current_metrics(),
                     "collaboration_events": await self._get_recent_collaboration_events(),
+                    "swarm_intelligence": swarm_snapshot,
+                    "agent_processes": swarm_snapshot.get("agent_processes", []),
+                    "system_health": swarm_snapshot.get("system_health", {}),
                 }
 
                 # Update dashboard
