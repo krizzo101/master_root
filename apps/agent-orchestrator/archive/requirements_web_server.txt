@@ -1,3 +1,0 @@
-aiohttp>=3.8.0
-asyncio
-jsonschema>=4.0.0
