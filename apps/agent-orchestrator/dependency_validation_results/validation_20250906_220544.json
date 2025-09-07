@@ -1,0 +1,105 @@
+{
+  "timestamp": "2025-09-06T22:05:44.042739",
+  "test_results": [
+    {
+      "test": "Linear Chain",
+      "passed": true,
+      "execution_order": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "expected_order": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "duration": 0.04098320007324219
+    },
+    {
+      "test": "Diamond Pattern",
+      "passed": true,
+      "execution_order": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "validation": "A first, D last, B&C in middle",
+      "duration": 0.030743837356567383
+    },
+    {
+      "test": "Complex Graph",
+      "passed": true,
+      "execution_layers": [
+        [
+          "A",
+          "B",
+          "C"
+        ],
+        [
+          "D",
+          "E",
+          "F"
+        ],
+        [
+          "G",
+          "H"
+        ],
+        [
+          "I"
+        ]
+      ],
+      "expected_layers": [
+        [
+          "B",
+          "A",
+          "C"
+        ],
+        [
+          "F",
+          "E",
+          "D"
+        ],
+        [
+          "H",
+          "G"
+        ],
+        [
+          "I"
+        ]
+      ],
+      "total_tasks": 9,
+      "duration": 0.040929317474365234
+    },
+    {
+      "test": "Parallel Efficiency",
+      "passed": true,
+      "parallel_time": 0.010283946990966797,
+      "sequential_estimate": 0.1,
+      "efficiency_ratio": 0.10283946990966797,
+      "task_count": 10
+    },
+    {
+      "test": "Circular Detection",
+      "passed": true,
+      "circular_detected": true,
+      "prevented_execution": true
+    },
+    {
+      "test": "Failed Dependency",
+      "passed": true,
+      "failed_task": "B",
+      "blocked_task": "C",
+      "c_can_run": false
+    }
+  ],
+  "summary": {
+    "total_tests": 6,
+    "passed": 6,
+    "failed": 0,
+    "dependency_management_score": 10.0
+  }
+}
