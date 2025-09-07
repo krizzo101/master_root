@@ -442,75 +442,82 @@ class CollaborativeOrchestrator(GenericOrchestrator):
 
         # Get token
         token, token_idx = await self.token_pool.acquire()
-        env = os.environ.copy()
-        env["CLAUDE_CODE_TOKEN"] = token
-
-        # Execute
-        task.start_time = datetime.now().timestamp()
-        task.status = "running"
-        await self.dep_manager.mark_running(task.task_id)
-
+        
         try:
-            logger.info(f"Executing collaborative task: {task.task_id}")
+            env = os.environ.copy()
+            env["CLAUDE_CODE_TOKEN"] = token
 
-            # Check for collaboration messages during execution
-            async def check_messages():
-                while task.status == "running":
-                    messages = await self.collaboration_manager.get_messages(
-                        task.task_id
-                    )
-                    if messages:
-                        logger.info(
-                            f"Agent {task.task_id} received {len(messages)} messages"
+            # Execute
+            task.start_time = datetime.now().timestamp()
+            task.status = "running"
+            await self.dep_manager.mark_running(task.task_id)
+
+            try:
+                logger.info(f"Executing collaborative task: {task.task_id}")
+
+                # Check for collaboration messages during execution
+                async def check_messages():
+                    while task.status == "running":
+                        messages = await self.collaboration_manager.get_messages(
+                            task.task_id
                         )
-                    await asyncio.sleep(
-                        self.collaboration_config.workspace_sync_interval
+                        if messages:
+                            logger.info(
+                                f"Agent {task.task_id} received {len(messages)} messages"
+                            )
+                        await asyncio.sleep(
+                            self.collaboration_config.workspace_sync_interval
+                        )
+
+                # Start message monitoring
+                message_task = asyncio.create_task(check_messages())
+
+                # Execute main process
+                process = await asyncio.create_subprocess_exec(
+                    *cmd,
+                    env=env,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+
+                stdout, stderr = await process.communicate()
+
+                # Stop message monitoring
+                message_task.cancel()
+
+                task.end_time = datetime.now().timestamp()
+                duration = task.end_time - task.start_time
+
+                if process.returncode == 0:
+                    task.status = "completed"
+                    task.result = json.loads(stdout.decode())
+                    await self.dep_manager.mark_completed(task.task_id)
+                    self.metrics["completed"] += 1
+                    logger.info(
+                        f"✓ Collaborative task {task.task_id} completed in {duration:.2f}s"
+                    )
+                else:
+                    task.status = "failed"
+                    task.error = stderr.decode()
+                    await self.dep_manager.mark_failed(task.task_id)
+                    self.metrics["failed"] += 1
+                    logger.error(
+                        f"✗ Collaborative task {task.task_id} failed: {task.error}"
                     )
 
-            # Start message monitoring
-            message_task = asyncio.create_task(check_messages())
+                self.metrics["total_duration"] += duration
 
-            # Execute main process
-            process = await asyncio.create_subprocess_exec(
-                *cmd,
-                env=env,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-
-            stdout, stderr = await process.communicate()
-
-            # Stop message monitoring
-            message_task.cancel()
-
-            task.end_time = datetime.now().timestamp()
-            duration = task.end_time - task.start_time
-
-            if process.returncode == 0:
-                task.status = "completed"
-                task.result = json.loads(stdout.decode())
-                await self.dep_manager.mark_completed(task.task_id)
-                self.metrics["completed"] += 1
-                logger.info(
-                    f"✓ Collaborative task {task.task_id} completed in {duration:.2f}s"
-                )
-            else:
+            except Exception as e:
                 task.status = "failed"
-                task.error = stderr.decode()
+                task.error = str(e)
                 await self.dep_manager.mark_failed(task.task_id)
                 self.metrics["failed"] += 1
-                logger.error(
-                    f"✗ Collaborative task {task.task_id} failed: {task.error}"
-                )
-
-            self.metrics["total_duration"] += duration
-
-        except Exception as e:
-            task.status = "failed"
-            task.error = str(e)
-            await self.dep_manager.mark_failed(task.task_id)
-            self.metrics["failed"] += 1
-            logger.error(f"✗ Collaborative task {task.task_id} exception: {e}")
+                logger.error(f"✗ Collaborative task {task.task_id} exception: {e}")
+        
+        finally:
+            # Always release the token
+            if hasattr(self.token_pool, 'release'):
+                self.token_pool.release(token_idx)
 
         # Save collaborative task state
         task_file = self.output_dir / "tasks" / f"{task.task_id}.json"

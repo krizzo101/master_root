@@ -23,7 +23,7 @@ import aiohttp.web_middlewares
 from aiohttp import ClientSession, web
 from aiohttp.web import Request, Response, json_response
 
-from .basic_monitoring import BasicMonitor
+from .basic_monitoring import RealTimeMonitor
 from .execution_plan_api import ExecutionPlanAPIEngine
 
 # Import orchestrator components

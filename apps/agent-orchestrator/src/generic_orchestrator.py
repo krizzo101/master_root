@@ -33,6 +33,7 @@ class AgentTask:
     error: Optional[str] = None
     start_time: Optional[float] = None
     end_time: Optional[float] = None
+    quality_gates: List[str] = field(default_factory=list)  # Quality gates for enhanced orchestrator
 
     def to_dict(self) -> Dict:
         return asdict(self)
@@ -52,6 +53,7 @@ class TokenPool:
 
         self.current_index = 0
         self.lock = asyncio.Lock()
+        self.in_use = set()  # Track tokens in use
 
         # Ensure we have at least one valid token
         if not self.tokens:
@@ -67,7 +69,14 @@ class TokenPool:
             token = self.tokens[self.current_index]
             token_idx = self.current_index
             self.current_index = (self.current_index + 1) % len(self.tokens)
+            self.in_use.add(token_idx)
             return token, token_idx
+
+    def release(self, token_idx: int):
+        """Release a token back to the pool"""
+        if token_idx in self.in_use:
+            self.in_use.discard(token_idx)
+            logger.debug(f"Released token index {token_idx}")
 
     def size(self) -> int:
         return len(self.tokens)
@@ -318,53 +327,60 @@ class GenericOrchestrator:
 
         # Get token
         token, token_idx = await self.token_pool.acquire()
-        env = os.environ.copy()
-        env["CLAUDE_CODE_TOKEN"] = token
-
-        # Execute
-        task.start_time = datetime.now().timestamp()
-        task.status = "running"
-        await self.dep_manager.mark_running(task.task_id)
-
+        
         try:
-            logger.info(f"Executing {task.task_id} ({task.task_type})")
+            env = os.environ.copy()
+            env["CLAUDE_CODE_TOKEN"] = token
 
-            process = await asyncio.create_subprocess_exec(
-                *cmd,
-                env=env,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
+            # Execute
+            task.start_time = datetime.now().timestamp()
+            task.status = "running"
+            await self.dep_manager.mark_running(task.task_id)
 
-            stdout, stderr = await process.communicate()
+            try:
+                logger.info(f"Executing {task.task_id} ({task.task_type})")
 
-            task.end_time = datetime.now().timestamp()
-            duration = task.end_time - task.start_time
+                process = await asyncio.create_subprocess_exec(
+                    *cmd,
+                    env=env,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
 
-            if process.returncode == 0:
-                task.status = "completed"
-                task.result = json.loads(stdout.decode())
-                await self.dep_manager.mark_completed(task.task_id)
-                self.metrics["completed"] += 1
+                stdout, stderr = await process.communicate()
 
-                logger.info(f"✓ {task.task_id} completed in {duration:.2f}s")
-            else:
+                task.end_time = datetime.now().timestamp()
+                duration = task.end_time - task.start_time
+
+                if process.returncode == 0:
+                    task.status = "completed"
+                    task.result = json.loads(stdout.decode())
+                    await self.dep_manager.mark_completed(task.task_id)
+                    self.metrics["completed"] += 1
+
+                    logger.info(f"✓ {task.task_id} completed in {duration:.2f}s")
+                else:
+                    task.status = "failed"
+                    task.error = stderr.decode()
+                    await self.dep_manager.mark_failed(task.task_id)
+                    self.metrics["failed"] += 1
+
+                    logger.error(f"✗ {task.task_id} failed: {task.error}")
+
+                self.metrics["total_duration"] += duration
+
+            except Exception as e:
                 task.status = "failed"
-                task.error = stderr.decode()
+                task.error = str(e)
                 await self.dep_manager.mark_failed(task.task_id)
                 self.metrics["failed"] += 1
 
-                logger.error(f"✗ {task.task_id} failed: {task.error}")
-
-            self.metrics["total_duration"] += duration
-
-        except Exception as e:
-            task.status = "failed"
-            task.error = str(e)
-            await self.dep_manager.mark_failed(task.task_id)
-            self.metrics["failed"] += 1
-
-            logger.error(f"✗ {task.task_id} exception: {e}")
+                logger.error(f"✗ {task.task_id} exception: {e}")
+        
+        finally:
+            # Always release the token
+            if hasattr(self.token_pool, 'release'):
+                self.token_pool.release(token_idx)
 
         # Post-execution hook
         if self.post_execute_hook:

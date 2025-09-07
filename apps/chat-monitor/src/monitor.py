@@ -26,6 +26,7 @@ from collaboration.workspace import WorkspaceTracker
 from config.settings import Settings
 from display.dashboard import Dashboard
 from orchestrator_registry import OrchestratorRegistry
+from swarm_intelligence import SwarmIntelligenceEngine
 
 
 @dataclass
@@ -68,6 +69,9 @@ class EnhancedChatMonitor:
         self.network_analyzer = AgentNetworkAnalyzer(settings)
         self.workspace_tracker = WorkspaceTracker(settings)
         self.metrics_calculator = MetricsCalculator(settings)
+
+        # Enhanced swarm intelligence system
+        self.swarm_intelligence = SwarmIntelligenceEngine(settings.chat_logs_dir.replace('/-home-opsvi-master-root', ''))
 
         # Display and user interface
         self.dashboard = Dashboard(settings)

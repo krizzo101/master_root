@@ -162,6 +162,9 @@ class EnhancedOrchestrator(GenericOrchestrator):
         # Enhanced features flags
         self.enable_quality_gates = enable_quality_gates
         self.enable_monitoring = enable_monitoring
+        
+        # Initialize task tracking for cleanup
+        self._quality_gate_init_task = None
 
         # Quality gate system
         self.quality_gate_manager: Optional[QualityGateManager] = None
@@ -371,60 +374,67 @@ class EnhancedOrchestrator(GenericOrchestrator):
 
         # Get token
         token, token_idx = await self.token_pool.acquire()
-        env = os.environ.copy()
-        env["CLAUDE_CODE_TOKEN"] = token
-
-        # Add enhanced metadata to environment
-        if task.team_id:
-            env["AGENT_TEAM_ID"] = task.team_id
-        env["AGENT_UUID"] = task.agent_uuid or ""
-
-        # Execute
-        task.start_time = datetime.now().timestamp()
-        task.status = "running"
-        await self.dep_manager.mark_running(task.task_id)
-
+        
         try:
-            logger.info(
-                f"Executing {task.task_id} (UUID: {task.agent_uuid}) ({task.task_type})"
-            )
+            env = os.environ.copy()
+            env["CLAUDE_CODE_TOKEN"] = token
 
-            process = await asyncio.create_subprocess_exec(
-                *cmd,
-                env=env,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
+            # Add enhanced metadata to environment
+            if task.team_id:
+                env["AGENT_TEAM_ID"] = task.team_id
+            env["AGENT_UUID"] = task.agent_uuid or ""
 
-            stdout, stderr = await process.communicate()
+            # Execute
+            task.start_time = datetime.now().timestamp()
+            task.status = "running"
+            await self.dep_manager.mark_running(task.task_id)
 
-            task.end_time = datetime.now().timestamp()
-            duration = task.end_time - task.start_time
+            try:
+                logger.info(
+                    f"Executing {task.task_id} (UUID: {task.agent_uuid}) ({task.task_type})"
+                )
 
-            if process.returncode == 0:
-                task.status = "completed"
-                task.result = json.loads(stdout.decode())
-                await self.dep_manager.mark_completed(task.task_id)
-                self.metrics["completed"] += 1
+                process = await asyncio.create_subprocess_exec(
+                    *cmd,
+                    env=env,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
 
-                logger.info(f"✓ {task.task_id} completed in {duration:.2f}s")
-            else:
+                stdout, stderr = await process.communicate()
+
+                task.end_time = datetime.now().timestamp()
+                duration = task.end_time - task.start_time
+
+                if process.returncode == 0:
+                    task.status = "completed"
+                    task.result = json.loads(stdout.decode())
+                    await self.dep_manager.mark_completed(task.task_id)
+                    self.metrics["completed"] += 1
+
+                    logger.info(f"✓ {task.task_id} completed in {duration:.2f}s")
+                else:
+                    task.status = "failed"
+                    task.error = stderr.decode()
+                    await self.dep_manager.mark_failed(task.task_id)
+                    self.metrics["failed"] += 1
+
+                    logger.error(f"✗ {task.task_id} failed: {task.error}")
+
+                self.metrics["total_duration"] += duration
+
+            except Exception as e:
                 task.status = "failed"
-                task.error = stderr.decode()
+                task.error = str(e)
                 await self.dep_manager.mark_failed(task.task_id)
                 self.metrics["failed"] += 1
-
-                logger.error(f"✗ {task.task_id} failed: {task.error}")
-
-            self.metrics["total_duration"] += duration
-
-        except Exception as e:
-            task.status = "failed"
-            task.error = str(e)
-            await self.dep_manager.mark_failed(task.task_id)
-            self.metrics["failed"] += 1
-
-            logger.error(f"✗ {task.task_id} exception: {e}")
+                
+                logger.error(f"✗ {task.task_id} exception: {e}")
+        
+        finally:
+            # Always release the token
+            if hasattr(self.token_pool, 'release'):
+                self.token_pool.release(token_idx)
 
         # Validate deliverable if enabled
         if (
@@ -594,7 +604,11 @@ class EnhancedOrchestrator(GenericOrchestrator):
             return None
 
         try:
-            return await self.agent_monitor.get_agent_status(agent_uuid)
+            if self.agent_monitor:
+                return await self.agent_monitor.get_agent_status(agent_uuid)
+            else:
+                logger.warning("Agent monitor not initialized")
+                return None
         except Exception as e:
             logger.error(f"Error getting agent status for {agent_uuid}: {e}")
             return None
@@ -606,7 +620,11 @@ class EnhancedOrchestrator(GenericOrchestrator):
             return {}
 
         try:
-            return await self.agent_monitor.get_all_agent_statuses(team_id)
+            if self.agent_monitor:
+                return await self.agent_monitor.get_all_agent_statuses(team_id)
+            else:
+                logger.warning("Agent monitor not initialized")
+                return {}
         except Exception as e:
             logger.error(f"Error getting team status for {team_id}: {e}")
             return {}
