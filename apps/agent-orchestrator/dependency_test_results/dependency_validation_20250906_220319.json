@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-09-06T22:03:19.658090",
+  "test_results": [
+    {
+      "test_name": "Linear Chain (10 tasks)",
+      "status": "error",
+      "error": "'DependencyTestOrchestrator' object has no attribute 'run_tasks'",
+      "task_count": 10
+    },
+    {
+      "test_name": "Diamond Pattern",
+      "status": "error",
+      "error": "'DependencyTestOrchestrator' object has no attribute 'run_tasks'",
+      "task_count": 4
+    },
+    {
+      "test_name": "Complex Graph (15 tasks)",
+      "status": "error",
+      "error": "'DependencyTestOrchestrator' object has no attribute 'run_tasks'",
+      "task_count": 14
+    },
+    {
+      "test_name": "Linear Chain (50 tasks)",
+      "status": "error",
+      "error": "'DependencyTestOrchestrator' object has no attribute 'run_tasks'",
+      "task_count": 50
+    },
+    {
+      "test_name": "Circular Dependency",
+      "status": "failed",
+      "error": "Circular dependency detected",
+      "task_count": 3
+    }
+  ],
+  "summary": {
+    "total_tests": 5,
+    "passed": 0,
+    "failed": 5,
+    "dependency_management_score": 0.0,
+    "average_parallelization_efficiency": 0,
+    "circular_dependency_detection": "working"
+  }
+}

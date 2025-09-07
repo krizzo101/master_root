@@ -1,0 +1,15 @@
+{
+  "task_id": "invalid_prompt_task",
+  "task_type": "test",
+  "prompt": "",
+  "context": {
+    "test": "empty_prompt"
+  },
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "Error: Input must be provided either through stdin or as a prompt argument when using --print\n",
+  "start_time": 1757210631.935516,
+  "end_time": 1757210637.495418,
+  "quality_gates": []
+}

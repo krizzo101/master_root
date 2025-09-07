@@ -1,0 +1,39 @@
+{
+  "task_id": "token_test_8",
+  "task_type": "test",
+  "prompt": "Simple test task 8 - just respond with 'ok'",
+  "context": {},
+  "dependencies": [],
+  "status": "completed",
+  "result": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 2788,
+    "duration_api_ms": 4587,
+    "num_turns": 1,
+    "result": "ok",
+    "session_id": "6a18ea7a-03e2-4f21-8bc4-5a2e034eb663",
+    "total_cost_usd": 0.35786585,
+    "usage": {
+      "input_tokens": 4,
+      "cache_creation_input_tokens": 18671,
+      "cache_read_input_tokens": 4738,
+      "output_tokens": 4,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 18671
+      }
+    },
+    "permission_denials": [],
+    "uuid": "892b6377-a52c-4703-8733-e966321675ee"
+  },
+  "error": null,
+  "start_time": 1757210631.294211,
+  "end_time": 1757210639.784876,
+  "quality_gates": []
+}
