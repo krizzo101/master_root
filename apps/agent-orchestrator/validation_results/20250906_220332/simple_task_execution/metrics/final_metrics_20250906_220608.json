@@ -1,0 +1,30 @@
+{
+  "basic_metrics": {
+    "total": 3,
+    "completed": 3,
+    "failed": 0,
+    "total_duration": 258.8100109100342,
+    "start_time": "2025-09-06T22:03:32.454916",
+    "end_time": "2025-09-06T22:06:08.312073"
+  },
+  "enhanced_metrics": {
+    "tasks_by_type": {
+      "test": 3
+    },
+    "tasks_by_status": {
+      "completed": 3
+    },
+    "average_duration_by_type": {
+      "test": [
+        33.430522203445435,
+        70.0255868434906,
+        155.35390186309814
+      ]
+    },
+    "team_performance": {},
+    "quality_gate_results": {},
+    "recovery_attempts": 0,
+    "checkpoint_saves": 0
+  },
+  "module_metrics": {}
+}

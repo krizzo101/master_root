@@ -1,0 +1,194 @@
+{
+  "metrics": {
+    "total": 3,
+    "completed": 3,
+    "failed": 0,
+    "total_duration": 258.8100109100342,
+    "start_time": "2025-09-06T22:03:32.454916",
+    "end_time": "2025-09-06T22:06:08.312073"
+  },
+  "results": [
+    {
+      "task_id": "simple_task_0",
+      "task_type": "test",
+      "prompt": "Execute simple task 0",
+      "context": {
+        "test": true,
+        "index": 0
+      },
+      "dependencies": [],
+      "status": "completed",
+      "result": {
+        "type": "result",
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 67156,
+        "duration_api_ms": 71768,
+        "num_turns": 35,
+        "result": "Task 0 executed successfully",
+        "session_id": "af0c9fae-2857-4d7b-af43-9fc7c930e7f1",
+        "total_cost_usd": 1.00295725,
+        "usage": {
+          "input_tokens": 3,
+          "cache_creation_input_tokens": 123,
+          "cache_read_input_tokens": 33560,
+          "output_tokens": 9,
+          "server_tool_use": {
+            "web_search_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 0,
+            "ephemeral_5m_input_tokens": 123
+          }
+        },
+        "permission_denials": [],
+        "uuid": "1e5ed874-dfe3-4cfd-a6dc-2addebcb6d7f"
+      },
+      "error": null,
+      "start_time": 1757210612.455264,
+      "end_time": 1757210682.480851,
+      "quality_gates": {},
+      "team_id": null,
+      "assigned_agents": [],
+      "collaboration_mode": null,
+      "validation_required": false,
+      "gate_results": {},
+      "retries": 0,
+      "last_error": null,
+      "health_status": "healthy",
+      "phase": null,
+      "execution_mode": "parallel",
+      "priority": 0,
+      "metrics": {}
+    },
+    {
+      "task_id": "simple_task_1",
+      "task_type": "test",
+      "prompt": "Execute simple task 1",
+      "context": {
+        "test": true,
+        "index": 1
+      },
+      "dependencies": [],
+      "status": "completed",
+      "result": {
+        "type": "result",
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 152470,
+        "duration_api_ms": 150871,
+        "num_turns": 4,
+        "result": "Now I'm ready to execute simple task 1. What would you like me to do?",
+        "session_id": "5d1cb14a-cef2-40be-90d0-643e511d1566",
+        "total_cost_usd": 0.5795165,
+        "usage": {
+          "input_tokens": 6,
+          "cache_creation_input_tokens": 1070,
+          "cache_read_input_tokens": 23145,
+          "output_tokens": 22,
+          "server_tool_use": {
+            "web_search_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 0,
+            "ephemeral_5m_input_tokens": 1070
+          }
+        },
+        "permission_denials": [],
+        "uuid": "ae08b5c7-6cea-4337-82e6-45b81b650aaa"
+      },
+      "error": null,
+      "start_time": 1757210612.456756,
+      "end_time": 1757210767.810658,
+      "quality_gates": {},
+      "team_id": null,
+      "assigned_agents": [],
+      "collaboration_mode": null,
+      "validation_required": false,
+      "gate_results": {},
+      "retries": 0,
+      "last_error": null,
+      "health_status": "healthy",
+      "phase": null,
+      "execution_mode": "parallel",
+      "priority": 0,
+      "metrics": {}
+    },
+    {
+      "task_id": "simple_task_2",
+      "task_type": "test",
+      "prompt": "Execute simple task 2",
+      "context": {
+        "test": true,
+        "index": 2
+      },
+      "dependencies": [],
+      "status": "completed",
+      "result": {
+        "type": "result",
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 30573,
+        "duration_api_ms": 27980,
+        "num_turns": 12,
+        "result": "Now, what is \"simple task 2\" that you'd like me to execute? Please provide the specific task details.",
+        "session_id": "dc935b76-e38f-4626-ab84-d1d40f863064",
+        "total_cost_usd": 0.4184695,
+        "usage": {
+          "input_tokens": 6,
+          "cache_creation_input_tokens": 1054,
+          "cache_read_input_tokens": 26224,
+          "output_tokens": 28,
+          "server_tool_use": {
+            "web_search_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 0,
+            "ephemeral_5m_input_tokens": 1054
+          }
+        },
+        "permission_denials": [],
+        "uuid": "6d4c828e-02f4-47a4-9a5b-3ced0455197c"
+      },
+      "error": null,
+      "start_time": 1757210612.457898,
+      "end_time": 1757210645.88842,
+      "quality_gates": {},
+      "team_id": null,
+      "assigned_agents": [],
+      "collaboration_mode": null,
+      "validation_required": false,
+      "gate_results": {},
+      "retries": 0,
+      "last_error": null,
+      "health_status": "healthy",
+      "phase": null,
+      "execution_mode": "parallel",
+      "priority": 0,
+      "metrics": {}
+    }
+  ],
+  "enhanced_metrics": {
+    "tasks_by_type": {
+      "test": 3
+    },
+    "tasks_by_status": {
+      "completed": 3
+    },
+    "average_duration_by_type": {
+      "test": [
+        33.430522203445435,
+        70.0255868434906,
+        155.35390186309814
+      ]
+    },
+    "team_performance": {},
+    "quality_gate_results": {},
+    "recovery_attempts": 0,
+    "checkpoint_saves": 0
+  },
+  "module_status": {}
+}
