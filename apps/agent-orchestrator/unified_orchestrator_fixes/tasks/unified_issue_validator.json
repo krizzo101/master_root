@@ -1,0 +1,22 @@
+{
+  "task_id": "unified_issue_validator",
+  "task_type": "qa-testing-guru",
+  "prompt": "UNIFIED ORCHESTRATOR CRITICAL ISSUE VALIDATION\n\nREFERENCE MATERIALS - READ THESE FIRST:\n1. /home/opsvi/master_root/apps/agent-orchestrator/UNIFIED_ORCHESTRATOR_VALIDATION_REPORT.md\n2. /home/opsvi/master_root/apps/agent-orchestrator/orchestrator_validation_suite.py (validation plan that generated the failure logs)\n3. /home/opsvi/master_root/apps/agent-orchestrator/unified_orchestrator_validation_20250906_220122/ (actual failure evidence)\n4. /home/opsvi/master_root/apps/agent-orchestrator/tests/integration/test_unified_orchestrator.py\n\nYou are validating the 6 critical UnifiedOrchestrator issues that need fixing.\n\nCRITICAL ISSUES TO VALIDATE (from validation report):\n\n1. **Missing get_metrics() Method**\n   - Status: May already be fixed\n   - Location: src/unified/unified_orchestrator.py\n   - Validation: Check if method exists and returns proper metrics\n\n2. **Task Execution Engine Problems**\n   - Issue: Empty error strings instead of actual errors\n   - Location: src/generic_orchestrator.py error handling logic\n   - Impact: Tasks fail with no diagnostic information\n\n3. **Enhanced Feature Module Loading Failures**\n   - Missing modules: QualityGatesModule, MonitoringModule, CollaborationModule, ExecutionPlanModule\n   - Root cause: Broken imports or missing files\n   - Location: src/unified/unified_orchestrator.py module loading\n\n4. **Agent Context Isolation Problems**\n   - Issue: Config inheritance problems between agents\n   - Impact: Cross-agent config leakage\n   - Solution needed: Isolated .agent_exec/ contexts\n\n5. **Task Type Validation Failures**\n   - Issue: Invalid task types like 'test-remediation-specialist'\n   - Solution needed: Update task type taxonomy\n\n6. **Subprocess Working Directory Missing**\n   - Issue: No cwd parameter in subprocess calls\n   - Impact: Relative paths don't resolve correctly\n   - Location: Agent execution code\n\nVALIDATION TASKS:\n1. Read and analyze ALL orchestrator files\n2. Identify which issues are already fixed vs still broken\n3. Assess the scope and complexity of remaining fixes\n4. Determine dependency order for fixes\n5. Create detailed analysis for solution architect\n\nDELIVERABLE:\nCreate unified_issues_analysis.md with:\n- CURRENT STATUS: Which issues are fixed/broken\n- ROOT CAUSE ANALYSIS: Detailed technical analysis\n- COMPLEXITY ASSESSMENT: Difficulty level for each fix\n- FIX DEPENDENCIES: What order fixes should be applied\n- RECOMMENDATIONS: Approach for solution architect\n\nBe thorough but focus on actionable technical details for the implementation agents.",
+  "context": {},
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "JSON parsing failed: Expecting value: line 1 column 2 (char 1). Agent output: [DEBUG] Watching for changes in setting files /home/opsvi/.claude/settings.json...\n[DEBUG] Writing to temp file: /home/opsvi/.claude.json.tmp.770153.1757237736303\n[DEBUG] Preserving file permissions: 100644\n[DEBUG] Temp file written successfully, size: 655585 bytes\n[DEBUG] Applied original permissions to temp file\n[DEBUG] Renaming /home/opsvi/.claude.json.tmp.770153.1757237736303 to /home/opsvi/.claude.json\n[DEBUG] File /home/opsvi/.claude.json written atomically\n[DEBUG] Applying permission upda...",
+  "start_time": 1757237735.582425,
+  "end_time": 1757238007.834685,
+  "quality_gates": [],
+  "validation_required": true,
+  "phase_id": null,
+  "agent_uuid": "05fbd910-88da-459b-b858-23e6c1945796",
+  "team_id": null,
+  "monitoring_enabled": false,
+  "background_execution": false,
+  "mcp_needs": [],
+  "work_dir_name": null,
+  "debug_mode": false
+}

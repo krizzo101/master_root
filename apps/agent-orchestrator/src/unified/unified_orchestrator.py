@@ -11,30 +11,30 @@ import logging
 import os
 import sys
 import uuid
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
+from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
-from enum import Enum
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 try:
     from src.generic_orchestrator import (
-        GenericOrchestrator,
         AgentTask,
-        TokenPool,
         DependencyManager,
+        GenericOrchestrator,
         MessageBus,
+        TokenPool,
     )
 except ImportError:
     from generic_orchestrator import (
-        GenericOrchestrator,
         AgentTask,
-        TokenPool,
         DependencyManager,
+        GenericOrchestrator,
         MessageBus,
+        TokenPool,
     )
 
 # CRITICAL SAFETY WARNING:
@@ -42,7 +42,7 @@ except ImportError:
 # NO FALLBACK to single tokens from environment variables is allowed.
 # Agents are FORBIDDEN from adding fallback mechanisms to TokenPool usage.
 
-from .orchestrator_module import OrchestratorModule, ModuleConfig, ModuleRegistry
+from .orchestrator_module import ModuleConfig, ModuleRegistry, OrchestratorModule
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -81,6 +81,14 @@ class UnifiedConfig:
 
     # Module configurations
     module_configs: Dict[str, ModuleConfig] = field(default_factory=dict)
+
+    # New dynamic architecture fields
+    master_mcp_registry_path: Optional[Path] = None
+    agent_execution_profile: str = "standard"
+    agent_debug_mode: bool = False
+    agent_base_work_dir: Optional[Path] = None
+    enable_dynamic_configs: bool = False
+    log_to_work_dir: bool = False
 
     # Collaboration settings (if enabled)
     enable_collaboration: bool = False
@@ -140,6 +148,13 @@ class EnhancedAgentTask(AgentTask):
     # Metrics
     metrics: Dict[str, Any] = field(default_factory=dict)
 
+    # Dynamic architecture support
+    mcp_needs: List[str] = field(
+        default_factory=list
+    )  # Required MCP servers for this task
+    work_dir_name: Optional[str] = None  # Custom working directory name
+    debug_mode: bool = False  # Enable debug mode for this specific task
+
     @classmethod
     def from_agent_task(cls, task: AgentTask) -> "EnhancedAgentTask":
         """Convert regular AgentTask to EnhancedAgentTask"""
@@ -169,12 +184,18 @@ class UnifiedOrchestrator(GenericOrchestrator):
         # Store config
         self.config = config
 
-        # Initialize base orchestrator
+        # Initialize base orchestrator with all parameters including new ones
         super().__init__(
             output_dir=config.output_dir,
             max_parallel=config.max_parallel,
             tokens=config.tokens,
             use_optimizations=config.use_optimizations,
+            master_mcp_registry_path=config.master_mcp_registry_path,
+            agent_execution_profile=config.agent_execution_profile,
+            agent_debug_mode=config.agent_debug_mode,
+            agent_base_work_dir=config.agent_base_work_dir,
+            enable_dynamic_configs=config.enable_dynamic_configs,
+            log_to_work_dir=config.log_to_work_dir,
         )
 
         # Initialize module registry
@@ -543,6 +564,13 @@ class UnifiedOrchestrator(GenericOrchestrator):
             return "completed"
 
         return "running"
+
+    def get_metrics(self) -> Dict:
+        """
+        Get metrics from the orchestrator.
+        Required method for orchestrator interface compliance.
+        """
+        return self.metrics
 
     async def cleanup(self):
         """Cleanup orchestrator resources"""

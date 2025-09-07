@@ -72,6 +72,15 @@ class EnhancedAgentTask(AgentTask):
     monitoring_enabled: bool = True  # Enable real-time monitoring
     background_execution: bool = False  # Allow background execution
 
+    # Dynamic architecture support
+    mcp_needs: List[str] = field(
+        default_factory=list
+    )  # Required MCP servers for this task
+    work_dir_name: Optional[
+        str
+    ] = None  # Custom working directory name (relative to agent_base_work_dir)
+    debug_mode: bool = False  # Enable debug mode for this specific task
+
     def __post_init__(self):
         # Generate UUID if not provided
         if self.agent_uuid is None:
@@ -160,9 +169,27 @@ class EnhancedOrchestrator(GenericOrchestrator):
         quality_gate_config: Dict[str, Any] = None,
         chat_logs_dir: Optional[str] = None,
         quality_gate_state_dir: Optional[Path] = None,
+        # New parameters for dynamic architecture
+        master_mcp_registry_path: Optional[Path] = None,
+        agent_execution_profile: str = "standard",
+        agent_debug_mode: bool = False,
+        agent_base_work_dir: Optional[Path] = None,
+        enable_dynamic_configs: bool = False,
+        log_to_work_dir: bool = False,
     ):
-        # Initialize parent class
-        super().__init__(output_dir, max_parallel, tokens, use_optimizations)
+        # Initialize parent class with new parameters
+        super().__init__(
+            output_dir,
+            max_parallel,
+            tokens,
+            use_optimizations,
+            master_mcp_registry_path=master_mcp_registry_path,
+            agent_execution_profile=agent_execution_profile,
+            agent_debug_mode=agent_debug_mode,
+            agent_base_work_dir=agent_base_work_dir,
+            enable_dynamic_configs=enable_dynamic_configs,
+            log_to_work_dir=log_to_work_dir,
+        )
 
         # Enhanced features flags
         self.enable_quality_gates = enable_quality_gates
@@ -367,15 +394,56 @@ class EnhancedOrchestrator(GenericOrchestrator):
         # Build enhanced prompt with metadata
         prompt = await self._build_enhanced_prompt(task)
 
+        # Set up dynamic working directory if enabled
+        agent_work_dir = self.output_dir
+        if self.enable_dynamic_configs:
+            # Use work_dir_name if provided, otherwise use task_id
+            dir_name = task.work_dir_name or task.task_id
+            agent_work_dir = self.agent_base_work_dir / dir_name
+            agent_work_dir.mkdir(parents=True, exist_ok=True)
+
+            # Create subdirectories
+            (agent_work_dir / "workspace").mkdir(exist_ok=True)
+            (agent_work_dir / "logs").mkdir(exist_ok=True)
+            (agent_work_dir / "data").mkdir(exist_ok=True)
+
+            # Generate agent-specific MCP config
+            agent_mcp_config = agent_work_dir / "mcp_config.json"
+            self._generate_enhanced_mcp_config(task, agent_mcp_config)
+
+            # Create symlinks to shared resources if needed
+            shared_data = self.output_dir / "shared_data"
+            if shared_data.exists():
+                target = agent_work_dir / "shared"
+                if not target.exists():
+                    target.symlink_to(shared_data)
+
         # Prepare command
-        cmd = self.claude_cmd + [
-            "--session-id",
-            session_id,
-            "--add-dir",
-            str(self.output_dir),
-            "--",  # Important: separator before prompt
-            prompt,
-        ]
+        cmd = self.claude_cmd.copy()
+
+        # Add debug flag if enabled (task-specific or global)
+        if task.debug_mode or self.agent_debug_mode:
+            cmd.append("--debug")
+
+        # Use agent-specific MCP config if dynamic configs enabled
+        if self.enable_dynamic_configs:
+            agent_mcp_config = agent_work_dir / "mcp_config.json"
+            if "--mcp-config" in cmd:
+                idx = cmd.index("--mcp-config")
+                cmd[idx + 1] = str(agent_mcp_config)
+            else:
+                cmd.extend(["--mcp-config", str(agent_mcp_config)])
+
+        cmd.extend(
+            [
+                "--session-id",
+                session_id,
+                "--add-dir",
+                str(agent_work_dir if self.enable_dynamic_configs else self.output_dir),
+                "--",  # Important: separator before prompt
+                prompt,
+            ]
+        )
 
         # Get token
         token, token_idx = await self.token_pool.acquire()
@@ -389,6 +457,21 @@ class EnhancedOrchestrator(GenericOrchestrator):
                 env["AGENT_TEAM_ID"] = task.team_id
             env["AGENT_UUID"] = task.agent_uuid or ""
 
+            # Add dynamic architecture environment variables
+            if self.enable_dynamic_configs:
+                env["AGENT_WORKSPACE"] = str(agent_work_dir)
+                env["AGENT_MCP_CONFIG"] = str(agent_work_dir / "mcp_config.json")
+                env["AGENT_TASK_ID"] = task.task_id
+                env["AGENT_TASK_TYPE"] = task.task_type
+
+                # Load .env file if exists
+                env_file = agent_work_dir / ".env"
+                if env_file.exists():
+                    for line in env_file.read_text().splitlines():
+                        if "=" in line and not line.startswith("#"):
+                            key, value = line.split("=", 1)
+                            env[key.strip()] = value.strip()
+
             # Execute
             task.start_time = datetime.now().timestamp()
             task.status = "running"
@@ -399,14 +482,35 @@ class EnhancedOrchestrator(GenericOrchestrator):
                     f"Executing {task.task_id} (UUID: {task.agent_uuid}) ({task.task_type})"
                 )
 
+                # Set up log file if log_to_work_dir is enabled
+                log_file_handle = None
+                if self.log_to_work_dir and self.enable_dynamic_configs:
+                    log_file = agent_work_dir / "logs" / f"agent_{task.task_id}.log"
+                    log_file.parent.mkdir(parents=True, exist_ok=True)
+                    log_file_handle = open(log_file, "w")
+                    stderr_target = log_file_handle
+                else:
+                    stderr_target = asyncio.subprocess.PIPE
+
                 process = await asyncio.create_subprocess_exec(
                     *cmd,
                     env=env,
+                    cwd=str(agent_work_dir) if self.enable_dynamic_configs else None,
                     stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
+                    stderr=stderr_target,
                 )
 
                 stdout, stderr = await process.communicate()
+
+                # Close log file if used
+                if log_file_handle:
+                    log_file_handle.close()
+                    # Read stderr from log file if process failed
+                    if process.returncode != 0:
+                        with open(
+                            agent_work_dir / "logs" / f"agent_{task.task_id}.log"
+                        ) as f:
+                            stderr = f.read().encode()
 
                 task.end_time = datetime.now().timestamp()
                 duration = task.end_time - task.start_time
@@ -420,7 +524,11 @@ class EnhancedOrchestrator(GenericOrchestrator):
                     logger.info(f"✓ {task.task_id} completed in {duration:.2f}s")
                 else:
                     task.status = "failed"
-                    task.error = stderr.decode()
+                    task.error = (
+                        stderr.decode()
+                        if stderr
+                        else "Process failed with no stderr output"
+                    )
                     await self.dep_manager.mark_failed(task.task_id)
                     self.metrics["failed"] += 1
 
@@ -513,9 +621,9 @@ class EnhancedOrchestrator(GenericOrchestrator):
                 result["quality_metrics"] = self.quality_metrics
 
                 if self.quality_gate_manager:
-                    result["quality_status"] = (
-                        await self.quality_gate_manager.get_status_report()
-                    )
+                    result[
+                        "quality_status"
+                    ] = await self.quality_gate_manager.get_status_report()
 
             return result
 
@@ -682,6 +790,73 @@ class EnhancedOrchestrator(GenericOrchestrator):
             metadata_prefix += "\n"
 
         return metadata_prefix + task.prompt
+
+    def _generate_enhanced_mcp_config(self, task: EnhancedAgentTask, config_path: Path):
+        """Generate enhanced agent-specific MCP configuration with task-specific requirements."""
+
+        # Start with base config
+        if self.master_mcp_registry_path and self.master_mcp_registry_path.exists():
+            with open(self.master_mcp_registry_path) as f:
+                mcp_config = json.load(f)
+        else:
+            # Use minimal config
+            mcp_config = {
+                "mcpServers": {
+                    "mcp_web_search": {
+                        "command": "npx",
+                        "args": ["-y", "brave-search-mcp"],
+                        "env": {"BRAVE_API_KEY": "BSAqv6fii19i_ZRARk67Gs5udOHgxSN"},
+                    },
+                }
+            }
+
+        # Filter based on execution profile and task MCP needs
+        if task.mcp_needs:
+            # Only include specifically requested MCP servers
+            filtered_servers = {}
+            for server_name in task.mcp_needs:
+                if server_name in mcp_config.get("mcpServers", {}):
+                    filtered_servers[server_name] = mcp_config["mcpServers"][
+                        server_name
+                    ]
+            mcp_config["mcpServers"] = filtered_servers
+        elif self.agent_execution_profile != "full":
+            # Apply profile filtering if no specific needs
+            mcp_config = self._filter_mcp_by_profile(
+                mcp_config, self.agent_execution_profile
+            )
+
+        # Task-specific customizations based on task type
+        if task.task_type == "research":
+            # Ensure research tools are included
+            if "mcp_web_search" not in mcp_config.get("mcpServers", {}):
+                mcp_config.setdefault("mcpServers", {})["mcp_web_search"] = {
+                    "command": "npx",
+                    "args": ["-y", "brave-search-mcp"],
+                    "env": {"BRAVE_API_KEY": "BSAqv6fii19i_ZRARk67Gs5udOHgxSN"},
+                }
+        elif task.task_type == "monitoring":
+            # Could add monitoring-specific tools here if needed
+            pass
+
+        # Update working directories and environment in config
+        work_dir = config_path.parent
+        for server_name, server_config in mcp_config.get("mcpServers", {}).items():
+            # Update environment variables
+            if "env" not in server_config:
+                server_config["env"] = {}
+
+            server_config["env"]["AGENT_TASK_ID"] = task.task_id
+            server_config["env"]["AGENT_WORK_DIR"] = str(work_dir)
+            server_config["env"]["AGENT_UUID"] = task.agent_uuid or ""
+
+            if task.team_id:
+                server_config["env"]["AGENT_TEAM_ID"] = task.team_id
+
+        # Write config
+        config_path.write_text(json.dumps(mcp_config, indent=2))
+
+        logger.debug(f"Generated enhanced MCP config for {task.task_id}: {config_path}")
 
     # ExecutionPlan Integration Methods
 

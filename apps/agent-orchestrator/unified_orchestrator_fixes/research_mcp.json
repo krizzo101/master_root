@@ -1,0 +1,50 @@
+{
+  "mcpServers": {
+    "firecrawl": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "env": {
+        "FIRECRAWL_API_KEY": "fc-a9cc6620c7b24c9c90bd010c73deb51f"
+      }
+    },
+    "time": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "time-mcp"
+      ]
+    },
+    "shell_exec": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mkusaka/mcp-shell-server",
+        "-w",
+        "/home/opsvi/master_root"
+      ],
+      "env": {
+        "SHELL": "/bin/bash"
+      }
+    },
+    "mcp_web_search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "brave-search-mcp"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "BSAqv6fii19i_ZRARk67Gs5udOHgxSN"
+      }
+    },
+    "research_papers": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "-m",
+        "arxiv_mcp_server"
+      ]
+    }
+  }
+}

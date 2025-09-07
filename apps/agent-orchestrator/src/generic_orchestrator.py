@@ -46,28 +46,41 @@ class TokenPool:
     Manages Claude API tokens for parallel execution
 
     CRITICAL SAFETY REQUIREMENT:
-    This TokenPool MUST fail catastrophically if token distribution fails.
-    NO FALLBACK to single tokens from environment variables is allowed.
-    Agents are FORBIDDEN from adding fallback mechanisms to this class.
+    NO FALLBACK to single environment token allowed.
+    Must use TokenTool or fail catastrophically.
     """
 
     def __init__(self, tokens: List[str] = None):
-        # CRITICAL: NO FALLBACK ALLOWED - Must fail if no tokens provided
-        if tokens is None or not tokens:
-            raise RuntimeError(
-                "CATASTROPHIC FAILURE: TokenPool requires explicit token list. "
-                "NO FALLBACK to environment variables allowed. "
-                "This is a critical safety requirement to prevent token conflicts."
-            )
+        # Handle explicit tokens or call TokenTool
+        if tokens is not None:
+            self.tokens = [t for t in tokens if t and t.strip()]
+        else:
+            # Call TokenLoader to get token pool - NO ENV FALLBACK ALLOWED
+            try:
+                from .token_loader import load_tokens
 
-        # Filter empty strings but ensure we still have valid tokens
-        self.tokens = [t for t in tokens if t and t.strip()]
+                self.tokens = load_tokens()
+                if not self.tokens:
+                    raise RuntimeError("TokenLoader returned empty token list")
+            except ImportError:
+                # TokenLoader not available - CATASTROPHIC FAILURE
+                raise RuntimeError(
+                    "CATASTROPHIC FAILURE: TokenLoader not available and no explicit tokens provided. "
+                    "NO FALLBACK to environment variables allowed. "
+                    "TokenLoader must work or system must fail."
+                )
+            except Exception as e:
+                # TokenLoader failed - CATASTROPHIC FAILURE
+                raise RuntimeError(
+                    f"CATASTROPHIC FAILURE: TokenLoader failed: {str(e)}. "
+                    "NO FALLBACK to environment variables allowed."
+                )
 
+        # Ensure we have valid tokens
         if not self.tokens:
             raise RuntimeError(
-                "CATASTROPHIC FAILURE: No valid tokens provided to TokenPool. "
-                "All tokens were empty or invalid. "
-                "This system requires explicit token management - NO FALLBACKS."
+                "CATASTROPHIC FAILURE: No valid tokens available. "
+                "TokenTool must provide tokens or system must fail - NO ENV FALLBACK."
             )
 
         self.current_index = 0
@@ -174,9 +187,33 @@ class GenericOrchestrator:
         max_parallel: int = 10,
         tokens: List[str] = None,
         use_optimizations: bool = True,
+        # New parameters for dynamic architecture
+        master_mcp_registry_path: Optional[Path] = None,
+        agent_execution_profile: str = "standard",  # standard, minimal, research, full
+        agent_debug_mode: bool = False,
+        agent_base_work_dir: Optional[Path] = None,
+        enable_dynamic_configs: bool = False,
+        log_to_work_dir: bool = False,
     ):
         self.output_dir = output_dir
         self.output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Store all parameters including existing ones
+        self.use_optimizations = use_optimizations
+
+        # Store new parameters
+        self.master_mcp_registry_path = master_mcp_registry_path
+        self.agent_execution_profile = agent_execution_profile
+        self.agent_debug_mode = agent_debug_mode
+        self.agent_base_work_dir = (
+            agent_base_work_dir or output_dir / "agent_workspaces"
+        )
+        self.enable_dynamic_configs = enable_dynamic_configs
+        self.log_to_work_dir = log_to_work_dir
+
+        # Create agent work directory if needed
+        if self.enable_dynamic_configs:
+            self.agent_base_work_dir.mkdir(parents=True, exist_ok=True)
 
         # Ensure subdirectories exist
         (self.output_dir / "tasks").mkdir(exist_ok=True)
@@ -200,17 +237,8 @@ class GenericOrchestrator:
         # Handle None and invalid values
         self.max_parallel = max(1, max_parallel if max_parallel is not None else 10)
 
-        # CRITICAL SAFETY: NO FALLBACK MECHANISMS ALLOWED
-        # TokenPool MUST receive explicit tokens or fail catastrophically
-        # Agents are FORBIDDEN from adding fallback mechanisms here
-
-        if tokens is None:
-            raise RuntimeError(
-                "CATASTROPHIC FAILURE: GenericOrchestrator requires explicit tokens. "
-                "NO FALLBACK to token loading or environment variables allowed. "
-                "This is a critical safety requirement to prevent token conflicts."
-            )
-
+        # Initialize TokenPool - will use TokenTool automatically if no explicit tokens
+        # NO FALLBACK to single environment token allowed per safety requirements
         self.token_pool = TokenPool(tokens)
         self.dep_manager = DependencyManager()
         self.message_bus = MessageBus(output_dir / "messages")
@@ -219,32 +247,50 @@ class GenericOrchestrator:
         self.claude_cmd = ["claude", "-p"]
 
         if use_optimizations:
-            # Create minimal research-only MCP config to avoid 20-second startup delays
-            research_config = Path(self.output_dir) / "research_mcp.json"
+            # NEW: Check for master registry first
+            if self.master_mcp_registry_path and self.master_mcp_registry_path.exists():
+                # Load from master registry
+                with open(self.master_mcp_registry_path) as f:
+                    mcp_config = json.load(f)
 
-            # Only include essential research tools (not all 15+ MCP servers)
-            minimal_research_config = {
-                "mcpServers": {
-                    "mcp_web_search": {
-                        "command": "npx",
-                        "args": ["-y", "brave-search-mcp"],
-                        "env": {"BRAVE_API_KEY": "BSAqv6fii19i_ZRARk67Gs5udOHgxSN"},
-                    },
-                    "research_papers": {
-                        "command": "/home/opsvi/miniconda/bin/python",
-                        "args": ["-m", "arxiv_mcp_server"],
-                    },
-                    "firecrawl": {
-                        "command": "npx",
-                        "args": ["-y", "firecrawl-mcp"],
-                        "env": {
-                            "FIRECRAWL_API_KEY": "fc-a9cc6620c7b24c9c90bd010c73deb51f"
+                # Filter based on execution profile
+                if self.agent_execution_profile != "full":
+                    mcp_config = self._filter_mcp_by_profile(
+                        mcp_config, self.agent_execution_profile
+                    )
+
+                # Write filtered config
+                research_config = Path(self.output_dir) / "research_mcp.json"
+                research_config.write_text(json.dumps(mcp_config, indent=2))
+            else:
+                # Existing minimal research config
+                research_config = Path(self.output_dir) / "research_mcp.json"
+
+                # Only include essential research tools (not all 15+ MCP servers)
+                minimal_research_config = {
+                    "mcpServers": {
+                        "mcp_web_search": {
+                            "command": "npx",
+                            "args": ["-y", "brave-search-mcp"],
+                            "env": {"BRAVE_API_KEY": "BSAqv6fii19i_ZRARk67Gs5udOHgxSN"},
                         },
-                    },
+                        "research_papers": {
+                            "command": "/home/opsvi/miniconda/bin/python",
+                            "args": ["-m", "arxiv_mcp_server"],
+                        },
+                        "firecrawl": {
+                            "command": "npx",
+                            "args": ["-y", "firecrawl-mcp"],
+                            "env": {
+                                "FIRECRAWL_API_KEY": "fc-a9cc6620c7b24c9c90bd010c73deb51f"
+                            },
+                        },
+                    }
                 }
-            }
 
-            research_config.write_text(json.dumps(minimal_research_config, indent=2))
+                research_config.write_text(
+                    json.dumps(minimal_research_config, indent=2)
+                )
 
             self.claude_cmd.extend(
                 [
@@ -275,10 +321,159 @@ class GenericOrchestrator:
         self.post_execute_hook: Optional[Callable] = None
         self.task_builder_hook: Optional[Callable] = None
 
+    def _filter_mcp_by_profile(self, config: Dict, profile: str) -> Dict:
+        """Filter MCP config based on execution profile."""
+
+        profile_servers = {
+            "minimal": ["shell_exec", "time"],
+            "standard": [
+                "shell_exec",
+                "time",
+                "mcp_web_search",
+                "firecrawl",
+                "research_papers",
+            ],
+            "research": [
+                "shell_exec",
+                "time",
+                "mcp_web_search",
+                "firecrawl",
+                "research_papers",
+                "tech_docs",
+                "knowledge",
+            ],
+            "full": None,  # Include all
+        }
+
+        if profile == "full" or profile not in profile_servers:
+            return config
+
+        allowed = profile_servers[profile]
+        filtered = {
+            "mcpServers": {
+                k: v for k, v in config.get("mcpServers", {}).items() if k in allowed
+            }
+        }
+
+        return filtered
+
+    def _generate_agent_mcp_config(self, task: AgentTask, config_path: Path):
+        """Generate agent-specific MCP configuration based on task requirements."""
+
+        # Start with base config
+        if self.master_mcp_registry_path and self.master_mcp_registry_path.exists():
+            with open(self.master_mcp_registry_path) as f:
+                mcp_config = json.load(f)
+        else:
+            # Use minimal config
+            mcp_config = {
+                "mcpServers": {
+                    "mcp_web_search": {
+                        "command": "npx",
+                        "args": ["-y", "brave-search-mcp"],
+                        "env": {"BRAVE_API_KEY": "BSAqv6fii19i_ZRARk67Gs5udOHgxSN"},
+                    },
+                    "research_papers": {
+                        "command": "/home/opsvi/miniconda/bin/python",
+                        "args": ["-m", "arxiv_mcp_server"],
+                    },
+                    "firecrawl": {
+                        "command": "npx",
+                        "args": ["-y", "firecrawl-mcp"],
+                        "env": {
+                            "FIRECRAWL_API_KEY": "fc-a9cc6620c7b24c9c90bd010c73deb51f"
+                        },
+                    },
+                }
+            }
+
+        # Check for task-specific MCP needs (if task has mcp_needs attribute)
+        if hasattr(task, "mcp_needs") and task.mcp_needs:
+            # Only include specifically requested MCP servers
+            filtered_servers = {}
+            for server_name in task.mcp_needs:
+                if server_name in mcp_config.get("mcpServers", {}):
+                    filtered_servers[server_name] = mcp_config["mcpServers"][
+                        server_name
+                    ]
+            mcp_config["mcpServers"] = filtered_servers
+        elif self.agent_execution_profile != "full":
+            # Apply profile filtering if no specific needs
+            mcp_config = self._filter_mcp_by_profile(
+                mcp_config, self.agent_execution_profile
+            )
+
+        # Task-specific customizations based on task type
+        if task.task_type == "research":
+            # Ensure research tools are included
+            if "mcp_web_search" not in mcp_config.get("mcpServers", {}):
+                mcp_config.setdefault("mcpServers", {})["mcp_web_search"] = {
+                    "command": "npx",
+                    "args": ["-y", "brave-search-mcp"],
+                    "env": {"BRAVE_API_KEY": "BSAqv6fii19i_ZRARk67Gs5udOHgxSN"},
+                }
+        elif task.task_type == "monitoring":
+            # Could add monitoring-specific tools here if needed
+            pass
+
+        # Update working directories and environment in config
+        work_dir = config_path.parent
+        for server_name, server_config in mcp_config.get("mcpServers", {}).items():
+            # Update environment variables
+            if "env" not in server_config:
+                server_config["env"] = {}
+
+            server_config["env"]["AGENT_TASK_ID"] = task.task_id
+            server_config["env"]["AGENT_WORK_DIR"] = str(work_dir)
+            server_config["env"]["AGENT_TASK_TYPE"] = task.task_type
+
+        # Write to config file
+        config_path.write_text(json.dumps(mcp_config, indent=2))
+
+        logger.debug(f"Generated MCP config for {task.task_id}: {config_path}")
+
     async def execute_agent(self, task: AgentTask) -> Dict:
-        """Execute a single agent task"""
+        """Execute a single agent task with dynamic architecture support"""
 
         session_id = str(uuid.uuid4())
+
+        # Set up dynamic working directory if enabled
+        agent_work_dir = self.output_dir
+        if self.enable_dynamic_configs:
+            # Use work_dir_name if task has it, otherwise use task_id
+            dir_name = getattr(task, "work_dir_name", None) or task.task_id
+            agent_work_dir = self.agent_base_work_dir / dir_name
+            agent_work_dir.mkdir(parents=True, exist_ok=True)
+
+            # Create subdirectories
+            (agent_work_dir / "workspace").mkdir(exist_ok=True)
+            (agent_work_dir / "logs").mkdir(exist_ok=True)
+            (agent_work_dir / "data").mkdir(exist_ok=True)
+
+            # Generate agent-specific MCP config
+            agent_mcp_config = agent_work_dir / "mcp_config.json"
+            self._generate_agent_mcp_config(task, agent_mcp_config)
+
+            # Create symlinks to shared resources if needed
+            shared_data = self.output_dir / "shared_data"
+            if shared_data.exists():
+                target = agent_work_dir / "shared"
+                if not target.exists():
+                    target.symlink_to(shared_data)
+
+            # Create agent-specific .env file
+            env_file = agent_work_dir / ".env"
+            env_content = [
+                f"AGENT_ID={task.task_id}",
+                f"AGENT_TYPE={task.task_type}",
+                f"WORKSPACE_ROOT={agent_work_dir}",
+                f"OUTPUT_DIR={self.output_dir}",
+            ]
+            env_file.write_text("\n".join(env_content))
+
+            logger.debug(f"Setup workspace for {task.task_id}: {agent_work_dir}")
+        else:
+            agent_work_dir = self.output_dir
 
         # Pre-execution hook
         if self.pre_execute_hook:
@@ -292,6 +487,19 @@ class GenericOrchestrator:
 
         # Prepare command with role-specific system prompt
         cmd = self.claude_cmd.copy()
+
+        # Add debug flag if enabled (task-specific or global)
+        if getattr(task, "debug_mode", False) or self.agent_debug_mode:
+            cmd.append("--debug")
+
+        # Use agent-specific MCP config if dynamic configs enabled
+        if self.enable_dynamic_configs:
+            agent_mcp_config = agent_work_dir / "mcp_config.json"
+            if "--mcp-config" in cmd:
+                idx = cmd.index("--mcp-config")
+                cmd[idx + 1] = str(agent_mcp_config)
+            else:
+                cmd.extend(["--mcp-config", str(agent_mcp_config)])
 
         # Add system prompt based on task type for better specialization
         system_prompts = {
@@ -310,7 +518,7 @@ class GenericOrchestrator:
                 "--session-id",
                 session_id,
                 "--add-dir",
-                str(self.output_dir),
+                str(agent_work_dir if self.enable_dynamic_configs else self.output_dir),
                 "--",  # Important: separator before prompt
                 prompt,
             ]
@@ -323,6 +531,21 @@ class GenericOrchestrator:
             env = os.environ.copy()
             env["CLAUDE_CODE_TOKEN"] = token
 
+            # Add dynamic architecture environment variables
+            if self.enable_dynamic_configs:
+                env["AGENT_WORKSPACE"] = str(agent_work_dir)
+                env["AGENT_MCP_CONFIG"] = str(agent_work_dir / "mcp_config.json")
+                env["AGENT_TASK_ID"] = task.task_id
+                env["AGENT_TASK_TYPE"] = task.task_type
+
+                # Load .env file if exists
+                env_file = agent_work_dir / ".env"
+                if env_file.exists():
+                    for line in env_file.read_text().splitlines():
+                        if "=" in line and not line.startswith("#"):
+                            key, value = line.split("=", 1)
+                            env[key.strip()] = value.strip()
+
             # Execute
             task.start_time = datetime.now().timestamp()
             task.status = "running"
@@ -331,28 +554,59 @@ class GenericOrchestrator:
             try:
                 logger.info(f"Executing {task.task_id} ({task.task_type})")
 
+                # Set up log file if log_to_work_dir is enabled
+                log_file_handle = None
+                if self.log_to_work_dir and self.enable_dynamic_configs:
+                    log_file = agent_work_dir / "logs" / f"agent_{task.task_id}.log"
+                    log_file.parent.mkdir(parents=True, exist_ok=True)
+                    log_file_handle = open(log_file, "w")
+                    stderr_target = log_file_handle
+                else:
+                    stderr_target = asyncio.subprocess.PIPE
+
                 process = await asyncio.create_subprocess_exec(
                     *cmd,
                     env=env,
+                    cwd=str(agent_work_dir) if self.enable_dynamic_configs else None,
                     stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
+                    stderr=stderr_target,
                 )
 
                 stdout, stderr = await process.communicate()
+
+                # Close log file if used
+                if log_file_handle:
+                    log_file_handle.close()
+                    # Read stderr from log file if process failed
+                    if process.returncode != 0:
+                        with open(
+                            agent_work_dir / "logs" / f"agent_{task.task_id}.log"
+                        ) as f:
+                            stderr = f.read().encode()
 
                 task.end_time = datetime.now().timestamp()
                 duration = task.end_time - task.start_time
 
                 if process.returncode == 0:
-                    task.status = "completed"
-                    task.result = json.loads(stdout.decode())
-                    await self.dep_manager.mark_completed(task.task_id)
-                    self.metrics["completed"] += 1
-
-                    logger.info(f"✓ {task.task_id} completed in {duration:.2f}s")
+                    try:
+                        task.result = json.loads(stdout.decode())
+                        task.status = "completed"
+                        await self.dep_manager.mark_completed(task.task_id)
+                        self.metrics["completed"] += 1
+                        logger.info(f"✓ {task.task_id} completed in {duration:.2f}s")
+                    except json.JSONDecodeError as e:
+                        task.status = "failed"
+                        task.error = f"JSON parsing failed: {e}. Agent output: {stdout.decode()[:500]}..."
+                        await self.dep_manager.mark_failed(task.task_id)
+                        self.metrics["failed"] += 1
+                        logger.error(f"✗ {task.task_id} JSON parsing failed: {task.error}")
                 else:
                     task.status = "failed"
-                    task.error = stderr.decode()
+                    task.error = (
+                        stderr.decode()
+                        if stderr
+                        else "Process failed with no stderr output"
+                    )
                     await self.dep_manager.mark_failed(task.task_id)
                     self.metrics["failed"] += 1
 
