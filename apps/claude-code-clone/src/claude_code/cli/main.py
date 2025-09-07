@@ -33,7 +33,7 @@ def analyze(
     provider: str = typer.Option(
         "openai", help="LLM provider (openai, anthropic, perplexity)"
     ),
-    model: str = typer.Option("gpt-5-mini", help="Model to use"),
+    model: str = typer.Option("gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"),
     api_key: Optional[str] = typer.Option(None, help="API key for the provider"),
     working_directory: str = typer.Option(".", help="Working directory"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
@@ -62,7 +62,7 @@ def generate(
     provider: str = typer.Option(
         "openai", help="LLM provider (openai, anthropic, perplexity)"
     ),
-    model: str = typer.Option("gpt-5-mini", help="Model to use"),
+    model: str = typer.Option("gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"),
     api_key: Optional[str] = typer.Option(None, help="API key for the provider"),
     working_directory: str = typer.Option(".", help="Working directory"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
@@ -93,7 +93,7 @@ def refactor(
     provider: str = typer.Option(
         "openai", help="LLM provider (openai, anthropic, perplexity)"
     ),
-    model: str = typer.Option("gpt-5-mini", help="Model to use"),
+    model: str = typer.Option("gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"),
     api_key: Optional[str] = typer.Option(None, help="API key for the provider"),
     working_directory: str = typer.Option(".", help="Working directory"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
@@ -122,7 +122,7 @@ def project(
     provider: str = typer.Option(
         "openai", help="LLM provider (openai, anthropic, perplexity)"
     ),
-    model: str = typer.Option("gpt-5-mini", help="Model to use"),
+    model: str = typer.Option("gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"),
     api_key: Optional[str] = typer.Option(None, help="API key for the provider"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
 ):
@@ -139,7 +139,7 @@ def interactive(
     provider: str = typer.Option(
         "openai", help="LLM provider (openai, anthropic, perplexity)"
     ),
-    model: str = typer.Option("gpt-5-mini", help="Model to use"),
+    model: str = typer.Option("gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"),
     api_key: Optional[str] = typer.Option(None, help="API key for the provider"),
     working_directory: str = typer.Option(".", help="Working directory"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),

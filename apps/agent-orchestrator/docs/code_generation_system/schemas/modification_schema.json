@@ -1,0 +1,297 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Code Modification Input Schema",
+  "description": "Standardized schema for modifying existing code",
+  "type": "object",
+  "required": [
+    "modification_metadata",
+    "target_analysis",
+    "change_requirements",
+    "impact_assessment",
+    "validation_plan"
+  ],
+  "properties": {
+    "modification_metadata": {
+      "type": "object",
+      "required": ["modification_id", "type", "priority", "requestor"],
+      "properties": {
+        "modification_id": {
+          "type": "string",
+          "pattern": "^MOD-\\d{4}-\\d{2}-\\d{2}-\\d+$",
+          "description": "Unique modification identifier"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["feature_add", "feature_modify", "feature_remove", "refactor", "optimization", "integration"],
+          "description": "Type of modification"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"],
+          "description": "Business priority"
+        },
+        "requestor": {
+          "type": "string",
+          "description": "Person or team requesting the modification"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 1000,
+          "description": "Clear description of the modification"
+        },
+        "business_justification": {
+          "type": "string",
+          "description": "Why this modification is needed"
+        }
+      }
+    },
+    "target_analysis": {
+      "type": "object",
+      "required": ["target_files", "current_state", "dependencies"],
+      "properties": {
+        "target_files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "type", "purpose"],
+            "properties": {
+              "path": {"type": "string"},
+              "type": {"type": "string", "enum": ["source", "test", "config", "documentation", "script"]},
+              "purpose": {"type": "string"},
+              "lines_of_code": {"type": "integer"},
+              "complexity_score": {"type": "number"},
+              "last_modified": {"type": "string", "format": "date"}
+            }
+          }
+        },
+        "current_state": {
+          "type": "object",
+          "properties": {
+            "version": {"type": "string"},
+            "git_branch": {"type": "string"},
+            "commit_hash": {"type": "string"},
+            "deployment_status": {"type": "string"},
+            "known_issues": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "dependencies": {
+          "type": "object",
+          "properties": {
+            "internal_dependencies": {"type": "array", "items": {"type": "string"}},
+            "external_dependencies": {"type": "array", "items": {"type": "string"}},
+            "database_schema": {"type": "object"},
+            "api_contracts": {"type": "array", "items": {"type": "string"}},
+            "configuration_files": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      }
+    },
+    "change_requirements": {
+      "type": "object",
+      "required": ["functional_changes", "technical_changes"],
+      "properties": {
+        "functional_changes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "description", "acceptance_criteria"],
+            "properties": {
+              "id": {"type": "string", "pattern": "^FC-\\d+$"},
+              "description": {"type": "string"},
+              "acceptance_criteria": {"type": "array", "items": {"type": "string"}},
+              "user_story": {"type": "string"},
+              "business_value": {"type": "string"}
+            }
+          }
+        },
+        "technical_changes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "description", "implementation_approach"],
+            "properties": {
+              "id": {"type": "string", "pattern": "^TC-\\d+$"},
+              "description": {"type": "string"},
+              "implementation_approach": {"type": "string"},
+              "affected_components": {"type": "array", "items": {"type": "string"}},
+              "new_dependencies": {"type": "array", "items": {"type": "string"}},
+              "removed_dependencies": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        },
+        "backward_compatibility": {
+          "type": "object",
+          "properties": {
+            "required": {"type": "boolean"},
+            "breaking_changes": {"type": "array", "items": {"type": "string"}},
+            "migration_required": {"type": "boolean"},
+            "migration_plan": {"type": "string"}
+          }
+        }
+      }
+    },
+    "impact_assessment": {
+      "type": "object",
+      "required": ["affected_systems", "risk_analysis"],
+      "properties": {
+        "affected_systems": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["system_name", "impact_level"],
+            "properties": {
+              "system_name": {"type": "string"},
+              "impact_level": {"type": "string", "enum": ["high", "medium", "low", "none"]},
+              "impact_description": {"type": "string"},
+              "mitigation_required": {"type": "boolean"}
+            }
+          }
+        },
+        "risk_analysis": {
+          "type": "object",
+          "properties": {
+            "technical_risks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["risk", "probability", "impact", "mitigation"],
+                "properties": {
+                  "risk": {"type": "string"},
+                  "probability": {"type": "string", "enum": ["high", "medium", "low"]},
+                  "impact": {"type": "string", "enum": ["high", "medium", "low"]},
+                  "mitigation": {"type": "string"}
+                }
+              }
+            },
+            "business_risks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["risk", "probability", "impact", "mitigation"],
+                "properties": {
+                  "risk": {"type": "string"},
+                  "probability": {"type": "string", "enum": ["high", "medium", "low"]},
+                  "impact": {"type": "string", "enum": ["high", "medium", "low"]},
+                  "mitigation": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
+        "performance_impact": {
+          "type": "object",
+          "properties": {
+            "expected_changes": {"type": "string"},
+            "performance_tests_required": {"type": "boolean"},
+            "monitoring_requirements": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      }
+    },
+    "validation_plan": {
+      "type": "object",
+      "required": ["testing_strategy", "deployment_plan"],
+      "properties": {
+        "testing_strategy": {
+          "type": "object",
+          "required": ["test_types", "test_environment"],
+          "properties": {
+            "test_types": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["type", "scope", "criteria"],
+                "properties": {
+                  "type": {"type": "string", "enum": ["unit", "integration", "system", "regression", "performance", "security"]},
+                  "scope": {"type": "string"},
+                  "criteria": {"type": "string"},
+                  "automated": {"type": "boolean"},
+                  "estimated_effort": {"type": "string"}
+                }
+              }
+            },
+            "test_environment": {
+              "type": "object",
+              "properties": {
+                "environment_type": {"type": "string", "enum": ["development", "staging", "production"]},
+                "data_requirements": {"type": "string"},
+                "setup_requirements": {"type": "array", "items": {"type": "string"}}
+              }
+            },
+            "acceptance_criteria": {
+              "type": "array",
+              "items": {"type": "string"}
+            }
+          }
+        },
+        "deployment_plan": {
+          "type": "object",
+          "required": ["deployment_strategy", "rollback_plan"],
+          "properties": {
+            "deployment_strategy": {
+              "type": "string",
+              "enum": ["blue_green", "rolling", "canary", "big_bang"]
+            },
+            "rollback_plan": {
+              "type": "object",
+              "required": ["trigger_conditions", "rollback_steps"],
+              "properties": {
+                "trigger_conditions": {"type": "array", "items": {"type": "string"}},
+                "rollback_steps": {"type": "array", "items": {"type": "string"}},
+                "estimated_rollback_time": {"type": "string"}
+              }
+            },
+            "monitoring_plan": {
+              "type": "object",
+              "properties": {
+                "key_metrics": {"type": "array", "items": {"type": "string"}},
+                "alert_conditions": {"type": "array", "items": {"type": "string"}},
+                "monitoring_duration": {"type": "string"}
+              }
+            }
+          }
+        },
+        "documentation_updates": {
+          "type": "object",
+          "properties": {
+            "required_updates": {"type": "array", "items": {"type": "string"}},
+            "new_documentation": {"type": "array", "items": {"type": "string"}},
+            "deprecated_documentation": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "timeline": {
+          "type": "object",
+          "properties": {
+            "deadline": {"type": "string", "format": "date"},
+            "development_time": {"type": "string"},
+            "testing_time": {"type": "string"},
+            "deployment_window": {"type": "string"}
+          }
+        },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "development_team": {"type": "array", "items": {"type": "string"}},
+            "testing_team": {"type": "array", "items": {"type": "string"}},
+            "infrastructure_requirements": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "compatibility": {
+          "type": "object",
+          "properties": {
+            "version_compatibility": {"type": "string"},
+            "platform_requirements": {"type": "array", "items": {"type": "string"}},
+            "third_party_integrations": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      }
+    }
+  }
+}
+

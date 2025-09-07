@@ -12,7 +12,7 @@ class ClaudeCodeConfig(BaseSettings):
     provider: str = Field(
         default="openai", description="LLM provider (openai, anthropic, perplexity)"
     )
-    model: str = Field(default="gpt-5-mini", description="Model to use")
+    model: str = Field(default="gpt-5-mini", description="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)")
     api_key: Optional[str] = Field(default=None, description="API key for the provider")
     organization: Optional[str] = Field(
         default=None, description="Organization ID (OpenAI)"

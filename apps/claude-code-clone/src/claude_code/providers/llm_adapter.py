@@ -15,6 +15,7 @@ from opsvi_llm import (
     Message,
     LLMProviderError,
 )
+from opsvi_llm.providers.openai_unified_interface import OpenAIUnifiedInterface
 
 # Import optional providers
 try:
@@ -31,6 +32,7 @@ except ImportError:
 from opsvi_foundation import BaseComponent, ComponentError
 
 from ..config import ClaudeCodeConfig
+from ..validation import ModelValidator, ModelValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -48,11 +50,22 @@ class LLMAdapter(BaseComponent):
         """Initialize the LLM adapter."""
         super().__init__(name="LLMAdapter")
         self.config = config
+        
+        # ✅ MANDATORY: Validate model before initialization
+        try:
+            ModelValidator.validate_config(config)
+        except ModelValidationError as e:
+            logger.error(f"Model validation failed: {e}")
+            raise LLMAdapterError(f"Configuration validation failed: {e}") from e
+        
         self._provider = None
+        self._unified_interface = None
         self._setup_provider()
 
     async def _initialize_impl(self) -> None:
         """Initialize the LLM adapter."""
+        if self._provider:
+            await self._provider.initialize()
         logger.info("LLM adapter initialized")
 
     async def _shutdown_impl(self) -> None:
@@ -72,6 +85,7 @@ class LLMAdapter(BaseComponent):
         """Setup the LLM provider based on configuration."""
         try:
             if self.config.provider.lower() == "openai":
+                # Use the unified interface which handles both APIs correctly
                 provider_config = OpenAIConfig(
                     provider_name="openai",
                     api_key=self.config.api_key,
@@ -79,8 +93,10 @@ class LLMAdapter(BaseComponent):
                     default_model=self.config.model,
                     max_tokens=self.config.max_tokens,
                     timeout=self.config.timeout,
+                    enable_audit_logging=False,  # Disable audit logging for now
                 )
-                self._provider = OpenAIProvider(provider_config)
+                self._unified_interface = OpenAIUnifiedInterface(provider_config)
+                self._provider = self._unified_interface.provider  # Keep reference for compatibility
 
             elif self.config.provider.lower() == "anthropic":
                 if AnthropicProvider is None or AnthropicConfig is None:
@@ -124,14 +140,30 @@ class LLMAdapter(BaseComponent):
     async def chat_completion(
         self, messages: List[Message], stream: bool = False, **kwargs: Any
     ) -> Union[ChatResponse, AsyncGenerator[ChatResponse, None]]:
-        """Perform chat completion."""
+        """Perform chat completion using the unified interface."""
         try:
-            request = ChatRequest(messages=messages, stream=stream, **kwargs)
-
-            if stream:
-                return await self._provider.chat_completion_stream(request)
+            if self._unified_interface:
+                # Use the unified interface which handles API differences automatically
+                if stream:
+                    return await self._unified_interface.responses_from_messages(
+                        messages=messages,
+                        model=self.config.model,
+                        stream=True,
+                        **kwargs
+                    )
+                else:
+                    return await self._unified_interface.responses_from_messages(
+                        messages=messages,
+                        model=self.config.model,
+                        **kwargs
+                    )
             else:
-                return await self._provider.chat_completion(request)
+                # Fallback to direct provider (for non-OpenAI providers)
+                request = ChatRequest(messages=messages, stream=stream, **kwargs)
+                if stream:
+                    return await self._provider.chat(request, stream=True)
+                else:
+                    return await self._provider.chat(request)
 
         except LLMProviderError as e:
             logger.error(f"LLM provider error: {e}")

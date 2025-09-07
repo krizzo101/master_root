@@ -8,6 +8,7 @@ import aiofiles
 import json
 
 from opsvi_foundation import BaseComponent, ComponentError
+from opsvi_llm import Message
 from ..config import ClaudeCodeConfig
 from ..providers.llm_adapter import LLMAdapter, LLMAdapterError
 
@@ -66,8 +67,8 @@ class ClaudeCodeExecutor(BaseComponent):
 
             # Create messages
             messages = [
-                {"role": "system", "content": self._get_system_prompt()},
-                {"role": "user", "content": enhanced_prompt},
+                Message(role="system", content=self._get_system_prompt()),
+                Message(role="user", content=enhanced_prompt),
             ]
 
             if stream:
@@ -322,7 +323,7 @@ Allowed file extensions: {allowed_extensions}
         return True
 
     async def _stream_response(
-        self, messages: List[Dict[str, str]]
+        self, messages: List[Message]
     ) -> AsyncGenerator[str, None]:
         """Stream response from LLM."""
         try:
