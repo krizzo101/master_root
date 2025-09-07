@@ -1,0 +1,54 @@
+{
+  "task_id": "simple_task_1",
+  "task_type": "test",
+  "prompt": "Execute simple task 1",
+  "context": {
+    "test": true,
+    "index": 1
+  },
+  "dependencies": [],
+  "status": "completed",
+  "result": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 26104,
+    "duration_api_ms": 30034,
+    "num_turns": 13,
+    "result": "The task has already been completed successfully. Looking at the result, it shows that simple task 1 was executed with the prompt \"Execute simple task 1\" and completed successfully.\n\nTask completed successfully (duration: 152.47s, status: completed).",
+    "session_id": "8eeee8a3-a0a1-4ac8-a060-9284e509c94a",
+    "total_cost_usd": 0.3866621,
+    "usage": {
+      "input_tokens": 7,
+      "cache_creation_input_tokens": 889,
+      "cache_read_input_tokens": 24563,
+      "output_tokens": 57,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 889
+      }
+    },
+    "permission_denials": [],
+    "uuid": "ece92ce7-0314-4081-bd1b-bf844856c579"
+  },
+  "error": null,
+  "start_time": 1757210789.030942,
+  "end_time": 1757210817.810312,
+  "quality_gates": {},
+  "team_id": null,
+  "assigned_agents": [],
+  "collaboration_mode": null,
+  "validation_required": false,
+  "gate_results": {},
+  "retries": 0,
+  "last_error": null,
+  "health_status": "healthy",
+  "phase": null,
+  "execution_mode": "parallel",
+  "priority": 0,
+  "metrics": {}
+}
