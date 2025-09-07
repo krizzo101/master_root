@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "shell_exec": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mkusaka/mcp-shell-server",
+        "-w",
+        "/home/opsvi/master_root"
+      ],
+      "env": {
+        "SHELL": "/bin/bash",
+        "AGENT_TASK_ID": "api_documentation_audit",
+        "AGENT_WORK_DIR": "/home/opsvi/master_root/apps/agent-orchestrator/docs_audit_results/agent_workspaces/api_documentation_audit",
+        "AGENT_UUID": "1157f4e9-7311-4898-93bd-dbedd6130a28",
+        "AGENT_TEAM_ID": "specialized-content"
+      }
+    }
+  },
+  "metadata": {
+    "created": "2025-09-07T04:23:06.360495",
+    "sources": [
+      "/home/opsvi/master_root/.mcp.json",
+      "/home/opsvi/master_root/.mcp.json.backup.2025-09-07-00-24-14"
+    ],
+    "total_servers": 17,
+    "duplicates_found": 0,
+    "merge_strategy": "primary_precedence"
+  }
+}

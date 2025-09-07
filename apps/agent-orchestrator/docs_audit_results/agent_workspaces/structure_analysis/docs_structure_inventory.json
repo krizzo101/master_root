@@ -1,0 +1,288 @@
+{
+  "metadata": {
+    "root_path": "/home/opsvi/master_root/apps/agent-orchestrator/docs",
+    "scan_timestamp": "2025-09-07T06:36:46.144835",
+    "total_files": 86,
+    "total_directories": 7,
+    "total_size": {
+      "bytes": 864144,
+      "human_readable": "843.89 KB"
+    }
+  },
+  "directory_tree": {
+    "structure": [
+      "docs/",
+      "├── analysis/ (16 files, 133.34 KB)",
+      "├── api/ (2 files, 20.32 KB)",
+      "├── architecture/ (15 files, 174.06 KB)",
+      "├── collaboration/ (6 files, 81.38 KB)",
+      "├── guides/ (14 files, 134.74 KB)",
+      "├── legacy/ (14 files, 113.94 KB)",
+      "└── root level (19 files, 186.11 KB)"
+    ],
+    "directories": {
+      "analysis": {
+        "purpose": "System analysis and orchestrator component evaluations",
+        "file_count": 16,
+        "total_size": "133.34 KB",
+        "notable_files": [
+          "MASTER_UNIFIED_STATE_REPORT.md",
+          "EXECUTIVE_DASHBOARD.md",
+          "CONSOLIDATION_ROADMAP.md"
+        ]
+      },
+      "api": {
+        "purpose": "Web API documentation and implementation details",
+        "file_count": 2,
+        "total_size": "20.32 KB",
+        "notable_files": [
+          "WEB_API_DOCUMENTATION.md",
+          "WEB_API_IMPLEMENTATION_SUMMARY.md"
+        ]
+      },
+      "architecture": {
+        "purpose": "System architecture and design documentation",
+        "file_count": 15,
+        "total_size": "174.06 KB",
+        "notable_files": [
+          "ARCHITECTURE.md",
+          "security_model.py",
+          "rollback_strategy.md"
+        ]
+      },
+      "collaboration": {
+        "purpose": "Multi-agent collaboration and messaging system docs",
+        "file_count": 6,
+        "total_size": "81.38 KB",
+        "notable_files": [
+          "REALTIME_COLLABORATION_SYSTEM_DESIGN.md",
+          "MESSAGE_BUS_README.md"
+        ]
+      },
+      "guides": {
+        "purpose": "User guides, tutorials, and quick start documentation",
+        "file_count": 14,
+        "total_size": "134.74 KB",
+        "notable_files": [
+          "EXECUTION_PLAN_VALIDATION_GUIDE.md",
+          "TUTORIALS.md",
+          "QUICKSTART_GUIDE.md"
+        ]
+      },
+      "legacy": {
+        "purpose": "Archived/legacy documentation from previous versions",
+        "file_count": 14,
+        "total_size": "113.94 KB",
+        "notable_files": [
+          "HOW_AGENTS_DISCOVER_AND_USE_ORCHESTRATOR.md",
+          "ENHANCED_QUALITY_GATES_README.md"
+        ]
+      }
+    }
+  },
+  "file_type_analysis": {
+    "markdown_files": {
+      "count": 85,
+      "percentage": 98.84,
+      "total_size": "824.88 KB",
+      "average_size": "9.70 KB"
+    },
+    "python_files": {
+      "count": 1,
+      "percentage": 1.16,
+      "total_size": "19.01 KB",
+      "files": ["architecture/security_model.py"]
+    },
+    "json_files": {
+      "count": 0,
+      "percentage": 0,
+      "note": "No JSON configuration files in docs directory"
+    }
+  },
+  "naming_patterns": {
+    "conventions_identified": {
+      "ALL_CAPS_FILES": {
+        "count": 61,
+        "percentage": 70.93,
+        "description": "Majority of files use ALL_CAPS naming convention",
+        "examples": [
+          "ARCHITECTURE.md",
+          "DOCUMENTATION_INDEX.md",
+          "EXECUTION_PLAN_GUIDE.md"
+        ]
+      },
+      "lowercase_snake_case": {
+        "count": 12,
+        "percentage": 13.95,
+        "description": "Technical/system files use lowercase with underscores",
+        "examples": [
+          "security_model.py",
+          "migration_guide.md",
+          "web_server_demo.md"
+        ]
+      },
+      "numbered_prefixes": {
+        "count": 13,
+        "percentage": 15.12,
+        "description": "Analysis files use numeric ordering",
+        "pattern": "\\d{2}_[a-z_]+_analysis\\.md",
+        "examples": [
+          "01_generic_orchestrator_analysis.md",
+          "12_comprehensive_inventory.md"
+        ]
+      }
+    },
+    "common_prefixes": [
+      {"prefix": "AGENT", "occurrences": 7},
+      {"prefix": "EXECUTION", "occurrences": 4},
+      {"prefix": "COLLABORATION", "occurrences": 4},
+      {"prefix": "ENHANCED", "occurrences": 3},
+      {"prefix": "DOCUMENTATION", "occurrences": 3}
+    ],
+    "common_suffixes": [
+      {"suffix": "README", "occurrences": 8},
+      {"suffix": "GUIDE", "occurrences": 9},
+      {"suffix": "ANALYSIS", "occurrences": 12},
+      {"suffix": "SUMMARY", "occurrences": 6},
+      {"suffix": "REPORT", "occurrences": 5}
+    ]
+  },
+  "file_size_distribution": {
+    "small_files": {
+      "range": "< 5KB",
+      "count": 16,
+      "percentage": 18.60,
+      "examples": ["ISSUES.md (1.73 KB)", "FIXED.md (2.21 KB)"]
+    },
+    "medium_files": {
+      "range": "5KB - 10KB",
+      "count": 39,
+      "percentage": 45.35,
+      "examples": ["API_REFERENCE.md (7.79 KB)", "README.md (3.79 KB)"]
+    },
+    "large_files": {
+      "range": "10KB - 20KB",
+      "count": 28,
+      "percentage": 32.56,
+      "examples": ["ESCALATION_INTEGRATION_README.md (12.50 KB)"]
+    },
+    "extra_large_files": {
+      "range": "> 20KB",
+      "count": 3,
+      "percentage": 3.49,
+      "files": [
+        "SPECIFIC_ENHANCEMENTS_DESIGN.md (39.63 KB)",
+        "EXECUTION_PLAN_INTEGRATION_ENHANCEMENTS.md (29.34 KB)",
+        "rollback_strategy.md (21.09 KB)"
+      ]
+    }
+  },
+  "content_categories": {
+    "documentation_types": {
+      "guides_and_tutorials": 14,
+      "api_documentation": 2,
+      "architecture_specs": 15,
+      "analysis_reports": 16,
+      "collaboration_docs": 6,
+      "legacy_reference": 14,
+      "system_integration": 5,
+      "troubleshooting": 2,
+      "quick_references": 3
+    },
+    "document_purposes": {
+      "user_guidance": ["guides/", "QUICKSTART*.md", "TUTORIALS.md"],
+      "technical_reference": ["architecture/", "api/", "COMPONENT_SPECIFICATIONS.md"],
+      "system_analysis": ["analysis/", "*_analysis.md"],
+      "operational_docs": ["TROUBLESHOOTING.md", "MONITORING*.md"],
+      "project_management": ["ISSUES.md", "TEST_REPORT.md", "CLEANUP*.md"]
+    }
+  },
+  "metadata_summary": {
+    "last_modified": {
+      "all_files_modified": "2025-09-07T01:21:39",
+      "note": "All files share the same modification timestamp, suggesting bulk import or migration"
+    },
+    "file_ages": {
+      "newest": "2025-09-07T01:21:39",
+      "oldest": "2025-09-07T01:21:39",
+      "average_age_days": 0
+    }
+  },
+  "recommendations": {
+    "organizational": [
+      {
+        "priority": "HIGH",
+        "issue": "Root level contains 19 files",
+        "recommendation": "Consider moving specialized docs to appropriate subdirectories",
+        "affected_files": [
+          "EXECUTION_PLAN_INTEGRATION_ENHANCEMENTS.md -> guides/ or architecture/",
+          "SPECIFIC_ENHANCEMENTS_DESIGN.md -> architecture/",
+          "TOKEN_INTEGRATION.md -> api/ or architecture/"
+        ]
+      },
+      {
+        "priority": "MEDIUM",
+        "issue": "Legacy directory contains active reference material",
+        "recommendation": "Review legacy/ contents and promote still-relevant documentation",
+        "affected_files": [
+          "HOW_AGENTS_DISCOVER_AND_USE_ORCHESTRATOR.md",
+          "ENHANCED_QUALITY_GATES_README.md"
+        ]
+      },
+      {
+        "priority": "LOW",
+        "issue": "Inconsistent naming conventions",
+        "recommendation": "Standardize on either ALL_CAPS or lowercase_snake_case per directory"
+      }
+    ],
+    "content_quality": [
+      {
+        "priority": "HIGH",
+        "issue": "Multiple overlapping guide documents",
+        "recommendation": "Consolidate QUICKSTART.md and QUICKSTART_GUIDE.md",
+        "note": "Reduces confusion and maintenance burden"
+      },
+      {
+        "priority": "MEDIUM",
+        "issue": "Numbered analysis files lack clear index",
+        "recommendation": "Create analysis/INDEX.md to explain numbering and sequence"
+      },
+      {
+        "priority": "LOW",
+        "issue": "Some files have generic names",
+        "recommendation": "Rename files like FIXED.md and ISSUES.md to be more descriptive"
+      }
+    ],
+    "maintenance": [
+      {
+        "priority": "HIGH",
+        "action": "Create comprehensive INDEX.md at root level",
+        "benefit": "Improves navigation and discoverability"
+      },
+      {
+        "priority": "MEDIUM",
+        "action": "Add file headers with creation date, author, and purpose",
+        "benefit": "Better tracking and context for documentation"
+      },
+      {
+        "priority": "LOW",
+        "action": "Consider adding .json configuration files for automation",
+        "benefit": "Enable automated documentation generation and validation"
+      }
+    ]
+  },
+  "statistics_summary": {
+    "total_documentation_volume": "843.89 KB",
+    "average_file_size": "10.05 KB",
+    "largest_directory": "root (186.11 KB)",
+    "smallest_directory": "api (20.32 KB)",
+    "documentation_completeness": {
+      "has_readme": true,
+      "has_api_docs": true,
+      "has_architecture_docs": true,
+      "has_user_guides": true,
+      "has_troubleshooting": true,
+      "completeness_score": "95%"
+    }
+  }
+}

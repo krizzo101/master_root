@@ -1,0 +1,24 @@
+{
+  "task_id": "error_capture_specialist",
+  "task_type": "development-specialist",
+  "prompt": "ERROR CAPTURE FIX IMPLEMENTATION\n\nREFERENCE MATERIALS - READ THESE FIRST:\n1. /home/opsvi/master_root/apps/agent-orchestrator/UNIFIED_ORCHESTRATOR_VALIDATION_REPORT.md\n2. /home/opsvi/master_root/apps/agent-orchestrator/unified_orchestrator_validation_20250906_220122/ (failure evidence)\n3. implementation_specs/error_capture_fix_spec.md (from solution architect)\n\nRead implementation_specs/error_capture_fix_spec.md for exact specifications.\n\nTASK: Fix the error capture problem where tasks fail but show empty error strings.\n\nEXPECTED ISSUES TO FIX:\n- Empty stderr causing empty error messages\n- JSON parsing errors from invalid stdout\n- CLI input errors not properly captured\n- Process failure with no diagnostic information\n\nREQUIREMENTS:\n- Maintain backward compatibility\n- Ensure all error conditions provide useful diagnostics\n- Test with various failure scenarios\n- Update error handling logic in generic_orchestrator.py\n\nCOMPREHENSIVE TESTING & VERIFICATION REQUIRED:\n1. **Code Path Analysis**: Trace through EVERY logical execution path in error handling\n2. **Edge Case Testing**: Test empty stderr, JSON parsing failures, CLI input errors, subprocess crashes\n3. **Integration Testing**: Verify error capture works with actual agent execution\n4. **Regression Testing**: Ensure existing functionality still works\n5. **Performance Testing**: Confirm error handling doesn't impact performance\n\nISSUE IDENTIFICATION REQUIREMENT:\nIf you discover additional issues during implementation that cannot be corrected in this run:\n- Provide detailed explanation of WHAT the issue is\n- Explain WHY it cannot be fixed in this run\n- Include all technical details necessary for the next implementation plan\n- Specify exact code locations, dependencies, and complexity assessment\n\nDELIVERABLE:\n- Modified orchestrator files with improved error capture\n- Comprehensive test report with all code paths verified\n- Documentation of all changes and any issues discovered\n- Complete verification that solution works as intended\n\nFollow the architect's specifications exactly.",
+  "context": {},
+  "dependencies": [
+    "unified_solution_architect"
+  ],
+  "status": "failed",
+  "result": null,
+  "error": "Process failed with no stderr output",
+  "start_time": 1757241613.096025,
+  "end_time": 1757241618.149413,
+  "quality_gates": [],
+  "validation_required": true,
+  "phase_id": null,
+  "agent_uuid": "a1f5366a-4ebb-4233-8893-3d7ba53f0873",
+  "team_id": null,
+  "monitoring_enabled": false,
+  "background_execution": false,
+  "mcp_needs": [],
+  "work_dir_name": null,
+  "debug_mode": false
+}

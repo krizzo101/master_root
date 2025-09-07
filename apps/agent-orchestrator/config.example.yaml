@@ -1,0 +1,101 @@
+# Multi-Agent Log Tailer Configuration Example
+# Copy this file to config.yaml and customize as needed
+
+# System configuration
+system:
+  projects_dir: ~/.claude/projects
+  pattern: "**/*.jsonl"
+  max_files: 1000
+
+# Monitoring settings
+monitoring:
+  poll_interval_ms: 100
+  buffer_size: 1000
+  include_historical: false
+
+# Swarm detection algorithms
+swarm_detection:
+  enabled: true
+  time_window_seconds: 300
+  min_agents: 3
+  algorithms:
+    - dbscan
+    - sliding_window
+    - directory_grouping
+    - behavioral
+
+  # Advanced algorithm tuning
+  dbscan:
+    eps_seconds: 5.0
+    min_samples: 3
+    metric: euclidean
+  
+  sliding_window:
+    window_size_seconds: 30
+    overlap_ratio: 0.5
+    min_density: 0.3
+  
+  behavioral:
+    burst_threshold: 5
+    sequence_min_length: 3
+    parallel_overlap_ratio: 0.7
+
+# Visual output settings
+visual:
+  color_scheme: default  # Options: default, high-contrast, colorblind
+  use_emoji: true
+  use_color: true
+  ascii_only: false
+  terminal_width: auto
+
+# Performance tuning
+performance:
+  worker_threads: 50
+  max_memory_mb: 500
+  cpu_limit_percent: 70
+  queue_high_water_mark: 10000
+  queue_low_water_mark: 5000
+
+# Resource limits
+resource_limits:
+  max_file_descriptors: 1024
+  max_memory_mb: 1000
+  max_cpu_percent: 80
+
+# Circuit breaker for fault tolerance
+circuit_breaker:
+  enabled: true
+  failure_threshold: 5
+  recovery_timeout_seconds: 30
+  half_open_requests: 3
+
+# Caching configuration
+caching:
+  enabled: true
+  max_entries: 1000
+  ttl_seconds: 300
+  eviction_policy: lru
+
+# Output configuration
+output:
+  format: text  # Options: text, json, csv
+  file: null    # Set to file path to write output to file
+  quiet: false
+
+# Logging configuration
+logging:
+  level: INFO  # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file: /var/log/swarm-tailer.log
+  rotate_size_mb: 100
+  retain_days: 7
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+# Monitoring endpoints (optional)
+metrics_port: 9090      # Prometheus metrics
+health_port: 8080       # Health check endpoint
+
+# Plugin configuration (future feature)
+plugins:
+  enabled: false
+  directory: ~/.swarm-tailer/plugins
+  autoload: true

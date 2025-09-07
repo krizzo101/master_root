@@ -9,6 +9,7 @@ import asyncio
 import json
 import logging
 import os
+import traceback
 import uuid
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
@@ -21,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class AgentTask:
-    """Generic agent task definition"""
+    """Generic agent task definition with enhanced error tracking"""
 
     task_id: str
     task_type: str
@@ -36,9 +37,17 @@ class AgentTask:
     quality_gates: List[str] = field(
         default_factory=list
     )  # Quality gates for enhanced orchestrator
+    raw_output: Optional[str] = None  # Store raw stdout for debugging
+    error_details: Optional[Dict] = None  # Detailed error information
 
     def to_dict(self) -> Dict:
-        return asdict(self)
+        """Convert to dictionary with error details"""
+        result = asdict(self)
+        # Include error details only if present
+        if self.raw_output and len(self.raw_output) > 1000:
+            # Truncate very long raw output for serialization
+            result["raw_output"] = self.raw_output[:500] + "..." + self.raw_output[-500:]
+        return result
 
 
 class TokenPool:
@@ -108,6 +117,11 @@ class TokenPool:
 
     def size(self) -> int:
         return len(self.tokens)
+    
+    @property
+    def available(self) -> int:
+        """Get number of available tokens (not in use)"""
+        return len(self.tokens) - len(self.in_use)
 
 
 class DependencyManager:
@@ -579,34 +593,130 @@ class GenericOrchestrator:
                     log_file_handle.close()
                     # Read stderr from log file if process failed
                     if process.returncode != 0:
-                        with open(
-                            agent_work_dir / "logs" / f"agent_{task.task_id}.log"
-                        ) as f:
-                            stderr = f.read().encode()
+                        try:
+                            with open(
+                                agent_work_dir / "logs" / f"agent_{task.task_id}.log"
+                            ) as f:
+                                stderr_content = f.read()
+                                stderr = stderr_content.encode() if stderr_content else None
+                        except Exception as e:
+                            logger.warning(f"Failed to read stderr from log file: {e}")
+                            stderr = None
 
                 task.end_time = datetime.now().timestamp()
                 duration = task.end_time - task.start_time
 
                 if process.returncode == 0:
-                    try:
-                        task.result = json.loads(stdout.decode())
-                        task.status = "completed"
-                        await self.dep_manager.mark_completed(task.task_id)
-                        self.metrics["completed"] += 1
-                        logger.info(f"✓ {task.task_id} completed in {duration:.2f}s")
-                    except json.JSONDecodeError as e:
+                    # Parse output with comprehensive error handling
+                    if stdout:
+                        try:
+                            # Attempt JSON parsing
+                            task.result = json.loads(stdout.decode())
+                            task.status = "completed"
+                            await self.dep_manager.mark_completed(task.task_id)
+                            self.metrics["completed"] += 1
+                            logger.info(f"✓ {task.task_id} completed in {duration:.2f}s")
+                        except json.JSONDecodeError as e:
+                            # Capture JSON parsing error with context
+                            stdout_str = stdout.decode()
+                            error_msg = f"JSON decode error at line {e.lineno}, col {e.colno}: {e.msg}"
+                            if len(stdout_str) > 500:
+                                preview = stdout_str[:250] + "..." + stdout_str[-250:]
+                            else:
+                                preview = stdout_str
+                            
+                            # Build comprehensive error message
+                            error_parts = [
+                                error_msg,
+                                f"Output preview: {preview[:200]}" if preview else "No output to preview",
+                                f"Task: {task.task_id}"
+                            ]
+                            task.error = " | ".join(error_parts)
+                            task.status = "failed"
+                            task.raw_output = stdout_str  # Preserve raw output
+                            task.error_details = {
+                                "type": "JSONDecodeError",
+                                "message": error_msg,
+                                "output_preview": preview,
+                                "task_id": task.task_id
+                            }
+                            await self.dep_manager.mark_failed(task.task_id)
+                            self.metrics["failed"] += 1
+                            logger.error(f"✗ {task.task_id} JSON parsing failed: {error_msg}")
+                    else:
+                        # No stdout despite successful return code
                         task.status = "failed"
-                        task.error = f"JSON parsing failed: {e}. Agent output: {stdout.decode()[:500]}..."
+                        task.error = "Process returned success but produced no output"
                         await self.dep_manager.mark_failed(task.task_id)
                         self.metrics["failed"] += 1
-                        logger.error(f"✗ {task.task_id} JSON parsing failed: {task.error}")
+                        logger.error(f"✗ {task.task_id} no output despite success code")
                 else:
                     task.status = "failed"
-                    task.error = (
-                        stderr.decode()
-                        if stderr
-                        else "Process failed with no stderr output"
-                    )
+                    # Build comprehensive error from available information
+                    error_parts = []
+                    
+                    # Process stderr
+                    if stderr:
+                        try:
+                            stderr_str = stderr.decode().strip()
+                            if stderr_str:
+                                # Look for specific error patterns
+                                if "Error:" in stderr_str:
+                                    # Extract the main error message
+                                    error_lines = [line for line in stderr_str.split('\n') if 'Error:' in line]
+                                    if error_lines:
+                                        error_parts.append(error_lines[0].strip())
+                                    else:
+                                        error_parts.append(f"Stderr: {stderr_str[:500]}")
+                                else:
+                                    error_parts.append(f"Stderr: {stderr_str[:500]}")
+                            else:
+                                error_parts.append("Empty stderr output")
+                        except Exception as e:
+                            error_parts.append(f"Failed to decode stderr: {str(e)}")
+                    else:
+                        error_parts.append("No stderr captured")
+                    
+                    # Process stdout for additional context
+                    if stdout:
+                        try:
+                            stdout_str = stdout.decode().strip()
+                            if stdout_str:
+                                preview = stdout_str[:200] if len(stdout_str) > 200 else stdout_str
+                                error_parts.append(f"Stdout preview: {preview}")
+                            else:
+                                error_parts.append("Empty stdout")
+                        except Exception as e:
+                            error_parts.append(f"Failed to decode stdout: {str(e)}")
+                    else:
+                        error_parts.append("No stdout captured")
+                    
+                    # Always include exit code and task info
+                    error_parts.append(f"Exit code: {process.returncode}")
+                    error_parts.append(f"Task: {task.task_id} (type: {task.task_type})")
+                    
+                    # Add command info for debugging
+                    if hasattr(task, 'prompt') and task.prompt:
+                        prompt_preview = task.prompt[:100] if len(task.prompt) > 100 else task.prompt
+                        error_parts.append(f"Prompt: {prompt_preview}")
+                    
+                    # Ensure we always have an error message
+                    if not error_parts or all(not part for part in error_parts):
+                        error_parts = [f"Process failed with exit code {process.returncode} but no diagnostic information was captured"]
+                    
+                    task.error = " | ".join(filter(None, error_parts))  # Filter out empty parts
+                    task.raw_output = stdout.decode() if stdout else None  # Preserve for debugging
+                    
+                    # Store detailed error information
+                    task.error_details = {
+                        "exit_code": process.returncode,
+                        "stderr": stderr.decode() if stderr else None,
+                        "stdout_preview": stdout.decode()[:500] if stdout else None,
+                        "task_id": task.task_id,
+                        "task_type": task.task_type,
+                        "timestamp": datetime.now().isoformat()
+                    }
+                    
                     await self.dep_manager.mark_failed(task.task_id)
                     self.metrics["failed"] += 1
 
@@ -616,11 +726,66 @@ class GenericOrchestrator:
 
             except Exception as e:
                 task.status = "failed"
-                task.error = str(e)
+                
+                # Build comprehensive error message
+                error_parts = []
+                
+                # Get exception type and message
+                error_type = type(e).__name__
+                error_msg = str(e).strip()
+                
+                if error_msg:
+                    error_parts.append(f"{error_type}: {error_msg}")
+                else:
+                    # Fallback for empty error messages - include repr for more info
+                    error_repr = repr(e)
+                    if error_repr and error_repr != "":
+                        error_parts.append(f"{error_type}: {error_repr}")
+                    else:
+                        error_parts.append(f"{error_type} occurred (no message available)")
+                
+                # Add traceback for debugging
+                tb_lines = traceback.format_tb(e.__traceback__)
+                if tb_lines:
+                    # Get the most relevant traceback lines
+                    relevant_tb = []
+                    for line in tb_lines[-3:]:  # Last 3 traceback lines
+                        line = line.strip()
+                        if line and 'File' in line:
+                            relevant_tb.append(line)
+                    if relevant_tb:
+                        error_parts.append(f"Traceback: {' -> '.join(relevant_tb[-2:])}")
+                
+                # Add context about the task
+                error_parts.append(f"Task: {task.task_id} (type: {task.task_type})")
+                
+                # Add prompt info if available
+                if hasattr(task, 'prompt') and task.prompt:
+                    prompt_preview = task.prompt[:100] if len(task.prompt) > 100 else task.prompt
+                    error_parts.append(f"Prompt: {prompt_preview}")
+                
+                # Ensure we have a meaningful error
+                if not error_parts:
+                    error_parts.append(f"Unknown error occurred during task execution")
+                
+                # Combine error information
+                task.error = " | ".join(filter(None, error_parts))
+                
+                # Store additional debugging info
+                task.error_details = {
+                    "type": error_type,
+                    "message": error_msg or repr(e) or "No message",
+                    "traceback": tb_lines,
+                    "task_id": task.task_id,
+                    "task_type": task.task_type,
+                    "prompt": task.prompt[:200] if hasattr(task, 'prompt') and task.prompt else None,
+                    "timestamp": datetime.now().isoformat()
+                }
+                
                 await self.dep_manager.mark_failed(task.task_id)
                 self.metrics["failed"] += 1
-
-                logger.error(f"✗ {task.task_id} exception: {e}")
+                
+                logger.error(f"✗ {task.task_id} exception: {task.error}")
 
         finally:
             # Always release the token
@@ -675,9 +840,44 @@ class GenericOrchestrator:
                 return_exceptions=True,
             )
 
-            for result in batch_results:
+            for i, result in enumerate(batch_results):
                 if isinstance(result, Exception):
-                    logger.error(f"Batch execution error: {result}")
+                    # Task failed with exception - create failure result
+                    failed_task = ready_tasks[i]
+                    
+                    # Build comprehensive error information
+                    error_type = type(result).__name__
+                    error_msg = str(result).strip()
+                    
+                    if error_msg:
+                        error_text = f"{error_type}: {error_msg}"
+                    else:
+                        error_text = f"{error_type} occurred during task execution"
+                    
+                    # Mark task as failed
+                    failed_task.status = "failed"
+                    failed_task.error = error_text
+                    failed_task.error_details = {
+                        "type": error_type,
+                        "message": error_msg or "No message",
+                        "task_id": failed_task.task_id,
+                        "task_type": failed_task.task_type,
+                        "timestamp": datetime.now().isoformat()
+                    }
+                    
+                    # Mark in dependency manager
+                    await self.dep_manager.mark_failed(failed_task.task_id)
+                    self.metrics["failed"] += 1
+                    
+                    # Save task state to file
+                    task_file = self.output_dir / "tasks" / f"{failed_task.task_id}.json"
+                    task_file.parent.mkdir(exist_ok=True)
+                    task_file.write_text(json.dumps(failed_task.to_dict(), indent=2))
+                    
+                    # Add failed task result to results
+                    results.append(failed_task.to_dict())
+                    
+                    logger.error(f"Batch execution error for {failed_task.task_id}: {error_text}")
                 else:
                     results.append(result)
 

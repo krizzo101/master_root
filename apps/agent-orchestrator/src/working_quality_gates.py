@@ -74,7 +74,35 @@ class TaskStructureGate(QualityGate):
             issues.append("Missing or empty prompt")
 
         # Task type validation
-        valid_types = {"research", "design", "code", "test", "review", "documentation"}
+        valid_types = {
+            # Architecture & Design
+            "security-architect",
+            "solution-architect",
+            "requirements-analyst",
+            # Development & Testing
+            "development-specialist",
+            "qa-testing-guru",
+            "performance-optimizer",
+            # Integration & Data
+            "api-integration-specialist",
+            "database-specialist",
+            # Analysis & Documentation
+            "business-analyst",
+            "technical-writer",
+            "research-genius",
+            "code-analyzer",
+            # Legacy types (for backward compatibility)
+            "general-purpose",
+            "web-scraper",
+            "data-processor",
+            "file-processor",
+            "api-caller",
+            "validation",
+            "monitoring",
+            # Legacy simple types (for backward compatibility)
+            "research", "design", "code", "test", "review", "documentation",
+            "analysis", "optimization", "integration", "deployment"
+        }
         if task.task_type not in valid_types:
             warnings.append(
                 f"Unusual task_type '{task.task_type}', expected one of: {valid_types}"

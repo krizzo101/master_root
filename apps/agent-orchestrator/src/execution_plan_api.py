@@ -214,14 +214,33 @@ class ExecutionPlanSchemaValidator:
         """Validate task types against known types"""
 
         known_types = {
-            "general-purpose",
+            # Architecture & Design
+            "security-architect",
+            "solution-architect",
+            "requirements-analyst",
+            # Development & Testing
+            "development-specialist",
+            "qa-testing-guru",
+            "performance-optimizer",
+            # Integration & Data
+            "api-integration-specialist",
+            "database-specialist",
+            # Analysis & Documentation
+            "business-analyst",
+            "technical-writer",
+            "research-genius",
             "code-analyzer",
+            # Legacy types (for backward compatibility)
+            "general-purpose",
             "web-scraper",
             "data-processor",
             "file-processor",
             "api-caller",
             "validation",
             "monitoring",
+            # Legacy simple types (for backward compatibility)
+            "research", "design", "code", "test", "review", "documentation",
+            "analysis", "optimization", "integration", "deployment"
         }
 
         invalid_types = []

@@ -1,0 +1,42 @@
+{
+  "task_id": "create_examples",
+  "task_type": "documentation",
+  "prompt": "**MISSION: Create Usage Examples and Demos**\n            \n            You are a developer advocate creating practical examples.\n            \n            **REQUIREMENTS:**\n            1. Create interactive example script\n            2. Demonstrate integration with orchestrator\n            3. Show different usage patterns\n            4. Include performance demonstrations\n            \n            **DELIVERABLES:**\n            - Create log_tailer_examples.py with:\n              - Interactive demo menu\n              - Live orchestrator integration\n              - Usage pattern demonstrations\n              - Performance benchmarks\n            \n            Make examples engaging and educational.",
+  "context": {},
+  "dependencies": [
+    "integration_testing",
+    "create_documentation"
+  ],
+  "status": "completed",
+  "result": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 375807,
+    "duration_api_ms": 351921,
+    "num_turns": 88,
+    "result": "## Summary\n\nI've successfully created comprehensive usage examples and demos for the Enhanced Log Tailer:\n\n### Deliverables Created:\n\n1. **log_tailer_examples.py** - Full-featured interactive demo script with:\n   - Interactive menu system\n   - 5 different demonstration scenarios\n   - Live orchestrator integration examples\n   - Performance benchmarking capabilities\n   - Custom pattern configuration demos\n\n2. **simple_log_tailer_demo.py** - Standalone demo script with:\n   - No external dependencies\n   - Pattern matching demonstrations\n   - Swarm detection examples\n   - Real-time monitoring simulation\n   - Performance analysis tools\n\n3. **EXAMPLES_DOCUMENTATION.md** - Comprehensive documentation covering:\n   - Usage instructions for both demo scripts\n   - Detailed explanation of each demo scenario\n   - Key capabilities demonstrated\n   - Example outputs and metrics\n   - Educational value and customization options\n\n### Key Features Demonstrated:\n\n- **Pattern Matching**: Shows ERROR, WARNING, and custom pattern detection\n- **Swarm Detection**: Demonstrates coordinated behavior identification\n- **Real-time Monitoring**: Simulates live log generation and analysis\n- **Performance**: Benchmarks showing >300,000 lines/second throughput\n- **Integration**: Examples of orchestrator task creation and management\n\nThe examples are engaging, educational, and provide practical demonstrations of the Enhanced Log Tailer's capabilities for both learning and testing purposes.",
+    "session_id": "6ae539c1-f77e-4d9e-b455-ab5a6d05d743",
+    "total_cost_usd": 4.04543275,
+    "usage": {
+      "input_tokens": 0,
+      "cache_creation_input_tokens": 1389,
+      "cache_read_input_tokens": 50662,
+      "output_tokens": 320,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 1389
+      }
+    },
+    "permission_denials": [],
+    "uuid": "1a0998d7-ccf1-4196-a154-74e53d422012"
+  },
+  "error": null,
+  "start_time": 1757240986.994683,
+  "end_time": 1757241365.058736,
+  "quality_gates": []
+}

@@ -205,7 +205,7 @@ class ColorScheme:
         'colorblind_safe': {...},
         'monochrome': {...}
     }
-    
+
     def __init__(self, scheme='default', force_color=None):
         self.enabled = self._detect_color_support(force_color)
         self.scheme = self.SCHEMES[scheme]

@@ -1,366 +1,287 @@
-# Claude Code Session Log Format Analysis
+# Claude Code Log Format Analysis
 
 ## Overview
-Claude Code stores session logs as JSONL (JSON Lines) files in the `~/.claude/projects/` directory. Each project directory contains multiple session log files with UUID-based filenames.
+Claude Code session logs are stored as JSONL (JSON Lines) files in `~/.claude/projects/` with project-specific subdirectories. Each line represents a single log entry in JSON format.
 
-## File Structure
-
-### Location Pattern
+## Directory Structure
 ```
-~/.claude/projects/{sanitized-project-path}/{session-uuid}.jsonl
+~/.claude/projects/
+├── -home-opsvi-master-root/           # Main project directory
+│   ├── *.jsonl                         # Session log files (UUID-named)
+├── -home-opsvi-master-root-apps-agent-orchestrator/
+├── -home-opsvi-master-root-libs-opsvi-mcp/
+└── ... (other project directories)
 ```
-
-**Example Paths:**
-- `~/.claude/projects/-home-opsvi/b9d42065-ce57-427b-ba55-5811767f0bcf.jsonl`
-- `~/.claude/projects/-tmp-test-analyze-job-52175846/cde4869a-37e8-4018-b73a-2cfdbe5244cb.jsonl`
 
 ### File Naming Convention
-- Project directories: Sanitized paths with hyphens replacing slashes
-- Log files: UUID v4 format with `.jsonl` extension
+- Format: `{session-uuid}.jsonl`
+- Example: `3cf2e5de-b4a8-4ded-a0f2-8466bea1548f.jsonl`
 
 ## Log Entry Types
 
-### 1. Summary Entry
+### Distribution (from 155,096 analyzed entries)
+- **assistant**: 83,306 entries (53.7%) - Claude's responses
+- **user**: 62,391 entries (40.2%) - User messages and tool results
+- **system**: 8,287 entries (5.3%) - System events and metadata
+- **summary**: 1,112 entries (0.7%) - Session summaries
+
+## JSON Structure
+
+### Common Fields (All Entry Types)
+```json
+{
+  "type": "user|assistant|system|summary",
+  "sessionId": "UUID string",
+  "timestamp": "ISO 8601 format",
+  "uuid": "Unique entry UUID",
+  "parentUuid": "Parent entry UUID or null",
+  "isSidechain": boolean,
+  "userType": "external",
+  "cwd": "Current working directory path",
+  "version": "Claude Code version (e.g., 1.0.108)",
+  "gitBranch": "Current git branch name"
+}
+```
+
+### Entry Type Specifics
+
+#### 1. User Entry
+```json
+{
+  "type": "user",
+  "message": {
+    "role": "user",
+    "content": "User's message or <session-start-hook>..."
+  },
+  "toolUseResult": [  // Optional: Present when responding to tool use
+    {
+      "type": "text",
+      "text": "Tool execution result"
+    }
+  ]
+}
+```
+
+#### 2. Assistant Entry
+```json
+{
+  "type": "assistant",
+  "message": {
+    "id": "msg_...",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-4-20250514",
+    "content": [
+      {
+        "type": "text",
+        "text": "Assistant's response"
+      },
+      // OR
+      {
+        "type": "tool_use",
+        "id": "toolu_...",
+        "name": "tool_name",
+        "input": { /* tool parameters */ }
+      }
+    ],
+    "stop_reason": null,
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": number,
+      "output_tokens": number,
+      "cache_creation_input_tokens": number,
+      "cache_read_input_tokens": number,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": number,
+        "ephemeral_1h_input_tokens": number
+      },
+      "service_tier": "standard"
+    }
+  },
+  "requestId": "req_..."
+}
+```
+
+#### 3. System Entry
+```json
+{
+  "type": "system",
+  "content": "System message with ANSI escape codes",
+  "isMeta": false,
+  "level": "info|warning|error",
+  "toolUseID": "Tool use identifier"
+}
+```
+
+#### 4. Summary Entry
 ```json
 {
   "type": "summary",
   "summary": "Brief description of conversation topic",
-  "leafUuid": "uuid-for-this-summary"
+  "leafUuid": "Reference UUID"
 }
 ```
-
-### 2. User Message Entry
-```json
-{
-  "parentUuid": "parent-message-uuid-or-null",
-  "isSidechain": false,
-  "userType": "external",
-  "cwd": "/working/directory/path",
-  "sessionId": "session-uuid",
-  "version": "1.0.100",
-  "gitBranch": "",
-  "type": "user",
-  "message": {
-    "role": "user",
-    "content": "User's message text or array of content blocks"
-  },
-  "uuid": "unique-message-uuid",
-  "timestamp": "2025-09-02T02:12:03.935Z"
-}
-```
-
-### 3. Assistant Message Entry
-```json
-{
-  "parentUuid": "parent-message-uuid",
-  "isSidechain": false,
-  "userType": "external",
-  "cwd": "/working/directory/path",
-  "sessionId": "session-uuid",
-  "version": "1.0.100",
-  "gitBranch": "",
-  "message": {
-    "id": "msg_01VRJAXBPKZdzPTAbMk8QFJb",
-    "type": "message",
-    "role": "assistant",
-    "model": "claude-opus-4-1-20250805",
-    "content": [
-      {
-        "type": "text",
-        "text": "Assistant's response text"
-      }
-    ],
-    "stop_reason": null,
-    "stop_sequence": null,
-    "usage": {
-      "input_tokens": 3,
-      "cache_creation_input_tokens": 16146,
-      "cache_read_input_tokens": 0,
-      "cache_creation": {
-        "ephemeral_5m_input_tokens": 16146,
-        "ephemeral_1h_input_tokens": 0
-      },
-      "output_tokens": 3,
-      "service_tier": "standard"
-    }
-  },
-  "requestId": "req_011CSimFVQUVuTJjoWpLaFTf",
-  "type": "assistant",
-  "uuid": "unique-message-uuid",
-  "timestamp": "2025-09-02T02:12:07.796Z"
-}
-```
-
-### 4. Tool Use Entry
-```json
-{
-  "parentUuid": "parent-message-uuid",
-  "isSidechain": false,
-  "userType": "external",
-  "cwd": "/working/directory/path",
-  "sessionId": "session-uuid",
-  "version": "1.0.100",
-  "gitBranch": "",
-  "message": {
-    "id": "msg_id",
-    "type": "message",
-    "role": "assistant",
-    "model": "claude-model-version",
-    "content": [
-      {
-        "type": "tool_use",
-        "id": "toolu_unique_id",
-        "name": "ToolName",
-        "input": {
-          "parameter1": "value1",
-          "parameter2": "value2"
-        }
-      }
-    ],
-    "stop_reason": null,
-    "stop_sequence": null,
-    "usage": {
-      // token usage details
-    }
-  },
-  "requestId": "req_id",
-  "type": "assistant",
-  "uuid": "unique-message-uuid",
-  "timestamp": "ISO-8601-timestamp"
-}
-```
-
-### 5. Tool Result Entry
-```json
-{
-  "parentUuid": "parent-message-uuid",
-  "isSidechain": false,
-  "userType": "external",
-  "cwd": "/working/directory/path",
-  "sessionId": "session-uuid",
-  "version": "1.0.100",
-  "gitBranch": "",
-  "type": "user",
-  "message": {
-    "role": "user",
-    "content": [
-      {
-        "type": "tool_result",
-        "content": "Tool execution result or error message",
-        "is_error": false,
-        "tool_use_id": "toolu_unique_id"
-      }
-    ]
-  },
-  "uuid": "unique-message-uuid",
-  "timestamp": "ISO-8601-timestamp",
-  "toolUseResult": "Optional additional result data"
-}
-```
-
-## Key Fields Explained
-
-### Common Fields
-- **uuid**: Unique identifier for each log entry
-- **parentUuid**: Links entries in conversation chain
-- **sessionId**: Groups all entries in a single session
-- **timestamp**: ISO 8601 formatted timestamp
-- **cwd**: Current working directory at time of entry
-- **version**: Claude Code version
-- **type**: Entry type (user, assistant, summary)
-
-### Message-Specific Fields
-- **role**: "user" or "assistant"
-- **content**: Message content (text, tool_use, tool_result)
-- **model**: Claude model version for assistant messages
-- **usage**: Token usage statistics for assistant messages
-
-### Tool-Related Fields
-- **tool_use_id**: Unique identifier linking tool calls to results
-- **name**: Tool name (Bash, Read, Write, etc.)
-- **input**: Tool parameters
-- **is_error**: Boolean indicating tool execution failure
 
 ## Timestamp Formats
-All timestamps use ISO 8601 format with millisecond precision:
-```
-2025-09-02T02:12:03.935Z
-```
+- **Format**: ISO 8601 with milliseconds
+- **Example**: `"2025-09-07T08:28:02.124Z"`
+- **Timezone**: Always UTC (Z suffix)
+- **Precision**: Millisecond accuracy
 
 ## Session ID Patterns
-Session IDs are UUID v4 format, consistent throughout a conversation:
-```
-cde4869a-37e8-4018-b73a-2cfdbe5244cb
-```
+- **Format**: Standard UUID v4
+- **Example**: `3cf2e5de-b4a8-4ded-a0f2-8466bea1548f`
+- **Consistency**: Same sessionId throughout a conversation
+- **File Naming**: Session ID is used as the filename
 
-## Sample Log Entries
+## Tool Use Patterns
 
-### Complete User-Assistant Exchange with Tool Use
+### Tool Call (in Assistant Entry)
 ```json
-// User message
-{
-  "parentUuid": null,
-  "type": "user",
-  "message": {
-    "role": "user",
-    "content": "List files in current directory"
-  },
-  "uuid": "msg-uuid-1",
-  "timestamp": "2025-09-07T10:00:00.000Z"
-}
-
-// Assistant message with tool use
-{
-  "parentUuid": "msg-uuid-1",
-  "type": "assistant",
-  "message": {
-    "role": "assistant",
-    "content": [{
-      "type": "tool_use",
-      "id": "tool-id-1",
-      "name": "Bash",
-      "input": {"command": "ls -la"}
-    }]
-  },
-  "uuid": "msg-uuid-2",
-  "timestamp": "2025-09-07T10:00:01.000Z"
-}
-
-// Tool result
-{
-  "parentUuid": "msg-uuid-2",
-  "type": "user",
-  "message": {
-    "role": "user",
-    "content": [{
-      "type": "tool_result",
-      "tool_use_id": "tool-id-1",
-      "content": "file1.txt\nfile2.md\ndir1/"
-    }]
-  },
-  "uuid": "msg-uuid-3",
-  "timestamp": "2025-09-07T10:00:02.000Z"
-}
+"content": [{
+  "type": "tool_use",
+  "id": "toolu_01PAtsqqD8WgbVaKWhwbSQBE",
+  "name": "mcp__time__current_time",
+  "input": {
+    "format": "YYYY-MM-DD HH:mm:ss"
+  }
+}]
 ```
+
+### Tool Result (in User Entry)
+```json
+"toolUseResult": [{
+  "type": "text",
+  "text": "Current UTC time is 2025-09-07 08:28:25..."
+}]
+```
+
+## UUID Relationships
+- **parentUuid**: Links entries in conversation threads
+- **uuid**: Unique identifier for each entry
+- **leafUuid**: Used in summary entries for reference
+- **Hierarchy**: Forms a tree structure of conversation flow
+
+## Edge Cases and Special Patterns
+
+### 1. Session Start Hook
+```json
+"content": "<session-start-hook>Session started: 2025-09-07 04:28:02</session-start-hook>"
+```
+
+### 2. ANSI Escape Codes in System Messages
+- System content may include formatting: `\\u001b[1m...\\u001b[22m`
+- Used for bold, colors, and other terminal formatting
+
+### 3. Multi-line User Input
+- Long user messages are preserved with newlines
+- Content field can be very large (thousands of characters)
+
+### 4. Tool Chaining
+- Multiple tool uses in single assistant message
+- Tool results referenced by tool_use_id
 
 ## Parsing Strategies
 
-### 1. Stream Processing (Recommended for Large Files)
+### 1. Streaming Parse
 ```python
 import json
+from pathlib import Path
 
-def parse_claude_log(filepath):
-    with open(filepath, 'r') as f:
+def parse_jsonl(file_path):
+    with open(file_path, 'r') as f:
         for line in f:
-            entry = json.loads(line)
-            yield entry
+            if line.strip():
+                try:
+                    yield json.loads(line)
+                except json.JSONDecodeError:
+                    # Skip malformed lines
+                    continue
 ```
 
-### 2. Filter by Entry Type
+### 2. Entry Type Filtering
 ```python
-def get_user_messages(filepath):
-    for entry in parse_claude_log(filepath):
-        if entry.get('type') == 'user' and 'message' in entry:
-            role = entry['message'].get('role')
-            if role == 'user':
-                yield entry
+def filter_by_type(entries, entry_type):
+    return [e for e in entries if e.get('type') == entry_type]
 ```
 
-### 3. Reconstruct Conversation Thread
+### 3. Chronological Sorting
+```python
+from datetime import datetime
+
+def sort_by_timestamp(entries):
+    return sorted(entries, 
+                  key=lambda x: datetime.fromisoformat(
+                      x['timestamp'].replace('Z', '+00:00')))
+```
+
+### 4. Session Reconstruction
 ```python
 def build_conversation_tree(entries):
     tree = {}
     for entry in entries:
-        uuid = entry.get('uuid')
         parent = entry.get('parentUuid')
-        
-        if uuid:
-            tree[uuid] = {
-                'entry': entry,
-                'children': []
-            }
-            
-        if parent and parent in tree:
-            tree[parent]['children'].append(uuid)
-    
+        uuid = entry.get('uuid')
+        if parent:
+            tree.setdefault(parent, []).append(entry)
     return tree
 ```
 
-### 4. Extract Tool Usage
-```python
-def extract_tool_usage(entries):
-    tools = []
-    for entry in entries:
-        if entry.get('type') == 'assistant':
-            content = entry.get('message', {}).get('content', [])
-            for item in content:
-                if item.get('type') == 'tool_use':
-                    tools.append({
-                        'tool': item.get('name'),
-                        'input': item.get('input'),
-                        'timestamp': entry.get('timestamp')
-                    })
-    return tools
-```
+## Error Handling Recommendations
 
-## Edge Cases and Error Handling
+### 1. Malformed JSON
+- Use try/except around json.loads()
+- Log or skip bad lines rather than crashing
+- Consider partial line buffering for incomplete writes
 
-### 1. Interrupted Tool Executions
-```json
-{
-  "type": "tool_result",
-  "content": "[Request interrupted by user for tool use]\nCommand aborted before execution",
-  "is_error": true
-}
-```
+### 2. Missing Fields
+- Use .get() method with defaults
+- Validate required fields before processing
+- Handle null/None values gracefully
 
-### 2. Empty or Null Fields
-- `gitBranch` often empty string
-- `parentUuid` null for first message
-- `stop_reason` and `stop_sequence` often null
+### 3. Large Files
+- Use streaming/iterative parsing
+- Implement file position tracking for resume capability
+- Consider memory limits with large sessions
 
-### 3. Large Content Fields
-- File contents in Read tool results can be very large
-- May include system reminders and warnings
-- Content may be truncated with ellipsis notation
-
-### 4. Multi-part Messages
-Assistant messages may contain multiple content blocks:
-```json
-"content": [
-  {"type": "text", "text": "Let me check that..."},
-  {"type": "tool_use", "name": "Read", "input": {...}},
-  {"type": "text", "text": "Based on the file..."}
-]
-```
+### 4. Concurrent Access
+- Handle file locks appropriately
+- Implement retry logic for temporary access issues
+- Use file modification time to detect changes
 
 ## Performance Considerations
 
-1. **File Sizes**: Log files can grow very large (>1MB)
-2. **Memory Usage**: Avoid loading entire files into memory
-3. **Parsing Speed**: Use streaming JSON parsing for large files
-4. **Index Building**: Consider building indices for frequently accessed data
+### 1. File Discovery
+- Cache directory listings
+- Use file modification times to skip unchanged files
+- Implement efficient glob patterns
 
-## Security Notes
+### 2. Real-time Monitoring
+- Use inotify/kqueue for file change detection
+- Implement tail-like behavior with seek()
+- Buffer reads for efficiency
 
-- Logs may contain sensitive file paths and content
-- Tool inputs/outputs may include credentials or API keys
-- Consider sanitizing logs before sharing or archiving
-- File paths in project directories are already sanitized
+### 3. Memory Management
+- Process entries in streams, not bulk loads
+- Implement sliding window for recent entries
+- Clear processed data regularly
 
-## Version Compatibility
+## Sample Log Entries
 
-Current version observed: `1.0.100`
-- Version field appears consistent across entries
-- Future versions may introduce schema changes
-- Consider version checking when parsing logs
+### Typical Conversation Flow
+```jsonl
+{"type":"system","content":"SessionStart...","timestamp":"2025-09-07T08:28:02.124Z",...}
+{"type":"user","message":{"content":"<session-start-hook>..."},...}
+{"type":"user","message":{"content":"Create a Python script"},...}
+{"type":"assistant","message":{"content":[{"type":"text","text":"I'll help you..."}]},...}
+{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Write",...}]},...}
+{"type":"user","toolUseResult":[{"type":"text","text":"File created"}],...}
+```
 
-## Best Practices
+## Implementation Notes
 
-1. **Always use streaming parsing** for production code
-2. **Handle malformed JSON lines** gracefully
-3. **Validate UUID formats** when building relationships
-4. **Cache parsed data** for repeated analysis
-5. **Implement retry logic** for incomplete logs
-6. **Use timestamp indices** for time-based queries
-7. **Sanitize sensitive data** before external storage
+1. **File Rotation**: New session = new file
+2. **Active Detection**: Check file modification time < 2 minutes
+3. **Swarm Identification**: Multiple files in same directory modified simultaneously
+4. **Color Coding**: Use last 8 chars of UUID for agent identification
+5. **Truncation**: Consider message length limits for display

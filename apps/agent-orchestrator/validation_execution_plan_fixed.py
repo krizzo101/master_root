@@ -68,7 +68,7 @@ class ValidationExecutionPlan:
         agents.append(
             EnhancedAgentTask(
                 task_id="agent_01_basic_orchestration",
-                task_type="test-remediation-specialist",
+                task_type="qa-testing-guru",
                 prompt="""
             BASIC ORCHESTRATION VALIDATION AGENT
 
@@ -118,7 +118,7 @@ class ValidationExecutionPlan:
         agents.append(
             EnhancedAgentTask(
                 task_id="agent_02_error_handling",
-                task_type="test-remediation-specialist",
+                task_type="qa-testing-guru",
                 prompt="""
             ERROR HANDLING & RECOVERY VALIDATION AGENT
 
@@ -168,7 +168,7 @@ class ValidationExecutionPlan:
         agents.append(
             EnhancedAgentTask(
                 task_id="agent_03_dependency_management",
-                task_type="test-remediation-specialist",
+                task_type="qa-testing-guru",
                 prompt="""
             DEPENDENCY MANAGEMENT VALIDATION AGENT
 
@@ -218,7 +218,7 @@ class ValidationExecutionPlan:
         agents.append(
             EnhancedAgentTask(
                 task_id="agent_04_resource_management",
-                task_type="test-remediation-specialist",
+                task_type="qa-testing-guru",
                 prompt="""
             RESOURCE MANAGEMENT VALIDATION AGENT
 
@@ -268,7 +268,7 @@ class ValidationExecutionPlan:
         agents.append(
             EnhancedAgentTask(
                 task_id="agent_05_configuration_management",
-                task_type="test-remediation-specialist",
+                task_type="qa-testing-guru",
                 prompt="""
             CONFIGURATION MANAGEMENT VALIDATION AGENT
 
@@ -327,7 +327,7 @@ class ValidationExecutionPlan:
         agents.append(
             EnhancedAgentTask(
                 task_id="agent_06_uuid_tracking",
-                task_type="test-remediation-specialist",
+                task_type="qa-testing-guru",
                 prompt="""
             UUID TRACKING & IDENTIFICATION VALIDATION AGENT
 
@@ -377,7 +377,7 @@ class ValidationExecutionPlan:
         agents.append(
             EnhancedAgentTask(
                 task_id="agent_07_background_execution",
-                task_type="test-remediation-specialist",
+                task_type="qa-testing-guru",
                 prompt="""
             BACKGROUND EXECUTION VALIDATION AGENT
 
@@ -428,7 +428,7 @@ class ValidationExecutionPlan:
         agents.append(
             EnhancedAgentTask(
                 task_id="agent_08_enhanced_metrics",
-                task_type="test-remediation-specialist",
+                task_type="qa-testing-guru",
                 prompt="""
             ENHANCED METRICS COLLECTION VALIDATION AGENT
 
@@ -478,7 +478,7 @@ class ValidationExecutionPlan:
         agents.append(
             EnhancedAgentTask(
                 task_id="agent_09_feature_integration",
-                task_type="test-remediation-specialist",
+                task_type="qa-testing-guru",
                 prompt="""
             FEATURE INTEGRATION & MODULE LOADING VALIDATION AGENT
 
@@ -537,7 +537,7 @@ class ValidationExecutionPlan:
         agents.append(
             EnhancedAgentTask(
                 task_id="agent_10_team_formation",
-                task_type="test-remediation-specialist",
+                task_type="qa-testing-guru",
                 prompt="""
             TEAM FORMATION & COORDINATION VALIDATION AGENT
 
@@ -589,7 +589,7 @@ class ValidationExecutionPlan:
         agents.append(
             EnhancedAgentTask(
                 task_id="agent_11_message_bus",
-                task_type="test-remediation-specialist",
+                task_type="qa-testing-guru",
                 prompt="""
             MESSAGE BUS & COMMUNICATION VALIDATION AGENT
 
@@ -641,7 +641,7 @@ class ValidationExecutionPlan:
         agents.append(
             EnhancedAgentTask(
                 task_id="agent_12_execution_modes",
-                task_type="test-remediation-specialist",
+                task_type="qa-testing-guru",
                 prompt="""
             EXECUTION MODES & WORKSPACE VALIDATION AGENT
 
@@ -703,7 +703,7 @@ class ValidationExecutionPlan:
         agents.append(
             EnhancedAgentTask(
                 task_id="agent_13_infrastructure_integration",
-                task_type="test-remediation-specialist",
+                task_type="qa-testing-guru",
                 prompt="""
             INFRASTRUCTURE INTEGRATION VALIDATION AGENT
 
@@ -753,7 +753,7 @@ class ValidationExecutionPlan:
         agents.append(
             EnhancedAgentTask(
                 task_id="agent_14_performance_benchmark",
-                task_type="test-remediation-specialist",
+                task_type="qa-testing-guru",
                 prompt="""
             PERFORMANCE BENCHMARK & LOAD TESTING AGENT
 

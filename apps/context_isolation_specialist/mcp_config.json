@@ -1,0 +1,69 @@
+{
+  "mcpServers": {
+    "firecrawl": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "env": {
+        "FIRECRAWL_API_KEY": "fc-a9cc6620c7b24c9c90bd010c73deb51f",
+        "AGENT_TASK_ID": "context_isolation_specialist",
+        "AGENT_WORK_DIR": "/home/opsvi/master_root/apps/context_isolation_specialist",
+        "AGENT_TASK_TYPE": "development-specialist"
+      }
+    },
+    "time": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "time-mcp"
+      ],
+      "env": {
+        "AGENT_TASK_ID": "context_isolation_specialist",
+        "AGENT_WORK_DIR": "/home/opsvi/master_root/apps/context_isolation_specialist",
+        "AGENT_TASK_TYPE": "development-specialist"
+      }
+    },
+    "shell_exec": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mkusaka/mcp-shell-server",
+        "-w",
+        "/home/opsvi/master_root"
+      ],
+      "env": {
+        "SHELL": "/bin/bash",
+        "AGENT_TASK_ID": "context_isolation_specialist",
+        "AGENT_WORK_DIR": "/home/opsvi/master_root/apps/context_isolation_specialist",
+        "AGENT_TASK_TYPE": "development-specialist"
+      }
+    },
+    "mcp_web_search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "brave-search-mcp"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "BSAqv6fii19i_ZRARk67Gs5udOHgxSN",
+        "AGENT_TASK_ID": "context_isolation_specialist",
+        "AGENT_WORK_DIR": "/home/opsvi/master_root/apps/context_isolation_specialist",
+        "AGENT_TASK_TYPE": "development-specialist"
+      }
+    },
+    "research_papers": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "-m",
+        "arxiv_mcp_server"
+      ],
+      "env": {
+        "AGENT_TASK_ID": "context_isolation_specialist",
+        "AGENT_WORK_DIR": "/home/opsvi/master_root/apps/context_isolation_specialist",
+        "AGENT_TASK_TYPE": "development-specialist"
+      }
+    }
+  }
+}

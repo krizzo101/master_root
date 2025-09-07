@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "shell_exec": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mkusaka/mcp-shell-server",
+        "-w",
+        "/home/opsvi/master_root"
+      ],
+      "env": {
+        "SHELL": "/bin/bash",
+        "AGENT_TASK_ID": "generic_orchestrator_docs",
+        "AGENT_WORK_DIR": "/home/opsvi/master_root/apps/agent-orchestrator/docs_audit_results/agent_workspaces/generic_orchestrator_analysis",
+        "AGENT_UUID": "c7c09bb1-9d14-4c06-be2b-35ff944d9d3e",
+        "AGENT_TEAM_ID": "orchestrator-validation"
+      }
+    }
+  },
+  "metadata": {
+    "created": "2025-09-07T04:23:06.360495",
+    "sources": [
+      "/home/opsvi/master_root/.mcp.json",
+      "/home/opsvi/master_root/.mcp.json.backup.2025-09-07-00-24-14"
+    ],
+    "total_servers": 17,
+    "duplicates_found": 0,
+    "merge_strategy": "primary_precedence"
+  }
+}

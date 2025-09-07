@@ -9,7 +9,7 @@ A real-time log monitoring tool for Claude Code session logs with swarm detectio
 - Streams new log entries as they appear (like `tail -f`)
 - Handles dynamic file creation and deletion
 
-🐝 **Swarm Detection & Visualization**  
+🐝 **Swarm Detection & Visualization**
 - Automatically detects agent swarms (multiple agents in same project)
 - Visual grouping with emoji indicators (🐝🐜🦋🐞🦗🕷️🦂🐛)
 - Color coordination while maintaining individual agent colors
@@ -77,7 +77,7 @@ The tailer produces beautifully formatted output like:
 
 ```
 🚀 Multi-Agent Log Tailer Started
-📁 Projects: /home/opsvi/.claude/projects  
+📁 Projects: /home/opsvi/.claude/projects
 🔍 Pattern: *agent-orchestrator*
 📊 Found 12 active agents
 
@@ -89,7 +89,7 @@ The tailer produces beautifully formatted output like:
 ================================================================================
 
 🐝 14:23:15 [a1b2c3d4] 👤 Create a new user authentication system
-🐝 14:23:16 [e5f6g7h8] 🤖 I'll help you create the authentication system 🔧 Write, Edit  
+🐝 14:23:16 [e5f6g7h8] 🤖 I'll help you create the authentication system 🔧 Write, Edit
 🐜 14:23:17 [i9j0k1l2] 👤 Generate comprehensive tests for the auth module
 🐝 14:23:20 [a1b2c3d4] ⚡ File created successfully: auth/models.py
    14:23:21 [m3n4o5p6] 🤖 Starting independent analysis of codebase structure
@@ -118,7 +118,7 @@ options:
 2. Finds `*.jsonl` files that are non-empty and recently modified (24h)
 3. Monitors file creation/deletion dynamically
 
-### Swarm Detection  
+### Swarm Detection
 1. Groups agents by project directory
 2. Checks if multiple agents were created within 5-minute windows
 3. Assigns unique emoji icons to each swarm
@@ -159,7 +159,7 @@ python3 my_workflow.py &
 Use alongside existing monitoring tools:
 
 ```bash
-# Terminal 1: Start orchestrator workflow  
+# Terminal 1: Start orchestrator workflow
 python3 workflow.py
 
 # Terminal 2: Real-time swarm monitoring
@@ -196,7 +196,7 @@ Supports Claude Code session log format:
 ```json
 {
   "sessionId": "uuid-string",
-  "timestamp": "2025-09-07T01:15:26.640Z", 
+  "timestamp": "2025-09-07T01:15:26.640Z",
   "role": "user|assistant|tool",
   "content": "message content",
   "tool_calls": [...],
@@ -223,7 +223,7 @@ Supports Claude Code session log format:
 ### Scenario 1: Monitor Agent Orchestrator Development
 
 ```bash
-# Monitor orchestrator projects specifically  
+# Monitor orchestrator projects specifically
 ./swarm_log_tailer.py --pattern "*agent-orchestrator*"
 ```
 
@@ -252,7 +252,7 @@ Filters to specific project agents only.
 The tailer is designed for easy extension:
 
 - **Add new formatters**: Extend `format_log_entry()` method
-- **Custom swarm detection**: Modify `detect_swarms()` algorithm  
+- **Custom swarm detection**: Modify `detect_swarms()` algorithm
 - **Additional visualizations**: Extend color/icon systems
 - **Output formats**: Add JSON/CSV output modes
 
