@@ -1,0 +1,25 @@
+{
+  "task_id": "simple_task_5",
+  "name": "Simple Success Task 5",
+  "description": "A straightforward task designed to succeed without any issues",
+  "status": "pending",
+  "type": "simple_success",
+  "priority": 5,
+  "execution": {
+    "command": "echo 'Task 5 executed successfully!'",
+    "expected_result": "success",
+    "timeout": 10
+  },
+  "validation": {
+    "success_criteria": [
+      "Command executes without errors",
+      "Output contains success message"
+    ],
+    "failure_conditions": []
+  },
+  "metadata": {
+    "created_at": "2025-01-07T00:00:00Z",
+    "category": "simple_task_execution",
+    "test_type": "positive_test"
+  }
+}
