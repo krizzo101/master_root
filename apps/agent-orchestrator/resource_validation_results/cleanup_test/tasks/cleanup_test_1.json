@@ -1,0 +1,39 @@
+{
+  "task_id": "cleanup_test_1",
+  "task_type": "test",
+  "prompt": "Simple success task 1",
+  "context": {},
+  "dependencies": [],
+  "status": "completed",
+  "result": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 24395,
+    "duration_api_ms": 28104,
+    "num_turns": 13,
+    "result": "I found a simple task 1 definition. It asks to generate 3 random words and create a short sentence using them. Let me execute this task:\n\n**Words:** mountain, whisper, crystal\n\n**Sentence:** The mountain's whisper echoed through the crystal cave.\n\nTask 1 completed successfully.",
+    "session_id": "ba5f868a-abf6-45f4-bcbb-fc2e9cdea7c0",
+    "total_cost_usd": 0.38490555,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 796,
+      "cache_read_input_tokens": 24587,
+      "output_tokens": 71,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 796
+      }
+    },
+    "permission_denials": [],
+    "uuid": "076eff34-7b21-4923-992b-1fb315f1c06c"
+  },
+  "error": null,
+  "start_time": 1757210642.828885,
+  "end_time": 1757210670.865255,
+  "quality_gates": []
+}

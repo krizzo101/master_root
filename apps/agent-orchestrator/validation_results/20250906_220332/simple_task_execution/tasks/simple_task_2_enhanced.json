@@ -1,0 +1,54 @@
+{
+  "task_id": "simple_task_2",
+  "task_type": "test",
+  "prompt": "Execute simple task 2",
+  "context": {
+    "test": true,
+    "index": 2
+  },
+  "dependencies": [],
+  "status": "completed",
+  "result": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 30573,
+    "duration_api_ms": 27980,
+    "num_turns": 12,
+    "result": "Now, what is \"simple task 2\" that you'd like me to execute? Please provide the specific task details.",
+    "session_id": "dc935b76-e38f-4626-ab84-d1d40f863064",
+    "total_cost_usd": 0.4184695,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 1054,
+      "cache_read_input_tokens": 26224,
+      "output_tokens": 28,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 1054
+      }
+    },
+    "permission_denials": [],
+    "uuid": "6d4c828e-02f4-47a4-9a5b-3ced0455197c"
+  },
+  "error": null,
+  "start_time": 1757210612.457898,
+  "end_time": 1757210645.88842,
+  "quality_gates": {},
+  "team_id": null,
+  "assigned_agents": [],
+  "collaboration_mode": null,
+  "validation_required": false,
+  "gate_results": {},
+  "retries": 0,
+  "last_error": null,
+  "health_status": "healthy",
+  "phase": null,
+  "execution_mode": "parallel",
+  "priority": 0,
+  "metrics": {}
+}

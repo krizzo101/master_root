@@ -1,0 +1,15 @@
+{
+  "task_id": "normal_task",
+  "task_type": "test",
+  "prompt": "Simple test task that should complete",
+  "context": {
+    "test": "normal"
+  },
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "Expecting value: line 1 column 1 (char 0)",
+  "start_time": 1757210631.937319,
+  "end_time": 1757210662.030521,
+  "quality_gates": []
+}
