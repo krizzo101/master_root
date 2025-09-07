@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-09-06T22:07:36.323166",
+  "uuid": "5459612d-87aa-48da-af24-11055e631f52",
+  "hostname": "OPSVISION-CMD-N-CTRL",
+  "platform": {
+    "system": "Linux",
+    "node": "OPSVISION-CMD-N-CTRL",
+    "release": "6.6.87.2-microsoft-standard-WSL2",
+    "version": "#1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025",
+    "machine": "x86_64",
+    "processor": "x86_64"
+  },
+  "python_version": "3.12.9",
+  "architecture": [
+    "64bit",
+    "ELF"
+  ],
+  "cpu_count": 16,
+  "current_directory": "/home/opsvi/master_root/apps/agent-orchestrator",
+  "user": "opsvi",
+  "home_directory": "/home/opsvi",
+  "os_details": {
+    "sysname": "Linux",
+    "nodename": "OPSVISION-CMD-N-CTRL",
+    "release": "6.6.87.2-microsoft-standard-WSL2",
+    "version": "#1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025",
+    "machine": "x86_64"
+  }
+}
