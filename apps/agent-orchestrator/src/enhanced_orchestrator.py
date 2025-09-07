@@ -354,7 +354,7 @@ class EnhancedOrchestrator(GenericOrchestrator):
             self.monitoring_metrics["uuid_assignments"] += 1
 
         # Build enhanced command with UUID as session ID for predictable log files
-        session_id = task.agent_uuid if task.monitoring_enabled else str(uuid.uuid4())
+        session_id = str(uuid.uuid4())  # Always use valid UUID for session ID
 
         # Build enhanced prompt with metadata
         prompt = await self._build_enhanced_prompt(task)

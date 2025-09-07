@@ -1,0 +1,42 @@
+# Include documentation
+include README.md
+include LICENSE
+include CHANGELOG.md
+
+# Include configuration files
+recursive-include config *.yaml *.json *.ini
+exclude config/.env*
+
+# Include static files
+recursive-include src/static *
+recursive-include src/templates *
+
+# Include test files
+recursive-include tests *.py *.yaml *.json
+include pytest.ini
+include .coveragerc
+
+# Include requirements
+include requirements*.txt
+
+# Include Docker files
+include Dockerfile
+include docker-compose.yml
+exclude .dockerignore
+
+# Include CI/CD
+recursive-include .github *.yml *.yaml
+
+# Exclude development files
+exclude .gitignore
+exclude .editorconfig
+exclude Makefile
+exclude tox.ini
+prune .git
+prune .github
+prune docs/_build
+prune __pycache__
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.swp
+global-exclude .DS_Store

@@ -748,6 +748,59 @@ class MockEnformionClient:
             },
         }
 
+    def person_search(self, **kwargs) -> Dict[str, Any]:
+        self.total_requests += 1
+        self.total_credits_used += 1
+        return {
+            "results": [
+                {
+                    "first_name": kwargs.get("first_name", "John"),
+                    "last_name": kwargs.get("last_name", "Smith"),
+                    "age": 35,
+                    "addresses": [{"city": "Charlotte", "state": "NC", "zip": "28202"}],
+                    "phones": ["9103925349"],
+                    "emails": ["john.smith@email.com"],
+                    "confidence_score": 0.9,
+                }
+            ],
+            "_sleuth_metadata": {
+                "search_params": kwargs,
+                "lookup_timestamp": datetime.now().isoformat(),
+                "credit_cost": 1,
+            },
+        }
+
+    def business_search(self, **kwargs) -> Dict[str, Any]:
+        self.total_requests += 1
+        self.total_credits_used += 2
+        return {
+            "results": [
+                {
+                    "business_name": kwargs.get("business_name", "Example Corp"),
+                    "address": "123 Main St",
+                    "city": "Charlotte",
+                    "state": "NC",
+                    "phone": "7045551234",
+                    "industry": "Technology",
+                    "principals": [{"name": "Jane Doe", "title": "CEO"}],
+                    "confidence_score": 0.88,
+                }
+            ],
+            "_sleuth_metadata": {
+                "search_params": kwargs,
+                "lookup_timestamp": datetime.now().isoformat(),
+                "credit_cost": 2,
+            },
+        }
+
+    def health_check(self) -> Dict[str, Any]:
+        return {
+            "status": "healthy",
+            "api_connectivity": "mocked",
+            "total_requests": self.total_requests,
+            "check_timestamp": datetime.now().isoformat(),
+        }
+
     def bulk_search(self, search_requests: List[Dict], **kwargs) -> Dict[str, Any]:
         return {
             "job_id": f"bulk_{int(time.time())}",

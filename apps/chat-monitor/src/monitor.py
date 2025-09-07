@@ -244,13 +244,26 @@ class EnhancedChatMonitor:
         except Exception as e:
             self.logger.error(f"Entry processing error: {e}")
 
-    async def _handle_collaboration_event(self, session: AgentSession, event: dict):
+    async def _handle_collaboration_event(self, session: AgentSession, event):
         """Handle detected collaboration event."""
-        session.collaboration_events.append(event)
+        # Convert CollaborationEvent object to dict if needed
+        if hasattr(event, 'event_type'):
+            event_dict = {
+                'type': event.event_type,
+                'timestamp': event.timestamp,
+                'partner_session_id': event.partner_session,
+                'significance': event.significance,
+                'details': event.details,
+                'evidence': event.evidence
+            }
+        else:
+            event_dict = event
+
+        session.collaboration_events.append(event_dict)
 
         # Track communication partners
-        if event.get("type") == "agent_communication":
-            partner_id = event.get("partner_session_id")
+        if event_dict.get("type") == "agent_communication":
+            partner_id = event_dict.get("partner_session_id")
             if partner_id:
                 session.communication_partners.add(partner_id)
 
@@ -261,10 +274,10 @@ class EnhancedChatMonitor:
                     )
 
         # Log significant collaboration events
-        if event.get("significance", 0) >= self.settings.collaboration_log_threshold:
+        if event_dict.get("significance", 0) >= self.settings.collaboration_log_threshold:
             self.logger.info(
-                f"Collaboration event: {event['type']} between {session.session_id} "
-                f"and {event.get('partner_session_id', 'unknown')}"
+                f"Collaboration event: {event_dict['type']} between {session.session_id} "
+                f"and {event_dict.get('partner_session_id', 'unknown')}"
             )
 
     async def _track_tool_usage(self, session: AgentSession, entry: dict):

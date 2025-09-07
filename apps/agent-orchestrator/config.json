@@ -1,0 +1,6 @@
+{
+    "database": "postgresql://localhost/testdb",
+    "timeout": 60,
+    "debug": true
+    "max_retries": 3
+}

@@ -1,0 +1,253 @@
+{
+  "investigation": {
+    "query": {
+      "phone": "9103925349"
+    },
+    "results": {
+      "phone_intelligence": {
+        "phone_number": "9103925349",
+        "line_type": "mobile",
+        "carrier": "Verizon Wireless",
+        "location": {
+          "city": "Charlotte",
+          "state": "NC"
+        },
+        "associated_name": "John Smith",
+        "confidence_score": 0.85,
+        "_sleuth_metadata": {
+          "query_phone": "9103925349",
+          "lookup_timestamp": "2025-09-06T18:37:50.589706",
+          "credit_cost": 1
+        }
+      },
+      "address_intelligence": {
+        "address": "Unknown St",
+        "residents": [
+          {
+            "name": "John Smith",
+            "residency_type": "owner",
+            "move_in_date": "2020-01-15"
+          }
+        ],
+        "property_details": {
+          "type": "single_family",
+          "bedrooms": 3,
+          "bathrooms": 2,
+          "year_built": 2005
+        },
+        "_sleuth_metadata": {
+          "search_address": "Unknown St",
+          "lookup_timestamp": "2025-09-06T18:37:50.589745",
+          "credit_cost": 1
+        }
+      },
+      "person_intelligence": {
+        "results": [
+          {
+            "first_name": "John",
+            "last_name": "Smith",
+            "age": 35,
+            "addresses": [
+              {
+                "city": "Charlotte",
+                "state": "NC",
+                "zip": "28202"
+              }
+            ],
+            "phones": [
+              "9103925349"
+            ],
+            "emails": [
+              "john.smith@email.com"
+            ],
+            "confidence_score": 0.9
+          }
+        ],
+        "_sleuth_metadata": {
+          "search_params": {
+            "first_name": "John",
+            "last_name": "Smith",
+            "phone": "9103925349",
+            "include_relatives": true,
+            "include_associates": true,
+            "confidence_threshold": 0.7
+          },
+          "lookup_timestamp": "2025-09-06T18:37:50.589759",
+          "credit_cost": 1
+        }
+      },
+      "email_intelligence": [
+        {
+          "email_address": "john.smith@email.com",
+          "is_deliverable": true,
+          "domain": "email.com",
+          "domain_type": "corporate",
+          "associated_name": "John Smith",
+          "social_profiles": [],
+          "_sleuth_metadata": {
+            "search_email": "john.smith@email.com",
+            "lookup_timestamp": "2025-09-06T18:37:50.589772",
+            "credit_cost": 1
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "investigation_id": "inv_1757198270",
+      "start_time": 1757198270.5897021,
+      "end_time": 1757198270.5897865,
+      "duration_seconds": 8.440017700195312e-05
+    },
+    "summary": {
+      "total_data_points": 3,
+      "confidence_scores": [
+        0.85
+      ],
+      "key_findings": [
+        "Phone associated with: John Smith",
+        "Address has 1 residents",
+        "Found 1 person matches"
+      ],
+      "average_confidence": 0.85
+    }
+  },
+  "bulk_processing": {
+    "job_id": "bulk_1757198270",
+    "status": "completed",
+    "total_requests": 4,
+    "results": [
+      {
+        "phone": "9103925349",
+        "status": "completed",
+        "data": {
+          "phone_number": "9103925349",
+          "line_type": "mobile",
+          "carrier": "Carrier 1",
+          "associated_name": "Person 1",
+          "confidence_score": 0.8
+        }
+      },
+      {
+        "phone": "7045551234",
+        "status": "completed",
+        "data": {
+          "phone_number": "7045551234",
+          "line_type": "landline",
+          "carrier": "Carrier 2",
+          "associated_name": "Person 2",
+          "confidence_score": 0.9
+        }
+      },
+      {
+        "phone": "6785559876",
+        "status": "completed",
+        "data": {
+          "phone_number": "6785559876",
+          "line_type": "mobile",
+          "carrier": "Carrier 3",
+          "associated_name": "Person 3",
+          "confidence_score": 1.0
+        }
+      },
+      {
+        "phone": "9194567890",
+        "status": "completed",
+        "data": {
+          "phone_number": "9194567890",
+          "line_type": "landline",
+          "carrier": "Carrier 1",
+          "associated_name": "Person 4",
+          "confidence_score": 0.8
+        }
+      }
+    ],
+    "bulk_metadata": {
+      "total_requests": 4,
+      "estimated_credits": 4,
+      "submission_timestamp": "2025-09-06T18:37:50.589805"
+    }
+  },
+  "business_intelligence": {
+    "business_intelligence": {
+      "results": [
+        {
+          "business_name": "Example Corporation",
+          "address": "123 Main St",
+          "city": "Charlotte",
+          "state": "NC",
+          "phone": "7045551234",
+          "industry": "Technology",
+          "principals": [
+            {
+              "name": "Jane Doe",
+              "title": "CEO"
+            }
+          ],
+          "confidence_score": 0.88
+        }
+      ],
+      "_sleuth_metadata": {
+        "search_params": {
+          "business_name": "Example Corporation",
+          "city": "Charlotte",
+          "state": "NC",
+          "include_principals": true,
+          "include_competitors": true,
+          "include_financial": true
+        },
+        "lookup_timestamp": "2025-09-06T18:37:50.589826",
+        "credit_cost": 2
+      }
+    },
+    "principal_investigations": [
+      {
+        "principal_name": "Jane Doe",
+        "principal_role": "CEO",
+        "investigation_results": {
+          "results": [
+            {
+              "first_name": "Jane",
+              "last_name": "Doe",
+              "age": 35,
+              "addresses": [
+                {
+                  "city": "Charlotte",
+                  "state": "NC",
+                  "zip": "28202"
+                }
+              ],
+              "phones": [
+                "9103925349"
+              ],
+              "emails": [
+                "john.smith@email.com"
+              ],
+              "confidence_score": 0.9
+            }
+          ],
+          "_sleuth_metadata": {
+            "search_params": {
+              "first_name": "Jane",
+              "last_name": "Doe",
+              "include_associates": true,
+              "confidence_threshold": 0.8
+            },
+            "lookup_timestamp": "2025-09-06T18:37:50.589836",
+            "credit_cost": 1
+          }
+        }
+      }
+    ]
+  },
+  "performance_monitoring": {
+    "health": {
+      "status": "healthy",
+      "api_connectivity": "mocked",
+      "total_requests": 6,
+      "check_timestamp": "2025-09-06T18:37:50.589844"
+    }
+  },
+  "cost_prediction": {
+    "error": "Cost prediction not supported"
+  }
+}

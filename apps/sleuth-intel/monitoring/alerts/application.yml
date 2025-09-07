@@ -1,0 +1,107 @@
+groups:
+  - name: sleuth-intel-application
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5.."}[5m])) by (job)
+            /
+            sum(rate(http_requests_total[5m])) by (job)
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "High error rate on {{ $labels.job }}"
+          description: "Error rate is {{ $value | humanizePercentage }} for job {{ $labels.job }}"
+
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (job, le)
+          ) > 1
+        for: 10m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High latency on {{ $labels.job }}"
+          description: "95th percentile latency is {{ $value }}s for job {{ $labels.job }}"
+
+      - alert: PodCrashLooping
+        expr: |
+          rate(kube_pod_container_status_restarts_total[15m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is crash looping"
+          description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has restarted {{ $value }} times in the last 15 minutes"
+
+      - alert: HighMemoryUsage
+        expr: |
+          (
+            container_memory_usage_bytes{pod=~"sleuth-intel-.*"}
+            /
+            container_spec_memory_limit_bytes{pod=~"sleuth-intel-.*"}
+          ) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High memory usage for pod {{ $labels.pod }}"
+          description: "Pod {{ $labels.pod }} is using {{ $value | humanizePercentage }} of its memory limit"
+
+      - alert: HighCPUUsage
+        expr: |
+          (
+            rate(container_cpu_usage_seconds_total{pod=~"sleuth-intel-.*"}[5m])
+            /
+            container_spec_cpu_quota{pod=~"sleuth-intel-.*"}
+            *
+            container_spec_cpu_period{pod=~"sleuth-intel-.*"}
+          ) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High CPU usage for pod {{ $labels.pod }}"
+          description: "Pod {{ $labels.pod }} is using {{ $value | humanizePercentage }} of its CPU limit"
+
+      - alert: DatabaseConnectionPoolExhausted
+        expr: |
+          database_connection_pool_available{job="sleuth-intel"} < 2
+        for: 5m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "Only {{ $value }} database connections available in the pool"
+
+      - alert: RedisConnectionFailure
+        expr: |
+          up{job="redis"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Redis connection failure"
+          description: "Unable to connect to Redis for more than 2 minutes"
+
+      - alert: APIRateLimitExceeded
+        expr: |
+          sum(rate(api_rate_limit_exceeded_total[5m])) by (endpoint) > 10
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "API rate limit exceeded for endpoint {{ $labels.endpoint }}"
+          description: "Rate limit exceeded {{ $value }} times per second for endpoint {{ $labels.endpoint }}"
