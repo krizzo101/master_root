@@ -183,8 +183,15 @@ class EnhancedChatMonitor:
             # Track new session files
             if session_id not in self.session_log_paths:
                 self.session_log_paths[session_id] = jsonl_file
-                self.last_file_positions[jsonl_file] = 0
-                self.logger.info(f"Discovered new session: {session_id}")
+                
+                # Start from end of existing files, 0 for new files
+                if jsonl_file.exists():
+                    file_size = jsonl_file.stat().st_size
+                    self.last_file_positions[jsonl_file] = file_size  # Skip existing content
+                    self.logger.info(f"Discovered existing session: {session_id} (skipping {file_size} bytes of history)")
+                else:
+                    self.last_file_positions[jsonl_file] = 0
+                    self.logger.info(f"Discovered new session: {session_id}")
 
                 # Initialize session tracking
                 if session_id not in self.active_sessions:
@@ -463,8 +470,9 @@ class EnhancedChatMonitor:
         """Perform cleanup on shutdown."""
         self.logger.info("Shutting down Enhanced Chat Monitor...")
 
-        # Close dashboard
+        # Close dashboard and swarm intelligence
         await self.dashboard.cleanup()
+        await self.swarm_intelligence.shutdown()
 
         # Save final analysis data if configured
         if self.settings.save_on_exit:

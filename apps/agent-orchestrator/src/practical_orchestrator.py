@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 # Import reliable base orchestrator
-from generic_orchestrator import (
+from src.generic_orchestrator import (
     AgentTask,
     DependencyManager,
     GenericOrchestrator,

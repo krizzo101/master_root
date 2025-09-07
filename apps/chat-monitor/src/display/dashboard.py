@@ -95,7 +95,9 @@ class Dashboard:
             return
 
         current_time = time.time()
-        if current_time - self.last_update < (1.0 / self.settings.refresh_rate_hz):
+        # Prevent division by zero
+        refresh_rate = max(self.settings.refresh_rate_hz, 0.1)  # Minimum 0.1 Hz
+        if current_time - self.last_update < (1.0 / refresh_rate):
             return  # Skip update if too frequent
 
         try:
