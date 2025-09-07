@@ -1,0 +1,39 @@
+{
+  "task_id": "cleanup_test_5",
+  "task_type": "test",
+  "prompt": "Simple success task 5",
+  "context": {},
+  "dependencies": [],
+  "status": "completed",
+  "result": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 34268,
+    "duration_api_ms": 35576,
+    "num_turns": 16,
+    "result": "The simple task 5 file has been created successfully at `validation_results/20250906_220332/simple_task_execution/tasks/simple_task_5.json`.",
+    "session_id": "46a4ed0f-154a-494e-8f2b-ad8fcc748fdf",
+    "total_cost_usd": 0.5042275,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 435,
+      "cache_read_input_tokens": 25471,
+      "output_tokens": 43,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 435
+      }
+    },
+    "permission_denials": [],
+    "uuid": "b7b4abe6-ff82-4115-b9ad-0c63455c404e"
+  },
+  "error": null,
+  "start_time": 1757210695.924868,
+  "end_time": 1757210733.322257,
+  "quality_gates": []
+}
