@@ -46,7 +46,9 @@ class AgentTask:
         # Include error details only if present
         if self.raw_output and len(self.raw_output) > 1000:
             # Truncate very long raw output for serialization
-            result["raw_output"] = self.raw_output[:500] + "..." + self.raw_output[-500:]
+            result["raw_output"] = (
+                self.raw_output[:500] + "..." + self.raw_output[-500:]
+            )
         return result
 
 
@@ -117,7 +119,7 @@ class TokenPool:
 
     def size(self) -> int:
         return len(self.tokens)
-    
+
     @property
     def available(self) -> int:
         """Get number of available tokens (not in use)"""
@@ -581,7 +583,7 @@ class GenericOrchestrator:
                 process = await asyncio.create_subprocess_exec(
                     *cmd,
                     env=env,
-                    cwd=str(agent_work_dir) if self.enable_dynamic_configs else None,
+                    cwd=str(agent_work_dir),  # Always provide working directory
                     stdout=asyncio.subprocess.PIPE,
                     stderr=stderr_target,
                 )
@@ -598,7 +600,9 @@ class GenericOrchestrator:
                                 agent_work_dir / "logs" / f"agent_{task.task_id}.log"
                             ) as f:
                                 stderr_content = f.read()
-                                stderr = stderr_content.encode() if stderr_content else None
+                                stderr = (
+                                    stderr_content.encode() if stderr_content else None
+                                )
                         except Exception as e:
                             logger.warning(f"Failed to read stderr from log file: {e}")
                             stderr = None
@@ -615,7 +619,9 @@ class GenericOrchestrator:
                             task.status = "completed"
                             await self.dep_manager.mark_completed(task.task_id)
                             self.metrics["completed"] += 1
-                            logger.info(f"✓ {task.task_id} completed in {duration:.2f}s")
+                            logger.info(
+                                f"✓ {task.task_id} completed in {duration:.2f}s"
+                            )
                         except json.JSONDecodeError as e:
                             # Capture JSON parsing error with context
                             stdout_str = stdout.decode()
@@ -624,12 +630,16 @@ class GenericOrchestrator:
                                 preview = stdout_str[:250] + "..." + stdout_str[-250:]
                             else:
                                 preview = stdout_str
-                            
+
                             # Build comprehensive error message
                             error_parts = [
                                 error_msg,
-                                f"Output preview: {preview[:200]}" if preview else "No output to preview",
-                                f"Task: {task.task_id}"
+                                (
+                                    f"Output preview: {preview[:200]}"
+                                    if preview
+                                    else "No output to preview"
+                                ),
+                                f"Task: {task.task_id}",
                             ]
                             task.error = " | ".join(error_parts)
                             task.status = "failed"
@@ -638,11 +648,13 @@ class GenericOrchestrator:
                                 "type": "JSONDecodeError",
                                 "message": error_msg,
                                 "output_preview": preview,
-                                "task_id": task.task_id
+                                "task_id": task.task_id,
                             }
                             await self.dep_manager.mark_failed(task.task_id)
                             self.metrics["failed"] += 1
-                            logger.error(f"✗ {task.task_id} JSON parsing failed: {error_msg}")
+                            logger.error(
+                                f"✗ {task.task_id} JSON parsing failed: {error_msg}"
+                            )
                     else:
                         # No stdout despite successful return code
                         task.status = "failed"
@@ -654,7 +666,7 @@ class GenericOrchestrator:
                     task.status = "failed"
                     # Build comprehensive error from available information
                     error_parts = []
-                    
+
                     # Process stderr
                     if stderr:
                         try:
@@ -663,11 +675,17 @@ class GenericOrchestrator:
                                 # Look for specific error patterns
                                 if "Error:" in stderr_str:
                                     # Extract the main error message
-                                    error_lines = [line for line in stderr_str.split('\n') if 'Error:' in line]
+                                    error_lines = [
+                                        line
+                                        for line in stderr_str.split("\n")
+                                        if "Error:" in line
+                                    ]
                                     if error_lines:
                                         error_parts.append(error_lines[0].strip())
                                     else:
-                                        error_parts.append(f"Stderr: {stderr_str[:500]}")
+                                        error_parts.append(
+                                            f"Stderr: {stderr_str[:500]}"
+                                        )
                                 else:
                                     error_parts.append(f"Stderr: {stderr_str[:500]}")
                             else:
@@ -676,13 +694,17 @@ class GenericOrchestrator:
                             error_parts.append(f"Failed to decode stderr: {str(e)}")
                     else:
                         error_parts.append("No stderr captured")
-                    
+
                     # Process stdout for additional context
                     if stdout:
                         try:
                             stdout_str = stdout.decode().strip()
                             if stdout_str:
-                                preview = stdout_str[:200] if len(stdout_str) > 200 else stdout_str
+                                preview = (
+                                    stdout_str[:200]
+                                    if len(stdout_str) > 200
+                                    else stdout_str
+                                )
                                 error_parts.append(f"Stdout preview: {preview}")
                             else:
                                 error_parts.append("Empty stdout")
@@ -690,23 +712,31 @@ class GenericOrchestrator:
                             error_parts.append(f"Failed to decode stdout: {str(e)}")
                     else:
                         error_parts.append("No stdout captured")
-                    
+
                     # Always include exit code and task info
                     error_parts.append(f"Exit code: {process.returncode}")
                     error_parts.append(f"Task: {task.task_id} (type: {task.task_type})")
-                    
+
                     # Add command info for debugging
-                    if hasattr(task, 'prompt') and task.prompt:
-                        prompt_preview = task.prompt[:100] if len(task.prompt) > 100 else task.prompt
+                    if hasattr(task, "prompt") and task.prompt:
+                        prompt_preview = (
+                            task.prompt[:100] if len(task.prompt) > 100 else task.prompt
+                        )
                         error_parts.append(f"Prompt: {prompt_preview}")
-                    
+
                     # Ensure we always have an error message
                     if not error_parts or all(not part for part in error_parts):
-                        error_parts = [f"Process failed with exit code {process.returncode} but no diagnostic information was captured"]
-                    
-                    task.error = " | ".join(filter(None, error_parts))  # Filter out empty parts
-                    task.raw_output = stdout.decode() if stdout else None  # Preserve for debugging
-                    
+                        error_parts = [
+                            f"Process failed with exit code {process.returncode} but no diagnostic information was captured"
+                        ]
+
+                    task.error = " | ".join(
+                        filter(None, error_parts)
+                    )  # Filter out empty parts
+                    task.raw_output = (
+                        stdout.decode() if stdout else None
+                    )  # Preserve for debugging
+
                     # Store detailed error information
                     task.error_details = {
                         "exit_code": process.returncode,
@@ -714,9 +744,9 @@ class GenericOrchestrator:
                         "stdout_preview": stdout.decode()[:500] if stdout else None,
                         "task_id": task.task_id,
                         "task_type": task.task_type,
-                        "timestamp": datetime.now().isoformat()
+                        "timestamp": datetime.now().isoformat(),
                     }
-                    
+
                     await self.dep_manager.mark_failed(task.task_id)
                     self.metrics["failed"] += 1
 
@@ -726,14 +756,14 @@ class GenericOrchestrator:
 
             except Exception as e:
                 task.status = "failed"
-                
+
                 # Build comprehensive error message
                 error_parts = []
-                
+
                 # Get exception type and message
                 error_type = type(e).__name__
                 error_msg = str(e).strip()
-                
+
                 if error_msg:
                     error_parts.append(f"{error_type}: {error_msg}")
                 else:
@@ -742,8 +772,10 @@ class GenericOrchestrator:
                     if error_repr and error_repr != "":
                         error_parts.append(f"{error_type}: {error_repr}")
                     else:
-                        error_parts.append(f"{error_type} occurred (no message available)")
-                
+                        error_parts.append(
+                            f"{error_type} occurred (no message available)"
+                        )
+
                 # Add traceback for debugging
                 tb_lines = traceback.format_tb(e.__traceback__)
                 if tb_lines:
@@ -751,26 +783,30 @@ class GenericOrchestrator:
                     relevant_tb = []
                     for line in tb_lines[-3:]:  # Last 3 traceback lines
                         line = line.strip()
-                        if line and 'File' in line:
+                        if line and "File" in line:
                             relevant_tb.append(line)
                     if relevant_tb:
-                        error_parts.append(f"Traceback: {' -> '.join(relevant_tb[-2:])}")
-                
+                        error_parts.append(
+                            f"Traceback: {' -> '.join(relevant_tb[-2:])}"
+                        )
+
                 # Add context about the task
                 error_parts.append(f"Task: {task.task_id} (type: {task.task_type})")
-                
+
                 # Add prompt info if available
-                if hasattr(task, 'prompt') and task.prompt:
-                    prompt_preview = task.prompt[:100] if len(task.prompt) > 100 else task.prompt
+                if hasattr(task, "prompt") and task.prompt:
+                    prompt_preview = (
+                        task.prompt[:100] if len(task.prompt) > 100 else task.prompt
+                    )
                     error_parts.append(f"Prompt: {prompt_preview}")
-                
+
                 # Ensure we have a meaningful error
                 if not error_parts:
-                    error_parts.append(f"Unknown error occurred during task execution")
-                
+                    error_parts.append("Unknown error occurred during task execution")
+
                 # Combine error information
                 task.error = " | ".join(filter(None, error_parts))
-                
+
                 # Store additional debugging info
                 task.error_details = {
                     "type": error_type,
@@ -778,13 +814,17 @@ class GenericOrchestrator:
                     "traceback": tb_lines,
                     "task_id": task.task_id,
                     "task_type": task.task_type,
-                    "prompt": task.prompt[:200] if hasattr(task, 'prompt') and task.prompt else None,
-                    "timestamp": datetime.now().isoformat()
+                    "prompt": (
+                        task.prompt[:200]
+                        if hasattr(task, "prompt") and task.prompt
+                        else None
+                    ),
+                    "timestamp": datetime.now().isoformat(),
                 }
-                
+
                 await self.dep_manager.mark_failed(task.task_id)
                 self.metrics["failed"] += 1
-                
+
                 logger.error(f"✗ {task.task_id} exception: {task.error}")
 
         finally:
@@ -844,16 +884,16 @@ class GenericOrchestrator:
                 if isinstance(result, Exception):
                     # Task failed with exception - create failure result
                     failed_task = ready_tasks[i]
-                    
+
                     # Build comprehensive error information
                     error_type = type(result).__name__
                     error_msg = str(result).strip()
-                    
+
                     if error_msg:
                         error_text = f"{error_type}: {error_msg}"
                     else:
                         error_text = f"{error_type} occurred during task execution"
-                    
+
                     # Mark task as failed
                     failed_task.status = "failed"
                     failed_task.error = error_text
@@ -862,22 +902,26 @@ class GenericOrchestrator:
                         "message": error_msg or "No message",
                         "task_id": failed_task.task_id,
                         "task_type": failed_task.task_type,
-                        "timestamp": datetime.now().isoformat()
+                        "timestamp": datetime.now().isoformat(),
                     }
-                    
+
                     # Mark in dependency manager
                     await self.dep_manager.mark_failed(failed_task.task_id)
                     self.metrics["failed"] += 1
-                    
+
                     # Save task state to file
-                    task_file = self.output_dir / "tasks" / f"{failed_task.task_id}.json"
+                    task_file = (
+                        self.output_dir / "tasks" / f"{failed_task.task_id}.json"
+                    )
                     task_file.parent.mkdir(exist_ok=True)
                     task_file.write_text(json.dumps(failed_task.to_dict(), indent=2))
-                    
+
                     # Add failed task result to results
                     results.append(failed_task.to_dict())
-                    
-                    logger.error(f"Batch execution error for {failed_task.task_id}: {error_text}")
+
+                    logger.error(
+                        f"Batch execution error for {failed_task.task_id}: {error_text}"
+                    )
                 else:
                     results.append(result)
 

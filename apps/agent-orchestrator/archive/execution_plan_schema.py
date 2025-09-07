@@ -2,6 +2,7 @@
 ExecutionPlan Schema Definition
 Comprehensive data classes and enums for the ExecutionPlan system
 """
+
 import json
 from dataclasses import dataclass, field
 from enum import Enum
@@ -50,7 +51,7 @@ class TaskType(Enum):
 
     # Specialized generators
     PROMPT_GENERATOR = "prompt-generator"
-    TEST_REMEDIATION_SPECIALIST = "test-remediation-specialist"
+    QA_TESTING_GURU = "qa-testing-guru"
 
 
 class ValidationLevel(Enum):
@@ -417,7 +418,7 @@ class ExecutionPlan:
         """Calculate execution order based on dependencies"""
         # Topological sort to determine execution batches
         task_deps = {task.task_id: set(task.dependencies) for task in self.tasks}
-        all_tasks = set(task_deps.keys())
+        # all_tasks = set(task_deps.keys())  # Unused variable removed
         execution_batches = []
 
         while task_deps:
@@ -477,9 +478,11 @@ class ExecutionPlan:
             "tasks": [task.to_dict() for task in self.tasks],
             "quality_gates": [gate.to_dict() for gate in self.quality_gates],
             "phases": [phase.to_dict() for phase in self.phases],
-            "resource_requirements": self.resource_requirements.to_dict()
-            if self.resource_requirements
-            else None,
+            "resource_requirements": (
+                self.resource_requirements.to_dict()
+                if self.resource_requirements
+                else None
+            ),
             "output_directory": self.output_directory,
             "estimated_total_duration_minutes": self.estimate_total_duration(),
             "fallback_strategy": self.fallback_strategy,
