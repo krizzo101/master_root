@@ -1,0 +1,28 @@
+{
+  "task_id": "user_guides_validation",
+  "task_type": "technical-writer",
+  "prompt": "\n            USER GUIDES VALIDATION AUDIT\n            \n            Comprehensive validation of user guides and tutorials.\n            \n            Your mission:\n            1. Identify all user guides and tutorials\n            2. Test example code and usage instructions\n            3. Validate step-by-step procedures\n            4. Check for broken links and references\n            5. Assess guide completeness and user experience\n            \n            Focus areas:\n            - docs/guides/ directory\n            - USAGE_GUIDE.md and similar files\n            - Tutorial content\n            - Getting started documentation\n            \n            Output a user guides validation report with:\n            - Working vs broken examples\n            - Incomplete or unclear instructions\n            - Missing prerequisite information\n            - User experience assessment\n            - Guide improvement recommendations\n            ",
+  "context": {},
+  "dependencies": [
+    "docs_content_categorization"
+  ],
+  "status": "failed",
+  "result": null,
+  "error": "Process failed with no stderr output",
+  "start_time": 1757241552.24012,
+  "end_time": 1757241596.949668,
+  "quality_gates": [],
+  "raw_output": null,
+  "error_details": null,
+  "validation_required": true,
+  "phase_id": null,
+  "agent_uuid": "ca86401c-cd92-4215-bd74-31ccd88deeca",
+  "team_id": "specialized-content",
+  "monitoring_enabled": true,
+  "background_execution": false,
+  "mcp_needs": [
+    "shell_exec"
+  ],
+  "work_dir_name": "user_guides_validation",
+  "debug_mode": false
+}

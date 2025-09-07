@@ -1,0 +1,13 @@
+{
+  "task_id": "cleanup_test_8",
+  "task_type": "test",
+  "prompt": "Simple success task 8",
+  "context": {},
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "",
+  "start_time": 1757210695.928482,
+  "end_time": 1757211130.728664,
+  "quality_gates": []
+}

@@ -1,0 +1,43 @@
+{
+  "task_id": "invalid_json_task",
+  "task_type": "test",
+  "prompt": "Return plain text instead of JSON",
+  "context": {
+    "test": "invalid_json"
+  },
+  "dependencies": [],
+  "status": "completed",
+  "result": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 33099,
+    "duration_api_ms": 36793,
+    "num_turns": 15,
+    "result": "The agent orchestrator project appears to be a comprehensive multi-agent system for orchestrating Claude agents in parallel. The codebase includes:\n\n1. **Core Orchestrator** (`src/generic_orchestrator.py`) - Framework for parallel agent execution with token pool management\n2. **Swarm Log Tailer** (`swarm_log_tailer.py`) - Real-time monitoring tool for multi-agent logs with swarm detection\n3. **CLI Interface** (`cli_interface.py`) - Command-line interface for the orchestrator\n4. **Various test files** - Comprehensive test coverage for different components\n\nThe project is actively being developed with recent work on swarm detection, monitoring patterns, and terminal visualization.\n\nWhat specific aspect would you like to work on? Some possibilities:\n- Running and testing the swarm log tailer\n- Reviewing the orchestrator architecture\n- Running tests to validate the system\n- Implementing new features or fixes\n- Documentation improvements",
+    "session_id": "bd6574e9-2262-46c0-bbfe-a4b6f4e86f99",
+    "total_cost_usd": 0.57529745,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 453,
+      "cache_read_input_tokens": 32490,
+      "output_tokens": 212,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 453
+      }
+    },
+    "permission_denials": [],
+    "uuid": "5e290e6a-67d3-4b89-bde7-e0537d3a5b76"
+  },
+  "error": null,
+  "start_time": 1757240331.407848,
+  "end_time": 1757240370.427931,
+  "quality_gates": [],
+  "raw_output": null,
+  "error_details": null
+}

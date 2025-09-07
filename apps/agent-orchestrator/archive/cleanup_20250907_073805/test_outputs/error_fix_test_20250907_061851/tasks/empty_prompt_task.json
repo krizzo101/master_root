@@ -1,0 +1,17 @@
+{
+  "task_id": "empty_prompt_task",
+  "task_type": "test",
+  "prompt": "",
+  "context": {
+    "test": "empty_prompt"
+  },
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "Stderr: Error: Input must be provided either through stdin or as a prompt argument when using --print | Exit code: 1 | Task: empty_prompt_task",
+  "start_time": 1757240331.406124,
+  "end_time": 1757240337.58677,
+  "quality_gates": [],
+  "raw_output": null,
+  "error_details": null
+}

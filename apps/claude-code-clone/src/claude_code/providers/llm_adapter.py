@@ -1,0 +1,291 @@
+"""LLM adapter for Claude Code Clone.
+
+Provides a unified interface to the opsvi-llm library for Claude Code-like functionality.
+"""
+
+import logging
+from typing import Any, Dict, List, Optional, AsyncGenerator, Union
+from pathlib import Path
+
+from opsvi_llm import (
+    OpenAIProvider,
+    OpenAIConfig,
+    ChatRequest,
+    ChatResponse,
+    Message,
+    LLMProviderError,
+)
+
+# Import optional providers
+try:
+    from opsvi_llm import AnthropicProvider, AnthropicConfig
+except ImportError:
+    AnthropicProvider = None
+    AnthropicConfig = None
+
+try:
+    from opsvi_llm import PerplexityProvider, PerplexityConfig
+except ImportError:
+    PerplexityProvider = None
+    PerplexityConfig = None
+from opsvi_foundation import BaseComponent, ComponentError
+
+from ..config import ClaudeCodeConfig
+
+logger = logging.getLogger(__name__)
+
+
+class LLMAdapterError(ComponentError):
+    """Error in LLM adapter operations."""
+
+    pass
+
+
+class LLMAdapter(BaseComponent):
+    """Adapter for LLM providers in Claude Code Clone."""
+
+    def __init__(self, config: ClaudeCodeConfig):
+        """Initialize the LLM adapter."""
+        super().__init__(name="LLMAdapter")
+        self.config = config
+        self._provider = None
+        self._setup_provider()
+
+    async def _initialize_impl(self) -> None:
+        """Initialize the LLM adapter."""
+        logger.info("LLM adapter initialized")
+
+    async def _shutdown_impl(self) -> None:
+        """Shutdown the LLM adapter."""
+        await self.close()
+        logger.info("LLM adapter shutdown")
+
+    async def _health_check_impl(self) -> bool:
+        """Check if the LLM adapter is healthy."""
+        try:
+            return self._provider is not None
+        except Exception as e:
+            logger.error(f"LLM adapter health check failed: {e}")
+            return False
+
+    def _setup_provider(self) -> None:
+        """Setup the LLM provider based on configuration."""
+        try:
+            if self.config.provider.lower() == "openai":
+                provider_config = OpenAIConfig(
+                    provider_name="openai",
+                    api_key=self.config.api_key,
+                    organization=self.config.organization,
+                    default_model=self.config.model,
+                    max_tokens=self.config.max_tokens,
+                    timeout=self.config.timeout,
+                )
+                self._provider = OpenAIProvider(provider_config)
+
+            elif self.config.provider.lower() == "anthropic":
+                if AnthropicProvider is None or AnthropicConfig is None:
+                    raise LLMAdapterError(
+                        "Anthropic provider not available. Install anthropic package."
+                    )
+                provider_config = AnthropicConfig(
+                    provider_name="anthropic",
+                    api_key=self.config.api_key,
+                    default_model=self.config.model,
+                    max_tokens=self.config.max_tokens,
+                    timeout=self.config.timeout,
+                )
+                self._provider = AnthropicProvider(provider_config)
+
+            elif self.config.provider.lower() == "perplexity":
+                if PerplexityProvider is None or PerplexityConfig is None:
+                    raise LLMAdapterError(
+                        "Perplexity provider not available. Install perplexity package."
+                    )
+                provider_config = PerplexityConfig(
+                    provider_name="perplexity",
+                    api_key=self.config.api_key,
+                    default_model=self.config.model,
+                    max_tokens=self.config.max_tokens,
+                    timeout=self.config.timeout,
+                )
+                self._provider = PerplexityProvider(provider_config)
+
+            else:
+                raise LLMAdapterError(f"Unsupported provider: {self.config.provider}")
+
+            logger.info(
+                f"Initialized {self.config.provider} provider with model {self.config.model}"
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to setup provider: {e}")
+            raise LLMAdapterError(f"Provider setup failed: {e}") from e
+
+    async def chat_completion(
+        self, messages: List[Message], stream: bool = False, **kwargs: Any
+    ) -> Union[ChatResponse, AsyncGenerator[ChatResponse, None]]:
+        """Perform chat completion."""
+        try:
+            request = ChatRequest(messages=messages, stream=stream, **kwargs)
+
+            if stream:
+                return await self._provider.chat_completion_stream(request)
+            else:
+                return await self._provider.chat_completion(request)
+
+        except LLMProviderError as e:
+            logger.error(f"LLM provider error: {e}")
+            raise LLMAdapterError(f"Chat completion failed: {e}") from e
+        except Exception as e:
+            logger.error(f"Unexpected error in chat completion: {e}")
+            raise LLMAdapterError(f"Chat completion failed: {e}") from e
+
+    async def analyze_code(
+        self,
+        code: str,
+        language: str = "python",
+        analysis_type: str = "general",
+        context: Optional[str] = None,
+    ) -> str:
+        """Analyze code using the LLM provider."""
+        system_prompt = self._build_analysis_prompt(language, analysis_type, context)
+
+        messages = [
+            Message(role="system", content=system_prompt),
+            Message(role="user", content=f"Analyze this {language} code:\n\n{code}"),
+        ]
+
+        response = await self.chat_completion(messages)
+        return response.choices[0].message.content
+
+    async def generate_code(
+        self,
+        prompt: str,
+        language: str = "python",
+        context: Optional[str] = None,
+        existing_code: Optional[str] = None,
+    ) -> str:
+        """Generate code using the LLM provider."""
+        system_prompt = self._build_generation_prompt(language, context, existing_code)
+
+        messages = [
+            Message(role="system", content=system_prompt),
+            Message(role="user", content=prompt),
+        ]
+
+        response = await self.chat_completion(messages)
+        return response.choices[0].message.content
+
+    async def refactor_code(
+        self,
+        code: str,
+        refactor_type: str = "improve",
+        language: str = "python",
+        context: Optional[str] = None,
+    ) -> str:
+        """Refactor code using the LLM provider."""
+        system_prompt = self._build_refactor_prompt(language, refactor_type, context)
+
+        messages = [
+            Message(role="system", content=system_prompt),
+            Message(
+                role="user",
+                content=f"Refactor this {language} code ({refactor_type}):\n\n{code}",
+            ),
+        ]
+
+        response = await self.chat_completion(messages)
+        return response.choices[0].message.content
+
+    def _build_analysis_prompt(
+        self, language: str, analysis_type: str, context: Optional[str]
+    ) -> str:
+        """Build system prompt for code analysis."""
+        base_prompt = f"""You are an expert {language} code analyzer. Analyze the provided code and provide detailed feedback.
+
+Analysis type: {analysis_type}
+"""
+
+        if context:
+            base_prompt += f"\nContext: {context}\n"
+
+        if analysis_type == "security":
+            base_prompt += "\nFocus on security vulnerabilities, potential exploits, and security best practices."
+        elif analysis_type == "performance":
+            base_prompt += "\nFocus on performance bottlenecks, optimization opportunities, and efficiency improvements."
+        elif analysis_type == "style":
+            base_prompt += "\nFocus on code style, readability, maintainability, and best practices."
+        elif analysis_type == "bugs":
+            base_prompt += "\nFocus on potential bugs, edge cases, error handling, and logical issues."
+        else:
+            base_prompt += (
+                "\nProvide comprehensive analysis covering all aspects of the code."
+            )
+
+        base_prompt += "\n\nProvide clear, actionable feedback with specific examples and suggestions."
+
+        return base_prompt
+
+    def _build_generation_prompt(
+        self, language: str, context: Optional[str], existing_code: Optional[str]
+    ) -> str:
+        """Build system prompt for code generation."""
+        base_prompt = f"""You are an expert {language} developer. Generate high-quality, production-ready code.
+
+Language: {language}
+"""
+
+        if context:
+            base_prompt += f"\nContext: {context}\n"
+
+        if existing_code:
+            base_prompt += f"\nExisting code to extend/modify:\n{existing_code}\n"
+
+        base_prompt += """
+Requirements:
+- Write clean, readable, and maintainable code
+- Follow best practices and conventions
+- Include proper error handling
+- Add appropriate comments and documentation
+- Ensure the code is production-ready
+"""
+
+        return base_prompt
+
+    def _build_refactor_prompt(
+        self, language: str, refactor_type: str, context: Optional[str]
+    ) -> str:
+        """Build system prompt for code refactoring."""
+        base_prompt = f"""You are an expert {language} developer. Refactor the provided code to improve it.
+
+Language: {language}
+Refactor type: {refactor_type}
+"""
+
+        if context:
+            base_prompt += f"\nContext: {context}\n"
+
+        if refactor_type == "improve":
+            base_prompt += "\nImprove the code by making it more readable, maintainable, and efficient."
+        elif refactor_type == "optimize":
+            base_prompt += (
+                "\nOptimize the code for better performance and resource usage."
+            )
+        elif refactor_type == "modernize":
+            base_prompt += "\nModernize the code using current best practices and language features."
+        elif refactor_type == "simplify":
+            base_prompt += "\nSimplify the code while maintaining functionality."
+        else:
+            base_prompt += f"\nRefactor the code according to: {refactor_type}"
+
+        base_prompt += (
+            "\n\nProvide the refactored code with explanations of the changes made."
+        )
+
+        return base_prompt
+
+    async def close(self) -> None:
+        """Close the LLM adapter and cleanup resources."""
+        if self._provider and hasattr(self._provider, "close"):
+            await self._provider.close()
+        logger.info("LLM adapter closed")

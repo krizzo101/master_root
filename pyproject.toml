@@ -46,10 +46,16 @@ members = [
     "apps/project-intel",
     "apps/accf",
     "apps/genfilemap",
+    "apps/claude-code-clone",
 ]
 exclude = [
     "libs/contexts",
     "libs/gatekeeper",
+    "libs/ARCHIVED",
+    "libs/opsvi-docker",
+    "libs/opsvi-interfaces",
+    "libs/opsvi-meta",
+    "libs/opsvi-master",
     "platform/*",
     "tools/*",
     "scripts/*",

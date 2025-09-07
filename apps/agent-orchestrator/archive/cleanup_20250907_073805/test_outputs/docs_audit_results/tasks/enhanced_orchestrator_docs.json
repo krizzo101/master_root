@@ -1,0 +1,28 @@
+{
+  "task_id": "enhanced_orchestrator_docs",
+  "task_type": "code-analyzer",
+  "prompt": "\n            ENHANCED ORCHESTRATOR DOCUMENTATION ANALYSIS\n            \n            Analyze documentation specific to the Enhanced Orchestrator implementation.\n            \n            Your mission:\n            1. Identify all docs that reference the Enhanced Orchestrator\n            2. Cross-reference with actual Enhanced Orchestrator source code  \n            3. Validate quality gates, monitoring, and background execution docs\n            4. Find usage examples and verify they work with current code\n            5. Assess completeness of Enhanced Orchestrator documentation\n            \n            Source to validate against: /home/opsvi/master_root/apps/agent-orchestrator/src/enhanced_orchestrator.py\n            \n            Output a validation report with:\n            - Docs specifically about Enhanced Orchestrator\n            - Feature documentation accuracy (quality gates, monitoring, etc.)\n            - Missing documentation areas\n            - Code-to-docs alignment status\n            - Recommended updates needed\n            ",
+  "context": {},
+  "dependencies": [
+    "docs_structure_inventory"
+  ],
+  "status": "failed",
+  "result": null,
+  "error": "Process failed with no stderr output",
+  "start_time": 1757241552.233036,
+  "end_time": 1757241595.251958,
+  "quality_gates": [],
+  "raw_output": null,
+  "error_details": null,
+  "validation_required": true,
+  "phase_id": null,
+  "agent_uuid": "25d8b697-1990-4ac3-9ab3-f9eee427000b",
+  "team_id": "orchestrator-validation",
+  "monitoring_enabled": true,
+  "background_execution": false,
+  "mcp_needs": [
+    "shell_exec"
+  ],
+  "work_dir_name": "enhanced_orchestrator_analysis",
+  "debug_mode": false
+}

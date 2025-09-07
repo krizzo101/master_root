@@ -1,0 +1,19 @@
+{
+  "task_id": "light_2",
+  "task_type": "test",
+  "prompt": "Light task 2",
+  "context": {},
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "",
+  "start_time": 1757211177.94048,
+  "end_time": 1757211181.133362,
+  "quality_gates": [],
+  "validation_required": true,
+  "phase_id": null,
+  "agent_uuid": "f1248023-673f-4378-8d66-1abca405f54d",
+  "team_id": null,
+  "monitoring_enabled": false,
+  "background_execution": false
+}

@@ -1,0 +1,109 @@
+{
+  "metrics": {
+    "total": 3,
+    "completed": 0,
+    "failed": 1,
+    "total_duration": 3.6770739555358887,
+    "start_time": "2025-09-06T22:10:24.196277",
+    "end_time": "2025-09-06T22:10:28.376432"
+  },
+  "results": [
+    {
+      "task_id": "task_A",
+      "task_type": "dependency_test",
+      "prompt": "Task A (no dependencies)",
+      "context": {},
+      "dependencies": [],
+      "status": "failed",
+      "result": null,
+      "error": "",
+      "start_time": 1757211024.197226,
+      "end_time": 1757211027.8743,
+      "quality_gates": {},
+      "team_id": null,
+      "assigned_agents": [],
+      "collaboration_mode": null,
+      "validation_required": false,
+      "gate_results": {},
+      "retries": 0,
+      "last_error": null,
+      "health_status": "healthy",
+      "phase": null,
+      "execution_mode": "parallel",
+      "priority": 0,
+      "metrics": {}
+    },
+    {
+      "task_id": "task_B",
+      "task_type": "dependency_test",
+      "prompt": "Task B (depends on A)",
+      "context": {},
+      "dependencies": [
+        "task_A"
+      ],
+      "status": "failed",
+      "result": null,
+      "error": "Dependencies not met",
+      "start_time": null,
+      "end_time": null,
+      "quality_gates": {},
+      "team_id": null,
+      "assigned_agents": [],
+      "collaboration_mode": null,
+      "validation_required": false,
+      "gate_results": {},
+      "retries": 0,
+      "last_error": null,
+      "health_status": "healthy",
+      "phase": null,
+      "execution_mode": "parallel",
+      "priority": 0,
+      "metrics": {}
+    },
+    {
+      "task_id": "task_C",
+      "task_type": "dependency_test",
+      "prompt": "Task C (depends on B)",
+      "context": {},
+      "dependencies": [
+        "task_B"
+      ],
+      "status": "failed",
+      "result": null,
+      "error": "Dependencies not met",
+      "start_time": null,
+      "end_time": null,
+      "quality_gates": {},
+      "team_id": null,
+      "assigned_agents": [],
+      "collaboration_mode": null,
+      "validation_required": false,
+      "gate_results": {},
+      "retries": 0,
+      "last_error": null,
+      "health_status": "healthy",
+      "phase": null,
+      "execution_mode": "parallel",
+      "priority": 0,
+      "metrics": {}
+    }
+  ],
+  "enhanced_metrics": {
+    "tasks_by_type": {
+      "dependency_test": 1
+    },
+    "tasks_by_status": {
+      "failed": 1
+    },
+    "average_duration_by_type": {
+      "dependency_test": [
+        3.6770739555358887
+      ]
+    },
+    "team_performance": {},
+    "quality_gate_results": {},
+    "recovery_attempts": 0,
+    "checkpoint_saves": 0
+  },
+  "module_status": {}
+}

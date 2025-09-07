@@ -1,0 +1,27 @@
+{
+  "task_id": "parallel_task_4",
+  "task_type": "parallel_test",
+  "prompt": "Parallel task 4",
+  "context": {
+    "delay": 0.1
+  },
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "",
+  "start_time": 1757211014.250316,
+  "end_time": 1757211023.676483,
+  "quality_gates": {},
+  "team_id": null,
+  "assigned_agents": [],
+  "collaboration_mode": null,
+  "validation_required": false,
+  "gate_results": {},
+  "retries": 0,
+  "last_error": null,
+  "health_status": "healthy",
+  "phase": null,
+  "execution_mode": "parallel",
+  "priority": 0,
+  "metrics": {}
+}

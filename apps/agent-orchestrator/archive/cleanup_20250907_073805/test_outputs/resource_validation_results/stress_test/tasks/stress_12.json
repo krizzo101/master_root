@@ -1,0 +1,13 @@
+{
+  "task_id": "stress_12",
+  "task_type": "analysis",
+  "prompt": "Analyze this text and provide a summary: Task 12 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "context": {},
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "",
+  "start_time": 1757211143.465818,
+  "end_time": 1757211148.162615,
+  "quality_gates": []
+}
