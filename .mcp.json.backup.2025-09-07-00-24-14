@@ -1,0 +1,211 @@
+{
+  "mcpServers": {
+    "knowledge": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "-m",
+        "opsvi_mcp.servers.knowledge.server"
+      ],
+      "env": {
+        "PYTHONPATH": "/home/opsvi/master_root/libs:/home/opsvi/master_root/apps",
+        "NEO4J_URI": "bolt://localhost:7687",
+        "NEO4J_USER": "neo4j",
+        "NEO4J_PASSWORD": "password",
+        "EMBEDDING_SERVICE_URL": "http://localhost:8001",
+        "KNOWLEDGE_LOG_LEVEL": "INFO"
+      }
+    },
+    "thinking": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "-m",
+        "opsvi_mcp.servers.thinking"
+      ],
+      "env": {
+        "PYTHONPATH": "/home/opsvi/master_root/libs:/home/opsvi/master_root/apps",
+        "OPENAI_API_KEY": "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",
+        "NEO4J_URI": "bolt://localhost:7687",
+        "NEO4J_USER": "neo4j",
+        "NEO4J_PASSWORD": "password",
+        "TRIAGE_MODE": "full"
+      }
+    },
+    "sounding-board": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "-m",
+        "opsvi_mcp.servers.sounding_board"
+      ],
+      "env": {
+        "PYTHONPATH": "/home/opsvi/master_root/libs:/home/opsvi/master_root/apps",
+        "OPENAI_API_KEY": "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",
+        "NEO4J_URI": "bolt://localhost:7687",
+        "NEO4J_USER": "neo4j",
+        "NEO4J_PASSWORD": "password"
+      }
+    },
+    "thinking-pure": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "-m",
+        "opsvi_mcp.servers.thinking_pure"
+      ],
+      "env": {
+        "PYTHONPATH": "/home/opsvi/master_root/libs"
+      }
+    },
+    "time": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "time-mcp"
+      ]
+    },
+    "shell_exec": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mkusaka/mcp-shell-server",
+        "-w",
+        "/home/opsvi/master_root"
+      ],
+      "env": {
+        "SHELL": "/bin/bash"
+      }
+    },
+    "claude-code-wrapper": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "-m",
+        "opsvi_mcp.servers.claude_code"
+      ],
+      "env": {
+        "PYTHONPATH": "/home/opsvi/master_root/libs",
+        "CLAUDE_CODE_TOKEN": "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",
+        "CLAUDE_MAX_RECURSION_DEPTH": "3",
+        "CLAUDE_MAX_CONCURRENT_AT_DEPTH": "8",
+        "CLAUDE_MAX_TOTAL_JOBS": "30",
+        "CLAUDE_TIMEOUT_SECONDS": "900",
+        "CLAUDE_LOG_LEVEL": "INFO",
+        "CLAUDE_PERF_LOGGING": "true",
+        "CLAUDE_CHILD_LOGGING": "true",
+        "CLAUDE_RECURSION_LOGGING": "true"
+      }
+    },
+    "consult_suite_enhanced": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "-m",
+        "accf.orchestrator.core.mcp_server_main"
+      ],
+      "env": {
+        "OPENAI_API_KEY": "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",
+        "PYTHONPATH": "/home/opsvi/master_root/apps/ACCF/src:/home/opsvi/master_root",
+        "ACCF_PROJECT_ROOT": "/home/opsvi/master_root/apps/ACCF",
+        "ACCF_AGENT_TYPE": "consult",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "CONSULT_ENABLE_ENSEMBLE": "true",
+        "CONSULT_ENABLE_MULTI_CRITIC": "true",
+        "CONSULT_ENABLE_CONTEXT_V2": "true",
+        "CONSULT_ENABLE_TELEMETRY": "true",
+        "CONSULT_DEFAULT_MODEL": "gpt-5-mini",
+        "CONSULT_MAX_CRITIC_ROUNDS": "3",
+        "CONSULT_CRITIC_THRESHOLD": "0.8",
+        "CONSULT_MAX_TOKENS": "8000",
+        "CONSULT_TIMEOUT_SECONDS": "300",
+        "CONSULT_CACHE_TTL": "900",
+        "CONSULT_LOG_LEVEL": "INFO",
+        "CONSULT_STRUCTURED_LOGGING": "true"
+      }
+    },
+    "db": {
+      "command": "uvx",
+      "args": [
+        "mcp-neo4j-cypher",
+        "--db-url",
+        "bolt://localhost:7687",
+        "--user",
+        "neo4j",
+        "--password",
+        "password"
+      ]
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://opsvi:opsvi_secure_password@localhost:5432/unified_context"
+      ]
+    },
+    "project-context": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "-m",
+        "project_context.server.main",
+        "--intel-dir",
+        "/home/opsvi/master_root/.proj-intel"
+      ],
+      "cwd": "/home/opsvi/master_root/apps/project-context",
+      "env": {
+        "PYTHONPATH": "/home/opsvi/master_root/apps/project-context/src:/home/opsvi/master_root/libs:/home/opsvi/master_root/apps",
+        "POSTGRES_URL": "postgresql://opsvi:opsvi_secure_password@localhost:5432/unified_context",
+        "NEO4J_URI": "bolt://localhost:7687",
+        "NEO4J_USER": "neo4j", 
+        "NEO4J_PASSWORD": "password",
+        "REDIS_HOST": "localhost",
+        "REDIS_PORT": "6379",
+        "PROJECT_INTEL_DIR": "/home/opsvi/master_root/.proj-intel"
+      }
+    },
+    "tech_docs": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ]
+    },
+    "mcp_web_search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "brave-search-mcp"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "BSAqv6fii19i_ZRARk67Gs5udOHgxSN"
+      }
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "env": {
+        "FIRECRAWL_API_KEY": "fc-a9cc6620c7b24c9c90bd010c73deb51f"
+      }
+    },
+    "research_papers": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "-m",
+        "arxiv_mcp_server"
+      ]
+    },
+    "gemini-agent": {
+      "command": "/home/opsvi/miniconda/bin/python",
+      "args": [
+        "-m",
+        "opsvi_mcp.servers.gemini_agent"
+      ],
+      "env": {
+        "PYTHONPATH": "/home/opsvi/master_root/libs",
+        "GEMINI_API_KEY": "AIzaSyDcABMDq_BnwtwYDW-xDYwpblaPaHxQFsY",
+        "GEMINI_WORKING_DIR": "/home/opsvi/master_root",
+        "GEMINI_MCP_CONFIG": "/home/opsvi/master_root/gemini-settings.json",
+        "GITHUB_TOKEN": "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",
+        "GEMINI_LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}

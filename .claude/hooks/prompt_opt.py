@@ -18,24 +18,8 @@ try:
 except Exception:
     logger = None  # Fail silently if logger not available
 
-# Use shared central AI interface instead of direct OpenAI
-# Replaced direct OpenAI usage with shared central AI interface (automated migration)
-sys.path.insert(0, "/home/opsvi/master_root/libs/opsvi-llm")
-from opsvi_llm.providers.openai_provider import (  # noqa: E402
-    OpenAIConfig,
-    OpenAIProvider,
-)
-from pydantic import BaseModel, Field  # noqa: E402
-
-# Initialize provider with timeout support
-config = OpenAIConfig(
-    provider_name="openai",
-    api_key=os.getenv("OPENAI_API_KEY"),
-    timeout=float(os.getenv("OPENAI_TIMEOUT_SEC", "25.0")),
-    enable_audit_logging=False,
-    enable_sanitization=False,
-)
-provider = OpenAIProvider(config)
+# Lazy loading - only import when needed
+_provider = None
 
 MODEL = os.getenv(
     "PROMPT_OPT_MODEL", "gpt-5-nano"
@@ -214,29 +198,14 @@ def get_cognitive_guidance(prompt_text):
     return f"{prefix}{selected_base}{suffix}"
 
 
-def get_output_text(resp):
-    # Extract text from Responses API response or structured output
-    # For structured responses from opsvi-llm
-    if isinstance(resp, OptimizedPromptSchema):
-        return resp.model_dump_json()
+def get_provider():
+    """Lazy load OpenAI client to reduce startup time."""
+    global _provider
+    if _provider is None:
+        from openai import OpenAI
 
-    # First try direct attribute
-    if hasattr(resp, "output_text") and resp.output_text:
-        return resp.output_text
-
-    # Try to extract from output structure
-    try:
-        if hasattr(resp, "output") and resp.output:
-            for item in resp.output:
-                if hasattr(item, "content") and item.content:
-                    for content_item in item.content:
-                        if hasattr(content_item, "text"):
-                            return content_item.text
-    except Exception:
-        pass
-
-    # Return empty string if no text found (don't convert whole response to string)
-    return ""
+        _provider = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    return _provider
 
 
 def load_config():
@@ -350,7 +319,7 @@ def main():
             sys.exit(0)
 
         if not should_opt:
-            # Pass through without optimization
+            # Pass through without optimization but still add token conservation guidance
             if logger:
                 logger.log_skip(f"mode_{config.get('mode')}_no_trigger", user_prompt)
             if os.getenv("DEBUG"):
@@ -358,7 +327,16 @@ def main():
                     f"DEBUG: Skipping optimization (mode={config.get('mode')})",
                     file=sys.stderr,
                 )
-            print(json.dumps({"suppressOutput": False}))
+
+            # Add token conservation guidance regardless of optimization
+            token_guidance = "CRITICAL: Conserve tokens when responding - wasting tokens costs money and reduces available context space, forcing early session compaction or restarts. Use minimal words for maximum effect."
+            output = {
+                "hookSpecificOutput": {
+                    "hookEventName": "UserPromptSubmit",
+                    "additionalContext": f"[TOKEN CONSERVATION GUIDANCE]\n{token_guidance}\n\n[USER PROMPT]\n{user_prompt}",
+                }
+            }
+            print(json.dumps(output))
             sys.exit(0)
 
         # Store original prompt for logging
@@ -395,6 +373,8 @@ def main():
             "If the task appears time-sensitive or likely to be outdated relative to {cutoff}, prepend a clear "
             "'RESEARCH BEFORE ACTION' directive that instructs the agent to: (1) perform brief research using available "
             "KB/search tools (and web if enabled), (2) summarize findings, and (3) cite sources or note 'no recent changes found'. "
+            "CRITICAL: Add guidance that the agent must conserve tokens when responding - wasting tokens costs money and "
+            "reduces available context space, forcing early session compaction or restarts. Use minimal words for maximum effect. "
             "Output ONLY the optimized prompt text; no preface."
         ).format(cutoff=KNOWLEDGE_CUTOFF, today=CURRENT_DATE)
 
@@ -421,39 +401,34 @@ def main():
                 file=sys.stderr,
             )
 
-        # Replaced direct OpenAI usage with shared central AI interface
-        # Provider will automatically use correct parameters based on model
-        resp = asyncio.run(
-            provider.responses_create_with_structured_output(
-                input=[
-                    {
-                        "role": "system",
-                        "content": [{"type": "input_text", "text": system}],
-                    },
-                    {"role": "user", "content": [{"type": "input_text", "text": user}]},
-                ],
-                response_model=OptimizedPromptSchema,
-                model=MODEL,
-                max_tokens=MAX_TOK,  # Will be translated to max_output_tokens
-                temperature=TEMP,
-                # Note: seed parameter may not be supported by all models
-            )
+        # Use direct OpenAI call with lazy loading
+        client = get_provider()
+
+        # Use correct parameter name based on model
+        if MODEL.startswith(("gpt-5", "o3", "o4")):
+            max_tokens_param = "max_completion_tokens"
+        else:
+            max_tokens_param = "max_tokens"
+
+        resp = client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            **{max_tokens_param: MAX_TOK},
+            temperature=TEMP,
+            response_format={"type": "json_object"},
         )
 
-        # Response is now a structured object (OptimizedPromptSchema)
-        if isinstance(resp, OptimizedPromptSchema):
-            optimized = resp.optimized_prompt.strip()
-            research_flag = bool(resp.research_required)
-        else:
-            # Fallback for unexpected response format
-            text = get_output_text(resp)
-            try:
-                data = json.loads(text)
-                optimized = data.get("optimized_prompt", "").strip()
-                research_flag = bool(data.get("research_required", False))
-            except Exception:
-                optimized = text.strip()
-                research_flag = False
+        # Parse response
+        try:
+            data = json.loads(resp.choices[0].message.content)
+            optimized = data.get("optimized_prompt", "").strip()
+            research_flag = bool(data.get("research_required", False))
+        except Exception:
+            optimized = resp.choices[0].message.content.strip()
+            research_flag = False
 
         # TODO: temporary print-based debug — replace with proper logger before merge/release
         if os.getenv("DEBUG"):
@@ -510,12 +485,14 @@ def main():
                 cognitive=cognitive_guidance,
             )
 
+        # Show user how their prompt was modified
         print(
             json.dumps(
                 {
                     "hookSpecificOutput": {
                         "hookEventName": "UserPromptSubmit",
                         "additionalContext": injected,
+                        "userVisible": f"🔧 **Prompt Optimized**\n\n**Original:** {original_prompt[:100]}{'...' if len(original_prompt) > 100 else ''}\n\n**Optimized:** {optimized[:200]}{'...' if len(optimized) > 200 else ''}",
                     }
                 }
             )
@@ -527,8 +504,15 @@ def main():
         # TODO: temporary print-based debug — replace with proper logger before merge/release
         if os.getenv("DEBUG"):
             print(f"DEBUG: prompt_opt.py:main() -- exception={e}", file=sys.stderr)
-        # Degrade gracefully: no injection, do not block prompt processing
-        print(json.dumps({"suppressOutput": False}))
+        # Degrade gracefully: add token conservation guidance even on error
+        token_guidance = "CRITICAL: Conserve tokens when responding - wasting tokens costs money and reduces available context space, forcing early session compaction or restarts. Use minimal words for maximum effect."
+        output = {
+            "hookSpecificOutput": {
+                "hookEventName": "UserPromptSubmit",
+                "additionalContext": f"[TOKEN CONSERVATION GUIDANCE]\n{token_guidance}\n\n[USER PROMPT]\n{user_prompt}",
+            }
+        }
+        print(json.dumps(output))
         sys.exit(0)
 
 

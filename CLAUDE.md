@@ -6,29 +6,29 @@
 
 ### MANDATORY STARTUP (EVERY SESSION, NO EXCEPTIONS)
 ```python
-# 1. THINK FIRST
-mcp__thinking__metacognitivethinking(thought="Starting session, loading instructions", thoughtNumber=1, totalThoughts=2, nextThoughtNeeded=True)
-
-# 2. CHECK TIME (to understand how outdated you are)
+# 1. CHECK TIME (to understand how outdated you are)
 mcp__time__current_time("YYYY-MM-DD HH:mm:ss")
+
+# 2. STATE KNOWLEDGE CUTOFF AWARENESS
+# Tell the agent to state:
+# "Today is ____________ (today's date). It has been XXXX days since my knowledge cutoff occurred.
+# That means what I think I know about the latest versions, capabilities, discoveries, best practices,
+# and other time sensitive topics is ________ and I need to _________." (Fill in the blanks)
 
 # 3. LOAD REAL INSTRUCTIONS FROM KB
 mcp__knowledge__knowledge_query(query_type="search", search_text="GLOBAL OPERATIONAL INSTRUCTIONS MASTER", limit=1)
 # ↑ THIS CONTAINS YOUR ACTUAL OPERATIONAL RULES
 
-# 4. UPDATE WORKSPACE INTELLIGENCE
-python3 .claude/knowledge/scripts/env_profiler.py
-
-# 5. CHECK RECENT WORK
+# 4. CHECK RECENT WORK
 mcp__knowledge__knowledge_query(query_type="recent", limit=5)
 
-# 6. UNDERSTAND PROJECT CONTEXT
+# 5. UNDERSTAND PROJECT CONTEXT
 # Read .claude/knowledge/docs/COMPREHENSIVE_PROJECT_CONTEXT.md - WHY you're working on this
 # Read .claude/knowledge/docs/CRITICAL_FILE_ORGANIZATION_SAFEGUARDS.md - FILE RULES (NON-NEGOTIABLE)
 # Read .claude/knowledge/docs/session_reference.md - WHAT works right now
 
-# 7. COMMIT CHECKPOINT
-git status && git add -A && git commit -m "checkpoint: session start"
+# 6. OPTIONAL: Update workspace intelligence (only if needed)
+# python3 .claude/knowledge/scripts/env_profiler.py
 ```
 
 ### IF KB IS UNAVAILABLE (MCP servers still initializing)
