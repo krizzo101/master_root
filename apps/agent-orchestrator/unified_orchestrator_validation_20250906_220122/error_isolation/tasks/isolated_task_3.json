@@ -1,0 +1,13 @@
+{
+  "task_id": "isolated_task_3",
+  "task_type": "test",
+  "prompt": "Third isolated task",
+  "context": {},
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "",
+  "start_time": 1757211024.021705,
+  "end_time": 1757211027.597602,
+  "quality_gates": []
+}

@@ -1,0 +1,13 @@
+{
+  "task_id": "independent",
+  "task_type": "test",
+  "prompt": "Independent task",
+  "context": {},
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "",
+  "start_time": 1757211063.711546,
+  "end_time": 1757211066.376333,
+  "quality_gates": []
+}

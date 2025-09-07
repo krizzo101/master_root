@@ -1,0 +1,13 @@
+{
+  "task_id": "batch_success_2",
+  "task_type": "test",
+  "prompt": "Batch task 2 that should succeed",
+  "context": {},
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "",
+  "start_time": 1757211028.104692,
+  "end_time": 1757211032.952795,
+  "quality_gates": []
+}

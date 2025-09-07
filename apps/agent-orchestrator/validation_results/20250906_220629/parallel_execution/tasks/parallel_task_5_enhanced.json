@@ -1,18 +1,16 @@
 {
-  "task_id": "parallel_task_5_enhanced",
+  "task_id": "parallel_task_5",
   "task_type": "parallel_test",
-  "prompt": "Parallel task 5 with enhanced features",
+  "prompt": "Parallel task 5",
   "context": {
-    "delay": 0.1,
-    "enhanced": true,
-    "features": ["advanced_logging", "retry_logic", "performance_metrics"]
+    "delay": 0.1
   },
   "dependencies": [],
-  "status": "pending",
+  "status": "failed",
   "result": null,
-  "error": null,
-  "start_time": null,
-  "end_time": null,
+  "error": "",
+  "start_time": 1757211014.251535,
+  "end_time": 1757211022.410853,
   "quality_gates": {},
   "team_id": null,
   "assigned_agents": [],

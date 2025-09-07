@@ -1,0 +1,146 @@
+{
+  "tests": {
+    "simple_task_execution": {
+      "passed": true,
+      "duration": 155.85882449150085,
+      "details": {
+        "total_tasks": 3,
+        "completed": 3,
+        "failed": 0
+      }
+    },
+    "parallel_execution": {
+      "passed": true,
+      "duration": 251.33258438110352,
+      "details": {
+        "max_parallel_limit": 2,
+        "max_concurrent_observed": 2,
+        "total_tasks": 6,
+        "completed": 6
+      }
+    },
+    "task_dependencies": {
+      "passed": false,
+      "duration": 3.2887651920318604,
+      "details": {
+        "expected_order": [
+          "task_A",
+          "task_B",
+          "task_C"
+        ],
+        "actual_order": [
+          "task_A"
+        ],
+        "order_correct": false,
+        "completed": 0
+      }
+    },
+    "token_management": {
+      "passed": false,
+      "error": "'TokenPool' object has no attribute 'available'"
+    },
+    "metrics_collection": {
+      "passed": false,
+      "details": {
+        "has_basic_metrics": false,
+        "has_enhanced_metrics": true,
+        "has_type_breakdown": true,
+        "has_status_breakdown": true,
+        "metrics": {
+          "total": 9,
+          "completed": 0,
+          "failed": 9,
+          "total_duration": 53.03429388999939,
+          "start_time": "2025-09-06T22:10:31.734186",
+          "end_time": "2025-09-06T22:10:51.375972"
+        },
+        "enhanced_metrics": {
+          "tasks_by_type": {
+            "validation": 3,
+            "analysis": 3,
+            "generation": 3
+          },
+          "tasks_by_status": {
+            "failed": 9
+          },
+          "average_duration_by_type": {
+            "validation": [
+              4.522764205932617,
+              4.27656888961792,
+              9.014918088912964
+            ],
+            "analysis": [
+              4.684802770614624,
+              3.9447691440582275,
+              9.00250792503357
+            ],
+            "generation": [
+              4.768141031265259,
+              3.93678879737854,
+              8.883033037185669
+            ]
+          },
+          "team_performance": {},
+          "quality_gate_results": {},
+          "recovery_attempts": 0,
+          "checkpoint_saves": 0
+        }
+      }
+    },
+    "output_structure": {
+      "passed": true,
+      "details": {
+        "directories_exist": {
+          "tasks": true,
+          "logs": true,
+          "metrics": true
+        },
+        "has_task_files": true,
+        "has_report_files": true
+      }
+    },
+    "error_handling": {
+      "passed": false,
+      "details": {
+        "attempt_counts": {
+          "error_task_0": 1,
+          "error_task_1": 1,
+          "error_task_2": 1
+        },
+        "recovery_occurred": false,
+        "all_completed": false,
+        "final_metrics": {
+          "total": 3,
+          "completed": 0,
+          "failed": 4,
+          "total_duration": 16.75089406967163,
+          "start_time": "2025-09-06T22:11:16.895386",
+          "end_time": "2025-09-06T22:11:34.855437"
+        }
+      }
+    },
+    "mixed_execution": {
+      "passed": false,
+      "details": {
+        "parallel_tasks_completed": true,
+        "sequential_tasks_completed": false,
+        "total_completed": 0,
+        "task_count": 3
+      }
+    }
+  },
+  "metrics": {},
+  "errors": [
+    "token_management: 'TokenPool' object has no attribute 'available'"
+  ],
+  "summary": {
+    "total_tests": 8,
+    "passed": 3,
+    "failed": 5,
+    "success_rate": "37.5%",
+    "functionality_score": 4,
+    "total_duration": 508.333692,
+    "errors_count": 1,
+    "timestamp": "2025-09-06T22:12:00.786351"
+  }
+}

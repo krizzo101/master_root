@@ -1,0 +1,163 @@
+{
+  "metrics": {
+    "total": 5,
+    "completed": 0,
+    "failed": 9,
+    "total_duration": 45.919431924819946,
+    "start_time": "2025-09-06T22:11:34.862727",
+    "end_time": "2025-09-06T22:12:00.784847"
+  },
+  "results": [
+    {
+      "task_id": "parallel_group_0",
+      "task_type": "parallel",
+      "prompt": "Parallel task 0",
+      "context": {},
+      "dependencies": [],
+      "status": "failed",
+      "result": null,
+      "error": "",
+      "start_time": 1757211115.403105,
+      "end_time": 1757211120.282498,
+      "quality_gates": {},
+      "team_id": null,
+      "assigned_agents": [],
+      "collaboration_mode": null,
+      "validation_required": false,
+      "gate_results": {},
+      "retries": 2,
+      "last_error": null,
+      "health_status": "healthy",
+      "phase": null,
+      "execution_mode": "parallel",
+      "priority": 0,
+      "metrics": {}
+    },
+    {
+      "task_id": "parallel_group_1",
+      "task_type": "parallel",
+      "prompt": "Parallel task 1",
+      "context": {},
+      "dependencies": [],
+      "status": "failed",
+      "result": null,
+      "error": "",
+      "start_time": 1757211115.530633,
+      "end_time": 1757211120.278303,
+      "quality_gates": {},
+      "team_id": null,
+      "assigned_agents": [],
+      "collaboration_mode": null,
+      "validation_required": false,
+      "gate_results": {},
+      "retries": 2,
+      "last_error": null,
+      "health_status": "healthy",
+      "phase": null,
+      "execution_mode": "parallel",
+      "priority": 0,
+      "metrics": {}
+    },
+    {
+      "task_id": "parallel_group_2",
+      "task_type": "parallel",
+      "prompt": "Parallel task 2",
+      "context": {},
+      "dependencies": [],
+      "status": "failed",
+      "result": null,
+      "error": "",
+      "start_time": 1757211115.368156,
+      "end_time": 1757211119.978019,
+      "quality_gates": {},
+      "team_id": null,
+      "assigned_agents": [],
+      "collaboration_mode": null,
+      "validation_required": false,
+      "gate_results": {},
+      "retries": 2,
+      "last_error": null,
+      "health_status": "healthy",
+      "phase": null,
+      "execution_mode": "parallel",
+      "priority": 0,
+      "metrics": {}
+    },
+    {
+      "task_id": "sequential_1",
+      "task_type": "sequential",
+      "prompt": "Sequential task 1",
+      "context": {},
+      "dependencies": [
+        "parallel_group_0",
+        "parallel_group_1",
+        "parallel_group_2"
+      ],
+      "status": "failed",
+      "result": null,
+      "error": "Dependencies not met",
+      "start_time": null,
+      "end_time": null,
+      "quality_gates": {},
+      "team_id": null,
+      "assigned_agents": [],
+      "collaboration_mode": null,
+      "validation_required": false,
+      "gate_results": {},
+      "retries": 0,
+      "last_error": null,
+      "health_status": "healthy",
+      "phase": null,
+      "execution_mode": "sequential",
+      "priority": 0,
+      "metrics": {}
+    },
+    {
+      "task_id": "sequential_2",
+      "task_type": "sequential",
+      "prompt": "Sequential task 2",
+      "context": {},
+      "dependencies": [
+        "sequential_1"
+      ],
+      "status": "failed",
+      "result": null,
+      "error": "Dependencies not met",
+      "start_time": null,
+      "end_time": null,
+      "quality_gates": {},
+      "team_id": null,
+      "assigned_agents": [],
+      "collaboration_mode": null,
+      "validation_required": false,
+      "gate_results": {},
+      "retries": 0,
+      "last_error": null,
+      "health_status": "healthy",
+      "phase": null,
+      "execution_mode": "sequential",
+      "priority": 0,
+      "metrics": {}
+    }
+  ],
+  "enhanced_metrics": {
+    "tasks_by_type": {
+      "parallel": 3
+    },
+    "tasks_by_status": {
+      "failed": 3
+    },
+    "average_duration_by_type": {
+      "parallel": [
+        4.609863042831421,
+        4.74766993522644,
+        4.879392862319946
+      ]
+    },
+    "team_performance": {},
+    "quality_gate_results": {},
+    "recovery_attempts": 6,
+    "checkpoint_saves": 0
+  },
+  "module_status": {}
+}

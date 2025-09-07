@@ -1,0 +1,13 @@
+{
+  "task_id": "stress_success_7",
+  "task_type": "test",
+  "prompt": "Stress test task 7",
+  "context": {},
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "",
+  "start_time": 1757211043.494178,
+  "end_time": 1757211053.531867,
+  "quality_gates": []
+}

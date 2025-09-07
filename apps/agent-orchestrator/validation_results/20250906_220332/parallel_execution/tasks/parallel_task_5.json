@@ -1,0 +1,53 @@
+{
+  "task_id": "parallel_task_5",
+  "task_type": "parallel_test",
+  "prompt": "Parallel task 5",
+  "context": {
+    "delay": 0.1
+  },
+  "dependencies": [],
+  "status": "completed",
+  "result": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 67355,
+    "duration_api_ms": 70982,
+    "num_turns": 32,
+    "result": "Parallel task 5 completed. Created both standard and enhanced validation files for parallel task 5.",
+    "session_id": "b3118981-8418-4fcb-b3ef-b9873098e01f",
+    "total_cost_usd": 0.89729835,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 201,
+      "cache_read_input_tokens": 29912,
+      "output_tokens": 24,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 201
+      }
+    },
+    "permission_denials": [],
+    "uuid": "adbc471e-3f86-4da8-af95-2b4414364b7b"
+  },
+  "error": null,
+  "start_time": 1757210949.534837,
+  "end_time": 1757211019.146303,
+  "quality_gates": {},
+  "team_id": null,
+  "assigned_agents": [],
+  "collaboration_mode": null,
+  "validation_required": false,
+  "gate_results": {},
+  "retries": 0,
+  "last_error": null,
+  "health_status": "healthy",
+  "phase": null,
+  "execution_mode": "parallel",
+  "priority": 0,
+  "metrics": {}
+}

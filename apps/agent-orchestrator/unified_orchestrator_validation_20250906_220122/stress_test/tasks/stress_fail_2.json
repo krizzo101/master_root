@@ -1,0 +1,13 @@
+{
+  "task_id": "stress_fail_2",
+  "task_type": "test",
+  "prompt": "",
+  "context": {},
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "Error: Input must be provided either through stdin or as a prompt argument when using --print\n",
+  "start_time": 1757211043.439069,
+  "end_time": 1757211052.933999,
+  "quality_gates": []
+}

@@ -6,11 +6,37 @@
     "delay": 0.1
   },
   "dependencies": [],
-  "status": "pending",
-  "result": null,
+  "status": "completed",
+  "result": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 80308,
+    "duration_api_ms": 84668,
+    "num_turns": 37,
+    "result": "Parallel task 3 files have been created successfully with:\n- **task_id**: \"parallel_task_3\"\n- **task_type**: \"parallel_test\"\n- **status**: \"pending\" (ready for execution)\n- **execution_mode**: \"parallel\"\n- **delay**: 0.1 seconds\n\nBoth `parallel_task_3.json` and `parallel_task_3_enhanced.json` are now in place at `/home/opsvi/master_root/apps/agent-orchestrator/validation_results/20250906_220629/parallel_execution/tasks/`.",
+    "session_id": "5b354131-7466-4803-8e39-3a33679932d1",
+    "total_cost_usd": 1.03481585,
+    "usage": {
+      "input_tokens": 5,
+      "cache_creation_input_tokens": 703,
+      "cache_read_input_tokens": 29748,
+      "output_tokens": 140,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 703
+      }
+    },
+    "permission_denials": [],
+    "uuid": "d8d623f4-bc49-42ba-9d8a-b7d88f9290f7"
+  },
   "error": null,
-  "start_time": null,
-  "end_time": null,
+  "start_time": 1757210930.872167,
+  "end_time": 1757211013.648312,
   "quality_gates": {},
   "team_id": null,
   "assigned_agents": [],

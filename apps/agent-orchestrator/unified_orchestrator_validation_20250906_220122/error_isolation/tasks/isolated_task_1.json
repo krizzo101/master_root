@@ -1,0 +1,13 @@
+{
+  "task_id": "isolated_task_1",
+  "task_type": "test",
+  "prompt": "First isolated task",
+  "context": {},
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "",
+  "start_time": 1757211024.016705,
+  "end_time": 1757211027.473152,
+  "quality_gates": []
+}
