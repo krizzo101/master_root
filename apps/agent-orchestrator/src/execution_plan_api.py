@@ -21,11 +21,11 @@ from typing import Any, Dict, List, Optional
 import jsonschema
 
 # Import orchestrator components
-from .generic_orchestrator import AgentTask, GenericOrchestrator
+from src.generic_orchestrator import AgentTask, GenericOrchestrator
 
 # Try to import ExecutionPlan components
 try:
-    from .execution_plan import ExecutionMode, ExecutionPlan
+    from execution_plan_schema import ExecutionMode, ExecutionPlan
 
     EXECUTION_PLAN_AVAILABLE = True
 except ImportError:
@@ -214,33 +214,14 @@ class ExecutionPlanSchemaValidator:
         """Validate task types against known types"""
 
         known_types = {
-            # Architecture & Design
-            "security-architect",
-            "solution-architect",
-            "requirements-analyst",
-            # Development & Testing
-            "development-specialist",
-            "qa-testing-guru",
-            "performance-optimizer",
-            # Integration & Data
-            "api-integration-specialist",
-            "database-specialist",
-            # Analysis & Documentation
-            "business-analyst",
-            "technical-writer",
-            "research-genius",
-            "code-analyzer",
-            # Legacy types (for backward compatibility)
             "general-purpose",
+            "code-analyzer",
             "web-scraper",
             "data-processor",
             "file-processor",
             "api-caller",
             "validation",
             "monitoring",
-            # Legacy simple types (for backward compatibility)
-            "research", "design", "code", "test", "review", "documentation",
-            "analysis", "optimization", "integration", "deployment"
         }
 
         invalid_types = []

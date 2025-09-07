@@ -9,6 +9,7 @@ import asyncio
 import json
 import logging
 import os
+import re
 import traceback
 import uuid
 from dataclasses import asdict, dataclass, field
@@ -613,9 +614,23 @@ class GenericOrchestrator:
                 if process.returncode == 0:
                     # Parse output with comprehensive error handling
                     if stdout:
+                        stdout_text = stdout.decode("utf-8", errors="replace").strip()
+
+                        # Opt-in parsing controls
+                        require_json = os.getenv("UNIFIED_REQUIRE_JSON", "0") == "1"
+                        strip_fences = os.getenv("UNIFIED_STRIP_FENCES", "0") == "1"
+
+                        if strip_fences:
+                            # Extract first fenced block ```json ... ``` or ``` ... ```
+                            m = re.search(
+                                r"```(?:json)?\s*(.*?)\s*```", stdout_text, re.S | re.I
+                            )
+                            if m:
+                                stdout_text = m.group(1).strip()
+
                         try:
                             # Attempt JSON parsing
-                            task.result = json.loads(stdout.decode())
+                            task.result = json.loads(stdout_text)
                             task.status = "completed"
                             await self.dep_manager.mark_completed(task.task_id)
                             self.metrics["completed"] += 1
@@ -623,38 +638,34 @@ class GenericOrchestrator:
                                 f"✓ {task.task_id} completed in {duration:.2f}s"
                             )
                         except json.JSONDecodeError as e:
-                            # Capture JSON parsing error with context
-                            stdout_str = stdout.decode()
-                            error_msg = f"JSON decode error at line {e.lineno}, col {e.colno}: {e.msg}"
-                            if len(stdout_str) > 500:
-                                preview = stdout_str[:250] + "..." + stdout_str[-250:]
+                            if require_json:
+                                task.status = "failed"
+                                task.error_details = f"json_parse_failed: {e.__class__.__name__}: {str(e)[:200]}"
+                                # ensure dependency graph is updated and metrics reflect failure
+                                await self.dep_manager.mark_failed(task.task_id)
+                                self.metrics["failed"] = (
+                                    self.metrics.get("failed", 0) + 1
+                                )
+                                logger.error(
+                                    f"✗ {task.task_id} failed JSON validation: {task.error_details}"
+                                )
+                                return {
+                                    "status": "error",
+                                    "error": "json_parse_failed",
+                                    "raw": stdout_text,
+                                }
                             else:
-                                preview = stdout_str
-
-                            # Build comprehensive error message
-                            error_parts = [
-                                error_msg,
-                                (
-                                    f"Output preview: {preview[:200]}"
-                                    if preview
-                                    else "No output to preview"
-                                ),
-                                f"Task: {task.task_id}",
-                            ]
-                            task.error = " | ".join(error_parts)
-                            task.status = "failed"
-                            task.raw_output = stdout_str  # Preserve raw output
-                            task.error_details = {
-                                "type": "JSONDecodeError",
-                                "message": error_msg,
-                                "output_preview": preview,
-                                "task_id": task.task_id,
-                            }
-                            await self.dep_manager.mark_failed(task.task_id)
-                            self.metrics["failed"] += 1
-                            logger.error(
-                                f"✗ {task.task_id} JSON parsing failed: {error_msg}"
-                            )
+                                # legacy behavior: accept freeform as success
+                                task.result = {
+                                    "status": "completed",
+                                    "raw_text": stdout_text,
+                                }
+                                task.status = "completed"
+                                await self.dep_manager.mark_completed(task.task_id)
+                                self.metrics["completed"] += 1
+                                logger.info(
+                                    f"✓ {task.task_id} completed in {duration:.2f}s (non-JSON output)"
+                                )
                     else:
                         # No stdout despite successful return code
                         task.status = "failed"

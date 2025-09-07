@@ -41,3 +41,12 @@ Thumbs.db
 *.tmp
 *.bak
 *.orig
+# Test and analysis outputs
+outputs/
+*_validation_*/
+system_analysis_*/
+_run_*/
+quality_gate_state/
+message_bus.log
+*.tar.gz
+.file_positions.json

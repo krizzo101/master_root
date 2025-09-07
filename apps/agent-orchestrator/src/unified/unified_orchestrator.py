@@ -441,7 +441,9 @@ class UnifiedOrchestrator(GenericOrchestrator):
 
         # Duration metrics
         if task.start_time and task.end_time:
-            duration = (task.end_time - task.start_time).total_seconds()
+            duration = (
+                task.end_time - task.start_time
+            )  # Already in seconds (float - float)
             if task.task_type not in self.enhanced_metrics["average_duration_by_type"]:
                 self.enhanced_metrics["average_duration_by_type"][task.task_type] = []
             self.enhanced_metrics["average_duration_by_type"][task.task_type].append(
@@ -464,7 +466,9 @@ class UnifiedOrchestrator(GenericOrchestrator):
                 team_metrics["failed"] += 1
 
             if task.start_time and task.end_time:
-                team_metrics["total_duration"] += (task.end_time - task.start_time).total_seconds()
+                team_metrics["total_duration"] += (
+                    task.end_time - task.start_time
+                )  # Already in seconds
 
     async def execute_batch(self, tasks: List[AgentTask]) -> List[Dict]:
         """
