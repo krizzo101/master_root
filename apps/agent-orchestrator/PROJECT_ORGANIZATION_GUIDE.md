@@ -40,7 +40,7 @@ Defines the expected output file organization with logical names mapped to absol
 **Common Structure Keys:**
 - `main_deliverable` - Primary project output
 - `documentation` - Documentation files
-- `source_code` - Source code files  
+- `source_code` - Source code files
 - `configuration` - Configuration files
 - `scripts` - Utility scripts
 - `tests` - Test files
@@ -101,7 +101,7 @@ The orchestrator automatically enhances tasks that don't have project organizati
 
 If a task prompt contains phrases like:
 - "create a new project"
-- "build an application called"  
+- "build an application called"
 - "implement a project named"
 - "initialize a project"
 
@@ -128,7 +128,7 @@ The orchestrator will:
 **Auto-Enhanced Task:**
 ```json
 {
-  "task_id": "create_app", 
+  "task_id": "create_app",
   "task_type": "development",
   "prompt": "Create a new project called MyAwesome App with React frontend",
   "project_location": "/home/opsvi/master_root/apps/my-awesome-app/",
@@ -167,7 +167,7 @@ The orchestrator validates project organization and provides warnings:
 [task_123] Project organization warnings:
   • Task appears to create a new project but lacks 'project_location' field
   • Deliverable path 'config' should be absolute: config/app.json
-  
+
 Suggestions:
   • Add project_location: '/home/opsvi/master_root/apps/my-project/'
   • Use absolute paths starting with '/' for all deliverables
@@ -179,7 +179,7 @@ Suggestions:
 All new fields are optional with sensible defaults:
 
 - `project_location`: `None`
-- `deliverable_structure`: `{}`  
+- `deliverable_structure`: `{}`
 - `directory_permissions`: `[]`
 - `output_validation`: `{}`
 
@@ -205,7 +205,7 @@ The orchestrator:
 
 1. **Always specify project_location** for tasks that create new projects
 2. **Use absolute paths** in all directory references
-3. **Follow kebab-case** for project names  
+3. **Follow kebab-case** for project names
 4. **Include comprehensive deliverable_structure** for complex projects
 5. **Add appropriate directory_permissions** for agent access
 6. **Set meaningful output_validation** rules
@@ -244,7 +244,7 @@ See `example_enhanced_task.json` for a comprehensive example showing all feature
 To update existing task files:
 
 1. **Add project_location** for tasks that create deliverables
-2. **Define deliverable_structure** for organized outputs  
+2. **Define deliverable_structure** for organized outputs
 3. **Specify directory_permissions** for proper access
 4. **Set output_validation** rules for quality assurance
 

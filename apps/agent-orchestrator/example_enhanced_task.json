@@ -11,7 +11,7 @@
         "database": "postgresql"
       },
       "dependencies": [],
-      
+
       "project_location": "/home/opsvi/master_root/apps/awesome-app/",
       "deliverable_structure": {
         "main_deliverable": "/home/opsvi/master_root/apps/awesome-app/",
@@ -35,7 +35,7 @@
     },
     {
       "task_id": "setup_awesome_app_ci",
-      "task_type": "devops-specialist", 
+      "task_type": "devops-specialist",
       "prompt": "Setup CI/CD pipeline for the awesome-app project.\n\nRequirements:\n1. Create GitHub Actions workflow for automated testing\n2. Setup linting and code quality checks\n3. Configure automated deployment for staging environment\n4. Add Docker configuration for containerized deployment\n5. Create deployment documentation\n\nAll CI/CD files should be properly organized in the project structure.",
       "context": {
         "ci_platform": "github_actions",
@@ -43,7 +43,7 @@
         "environments": ["staging", "production"]
       },
       "dependencies": ["create_awesome_app"],
-      
+
       "project_location": "/home/opsvi/master_root/apps/awesome-app/",
       "deliverable_structure": {
         "workflows": "/home/opsvi/master_root/apps/awesome-app/.github/workflows/",
@@ -65,7 +65,7 @@
       }
     },
     {
-      "task_id": "document_awesome_app_architecture", 
+      "task_id": "document_awesome_app_architecture",
       "task_type": "technical-writer",
       "prompt": "Create comprehensive architecture documentation for the awesome-app project.\n\nRequirements:\n1. System architecture diagram and explanation\n2. API documentation with examples\n3. Database schema documentation\n4. Frontend component architecture\n5. Deployment architecture guide\n6. Developer onboarding guide\n\nAll documentation should follow standard technical writing practices and be organized properly.",
       "context": {
@@ -74,7 +74,7 @@
         "target_audience": ["developers", "devops", "product_managers"]
       },
       "dependencies": ["create_awesome_app", "setup_awesome_app_ci"],
-      
+
       "project_location": "/home/opsvi/master_root/apps/awesome-app/",
       "deliverable_structure": {
         "architecture_docs": "/home/opsvi/master_root/apps/awesome-app/docs/architecture/",
@@ -92,7 +92,7 @@
         "check_project_standards": true,
         "required_files": [
           "ARCHITECTURE.md",
-          "API_REFERENCE.md", 
+          "API_REFERENCE.md",
           "DEVELOPER_GUIDE.md",
           "DEPLOYMENT.md"
         ],
