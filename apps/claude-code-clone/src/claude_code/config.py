@@ -1,6 +1,8 @@
 """Configuration for Claude Code Clone."""
 
-from typing import Optional, List, Dict, Any
+import os
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 
@@ -12,8 +14,14 @@ class ClaudeCodeConfig(BaseSettings):
     provider: str = Field(
         default="openai", description="LLM provider (openai, anthropic, perplexity)"
     )
-    model: str = Field(default="gpt-5-mini", description="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)")
-    api_key: Optional[str] = Field(default=None, description="API key for the provider")
+    model: str = Field(
+        default="gpt-5-mini",
+        description="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)",
+    )
+    api_key: Optional[str] = Field(
+        default_factory=lambda: os.getenv("OPENAI_API_KEY", ""),
+        description="API key for the provider",
+    )
     organization: Optional[str] = Field(
         default=None, description="Organization ID (OpenAI)"
     )
@@ -108,6 +116,6 @@ class ClaudeCodeConfig(BaseSettings):
     context_window: int = Field(default=128000, description="Context window size")
 
     class Config:
-        env_prefix = "CLAUDE_CODE_"
+        env_prefix = ""  # Remove prefix since we use explicit env mapping
         env_file = ".env"
         case_sensitive = False

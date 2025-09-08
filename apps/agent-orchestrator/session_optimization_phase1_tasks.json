@@ -1,0 +1,100 @@
+{
+  "tasks": [
+    {
+      "task_id": "analyze_existing_parsers",
+      "task_type": "analysis",
+      "prompt": "Analyze existing chat log parsing infrastructure in /home/opsvi/master_root/libs/ including chat_taxonomy_parser.py, chat_report_generator.py, and postgres_chat_ingester.py. Document current capabilities, data structures, and how they can be extended for session context optimization. Identify reusable components and integration points.",
+      "dependencies": [],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/session-optimizer/analysis",
+        "focus_files": [
+          "/home/opsvi/master_root/libs/chat_taxonomy_parser.py",
+          "/home/opsvi/master_root/libs/chat_report_generator.py",
+          "/home/opsvi/master_root/libs/chat_web_dashboard.py",
+          "/home/opsvi/master_root/apps/chat-search/jsonl_to_markdown.py"
+        ]
+      }
+    },
+    {
+      "task_id": "design_session_analyzer",
+      "task_type": "solution-architect",
+      "prompt": "Design a comprehensive session analysis system that extends existing parsing infrastructure to generate detailed reports for GPT-5 optimization. Design should include: session metadata extraction, timeline analysis, file operations tracking, tool usage analytics, conversation flow analysis, and content summarization. Focus on extracting actionable context while minimizing token usage.",
+      "dependencies": ["analyze_existing_parsers"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/session-optimizer/design",
+        "requirements": [
+          "Extend existing chat_taxonomy_parser.py",
+          "Generate comprehensive session analytics",
+          "Prepare data for GPT-5 optimization",
+          "Handle large session logs (500KB+)",
+          "Extract essential context only"
+        ]
+      }
+    },
+    {
+      "task_id": "implement_session_parser",
+      "task_type": "development-specialist",
+      "prompt": "Implement SessionAnalyticsEngine that extends existing chat parsing infrastructure to analyze .jsonl session logs. Must parse session logs from /home/opsvi/.claude/projects/ directory structure, extract comprehensive analytics including: start/end times, message counts, file operations, URL access, tool usage, conversation patterns. Use CLAUDE_PROJECT_ROOT environment variable for path construction. Create modular, reusable components.",
+      "dependencies": ["design_session_analyzer"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/session-optimizer/src",
+        "base_components": [
+          "/home/opsvi/master_root/libs/chat_taxonomy_parser.py",
+          "/home/opsvi/master_root/libs/chat_report_generator.py"
+        ],
+        "test_session": "87d77601-6cec-4852-bc5e-e6a0306d3c88",
+        "session_path": "/home/opsvi/.claude/projects/-home-opsvi-master-root/"
+      }
+    },
+    {
+      "task_id": "create_payload_generator",
+      "task_type": "development-specialist",
+      "prompt": "Create GPT-5 payload generation system that converts session analytics into optimized input format for context compression. Must analyze token counts, estimate GPT-5 input sizes, implement chunking strategies for large sessions, and create structured prompts for context optimization. Include size analysis and reporting tools to understand payload dimensions before GPT-5 submission.",
+      "dependencies": ["implement_session_parser"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/session-optimizer/src",
+        "target_model": "gpt-5",
+        "target_output_tokens": 1500,
+        "max_input_tokens": 100000,
+        "optimization_focus": [
+          "Essential context preservation",
+          "Action items and decisions",
+          "Key file modifications",
+          "Important discoveries"
+        ]
+      }
+    },
+    {
+      "task_id": "test_payload_sizes",
+      "task_type": "qa-testing-guru",
+      "prompt": "Test payload generation system with real session data to analyze size characteristics and optimization requirements. Test with multiple session types including current session (87d77601-6cec-4852-bc5e-e6a0306d3c88) and other available sessions. Generate size analysis reports, identify sessions that exceed GPT-5 input limits, test chunking strategies. Document findings and recommendations for production implementation.",
+      "dependencies": ["create_payload_generator"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/session-optimizer/testing",
+        "test_sessions": [
+          "87d77601-6cec-4852-bc5e-e6a0306d3c88",
+          "6010818e-35cb-47d9-b33b-82cac9fc64bd"
+        ],
+        "test_scenarios": [
+          "Small sessions (< 10KB)",
+          "Medium sessions (10-100KB)",
+          "Large sessions (100KB+)",
+          "Current active session"
+        ]
+      }
+    },
+    {
+      "task_id": "document_phase1_results",
+      "task_type": "technical-writer",
+      "prompt": "Create comprehensive documentation for Phase 1 implementation including: system architecture overview, component documentation, API reference, payload size analysis results, integration guide for existing parsing infrastructure, and recommendations for Phase 2 (GPT-5 integration). Include usage examples and testing results.",
+      "dependencies": ["test_payload_sizes"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/session-optimizer/docs",
+        "documentation_type": "comprehensive",
+        "target_audience": "developers and system administrators",
+        "include_examples": true,
+        "include_api_docs": true
+      }
+    }
+  ]
+}

@@ -228,44 +228,25 @@ class RateLimiter:
 class EnformionClient:
     """Enhanced client for EnformionGO API with advanced features"""
 
-    # API endpoint configurations
+    # API endpoint configurations - Updated for correct EnformionGO API
     ENDPOINTS = {
         "reverse_phone": EndpointConfig(
-            "/reverse-phone-search", credit_cost=1, cache_ttl_minutes=180
+            "/ReversePhone", credit_cost=1, cache_ttl_minutes=180
         ),
-        "caller_id": EndpointConfig("/callerid", credit_cost=1, cache_ttl_minutes=180),
         "person_search": EndpointConfig(
-            "/person-search", credit_cost=1, cache_ttl_minutes=60
+            "/PersonSearch", credit_cost=1, cache_ttl_minutes=60
         ),
         "business_search": EndpointConfig(
-            "/business-search", credit_cost=2, cache_ttl_minutes=120
-        ),
-        "address_search": EndpointConfig(
-            "/address-search", credit_cost=1, cache_ttl_minutes=180
-        ),
-        "email_search": EndpointConfig(
-            "/email-search", credit_cost=1, cache_ttl_minutes=180
-        ),
-        "identity_verification": EndpointConfig(
-            "/id-verification", credit_cost=2, cache_ttl_minutes=60
+            "/BusinessSearch", credit_cost=2, cache_ttl_minutes=120
         ),
         "contact_enrichment": EndpointConfig(
-            "/contact-enrichment", credit_cost=2, cache_ttl_minutes=60
-        ),
-        "account_status": EndpointConfig(
-            "/account/status", credit_cost=0, cache_ttl_minutes=5
-        ),
-        "bulk_search": EndpointConfig(
-            "/bulk-search", credit_cost=1, cache_ttl_minutes=0
-        ),  # No caching for bulk
-        "webhook_status": EndpointConfig(
-            "/webhook/status", credit_cost=0, cache_ttl_minutes=1
+            "/Contact/Enrich", credit_cost=2, cache_ttl_minutes=60
         ),
     }
 
     def __init__(
         self,
-        base_url: str = "https://api.enformion.com/v1",
+        base_url: str = "https://devapi.enformion.com",
         enable_caching: bool = True,
         enable_metrics: bool = True,
         enable_circuit_breaker: bool = True,
@@ -353,12 +334,18 @@ class EnformionClient:
     def _load_credentials(self):
         """Load EnformionGO credentials from secure locker"""
         try:
-            self._credential = api_locker_manager.get_credential("enformion")
-            if not self._credential:
+            # Get the most recent credential (after any fixes)
+            credentials_list = api_locker_manager.locker.get_all_credentials(
+                "enformion"
+            )
+            if not credentials_list:
                 raise EnformionAPIError(
                     "No EnformionGO credentials found in secure locker",
                     error_type=ErrorType.AUTHENTICATION,
                 )
+
+            # Use the most recently added credential (last in list)
+            self._credential = credentials_list[-1]
 
             logger.info(f"Loaded EnformionGO credentials: {self._credential.key_name}")
 
@@ -368,7 +355,7 @@ class EnformionClient:
                 f"Credential loading failed: {e}", error_type=ErrorType.AUTHENTICATION
             )
 
-    def _get_auth_headers(self) -> Dict[str, str]:
+    def _get_auth_headers(self, search_type: str = None) -> Dict[str, str]:
         """Get authentication headers for API requests"""
         if not self._credential:
             raise EnformionAPIError(
@@ -377,17 +364,18 @@ class EnformionClient:
 
         headers = {
             "Content-Type": "application/json",
-            "User-Agent": "SleuthIntel/2.0-Enhanced",
             "Accept": "application/json",
-            "X-Request-ID": self._generate_request_id(),
+            "User-Agent": "SleuthIntel/2.0-Enhanced",
         }
 
-        # EnformionGO uses profile key and password for authentication
-        if self._credential.password:
-            headers["X-API-Key"] = self._credential.key_value
-            headers["X-API-Password"] = self._credential.password
-        else:
-            headers["Authorization"] = f"Bearer {self._credential.key_value}"
+        # EnformionGO uses galaxy headers for authentication
+        headers["galaxy-ap-name"] = self._credential.key_value
+        headers["galaxy-ap-password"] = self._credential.password
+        headers["galaxy-client-session-id"] = self._generate_request_id()
+
+        # Add search type if provided
+        if search_type:
+            headers["galaxy-search-type"] = search_type
 
         return headers
 
@@ -529,6 +517,7 @@ class EnformionClient:
         data: Optional[Dict] = None,
         skip_cache: bool = False,
         skip_rate_limit: bool = False,
+        search_type: str = None,
     ) -> Dict:
         """Enhanced request method with caching, rate limiting, and error handling"""
         endpoint_config = self._get_endpoint_config(endpoint)
@@ -549,13 +538,17 @@ class EnformionClient:
                     return cached_response
 
             # Rate limiting
-            if not skip_rate_limit:
+            if (
+                not skip_rate_limit
+                and hasattr(self, "rate_limiter")
+                and self.rate_limiter
+            ):
                 self._wait_for_rate_limit(endpoint_config.credit_cost)
 
             # Make the actual request
             def _execute_request():
                 return self._execute_request(
-                    method, endpoint, params, data, endpoint_config
+                    method, endpoint, params, data, endpoint_config, search_type
                 )
 
             if self.enable_circuit_breaker:
@@ -596,10 +589,11 @@ class EnformionClient:
         params: Optional[Dict],
         data: Optional[Dict],
         endpoint_config: EndpointConfig,
+        search_type: str = None,
     ) -> Dict:
         """Execute the actual HTTP request"""
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
-        headers = self._get_auth_headers()
+        headers = self._get_auth_headers(search_type)
 
         logger.debug(f"Making {method} request to {endpoint}")
 
@@ -694,6 +688,9 @@ class EnformionClient:
     ) -> Dict[str, Any]:
         """Enhanced reverse phone lookup with metadata
 
+        Note: Free accounts use Contact Enrichment for phone lookups
+        since PersonSearch/ReversePhone requires paid access.
+
         Args:
             phone_number: Phone number to lookup (e.g., '9103925349')
             include_metadata: Include additional metadata about the lookup
@@ -704,26 +701,34 @@ class EnformionClient:
         """
         phone_clean = "".join(filter(str.isdigit, phone_number))
 
+        # Format phone number with dashes for EnformionGO API
+        if len(phone_clean) == 10:
+            formatted_phone = f"{phone_clean[:3]}-{phone_clean[3:6]}-{phone_clean[6:]}"
+        else:
+            formatted_phone = phone_clean
+
         if not phone_clean or len(phone_clean) < 10:
             raise EnformionAPIError(
                 "Invalid phone number format", error_type=ErrorType.VALIDATION
             )
 
-        params = {"phone": phone_clean}
-        if include_metadata:
-            params["include_metadata"] = "true"
-
-        result = self._make_request(
-            "GET", "/reverse-phone-search", params=params, skip_cache=skip_cache
+        # Free accounts: Use contact enrichment with phone + minimal data to trigger search
+        # We'll use common placeholder data to make the API accept the phone lookup
+        result = self.contact_enrichment(
+            phone=formatted_phone,
+            first_name="",  # Empty but present to satisfy API requirements
+            last_name="",  # Empty but present to satisfy API requirements
         )
 
-        # Add enhanced metadata
+        # Add reverse phone metadata
         if include_metadata:
             result["_sleuth_metadata"] = {
                 "query_phone": phone_number,
-                "normalized_phone": phone_clean,
+                "formatted_phone": formatted_phone,
                 "lookup_timestamp": datetime.now().isoformat(),
-                "credit_cost": self.ENDPOINTS["reverse_phone"].credit_cost,
+                "method": "contact_enrichment_with_phone",
+                "note": "Free account - using contact enrichment for phone lookup",
+                "credit_cost": self.ENDPOINTS["contact_enrichment"].credit_cost,
             }
 
         return result
@@ -972,22 +977,56 @@ class EnformionClient:
 
         return self._make_request("GET", "/id-verification", params=params)
 
-    def contact_enrichment(self, **kwargs) -> Dict[str, Any]:
+    def contact_enrichment(
+        self,
+        first_name: str = None,
+        last_name: str = None,
+        phone: str = None,
+        email: str = None,
+        address_line1: str = None,
+        address_line2: str = None,
+        **kwargs,
+    ) -> Dict[str, Any]:
         """Enrich contact with additional information
 
-        Accepts various combinations of:
-        - first_name, last_name
-        - phone
-        - email
-        - address
+        Args:
+            first_name: First name
+            last_name: Last name
+            phone: Phone number
+            email: Email address
+            address_line1: Street address
+            address_line2: City, State ZIP
 
         Returns:
             Dict with enriched contact information
         """
-        if not kwargs:
+        data = {}
+
+        if first_name:
+            data["FirstName"] = first_name
+        if last_name:
+            data["LastName"] = last_name
+        if phone:
+            data["Phone"] = phone
+        if email:
+            data["Email"] = email
+
+        if address_line1 or address_line2:
+            data["Address"] = {}
+            if address_line1:
+                data["Address"]["addressLine1"] = address_line1
+            if address_line2:
+                data["Address"]["addressLine2"] = address_line2
+
+        # Add any additional fields
+        data.update(kwargs)
+
+        if not data:
             raise EnformionAPIError("At least one contact field is required")
 
-        return self._make_request("GET", "/contact-enrichment", params=kwargs)
+        return self._make_request(
+            "POST", "/Contact/Enrich", data=data, search_type="DevAPIContactEnrich"
+        )
 
     def get_account_status(self) -> Dict[str, Any]:
         """Get account status and usage information"""

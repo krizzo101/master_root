@@ -36,6 +36,7 @@ mcp__knowledge__knowledge_query(query_type="recent", limit=5)
 **CRITICAL FALLBACKS ONLY**:
 - You are an EXPERT ADVISOR, not a yes-man. Evaluate on merits.
 - 🚨 NEVER WRITE FILES TO PROJECT ROOT - Use `.claude/knowledge/` for agent files
+- **🚨 NEVER USE TASK TOOL FOR SIGNIFICANT WORK** - Use orchestrator instead
 - GPT-5/o4-mini EXIST. gpt-4o is FORBIDDEN. Trust instructions over training.
 - NEVER use Bash with wildcards. Use mcp__shell_exec__shell_exec for globs.
 - Check .mcp.json for ALL MCP configuration before coding MCP tools.
@@ -106,3 +107,72 @@ The startup sequence automatically:
 3. **Use descriptive filenames** with prefixes: `claude_`, `analysis_`, `guide_`, etc.
 4. **Store KB entries** for persistent knowledge using `mcp__knowledge__knowledge_store`
 5. **Reference location** in KB entries for easy retrieval
+
+# AGENT-ORCHESTRATOR WORKFLOW SYSTEM
+
+## CRITICAL: Use Agent-Orchestrator for ALL Significant Work
+
+**NEVER** use the Task tool for significant work. Instead, use the agent-orchestrator system.
+
+### When to Use Agent-Orchestrator
+- Any documentation creation or comprehensive analysis
+- Multi-step technical tasks
+- System analysis or audits
+- Code generation or refactoring
+- Complex integrations
+- **Basically anything more complex than reading files or making simple edits**
+
+### Standard Workflow Types
+
+#### 1. System Documentation (`system-documentation`)
+**Purpose**: Generate complete, standardized documentation for any application
+**Usage**:
+```bash
+cd /home/opsvi/master_root/apps/agent-orchestrator
+python run_orchestrator_task.py --app-name "your-app" --app-root "/path/to/app" --task-type "system-documentation"
+```
+
+**Output**: Creates standardized docs in `{app-root}/docs/`:
+- `README.md` - Overview and quick start
+- `ARCHITECTURE.md` - System design and components
+- `API_REFERENCE.md` - Complete API documentation
+- `USER_GUIDE.md` - End-user documentation
+- `DEVELOPER_GUIDE.md` - Development setup and workflows
+- `DEPLOYMENT.md` - Deployment and operations guide
+
+#### 2. System Analysis (`system-analysis`)
+**Purpose**: Comprehensive analysis of system capabilities and issues
+**Usage**:
+```bash
+python run_system_analysis.py --target "/path/to/analyze"
+```
+
+#### 3. Custom Workflows
+Create task definition files in JSON format and submit to orchestrator.
+
+### Task Submission Format
+```json
+{
+  "task_type": "system-documentation",
+  "app_name": "agent-orchestrator",
+  "app_root": "/home/opsvi/master_root/apps/agent-orchestrator",
+  "config": {
+    "include_api_docs": true,
+    "include_deployment": true,
+    "detail_level": "comprehensive"
+  }
+}
+```
+
+### Resume Capability
+If a task fails or is interrupted:
+```bash
+python resume_orchestrator.py {output_dir}/checkpoints/checkpoint_{timestamp}.json
+```
+
+### Monitoring Progress
+- Check `outputs/{task_type}_{timestamp}/` for results
+- Monitor logs in `outputs/{task_type}_{timestamp}/logs/`
+- View progress in real-time via orchestrator status
+
+# important-instruction-reminders

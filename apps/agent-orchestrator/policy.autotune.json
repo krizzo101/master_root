@@ -1,0 +1,100 @@
+{
+  "policy_version": "1.0",
+  "description": "Auto-tuning policy for self-improving orchestrator",
+  "last_updated": "2025-09-07T20:53:00Z",
+
+  "environment_flags": {
+    "UNIFIED_STRIP_FENCES": "1",
+    "UNIFIED_REQUIRE_JSON": "0",
+    "UNIFIED_VALIDATE_SCHEMA": "0",
+    "ORCH_ENABLE_AUTO_TUNE": "1",
+    "ORCH_STATE_FILE": ".adaptive_parallelism.json"
+  },
+
+  "parallelism_tuning": {
+    "initial": 5,
+    "range": {
+      "min": 2,
+      "max": 16
+    },
+    "adjustment_policy": {
+      "success_rate_threshold": 0.95,
+      "latency_threshold_seconds": 60,
+      "cooldown_seconds": 30,
+      "aggressive_scaling": false
+    }
+  },
+
+  "performance_targets": {
+    "min_success_rate": 0.95,
+    "max_avg_latency_seconds": 60,
+    "max_total_runtime_minutes": 30,
+    "token_efficiency_target": 1000
+  },
+
+  "failure_recovery": {
+    "max_retries": 2,
+    "retry_delay_seconds": 5,
+    "exponential_backoff": true,
+    "fail_fast_errors": [
+      "json_parse_failed",
+      "schema_validation_failed"
+    ]
+  },
+
+  "provider_routing": {
+    "default_provider": "claude",
+    "routing_rules": [
+      {
+        "condition": "context_tokens < 128000",
+        "provider": "openai",
+        "reason": "OpenAI more efficient for small contexts"
+      },
+      {
+        "condition": "context_tokens >= 128000",
+        "provider": "claude",
+        "reason": "Claude better for large contexts"
+      }
+    ],
+    "fallback_chain": ["claude", "openai"]
+  },
+
+  "monitoring": {
+    "enable_metrics_collection": true,
+    "metrics_retention_hours": 168,
+    "alert_thresholds": {
+      "success_rate_below": 0.9,
+      "avg_latency_above": 120,
+      "consecutive_failures": 3
+    }
+  },
+
+  "validation": {
+    "enable_adversarial_testing": false,
+    "validation_frequency": "after_failures",
+    "auto_generate_test_cases": true,
+    "max_adversarial_cases": 50
+  },
+
+  "adaptation_triggers": {
+    "success_rate_degradation": {
+      "threshold": 0.85,
+      "action": "reduce_parallelism"
+    },
+    "latency_increase": {
+      "threshold_multiplier": 2.0,
+      "action": "optimize_prompts"
+    },
+    "repeated_failures": {
+      "count": 3,
+      "action": "enable_strict_validation"
+    }
+  },
+
+  "learning": {
+    "enable_pattern_detection": true,
+    "min_samples_for_adaptation": 10,
+    "confidence_threshold": 0.8,
+    "adaptation_rate": "conservative"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "task_type": "phase1-comprehensive-documentation",
+  "app_name": "agent-orchestrator-phase1",
+  "app_root": "/home/opsvi/master_root/apps/agent-orchestrator",
+  "config": {
+    "include_api_docs": true,
+    "include_deployment": true,
+    "include_testing_results": true,
+    "include_integration_guide": true,
+    "include_phase2_recommendations": true,
+    "detail_level": "comprehensive",
+    "focus_areas": [
+      "system_architecture_overview",
+      "component_documentation",
+      "api_reference",
+      "payload_size_analysis_results",
+      "integration_guide_existing_parsing",
+      "gpt5_integration_recommendations",
+      "usage_examples",
+      "testing_results"
+    ]
+  },
+  "specific_requirements": {
+    "system_architecture": {
+      "include_gpt5_payload_system": true,
+      "include_session_analytics_engine": true,
+      "include_orchestrator_dashboard": true,
+      "include_component_interactions": true
+    },
+    "component_documentation": {
+      "gpt5_payload_generator": "src/gpt5_payload_generator.py",
+      "session_analytics_engine": "src/session_analytics_engine.py",
+      "analytics_components": "src/analytics_components.py",
+      "orchestrator_dashboard": "orchestrator_api.py"
+    },
+    "api_reference": {
+      "include_cli_tools": true,
+      "payload_cli": "tools/payload_cli.py",
+      "size_reporter": "tools/size_reporter.py",
+      "dashboard_api": "orchestrator_api.py"
+    },
+    "payload_analysis": {
+      "compression_ratios": true,
+      "token_optimization": true,
+      "chunking_strategies": true,
+      "performance_metrics": true
+    },
+    "integration_guide": {
+      "existing_parsing_infrastructure": true,
+      "postgresql_integration": true,
+      "chat_parsing_extensions": true
+    },
+    "phase2_recommendations": {
+      "gpt5_integration_architecture": true,
+      "scalability_considerations": true,
+      "production_deployment": true,
+      "monitoring_enhancements": true
+    },
+    "usage_examples": {
+      "payload_generation_workflows": true,
+      "session_analytics_usage": true,
+      "dashboard_monitoring": true,
+      "integration_patterns": true
+    },
+    "testing_results": {
+      "performance_benchmarks": true,
+      "compression_analysis": true,
+      "real_world_validation": true,
+      "component_testing": true
+    }
+  },
+  "output_requirements": {
+    "create_in_claude_knowledge": true,
+    "knowledge_subdirs": [
+      "docs",
+      "architecture",
+      "guides",
+      "analysis"
+    ],
+    "formats": ["markdown", "json"],
+    "include_diagrams": true,
+    "include_code_examples": true
+  }
+}

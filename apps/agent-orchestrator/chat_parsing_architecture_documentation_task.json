@@ -1,0 +1,110 @@
+{
+  "tasks": [
+    {
+      "task_id": "analyze_existing_architecture",
+      "task_type": "solution-architect",
+      "prompt": "Analyze the existing chat parsing components to understand the complete analytics ecosystem. Focus on: 1) System architecture and component relationships, 2) Current data flow from parsing to storage, 3) Integration patterns and extension points, 4) Performance characteristics and scalability patterns. Base analysis on: /home/opsvi/master_root/libs/chat_taxonomy_parser.py, /home/opsvi/master_root/libs/chat_report_generator.py, /home/opsvi/master_root/libs/opsvi-monitoring/opsvi_monitoring/chat_analytics/realtime_ingestion/postgres_chat_ingester.py, and related components in the chat parsing ecosystem.",
+      "dependencies": [],
+      "context": {
+        "target_files": [
+          "/home/opsvi/master_root/libs/chat_taxonomy_parser.py",
+          "/home/opsvi/master_root/libs/chat_report_generator.py",
+          "/home/opsvi/master_root/libs/opsvi-monitoring/opsvi_monitoring/chat_analytics/realtime_ingestion/postgres_chat_ingester.py",
+          "/home/opsvi/master_root/libs/chat_web_dashboard.py"
+        ],
+        "focus_areas": ["architecture", "data_flow", "integration_patterns", "performance"],
+        "output_location": "/home/opsvi/master_root/.claude/knowledge/architecture/"
+      }
+    },
+    {
+      "task_id": "create_system_architecture_diagrams",
+      "task_type": "technical-writer",
+      "prompt": "Create comprehensive system architecture diagrams and documentation showing how chat parsing components form a complete analytics ecosystem. Include: 1) High-level system architecture diagram (using mermaid or ASCII), 2) Component relationship diagrams, 3) Layer architecture documentation, 4) Service interaction patterns, 5) Data model relationships. Format as detailed markdown with embedded diagrams suitable for technical implementation.",
+      "dependencies": ["analyze_existing_architecture"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/.claude/knowledge/architecture/",
+        "diagram_formats": ["mermaid", "ascii"],
+        "include_data_models": true,
+        "technical_depth": "implementation_ready"
+      }
+    },
+    {
+      "task_id": "document_data_flow_patterns",
+      "task_type": "technical-writer",
+      "prompt": "Document comprehensive data flow patterns from parsing to storage in the chat analytics ecosystem. Include: 1) End-to-end data pipeline documentation, 2) Transform and processing stages, 3) Storage layer interactions (PostgreSQL, SQLite), 4) Real-time vs batch processing flows, 5) Error handling and resilience patterns, 6) Performance optimization points. Format as detailed technical documentation with flow diagrams.",
+      "dependencies": ["analyze_existing_architecture"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/.claude/knowledge/architecture/",
+        "include_performance_metrics": true,
+        "include_error_patterns": true,
+        "data_pipeline_focus": true
+      }
+    },
+    {
+      "task_id": "create_api_extension_specifications",
+      "task_type": "development-specialist",
+      "prompt": "Create comprehensive API and extension point specifications for the chat parsing analytics ecosystem. Include: 1) Current API interfaces and contracts, 2) Extension point documentation with examples, 3) Plugin architecture specifications, 4) Integration patterns for new data sources, 5) Custom parser development guidelines, 6) Context extractor extension patterns, 7) Database integration patterns. Format as technical specifications suitable for developers implementing extensions.",
+      "dependencies": ["analyze_existing_architecture", "create_system_architecture_diagrams"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/.claude/knowledge/architecture/",
+        "include_code_examples": true,
+        "extension_focus": true,
+        "api_specifications": true,
+        "plugin_patterns": true
+      }
+    },
+    {
+      "task_id": "document_session_optimization_integration",
+      "task_type": "solution-architect",
+      "prompt": "Document integration patterns specifically for session context optimization within the chat parsing ecosystem. Include: 1) Session context extraction patterns, 2) Context relevance scoring approaches, 3) Multi-session correlation techniques, 4) Optimization caching strategies, 5) Real-time context update patterns, 6) Integration with existing PostgreSQL and SQLite layers, 7) Performance considerations for context-heavy workloads. Focus on practical implementation patterns for session optimization features.",
+      "dependencies": ["create_system_architecture_diagrams", "document_data_flow_patterns"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/.claude/knowledge/architecture/",
+        "session_context_focus": true,
+        "optimization_patterns": true,
+        "integration_ready": true,
+        "performance_considerations": true
+      }
+    },
+    {
+      "task_id": "create_technical_recommendations",
+      "task_type": "solution-architect",
+      "prompt": "Create comprehensive technical recommendations for extending the chat parsing analytics system. Include: 1) Architecture evolution roadmap, 2) Scalability improvement recommendations, 3) Performance optimization strategies, 4) New feature integration approaches, 5) Technology stack considerations, 6) Migration and deployment strategies, 7) Testing and validation approaches for extensions, 8) Security and governance considerations. Format as actionable technical recommendations with implementation priorities.",
+      "dependencies": ["create_api_extension_specifications", "document_session_optimization_integration"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/.claude/knowledge/architecture/",
+        "recommendations_focus": true,
+        "implementation_priorities": true,
+        "roadmap_planning": true,
+        "actionable_guidance": true
+      }
+    },
+    {
+      "task_id": "compile_comprehensive_architecture_guide",
+      "task_type": "technical-writer",
+      "prompt": "Compile all previous analysis and documentation into a single comprehensive architectural documentation guide for the chat parsing analytics ecosystem. Integrate: 1) System architecture diagrams and relationships, 2) Data flow documentation, 3) API and extension specifications, 4) Session optimization integration patterns, 5) Technical recommendations and roadmap. Format as a master architectural guide suitable for developers implementing session optimization features. Ensure consistency, cross-references, and implementation readiness.",
+      "dependencies": ["create_system_architecture_diagrams", "document_data_flow_patterns", "create_api_extension_specifications", "document_session_optimization_integration", "create_technical_recommendations"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/.claude/knowledge/architecture/",
+        "master_document": true,
+        "comprehensive_integration": true,
+        "cross_references": true,
+        "implementation_ready": true,
+        "final_deliverable": true
+      }
+    },
+    {
+      "task_id": "validate_documentation_completeness",
+      "task_type": "qa-testing-guru",
+      "prompt": "Validate that the comprehensive architectural documentation meets all requirements: 1) System architecture diagrams and component relationships are complete and accurate, 2) Data flow documentation covers end-to-end processing, 3) API and extension point specifications are implementation-ready, 4) Session context optimization integration patterns are well-defined, 5) Technical recommendations are actionable and prioritized, 6) Documentation is formatted for developer consumption, 7) All cross-references and consistency checks pass. Provide validation report and any necessary corrections.",
+      "dependencies": ["compile_comprehensive_architecture_guide"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/.claude/knowledge/architecture/",
+        "validation_focus": true,
+        "completeness_check": true,
+        "quality_assurance": true,
+        "requirements_verification": true
+      }
+    }
+  ]
+}

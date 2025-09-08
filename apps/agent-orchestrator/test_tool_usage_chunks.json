@@ -1,0 +1,193 @@
+{
+  "payload": {
+    "session_id": "test_session_001",
+    "total_tokens": 731,
+    "chunk_count": 2,
+    "compression_ratio": 3.140902872777018,
+    "chunks": [
+      {
+        "chunk_id": "tool_0_Bash",
+        "content": {
+          "tool_name": "Bash",
+          "tool_calls": [
+            {
+              "name": "Bash",
+              "timestamp": "2025-09-08T10:05:00Z",
+              "parameters": {
+                "command": "mkdir -p my_project/{src,tests,docs}",
+                "description": "Create project directory structure"
+              },
+              "result": {
+                "success": true
+              }
+            },
+            {
+              "name": "Bash",
+              "timestamp": "2025-09-08T10:25:00Z",
+              "parameters": {
+                "command": "cd /project/my_project && python -m pytest tests/",
+                "description": "Run pytest on the sample tests"
+              },
+              "result": {
+                "success": true,
+                "output": "===== test session starts =====\ncollected 2 items\n\ntests/test_sample.py::test_example PASSED\ntests/test_sample.py::test_string_operations PASSED\n\n===== 2 passed in 0.02s ====="
+              }
+            }
+          ],
+          "call_count": 2,
+          "session_metadata": {
+            "session_id": "test_session_001",
+            "chunk_type": "tool_usage"
+          }
+        },
+        "token_count": 220,
+        "chunk_type": "tool_usage",
+        "overlap_tokens": 0,
+        "context_score": 19,
+        "metadata": {
+          "tool_name": "Bash",
+          "call_count": 2
+        }
+      },
+      {
+        "chunk_id": "tool_1_Write",
+        "content": {
+          "tool_name": "Write",
+          "tool_calls": [
+            {
+              "name": "Write",
+              "timestamp": "2025-09-08T10:08:00Z",
+              "parameters": {
+                "file_path": "/project/my_project/src/__init__.py",
+                "content": "\"\"\"Main package init file\"\"\""
+              },
+              "result": {
+                "success": true
+              }
+            },
+            {
+              "name": "Write",
+              "timestamp": "2025-09-08T10:10:00Z",
+              "parameters": {
+                "file_path": "/project/my_project/setup.py",
+                "content": "from setuptools import setup, find_packages\n\nsetup(\n    name='my_project',\n    version='0.1.0',\n    packages=find_packages(),\n    install_requires=[],\n    test_suite='tests'\n)"
+              },
+              "result": {
+                "success": true
+              }
+            },
+            {
+              "name": "Write",
+              "timestamp": "2025-09-08T10:15:00Z",
+              "parameters": {
+                "file_path": "/project/my_project/pytest.ini",
+                "content": "[tool:pytest]\ntestpaths = tests\npython_files = test_*.py\npython_functions = test_*\naddopts = -v --tb=short"
+              },
+              "result": {
+                "success": true
+              }
+            },
+            {
+              "name": "Write",
+              "timestamp": "2025-09-08T10:18:00Z",
+              "parameters": {
+                "file_path": "/project/my_project/tests/test_sample.py",
+                "content": "import pytest\n\ndef test_example():\n    \"\"\"Sample test function\"\"\"\n    assert 1 + 1 == 2\n\ndef test_string_operations():\n    \"\"\"Test string operations\"\"\"\n    text = 'hello world'\n    assert text.upper() == 'HELLO WORLD'\n    assert len(text) == 11"
+              },
+              "result": {
+                "success": true
+              }
+            },
+            {
+              "name": "Write",
+              "timestamp": "2025-09-08T10:22:00Z",
+              "parameters": {
+                "file_path": "/project/my_project/requirements.txt",
+                "content": "pytest>=7.0.0\npytest-cov>=4.0.0\nblack>=22.0.0\nflake8>=5.0.0"
+              },
+              "result": {
+                "success": true
+              }
+            }
+          ],
+          "call_count": 5,
+          "session_metadata": {
+            "session_id": "test_session_001",
+            "chunk_type": "tool_usage"
+          }
+        },
+        "token_count": 511,
+        "chunk_type": "tool_usage",
+        "overlap_tokens": 0,
+        "context_score": 25,
+        "metadata": {
+          "tool_name": "Write",
+          "call_count": 5
+        }
+      }
+    ],
+    "metadata": {
+      "original_session_size": 2296,
+      "chunking_strategy": "tool_usage",
+      "optimization_applied": false,
+      "processing_stats": {
+        "chunk_count": 2,
+        "avg_chunk_size": 365.5,
+        "max_chunk_size": 511,
+        "min_chunk_size": 220
+      }
+    },
+    "optimization_report": {
+      "total_tokens": 731,
+      "estimated_cost": 0.018275,
+      "compression_ratio": 3.140902872777018,
+      "context_efficiency_score": 32.849604221635886,
+      "recommended_chunks": 2,
+      "processing_time_estimate": 0.0731
+    },
+    "generated_at": "2025-09-08 13:29:44.516073"
+  },
+  "analysis": {
+    "payload_summary": {
+      "session_id": "test_session_001",
+      "total_tokens": 731,
+      "chunk_count": 2,
+      "estimated_cost": 0.018275,
+      "size_category": "Small",
+      "compression_ratio": 3.140902872777018
+    },
+    "chunk_analysis": [
+      {
+        "chunk_id": "tool_0_Bash",
+        "token_count": 220,
+        "chunk_type": "tool_usage",
+        "context_score": 19,
+        "efficiency_rating": "Poor"
+      },
+      {
+        "chunk_id": "tool_1_Write",
+        "token_count": 511,
+        "chunk_type": "tool_usage",
+        "context_score": 25,
+        "efficiency_rating": "Poor"
+      }
+    ],
+    "efficiency_metrics": {
+      "avg_context_score": 22.0,
+      "token_distribution": {
+        "mean": 365.5,
+        "max": 511,
+        "min": 220,
+        "std_dev": 145.5
+      },
+      "chunk_type_breakdown": {
+        "tool_usage": 2
+      }
+    },
+    "recommendations": [
+      "Consider more aggressive chunking to reduce redundancy",
+      "Many low-context chunks detected - review chunking strategy"
+    ],
+    "analysis_timestamp": "2025-09-08T13:29:44.516100"
+  }
+}

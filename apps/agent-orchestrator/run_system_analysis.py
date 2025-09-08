@@ -20,18 +20,64 @@ from src.unified.unified_orchestrator import (
 )
 
 
-def load_tasks_from_file(file_path: str) -> list:
-    """Load task definitions from a JSON file and convert to AgentTask objects"""
+def load_tasks_from_file(file_path: str) -> tuple:
+    """Load task definitions from a JSON file and convert to AgentTask objects with parallel agent support"""
     import json
 
     with open(file_path, "r") as f:
         data = json.load(f)
 
+    # Extract agent execution config
+    agent_config = data.get("agent_execution_config", {})
+    agent_requirements = agent_config.get("agent_requirements", {})
+    max_parallel = agent_requirements.get("max_parallel_agents", 8)
+
     tasks = []
     for task_data in data.get("tasks", []):
-        tasks.append(AgentTask(**task_data))
+        # Extract agent_config if present
+        task_agent_config = task_data.pop("agent_config", {})
+        agent_count = task_agent_config.get("agent_count", 1)
 
-    return tasks
+        # Create multiple agent instances for parallel execution
+        for i in range(agent_count):
+            # Create unique task ID for each agent instance
+            if agent_count > 1:
+                task_id = f"{task_data['task_id']}_agent_{i+1}"
+                agent_prompt = f"AGENT {i+1}/{agent_count} - PARALLEL EXECUTION\n\n{task_data['prompt']}"
+            else:
+                task_id = task_data["task_id"]
+                agent_prompt = task_data["prompt"]
+
+            # Handle dependencies - simple mapping to _agent_1 for consistency
+            dependencies = []
+            for dep in task_data.get("dependencies", []):
+                # Simple consistent mapping - always use _agent_1 for multi-agent dependencies
+                if not dep.endswith("_agent_1"):
+                    dependencies.append(f"{dep}_agent_1")
+                else:
+                    dependencies.append(dep)  # Already has suffix
+
+            # Create AgentTask with core fields
+            task = AgentTask(
+                task_id=task_id,
+                task_type=task_data["task_type"],
+                prompt=agent_prompt,
+                dependencies=dependencies,
+            )
+
+            # Store agent config as metadata
+            if task_agent_config:
+                task.metadata = task_agent_config.copy()
+                task.metadata["agent_instance"] = i + 1
+                task.metadata["total_agents"] = agent_count
+                task.metadata["original_task_id"] = task_data["task_id"]
+
+            tasks.append(task)
+
+            print(f"📋 Created agent task: {task_id} ({task_data['task_type']})")
+
+    print(f"🚀 Total agents created: {len(tasks)} (max parallel: {max_parallel})")
+    return tasks, max_parallel, agent_requirements
 
 
 async def run_system_analysis():
@@ -54,11 +100,12 @@ async def run_system_analysis():
         Path(__file__).parent / "outputs" / "analysis" / f"system_analysis_{timestamp}"
     )
 
-    # Load tasks
+    # Load tasks with parallel configuration
     print(f"\n📋 Loading analysis tasks from: {tasks_file}")
     try:
-        tasks = load_tasks_from_file(str(tasks_file))
+        tasks, max_parallel, agent_requirements = load_tasks_from_file(str(tasks_file))
         print(f"✅ Loaded {len(tasks)} specialized analysis tasks")
+        print(f"🔧 Parallel configuration: {max_parallel} max agents")
     except Exception as e:
         print(f"❌ Failed to load tasks: {e}")
         return False
@@ -95,7 +142,7 @@ async def run_system_analysis():
 
     config = UnifiedConfig(
         output_dir=output_dir,
-        max_parallel=8,  # Allow high parallelism for complex analysis
+        max_parallel=max_parallel,  # Use configured max parallel agents
         enabled_features={
             FeatureFlag.ENHANCED_METRICS,
             FeatureFlag.QUALITY_GATES,
@@ -117,7 +164,7 @@ async def run_system_analysis():
     )
 
     orchestrator = create_advanced_orchestrator(
-        output_dir=output_dir, max_parallel=8, tokens=None
+        output_dir=output_dir, max_parallel=max_parallel, tokens=None
     )
 
     # Execute comprehensive analysis

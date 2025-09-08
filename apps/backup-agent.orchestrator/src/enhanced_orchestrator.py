@@ -1,0 +1,1184 @@
+#!/usr/bin/env python3
+"""
+Enhanced Agent Orchestrator with Quality Gate Support
+
+Extends the GenericOrchestrator with quality gate validation and dependency management.
+Provides non-breaking integration while enabling complex dependency chains.
+"""
+
+import asyncio
+import json
+import logging
+import os
+
+# Import base orchestrator components
+import sys
+import uuid
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
+sys.path.append(os.path.dirname(__file__))
+
+from generic_orchestrator import (
+    AgentTask,
+    DependencyManager,
+    GenericOrchestrator,
+    MessageBus,
+    TokenPool,
+)
+
+# CRITICAL SAFETY WARNING:
+# TokenPool in this system MUST fail catastrophically if token distribution fails.
+# NO FALLBACK to single tokens from environment variables is allowed.
+# Agents are FORBIDDEN from adding fallback mechanisms to TokenPool usage.
+from quality_gates import GateStatus, QualityGateManager, ValidationResult
+
+try:
+    from agent_monitor import AgentStatus, AgentStatusMonitor
+except ImportError:
+    # Fallback for missing agent_monitor
+    AgentStatus = None
+    AgentStatusMonitor = None
+
+# ExecutionPlan integration
+try:
+    from .execution_plan import ExecutionMode, ExecutionPlan
+    from .execution_plan.adapter import ExecutionPlanAdapter
+
+    EXECUTION_PLAN_AVAILABLE = True
+except ImportError:
+    ExecutionPlan = None
+    ExecutionMode = None
+    ExecutionPlanAdapter = None
+    EXECUTION_PLAN_AVAILABLE = False
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class EnhancedAgentTask(AgentTask):
+    """Enhanced agent task with quality gate and monitoring support"""
+
+    # Quality gate support
+    quality_gates: List[str] = field(default_factory=list)  # Gates this task depends on
+    validation_required: bool = True  # Whether to validate deliverable
+    phase_id: Optional[str] = None  # Execution phase this task belongs to
+
+    # Monitoring support
+    agent_uuid: Optional[str] = None  # Predictable UUID for log file tracking
+    team_id: Optional[str] = None  # Team identifier for coordinated execution
+    monitoring_enabled: bool = True  # Enable real-time monitoring
+    background_execution: bool = False  # Allow background execution
+
+    # Dynamic architecture support
+    mcp_needs: List[str] = field(
+        default_factory=list
+    )  # Required MCP servers for this task
+    work_dir_name: Optional[
+        str
+    ] = None  # Custom working directory name (relative to agent_base_work_dir)
+    debug_mode: bool = False  # Enable debug mode for this specific task
+
+    def __post_init__(self):
+        # Generate UUID if not provided
+        if self.agent_uuid is None:
+            self.agent_uuid = str(uuid.uuid4())
+
+        # Extract team_id from agent_uuid if follows pattern
+        if self.team_id is None and self.agent_uuid:
+            parts = self.agent_uuid.split("-")
+            if len(parts) >= 3 and parts[0] == "team":
+                self.team_id = "-".join(parts[:3])  # team-phase1-001
+
+
+@dataclass
+class BackgroundJob:
+    """Background execution job tracking"""
+
+    job_id: str
+    team_id: str
+    agent_uuids: List[str]
+    status: str = "running"  # running, completed, failed
+    start_time: float = field(default_factory=lambda: datetime.now().timestamp())
+    end_time: Optional[float] = None
+    results: Dict[str, Any] = field(default_factory=dict)
+
+
+class EnhancedDependencyManager(DependencyManager):
+    """Enhanced dependency manager with quality gate integration"""
+
+    def __init__(self, quality_gate_manager: QualityGateManager = None):
+        super().__init__()
+        self.quality_gate_manager = quality_gate_manager
+
+    async def can_run(self, task: EnhancedAgentTask) -> bool:
+        """Check if task dependencies and quality gates are satisfied"""
+        # Check basic dependencies first
+        if not await super().can_run(task):
+            return False
+
+        # Check quality gates if manager is available
+        if self.quality_gate_manager and task.quality_gates:
+            for gate_id in task.quality_gates:
+                gate_status = await self.quality_gate_manager.check_quality_gates(
+                    gate_id
+                )
+                if gate_status != GateStatus.PASSED:
+                    logger.debug(
+                        f"Task {task.task_id} blocked by gate {gate_id} (status: {gate_status})"
+                    )
+                    return False
+
+        return True
+
+    async def validate_task_deliverable(
+        self, task: EnhancedAgentTask
+    ) -> ValidationResult:
+        """Validate task deliverable using quality gate manager"""
+        if not task.validation_required or not self.quality_gate_manager:
+            return ValidationResult(True, "Validation skipped or not configured")
+
+        return await self.quality_gate_manager.validate_deliverable(
+            task.task_id, task.result
+        )
+
+
+class EnhancedOrchestrator(GenericOrchestrator):
+    """
+    Enhanced orchestrator with monitoring and quality gate integration.
+
+    Extends GenericOrchestrator to add:
+    - Real-time agent monitoring via AgentStatusMonitor
+    - Quality gate validation via QualityGateManager
+    - UUID management for predictable log file tracking
+    - Background execution with status tracking
+    - Full backward compatibility with existing code
+    """
+
+    def __init__(
+        self,
+        output_dir: Path,
+        max_parallel: int = 10,
+        tokens: List[str] = None,
+        use_optimizations: bool = True,
+        # Enhanced features
+        enable_quality_gates: bool = True,
+        enable_monitoring: bool = True,
+        quality_gate_config: Dict[str, Any] = None,
+        chat_logs_dir: Optional[str] = None,
+        quality_gate_state_dir: Optional[Path] = None,
+        # New parameters for dynamic architecture
+        master_mcp_registry_path: Optional[Path] = None,
+        agent_execution_profile: str = "standard",
+        agent_debug_mode: bool = False,
+        agent_base_work_dir: Optional[Path] = None,
+        enable_dynamic_configs: bool = False,
+        log_to_work_dir: bool = False,
+    ):
+        # Initialize parent class with new parameters
+        super().__init__(
+            output_dir,
+            max_parallel,
+            tokens,
+            use_optimizations,
+            master_mcp_registry_path=master_mcp_registry_path,
+            agent_execution_profile=agent_execution_profile,
+            agent_debug_mode=agent_debug_mode,
+            agent_base_work_dir=agent_base_work_dir,
+            enable_dynamic_configs=enable_dynamic_configs,
+            log_to_work_dir=log_to_work_dir,
+        )
+
+        # Enhanced features flags
+        self.enable_quality_gates = enable_quality_gates
+        self.enable_monitoring = enable_monitoring
+
+        # Initialize task tracking for cleanup
+        self._quality_gate_init_task = None
+
+        # Quality gate system
+        self.quality_gate_manager: Optional[QualityGateManager] = None
+        if enable_quality_gates:
+            gate_state_dir = quality_gate_state_dir or (output_dir / "quality_gates")
+            self.quality_gate_manager = QualityGateManager(gate_state_dir)
+
+            # Replace dependency manager with enhanced version
+            self.dep_manager = EnhancedDependencyManager(self.quality_gate_manager)
+
+            # Initialize common quality gates if config provided
+            if quality_gate_config:
+                asyncio.create_task(self._initialize_quality_gates(quality_gate_config))
+
+        # Monitoring system
+        self.agent_monitor: Optional[AgentStatusMonitor] = None
+        if enable_monitoring:
+            self.agent_monitor = AgentStatusMonitor(chat_logs_dir)
+
+        # Background execution tracking
+        self.background_jobs: Dict[str, BackgroundJob] = {}
+        self._background_task_lock = asyncio.Lock()
+
+        # Enhanced metrics
+        self.quality_metrics = {
+            "gates_validated": 0,
+            "gates_failed": 0,
+            "deliverables_validated": 0,
+            "deliverables_failed": 0,
+            "quality_gate_wait_time": 0,
+        }
+
+        self.monitoring_metrics = {
+            "agents_monitored": 0,
+            "background_jobs": 0,
+            "uuid_assignments": 0,
+        }
+
+        # Enhanced hooks
+        self.monitoring_hook: Optional[Callable] = None
+
+        # ExecutionPlan adapter
+        self.execution_plan_adapter: Optional[ExecutionPlanAdapter] = None
+        if EXECUTION_PLAN_AVAILABLE:
+            self.execution_plan_adapter = ExecutionPlanAdapter(
+                self.quality_gate_manager
+            )
+
+        logger.info(
+            f"EnhancedOrchestrator initialized (quality_gates: {enable_quality_gates}, monitoring: {enable_monitoring}, execution_plan: {EXECUTION_PLAN_AVAILABLE})"
+        )
+
+    async def _initialize_quality_gates(self, config: Dict[str, Any]):
+        """Initialize quality gates from configuration"""
+        try:
+            # Define gates from config
+            gates_config = config.get("gates", [])
+            for gate_config in gates_config:
+                await self.quality_gate_manager.define_gate(
+                    gate_id=gate_config["gate_id"],
+                    name=gate_config["name"],
+                    description=gate_config["description"],
+                    validator_type=gate_config["validator_type"],
+                    config=gate_config["config"],
+                    dependencies=gate_config.get("dependencies", []),
+                    timeout_seconds=gate_config.get("timeout_seconds", 300),
+                    retry_interval=gate_config.get("retry_interval", 30),
+                    max_retries=gate_config.get("max_retries", 10),
+                )
+
+            # Define phases from config
+            phases_config = config.get("phases", [])
+            for phase_config in phases_config:
+                await self.quality_gate_manager.define_phase(
+                    phase_id=phase_config["phase_id"],
+                    name=phase_config["name"],
+                    description=phase_config["description"],
+                    gates=phase_config["gates"],
+                )
+
+            # Start validation loop
+            await self.quality_gate_manager.start_validation_loop()
+
+            logger.info(
+                f"Initialized {len(gates_config)} quality gates and {len(phases_config)} phases"
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to initialize quality gates: {e}")
+            raise
+
+    async def define_quality_gate(
+        self,
+        gate_id: str,
+        name: str,
+        description: str,
+        validator_type: str,
+        config: Dict[str, Any],
+        dependencies: List[str] = None,
+    ):
+        """Define a quality gate (convenience method)"""
+        if not self.quality_gate_manager:
+            raise RuntimeError("Quality gates not enabled")
+
+        return await self.quality_gate_manager.define_gate(
+            gate_id, name, description, validator_type, config, dependencies
+        )
+
+    async def define_phase(
+        self, phase_id: str, name: str, description: str, gates: List[str]
+    ):
+        """Define an execution phase (convenience method)"""
+        if not self.quality_gate_manager:
+            raise RuntimeError("Quality gates not enabled")
+
+        return await self.quality_gate_manager.define_phase(
+            phase_id, name, description, gates
+        )
+
+    async def wait_for_quality_gates(self, task: EnhancedAgentTask) -> bool:
+        """Wait for all quality gates required by a task"""
+        if not self.quality_gate_manager or not task.quality_gates:
+            return True
+
+        wait_start = datetime.now().timestamp()
+
+        try:
+            await self.quality_gate_manager.block_until_dependencies_ready(
+                task.task_id, task.quality_gates
+            )
+
+            wait_time = datetime.now().timestamp() - wait_start
+            self.quality_metrics["quality_gate_wait_time"] += wait_time
+
+            logger.info(
+                f"Task {task.task_id} quality gates satisfied after {wait_time:.2f}s"
+            )
+            return True
+
+        except Exception as e:
+            logger.error(f"Task {task.task_id} quality gate validation failed: {e}")
+            task.error = f"Quality gate validation failed: {str(e)}"
+            task.status = "failed"
+            return False
+
+    async def execute_agent(self, task: AgentTask) -> Dict:
+        """
+        Execute agent with enhanced features.
+        Maintains backward compatibility by handling both regular and enhanced tasks.
+        """
+
+        # Convert regular tasks to enhanced for internal processing
+        if not isinstance(task, EnhancedAgentTask):
+            enhanced_task = EnhancedAgentTask(
+                task_id=task.task_id,
+                task_type=task.task_type,
+                prompt=task.prompt,
+                context=task.context,
+                dependencies=task.dependencies,
+                status=task.status,
+                result=task.result,
+                error=task.error,
+                start_time=task.start_time,
+                end_time=task.end_time,
+                # Disable enhanced features for backward compatibility
+                monitoring_enabled=False,
+                quality_gates=[],
+            )
+            # Use parent implementation for backward compatibility
+            return await super().execute_agent(enhanced_task)
+
+        # Handle enhanced tasks
+        return await self.execute_agent_enhanced(task)
+
+    async def execute_agent_enhanced(self, task: EnhancedAgentTask) -> Dict:
+        """Execute enhanced agent task with full monitoring and quality gate support"""
+
+        # Wait for quality gates before execution
+        if not await self.wait_for_quality_gates(task):
+            # Task failed quality gate validation
+            return task.to_dict()
+
+        # Pre-execution monitoring hook
+        if self.monitoring_hook:
+            await self.monitoring_hook(task, "pre_execute")
+
+        # Store original task details for monitoring
+        if task.monitoring_enabled and task.agent_uuid:
+            self.monitoring_metrics["agents_monitored"] += 1
+            self.monitoring_metrics["uuid_assignments"] += 1
+
+        # Build enhanced command with UUID as session ID for predictable log files
+        session_id = str(uuid.uuid4())  # Always use valid UUID for session ID
+
+        # Build enhanced prompt with metadata
+        prompt = await self._build_enhanced_prompt(task)
+
+        # Set up dynamic working directory if enabled
+        agent_work_dir = self.output_dir
+        if self.enable_dynamic_configs:
+            # Use work_dir_name if provided, otherwise use task_id
+            dir_name = task.work_dir_name or task.task_id
+            agent_work_dir = self.agent_base_work_dir / dir_name
+            agent_work_dir.mkdir(parents=True, exist_ok=True)
+
+            # Create subdirectories
+            (agent_work_dir / "workspace").mkdir(exist_ok=True)
+            (agent_work_dir / "logs").mkdir(exist_ok=True)
+            (agent_work_dir / "data").mkdir(exist_ok=True)
+
+            # Generate agent-specific MCP config
+            agent_mcp_config = agent_work_dir / "mcp_config.json"
+            self._generate_enhanced_mcp_config(task, agent_mcp_config)
+
+            # Create symlinks to shared resources if needed
+            shared_data = self.output_dir / "shared_data"
+            if shared_data.exists():
+                target = agent_work_dir / "shared"
+                if not target.exists():
+                    target.symlink_to(shared_data)
+
+        # Prepare command
+        cmd = self.claude_cmd.copy()
+
+        # Add debug flag if enabled (task-specific or global)
+        if task.debug_mode or self.agent_debug_mode:
+            cmd.append("--debug")
+
+        # Use agent-specific MCP config if dynamic configs enabled
+        if self.enable_dynamic_configs:
+            agent_mcp_config = agent_work_dir / "mcp_config.json"
+            if "--mcp-config" in cmd:
+                idx = cmd.index("--mcp-config")
+                cmd[idx + 1] = str(agent_mcp_config)
+            else:
+                cmd.extend(["--mcp-config", str(agent_mcp_config)])
+
+        cmd.extend(
+            [
+                "--session-id",
+                session_id,
+                "--add-dir",
+                str(agent_work_dir if self.enable_dynamic_configs else self.output_dir),
+                "--",  # Important: separator before prompt
+                prompt,
+            ]
+        )
+
+        # Get token
+        token, token_idx = await self.token_pool.acquire()
+
+        try:
+            env = os.environ.copy()
+            env["CLAUDE_CODE_TOKEN"] = token
+
+            # Add enhanced metadata to environment
+            if task.team_id:
+                env["AGENT_TEAM_ID"] = task.team_id
+            env["AGENT_UUID"] = task.agent_uuid or ""
+
+            # Add dynamic architecture environment variables
+            if self.enable_dynamic_configs:
+                env["AGENT_WORKSPACE"] = str(agent_work_dir)
+                env["AGENT_MCP_CONFIG"] = str(agent_work_dir / "mcp_config.json")
+                env["AGENT_TASK_ID"] = task.task_id
+                env["AGENT_TASK_TYPE"] = task.task_type
+
+                # Load .env file if exists
+                env_file = agent_work_dir / ".env"
+                if env_file.exists():
+                    for line in env_file.read_text().splitlines():
+                        if "=" in line and not line.startswith("#"):
+                            key, value = line.split("=", 1)
+                            env[key.strip()] = value.strip()
+
+            # Execute
+            task.start_time = datetime.now().timestamp()
+            task.status = "running"
+            await self.dep_manager.mark_running(task.task_id)
+
+            try:
+                logger.info(
+                    f"Executing {task.task_id} (UUID: {task.agent_uuid}) ({task.task_type})"
+                )
+
+                # Set up log file if log_to_work_dir is enabled
+                log_file_handle = None
+                if self.log_to_work_dir and self.enable_dynamic_configs:
+                    log_file = agent_work_dir / "logs" / f"agent_{task.task_id}.log"
+                    log_file.parent.mkdir(parents=True, exist_ok=True)
+                    log_file_handle = open(log_file, "w")
+                    stderr_target = log_file_handle
+                else:
+                    stderr_target = asyncio.subprocess.PIPE
+
+                process = await asyncio.create_subprocess_exec(
+                    *cmd,
+                    env=env,
+                    cwd=str(agent_work_dir) if self.enable_dynamic_configs else None,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=stderr_target,
+                )
+
+                stdout, stderr = await process.communicate()
+
+                # Close log file if used
+                if log_file_handle:
+                    log_file_handle.close()
+                    # Read stderr from log file if process failed
+                    if process.returncode != 0:
+                        with open(
+                            agent_work_dir / "logs" / f"agent_{task.task_id}.log"
+                        ) as f:
+                            stderr = f.read().encode()
+
+                task.end_time = datetime.now().timestamp()
+                duration = task.end_time - task.start_time
+
+                if process.returncode == 0:
+                    task.status = "completed"
+                    task.result = json.loads(stdout.decode())
+                    await self.dep_manager.mark_completed(task.task_id)
+                    self.metrics["completed"] += 1
+
+                    logger.info(f"✓ {task.task_id} completed in {duration:.2f}s")
+                else:
+                    task.status = "failed"
+                    task.error = (
+                        stderr.decode()
+                        if stderr
+                        else "Process failed with no stderr output"
+                    )
+                    await self.dep_manager.mark_failed(task.task_id)
+                    self.metrics["failed"] += 1
+
+                    logger.error(f"✗ {task.task_id} failed: {task.error}")
+
+                self.metrics["total_duration"] += duration
+
+            except Exception as e:
+                task.status = "failed"
+                task.error = str(e)
+                await self.dep_manager.mark_failed(task.task_id)
+                self.metrics["failed"] += 1
+
+                logger.error(f"✗ {task.task_id} exception: {e}")
+
+        finally:
+            # Always release the token
+            if hasattr(self.token_pool, "release"):
+                self.token_pool.release(token_idx)
+
+        # Validate deliverable if enabled
+        if (
+            task.validation_required
+            and self.quality_gate_manager
+            and task.status == "completed"
+        ):
+            validation = await self.dep_manager.validate_task_deliverable(task)
+
+            if validation.success:
+                self.quality_metrics["deliverables_validated"] += 1
+                logger.info(
+                    f"Task {task.task_id} deliverable validated: {validation.message}"
+                )
+            else:
+                self.quality_metrics["deliverables_failed"] += 1
+                logger.warning(
+                    f"Task {task.task_id} deliverable validation failed: {validation.message}"
+                )
+
+                # Mark task as failed if deliverable validation fails
+                task.status = "failed"
+                task.error = f"Deliverable validation failed: {validation.message}"
+                await self.dep_manager.mark_failed(task.task_id)
+
+        # Post-execution monitoring hook
+        if self.monitoring_hook:
+            await self.monitoring_hook(task, "post_execute")
+
+        # Save enhanced task state
+        task_file = self.output_dir / "tasks" / f"{task.task_id}.json"
+        task_file.parent.mkdir(exist_ok=True)
+        task_file.write_text(json.dumps(task.to_dict(), indent=2))
+
+        return task.to_dict()
+
+    async def execute_batch(self, tasks: List[AgentTask]) -> List[Dict]:
+        """Execute batch with enhanced dependency and quality gate management"""
+
+        if self.quality_gate_manager:
+            logger.info("Starting quality gate validation background process")
+
+        # Execute using parent implementation
+        results = await super().execute_batch(tasks)
+
+        # Generate quality report
+        if self.quality_gate_manager:
+            quality_report = await self.quality_gate_manager.get_status_report()
+
+            # Save quality report
+            report_file = self.output_dir / "quality_gate_report.json"
+            report_file.write_text(json.dumps(quality_report, indent=2))
+
+            logger.info(f"Quality gate report saved to {report_file}")
+
+        return results
+
+    async def run(
+        self,
+        task_generator: Callable[[], List[AgentTask]],
+        result_processor: Optional[Callable[[List[Dict]], None]] = None,
+    ) -> Dict:
+        """Run orchestration with quality gate support"""
+
+        try:
+            # Run the orchestration
+            result = await super().run(task_generator, result_processor)
+
+            # Add quality metrics to result
+            if self.enable_quality_gates:
+                result["quality_metrics"] = self.quality_metrics
+
+                if self.quality_gate_manager:
+                    result[
+                        "quality_status"
+                    ] = await self.quality_gate_manager.get_status_report()
+
+            return result
+
+        finally:
+            # Cleanup quality gate manager
+            if self.quality_gate_manager:
+                await self.quality_gate_manager.stop_validation_loop()
+
+    async def get_quality_status(self) -> Dict[str, Any]:
+        """Get current quality gate status"""
+        if not self.quality_gate_manager:
+            return {"status": "quality_gates_disabled"}
+
+        return await self.quality_gate_manager.get_status_report()
+
+    async def trigger_gate_validation(self, gate_id: str) -> ValidationResult:
+        """Manually trigger validation of a specific gate"""
+        if not self.quality_gate_manager:
+            raise RuntimeError("Quality gates not enabled")
+
+        return await self.quality_gate_manager.validate_gate(gate_id)
+
+    # Enhanced monitoring and background execution methods
+
+    async def launch_background_team(
+        self, tasks: List[EnhancedAgentTask], team_id: Optional[str] = None
+    ) -> str:
+        """
+        Launch a team of agents in background execution.
+        Returns job_id for monitoring and management.
+        """
+
+        job_id = team_id or f"bg-{str(uuid.uuid4())[:8]}"
+        agent_uuids = [task.agent_uuid for task in tasks if task.agent_uuid]
+
+        # Create background job
+        job = BackgroundJob(
+            job_id=job_id, team_id=team_id or job_id, agent_uuids=agent_uuids
+        )
+
+        async with self._background_task_lock:
+            self.background_jobs[job_id] = job
+
+        self.monitoring_metrics["background_jobs"] += 1
+
+        # Launch background task
+        asyncio.create_task(self._execute_background_team(job, tasks))
+
+        logger.info(f"Launched background team {job_id} with {len(tasks)} agents")
+        return job_id
+
+    async def get_background_job_status(self, job_id: str) -> Optional[Dict]:
+        """Get status of background job"""
+
+        async with self._background_task_lock:
+            job = self.background_jobs.get(job_id)
+            if not job:
+                return None
+
+        # Get individual agent statuses if monitoring enabled
+        agent_statuses = {}
+        if self.enable_monitoring and self.agent_monitor:
+            for agent_uuid in job.agent_uuids:
+                try:
+                    status = await self.agent_monitor.get_agent_status(agent_uuid)
+                    agent_statuses[agent_uuid] = {
+                        "status": status.status,
+                        "progress": status.progress.progress_percentage,
+                        "errors": status.error_count,
+                        "last_activity": status.last_activity_timestamp,
+                    }
+                except Exception as e:
+                    agent_statuses[agent_uuid] = {"error": str(e)}
+
+        return {
+            "job_id": job.job_id,
+            "team_id": job.team_id,
+            "status": job.status,
+            "start_time": job.start_time,
+            "end_time": job.end_time,
+            "agent_count": len(job.agent_uuids),
+            "agent_statuses": agent_statuses,
+            "results": job.results,
+        }
+
+    async def get_agent_status(self, agent_uuid: str) -> Optional[AgentStatus]:
+        """Get real-time status for specific agent"""
+
+        if not self.enable_monitoring or not self.agent_monitor:
+            logger.warning("Monitoring not enabled")
+            return None
+
+        try:
+            if self.agent_monitor:
+                return await self.agent_monitor.get_agent_status(agent_uuid)
+            else:
+                logger.warning("Agent monitor not initialized")
+                return None
+        except Exception as e:
+            logger.error(f"Error getting agent status for {agent_uuid}: {e}")
+            return None
+
+    async def get_team_status(self, team_id: str) -> Dict[str, AgentStatus]:
+        """Get status for all agents in a team"""
+
+        if not self.enable_monitoring or not self.agent_monitor:
+            return {}
+
+        try:
+            if self.agent_monitor:
+                return await self.agent_monitor.get_all_agent_statuses(team_id)
+            else:
+                logger.warning("Agent monitor not initialized")
+                return {}
+        except Exception as e:
+            logger.error(f"Error getting team status for {team_id}: {e}")
+            return {}
+
+    async def _execute_background_team(
+        self, job: BackgroundJob, tasks: List[EnhancedAgentTask]
+    ):
+        """Execute background team and update job status"""
+
+        try:
+            # Mark tasks for background execution
+            for task in tasks:
+                task.background_execution = True
+
+            # Execute batch using base orchestrator
+            results = await self.execute_batch(tasks)
+
+            # Update job status
+            async with self._background_task_lock:
+                job.status = "completed"
+                job.end_time = datetime.now().timestamp()
+                job.results = {r["task_id"]: r for r in results}
+
+            logger.info(f"Background team {job.job_id} completed")
+
+        except Exception as e:
+            async with self._background_task_lock:
+                job.status = "failed"
+                job.end_time = datetime.now().timestamp()
+                job.results = {"error": str(e)}
+
+            logger.error(f"Background team {job.job_id} failed: {e}")
+
+    async def _build_enhanced_prompt(self, task: EnhancedAgentTask) -> str:
+        """Build enhanced prompt with metadata"""
+
+        if self.task_builder_hook:
+            return await self.task_builder_hook(task)
+
+        # Add metadata to prompt for agent awareness
+        metadata_prefix = ""
+        if task.agent_uuid:
+            metadata_prefix += f"AGENT_UUID: {task.agent_uuid}\n"
+        if task.team_id:
+            metadata_prefix += f"TEAM_ID: {task.team_id}\n"
+        if task.quality_gates:
+            metadata_prefix += f"QUALITY_GATES: {', '.join(task.quality_gates)}\n"
+
+        if metadata_prefix:
+            metadata_prefix += "\n"
+
+        return metadata_prefix + task.prompt
+
+    def _generate_enhanced_mcp_config(self, task: EnhancedAgentTask, config_path: Path):
+        """Generate enhanced agent-specific MCP configuration with task-specific requirements."""
+
+        # Start with base config
+        if self.master_mcp_registry_path and self.master_mcp_registry_path.exists():
+            with open(self.master_mcp_registry_path) as f:
+                mcp_config = json.load(f)
+        else:
+            # Use minimal config
+            mcp_config = {
+                "mcpServers": {
+                    "mcp_web_search": {
+                        "command": "npx",
+                        "args": ["-y", "brave-search-mcp"],
+                        "env": {"BRAVE_API_KEY": "BSAqv6fii19i_ZRARk67Gs5udOHgxSN"},
+                    },
+                }
+            }
+
+        # Filter based on execution profile and task MCP needs
+        if task.mcp_needs:
+            # Only include specifically requested MCP servers
+            filtered_servers = {}
+            for server_name in task.mcp_needs:
+                if server_name in mcp_config.get("mcpServers", {}):
+                    filtered_servers[server_name] = mcp_config["mcpServers"][
+                        server_name
+                    ]
+            mcp_config["mcpServers"] = filtered_servers
+        elif self.agent_execution_profile != "full":
+            # Apply profile filtering if no specific needs
+            mcp_config = self._filter_mcp_by_profile(
+                mcp_config, self.agent_execution_profile
+            )
+
+        # Task-specific customizations based on task type
+        if task.task_type == "research":
+            # Ensure research tools are included
+            if "mcp_web_search" not in mcp_config.get("mcpServers", {}):
+                mcp_config.setdefault("mcpServers", {})["mcp_web_search"] = {
+                    "command": "npx",
+                    "args": ["-y", "brave-search-mcp"],
+                    "env": {"BRAVE_API_KEY": "BSAqv6fii19i_ZRARk67Gs5udOHgxSN"},
+                }
+        elif task.task_type == "monitoring":
+            # Could add monitoring-specific tools here if needed
+            pass
+
+        # Update working directories and environment in config
+        work_dir = config_path.parent
+        for server_name, server_config in mcp_config.get("mcpServers", {}).items():
+            # Update environment variables
+            if "env" not in server_config:
+                server_config["env"] = {}
+
+            server_config["env"]["AGENT_TASK_ID"] = task.task_id
+            server_config["env"]["AGENT_WORK_DIR"] = str(work_dir)
+            server_config["env"]["AGENT_UUID"] = task.agent_uuid or ""
+
+            if task.team_id:
+                server_config["env"]["AGENT_TEAM_ID"] = task.team_id
+
+        # Write config
+        config_path.write_text(json.dumps(mcp_config, indent=2))
+
+        logger.debug(f"Generated enhanced MCP config for {task.task_id}: {config_path}")
+
+    # ExecutionPlan Integration Methods
+
+    async def execute_plan(self, execution_plan) -> Dict[str, Any]:
+        """
+        Execute an ExecutionPlan with full orchestrator capabilities.
+
+        Args:
+            execution_plan: ExecutionPlan object to execute
+
+        Returns:
+            Execution results with metrics and status
+        """
+        if not EXECUTION_PLAN_AVAILABLE:
+            raise RuntimeError(
+                "ExecutionPlan not available - missing execution_plan package"
+            )
+
+        if not isinstance(execution_plan, ExecutionPlan):
+            raise ValueError("execution_plan must be an ExecutionPlan instance")
+
+        logger.info(
+            f"Executing plan: {execution_plan.name} (ID: {execution_plan.plan_id})"
+        )
+
+        try:
+            # Validate plan compatibility
+            warnings = self.execution_plan_adapter.validate_orchestrator_compatibility(
+                execution_plan
+            )
+            if warnings:
+                for warning in warnings:
+                    logger.warning(f"Plan compatibility warning: {warning}")
+
+            # Initialize quality gates from plan
+            if execution_plan.enable_quality_gates and self.quality_gate_manager:
+                await self.execution_plan_adapter.initialize_quality_gates(
+                    execution_plan
+                )
+
+            # Convert plan to orchestrator format
+            plan_data = self.execution_plan_adapter.convert_execution_plan(
+                execution_plan
+            )
+            enhanced_tasks = plan_data["tasks"]
+            config = plan_data["config"]
+
+            # Apply plan configuration
+            if config.get("output_directory"):
+                # Note: output_dir is set at initialization, we can log it for tracking
+                logger.info(f"Plan output directory: {config['output_directory']}")
+
+            # Execute based on execution mode
+            execution_mode = config.get("execution_mode", ExecutionMode.PARALLEL)
+
+            if execution_mode == ExecutionMode.SEQUENTIAL:
+                results = await self._execute_sequential(enhanced_tasks)
+            elif execution_mode == ExecutionMode.PARALLEL:
+                results = await self.execute_batch(enhanced_tasks)
+            elif execution_mode == ExecutionMode.MIXED:
+                results = await self._execute_mixed(enhanced_tasks, execution_plan)
+            else:
+                raise ValueError(f"Unsupported execution mode: {execution_mode}")
+
+            # Process results
+            execution_result = {
+                "plan_id": execution_plan.plan_id,
+                "plan_name": execution_plan.name,
+                "execution_mode": (
+                    execution_mode.value
+                    if hasattr(execution_mode, "value")
+                    else str(execution_mode)
+                ),
+                "total_tasks": len(enhanced_tasks),
+                "results": results,
+                "metrics": self.metrics,
+                "quality_metrics": (
+                    self.quality_metrics if self.enable_quality_gates else None
+                ),
+                "monitoring_metrics": (
+                    self.monitoring_metrics if self.enable_monitoring else None
+                ),
+            }
+
+            # Save execution report
+            report_file = (
+                self.output_dir / f"execution_plan_report_{execution_plan.plan_id}.json"
+            )
+            report_file.write_text(json.dumps(execution_result, indent=2))
+
+            logger.info(
+                f"ExecutionPlan {execution_plan.plan_id} completed - report saved to {report_file}"
+            )
+
+            return execution_result
+
+        except Exception as e:
+            logger.error(f"ExecutionPlan execution failed: {e}")
+            raise
+
+        finally:
+            # Cleanup quality gates
+            if self.quality_gate_manager:
+                try:
+                    await self.quality_gate_manager.stop_validation_loop()
+                except Exception as e:
+                    logger.warning(f"Quality gate cleanup warning: {e}")
+
+    async def _execute_sequential(self, tasks: List[EnhancedAgentTask]) -> List[Dict]:
+        """Execute tasks sequentially respecting dependencies"""
+
+        if not self.execution_plan_adapter:
+            raise RuntimeError("ExecutionPlan adapter not available")
+
+        results = []
+
+        # Get execution order from dependency graph
+        task_map = {task.task_id: task for task in tasks}
+        remaining_tasks = set(task.task_id for task in tasks)
+
+        while remaining_tasks:
+            # Find tasks that can run (dependencies satisfied)
+            ready_tasks = []
+            for task_id in remaining_tasks:
+                task = task_map[task_id]
+                if all(dep not in remaining_tasks for dep in task.dependencies):
+                    ready_tasks.append(task)
+
+            if not ready_tasks:
+                # Check for circular dependencies
+                logger.error(
+                    f"No tasks ready to run - possible circular dependency: {remaining_tasks}"
+                )
+                break
+
+            # Execute one task at a time
+            for task in ready_tasks:
+                logger.info(f"Executing sequential task: {task.task_id}")
+                result = await self.execute_agent(task)
+                results.append(result)
+                remaining_tasks.remove(task.task_id)
+
+        return results
+
+    async def _execute_mixed(
+        self, tasks: List[EnhancedAgentTask], execution_plan
+    ) -> List[Dict]:
+        """Execute tasks with mixed parallel/sequential based on dependencies and phases"""
+
+        if not self.execution_plan_adapter:
+            raise RuntimeError("ExecutionPlan adapter not available")
+
+        # Get execution order batches
+        execution_batches = self.execution_plan_adapter.get_execution_order_batches(
+            execution_plan
+        )
+        task_map = {task.task_id: task for task in tasks}
+
+        all_results = []
+
+        # Execute each batch (tasks in a batch can run in parallel)
+        for batch_num, batch_task_ids in enumerate(execution_batches):
+            logger.info(
+                f"Executing batch {batch_num + 1}/{len(execution_batches)} with {len(batch_task_ids)} tasks"
+            )
+
+            batch_tasks = [
+                task_map[task_id] for task_id in batch_task_ids if task_id in task_map
+            ]
+
+            # Execute batch tasks in parallel
+            batch_results = await asyncio.gather(
+                *[self.execute_agent(task) for task in batch_tasks],
+                return_exceptions=True,
+            )
+
+            # Process batch results
+            for result in batch_results:
+                if isinstance(result, Exception):
+                    logger.error(f"Batch execution error: {result}")
+                    # Create failed result
+                    failed_result = {
+                        "task_id": "unknown",
+                        "status": "failed",
+                        "error": str(result),
+                    }
+                    all_results.append(failed_result)
+                else:
+                    all_results.append(result)
+
+            # Brief pause between batches
+            await asyncio.sleep(0.5)
+
+        return all_results
+
+    def create_enhanced_task(
+        self,
+        task_id: str,
+        task_type: str,
+        prompt: str,
+        dependencies: List[str] = None,
+        quality_gates: List[str] = None,
+        validation_required: bool = True,
+        phase_id: str = None,
+        context: Dict[str, Any] = None,
+        # Enhanced parameters
+        agent_uuid: Optional[str] = None,
+        team_id: Optional[str] = None,
+        monitoring_enabled: bool = True,
+    ) -> EnhancedAgentTask:
+        """Convenience method to create enhanced tasks"""
+
+        return EnhancedAgentTask(
+            task_id=task_id,
+            task_type=task_type,
+            prompt=prompt,
+            dependencies=dependencies or [],
+            quality_gates=quality_gates or [],
+            validation_required=validation_required,
+            phase_id=phase_id,
+            context=context or {},
+            # Enhanced parameters
+            agent_uuid=agent_uuid,
+            team_id=team_id,
+            monitoring_enabled=monitoring_enabled,
+        )
+
+
+# Factory functions for common configurations
+
+
+def create_database_orchestrator(
+    output_dir: Path, database_url: str, max_parallel: int = 5, tokens: List[str] = None
+) -> EnhancedOrchestrator:
+    """Create orchestrator pre-configured for database operations"""
+
+    quality_config = {
+        "gates": [
+            {
+                "gate_id": "database_ready",
+                "name": "Database Ready",
+                "description": "Database is accessible and has required extensions",
+                "validator_type": "database",
+                "config": {
+                    "connection_string": database_url,
+                    "query": "SELECT * FROM pg_extension WHERE extname = 'vector'",
+                },
+            },
+            {
+                "gate_id": "migration_ready",
+                "name": "Migration Ready",
+                "description": "Database schema is ready for migration",
+                "validator_type": "database",
+                "config": {
+                    "connection_string": database_url,
+                    "query": "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public'",
+                },
+                "dependencies": ["database_ready"],
+            },
+        ],
+        "phases": [
+            {
+                "phase_id": "database_setup",
+                "name": "Database Setup",
+                "description": "Initialize database and extensions",
+                "gates": ["database_ready", "migration_ready"],
+            }
+        ],
+    }
+
+    return EnhancedOrchestrator(
+        output_dir=output_dir,
+        max_parallel=max_parallel,
+        tokens=tokens,
+        enable_quality_gates=True,
+        quality_gate_config=quality_config,
+    )
+
+
+def create_web_service_orchestrator(
+    output_dir: Path,
+    api_endpoints: List[str],
+    max_parallel: int = 3,
+    tokens: List[str] = None,
+) -> EnhancedOrchestrator:
+    """Create orchestrator pre-configured for web service operations"""
+
+    gates = []
+    for i, endpoint in enumerate(api_endpoints):
+        gates.append(
+            {
+                "gate_id": f"api_ready_{i}",
+                "name": f"API Ready {endpoint}",
+                "description": f"API endpoint {endpoint} is responding",
+                "validator_type": "http",
+                "config": {
+                    "url": endpoint,
+                    "method": "GET",
+                    "expected_status": [
+                        200,
+                        404,
+                    ],  # Either OK or Not Found is acceptable
+                },
+            }
+        )
+
+    quality_config = {
+        "gates": gates,
+        "phases": [
+            {
+                "phase_id": "api_validation",
+                "name": "API Validation",
+                "description": "Validate all API endpoints are accessible",
+                "gates": [g["gate_id"] for g in gates],
+            }
+        ],
+    }
+
+    return EnhancedOrchestrator(
+        output_dir=output_dir,
+        max_parallel=max_parallel,
+        tokens=tokens,
+        enable_quality_gates=True,
+        quality_gate_config=quality_config,
+    )

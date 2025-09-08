@@ -4,28 +4,44 @@ WBS Documenter - Production Run Script
 Uses the working agent-orchestrator with 15 parallel tokens
 """
 
+import argparse
 import asyncio
 import json
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Add agent-orchestrator to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "agent-orchestrator" / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "agent-orchestrator"))
 
-from generic_orchestrator import AgentTask, GenericOrchestrator
+from src.generic_orchestrator import AgentTask, GenericOrchestrator
 
 
 class WBSDocumenter:
     """WBS documentation system using parallel agents"""
 
-    def __init__(self, output_dir: Path = None):
+    def __init__(
+        self,
+        output_dir: Path = None,
+        non_interactive: bool = False,
+        automation_config: Dict[str, Any] = None,
+    ):
         if output_dir is None:
             output_dir = Path("./wbs_output") / datetime.now().strftime("%Y%m%d_%H%M%S")
 
         self.output_dir = output_dir
         self.docs_dir = output_dir / "docs"
+        self.non_interactive = non_interactive
+
+        # Default automation configuration
+        self.automation_config = automation_config or {
+            "auto_proceed": True,
+            "review_timeout": 5,  # seconds to show review info before proceeding
+            "log_decisions": True,
+            "create_review_summary": True,
+        }
         self.docs_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize orchestrator with full parallelism
@@ -261,17 +277,33 @@ class WBSDocumenter:
         # Phase 1: Discovery
         discovery_results = await self.phase1_discovery()
 
-        # Human review checkpoint
-        print("\n" + "⚠️" * 20)
-        print("HUMAN REVIEW CHECKPOINT")
-        print("Please review the discovered structure in:")
-        print(f"  {self.docs_dir}/discovered_structure.json")
-        print("⚠️" * 20)
+        # Review checkpoint - automated or interactive
+        if self.non_interactive and self.automation_config.get("auto_proceed", True):
+            print("\n" + "🤖" * 20)
+            print("AUTOMATED REVIEW CHECKPOINT")
+            print("Structure review details:")
+            print(f"  📁 {self.docs_dir}/discovered_structure.json")
+            if self.automation_config.get("log_decisions", True):
+                print("🤖 AUTO-DECISION: Proceeding with stage documentation")
 
-        response = input("\nProceed with stage documentation? (y/n): ")
-        if response.lower() != "y":
-            print("Documentation halted for review.")
-            return
+            # Brief pause to show info if configured
+            review_timeout = self.automation_config.get("review_timeout", 0)
+            if review_timeout > 0:
+                print(f"⏱️  Review timeout: {review_timeout}s")
+                await asyncio.sleep(review_timeout)
+            print("🤖" * 20)
+        else:
+            # Interactive mode
+            print("\n" + "⚠️" * 20)
+            print("HUMAN REVIEW CHECKPOINT")
+            print("Please review the discovered structure in:")
+            print(f"  {self.docs_dir}/discovered_structure.json")
+            print("⚠️" * 20)
+
+            response = input("\nProceed with stage documentation? (y/n): ")
+            if response.lower() != "y":
+                print("Documentation halted for review.")
+                return
 
         # Phase 2: Stage documentation
         stage_results = await self.phase2_stage_documentation()
@@ -299,14 +331,51 @@ class WBSDocumenter:
 
 async def main():
     """Main entry point"""
+    parser = argparse.ArgumentParser(description="WBS Documenter - Production Version")
+    parser.add_argument(
+        "--non-interactive", action="store_true", help="Run in non-interactive mode"
+    )
+    parser.add_argument("--input-data", help="Input data directory for analysis")
+    parser.add_argument("--project-name", help="Project name for documentation")
+    parser.add_argument("--output-dir", help="Output directory for results")
+    parser.add_argument(
+        "--auto-proceed",
+        action="store_true",
+        default=True,
+        help="Auto-proceed through checkpoints",
+    )
+    parser.add_argument(
+        "--review-timeout", type=int, default=3, help="Review timeout in seconds"
+    )
+
+    args = parser.parse_args()
 
     print("\n" + "=" * 60)
     print("WBS DOCUMENTER - PRODUCTION VERSION")
     print("Powered by Agent Orchestrator with 15 parallel tokens")
+    if args.non_interactive:
+        print("🤖 AUTOMATED MODE ENABLED")
     print("=" * 60)
 
-    # Check token availability
-    documenter = WBSDocumenter()
+    # Setup automation config
+    automation_config = {
+        "auto_proceed": args.auto_proceed,
+        "review_timeout": args.review_timeout,
+        "log_decisions": True,
+        "create_review_summary": True,
+    }
+
+    # Setup output directory
+    output_dir = None
+    if args.output_dir:
+        output_dir = Path(args.output_dir)
+
+    # Initialize documenter
+    documenter = WBSDocumenter(
+        output_dir=output_dir,
+        non_interactive=args.non_interactive,
+        automation_config=automation_config,
+    )
 
     if documenter.orchestrator.token_pool.size() < 2:
         print("\n⚠️  WARNING: Limited parallelism available")

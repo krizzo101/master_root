@@ -1,0 +1,102 @@
+{
+  "tasks": [
+    {
+      "task_id": "dashboard_specifications_generation",
+      "task_type": "technical-writer",
+      "prompt": "Create comprehensive dashboard specification documents based on current orchestrator monitoring needs. CRITICAL CONTEXT: Currently 10+ workflows running simultaneously with all logs mixed in same directory - impossible to monitor individual workflows.\n\nGenerate these specification documents in docs/ directory:\n\n1. PROJECT_REQUIREMENTS.md - Current problems (mixed logs, no workflow tracking), success criteria (monitor 10+ concurrent workflows)\n2. UI_SPECIFICATIONS.md - Interface mockups with ASCII art for main dashboard grid, workflow detail view, multi-workflow comparison\n3. TECHNICAL_SPECIFICATIONS.md - FastAPI + WebSocket stack, performance targets, integration constraints \n4. API_SPECIFICATIONS.md - REST endpoints, WebSocket events, data models\n\nKey requirements to document:\n- Real-time monitoring of 10+ concurrent workflows\n- Workflow-specific log separation and streaming\n- Progress tracking with ETAs and agent activity\n- Deliverable tracking with download links\n- Task pipeline visualization with dependencies\n- Multi-workflow comparison view",
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/docs",
+        "current_problem": "10+ workflows writing to same log directory, zero visibility into individual workflow progress",
+        "existing_orchestrator": "/home/opsvi/master_root/apps/agent-orchestrator/src/generic_orchestrator.py",
+        "current_dashboard": "/home/opsvi/master_root/start_orchestrator_dashboard.py",
+        "current_issues": "Basic metrics only, no workflow separation, no real-time log tailing",
+        "performance_target": "Handle 10+ concurrent workflows with <500ms update latency"
+      }
+    },
+    {
+      "task_id": "dashboard_architecture_design",
+      "task_type": "solution-architect",
+      "dependencies": ["dashboard_specifications_generation"],
+      "prompt": "Design comprehensive dashboard architecture based on the specification documents in docs/ directory. Read and follow PROJECT_REQUIREMENTS.md, UI_SPECIFICATIONS.md, TECHNICAL_SPECIFICATIONS.md, and API_SPECIFICATIONS.md.\n\nCreate detailed architecture covering:\n1. Backend API design (FastAPI with WebSocket support)\n2. Real-time workflow monitoring system\n3. File system monitoring for logs and deliverables\n4. Integration points with existing GenericOrchestrator class\n5. Database/state management approach\n6. Scalability architecture for 10+ concurrent workflows\n\nOutput detailed architecture diagrams, component specifications, and integration strategy.",
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/dashboard_build/architecture",
+        "reference_docs": [
+          "/home/opsvi/master_root/apps/agent-orchestrator/docs/PROJECT_REQUIREMENTS.md",
+          "/home/opsvi/master_root/apps/agent-orchestrator/docs/UI_SPECIFICATIONS.md",
+          "/home/opsvi/master_root/apps/agent-orchestrator/docs/TECHNICAL_SPECIFICATIONS.md",
+          "/home/opsvi/master_root/apps/agent-orchestrator/docs/API_SPECIFICATIONS.md"
+        ],
+        "orchestrator_integration": "/home/opsvi/master_root/apps/agent-orchestrator/src/generic_orchestrator.py",
+        "new_orchestrator_fields": "AgentTask now has work_dir_name field (line 49)"
+      }
+    },
+    {
+      "task_id": "dashboard_backend_implementation",
+      "task_type": "development-specialist",
+      "dependencies": ["dashboard_architecture_design"],
+      "prompt": "Implement the dashboard backend based on architecture design and specification documents. Reference all docs in docs/ directory for requirements.\n\nImplement:\n1. FastAPI application with WebSocket endpoints for real-time updates\n2. WorkflowMonitor class to track active workflows from running processes\n3. LogStreamer for real-time log tailing with filtering\n4. REST API endpoints for workflow data, task status, metrics\n5. File system watchers for deliverable tracking\n6. Integration hooks with existing GenericOrchestrator\n\nEnsure backend can handle current load (10+ concurrent workflows) with real-time updates.",
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/dashboard_build/backend",
+        "python_version": "3.12",
+        "dependencies": ["fastapi", "websockets", "watchdog", "asyncio", "psutil"],
+        "current_load": "10+ workflows currently running, need to monitor existing processes",
+        "orchestrator_location": "/home/opsvi/master_root/apps/agent-orchestrator/src/generic_orchestrator.py"
+      }
+    },
+    {
+      "task_id": "dashboard_frontend_implementation",
+      "task_type": "development-specialist",
+      "dependencies": ["dashboard_architecture_design"],
+      "prompt": "Create dashboard frontend web interface based on UI_SPECIFICATIONS.md mockups and requirements.\n\nImplement exact interface specified in docs:\n1. Main dashboard grid view with workflow cards showing progress bars, runtime, ETA, agent status\n2. Workflow detail view with 3-panel layout (task pipeline, live logs, metrics)\n3. Real-time log streaming with auto-scroll and filtering\n4. Multi-workflow comparison view (2x2 grid)\n5. Task pipeline visualization with dependency arrows\n6. Responsive design, WebSocket integration for live updates\n\nUse vanilla JavaScript or lightweight framework for performance under heavy load.",
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/dashboard_build/frontend",
+        "static_files": "/home/opsvi/master_root/apps/agent-orchestrator/web",
+        "websocket_endpoint": "ws://localhost:8765/ws",
+        "ui_mockup_reference": "/home/opsvi/master_root/apps/agent-orchestrator/docs/UI_SPECIFICATIONS.md",
+        "performance_requirement": "60fps updates, handle 10+ workflow cards simultaneously"
+      }
+    },
+    {
+      "task_id": "orchestrator_integration",
+      "task_type": "development-specialist",
+      "dependencies": ["dashboard_backend_implementation"],
+      "prompt": "Integrate dashboard with existing GenericOrchestrator to enable workflow tracking and separation. Based on integration requirements in TECHNICAL_SPECIFICATIONS.md.\n\nImplement:\n1. Workflow-specific output directory structure (output/workflow_NAME_TIMESTAMP/)\n2. Enhanced logging with workflow identification in filenames\n3. Dashboard state reporting hooks in GenericOrchestrator\n4. Workflow naming derived from task file names\n5. Agent activity monitoring and progress tracking\n6. ETA calculation based on task completion rates\n\nMUST preserve backward compatibility - existing main.py --tasks-file workflows must continue working.",
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/src",
+        "orchestrator_file": "/home/opsvi/master_root/apps/agent-orchestrator/src/generic_orchestrator.py",
+        "preserve_compatibility": true,
+        "current_output_structure": "/home/opsvi/master_root/apps/agent-orchestrator/output/logs/orchestrator_TIMESTAMP.log",
+        "proposed_structure": "output/workflow_NAME_TIMESTAMP/orchestrator.log + agents/ + deliverables/"
+      }
+    },
+    {
+      "task_id": "dashboard_testing_validation",
+      "task_type": "qa-testing-guru",
+      "dependencies": ["dashboard_backend_implementation", "dashboard_frontend_implementation", "orchestrator_integration"],
+      "prompt": "Test complete dashboard system against current high-load conditions (10+ concurrent workflows). Validate against all requirements in specification documents.\n\nTest scenarios:\n1. Real-time monitoring accuracy with current workflow load\n2. Log streaming performance with large log files from active workflows\n3. WebSocket connection stability under concurrent load\n4. Multi-workflow monitoring with existing running workflows\n5. UI responsiveness with 10+ workflow cards updating simultaneously\n6. Integration testing with existing orchestrator workflows\n7. Error handling and recovery scenarios\n\nUse actual running workflows for testing - don't create test scenarios, use real load.",
+      "context": {
+        "active_workflows": [
+          "create_documentation_workflow_task.json",
+          "session_optimization_phase1_tasks.json",
+          "run_orchestrator_task.py system-documentation"
+        ],
+        "current_load": "10+ workflows, 19 token pool likely saturated",
+        "performance_benchmarks": "Sub-500ms updates, 60fps UI, stable WebSocket under load",
+        "specification_compliance": "Must meet all requirements in docs/ directory"
+      }
+    },
+    {
+      "task_id": "dashboard_deployment_setup",
+      "task_type": "development-specialist",
+      "dependencies": ["dashboard_testing_validation"],
+      "prompt": "Create production deployment setup for dashboard system based on testing results and requirements.\n\nImplement:\n1. Production-ready startup script for dashboard server\n2. Service configuration with auto-restart capabilities\n3. Environment configuration management\n4. Production logging configuration\n5. Performance optimization settings for high-load scenarios\n6. Integration with existing orchestrator startup workflow\n7. Documentation for running dashboard alongside multiple workflows\n\nEnsure dashboard can start automatically and monitor existing workflows immediately.",
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator",
+        "service_name": "orchestrator-dashboard",
+        "default_port": 8765,
+        "startup_integration": "Must work with existing main.py workflow",
+        "production_requirements": "Handle 10+ workflows, auto-restart, performance monitoring"
+      }
+    }
+  ]
+}

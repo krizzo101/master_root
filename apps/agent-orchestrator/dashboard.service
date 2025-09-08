@@ -1,0 +1,50 @@
+[Unit]
+Description=Agent Orchestrator Dashboard Server
+Documentation=https://github.com/opsvi/agent-orchestrator/blob/main/DASHBOARD_INTEGRATION_GUIDE.md
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=opsvi
+Group=opsvi
+WorkingDirectory=/home/opsvi/master_root/apps/agent-orchestrator
+Environment=PYTHONPATH=/home/opsvi/master_root/apps/agent-orchestrator/src
+Environment=DASHBOARD_HOST=0.0.0.0
+Environment=DASHBOARD_PORT=8765
+Environment=DASHBOARD_LOG_LEVEL=INFO
+ExecStart=/home/opsvi/miniconda/bin/python production_dashboard.py --config production_config.json
+ExecReload=/bin/kill -USR1 $MAINPID
+
+# Auto-restart configuration
+Restart=always
+RestartSec=10
+StartLimitInterval=300
+StartLimitBurst=5
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=2G
+CPUQuota=200%
+
+# Security hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/opsvi/master_root/apps/agent-orchestrator/logs
+ReadWritePaths=/home/opsvi/master_root/apps/agent-orchestrator/outputs
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=dashboard
+
+# Health monitoring
+WatchdogSec=60
+NotifyAccess=none
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,22 @@
+{
+  "task_id": "stage_5",
+  "task_type": "documentation",
+  "prompt": "Document Stage 5: Testing Framework Implementation\n\n                Create comprehensive documentation including:\n                1. Overview and objectives\n                2. Key components and deliverables\n                3. Required inputs and outputs\n                4. Success criteria\n                5. Dependencies on other stages\n                6. Typical timeline and effort\n                7. Tools and technologies used\n                8. Best practices and pitfalls\n\n                Output detailed documentation to: wbs_output/test_20250908_001501/docs/stages/stage_5_testing_framework_implementation.md\n\n                IMPORTANT: Identify 3-7 major steps within this stage that should be documented separately.",
+  "context": {},
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "Error: Invalid MCP configuration: | No stdout captured | Exit code: 1 | Task: stage_5 (type: documentation) | Prompt: Document Stage 5: Testing Framework Implementation\n\n                Create comprehensive documentati",
+  "start_time": 1757304904.426348,
+  "end_time": 1757304906.217905,
+  "quality_gates": [],
+  "raw_output": null,
+  "error_details": {
+    "exit_code": 1,
+    "stderr": "file:///home/opsvi/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/cli.js:3649\n`);throw new Error(`Invalid MCP configuration:\n         ^\n\nError: Invalid MCP configuration:\nMCP config file not found: /home/opsvi/master_root/apps/wbs-documenter/wbs_output/test_20250908_001501/wbs_output/test_20250908_001501/research_mcp.json\n    at Ay0.<anonymous> (file:///home/opsvi/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/cli.js:3649:10)\n    at Ay0.B [as _actionHandler] (file:///home/opsvi/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/cli.js:703:528)\n    at file:///home/opsvi/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/cli.js:707:3127\n    at Ay0._chainOrCall (file:///home/opsvi/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/cli.js:707:1694)\n    at Ay0._parseCommand (file:///home/opsvi/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/cli.js:707:3103)\n    at Ay0.parseAsync (file:///home/opsvi/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/cli.js:704:4195)\n    at lu5 (file:///home/opsvi/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/cli.js:3680:1301)\n    at mu5 (file:///home/opsvi/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/cli.js:3640:1106)\n    at file:///home/opsvi/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/cli.js:3680:1450\n\nNode.js v22.14.0\n",
+    "stdout_preview": null,
+    "task_id": "stage_5",
+    "task_type": "documentation",
+    "timestamp": "2025-09-08T00:15:06.217917"
+  }
+}

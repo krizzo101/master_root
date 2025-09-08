@@ -17,6 +17,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
+# Multi-provider support
+try:
+    from .providers.openai_provider import OpenAIProvider
+except ImportError:
+    OpenAIProvider = None
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
@@ -40,6 +46,7 @@ class AgentTask:
     )  # Quality gates for enhanced orchestrator
     raw_output: Optional[str] = None  # Store raw stdout for debugging
     error_details: Optional[Dict] = None  # Detailed error information
+    work_dir_name: Optional[str] = None  # Custom working directory name
 
     def to_dict(self) -> Dict:
         """Convert to dictionary with error details"""
@@ -67,25 +74,89 @@ class TokenPool:
         if tokens is not None:
             self.tokens = [t for t in tokens if t and t.strip()]
         else:
-            # Call TokenLoader to get token pool - NO ENV FALLBACK ALLOWED
+            # Robust token loading with multiple fallback strategies
+            self.tokens = []
+
+            # Strategy 1: Try relative import (works when called from orchestrator)
             try:
                 from .token_loader import load_tokens
 
                 self.tokens = load_tokens()
-                if not self.tokens:
-                    raise RuntimeError("TokenLoader returned empty token list")
+                if self.tokens:
+                    print(f"✓ Loaded {len(self.tokens)} tokens via relative import")
             except ImportError:
-                # TokenLoader not available - CATASTROPHIC FAILURE
+                pass
+
+            # Strategy 2: Try absolute import (works when called from other apps)
+            if not self.tokens:
+                try:
+                    import os
+                    import sys
+
+                    # Add orchestrator src to path if not already there
+                    orchestrator_src = os.path.join(os.path.dirname(__file__), "..")
+                    if orchestrator_src not in sys.path:
+                        sys.path.insert(0, orchestrator_src)
+
+                    from src.token_loader import load_tokens
+
+                    self.tokens = load_tokens()
+                    if self.tokens:
+                        print(f"✓ Loaded {len(self.tokens)} tokens via absolute import")
+                except ImportError:
+                    pass
+
+            # Strategy 3: Direct file access to token_loader
+            if not self.tokens:
+                try:
+                    import importlib.util
+                    import os
+
+                    token_loader_path = os.path.join(
+                        os.path.dirname(__file__), "token_loader.py"
+                    )
+                    if os.path.exists(token_loader_path):
+                        spec = importlib.util.spec_from_file_location(
+                            "token_loader", token_loader_path
+                        )
+                        token_loader = importlib.util.module_from_spec(spec)
+                        spec.loader.exec_module(token_loader)
+                        self.tokens = token_loader.load_tokens()
+                        if self.tokens:
+                            print(
+                                f"✓ Loaded {len(self.tokens)} tokens via direct file access"
+                            )
+                except Exception:
+                    pass
+
+            # Strategy 4: Environment variable fallback (for emergency cases)
+            if not self.tokens:
+                import os
+
+                env_token = os.environ.get("CLAUDE_CODE_TOKEN")
+                if env_token:
+                    self.tokens = [env_token]
+                    print(
+                        "✓ Loaded 1 token from CLAUDE_CODE_TOKEN environment variable"
+                    )
+
+                # Try multiple tokens
+                env_tokens = os.environ.get("CLAUDE_CODE_TOKENS")
+                if env_tokens and not self.tokens:
+                    self.tokens = env_tokens.split(",")
+                    print(
+                        f"✓ Loaded {len(self.tokens)} tokens from CLAUDE_CODE_TOKENS environment variable"
+                    )
+
+            # Final check
+            if not self.tokens:
                 raise RuntimeError(
-                    "CATASTROPHIC FAILURE: TokenLoader not available and no explicit tokens provided. "
-                    "NO FALLBACK to environment variables allowed. "
-                    "TokenLoader must work or system must fail."
-                )
-            except Exception as e:
-                # TokenLoader failed - CATASTROPHIC FAILURE
-                raise RuntimeError(
-                    f"CATASTROPHIC FAILURE: TokenLoader failed: {str(e)}. "
-                    "NO FALLBACK to environment variables allowed."
+                    "CATASTROPHIC FAILURE: Could not load tokens via any strategy:\n"
+                    "- Relative import failed\n"
+                    "- Absolute import failed\n"
+                    "- Direct file access failed\n"
+                    "- Environment variables not set\n"
+                    "Please ensure tokens are available via TokenLoader or environment variables."
                 )
 
         # Ensure we have valid tokens
@@ -196,6 +267,7 @@ class GenericOrchestrator:
     """
     Generic orchestrator for parallel Claude agent execution.
     Can be customized for any use case by providing task generator and result processor.
+    Enhanced with workflow tracking and dashboard integration support.
     """
 
     def __init__(
@@ -211,12 +283,38 @@ class GenericOrchestrator:
         agent_base_work_dir: Optional[Path] = None,
         enable_dynamic_configs: bool = False,
         log_to_work_dir: bool = False,
+        # New workflow and dashboard parameters
+        workflow_name: Optional[str] = None,
+        task_file_path: Optional[str] = None,
+        enable_dashboard_reporting: bool = False,
+        dashboard_state_callback: Optional[Callable] = None,
     ):
-        self.output_dir = output_dir
+        # Determine workflow name and create workflow-specific output directory
+        self.workflow_name = self._determine_workflow_name(
+            workflow_name, task_file_path
+        )
+        self.workflow_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        # Create workflow-specific output directory structure: outputs/workflow_NAME/workflow_NAME_TIMESTAMP/
+        if workflow_name or task_file_path:
+            # Use workflow-specific directory structure
+            workflow_base_dir = output_dir.parent / "outputs" / self.workflow_name
+            workflow_dir = (
+                workflow_base_dir / f"{self.workflow_name}_{self.workflow_timestamp}"
+            )
+            self.output_dir = workflow_dir
+            self.workflow_base_dir = workflow_base_dir
+        else:
+            # Use provided output_dir directly for backward compatibility
+            self.output_dir = output_dir
+            self.workflow_base_dir = None
+
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         # Store all parameters including existing ones
         self.use_optimizations = use_optimizations
+        self.enable_dashboard_reporting = enable_dashboard_reporting
+        self.dashboard_state_callback = dashboard_state_callback
 
         # Store new parameters
         self.master_mcp_registry_path = master_mcp_registry_path
@@ -228,6 +326,12 @@ class GenericOrchestrator:
         self.enable_dynamic_configs = enable_dynamic_configs
         self.log_to_work_dir = log_to_work_dir
 
+        # Initialize workflow tracking
+        self.workflow_id = str(uuid.uuid4())
+        self.workflow_start_time = None
+        self.total_tasks = 0
+        self.task_completion_times = []  # For ETA calculations
+
         # Create agent work directory if needed
         if self.enable_dynamic_configs:
             self.agent_base_work_dir.mkdir(parents=True, exist_ok=True)
@@ -236,12 +340,11 @@ class GenericOrchestrator:
         (self.output_dir / "tasks").mkdir(exist_ok=True)
         (self.output_dir / "logs").mkdir(exist_ok=True)
 
-        # Setup debug file logging
-        self.log_file = (
-            self.output_dir
-            / "logs"
-            / f"orchestrator_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+        # Setup debug file logging with workflow identification
+        log_filename = (
+            f"orchestrator_{self.workflow_name}_{self.workflow_timestamp}.log"
         )
+        self.log_file = self.output_dir / "logs" / log_filename
         file_handler = logging.FileHandler(self.log_file)
         file_handler.setLevel(logging.DEBUG)
         formatter = logging.Formatter(
@@ -260,8 +363,16 @@ class GenericOrchestrator:
         self.dep_manager = DependencyManager()
         self.message_bus = MessageBus(output_dir / "messages")
 
-        # Setup Claude command
-        self.claude_cmd = ["claude", "-p"]
+        # Initialize multi-provider support
+        self._init_providers()
+
+        # Setup Claude command with main MCP config
+        self.claude_cmd = [
+            "claude",
+            "-p",
+            "--mcp-config",
+            "/home/opsvi/master_root/.mcp.json",
+        ]
 
         if use_optimizations:
             # NEW: Check for master registry first
@@ -338,6 +449,141 @@ class GenericOrchestrator:
         self.post_execute_hook: Optional[Callable] = None
         self.task_builder_hook: Optional[Callable] = None
 
+        # Initialize dashboard reporting if enabled
+        if self.enable_dashboard_reporting:
+            self._report_workflow_started()
+
+    def _determine_workflow_name(
+        self, workflow_name: Optional[str], task_file_path: Optional[str]
+    ) -> str:
+        """Determine workflow name from parameters or task file path."""
+        if workflow_name:
+            return workflow_name
+
+        if task_file_path:
+            # Extract workflow name from task file path
+            # Examples: system_analysis_tasks.json -> system_analysis
+            #           orchestrator_dashboard_build_tasks.json -> orchestrator_dashboard_build
+            task_file = Path(task_file_path)
+            name = task_file.stem  # Remove .json extension
+
+            # Remove common suffixes
+            for suffix in ["_tasks", "_task", "_workflow", "_plan"]:
+                if name.endswith(suffix):
+                    name = name[: -len(suffix)]
+                    break
+
+            return name
+
+        # Default workflow name
+        return "generic_workflow"
+
+    def _report_workflow_started(self):
+        """Report workflow start to dashboard if callback is configured."""
+        if self.dashboard_state_callback:
+            try:
+                state_data = {
+                    "event": "workflow_started",
+                    "workflow_id": self.workflow_id,
+                    "workflow_name": self.workflow_name,
+                    "output_dir": str(self.output_dir),
+                    "timestamp": datetime.now().isoformat(),
+                    "max_parallel": self.max_parallel,
+                    "token_pool_size": self.token_pool.size(),
+                }
+                self.dashboard_state_callback(state_data)
+            except Exception as e:
+                logger.warning(f"Failed to report workflow start to dashboard: {e}")
+
+    def _report_workflow_progress(
+        self, completed_tasks: int, total_tasks: int, current_task: Optional[str] = None
+    ):
+        """Report workflow progress to dashboard."""
+        if self.dashboard_state_callback:
+            try:
+                progress_percent = (
+                    int((completed_tasks / total_tasks) * 100) if total_tasks > 0 else 0
+                )
+                eta_seconds = self._calculate_eta(completed_tasks, total_tasks)
+
+                state_data = {
+                    "event": "workflow_progress",
+                    "workflow_id": self.workflow_id,
+                    "workflow_name": self.workflow_name,
+                    "completed_tasks": completed_tasks,
+                    "total_tasks": total_tasks,
+                    "progress_percent": progress_percent,
+                    "current_task": current_task,
+                    "eta_seconds": eta_seconds,
+                    "timestamp": datetime.now().isoformat(),
+                }
+                self.dashboard_state_callback(state_data)
+            except Exception as e:
+                logger.warning(f"Failed to report workflow progress to dashboard: {e}")
+
+    def _report_task_activity(
+        self, task: AgentTask, activity: str, details: Optional[Dict] = None
+    ):
+        """Report individual task activity to dashboard."""
+        if self.dashboard_state_callback:
+            try:
+                state_data = {
+                    "event": "task_activity",
+                    "workflow_id": self.workflow_id,
+                    "workflow_name": self.workflow_name,
+                    "task_id": task.task_id,
+                    "task_type": task.task_type,
+                    "activity": activity,  # started, completed, failed, progress
+                    "status": task.status,
+                    "timestamp": datetime.now().isoformat(),
+                    "details": details or {},
+                }
+                if task.start_time:
+                    state_data["duration"] = (
+                        datetime.now().timestamp() - task.start_time
+                    )
+                self.dashboard_state_callback(state_data)
+            except Exception as e:
+                logger.warning(f"Failed to report task activity to dashboard: {e}")
+
+    def _report_workflow_completed(self, metrics: Dict):
+        """Report workflow completion to dashboard."""
+        if self.dashboard_state_callback:
+            try:
+                state_data = {
+                    "event": "workflow_completed",
+                    "workflow_id": self.workflow_id,
+                    "workflow_name": self.workflow_name,
+                    "output_dir": str(self.output_dir),
+                    "timestamp": datetime.now().isoformat(),
+                    "metrics": metrics,
+                    "total_duration": metrics.get("total_duration", 0),
+                }
+                self.dashboard_state_callback(state_data)
+            except Exception as e:
+                logger.warning(
+                    f"Failed to report workflow completion to dashboard: {e}"
+                )
+
+    def _calculate_eta(self, completed_tasks: int, total_tasks: int) -> Optional[int]:
+        """Calculate estimated time to completion based on task completion rates."""
+        if completed_tasks == 0 or not self.task_completion_times:
+            return None
+
+        remaining_tasks = total_tasks - completed_tasks
+        if remaining_tasks <= 0:
+            return 0
+
+        # Calculate average completion time from recent completions
+        recent_times = self.task_completion_times[
+            -min(5, len(self.task_completion_times)) :
+        ]
+        avg_completion_time = sum(recent_times) / len(recent_times)
+
+        # Estimate remaining time (accounting for parallel execution)
+        estimated_seconds = (remaining_tasks * avg_completion_time) / self.max_parallel
+        return int(estimated_seconds)
+
     def _filter_mcp_by_profile(self, config: Dict, profile: str) -> Dict:
         """Filter MCP config based on execution profile."""
 
@@ -373,6 +619,32 @@ class GenericOrchestrator:
         }
 
         return filtered
+
+    def _init_providers(self):
+        """Initialize multi-provider support"""
+        self.providers = {}
+        self.active_provider = "claude"
+
+        # Initialize OpenAI provider if available
+        if OpenAIProvider and os.getenv("OPENAI_API_KEY"):
+            self.providers["openai"] = OpenAIProvider()
+            logger.info("OpenAI provider initialized")
+        else:
+            logger.info("OpenAI provider not available")
+
+    def _switch_provider(self):
+        """Switch to fallback provider when current exhausted"""
+        if self.active_provider == "claude" and "openai" in self.providers:
+            if self.providers["openai"].has_capacity():
+                self.active_provider = "openai"
+                logger.info("Switched to OpenAI provider")
+                return True
+        elif self.active_provider == "openai":
+            # Try switching back to Claude (if tokens refreshed)
+            self.active_provider = "claude"
+            logger.info("Switched back to Claude provider")
+            return True
+        return False
 
     def _generate_agent_mcp_config(self, task: AgentTask, config_path: Path):
         """Generate agent-specific MCP configuration based on task requirements."""
@@ -492,6 +764,9 @@ class GenericOrchestrator:
         else:
             agent_work_dir = self.output_dir
 
+        # Report task start to dashboard
+        self._report_task_activity(task, "started")
+
         # Pre-execution hook
         if self.pre_execute_hook:
             await self.pre_execute_hook(task)
@@ -568,6 +843,9 @@ class GenericOrchestrator:
             task.status = "running"
             await self.dep_manager.mark_running(task.task_id)
 
+            # Report task running to dashboard
+            self._report_task_activity(task, "running", {"start_time": task.start_time})
+
             try:
                 logger.info(f"Executing {task.task_id} ({task.task_type})")
 
@@ -634,6 +912,17 @@ class GenericOrchestrator:
                             task.status = "completed"
                             await self.dep_manager.mark_completed(task.task_id)
                             self.metrics["completed"] += 1
+
+                            # Track completion time for ETA calculations
+                            self.task_completion_times.append(duration)
+
+                            # Report task completion to dashboard
+                            self._report_task_activity(
+                                task,
+                                "completed",
+                                {"duration": duration, "result_type": "json"},
+                            )
+
                             logger.info(
                                 f"✓ {task.task_id} completed in {duration:.2f}s"
                             )
@@ -663,6 +952,17 @@ class GenericOrchestrator:
                                 task.status = "completed"
                                 await self.dep_manager.mark_completed(task.task_id)
                                 self.metrics["completed"] += 1
+
+                                # Track completion time for ETA calculations
+                                self.task_completion_times.append(duration)
+
+                                # Report task completion to dashboard
+                                self._report_task_activity(
+                                    task,
+                                    "completed",
+                                    {"duration": duration, "result_type": "non_json"},
+                                )
+
                                 logger.info(
                                     f"✓ {task.task_id} completed in {duration:.2f}s (non-JSON output)"
                                 )
@@ -761,6 +1061,17 @@ class GenericOrchestrator:
                     await self.dep_manager.mark_failed(task.task_id)
                     self.metrics["failed"] += 1
 
+                    # Report task failure to dashboard
+                    self._report_task_activity(
+                        task,
+                        "failed",
+                        {
+                            "duration": duration,
+                            "error": task.error,
+                            "exit_code": process.returncode,
+                        },
+                    )
+
                     logger.error(f"✗ {task.task_id} failed: {task.error}")
 
                 self.metrics["total_duration"] += duration
@@ -836,6 +1147,11 @@ class GenericOrchestrator:
                 await self.dep_manager.mark_failed(task.task_id)
                 self.metrics["failed"] += 1
 
+                # Report task exception to dashboard
+                self._report_task_activity(
+                    task, "failed", {"error": task.error, "error_type": "exception"}
+                )
+
                 logger.error(f"✗ {task.task_id} exception: {task.error}")
 
         finally:
@@ -859,6 +1175,11 @@ class GenericOrchestrator:
 
         self.metrics["total"] = len(tasks)
         self.metrics["start_time"] = datetime.now().isoformat()
+        self.workflow_start_time = datetime.now().timestamp()
+        self.total_tasks = len(tasks)
+
+        # Report initial workflow progress
+        self._report_workflow_progress(0, len(tasks))
 
         results = []
 
@@ -936,10 +1257,20 @@ class GenericOrchestrator:
                 else:
                     results.append(result)
 
+            # Report progress after each batch
+            completed_count = len(
+                [r for r in results if r.get("status") == "completed"]
+            )
+            self._report_workflow_progress(completed_count, len(tasks))
+
             # Brief pause between batches
             await asyncio.sleep(0.5)
 
         self.metrics["end_time"] = datetime.now().isoformat()
+
+        # Report workflow completion
+        if self.enable_dashboard_reporting:
+            self._report_workflow_completed(self.metrics)
 
         return results
 

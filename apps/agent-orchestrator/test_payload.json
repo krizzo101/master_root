@@ -1,0 +1,256 @@
+{
+  "payload": {
+    "session_id": "test_session_001",
+    "total_tokens": 1031,
+    "chunk_count": 2,
+    "compression_ratio": 2.2269641125121242,
+    "chunks": [
+      {
+        "chunk_id": "summary_0",
+        "content": {
+          "session_overview": {
+            "session_id": "test_session_001",
+            "total_messages": 19,
+            "total_tool_calls": 7,
+            "duration": 30,
+            "working_directories": [
+              "/project/my_project"
+            ],
+            "tools_used": [
+              "Write",
+              "Bash"
+            ]
+          }
+        },
+        "token_count": 59,
+        "chunk_type": "summary",
+        "overlap_tokens": 0,
+        "context_score": 100.0,
+        "metadata": {
+          "is_summary": true
+        }
+      },
+      {
+        "chunk_id": "conv_0",
+        "content": {
+          "messages": [
+            {
+              "role": "user",
+              "content": "I need help setting up a Python project with proper structure and testing framework."
+            },
+            {
+              "role": "assistant",
+              "content": "I'll help you set up a well-structured Python project. Let me start by creating the basic directory structure and then set up testing with pytest.",
+              "tool_calls": [
+                {
+                  "name": "Bash",
+                  "parameters": {
+                    "command": "mkdir -p my_project/{src,tests,docs}",
+                    "description": "Create project directory structure"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "content": "Directory structure created successfully"
+            },
+            {
+              "role": "assistant",
+              "content": "Great! Now let me create the main package files and setup configuration.",
+              "tool_calls": [
+                {
+                  "name": "Write",
+                  "parameters": {
+                    "file_path": "/project/my_project/src/__init__.py",
+                    "content": "\"\"\"Main package init file\"\"\""
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "content": "File created successfully"
+            },
+            {
+              "role": "assistant",
+              "content": "Now let's create a setup.py file for the project.",
+              "tool_calls": [
+                {
+                  "name": "Write",
+                  "parameters": {
+                    "file_path": "/project/my_project/setup.py",
+                    "content": "from setuptools import setup, find_packages\n\nsetup(\n    name='my_project',\n    version='0.1.0',\n    packages=find_packages(),\n    install_requires=[],\n    test_suite='tests'\n)"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "content": "Setup file created"
+            },
+            {
+              "role": "user",
+              "content": "Perfect! Can you also add pytest configuration and a sample test?"
+            },
+            {
+              "role": "assistant",
+              "content": "Absolutely! Let me create a pytest configuration file and a sample test.",
+              "tool_calls": [
+                {
+                  "name": "Write",
+                  "parameters": {
+                    "file_path": "/project/my_project/pytest.ini",
+                    "content": "[tool:pytest]\ntestpaths = tests\npython_files = test_*.py\npython_functions = test_*\naddopts = -v --tb=short"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "content": "Pytest configuration created"
+            },
+            {
+              "role": "assistant",
+              "content": "Now let's create a sample test file.",
+              "tool_calls": [
+                {
+                  "name": "Write",
+                  "parameters": {
+                    "file_path": "/project/my_project/tests/test_sample.py",
+                    "content": "import pytest\n\ndef test_example():\n    \"\"\"Sample test function\"\"\"\n    assert 1 + 1 == 2\n\ndef test_string_operations():\n    \"\"\"Test string operations\"\"\"\n    text = 'hello world'\n    assert text.upper() == 'HELLO WORLD'\n    assert len(text) == 11"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "content": "Sample test file created"
+            },
+            {
+              "role": "assistant",
+              "content": "Let's also create a requirements.txt file for dependencies.",
+              "tool_calls": [
+                {
+                  "name": "Write",
+                  "parameters": {
+                    "file_path": "/project/my_project/requirements.txt",
+                    "content": "pytest>=7.0.0\npytest-cov>=4.0.0\nblack>=22.0.0\nflake8>=5.0.0"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "content": "Requirements file created"
+            },
+            {
+              "role": "user",
+              "content": "Excellent! Can you run the tests to make sure everything works?"
+            },
+            {
+              "role": "assistant",
+              "content": "Let me run the tests to verify everything is working correctly.",
+              "tool_calls": [
+                {
+                  "name": "Bash",
+                  "parameters": {
+                    "command": "cd /project/my_project && python -m pytest tests/",
+                    "description": "Run pytest on the sample tests"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "content": "===== test session starts =====\ncollected 2 items\n\ntests/test_sample.py::test_example PASSED\ntests/test_sample.py::test_string_operations PASSED\n\n===== 2 passed in 0.02s ====="
+            },
+            {
+              "role": "assistant",
+              "content": "Perfect! All tests are passing. Your Python project is now set up with:\n\n1. Proper directory structure (src/, tests/, docs/)\n2. Package initialization files\n3. Setup.py for distribution\n4. Pytest configuration\n5. Sample tests that pass\n6. Requirements.txt with development dependencies\n\nYou can now start developing your application in the src/ directory and add more tests in the tests/ directory. The project follows Python best practices for structure and testing."
+            },
+            {
+              "role": "user",
+              "content": "Thank you! This is exactly what I needed."
+            }
+          ],
+          "message_count": 19,
+          "chunk_metadata": {
+            "chunk_type": "conversation",
+            "created_at": "2025-09-08T13:18:05.068420"
+          }
+        },
+        "token_count": 972,
+        "chunk_type": "conversation",
+        "overlap_tokens": 0,
+        "context_score": 100.0,
+        "metadata": {
+          "message_count": 19
+        }
+      }
+    ],
+    "metadata": {
+      "original_session_size": 2296,
+      "chunking_strategy": "adaptive",
+      "optimization_applied": false,
+      "processing_stats": {
+        "chunk_count": 2,
+        "avg_chunk_size": 515.5,
+        "max_chunk_size": 972,
+        "min_chunk_size": 59
+      }
+    },
+    "optimization_report": {
+      "total_tokens": 1031,
+      "estimated_cost": 0.025775,
+      "compression_ratio": 2.2269641125121242,
+      "context_efficiency_score": 32.849604221635886,
+      "recommended_chunks": 2,
+      "processing_time_estimate": 0.1031
+    },
+    "generated_at": "2025-09-08 13:18:05.068517"
+  },
+  "analysis": {
+    "payload_summary": {
+      "session_id": "test_session_001",
+      "total_tokens": 1031,
+      "chunk_count": 2,
+      "estimated_cost": 0.025775,
+      "size_category": "Medium",
+      "compression_ratio": 2.2269641125121242
+    },
+    "chunk_analysis": [
+      {
+        "chunk_id": "summary_0",
+        "token_count": 59,
+        "chunk_type": "summary",
+        "context_score": 100.0,
+        "efficiency_rating": "Excellent"
+      },
+      {
+        "chunk_id": "conv_0",
+        "token_count": 972,
+        "chunk_type": "conversation",
+        "context_score": 100.0,
+        "efficiency_rating": "Excellent"
+      }
+    ],
+    "efficiency_metrics": {
+      "avg_context_score": 100.0,
+      "token_distribution": {
+        "mean": 515.5,
+        "max": 972,
+        "min": 59,
+        "std_dev": 456.5
+      },
+      "chunk_type_breakdown": {
+        "summary": 1,
+        "conversation": 1
+      }
+    },
+    "recommendations": [
+      "Consider more aggressive chunking to reduce redundancy"
+    ],
+    "analysis_timestamp": "2025-09-08T13:18:05.068543"
+  }
+}

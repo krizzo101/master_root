@@ -1,0 +1,87 @@
+{
+  "agent_execution_config": {
+    "agent_requirements": {
+      "max_parallel_agents": 15,
+      "execution_strategy": "parallel_swarm",
+      "coordination_mode": "independent_analysis"
+    }
+  },
+  "tasks": [
+    {
+      "task_id": "high_value_apps_audit",
+      "task_type": "code-analyzer",
+      "prompt": "Analyze these high-priority apps for completeness and value:\n- agent-orchestrator (our core engine)\n- claude-code-clone (OpenAI integration)\n- autonomous_coder (self-coding capabilities)\n- kb-auto-docs (documentation automation)\n- multi-agent-monitor (coordination hub)\n\nFor each app, determine:\n1. Functional status (works/broken/partially working)\n2. Value proposition and purpose\n3. Completion percentage (0-100%)\n4. Dependencies and integration points\n5. Quick wins to make it production-ready\n6. Should we invest more time or abandon?\n\nProvide clear recommendations for next steps."
+    },
+    {
+      "task_id": "monitoring_infrastructure_audit",
+      "task_type": "solution-architect",
+      "prompt": "Audit monitoring and intelligence apps:\n- monitoring-dashboard\n- chat-monitor\n- claude-monitor\n- thinking-supervisor\n- sleuth-intel\n- project-intelligence\n\nEvaluate:\n1. What monitoring capabilities actually work?\n2. Which apps provide unique vs redundant functionality?\n3. Integration possibilities between monitoring tools\n4. Production readiness assessment\n5. Resource requirements and performance\n\nRecommend consolidation strategy and priority order."
+    },
+    {
+      "task_id": "context_tools_audit",
+      "task_type": "technical-writer",
+      "prompt": "Analyze context and project management tools:\n- project-context\n- context_isolation_specialist\n- ide-context-bridge\n- proj-mapper\n- genFileMap\n- files\n\nAssess:\n1. Functional overlap and unique capabilities\n2. Integration with main workflow\n3. User experience and ease of use\n4. Technical debt and maintenance needs\n5. Value-add for development workflow\n\nCreate consolidation plan and usage recommendations."
+    },
+    {
+      "task_id": "specialized_agents_audit",
+      "task_type": "performance-optimizer",
+      "prompt": "Review specialized agent applications:\n- error_capture_specialist\n- task_validation_specialist\n- module_loading_specialist\n- unified_issue_validator\n- unified_solution_architect\n- unified_orchestrator_fixes\n\nEvaluate:\n1. Specific capabilities and use cases\n2. Integration with agent-orchestrator\n3. Standalone vs module conversion potential\n4. Performance characteristics\n5. Maintenance complexity\n\nRecommend integration strategy or deprecation."
+    },
+    {
+      "task_id": "documentation_tools_audit",
+      "task_type": "technical-writer",
+      "prompt": "Assess documentation and analysis tools:\n- kb-auto-docs\n- wbs-documenter (known broken)\n- ACCF\n- embedding-service\n- knowledge_system\n\nAnalyze:\n1. Documentation generation capabilities\n2. Knowledge management features\n3. Integration with development workflow\n4. Output quality and usefulness\n5. Maintenance burden vs value\n\nPrioritize based on immediate utility."
+    },
+    {
+      "task_id": "development_tools_audit",
+      "task_type": "development-specialist",
+      "prompt": "Review development and coding tools:\n- autonomous_claude_agent\n- cc_dev_tool\n- claude_dev_tool\n- auto-forge-factory\n- opsvi-assistant\n\nEvaluate:\n1. Coding assistance capabilities\n2. Automation features and reliability\n3. Integration with existing workflow\n4. Code quality and maintainability\n5. User adoption potential\n\nRecommend which tools to prioritize for completion."
+    },
+    {
+      "task_id": "experimental_projects_audit",
+      "task_type": "research-genius",
+      "prompt": "Analyze experimental and research projects:\n- hecaton (appears to be a major project)\n- tetra\n- razer\n- chat-search\n\nInvestigate:\n1. Project scope and intended purpose\n2. Development progress and current state\n3. Innovation potential and uniqueness\n4. Resource investment vs likely ROI\n5. Technical feasibility and risks\n\nProvide go/no-go recommendations with rationale."
+    },
+    {
+      "task_id": "integration_opportunities",
+      "task_type": "api-integration-specialist",
+      "prompt": "Identify cross-app integration opportunities across all apps in /apps/:\n1. Which apps could be combined or merged?\n2. What shared libraries or modules could be extracted?\n3. Which apps complement each other functionally?\n4. API integration possibilities\n5. Data sharing and workflow automation potential\n\nCreate integration roadmap focusing on maximum value with minimum effort."
+    },
+    {
+      "task_id": "technical_debt_assessment",
+      "task_type": "code-analyzer",
+      "prompt": "Perform technical debt analysis across all apps:\n1. Code quality and maintainability issues\n2. Dependency management problems\n3. Configuration and setup complexity\n4. Testing coverage and reliability\n5. Security vulnerabilities\n\nPrioritize technical debt by impact on production readiness."
+    },
+    {
+      "task_id": "resource_utilization_audit",
+      "task_type": "performance-optimizer",
+      "prompt": "Analyze resource usage and efficiency:\n1. Which apps use similar dependencies?\n2. Memory and CPU footprint analysis\n3. Token usage and API costs\n4. Storage requirements\n5. Parallel execution opportunities\n\nRecommend resource optimization strategies."
+    },
+    {
+      "task_id": "user_value_proposition",
+      "task_type": "business-analyst",
+      "prompt": "Assess user value and business impact:\n1. Which apps solve real user problems?\n2. User experience and ease of adoption\n3. Time-to-value for new users\n4. Competitive advantages\n5. Market positioning potential\n\nRank apps by user value and market potential."
+    },
+    {
+      "task_id": "production_readiness_matrix",
+      "task_type": "qa-testing-guru",
+      "prompt": "Create production readiness assessment:\n1. Testing coverage and reliability\n2. Error handling and recovery\n3. Configuration management\n4. Deployment complexity\n5. Monitoring and observability\n\nCreate readiness matrix with specific improvement actions."
+    },
+    {
+      "task_id": "consolidation_strategy",
+      "task_type": "solution-architect",
+      "prompt": "Develop app consolidation strategy:\n1. Which apps should be merged or eliminated?\n2. Core platform vs specialized tools\n3. Modular architecture opportunities\n4. Migration and sunset plans\n5. Resource allocation priorities\n\nCreate actionable consolidation roadmap."
+    },
+    {
+      "task_id": "quick_wins_identification",
+      "task_type": "development-specialist",
+      "prompt": "Identify immediate quick wins (< 2 hours work):\n1. Simple fixes to make broken apps work\n2. Configuration improvements\n3. Documentation updates\n4. Integration enablers\n5. User experience improvements\n\nPrioritize by effort vs impact ratio."
+    },
+    {
+      "task_id": "master_recommendations",
+      "task_type": "solution-architect",
+      "prompt": "Synthesize all audit findings into master recommendations:\n1. Top 5 apps to prioritize for completion\n2. Apps to deprecate or archive\n3. Integration opportunities to pursue\n4. Resource allocation strategy\n5. 30-day action plan\n\nCreate executive summary with clear next steps and success metrics.",
+      "dependencies": ["high_value_apps_audit", "monitoring_infrastructure_audit", "context_tools_audit", "specialized_agents_audit", "documentation_tools_audit", "development_tools_audit", "experimental_projects_audit", "integration_opportunities", "technical_debt_assessment", "resource_utilization_audit", "user_value_proposition", "production_readiness_matrix", "consolidation_strategy", "quick_wins_identification"]
+    }
+  ]
+}

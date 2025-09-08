@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "project_path": "output/create-a-simple",
+  "tech_stack": {
+    "framework": "vite@7.1.1",
+    "ui": "react@19.1.1",
+    "styling": "tailwindcss@3.4.17",
+    "language": "typescript@5.7.2",
+    "testing": "vitest@2.2.0"
+  },
+  "files_created": [
+    "output/create-a-simple/package.json",
+    "output/create-a-simple/index.html",
+    "output/create-a-simple/src/main.ts",
+    "output/create-a-simple/src/styles.css",
+    "output/create-a-simple/vite.config.ts",
+    "output/create-a-simple/tsconfig.json",
+    "output/create-a-simple/README.md"
+  ],
+  "execution_time": 0.0028841495513916016,
+  "errors": [],
+  "warnings": [
+    "Enzyme for testing (use Testing Library)"
+  ],
+  "metrics": {
+    "phases_completed": 5,
+    "checkpoints_created": 5,
+    "research_items": 2,
+    "files_generated": 7
+  }
+}

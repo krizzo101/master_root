@@ -3,7 +3,7 @@
 import asyncio
 import logging
 from pathlib import Path
-from typing import Optional, List
+from typing import List, Optional
 
 import typer
 from rich.console import Console
@@ -11,8 +11,8 @@ from rich.panel import Panel
 from rich.text import Text
 
 from ..config import ClaudeCodeConfig
-from ..core.executor import ClaudeCodeExecutor
 from ..core.analyzer import CodeAnalyzer
+from ..core.executor import ClaudeCodeExecutor
 from ..core.streaming import StreamingHandler
 
 app = typer.Typer(
@@ -33,7 +33,9 @@ def analyze(
     provider: str = typer.Option(
         "openai", help="LLM provider (openai, anthropic, perplexity)"
     ),
-    model: str = typer.Option("gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"),
+    model: str = typer.Option(
+        "gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"
+    ),
     api_key: Optional[str] = typer.Option(None, help="API key for the provider"),
     working_directory: str = typer.Option(".", help="Working directory"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
@@ -62,7 +64,9 @@ def generate(
     provider: str = typer.Option(
         "openai", help="LLM provider (openai, anthropic, perplexity)"
     ),
-    model: str = typer.Option("gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"),
+    model: str = typer.Option(
+        "gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"
+    ),
     api_key: Optional[str] = typer.Option(None, help="API key for the provider"),
     working_directory: str = typer.Option(".", help="Working directory"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
@@ -93,7 +97,9 @@ def refactor(
     provider: str = typer.Option(
         "openai", help="LLM provider (openai, anthropic, perplexity)"
     ),
-    model: str = typer.Option("gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"),
+    model: str = typer.Option(
+        "gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"
+    ),
     api_key: Optional[str] = typer.Option(None, help="API key for the provider"),
     working_directory: str = typer.Option(".", help="Working directory"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
@@ -122,7 +128,9 @@ def project(
     provider: str = typer.Option(
         "openai", help="LLM provider (openai, anthropic, perplexity)"
     ),
-    model: str = typer.Option("gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"),
+    model: str = typer.Option(
+        "gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"
+    ),
     api_key: Optional[str] = typer.Option(None, help="API key for the provider"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
 ):
@@ -139,7 +147,9 @@ def interactive(
     provider: str = typer.Option(
         "openai", help="LLM provider (openai, anthropic, perplexity)"
     ),
-    model: str = typer.Option("gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"),
+    model: str = typer.Option(
+        "gpt-5-mini", help="Model to use (o4-mini, o3, gpt-5-mini, gpt-5, gpt-5-nano)"
+    ),
     api_key: Optional[str] = typer.Option(None, help="API key for the provider"),
     working_directory: str = typer.Option(".", help="Working directory"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
@@ -162,12 +172,16 @@ async def _analyze_file(
     if verbose:
         logging.basicConfig(level=logging.INFO)
 
-    config = ClaudeCodeConfig(
-        provider=provider,
-        model=model,
-        api_key=api_key,
-        working_directory=working_directory,
-    )
+    # Only pass api_key if explicitly provided, let config load from env otherwise
+    config_kwargs = {
+        "provider": provider,
+        "model": model,
+        "working_directory": working_directory,
+    }
+    if api_key:
+        config_kwargs["api_key"] = api_key
+
+    config = ClaudeCodeConfig(**config_kwargs)
 
     executor = ClaudeCodeExecutor(config)
 
@@ -201,12 +215,16 @@ async def _generate_file(
     if verbose:
         logging.basicConfig(level=logging.INFO)
 
-    config = ClaudeCodeConfig(
-        provider=provider,
-        model=model,
-        api_key=api_key,
-        working_directory=working_directory,
-    )
+    # Only pass api_key if explicitly provided, let config load from env otherwise
+    config_kwargs = {
+        "provider": provider,
+        "model": model,
+        "working_directory": working_directory,
+    }
+    if api_key:
+        config_kwargs["api_key"] = api_key
+
+    config = ClaudeCodeConfig(**config_kwargs)
 
     executor = ClaudeCodeExecutor(config)
 
@@ -239,12 +257,16 @@ async def _refactor_file(
     if verbose:
         logging.basicConfig(level=logging.INFO)
 
-    config = ClaudeCodeConfig(
-        provider=provider,
-        model=model,
-        api_key=api_key,
-        working_directory=working_directory,
-    )
+    # Only pass api_key if explicitly provided, let config load from env otherwise
+    config_kwargs = {
+        "provider": provider,
+        "model": model,
+        "working_directory": working_directory,
+    }
+    if api_key:
+        config_kwargs["api_key"] = api_key
+
+    config = ClaudeCodeConfig(**config_kwargs)
 
     executor = ClaudeCodeExecutor(config)
 
@@ -275,9 +297,16 @@ async def _analyze_project(
     if verbose:
         logging.basicConfig(level=logging.INFO)
 
-    config = ClaudeCodeConfig(
-        provider=provider, model=model, api_key=api_key, working_directory=project_path
-    )
+    # Only pass api_key if explicitly provided, let config load from env otherwise
+    config_kwargs = {
+        "provider": provider,
+        "model": model,
+        "working_directory": project_path,
+    }
+    if api_key:
+        config_kwargs["api_key"] = api_key
+
+    config = ClaudeCodeConfig(**config_kwargs)
 
     analyzer = CodeAnalyzer(config)
 
@@ -332,12 +361,16 @@ async def _interactive_mode(
     if verbose:
         logging.basicConfig(level=logging.INFO)
 
-    config = ClaudeCodeConfig(
-        provider=provider,
-        model=model,
-        api_key=api_key,
-        working_directory=working_directory,
-    )
+    # Only pass api_key if explicitly provided, let config load from env otherwise
+    config_kwargs = {
+        "provider": provider,
+        "model": model,
+        "working_directory": working_directory,
+    }
+    if api_key:
+        config_kwargs["api_key"] = api_key
+
+    config = ClaudeCodeConfig(**config_kwargs)
 
     executor = ClaudeCodeExecutor(config)
 

@@ -1,0 +1,86 @@
+{
+  "report_metadata": {
+    "generated_at": "2025-09-08T13:25:28.433402",
+    "total_files": 1,
+    "analysis_version": "1.0"
+  },
+  "file_analyses": [
+    {
+      "file_path": "/home/opsvi/.claude/projects/-home-opsvi-master-root-apps-agent-orchestrator-docs-audit-results-agent-workspaces-content-categorization/ecb4b4d2-7ac6-4620-a3bf-bd5eaac8b9cc.jsonl",
+      "file_name": "ecb4b4d2-7ac6-4620-a3bf-bd5eaac8b9cc.jsonl",
+      "file_size_mb": 0.17431163787841797,
+      "token_count": 57239,
+      "estimated_cost": 1.430975,
+      "context_efficiency_score": 21.716114735935,
+      "recommended_chunks": 9,
+      "processing_time_estimate": 5.7239,
+      "structure_analysis": {
+        "message_composition": {
+          "user": 0,
+          "assistant": 0,
+          "system": 0,
+          "tool": 0
+        },
+        "total_messages": 52,
+        "tool_usage_breakdown": {},
+        "total_tool_calls": 0,
+        "unique_tools_used": 0,
+        "file_operation_types": {},
+        "total_file_operations": 0,
+        "content_diversity_score": 0.0
+      },
+      "size_category": "Large",
+      "optimization_potential": {
+        "optimization_score": 70,
+        "optimization_level": "Very High",
+        "optimization_reasons": [
+          "Low context efficiency detected",
+          "Large size suitable for chunking",
+          "Low content diversity"
+        ]
+      }
+    }
+  ],
+  "aggregate_statistics": {
+    "total_files": 1,
+    "total_tokens": 57239,
+    "total_estimated_cost": 1.430975,
+    "average_tokens_per_file": 57239.0,
+    "average_file_size_mb": 0.17431163787841797,
+    "token_statistics": {
+      "min": 57239,
+      "max": 57239,
+      "median": 57239,
+      "std_deviation": 0.0
+    },
+    "size_categories": {
+      "Large": 1
+    },
+    "optimization_summary": {
+      "average_optimization_score": 70.0,
+      "optimization_level_distribution": {
+        "Very High": 1,
+        "High": 0,
+        "Medium": 0,
+        "Low": 0
+      },
+      "high_potential_files": 1
+    }
+  },
+  "size_distribution": {
+    "bin_size": 57239,
+    "distribution": {
+      "57239": 1
+    },
+    "percentiles": {
+      "25th": 57239,
+      "50th": 57239,
+      "75th": 57239,
+      "90th": 57239
+    }
+  },
+  "recommendations": [
+    "High optimization potential detected in 1 files - consider implementing chunking and context compression",
+    "Many files with low context efficiency - review content for redundancy and repetitive patterns"
+  ]
+}

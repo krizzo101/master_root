@@ -1,0 +1,76 @@
+{
+  "task_name": "GPT-5 Payload Generation System Development",
+  "description": "Create comprehensive GPT-5 payload generation system with token analysis, chunking strategies, and optimization tools",
+  "agent_execution_config": {
+    "agent_requirements": {
+      "max_parallel_agents": 5,
+      "coordination_pattern": "pipeline",
+      "shared_workspace": true
+    }
+  },
+  "tasks": [
+    {
+      "task_id": "gpt5_architecture_design",
+      "priority": 1,
+      "prompt": "Design the architecture for a GPT-5 payload generation system that converts session analytics into optimized input format for context compression.\n\nREQUIREMENTS:\n- Token count analysis and estimation for GPT-5 input sizes\n- Intelligent chunking strategies for large sessions (>1GB)\n- Structured prompt generation for context optimization\n- Size analysis and reporting tools\n- Memory-efficient processing capabilities\n- Integration with existing SessionAnalyticsEngine\n\nDELIVERABLES:\n1. Complete system architecture document\n2. Component interaction diagrams\n3. Data flow specifications\n4. Performance requirements analysis\n5. Integration points with existing infrastructure\n\nFOCUS ON:\n- Scalability for large session files\n- Token efficiency optimization (target 25-40% reduction)\n- Real-time payload generation capabilities\n- Comprehensive reporting and analytics",
+      "output_file": "docs/GPT5_PAYLOAD_ARCHITECTURE.md",
+      "agent_config": {
+        "agent_count": 1
+      }
+    },
+    {
+      "task_id": "token_analysis_engine",
+      "priority": 2,
+      "prompt": "Implement the TokenCountAnalyzer component for accurate GPT-5 token counting and estimation.\n\nCOMPONENTS TO CREATE:\n1. TokenCountAnalyzer class with tiktoken integration\n2. Model-specific tokenization handlers (GPT-4, GPT-5)\n3. Batch processing capabilities for large sessions\n4. Token estimation algorithms with accuracy validation\n5. Performance optimization for real-time analysis\n\nREQUIREMENTS:\n- Accurate token counting within 5% of actual GPT-5 usage\n- Support for multiple tokenization models\n- Efficient batch processing for large datasets\n- Caching mechanisms for repeated operations\n- Integration with existing session analytics\n\nFILES TO CREATE:\n- src/token_analyzers/token_count_analyzer.py\n- src/token_analyzers/model_tokenizers.py\n- src/token_analyzers/__init__.py\n- tests/test_token_analysis.py\n\nINCLUDE:\n- Comprehensive test suite with real session data\n- Performance benchmarks\n- Usage examples and documentation",
+      "output_file": "src/token_analyzers/",
+      "agent_config": {
+        "agent_count": 1
+      }
+    },
+    {
+      "task_id": "chunking_strategies_engine",
+      "priority": 2,
+      "prompt": "Implement intelligent chunking strategies for large session segmentation.\n\nCHUNKING STRATEGIES TO IMPLEMENT:\n1. Semantic chunking based on conversation flow\n2. Fixed-size chunking with overlap management\n3. Tool-boundary chunking (preserve tool usage context)\n4. Adaptive chunking based on content complexity\n5. Context-preserving chunking with metadata\n\nCOMPONENTS:\n- ChunkingEngine main orchestrator\n- Multiple chunking strategy implementations\n- Overlap management and context preservation\n- Chunk quality scoring and validation\n- Memory-efficient streaming processing\n\nREQUIREMENTS:\n- Handle session files up to 1GB\n- Preserve context across chunk boundaries\n- Configurable chunk sizes and overlap\n- Quality metrics for chunk effectiveness\n- Integration with SessionAnalyticsEngine\n\nFILES TO CREATE:\n- src/chunking_strategies/chunking_engine.py\n- src/chunking_strategies/semantic_chunker.py\n- src/chunking_strategies/fixed_size_chunker.py\n- src/chunking_strategies/adaptive_chunker.py\n- src/chunking_strategies/__init__.py\n- tests/test_chunking_strategies.py\n\nINCLUDE:\n- Algorithm documentation with examples\n- Performance analysis and optimization\n- Validation with real session data",
+      "output_file": "src/chunking_strategies/",
+      "agent_config": {
+        "agent_count": 1
+      }
+    },
+    {
+      "task_id": "payload_generator_core",
+      "priority": 3,
+      "prompt": "Implement the core GPT-5 payload generation system that orchestrates all components.\n\nCORE COMPONENTS:\n1. SessionPayloadConverter - Main conversion engine\n2. GPT5PayloadGenerator - Primary orchestrator\n3. PayloadOptimizer - Context compression and optimization\n4. MetadataExtractor - Enhanced session metadata\n5. ValidationEngine - Payload quality validation\n\nFEATURES:\n- Convert SessionAnalyticsEngine output to GPT-5 format\n- Context compression with relevance scoring\n- Multi-format output support (JSON, structured prompts)\n- Real-time payload generation capabilities\n- Integration with token analysis and chunking engines\n\nREQUIREMENTS:\n- <2s processing time for standard sessions\n- Memory-efficient processing for large files\n- Concurrent payload generation support\n- Comprehensive error handling and recovery\n- Plugin architecture for extensibility\n\nFILES TO CREATE:\n- src/gpt5_payload_generator.py\n- src/payload_formatters/json_formatter.py\n- src/payload_formatters/prompt_formatter.py\n- src/payload_formatters/__init__.py\n- src/session_converter.py\n- tests/test_payload_generation.py\n\nINCLUDE:\n- Complete API documentation\n- Usage examples with real data\n- Performance optimization analysis\n- Integration test suite",
+      "output_file": "src/gpt5_payload_generator.py",
+      "agent_config": {
+        "agent_count": 1
+      }
+    },
+    {
+      "task_id": "size_analysis_reporting",
+      "priority": 3,
+      "prompt": "Implement comprehensive size analysis and reporting tools for payload dimension analysis.\n\nREPORTING COMPONENTS:\n1. PayloadSizeAnalyzer - Pre-submission analysis\n2. CompressionReporter - Compression ratio analysis\n3. CostEstimator - GPT-5 usage cost calculation\n4. DimensionAnalyzer - Payload structure analysis\n5. PerformanceReporter - Processing performance metrics\n\nANALYSIS FEATURES:\n- Token count analysis and validation\n- Compression effectiveness measurement\n- Cost estimation for GPT-5 usage\n- Payload structure optimization recommendations\n- Performance benchmarking and reporting\n\nREQUIREMENTS:\n- Real-time size analysis capabilities\n- Detailed reporting with visualizations\n- Export capabilities (JSON, HTML, CSV)\n- Historical analysis and trending\n- Integration with existing analytics infrastructure\n\nFILES TO CREATE:\n- src/size_analysis/payload_size_analyzer.py\n- src/size_analysis/compression_reporter.py\n- src/size_analysis/cost_estimator.py\n- tools/size_reporter.py\n- tools/payload_cli.py\n- tests/test_size_analysis.py\n\nINCLUDE:\n- Command-line interface for standalone usage\n- Web-friendly reporting formats\n- Integration with existing dashboard\n- Comprehensive test coverage",
+      "output_file": "src/size_analysis/",
+      "agent_config": {
+        "agent_count": 1
+      }
+    },
+    {
+      "task_id": "documentation_and_integration",
+      "priority": 4,
+      "prompt": "Create comprehensive documentation and integration guides for the GPT-5 payload generation system.\n\nDOCUMENTATION TO CREATE:\n1. Complete usage guide with examples\n2. API reference documentation\n3. Chunking strategies detailed guide\n4. Integration guide with existing systems\n5. Performance optimization guide\n6. Troubleshooting and FAQ\n\nINTEGRATION WORK:\n- SessionAnalyticsEngine integration\n- PostgreSQL database schema extensions\n- Web dashboard integration points\n- CLI tool development and testing\n- Docker deployment configuration\n\nVALIDATION SCENARIOS:\n- Large session processing (500MB+ files)\n- Token count accuracy validation\n- Chunking strategy effectiveness testing\n- Compression ratio analysis\n- Performance benchmarking\n\nFILES TO CREATE:\n- docs/GPT5_PAYLOAD_GUIDE.md\n- docs/CHUNKING_STRATEGIES.md\n- docs/API_REFERENCE.md\n- docs/INTEGRATION_GUIDE.md\n- docs/PERFORMANCE_GUIDE.md\n- examples/\n- docker/Dockerfile.gpt5-payload\n\nINCLUDE:\n- Real-world usage examples\n- Performance benchmarks\n- Integration test suite\n- Deployment documentation\n- Monitoring and observability setup",
+      "output_file": "docs/",
+      "agent_config": {
+        "agent_count": 1
+      }
+    }
+  ],
+  "success_criteria": [
+    "Complete GPT-5 payload generation system with all core components",
+    "Token counting accuracy within 5% of GPT-5 actual usage",
+    "Support for session files up to 1GB with memory-efficient processing",
+    "Achieve 25-40% token reduction through intelligent compression",
+    "Processing time <2s for standard sessions",
+    "Comprehensive documentation and integration guides",
+    "Full test suite with real session data validation"
+  ]
+}
