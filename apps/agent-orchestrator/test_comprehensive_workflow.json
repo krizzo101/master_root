@@ -10,7 +10,7 @@
     },
     {
       "task_id": "test_dependency_handling",
-      "task_type": "technical-writer", 
+      "task_type": "technical-writer",
       "dependencies": ["test_basic_functionality"],
       "prompt": "Create comprehensive documentation for the factorial calculator. Include:\n1. README.md with usage instructions\n2. Code comments explanation\n3. Example outputs\n4. Testing instructions\n\nReference the factorial_calculator.py file created in the previous task.",
       "context": {
@@ -26,11 +26,11 @@
       }
     },
     {
-      "task_id": "test_parallel_task_2", 
+      "task_id": "test_parallel_task_2",
       "task_type": "technical-writer",
       "prompt": "Create a simple CHANGELOG.md file documenting the factorial calculator project. Include:\n1. Version 1.0.0 - Initial release\n2. Features implemented\n3. Future improvements planned\n\nThis should be independent of other tasks.",
       "context": {
-        "test_purpose": "Verify parallel execution works - task 2" 
+        "test_purpose": "Verify parallel execution works - task 2"
       }
     },
     {
