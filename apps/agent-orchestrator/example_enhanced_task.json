@@ -1,0 +1,105 @@
+{
+  "tasks": [
+    {
+      "task_id": "create_awesome_app",
+      "task_type": "development-specialist",
+      "prompt": "Create a new web application called 'awesome-app' with modern React frontend and Express backend.\n\nRequirements:\n1. Setup project structure with proper separation of frontend/backend\n2. Create package.json files for both frontend and backend\n3. Setup basic routing and API endpoints\n4. Add README.md with project overview and setup instructions\n5. Follow best practices for modern web development\n\nEnsure all deliverables are properly organized in the project directory structure.",
+      "context": {
+        "project_type": "fullstack_web_app",
+        "frontend": "react",
+        "backend": "express",
+        "database": "postgresql"
+      },
+      "dependencies": [],
+      
+      "project_location": "/home/opsvi/master_root/apps/awesome-app/",
+      "deliverable_structure": {
+        "main_deliverable": "/home/opsvi/master_root/apps/awesome-app/",
+        "documentation": "/home/opsvi/master_root/apps/awesome-app/docs/",
+        "frontend": "/home/opsvi/master_root/apps/awesome-app/frontend/",
+        "backend": "/home/opsvi/master_root/apps/awesome-app/backend/",
+        "configuration": "/home/opsvi/master_root/apps/awesome-app/config/",
+        "scripts": "/home/opsvi/master_root/apps/awesome-app/scripts/"
+      },
+      "directory_permissions": [
+        "/home/opsvi/master_root/apps/awesome-app/",
+        "/home/opsvi/master_root/apps/"
+      ],
+      "output_validation": {
+        "required_structure": true,
+        "validate_paths": true,
+        "check_project_standards": true,
+        "required_files": ["README.md", "package.json"],
+        "required_directories": ["frontend", "backend", "docs"]
+      }
+    },
+    {
+      "task_id": "setup_awesome_app_ci",
+      "task_type": "devops-specialist", 
+      "prompt": "Setup CI/CD pipeline for the awesome-app project.\n\nRequirements:\n1. Create GitHub Actions workflow for automated testing\n2. Setup linting and code quality checks\n3. Configure automated deployment for staging environment\n4. Add Docker configuration for containerized deployment\n5. Create deployment documentation\n\nAll CI/CD files should be properly organized in the project structure.",
+      "context": {
+        "ci_platform": "github_actions",
+        "deployment_target": "docker",
+        "environments": ["staging", "production"]
+      },
+      "dependencies": ["create_awesome_app"],
+      
+      "project_location": "/home/opsvi/master_root/apps/awesome-app/",
+      "deliverable_structure": {
+        "workflows": "/home/opsvi/master_root/apps/awesome-app/.github/workflows/",
+        "docker": "/home/opsvi/master_root/apps/awesome-app/docker/",
+        "deployment_docs": "/home/opsvi/master_root/apps/awesome-app/docs/deployment/",
+        "scripts": "/home/opsvi/master_root/apps/awesome-app/scripts/deploy/"
+      },
+      "directory_permissions": [
+        "/home/opsvi/master_root/apps/awesome-app/",
+        "/home/opsvi/master_root/apps/"
+      ],
+      "output_validation": {
+        "required_structure": true,
+        "validate_paths": true,
+        "check_project_standards": true,
+        "required_files": ["Dockerfile", ".github/workflows/ci.yml"],
+        "validate_yaml": true,
+        "check_docker_syntax": true
+      }
+    },
+    {
+      "task_id": "document_awesome_app_architecture", 
+      "task_type": "technical-writer",
+      "prompt": "Create comprehensive architecture documentation for the awesome-app project.\n\nRequirements:\n1. System architecture diagram and explanation\n2. API documentation with examples\n3. Database schema documentation\n4. Frontend component architecture\n5. Deployment architecture guide\n6. Developer onboarding guide\n\nAll documentation should follow standard technical writing practices and be organized properly.",
+      "context": {
+        "documentation_format": "markdown",
+        "include_diagrams": true,
+        "target_audience": ["developers", "devops", "product_managers"]
+      },
+      "dependencies": ["create_awesome_app", "setup_awesome_app_ci"],
+      
+      "project_location": "/home/opsvi/master_root/apps/awesome-app/",
+      "deliverable_structure": {
+        "architecture_docs": "/home/opsvi/master_root/apps/awesome-app/docs/architecture/",
+        "api_docs": "/home/opsvi/master_root/apps/awesome-app/docs/api/",
+        "developer_guide": "/home/opsvi/master_root/apps/awesome-app/docs/development/",
+        "deployment_guide": "/home/opsvi/master_root/apps/awesome-app/docs/deployment/"
+      },
+      "directory_permissions": [
+        "/home/opsvi/master_root/apps/awesome-app/",
+        "/home/opsvi/master_root/apps/"
+      ],
+      "output_validation": {
+        "required_structure": true,
+        "validate_paths": true,
+        "check_project_standards": true,
+        "required_files": [
+          "ARCHITECTURE.md",
+          "API_REFERENCE.md", 
+          "DEVELOPER_GUIDE.md",
+          "DEPLOYMENT.md"
+        ],
+        "validate_markdown": true,
+        "check_internal_links": true,
+        "minimum_doc_quality": 8
+      }
+    }
+  ]
+}

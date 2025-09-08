@@ -6,12 +6,16 @@ Extracted and simplified from Hecaton patterns
 """
 
 import asyncio
+import hashlib
 import json
 import logging
 import os
+import psutil
 import re
+import time
 import traceback
 import uuid
+import warnings
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -29,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class AgentTask:
-    """Generic agent task definition with enhanced error tracking"""
+    """Generic agent task definition with enhanced error tracking and project organization"""
 
     task_id: str
     task_type: str
@@ -47,6 +51,12 @@ class AgentTask:
     raw_output: Optional[str] = None  # Store raw stdout for debugging
     error_details: Optional[Dict] = None  # Detailed error information
     work_dir_name: Optional[str] = None  # Custom working directory name
+    
+    # Project organization fields
+    project_location: Optional[str] = None  # Expected project path (/apps/PROJECT-NAME/)
+    deliverable_structure: Optional[Dict[str, str]] = field(default_factory=dict)  # Expected output organization
+    directory_permissions: Optional[List[str]] = field(default_factory=list)  # Required --add-dir parameters
+    output_validation: Optional[Dict[str, Any]] = field(default_factory=dict)  # Validation rules for outputs
 
     def to_dict(self) -> Dict:
         """Convert to dictionary with error details"""
@@ -268,6 +278,10 @@ class GenericOrchestrator:
     Generic orchestrator for parallel Claude agent execution.
     Can be customized for any use case by providing task generator and result processor.
     Enhanced with workflow tracking and dashboard integration support.
+    
+    Enforces project directory standards to maintain proper separation between:
+    - Project deliverables (in project-specific directories)
+    - Orchestrator operations (in orchestrator-specific directories)
     """
 
     def __init__(
@@ -288,28 +302,45 @@ class GenericOrchestrator:
         task_file_path: Optional[str] = None,
         enable_dashboard_reporting: bool = False,
         dashboard_state_callback: Optional[Callable] = None,
+        # New workflow isolation parameters
+        workflow_source: Optional[str] = None,
     ):
-        # Determine workflow name and create workflow-specific output directory
+        # Determine workflow source and name
+        self.workflow_source = workflow_source or self._determine_workflow_source(task_file_path)
         self.workflow_name = self._determine_workflow_name(
             workflow_name, task_file_path
         )
         self.workflow_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # Generate unique workflow ID with hash
+        workflow_content = f"{self.workflow_source}_{self.workflow_name}_{self.workflow_timestamp}"
+        workflow_hash = hashlib.md5(workflow_content.encode()).hexdigest()[:8]
+        self.workflow_id = f"workflow_{self.workflow_source}_{self.workflow_timestamp}_{workflow_hash}"
 
-        # Create workflow-specific output directory structure: outputs/workflow_NAME/workflow_NAME_TIMESTAMP/
-        if workflow_name or task_file_path:
-            # Use workflow-specific directory structure
-            workflow_base_dir = output_dir.parent / "outputs" / self.workflow_name
-            workflow_dir = (
-                workflow_base_dir / f"{self.workflow_name}_{self.workflow_timestamp}"
-            )
-            self.output_dir = workflow_dir
-            self.workflow_base_dir = workflow_base_dir
+        # Create workflow-specific output directory structure: output/workflow_SOURCE_TIMESTAMP_HASH/
+        self.use_isolated_workflow = bool(workflow_name or task_file_path or workflow_source)
+        
+        if self.use_isolated_workflow:
+            # Use workflow-isolated directory structure
+            base_output_dir = output_dir.parent if output_dir.parent.name != "outputs" else output_dir.parent.parent
+            self.output_dir = base_output_dir / "output" / self.workflow_id
+            self.workflow_base_dir = base_output_dir / "output"
         else:
             # Use provided output_dir directly for backward compatibility
             self.output_dir = output_dir
             self.workflow_base_dir = None
+            # For backward compatibility, use generic workflow ID
+            self.workflow_id = f"workflow_{self.workflow_source}_{self.workflow_timestamp}"
 
         self.output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create workflow-specific subdirectories only if using isolated structure
+        if self.use_isolated_workflow:
+            (self.output_dir / "metadata").mkdir(exist_ok=True)
+            (self.output_dir / "orchestrator.log").touch()
+            (self.output_dir / "agents").mkdir(exist_ok=True)
+            (self.output_dir / "deliverables").mkdir(exist_ok=True)
+            (self.output_dir / "checkpoints").mkdir(exist_ok=True)
 
         # Store all parameters including existing ones
         self.use_optimizations = use_optimizations
@@ -327,24 +358,41 @@ class GenericOrchestrator:
         self.log_to_work_dir = log_to_work_dir
 
         # Initialize workflow tracking
-        self.workflow_id = str(uuid.uuid4())
         self.workflow_start_time = None
         self.total_tasks = 0
         self.task_completion_times = []  # For ETA calculations
+        
+        # Initialize resource tracking
+        self.process = psutil.Process()
+        self.initial_memory = self.process.memory_info().rss / 1024 / 1024  # MB
+        self.initial_cpu_time = self.process.cpu_times()
+        self.peak_memory = self.initial_memory
+        
+        # Initialize audit logging and deliverables tracking
+        self.audit_log = []
+        self.deliverables = set()
+        self.file_operations = {'created': 0, 'modified': 0, 'deleted': 0}
+        
+        # Track file system state before workflow starts
+        self.initial_file_count = 0
+        if self.output_dir.exists():
+            self.initial_file_count = len(list(self.output_dir.rglob('*')))
+        
+        # Mark metadata as pending - will be created after token_pool initialization
+        # Only create metadata for isolated workflows
+        if self.use_isolated_workflow:
+            self._metadata_pending = True
 
         # Create agent work directory if needed
         if self.enable_dynamic_configs:
             self.agent_base_work_dir.mkdir(parents=True, exist_ok=True)
 
-        # Ensure subdirectories exist
+        # Legacy directory structure for backward compatibility
         (self.output_dir / "tasks").mkdir(exist_ok=True)
         (self.output_dir / "logs").mkdir(exist_ok=True)
 
         # Setup debug file logging with workflow identification
-        log_filename = (
-            f"orchestrator_{self.workflow_name}_{self.workflow_timestamp}.log"
-        )
-        self.log_file = self.output_dir / "logs" / log_filename
+        self.log_file = self.output_dir / "orchestrator.log"
         file_handler = logging.FileHandler(self.log_file)
         file_handler.setLevel(logging.DEBUG)
         formatter = logging.Formatter(
@@ -361,7 +409,12 @@ class GenericOrchestrator:
         # NO FALLBACK to single environment token allowed per safety requirements
         self.token_pool = TokenPool(tokens)
         self.dep_manager = DependencyManager()
-        self.message_bus = MessageBus(output_dir / "messages")
+        self.message_bus = MessageBus(self.output_dir / "messages")
+        
+        # Create initial metadata.json now that token_pool is initialized (only for isolated workflows)
+        if hasattr(self, '_metadata_pending'):
+            self._create_workflow_metadata()
+            delattr(self, '_metadata_pending')
 
         # Initialize multi-provider support
         self._init_providers()
@@ -452,6 +505,57 @@ class GenericOrchestrator:
         # Initialize dashboard reporting if enabled
         if self.enable_dashboard_reporting:
             self._report_workflow_started()
+        
+        # Initialize project directory validation
+        self.project_root_base = Path("/home/opsvi/master_root/apps")
+        self.orchestrator_root = Path("/home/opsvi/master_root/apps/agent-orchestrator")
+        
+        # Track directory validation warnings
+        self._directory_warnings = set()
+        
+        # Log workflow initialization
+        logger.info(f"Workflow {self.workflow_id} initialized in {self.output_dir}")
+        
+        # Log initial audit entry
+        self._log_audit_action("workflow_initialized", {
+            "workflow_id": self.workflow_id,
+            "output_dir": str(self.output_dir),
+            "max_parallel": self.max_parallel,
+            "token_pool_size": self.token_pool.size(),
+            "initial_memory_mb": self.initial_memory,
+            "initial_file_count": self.initial_file_count
+        })
+
+    def _determine_workflow_source(self, task_file_path: Optional[str]) -> str:
+        """Determine workflow source from task file path or caller context."""
+        if task_file_path:
+            task_file = Path(task_file_path)
+            # Extract meaningful part from filename
+            name = task_file.stem
+            
+            # Remove common suffixes to get the core name
+            for suffix in ["_tasks", "_task", "_workflow", "_plan"]:
+                if name.endswith(suffix):
+                    name = name[: -len(suffix)]
+                    break
+            
+            return name
+        
+        # Try to determine from calling context
+        import inspect
+        frame = inspect.currentframe()
+        try:
+            # Go up the call stack to find the originating module
+            caller_frame = frame.f_back.f_back if frame.f_back else None
+            if caller_frame and caller_frame.f_globals.get('__name__'):
+                module_name = caller_frame.f_globals['__name__']
+                if module_name != '__main__':
+                    # Extract meaningful part from module name
+                    return module_name.split('.')[-1]
+        finally:
+            del frame
+        
+        return "generic"
 
     def _determine_workflow_name(
         self, workflow_name: Optional[str], task_file_path: Optional[str]
@@ -477,6 +581,257 @@ class GenericOrchestrator:
 
         # Default workflow name
         return "generic_workflow"
+    
+    def _log_audit_action(self, action: str, details: Dict[str, Any] = None):
+        """Log an action to the audit trail with timestamp."""
+        audit_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "action": action,
+            "details": details or {}
+        }
+        self.audit_log.append(audit_entry)
+        
+        # Also log to main logger for visibility
+        logger.debug(f"AUDIT: {action} - {details}")
+        
+    def _update_resource_usage(self):
+        """Update resource usage metrics."""
+        try:
+            current_memory = self.process.memory_info().rss / 1024 / 1024  # MB
+            if current_memory > self.peak_memory:
+                self.peak_memory = current_memory
+                
+            # Update file operations count
+            if self.output_dir.exists():
+                current_file_count = len(list(self.output_dir.rglob('*')))
+                if current_file_count > self.initial_file_count:
+                    self.file_operations['created'] = current_file_count - self.initial_file_count
+                    
+        except Exception as e:
+            logger.warning(f"Failed to update resource usage: {e}")
+            
+    def _track_deliverable(self, file_path: str, operation: str = "created"):
+        """Track a deliverable file that was created or modified."""
+        try:
+            path_obj = Path(file_path)
+            if path_obj.exists():
+                # Convert to absolute path for consistent tracking
+                abs_path = str(path_obj.resolve())
+                
+                # Only track files within our output directory or apps directory
+                if (str(self.output_dir.resolve()) in abs_path or 
+                    "/home/opsvi/master_root/apps/" in abs_path):
+                    
+                    self.deliverables.add(abs_path)
+                    self.file_operations[operation] += 1
+                    
+                    self._log_audit_action(f"deliverable_{operation}", {
+                        "file_path": abs_path,
+                        "operation": operation,
+                        "file_size": path_obj.stat().st_size if path_obj.exists() else 0
+                    })
+                    
+        except Exception as e:
+            logger.warning(f"Failed to track deliverable {file_path}: {e}")
+            
+    def _scan_for_deliverables(self):
+        """Scan output and related directories for deliverables created during workflow."""
+        try:
+            # Scan output directory
+            if self.output_dir.exists():
+                for file_path in self.output_dir.rglob('*'):
+                    if file_path.is_file():
+                        self._track_deliverable(str(file_path), "created")
+                        
+            # Scan apps directories for project deliverables
+            apps_base = Path("/home/opsvi/master_root/apps")
+            if apps_base.exists():
+                # Look for recently modified files that might be deliverables
+                cutoff_time = self.workflow_start_time if self.workflow_start_time else time.time() - 3600
+                
+                for app_dir in apps_base.iterdir():
+                    if app_dir.is_dir() and app_dir.name != "agent-orchestrator":
+                        for file_path in app_dir.rglob('*'):
+                            if (file_path.is_file() and 
+                                file_path.stat().st_mtime > cutoff_time and
+                                not file_path.name.startswith('.')):
+                                self._track_deliverable(str(file_path), "created")
+                                
+        except Exception as e:
+            logger.warning(f"Failed to scan for deliverables: {e}")
+            
+    def _generate_workflow_completion_report(self) -> Dict[str, Any]:
+        """Generate comprehensive workflow completion report."""
+        end_time = datetime.now()
+        start_time_dt = datetime.fromtimestamp(self.workflow_start_time) if self.workflow_start_time else end_time
+        duration_seconds = (end_time - start_time_dt).total_seconds()
+        
+        # Update resource usage one final time
+        self._update_resource_usage()
+        
+        # Scan for deliverables
+        self._scan_for_deliverables()
+        
+        # Calculate CPU time used
+        current_cpu_time = self.process.cpu_times()
+        cpu_time_used = (current_cpu_time.user - self.initial_cpu_time.user) + \
+                       (current_cpu_time.system - self.initial_cpu_time.system)
+        
+        # Collect error information
+        errors = []
+        for entry in self.audit_log:
+            if "error" in entry.get("action", "").lower() or "failed" in entry.get("action", "").lower():
+                errors.append(entry.get("details", {}).get("error", str(entry)))
+        
+        # Generate report
+        report = {
+            "workflow_id": self.workflow_id,
+            "workflow_source": self.workflow_source,
+            "workflow_name": self.workflow_name,
+            "start_time": start_time_dt.isoformat(),
+            "end_time": end_time.isoformat(),
+            "duration_seconds": round(duration_seconds, 2),
+            "tasks_total": self.total_tasks,
+            "tasks_completed": self.metrics.get("completed", 0),
+            "tasks_failed": self.metrics.get("failed", 0),
+            "deliverables": sorted(list(self.deliverables)),
+            "deliverables_count": len(self.deliverables),
+            "resource_usage": {
+                "initial_memory_mb": round(self.initial_memory, 2),
+                "peak_memory_mb": round(self.peak_memory, 2),
+                "memory_growth_mb": round(self.peak_memory - self.initial_memory, 2),
+                "cpu_time_seconds": round(cpu_time_used, 2),
+                "file_operations": self.file_operations.copy(),
+                "files_tracked": len(self.deliverables)
+            },
+            "errors": errors[:10],  # Limit to first 10 errors
+            "error_count": len(errors),
+            "audit_log": self.audit_log[-50:],  # Last 50 audit entries
+            "audit_entries_total": len(self.audit_log),
+            "performance_metrics": {
+                "avg_task_duration": round(duration_seconds / max(self.total_tasks, 1), 2),
+                "tasks_per_minute": round((self.metrics.get("completed", 0) / max(duration_seconds / 60, 0.1)), 2),
+                "success_rate": round((self.metrics.get("completed", 0) / max(self.total_tasks, 1)) * 100, 1)
+            },
+            "output_directory": str(self.output_dir),
+            "generated_at": datetime.now().isoformat()
+        }
+        
+        return report
+        
+    def _save_completion_report(self, report: Dict[str, Any]):
+        """Save the workflow completion report to the deliverables directory."""
+        try:
+            deliverables_dir = self.output_dir / "deliverables"
+            deliverables_dir.mkdir(parents=True, exist_ok=True)
+            
+            report_file = deliverables_dir / "workflow_completion_report.json"
+            report_file.write_text(json.dumps(report, indent=2, default=str))
+            
+            # Also create a summary report
+            summary = {
+                "workflow_id": report["workflow_id"],
+                "workflow_name": report["workflow_name"],
+                "duration_seconds": report["duration_seconds"],
+                "tasks_completed": report["tasks_completed"],
+                "tasks_failed": report["tasks_failed"],
+                "success_rate": report["performance_metrics"]["success_rate"],
+                "deliverables_count": report["deliverables_count"],
+                "peak_memory_mb": report["resource_usage"]["peak_memory_mb"],
+                "error_count": report["error_count"],
+                "completed_at": report["end_time"]
+            }
+            
+            summary_file = deliverables_dir / "workflow_summary.json"
+            summary_file.write_text(json.dumps(summary, indent=2))
+            
+            # Track these reports as deliverables
+            self._track_deliverable(str(report_file), "created")
+            self._track_deliverable(str(summary_file), "created")
+            
+            logger.info(f"Workflow completion report saved: {report_file}")
+            logger.info(f"Workflow summary saved: {summary_file}")
+            
+        except Exception as e:
+            logger.error(f"Failed to save completion report: {e}")
+    
+    def _create_workflow_metadata(self):
+        """Create initial metadata.json with workflow tracking info."""
+        metadata = {
+            "workflow_id": self.workflow_id,
+            "workflow_source": self.workflow_source,
+            "workflow_name": self.workflow_name,
+            "timestamp": self.workflow_timestamp,
+            "created_at": datetime.now().isoformat(),
+            "status": "initialized",
+            "output_dir": str(self.output_dir),
+            "max_parallel": self.max_parallel,
+            "token_pool_size": self.token_pool.size() if hasattr(self, 'token_pool') and self.token_pool else 0,
+            "agent_execution_profile": self.agent_execution_profile,
+            "total_tasks": 0,
+            "completed_tasks": 0,
+            "failed_tasks": 0,
+            "agents": [],
+            "deliverables": [],
+            "progress": {
+                "percent": 0,
+                "current_phase": "initializing",
+                "eta_seconds": None
+            },
+            "directory_structure": {
+                "metadata": "workflow_info.json and other metadata files",
+                "orchestrator.log": "main orchestrator log file",
+                "agents": "individual agent logs and results",
+                "deliverables": "workflow outputs and results",
+                "checkpoints": "resume capability data"
+            }
+        }
+        
+        metadata_file = self.output_dir / "metadata" / "workflow_info.json"
+        metadata_file.write_text(json.dumps(metadata, indent=2))
+        
+    def _update_workflow_metadata(self, updates: Dict):
+        """Update workflow metadata with new information."""
+        metadata_file = self.output_dir / "metadata" / "workflow_info.json"
+        
+        try:
+            if metadata_file.exists():
+                metadata = json.loads(metadata_file.read_text())
+            else:
+                metadata = {}
+            
+            metadata.update(updates)
+            metadata["last_updated"] = datetime.now().isoformat()
+            
+            metadata_file.write_text(json.dumps(metadata, indent=2))
+        except Exception as e:
+            logger.warning(f"Failed to update workflow metadata: {e}")
+    
+    def _create_checkpoint(self, task: AgentTask):
+        """Create checkpoint for resume capability."""
+        try:
+            checkpoint_data = {
+                "workflow_id": self.workflow_id,
+                "workflow_source": self.workflow_source,
+                "workflow_name": self.workflow_name,
+                "timestamp": datetime.now().isoformat(),
+                "task_id": task.task_id,
+                "task_status": task.status,
+                "metrics": self.metrics.copy(),
+                "completed_tasks": list(self.dep_manager.completed),
+                "failed_tasks": list(self.dep_manager.failed),
+                "running_tasks": list(self.dep_manager.running)
+            }
+            
+            checkpoint_file = self.output_dir / "checkpoints" / f"checkpoint_{task.task_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            checkpoint_file.write_text(json.dumps(checkpoint_data, indent=2))
+            
+            # Also create latest checkpoint
+            latest_checkpoint = self.output_dir / "checkpoints" / "latest_checkpoint.json"
+            latest_checkpoint.write_text(json.dumps(checkpoint_data, indent=2))
+            
+        except Exception as e:
+            logger.warning(f"Failed to create checkpoint: {e}")
 
     def _report_workflow_started(self):
         """Report workflow start to dashboard if callback is configured."""
@@ -619,6 +974,394 @@ class GenericOrchestrator:
         }
 
         return filtered
+
+    def _validate_project_directory(self, path: str) -> Dict[str, Any]:
+        """
+        Validate that a directory path follows project directory standards.
+        
+        Returns:
+            Dict with 'is_valid', 'category', 'warnings', and 'suggestions'
+        """
+        path_obj = Path(path).resolve()
+        result = {
+            'is_valid': True,
+            'category': 'unknown',
+            'warnings': [],
+            'suggestions': []
+        }
+        
+        # Check if path is under the master root
+        master_root = Path("/home/opsvi/master_root").resolve()
+        try:
+            relative_to_master = path_obj.relative_to(master_root)
+        except ValueError:
+            result['is_valid'] = False
+            result['warnings'].append(f"Path {path} is outside master_root structure")
+            result['suggestions'].append("Place project files under /home/opsvi/master_root/apps/PROJECT-NAME/")
+            return result
+        
+        # Categorize the path
+        parts = relative_to_master.parts
+        if not parts:
+            result['category'] = 'master_root'
+            result['warnings'].append("Writing directly to master_root is discouraged")
+            result['suggestions'].append("Create project directory under apps/PROJECT-NAME/")
+        elif parts[0] == 'apps':
+            result['category'] = 'apps'
+            if len(parts) == 1:
+                # Writing to /apps directory itself
+                result['warnings'].append("Writing directly to apps/ directory")
+                result['suggestions'].append("Create specific project directory like apps/PROJECT-NAME/")
+            elif len(parts) >= 2:
+                project_name = parts[1]
+                if project_name == 'agent-orchestrator':
+                    result['category'] = 'orchestrator'
+                    # This is orchestrator-specific, which is OK
+                else:
+                    result['category'] = 'project'
+                    # Validate project directory structure
+                    if not self._is_valid_project_name(project_name):
+                        result['warnings'].append(f"Project name '{project_name}' should follow kebab-case convention")
+                        result['suggestions'].append("Use lowercase with hyphens (e.g., my-awesome-project)")
+        elif parts[0] == '.claude':
+            result['category'] = 'claude_workspace'
+            # This is OK - Claude's personal workspace
+        else:
+            result['category'] = 'other'
+            result['warnings'].append(f"Path under {parts[0]}/ - consider if this belongs in apps/PROJECT-NAME/")
+        
+        return result
+    
+    def _is_valid_project_name(self, name: str) -> bool:
+        """
+        Validate project name follows conventions.
+        
+        Project names should:
+        - Be lowercase
+        - Use hyphens instead of underscores
+        - Be descriptive
+        - Avoid generic names
+        """
+        # Basic format check: lowercase alphanumeric with hyphens
+        if not re.match(r'^[a-z0-9]+(-[a-z0-9]+)*$', name):
+            return False
+        
+        # Avoid single character or very short names
+        if len(name) < 3:
+            return False
+        
+        # Avoid generic names that might conflict
+        generic_names = {'app', 'project', 'test', 'demo', 'sample', 'temp', 'tmp'}
+        if name in generic_names:
+            return False
+        
+        return True
+    
+    def _suggest_project_directory_structure(self, project_name: str) -> str:
+        """
+        Suggest proper directory structure for a new project.
+        """
+        # Clean and validate project name
+        clean_name = self._clean_project_name(project_name)
+        
+        suggestions = f"""Suggested project structure for '{clean_name}':
+
+/home/opsvi/master_root/apps/{clean_name}/
+├── README.md                 # Project overview
+├── docs/                     # Documentation
+│   ├── ARCHITECTURE.md
+│   ├── API_REFERENCE.md
+│   └── USER_GUIDE.md
+├── src/                      # Source code
+├── tests/                    # Test files
+├── config/                   # Configuration files
+├── scripts/                  # Utility scripts
+├── data/                     # Project data files
+└── outputs/                  # Generated outputs
+
+Project deliverables go in: /apps/{clean_name}/
+Orchestrator operations remain in: /apps/agent-orchestrator/
+"""
+        return suggestions
+    
+    def _clean_project_name(self, name: str) -> str:
+        """
+        Clean and normalize a project name to follow conventions.
+        """
+        # Convert to lowercase
+        clean = name.lower().strip()
+        
+        # Replace underscores and spaces with hyphens
+        clean = re.sub(r'[_\s]+', '-', clean)
+        
+        # Remove non-alphanumeric characters except hyphens
+        clean = re.sub(r'[^a-z0-9-]', '', clean)
+        
+        # Remove consecutive hyphens
+        clean = re.sub(r'-+', '-', clean)
+        
+        # Remove leading/trailing hyphens
+        clean = clean.strip('-')
+        
+        # Ensure it's not empty and not too short
+        if len(clean) < 3:
+            clean = f"project-{clean}" if clean else "new-project"
+        
+        return clean
+    
+    def _validate_and_warn_directory_usage(self, task: AgentTask, directory_path: str) -> bool:
+        """
+        Validate directory usage for a task and issue warnings if needed.
+        
+        Returns:
+            True if directory usage is acceptable, False if it should be blocked
+        """
+        validation = self._validate_project_directory(directory_path)
+        
+        # Create a warning key to avoid duplicate warnings
+        warning_key = f"{task.task_type}:{validation['category']}:{directory_path}"
+        
+        if validation['warnings'] and warning_key not in self._directory_warnings:
+            self._directory_warnings.add(warning_key)
+            
+            warning_msg = f"[{task.task_id}] Directory usage warning for {directory_path}:\n"
+            for warning in validation['warnings']:
+                warning_msg += f"  • {warning}\n"
+            
+            if validation['suggestions']:
+                warning_msg += "Suggestions:\n"
+                for suggestion in validation['suggestions']:
+                    warning_msg += f"  • {suggestion}\n"
+            
+            logger.warning(warning_msg)
+            
+            # Issue Python warning as well
+            warnings.warn(
+                f"Task {task.task_id}: {validation['warnings'][0]}",
+                UserWarning,
+                stacklevel=2
+            )
+        
+        # For now, don't block any operations for backward compatibility
+        # In the future, could return False for certain violations
+        return True
+    
+    def _detect_new_project_creation(self, task: AgentTask) -> Optional[str]:
+        """
+        Detect if a task is trying to create a new project.
+        
+        Returns:
+            Project name if new project creation detected, None otherwise
+        """
+        # Look for patterns in task prompts that suggest new project creation
+        if not hasattr(task, 'prompt') or not task.prompt:
+            return None
+        
+        prompt_lower = task.prompt.lower()
+        
+        # Common patterns that suggest new project creation
+        creation_patterns = [
+            r'create\s+(?:a\s+)?(?:new\s+)?project\s+(?:named\s+|called\s+)?["\']?([a-zA-Z0-9_-]+)["\']?',
+            r'build\s+(?:a\s+)?(?:new\s+)?(?:application|app)\s+(?:named\s+|called\s+)?["\']?([a-zA-Z0-9_-]+)["\']?',
+            r'implement\s+(?:a\s+)?(?:new\s+)?project\s+["\']?([a-zA-Z0-9_-]+)["\']?',
+            r'start\s+(?:a\s+)?(?:new\s+)?project\s+["\']?([a-zA-Z0-9_-]+)["\']?',
+            r'initialize\s+(?:a\s+)?(?:new\s+)?project\s+["\']?([a-zA-Z0-9_-]+)["\']?'
+        ]
+        
+        for pattern in creation_patterns:
+            match = re.search(pattern, prompt_lower)
+            if match:
+                return match.group(1)
+        
+        return None
+    
+    def _provide_project_creation_guidance(self, task: AgentTask, project_name: str):
+        """
+        Provide guidance when new project creation is detected.
+        """
+        clean_name = self._clean_project_name(project_name)
+        suggested_structure = self._suggest_project_directory_structure(clean_name)
+        
+        guidance_msg = f"""[{task.task_id}] New project creation detected: '{project_name}'
+
+Project Directory Standards:
+{suggested_structure}
+
+To ensure proper organization:
+1. All project deliverables should go in /apps/{clean_name}/
+2. Keep orchestrator operations separate in /apps/agent-orchestrator/
+3. Follow the suggested directory structure above
+4. Use kebab-case for project names (lowercase with hyphens)
+"""
+        
+        logger.info(guidance_msg)
+        
+        # Store guidance in task context for agent to see
+        if not hasattr(task, 'context'):
+            task.context = {}
+        task.context['project_directory_guidance'] = {
+            'project_name': project_name,
+            'clean_name': clean_name,
+            'suggested_path': f"/home/opsvi/master_root/apps/{clean_name}",
+            'structure': suggested_structure
+        }
+    
+    def _validate_task_project_organization(self, task: AgentTask) -> Dict[str, Any]:
+        """
+        Validate task project organization fields and suggest improvements.
+        
+        Returns:
+            Dict with 'is_valid', 'warnings', and 'suggestions'
+        """
+        result = {
+            'is_valid': True,
+            'warnings': [],
+            'suggestions': []
+        }
+        
+        # Check if project location is specified
+        if hasattr(task, 'project_location') and task.project_location:
+            project_validation = self._validate_project_directory(task.project_location)
+            if not project_validation['is_valid']:
+                result['is_valid'] = False
+                result['warnings'].extend([f"Project location: {w}" for w in project_validation['warnings']])
+                result['suggestions'].extend([f"Project location: {s}" for s in project_validation['suggestions']])
+        else:
+            # Check if task suggests new project creation
+            project_name = self._detect_new_project_creation(task)
+            if project_name:
+                result['warnings'].append("Task appears to create a new project but lacks 'project_location' field")
+                clean_name = self._clean_project_name(project_name)
+                result['suggestions'].append(f"Add project_location: '/home/opsvi/master_root/apps/{clean_name}/'")
+        
+        # Validate deliverable structure if specified
+        if hasattr(task, 'deliverable_structure') and task.deliverable_structure:
+            for key, path in task.deliverable_structure.items():
+                if not path.startswith('/'):
+                    result['warnings'].append(f"Deliverable path '{key}' should be absolute: {path}")
+                    result['suggestions'].append(f"Use absolute paths starting with '/' for all deliverables")
+                    break
+        
+        # Check if directory permissions are properly specified
+        if hasattr(task, 'directory_permissions') and task.directory_permissions:
+            for perm in task.directory_permissions:
+                if not perm.startswith('/'):
+                    result['warnings'].append(f"Directory permission should be absolute path: {perm}")
+                    result['suggestions'].append("Use absolute paths for directory permissions")
+                    break
+        else:
+            # Suggest standard permissions based on task type
+            if hasattr(task, 'project_location') and task.project_location:
+                result['suggestions'].append(f"Consider adding directory_permissions: ['{task.project_location}']")
+        
+        return result
+    
+    def _enhance_task_with_project_organization(self, task: AgentTask) -> AgentTask:
+        """
+        Enhance task with suggested project organization fields if missing.
+        
+        Returns:
+            Enhanced task with project organization suggestions
+        """
+        # Auto-detect project creation and suggest project_location
+        if not hasattr(task, 'project_location') or not task.project_location:
+            project_name = self._detect_new_project_creation(task)
+            if project_name:
+                clean_name = self._clean_project_name(project_name)
+                task.project_location = f"/home/opsvi/master_root/apps/{clean_name}/"
+                
+                # Suggest standard deliverable structure
+                if not hasattr(task, 'deliverable_structure') or not task.deliverable_structure:
+                    task.deliverable_structure = {
+                        "main_deliverable": f"{task.project_location}",
+                        "documentation": f"{task.project_location}docs/",
+                        "source_code": f"{task.project_location}src/",
+                        "configuration": f"{task.project_location}config/"
+                    }
+                
+                # Add standard directory permissions
+                if not hasattr(task, 'directory_permissions') or not task.directory_permissions:
+                    task.directory_permissions = [
+                        task.project_location,
+                        "/home/opsvi/master_root/apps/"
+                    ]
+                
+                # Add basic output validation rules
+                if not hasattr(task, 'output_validation') or not task.output_validation:
+                    task.output_validation = {
+                        "required_structure": True,
+                        "validate_paths": True,
+                        "check_project_standards": True
+                    }
+        
+        return task
+    
+    def _apply_task_directory_permissions(self, task: AgentTask, cmd: List[str]) -> List[str]:
+        """
+        Apply directory permissions from task to command.
+        
+        Args:
+            task: The task with potential directory permissions
+            cmd: The command list to modify
+        
+        Returns:
+            Modified command list with additional --add-dir parameters
+        """
+        # Apply directory permissions from task if available
+        if hasattr(task, 'directory_permissions') and task.directory_permissions:
+            for dir_path in task.directory_permissions:
+                # Avoid duplicates
+                if "--add-dir" in cmd:
+                    existing_dirs = []
+                    i = 0
+                    while i < len(cmd) - 1:
+                        if cmd[i] == "--add-dir":
+                            existing_dirs.append(cmd[i + 1])
+                            i += 2
+                        else:
+                            i += 1
+                    
+                    if dir_path not in existing_dirs:
+                        # Find insertion point (before the "--" separator)
+                        try:
+                            separator_idx = cmd.index("--")
+                            cmd.insert(separator_idx, "--add-dir")
+                            cmd.insert(separator_idx + 1, dir_path)
+                        except ValueError:
+                            # No separator found, add at end
+                            cmd.extend(["--add-dir", dir_path])
+                else:
+                    # First --add-dir parameter
+                    try:
+                        separator_idx = cmd.index("--")
+                        cmd.insert(separator_idx, "--add-dir")
+                        cmd.insert(separator_idx + 1, dir_path)
+                    except ValueError:
+                        # No separator found, add at end
+                        cmd.extend(["--add-dir", dir_path])
+        
+        return cmd
+    
+    def _log_task_organization_validation(self, task: AgentTask, validation_result: Dict[str, Any]):
+        """Log task organization validation results."""
+        if validation_result['warnings']:
+            warning_msg = f"[{task.task_id}] Project organization warnings:\n"
+            for warning in validation_result['warnings']:
+                warning_msg += f"  • {warning}\n"
+            
+            if validation_result['suggestions']:
+                warning_msg += "Suggestions:\n"
+                for suggestion in validation_result['suggestions']:
+                    warning_msg += f"  • {suggestion}\n"
+            
+            logger.warning(warning_msg)
+            
+            # Log to audit trail
+            self._log_audit_action("task_organization_validation", {
+                "task_id": task.task_id,
+                "task_type": task.task_type,
+                "validation_result": validation_result
+            })
 
     def _init_providers(self):
         """Initialize multi-provider support"""
@@ -764,6 +1507,22 @@ class GenericOrchestrator:
         else:
             agent_work_dir = self.output_dir
 
+        # Log audit entry for task start
+        self._log_audit_action("task_started", {
+            "task_id": task.task_id,
+            "task_type": task.task_type,
+            "session_id": session_id,
+            "agent_work_dir": str(agent_work_dir)
+        })
+
+        # Validate and enhance task project organization
+        validation_result = self._validate_task_project_organization(task)
+        if validation_result['warnings'] or validation_result['suggestions']:
+            self._log_task_organization_validation(task, validation_result)
+        
+        # Enhance task with project organization if needed
+        task = self._enhance_task_with_project_organization(task)
+
         # Report task start to dashboard
         self._report_task_activity(task, "started")
 
@@ -804,17 +1563,36 @@ class GenericOrchestrator:
         if task.task_type in system_prompts:
             cmd.extend(["--append-system-prompt", system_prompts[task.task_type]])
 
+        # Validate directory usage and provide guidance
+        project_name = self._detect_new_project_creation(task)
+        if project_name:
+            self._provide_project_creation_guidance(task, project_name)
+        
+        # Validate primary working directory
+        work_dir_path = str(agent_work_dir if self.enable_dynamic_configs else self.output_dir)
+        self._validate_and_warn_directory_usage(task, work_dir_path)
+        
+        # Validate additional directory access
+        apps_dir = "/home/opsvi/master_root/apps"
+        self._validate_and_warn_directory_usage(task, apps_dir)
+
         # Add session and workspace parameters
         cmd.extend(
             [
                 "--session-id",
                 session_id,
                 "--add-dir",
-                str(agent_work_dir if self.enable_dynamic_configs else self.output_dir),
-                "--",  # Important: separator before prompt
-                prompt,
+                work_dir_path,
+                "--add-dir",
+                apps_dir,  # Allow agents to create project directories outside orchestrator scope
             ]
         )
+        
+        # Apply additional directory permissions from task
+        cmd = self._apply_task_directory_permissions(task, cmd)
+        
+        # Add prompt separator and prompt
+        cmd.extend(["--", prompt])
 
         # Get token
         token, token_idx = await self.token_pool.acquire()
@@ -849,13 +1627,26 @@ class GenericOrchestrator:
             try:
                 logger.info(f"Executing {task.task_id} ({task.task_type})")
 
-                # Set up log file if log_to_work_dir is enabled
+                # Set up log file - always log to agents directory
                 log_file_handle = None
+                agent_log_file = self.output_dir / "agents" / f"{task.task_id}.log"
+                agent_log_file.parent.mkdir(parents=True, exist_ok=True)
+                
                 if self.log_to_work_dir and self.enable_dynamic_configs:
-                    log_file = agent_work_dir / "logs" / f"agent_{task.task_id}.log"
-                    log_file.parent.mkdir(parents=True, exist_ok=True)
-                    log_file_handle = open(log_file, "w")
+                    # Also log to work dir if requested
+                    work_dir_log_file = agent_work_dir / "logs" / f"agent_{task.task_id}.log"
+                    work_dir_log_file.parent.mkdir(parents=True, exist_ok=True)
+                    log_file_handle = open(work_dir_log_file, "w")
                     stderr_target = log_file_handle
+                    
+                    # Create symlink from agents directory to work dir log
+                    try:
+                        if agent_log_file.exists():
+                            agent_log_file.unlink()
+                        agent_log_file.symlink_to(work_dir_log_file)
+                    except OSError:
+                        # Fallback to copy if symlink fails
+                        pass
                 else:
                     stderr_target = asyncio.subprocess.PIPE
 
@@ -885,6 +1676,14 @@ class GenericOrchestrator:
                         except Exception as e:
                             logger.warning(f"Failed to read stderr from log file: {e}")
                             stderr = None
+                elif process.returncode != 0 and stderr is None:
+                    # Try to capture stderr from agents log file
+                    try:
+                        if agent_log_file.exists():
+                            stderr_content = agent_log_file.read_text()
+                            stderr = stderr_content.encode() if stderr_content else None
+                    except Exception as e:
+                        logger.warning(f"Failed to read stderr from agent log file: {e}")
 
                 task.end_time = datetime.now().timestamp()
                 duration = task.end_time - task.start_time
@@ -915,6 +1714,15 @@ class GenericOrchestrator:
 
                             # Track completion time for ETA calculations
                             self.task_completion_times.append(duration)
+                            
+                            # Log audit entry for task completion
+                            self._log_audit_action("task_completed", {
+                                "task_id": task.task_id,
+                                "task_type": task.task_type,
+                                "duration_seconds": duration,
+                                "result_type": "json",
+                                "memory_usage_mb": self.process.memory_info().rss / 1024 / 1024
+                            })
 
                             # Report task completion to dashboard
                             self._report_task_activity(
@@ -922,6 +1730,18 @@ class GenericOrchestrator:
                                 "completed",
                                 {"duration": duration, "result_type": "json"},
                             )
+                            
+                            # Update workflow progress
+                            self._update_workflow_metadata({
+                                "completed_tasks": self.metrics["completed"],
+                                "progress": {
+                                    "percent": int((self.metrics["completed"] / self.total_tasks) * 100) if self.total_tasks > 0 else 0,
+                                    "current_phase": "executing"
+                                }
+                            })
+                            
+                            # Create checkpoint
+                            self._create_checkpoint(task)
 
                             logger.info(
                                 f"✓ {task.task_id} completed in {duration:.2f}s"
@@ -955,6 +1775,15 @@ class GenericOrchestrator:
 
                                 # Track completion time for ETA calculations
                                 self.task_completion_times.append(duration)
+                                
+                                # Log audit entry for task completion
+                                self._log_audit_action("task_completed", {
+                                    "task_id": task.task_id,
+                                    "task_type": task.task_type,
+                                    "duration_seconds": duration,
+                                    "result_type": "non_json",
+                                    "memory_usage_mb": self.process.memory_info().rss / 1024 / 1024
+                                })
 
                                 # Report task completion to dashboard
                                 self._report_task_activity(
@@ -962,6 +1791,18 @@ class GenericOrchestrator:
                                     "completed",
                                     {"duration": duration, "result_type": "non_json"},
                                 )
+                                
+                                # Update workflow progress
+                                self._update_workflow_metadata({
+                                    "completed_tasks": self.metrics["completed"],
+                                    "progress": {
+                                        "percent": int((self.metrics["completed"] / self.total_tasks) * 100) if self.total_tasks > 0 else 0,
+                                        "current_phase": "executing"
+                                    }
+                                })
+                                
+                                # Create checkpoint
+                                self._create_checkpoint(task)
 
                                 logger.info(
                                     f"✓ {task.task_id} completed in {duration:.2f}s (non-JSON output)"
@@ -1060,6 +1901,16 @@ class GenericOrchestrator:
 
                     await self.dep_manager.mark_failed(task.task_id)
                     self.metrics["failed"] += 1
+                    
+                    # Log audit entry for task failure
+                    self._log_audit_action("task_failed", {
+                        "task_id": task.task_id,
+                        "task_type": task.task_type,
+                        "duration_seconds": duration,
+                        "error": task.error[:200] if task.error else "Unknown error",
+                        "exit_code": process.returncode,
+                        "memory_usage_mb": self.process.memory_info().rss / 1024 / 1024
+                    })
 
                     # Report task failure to dashboard
                     self._report_task_activity(
@@ -1071,6 +1922,14 @@ class GenericOrchestrator:
                             "exit_code": process.returncode,
                         },
                     )
+                    
+                    # Update workflow metadata with failure
+                    self._update_workflow_metadata({
+                        "failed_tasks": self.metrics["failed"]
+                    })
+                    
+                    # Create checkpoint for failed task too
+                    self._create_checkpoint(task)
 
                     logger.error(f"✗ {task.task_id} failed: {task.error}")
 
@@ -1146,11 +2005,28 @@ class GenericOrchestrator:
 
                 await self.dep_manager.mark_failed(task.task_id)
                 self.metrics["failed"] += 1
+                
+                # Log audit entry for task exception
+                self._log_audit_action("task_exception", {
+                    "task_id": task.task_id,
+                    "task_type": task.task_type,
+                    "error": task.error[:200] if task.error else "Unknown exception",
+                    "error_type": error_type,
+                    "memory_usage_mb": self.process.memory_info().rss / 1024 / 1024
+                })
 
                 # Report task exception to dashboard
                 self._report_task_activity(
                     task, "failed", {"error": task.error, "error_type": "exception"}
                 )
+                
+                # Update workflow metadata with failure
+                self._update_workflow_metadata({
+                    "failed_tasks": self.metrics["failed"]
+                })
+                
+                # Create checkpoint for exception too
+                self._create_checkpoint(task)
 
                 logger.error(f"✗ {task.task_id} exception: {task.error}")
 
@@ -1163,10 +2039,16 @@ class GenericOrchestrator:
         if self.post_execute_hook:
             await self.post_execute_hook(task)
 
-        # Save task state
-        task_file = self.output_dir / "tasks" / f"{task.task_id}.json"
+        # Update resource usage after task completion
+        self._update_resource_usage()
+        
+        # Save task state to agents directory
+        task_file = self.output_dir / "agents" / f"{task.task_id}.json"
         task_file.parent.mkdir(exist_ok=True)
         task_file.write_text(json.dumps(task.to_dict(), indent=2))
+        
+        # Track the task file as a deliverable
+        self._track_deliverable(str(task_file), "created")
 
         return task.to_dict()
 
@@ -1177,6 +2059,13 @@ class GenericOrchestrator:
         self.metrics["start_time"] = datetime.now().isoformat()
         self.workflow_start_time = datetime.now().timestamp()
         self.total_tasks = len(tasks)
+        
+        # Log audit entry for batch execution start
+        self._log_audit_action("batch_execution_started", {
+            "total_tasks": len(tasks),
+            "max_parallel": self.max_parallel,
+            "initial_memory_mb": self.process.memory_info().rss / 1024 / 1024
+        })
 
         # Report initial workflow progress
         self._report_workflow_progress(0, len(tasks))
@@ -1243,7 +2132,7 @@ class GenericOrchestrator:
 
                     # Save task state to file
                     task_file = (
-                        self.output_dir / "tasks" / f"{failed_task.task_id}.json"
+                        self.output_dir / "agents" / f"{failed_task.task_id}.json"
                     )
                     task_file.parent.mkdir(exist_ok=True)
                     task_file.write_text(json.dumps(failed_task.to_dict(), indent=2))
@@ -1267,10 +2156,33 @@ class GenericOrchestrator:
             await asyncio.sleep(0.5)
 
         self.metrics["end_time"] = datetime.now().isoformat()
+        
+        # Generate and save workflow completion report
+        completion_report = self._generate_workflow_completion_report()
+        self._save_completion_report(completion_report)
+        
+        # Log audit entry for batch completion
+        self._log_audit_action("batch_execution_completed", {
+            "total_tasks": len(tasks),
+            "completed_tasks": self.metrics["completed"],
+            "failed_tasks": self.metrics["failed"],
+            "duration_seconds": completion_report["duration_seconds"],
+            "success_rate": completion_report["performance_metrics"]["success_rate"],
+            "deliverables_count": completion_report["deliverables_count"],
+            "peak_memory_mb": completion_report["resource_usage"]["peak_memory_mb"]
+        })
 
         # Report workflow completion
         if self.enable_dashboard_reporting:
             self._report_workflow_completed(self.metrics)
+            
+        # Update final metadata
+        self._update_workflow_metadata({
+            "status": "batch_completed",
+            "completed_tasks": self.metrics["completed"],
+            "failed_tasks": self.metrics["failed"],
+            "completion_report_generated": True
+        })
 
         return results
 
@@ -1301,12 +2213,28 @@ class GenericOrchestrator:
         tasks = task_generator()
         logger.info(f"Generated {len(tasks)} tasks")
 
+        # Update metadata with task count
+        self._update_workflow_metadata({
+            "total_tasks": len(tasks),
+            "status": "running",
+            "started_at": datetime.now().isoformat()
+        })
+
         # Execute tasks
         results = await self.execute_batch(tasks)
 
         # Process results if processor provided
         if result_processor:
             await result_processor(results)
+            
+        # Final metadata update (completion report already generated in execute_batch)
+        self._update_workflow_metadata({
+            "status": "completed",
+            "completed_at": datetime.now().isoformat(),
+            "completed_tasks": self.metrics["completed"],
+            "failed_tasks": self.metrics["failed"],
+            "total_duration": self.metrics["total_duration"]
+        })
 
         # Print summary
         logger.info("=" * 60)

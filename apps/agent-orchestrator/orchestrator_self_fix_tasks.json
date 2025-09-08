@@ -1,0 +1,83 @@
+{
+  "tasks": [
+    {
+      "task_id": "orchestrator_permission_fix",
+      "task_type": "development-specialist",
+      "prompt": "Fix GenericOrchestrator to add --add-dir /home/opsvi/master_root/apps parameter to all agent commands. This will allow agents to create project directories outside the orchestrator scope.\n\nFILE TO MODIFY: /home/opsvi/master_root/apps/agent-orchestrator/src/generic_orchestrator.py\n\nFIND the section around line 617 where agent commands are constructed and ADD the --add-dir parameter.\n\nBefore fixing:\n- Read the current file to understand the exact structure\n- Locate where agent commands are built (likely in _run_agent_task method)\n- Add --add-dir /home/opsvi/master_root/apps to the command construction\n- Ensure backward compatibility is maintained\n- Test that the change doesn't break existing workflows\n\nIMPORTANT: Make targeted changes only. Do not refactor or restructure - just add the missing --add-dir parameter.",
+      "context": {
+        "target_file": "/home/opsvi/master_root/apps/agent-orchestrator/src/generic_orchestrator.py",
+        "target_line": "~617",
+        "change_type": "Add --add-dir parameter to agent commands",
+        "safety_requirement": "Must preserve backward compatibility",
+        "test_requirement": "Must not break existing workflows"
+      }
+    },
+    {
+      "task_id": "workflow_isolation_implementation", 
+      "task_type": "development-specialist",
+      "dependencies": ["orchestrator_permission_fix"],
+      "prompt": "Implement workflow isolation by creating unique output directories for each workflow execution.\n\nMODIFY: /home/opsvi/master_root/apps/agent-orchestrator/src/generic_orchestrator.py\n\nImplement workflow-specific directory structure:\n- output/workflow_{SOURCE}_{TIMESTAMP}_{HASH}/\n  - metadata.json (workflow info, progress, agents, deliverables)\n  - orchestrator.log\n  - agents/ (individual agent logs)\n  - deliverables/ (workflow outputs)\n  - checkpoints/ (resume data)\n\nChanges needed:\n1. Generate unique workflow IDs in format: workflow_{source}_{timestamp}_{hash}\n2. Create workflow-specific output directories\n3. Route all workflow outputs to isolated directories\n4. Update logging to use workflow-specific paths\n5. Create metadata.json with workflow tracking info\n6. Ensure existing --output-dir parameter still works for backward compatibility\n\nMAINTAIN: All existing command-line interfaces and behaviors",
+      "context": {
+        "target_file": "/home/opsvi/master_root/apps/agent-orchestrator/src/generic_orchestrator.py",
+        "workflow_format": "workflow_{SOURCE}_{TIMESTAMP}_{HASH}",
+        "directory_structure": "output/workflow_ID/[metadata.json, orchestrator.log, agents/, deliverables/, checkpoints/]",
+        "compatibility_requirement": "Must preserve existing --output-dir behavior"
+      }
+    },
+    {
+      "task_id": "project_directory_standards",
+      "task_type": "development-specialist", 
+      "dependencies": ["orchestrator_permission_fix"],
+      "prompt": "Update GenericOrchestrator to enforce project directory standards for new projects.\n\nMODIFY: /home/opsvi/master_root/apps/agent-orchestrator/src/generic_orchestrator.py\n\nImplement project directory validation:\n1. When agents request to create new projects, validate they use /apps/PROJECT-NAME/ structure\n2. Add validation that project deliverables go in project-specific directories only\n3. Separate orchestrator operations from project deliverables\n4. Add warnings when workflows try to write outside proper directories\n5. Create helper method to suggest proper directory structure\n\nValidation rules:\n- New projects: Must create /apps/PROJECT-NAME/ directories\n- Project deliverables: Only in project-specific directories  \n- Orchestrator operations: Only in orchestrator-specific directories\n- Issue warnings for improper directory usage\n\nMAINTAIN: Backward compatibility for existing workflows",
+      "context": {
+        "project_structure": "/apps/PROJECT-NAME/[src/, docs/, deliverables/, tests/]",
+        "orchestrator_structure": "/apps/agent-orchestrator/orchestrator/workflows/",
+        "validation_type": "Warning-based (not blocking) for compatibility"
+      }
+    },
+    {
+      "task_id": "workflow_completion_reporting",
+      "task_type": "development-specialist",
+      "dependencies": ["workflow_isolation_implementation"],
+      "prompt": "Add comprehensive workflow completion reporting and audit logging to GenericOrchestrator.\n\nMODIFY: /home/opsvi/master_root/apps/agent-orchestrator/src/generic_orchestrator.py\n\nImplement completion reporting:\n1. Generate workflow completion report after each workflow\n2. Include metrics: duration, tasks completed/failed, deliverables created, errors encountered\n3. Create audit log of all actions taken during workflow execution\n4. Save reports to workflow-specific directory: deliverables/workflow_completion_report.json\n5. Include resource usage metrics (CPU, memory, file operations)\n6. Track all file creation/modification during workflow\n\nReport format:\n{\n  \"workflow_id\": \"workflow_name_timestamp_hash\",\n  \"start_time\": \"iso_timestamp\",\n  \"end_time\": \"iso_timestamp\", \n  \"duration_seconds\": 123,\n  \"tasks_total\": 5,\n  \"tasks_completed\": 4,\n  \"tasks_failed\": 1,\n  \"deliverables\": [\"/path/to/file1\", \"/path/to/file2\"],\n  \"resource_usage\": {\"max_memory_mb\": 256, \"cpu_time_seconds\": 45},\n  \"errors\": [\"error descriptions\"],\n  \"audit_log\": [\"timestamped action entries\"]\n}",
+      "context": {
+        "report_location": "workflow_directory/deliverables/workflow_completion_report.json",
+        "audit_location": "workflow_directory/audit_log.json", 
+        "metrics_to_track": "duration, success_rate, resources, deliverables, errors"
+      }
+    },
+    {
+      "task_id": "enhanced_workflow_templates",
+      "task_type": "development-specialist",
+      "dependencies": ["project_directory_standards"],
+      "prompt": "Update workflow task templates to include project organization fields.\n\nMODIFY: /home/opsvi/master_root/apps/agent-orchestrator/src/generic_orchestrator.py (AgentTask class)\n\nEnhance AgentTask to include:\n1. project_location: Where the project should be created (/apps/PROJECT-NAME/)\n2. deliverable_structure: Expected output file organization\n3. directory_permissions: Required --add-dir parameters\n4. output_validation: Rules for validating outputs are in correct locations\n\nUpdate task validation to:\n- Check that tasks specify proper project locations\n- Validate deliverable paths before workflow execution\n- Warn if tasks don't follow directory standards\n- Suggest corrections for improperly structured tasks\n\nEnsure all new workflow task files include these organizational fields while maintaining compatibility with existing task files that don't have them.",
+      "context": {
+        "class_to_modify": "AgentTask",
+        "new_fields": ["project_location", "deliverable_structure", "directory_permissions", "output_validation"],
+        "backward_compatibility": "Optional fields - existing tasks continue to work"
+      }
+    },
+    {
+      "task_id": "resource_metrics_collection",
+      "task_type": "development-specialist", 
+      "dependencies": ["workflow_completion_reporting"],
+      "prompt": "Add enhanced resource usage and performance metrics collection to GenericOrchestrator.\n\nMODIFY: /home/opsvi/master_root/apps/agent-orchestrator/src/generic_orchestrator.py\n\nImplement comprehensive metrics collection:\n1. CPU usage monitoring per workflow and per agent\n2. Memory consumption tracking with peak usage\n3. Execution time per task with detailed breakdowns\n4. Agent performance metrics (response time, success rate)\n5. File I/O operations and disk usage changes\n6. Network usage if applicable\n7. Token usage and API call metrics\n\nMetrics to collect:\n- workflow_start_time, workflow_end_time, total_duration\n- cpu_percent_avg, cpu_percent_peak, memory_mb_avg, memory_mb_peak\n- tasks_per_minute, agent_response_time_avg, agent_success_rate\n- files_created_count, files_modified_count, disk_usage_delta_mb\n- api_calls_total, tokens_used_total, errors_count\n\nStore metrics in: workflow_directory/metrics/performance_metrics.json\nIntegrate with dashboard for real-time monitoring.",
+      "context": {
+        "metrics_file": "workflow_directory/metrics/performance_metrics.json",
+        "monitoring_integration": "Compatible with existing dashboard system",
+        "collection_frequency": "Per-task and workflow-level aggregation"
+      }
+    },
+    {
+      "task_id": "validation_and_testing",
+      "task_type": "qa-testing-guru",
+      "dependencies": ["orchestrator_permission_fix", "workflow_isolation_implementation", "project_directory_standards", "workflow_completion_reporting", "enhanced_workflow_templates", "resource_metrics_collection"],
+      "prompt": "Create comprehensive tests to validate all orchestrator fixes work correctly and don't break existing functionality.\n\nCreate test files in: /home/opsvi/master_root/apps/agent-orchestrator/tests/\n\nTest scenarios:\n1. Permission Fix Test: Verify agents can create /apps/PROJECT-NAME/ directories\n2. Workflow Isolation Test: Confirm each workflow gets unique output directory\n3. Backward Compatibility Test: Ensure existing workflows continue working unchanged\n4. Directory Standards Test: Validate project directory enforcement\n5. Completion Reporting Test: Check reports are generated correctly\n6. Resource Metrics Test: Verify metrics collection accuracy\n7. Template Enhancement Test: Confirm new task fields work properly\n8. Integration Test: Run full workflow with all fixes enabled\n\nCreate automated test scripts that can be run before deploying changes to production.\nInclude rollback validation - test that reverting changes restores original behavior.\nTest with actual existing workflow files to ensure compatibility.",
+      "context": {
+        "test_directory": "/home/opsvi/master_root/apps/agent-orchestrator/tests/",
+        "test_types": ["unit", "integration", "regression", "compatibility"],
+        "validation_requirements": "Must pass all tests before production deployment"
+      }
+    }
+  ]
+}
