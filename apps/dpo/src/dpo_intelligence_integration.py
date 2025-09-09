@@ -17,11 +17,24 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from .enhanced_token_pool import EnhancedTokenPool
-from .generic_orchestrator import AgentTask, GenericOrchestrator
+# from .enhanced_token_pool import EnhancedTokenPool  # Not needed for basic DPO
+# from generic_orchestrator import AgentTask, GenericOrchestrator  # Import from agent-orchestrator instead
 
-# Import core components
-from .intelligence_review_engine_enhanced import EnhancementIntelligenceEngine
+# Setup import paths
+try:
+    from ._path_setup import setup_paths
+except ImportError:
+    from _path_setup import setup_paths
+setup_paths()
+
+# Import from agent-orchestrator
+from generic_orchestrator import AgentTask, GenericOrchestrator
+
+# Import core components - handle both relative and absolute
+try:
+    from .intelligence_review_engine_enhanced import EnhancementIntelligenceEngine
+except ImportError:
+    from intelligence_review_engine_enhanced import EnhancementIntelligenceEngine
 
 logger = logging.getLogger(__name__)
 

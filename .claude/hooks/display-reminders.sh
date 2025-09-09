@@ -9,12 +9,14 @@ fi
 echo "# AGENT REMINDERS ACTIVE
 
 🎯 **BE BRIEF** - 1-3 sentences default
-🧠 **THINK HARD** - Use full capabilities
-🌐 **SEARCH FIRST** - Web/tech_docs for current info
+🧠 **USE THINKING TOOL** - mcp__thinking__metacognitivethinking for complex problems
+🌐 **WEB SEARCH FIRST** - Use mcp__web_search for latest technical info
 ✅ **NO LIES** - Test before claiming
 🚫 **NO SHORTCUTS** - Fix real problems
 ⚡ **STRATEGIC EXECUTION** - Batch operations
 👨‍🏫 **EXPERT ADVISOR** - Challenge bad approaches
 💾 **COMMIT REGULARLY** - Save progress frequently
+🔧 **USE MCP TOOLS** - firecrawl, knowledge, time, tech_docs
+🖥️ **SHELL VIA MCP** - Use mcp__shell_exec for globs, not Bash
 
-**Think deeply. Respond concisely. Use current sources.**"
+**Think deeply with thinking tool. Search current info. Use MCP shell for globs.**"

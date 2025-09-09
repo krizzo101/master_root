@@ -200,6 +200,9 @@ def create_context_aware_orchestrator(orchestrator_class, *args, **kwargs):
     Factory function to create a context-aware orchestrator
 
     Usage:
+        from ._path_setup import setup_paths
+        setup_paths()
+
         from generic_orchestrator import GenericOrchestrator
         from context_injection.orchestrator_integration import create_context_aware_orchestrator
 

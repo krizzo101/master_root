@@ -1,0 +1,29 @@
+{
+  "tasks": [
+    {
+      "task_id": "analyze_system",
+      "task_type": "analysis",
+      "prompt": "List the Python files in the src directory and count them",
+      "context": {
+        "target_dir": "./src"
+      },
+      "dependencies": []
+    },
+    {
+      "task_id": "check_imports",
+      "task_type": "analysis",
+      "prompt": "Check if the unified orchestrator module exists and list its main classes",
+      "context": {
+        "module_path": "./src/unified/unified_orchestrator.py"
+      },
+      "dependencies": ["analyze_system"]
+    },
+    {
+      "task_id": "summarize",
+      "task_type": "synthesis",
+      "prompt": "Create a brief summary of the findings from the previous tasks",
+      "context": {},
+      "dependencies": ["analyze_system", "check_imports"]
+    }
+  ]
+}

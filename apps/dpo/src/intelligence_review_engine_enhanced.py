@@ -25,15 +25,21 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from .generic_orchestrator import AgentTask, GenericOrchestrator
+# Setup import paths
+try:
+    from ._path_setup import setup_paths
+except ImportError:
+    from _path_setup import setup_paths
+setup_paths()
 
-# Import core components
-from .intelligence_review_engine import (
+# Import from agent-orchestrator
+from src.generic_orchestrator import AgentTask, GenericOrchestrator
+from src.intelligence_review_engine import (
     EnhancementCategory,
     EnhancementResult,
     IntelligenceReviewEngine,
 )
-from .specialist_agent_templates import (
+from src.specialist_agent_templates import (
     SpecialistAgentTemplate,
     SpecialistAgentTemplates,
 )
@@ -1006,6 +1012,243 @@ class EnhancementIntelligenceEngine:
                 f.write("\n")
 
         logger.info(f"Enhanced results saved to {output_dir}")
+
+    async def process_request(
+        self, request: str, analysis: Any = None
+    ) -> Dict[str, Any]:
+        """
+        Process a request for enhancements - main entry point for workflow integration
+
+        This method bridges the gap between the DPO controller and the enhanced intelligence engine.
+        It accepts either a string request or a request dictionary and returns enhancements
+        suitable for workflow generation.
+
+        Args:
+            request: Either a string request or a dictionary containing request details
+            analysis: Optional analysis object (for compatibility, can be None)
+
+        Returns:
+            Dictionary containing enhancements and metadata for workflow generation
+        """
+        start_time = time.time()
+
+        try:
+            # Handle both string and dictionary inputs
+            if isinstance(request, str):
+                # Simple string request
+                original_request = request
+                project_context = {}
+                optimization_goals = []
+                constraints = {}
+            elif isinstance(request, dict):
+                # Dictionary request from DPO controller
+                original_request = request.get("request", str(request))
+
+                # Extract context information
+                project_context = {
+                    "project_type": request.get("project_type", "unknown"),
+                    "complexity": request.get("complexity", "medium"),
+                    "key_requirements": request.get("key_requirements", []),
+                    "suggested_technologies": request.get("suggested_technologies", []),
+                    "additional_context": request.get("context", {}),
+                }
+
+                # Map focus areas to optimization goals
+                focus_areas = request.get("focus_areas", [])
+                optimization_goals = []
+
+                if "performance" in focus_areas or "optimization" in focus_areas:
+                    optimization_goals.append("maximize_performance")
+                if "quality" in focus_areas or "testing" in focus_areas:
+                    optimization_goals.append("ensure_quality")
+                if "innovation" in focus_areas or "advanced_features" in focus_areas:
+                    optimization_goals.append("maximize_innovation")
+                if not optimization_goals:
+                    optimization_goals = ["maximize_performance", "ensure_scalability"]
+
+                # Set reasonable constraints based on complexity
+                complexity = request.get("complexity", "medium")
+                if complexity == "high":
+                    constraints = {
+                        "budget_units": 150,
+                        "max_enhancements": 25,
+                        "timeline": "normal",
+                    }
+                elif complexity == "low":
+                    constraints = {
+                        "budget_units": 75,
+                        "max_enhancements": 10,
+                        "timeline": "aggressive",
+                    }
+                else:  # medium
+                    constraints = {
+                        "budget_units": 100,
+                        "max_enhancements": 15,
+                        "timeline": "normal",
+                    }
+
+            else:
+                raise ValueError(
+                    f"Invalid request type: {type(request)}. Expected string or dict."
+                )
+
+            # Validate inputs
+            if not original_request or not original_request.strip():
+                raise ValueError("Request cannot be empty")
+
+            logger.info(f"Processing request: {original_request[:100]}...")
+            logger.info(f"Optimization goals: {optimization_goals}")
+            logger.info(f"Constraints: {constraints}")
+
+            # Call the enhanced intelligence engine
+            full_result = await self.enhance_with_intelligence(
+                original_request=original_request,
+                project_context=project_context,
+                optimization_goals=optimization_goals,
+                constraints=constraints,
+            )
+
+            # Transform the result for workflow consumption
+            workflow_ready_result = self._transform_for_workflow_consumption(
+                full_result, original_request
+            )
+
+            # Add processing metadata
+            workflow_ready_result["processing_metadata"] = {
+                "method": "process_request",
+                "duration_seconds": time.time() - start_time,
+                "input_type": "dict" if isinstance(request, dict) else "string",
+                "timestamp": datetime.now().isoformat(),
+                "engine_session_id": self.session_id,
+            }
+
+            logger.info(
+                f"Request processed successfully in {time.time() - start_time:.2f}s - "
+                f"{len(workflow_ready_result.get('enhancements', []))} enhancements generated"
+            )
+
+            return workflow_ready_result
+
+        except Exception as e:
+            logger.error(f"Error processing request: {str(e)}", exc_info=True)
+
+            # Return a fallback result to prevent workflow failures
+            fallback_result = {
+                "original_request": str(request)[:200]
+                if request
+                else "Unknown request",
+                "enhanced_specification": f"Basic implementation for: {str(request)[:100]}",
+                "enhancements": [],
+                "quick_wins": [],
+                "roadmap": {
+                    "phases": [
+                        {
+                            "phase_number": 1,
+                            "name": "Basic Implementation",
+                            "enhancements": [],
+                            "estimated_duration": "2-3 weeks",
+                            "key_deliverables": ["Basic functionality implemented"],
+                        }
+                    ],
+                    "milestones": [],
+                },
+                "error": {"occurred": True, "message": str(e), "fallback_mode": True},
+                "processing_metadata": {
+                    "method": "process_request",
+                    "duration_seconds": time.time() - start_time,
+                    "timestamp": datetime.now().isoformat(),
+                    "status": "error_fallback",
+                },
+            }
+
+            return fallback_result
+
+    def _transform_for_workflow_consumption(
+        self, full_result: Dict[str, Any], original_request: str
+    ) -> Dict[str, Any]:
+        """
+        Transform the full enhancement result into a format optimized for workflow generation
+
+        Args:
+            full_result: The complete result from enhance_with_intelligence
+            original_request: The original request string
+
+        Returns:
+            Simplified result optimized for workflow consumption
+        """
+        try:
+            # Extract key components for workflow generation
+            workflow_result = {
+                "original_request": original_request,
+                "enhanced_specification": full_result.get("enhanced_specification", ""),
+                "enhancements": [],
+                "quick_wins": full_result.get("quick_wins", []),
+                "innovation_highlights": full_result.get("innovation_highlights", []),
+                "roadmap": full_result.get("implementation_roadmap", {}),
+                "risk_analysis": full_result.get("risk_analysis", {}),
+                "cost_benefit_analysis": full_result.get("cost_benefit_analysis", {}),
+                "metadata": full_result.get("metadata", {}),
+            }
+
+            # Flatten enhancement plan for easier workflow consumption
+            enhancement_plan = full_result.get("enhancement_plan", [])
+            for enhancement in enhancement_plan:
+                if hasattr(enhancement, "to_dict"):
+                    workflow_result["enhancements"].append(enhancement.to_dict())
+                elif isinstance(enhancement, dict):
+                    workflow_result["enhancements"].append(enhancement)
+                else:
+                    # Handle EnhancementNode objects or other formats
+                    try:
+                        enhancement_dict = {
+                            "id": getattr(enhancement, "enhancement_id", "unknown"),
+                            "title": getattr(enhancement, "title", "Enhancement"),
+                            "description": getattr(enhancement, "description", ""),
+                            "category": getattr(enhancement, "category", "general"),
+                            "phase": getattr(enhancement, "implementation_phase", 1),
+                            "composite_score": getattr(
+                                getattr(enhancement, "score", None),
+                                "composite_score",
+                                0.5,
+                            )
+                            if hasattr(enhancement, "score")
+                            else 0.5,
+                        }
+                        workflow_result["enhancements"].append(enhancement_dict)
+                    except Exception as e:
+                        logger.warning(
+                            f"Could not process enhancement {enhancement}: {e}"
+                        )
+
+            # Ensure roadmap has required structure
+            if not workflow_result["roadmap"]:
+                workflow_result["roadmap"] = {"phases": [], "milestones": []}
+
+            # Add summary metrics
+            workflow_result["summary"] = {
+                "total_enhancements": len(workflow_result["enhancements"]),
+                "quick_wins_count": len(workflow_result["quick_wins"]),
+                "innovation_count": len(workflow_result["innovation_highlights"]),
+                "phases_count": len(workflow_result["roadmap"].get("phases", [])),
+                "estimated_impact": workflow_result["metadata"].get(
+                    "estimated_impact_score", 0.5
+                ),
+            }
+
+            return workflow_result
+
+        except Exception as e:
+            logger.error(f"Error transforming result for workflow consumption: {e}")
+            # Return minimal viable structure
+            return {
+                "original_request": original_request,
+                "enhanced_specification": f"Enhanced implementation for: {original_request}",
+                "enhancements": [],
+                "quick_wins": [],
+                "roadmap": {"phases": [], "milestones": []},
+                "summary": {"total_enhancements": 0},
+                "transformation_error": str(e),
+            }
 
 
 async def main():

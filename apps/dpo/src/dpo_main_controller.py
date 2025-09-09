@@ -36,22 +36,44 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from .context_injection import ContextInjectionSystem, get_context_system
+# Import DPO components - handle both relative and absolute
+try:
+    from .context_injection import ContextInjectionSystem, get_context_system
+    from .dpo_intelligence_integration import (
+        DPOIntelligenceIntegration,
+        DPORequest,
+        EnhancedDPOWorkflow,
+    )
+    from .dpo_orchestrator_integration import (
+        DPOOrchestrator,
+        WorkflowStatus,
+        WorkflowSubmission,
+    )
+    from .intelligence_review_engine_enhanced import EnhancementIntelligenceEngine
+    from .sdlc_template_system import SDLCTemplateSystem
+except ImportError:
+    from context_injection import ContextInjectionSystem, get_context_system
+    from dpo_intelligence_integration import (
+        DPOIntelligenceIntegration,
+        DPORequest,
+        EnhancedDPOWorkflow,
+    )
+    from dpo_orchestrator_integration import (
+        DPOOrchestrator,
+        WorkflowStatus,
+        WorkflowSubmission,
+    )
+    from intelligence_review_engine_enhanced import EnhancementIntelligenceEngine
+    from sdlc_template_system import SDLCTemplateSystem
+# Setup import paths
+try:
+    from ._path_setup import setup_paths
+except ImportError:
+    from _path_setup import setup_paths
+setup_paths()
 
-# Import DPO components
-from .dpo_intelligence_integration import (
-    DPOIntelligenceIntegration,
-    DPORequest,
-    EnhancedDPOWorkflow,
-)
-from .dpo_orchestrator_integration import (
-    DPOOrchestrator,
-    WorkflowStatus,
-    WorkflowSubmission,
-)
-from .generic_orchestrator import AgentTask, GenericOrchestrator
-from .intelligence_review_engine_enhanced import EnhancementIntelligenceEngine
-from .sdlc_template_system import SDLCTemplateSystem
+# Import from agent-orchestrator
+from generic_orchestrator import AgentTask, GenericOrchestrator
 
 # Configure logging
 logging.basicConfig(
@@ -396,7 +418,7 @@ class DevelopmentProcessOrchestrator:
         # Initialize intelligence engine if enabled
         if self.config.enable_intelligence:
             self.intelligence_engine = EnhancementIntelligenceEngine(
-                enable_llm_enhancement=True, cache_enhancements=True
+                orchestrator=None, parallel_agents=6, output_dir=None
             )
         else:
             self.intelligence_engine = None
@@ -517,17 +539,30 @@ class DevelopmentProcessOrchestrator:
 
             # Step 5: Execute through orchestrator
             logger.info("Step 5: Submitting to orchestrator for execution...")
-            workflow_id = await self.orchestrator.submit_development_request(
-                request=request,
-                project_type=analysis.project_type,
-                complexity=analysis.complexity,
-                context={
-                    **(context if context else {}),
-                    "analysis": asdict(analysis),
-                    "enhancements": enhancements,
-                    "workflow": contextualized_workflow,
-                },
-            )
+
+            # Create workflow submission with proper format
+            try:
+                submission_result = await self._submit_to_orchestrator(
+                    workflow=contextualized_workflow,
+                    request=request,
+                    analysis=analysis,
+                    enhancements=enhancements,
+                    context=context,
+                )
+
+                if not submission_result.get("success"):
+                    raise Exception(
+                        f"Orchestrator submission failed: {submission_result.get('error')}"
+                    )
+
+                workflow_id = submission_result["workflow_id"]
+
+            except Exception as e:
+                logger.error(f"Failed to submit to orchestrator: {str(e)}")
+                # Try fallback submission
+                workflow_id = await self._fallback_submission(
+                    request, analysis, contextualized_workflow
+                )
 
             # Track workflow
             workflow_record = {
@@ -585,39 +620,64 @@ class DevelopmentProcessOrchestrator:
         enhancement_prefs: Optional[Dict],
     ) -> Dict:
         """Enhance request through intelligence review"""
-        # Create a simplified request for intelligence engine
-        intelligence_request = {
-            "request": request,
-            "project_type": analysis.project_type,
-            "complexity": analysis.complexity,
-            "key_requirements": analysis.key_requirements,
-            "suggested_technologies": analysis.suggested_technologies,
-            "context": context or {},
-        }
+        try:
+            # Create a DPO request for intelligence engine
+            dpo_request = DPORequest(
+                request_id=str(uuid.uuid4()),
+                request_text=request,
+                project_type=analysis.project_type,
+                complexity=analysis.complexity,
+                priority="normal",
+                metadata={
+                    "key_requirements": analysis.key_requirements,
+                    "suggested_technologies": analysis.suggested_technologies,
+                    "context": context or {},
+                    "enhancement_prefs": enhancement_prefs or {},
+                },
+            )
 
-        # Apply enhancement preferences
-        if enhancement_prefs:
-            if enhancement_prefs.get("prioritize_quality"):
-                intelligence_request["focus_areas"] = [
-                    "quality",
-                    "testing",
-                    "documentation",
-                ]
-            if enhancement_prefs.get("prioritize_innovation"):
-                intelligence_request["focus_areas"] = intelligence_request.get(
-                    "focus_areas", []
-                ) + ["innovation", "advanced_features"]
-            if enhancement_prefs.get("prioritize_performance"):
-                intelligence_request["focus_areas"] = intelligence_request.get(
-                    "focus_areas", []
-                ) + ["performance", "optimization"]
+            # Apply enhancement preferences
+            focus_areas = []
+            if enhancement_prefs:
+                if enhancement_prefs.get("prioritize_quality"):
+                    focus_areas.extend(["quality", "testing", "documentation"])
+                if enhancement_prefs.get("prioritize_innovation"):
+                    focus_areas.extend(["innovation", "advanced_features"])
+                if enhancement_prefs.get("prioritize_performance"):
+                    focus_areas.extend(["performance", "optimization"])
 
-        # Process through intelligence engine
-        enhancement_result = await self.intelligence_engine.process_request(
-            intelligence_request
-        )
+            if focus_areas:
+                dpo_request.metadata["focus_areas"] = focus_areas
 
-        return enhancement_result
+            # Process through intelligence engine (synchronous call)
+            enhancement_result = self.intelligence_engine.enhance_request(dpo_request)
+
+            return {
+                "enhancements": enhancement_result.enhancements
+                if enhancement_result
+                else [],
+                "quality_score": enhancement_result.quality_score
+                if enhancement_result
+                else 0.0,
+                "innovation_suggestions": enhancement_result.innovation_suggestions
+                if enhancement_result
+                else [],
+                "risk_mitigations": enhancement_result.risk_mitigations
+                if enhancement_result
+                else [],
+                "recommended_technologies": enhancement_result.recommended_technologies
+                if enhancement_result
+                else [],
+            }
+        except Exception as e:
+            logger.warning(f"Intelligence enhancement failed: {str(e)}")
+            return {
+                "enhancements": [],
+                "quality_score": 0.0,
+                "innovation_suggestions": [],
+                "risk_mitigations": [],
+                "recommended_technologies": [],
+            }
 
     async def _generate_workflow(
         self,
@@ -627,44 +687,109 @@ class DevelopmentProcessOrchestrator:
         context: Optional[Dict],
     ) -> Dict:
         """Generate SDLC workflow based on analysis and enhancements"""
-        # Prepare project name
-        project_name = (
-            f"{analysis.project_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        )
+        try:
+            # Prepare project name
+            project_name = (
+                f"{analysis.project_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            )
 
-        # Prepare specifications for workflow generation
-        specifications = {
-            "requirements": analysis.key_requirements,
-            "technologies": analysis.suggested_technologies,
-            "enhancements": enhancements.get("enhancements", []),
-            "context": context or {},
-        }
+            # Prepare specifications for workflow generation
+            specifications = {
+                "requirements": analysis.key_requirements,
+                "technologies": analysis.suggested_technologies
+                + enhancements.get("recommended_technologies", []),
+                "enhancements": enhancements.get("enhancements", []),
+                "innovation_suggestions": enhancements.get(
+                    "innovation_suggestions", []
+                ),
+                "risk_mitigations": enhancements.get("risk_mitigations", []),
+                "quality_gates": self._generate_quality_gates(analysis, enhancements),
+                "context": context or {},
+            }
 
-        # Generate workflow through template system
-        workflow = self.template_system.generate_workflow(
-            project_name=project_name,
-            project_type=analysis.project_type,
-            complexity=analysis.complexity,
-            specifications=specifications,
-        )
+            # Generate workflow through template system (synchronous)
+            workflow = self.template_system.generate_workflow(
+                project_name=project_name,
+                project_type=analysis.project_type,
+                complexity=analysis.complexity,
+                specifications=specifications,
+            )
 
-        return workflow
+            # Convert workflow phases to orchestrator-compatible format
+            orchestrator_tasks = []
+            for phase in workflow.get("phases", []):
+                for agent in phase.get("agents", []):
+                    # Create multiple tasks based on agent count
+                    agent_count = agent.get("count", 1)
+                    for i in range(agent_count):
+                        task = AgentTask(
+                            task_id=f"{phase['phase_id']}_{agent['type']}_{i+1}",
+                            task_type=agent["type"],
+                            prompt=self._generate_agent_prompt(
+                                agent["type"], phase, specifications, request
+                            ),
+                            context={
+                                "phase": phase["phase_name"],
+                                "phase_type": phase["phase_type"],
+                                "requirements": specifications["requirements"],
+                                "technologies": specifications["technologies"],
+                                "enhancements": specifications["enhancements"],
+                                "project_name": project_name,
+                            },
+                            dependencies=phase.get("dependencies", []),
+                            quality_gates=phase.get("quality_gates", []),
+                            project_location=f"/apps/{project_name}/",
+                            deliverable_structure=self._get_deliverable_structure(
+                                phase["phase_type"]
+                            ),
+                        )
+                        orchestrator_tasks.append(task)
+
+            workflow["orchestrator_tasks"] = orchestrator_tasks
+            workflow["project_name"] = project_name
+            workflow["total_agents"] = len(orchestrator_tasks)
+
+            return workflow
+
+        except Exception as e:
+            logger.error(f"Workflow generation failed: {str(e)}")
+            # Return minimal workflow on error
+            return {
+                "phases": [],
+                "orchestrator_tasks": [],
+                "project_name": f"fallback_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                "error": str(e),
+            }
 
     async def _inject_context(self, workflow: Dict) -> Dict:
         """Inject ecosystem context into workflow"""
-        # Discover available tools and capabilities
-        ecosystem_context = await self.context_system.discover_ecosystem()
+        try:
+            # Discover available tools and capabilities (synchronous call wrapped)
+            loop = asyncio.get_event_loop()
+            ecosystem_context = await loop.run_in_executor(
+                None, self.context_system.discover_ecosystem
+            )
 
-        # Inject context into each workflow phase
-        for phase in workflow.get("phases", []):
-            phase["context"] = {
-                "available_tools": ecosystem_context.get("tools", []),
-                "available_libraries": ecosystem_context.get("libraries", []),
-                "best_practices": ecosystem_context.get("best_practices", []),
-                "existing_patterns": ecosystem_context.get("patterns", []),
-            }
+            # Inject context into each workflow phase
+            for phase in workflow.get("phases", []):
+                phase["context"] = {
+                    "available_tools": ecosystem_context.get("tools", []),
+                    "available_libraries": ecosystem_context.get("libraries", []),
+                    "best_practices": ecosystem_context.get("best_practices", []),
+                    "existing_patterns": ecosystem_context.get("patterns", []),
+                }
 
-        return workflow
+            # Also inject into orchestrator tasks
+            for task in workflow.get("orchestrator_tasks", []):
+                task.context.update({"ecosystem": ecosystem_context})
+
+            workflow["context_injected"] = True
+            return workflow
+
+        except Exception as e:
+            logger.warning(f"Context injection failed: {str(e)}")
+            workflow["context_injected"] = False
+            return workflow
 
     async def get_workflow_status(self, workflow_id: str) -> Dict:
         """Get current status of a workflow"""
@@ -806,35 +931,319 @@ class DevelopmentProcessOrchestrator:
             "message": "No recovery handler available",
         }
 
+    async def _submit_to_orchestrator(
+        self,
+        workflow: Dict,
+        request: str,
+        analysis: RequestAnalysis,
+        enhancements: Dict,
+        context: Optional[Dict],
+    ) -> Dict:
+        """Submit workflow to orchestrator with proper formatting"""
+        try:
+            # Extract orchestrator tasks from workflow
+            orchestrator_tasks = workflow.get("orchestrator_tasks", [])
+
+            if not orchestrator_tasks:
+                # Generate fallback tasks if none exist
+                orchestrator_tasks = self._generate_fallback_tasks(
+                    request, analysis, workflow
+                )
+
+            # Submit using orchestrator's expected format
+            workflow_id = await self.orchestrator.submit_workflow(
+                tasks=orchestrator_tasks,
+                workflow_name=workflow.get("project_name", "unnamed_workflow"),
+                metadata={
+                    "request": request,
+                    "analysis": asdict(analysis),
+                    "enhancements": enhancements,
+                    "context": context or {},
+                    "phases": len(workflow.get("phases", [])),
+                    "total_agents": workflow.get(
+                        "total_agents", len(orchestrator_tasks)
+                    ),
+                },
+            )
+
+            return {"success": True, "workflow_id": workflow_id}
+
+        except AttributeError:
+            # Fallback if orchestrator doesn't have submit_workflow method
+            workflow_id = await self.orchestrator.submit_development_request(
+                request=request,
+                project_type=analysis.project_type,
+                complexity=analysis.complexity,
+                context={
+                    **(context if context else {}),
+                    "analysis": asdict(analysis),
+                    "enhancements": enhancements,
+                    "workflow": workflow,
+                },
+            )
+
+            return {"success": True, "workflow_id": workflow_id}
+
+        except Exception as e:
+            logger.error(f"Orchestrator submission error: {str(e)}")
+            return {"success": False, "error": str(e)}
+
+    def _generate_fallback_tasks(
+        self, request: str, analysis: RequestAnalysis, workflow: Dict
+    ) -> List[AgentTask]:
+        """Generate fallback tasks when workflow doesn't have orchestrator tasks"""
+        tasks = []
+
+        # Create a minimal set of tasks based on request type
+        if analysis.request_type == RequestType.BUILD:
+            tasks.extend(
+                [
+                    AgentTask(
+                        task_id="requirements_1",
+                        task_type="requirements-analyst",
+                        prompt=f"Analyze requirements for: {request}",
+                        context={"phase": "discovery"},
+                    ),
+                    AgentTask(
+                        task_id="architect_1",
+                        task_type="solution-architect",
+                        prompt=f"Design architecture for: {request}",
+                        context={"phase": "design"},
+                        dependencies=["requirements_1"],
+                    ),
+                    AgentTask(
+                        task_id="developer_1",
+                        task_type="developer",
+                        prompt=f"Implement solution for: {request}",
+                        context={"phase": "implementation"},
+                        dependencies=["architect_1"],
+                    ),
+                ]
+            )
+        elif analysis.request_type == RequestType.FIX:
+            tasks.append(
+                AgentTask(
+                    task_id="debugger_1",
+                    task_type="debugger",
+                    prompt=f"Debug and fix: {request}",
+                    context={"phase": "debugging"},
+                )
+            )
+        else:
+            # Generic fallback task
+            tasks.append(
+                AgentTask(
+                    task_id="generic_1",
+                    task_type="general-purpose",
+                    prompt=f"Process request: {request}",
+                    context={"phase": "processing"},
+                )
+            )
+
+        return tasks
+
+    async def _fallback_submission(
+        self, request: str, analysis: RequestAnalysis, workflow: Dict
+    ) -> str:
+        """Fallback submission method when primary fails"""
+        try:
+            # Generate a unique workflow ID
+            workflow_id = f"fallback_{uuid.uuid4().hex[:8]}"
+
+            # Create a minimal workflow record
+            workflow_record = {
+                "workflow_id": workflow_id,
+                "request": request,
+                "analysis": asdict(analysis),
+                "enhancements": {},
+                "start_time": datetime.now().isoformat(),
+                "status": "pending_fallback",
+                "workflow": workflow,
+            }
+
+            # Store locally
+            self.active_workflows[workflow_id] = workflow_record
+
+            # Save to file for recovery
+            fallback_dir = Path(self.config.output_base_dir) / "fallback_workflows"
+            fallback_dir.mkdir(parents=True, exist_ok=True)
+
+            with open(fallback_dir / f"{workflow_id}.json", "w") as f:
+                json.dump(workflow_record, f, indent=2)
+
+            logger.info(f"Created fallback workflow: {workflow_id}")
+            return workflow_id
+
+        except Exception as e:
+            logger.error(f"Fallback submission also failed: {str(e)}")
+            # Return a placeholder ID
+            return f"error_{uuid.uuid4().hex[:8]}"
+
     async def _recover_request_processing(
         self, error: Exception, context: Dict
     ) -> Dict:
         """Recover from request processing errors"""
-        # Simplified recovery - retry with defaults
         request = context.get("request")
-        if request:
-            try:
-                # Retry with simplified parameters
-                return await self.process_development_request(
-                    request=request,
-                    project_type="web_app",  # default
-                    complexity="moderate",  # default
-                    context=None,  # no context
-                )
-            except Exception as e:
-                logger.error(f"Recovery retry failed: {str(e)}")
+        if not request:
+            return {"success": False, "error": "No request to recover"}
 
-        return {"success": False, "error": str(error)}
+        logger.info("Attempting recovery with simplified workflow...")
+
+        try:
+            # Create simplified analysis
+            simplified_analysis = RequestAnalysis(
+                request_type=RequestType.BUILD,
+                project_type="generic",
+                complexity="simple",
+                key_requirements=[request[:200]],  # Truncate if too long
+                suggested_technologies=["Python"],
+                risk_factors=[],
+                estimated_effort="1-2 days",
+                confidence_score=0.5,
+            )
+
+            # Create minimal workflow
+            minimal_workflow = {
+                "phases": [
+                    {
+                        "phase_id": "single_phase",
+                        "phase_name": "Processing",
+                        "phase_type": "implementation",
+                        "agents": [{"type": "general-purpose", "count": 1}],
+                    }
+                ],
+                "orchestrator_tasks": [
+                    AgentTask(
+                        task_id="recovery_task_1",
+                        task_type="general-purpose",
+                        prompt=f"Process this request with error recovery: {request}",
+                        context={"recovery_mode": True, "original_error": str(error)},
+                    )
+                ],
+                "project_name": f"recovery_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            }
+
+            # Submit minimal workflow
+            submission_result = await self._submit_to_orchestrator(
+                workflow=minimal_workflow,
+                request=request,
+                analysis=simplified_analysis,
+                enhancements={},
+                context={"recovery_attempt": True},
+            )
+
+            if submission_result.get("success"):
+                self.metrics.errors_recovered += 1
+                return {
+                    "success": True,
+                    "workflow_id": submission_result["workflow_id"],
+                    "analysis": asdict(simplified_analysis),
+                    "message": "Recovered with simplified workflow",
+                    "recovery_mode": True,
+                }
+
+        except Exception as recovery_error:
+            logger.error(f"Recovery failed: {str(recovery_error)}")
+
+        return {"success": False, "error": str(error), "recovery_failed": True}
 
     async def _recover_workflow_execution(
         self, error: Exception, context: Dict
     ) -> Dict:
         """Recover from workflow execution errors"""
-        # Could implement checkpoint recovery here
+        workflow_id = context.get("workflow_id")
+
+        if not workflow_id:
+            return {
+                "success": False,
+                "error": str(error),
+                "message": "No workflow ID for recovery",
+            }
+
+        try:
+            # Check if we have a checkpoint
+            checkpoint_dir = Path(self.config.output_base_dir) / "checkpoints"
+            checkpoint_file = checkpoint_dir / f"{workflow_id}.json"
+
+            if checkpoint_file.exists():
+                logger.info(
+                    f"Found checkpoint for workflow {workflow_id}, attempting resume..."
+                )
+
+                with open(checkpoint_file, "r") as f:
+                    checkpoint_data = json.load(f)
+
+                # Resume from checkpoint
+                resume_result = await self.orchestrator.resume_workflow(
+                    workflow_id=workflow_id, checkpoint_data=checkpoint_data
+                )
+
+                if resume_result.get("success"):
+                    self.metrics.errors_recovered += 1
+                    return {
+                        "success": True,
+                        "workflow_id": workflow_id,
+                        "message": "Workflow resumed from checkpoint",
+                        "resumed_from": checkpoint_data.get("last_completed_task"),
+                    }
+
+            # No checkpoint available, try to restart with partial completion tracking
+            logger.info(
+                f"No checkpoint found, attempting partial restart for {workflow_id}..."
+            )
+
+            if workflow_id in self.active_workflows:
+                workflow_data = self.active_workflows[workflow_id]
+
+                # Get partial results if available
+                partial_results = await self.orchestrator.get_partial_results(
+                    workflow_id
+                )
+
+                if partial_results:
+                    # Create new workflow continuing from partial results
+                    continuation_id = f"{workflow_id}_cont_{uuid.uuid4().hex[:4]}"
+
+                    # Filter out completed tasks
+                    remaining_tasks = [
+                        task
+                        for task in workflow_data.get("workflow", {}).get(
+                            "orchestrator_tasks", []
+                        )
+                        if task.task_id
+                        not in partial_results.get("completed_tasks", [])
+                    ]
+
+                    if remaining_tasks:
+                        # Submit remaining tasks
+                        continuation_result = await self.orchestrator.submit_workflow(
+                            tasks=remaining_tasks,
+                            workflow_name=f"{workflow_data.get('workflow', {}).get('project_name', 'unnamed')}_continuation",
+                            metadata={
+                                "original_workflow_id": workflow_id,
+                                "continuation": True,
+                                "partial_results": partial_results,
+                            },
+                        )
+
+                        if continuation_result:
+                            return {
+                                "success": True,
+                                "workflow_id": continuation_id,
+                                "message": "Workflow continued with remaining tasks",
+                                "completed_tasks": len(
+                                    partial_results.get("completed_tasks", [])
+                                ),
+                                "remaining_tasks": len(remaining_tasks),
+                            }
+
+        except Exception as recovery_error:
+            logger.error(f"Workflow recovery failed: {str(recovery_error)}")
+
         return {
             "success": False,
             "error": str(error),
-            "message": "Workflow recovery not yet implemented",
+            "message": "Workflow recovery failed",
         }
 
     async def _recover_intelligence(self, error: Exception, context: Dict) -> Dict:
@@ -845,6 +1254,116 @@ class DevelopmentProcessOrchestrator:
             "enhancements": {},
             "message": "Continued without intelligence enhancements",
         }
+
+    def _generate_quality_gates(
+        self, analysis: RequestAnalysis, enhancements: Dict
+    ) -> List[str]:
+        """Generate quality gates based on analysis and enhancements"""
+        gates = []
+
+        # Basic quality gates
+        gates.append("code_review_passed")
+        gates.append("unit_tests_passed")
+
+        # Complexity-based gates
+        if analysis.complexity in ["complex", "enterprise"]:
+            gates.append("integration_tests_passed")
+            gates.append("performance_benchmarks_met")
+            gates.append("security_audit_passed")
+
+        # Enhancement-based gates
+        if enhancements.get("quality_score", 0) > 0.8:
+            gates.append("advanced_quality_checks")
+
+        # Risk-based gates
+        if analysis.risk_factors:
+            gates.append("risk_mitigation_verified")
+
+        return gates
+
+    def _generate_agent_prompt(
+        self, agent_type: str, phase: Dict, specifications: Dict, original_request: str
+    ) -> str:
+        """Generate specific prompt for each agent based on type and phase"""
+        base_prompt = f"""
+You are a {agent_type} agent working on the {phase['phase_name']} phase.
+
+Original Request: {original_request}
+
+Your specific responsibilities in this phase:
+- Phase Type: {phase['phase_type']}
+- Expected Outputs: {', '.join(phase.get('expected_outputs', []))}
+
+Project Requirements:
+{json.dumps(specifications['requirements'], indent=2)}
+
+Technologies to Use:
+{json.dumps(specifications['technologies'], indent=2)}
+
+Enhancements to Apply:
+{json.dumps(specifications.get('enhancements', []), indent=2)}
+
+Quality Gates to Meet:
+{json.dumps(phase.get('quality_gates', []), indent=2)}
+
+Please complete your assigned tasks following best practices and ensure all quality gates are met.
+"""
+
+        # Add agent-specific instructions
+        agent_prompts = {
+            "requirements-analyst": "Focus on detailed requirement analysis, user stories, and acceptance criteria.",
+            "solution-architect": "Design the system architecture, define components, and create technical specifications.",
+            "developer": "Implement the solution according to specifications, ensuring code quality and testing.",
+            "qa-engineer": "Create and execute comprehensive test plans, ensure quality standards are met.",
+            "documentation-specialist": "Create clear, comprehensive documentation for all aspects of the project.",
+        }
+
+        if agent_type in agent_prompts:
+            base_prompt += f"\n\nSpecific Instructions: {agent_prompts[agent_type]}"
+
+        return base_prompt
+
+    def _get_deliverable_structure(self, phase_type: str) -> Dict[str, str]:
+        """Get expected deliverable structure for a phase type"""
+        structures = {
+            "discovery": {
+                "requirements.md": "Detailed requirements document",
+                "user_stories.md": "User stories with acceptance criteria",
+                "research_findings.md": "Research and feasibility analysis",
+            },
+            "design": {
+                "architecture.md": "System architecture document",
+                "api_design.md": "API specifications",
+                "database_schema.sql": "Database design",
+                "ui_mockups/": "UI/UX designs and mockups",
+            },
+            "implementation": {
+                "src/": "Source code",
+                "tests/": "Test files",
+                "config/": "Configuration files",
+                "scripts/": "Utility scripts",
+            },
+            "qa": {
+                "test_plans/": "Test plans and strategies",
+                "test_results/": "Test execution results",
+                "bug_reports/": "Bug reports and issues",
+                "performance_reports/": "Performance test results",
+            },
+            "documentation": {
+                "README.md": "Project overview and setup",
+                "docs/api/": "API documentation",
+                "docs/user/": "User documentation",
+                "docs/developer/": "Developer documentation",
+            },
+            "deployment": {
+                "deployment/": "Deployment configurations",
+                "kubernetes/": "Kubernetes manifests",
+                "docker/": "Docker configurations",
+                "ci_cd/": "CI/CD pipeline configurations",
+            },
+        }
+
+        return structures.get(phase_type, {})
 
     async def shutdown(self):
         """Shutdown the DPO system gracefully"""

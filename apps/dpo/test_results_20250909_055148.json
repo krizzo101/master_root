@@ -1,0 +1,114 @@
+{
+  "timestamp": "2025-09-09T05:51:48.464189",
+  "tests_run": 13,
+  "tests_passed": 0,
+  "tests_failed": 13,
+  "failures": [
+    "standalone_dpo_import",
+    "intelligence_engine_import",
+    "orchestrator_integration",
+    "simple_workflow_generation",
+    "complex_workflow_generation",
+    "template_based_workflow",
+    "multi_agent_coordination",
+    "error_handling",
+    "workflow_validation",
+    "context_injection",
+    "performance_test",
+    "edge_cases",
+    "create_example_workflows"
+  ],
+  "test_details": {
+    "standalone_dpo_import": {
+      "passed": false,
+      "details": {
+        "error": "attempted relative import with no known parent package",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/opsvi/master_root/apps/dpo/test_dpo_comprehensive.py\", line 78, in test_standalone_dpo_import\n    from dpo_main_controller import DevelopmentProcessOrchestrator\n  File \"/home/opsvi/master_root/apps/agent-orchestrator/src/dpo_main_controller.py\", line 39, in <module>\n    from .context_injection import ContextInjectionSystem, get_context_system\nImportError: attempted relative import with no known parent package\n"
+      }
+    },
+    "intelligence_engine_import": {
+      "passed": false,
+      "details": {
+        "error": "attempted relative import with no known parent package",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/opsvi/master_root/apps/dpo/test_dpo_comprehensive.py\", line 112, in test_intelligence_engine_import\n    from intelligence_review_engine_enhanced import IntelligenceReviewEngine\n  File \"/home/opsvi/master_root/apps/agent-orchestrator/src/intelligence_review_engine_enhanced.py\", line 28, in <module>\n    from .generic_orchestrator import AgentTask, GenericOrchestrator\nImportError: attempted relative import with no known parent package\n"
+      }
+    },
+    "orchestrator_integration": {
+      "passed": false,
+      "details": {
+        "error": "attempted relative import with no known parent package",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/opsvi/master_root/apps/dpo/test_dpo_comprehensive.py\", line 146, in test_orchestrator_integration\n    from dpo_orchestrator_integration import DPOOrchestratorIntegration\n  File \"/home/opsvi/master_root/apps/agent-orchestrator/src/dpo_orchestrator_integration.py\", line 31, in <module>\n    from .dpo_intelligence_integration import (\nImportError: attempted relative import with no known parent package\n"
+      }
+    },
+    "simple_workflow_generation": {
+      "passed": false,
+      "details": {
+        "error": "attempted relative import with no known parent package",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/opsvi/master_root/apps/dpo/test_dpo_comprehensive.py\", line 190, in test_simple_workflow_generation\n    from dpo_main_controller import DevelopmentProcessOrchestrator\n  File \"/home/opsvi/master_root/apps/agent-orchestrator/src/dpo_main_controller.py\", line 39, in <module>\n    from .context_injection import ContextInjectionSystem, get_context_system\nImportError: attempted relative import with no known parent package\n"
+      }
+    },
+    "complex_workflow_generation": {
+      "passed": false,
+      "details": {
+        "error": "attempted relative import with no known parent package",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/opsvi/master_root/apps/dpo/test_dpo_comprehensive.py\", line 232, in test_complex_workflow_generation\n    from dpo_main_controller import DevelopmentProcessOrchestrator\n  File \"/home/opsvi/master_root/apps/agent-orchestrator/src/dpo_main_controller.py\", line 39, in <module>\n    from .context_injection import ContextInjectionSystem, get_context_system\nImportError: attempted relative import with no known parent package\n"
+      }
+    },
+    "template_based_workflow": {
+      "passed": false,
+      "details": {
+        "error": "attempted relative import with no known parent package",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/opsvi/master_root/apps/dpo/test_dpo_comprehensive.py\", line 292, in test_template_based_workflow\n    from dpo_main_controller import DevelopmentProcessOrchestrator\n  File \"/home/opsvi/master_root/apps/agent-orchestrator/src/dpo_main_controller.py\", line 39, in <module>\n    from .context_injection import ContextInjectionSystem, get_context_system\nImportError: attempted relative import with no known parent package\n"
+      }
+    },
+    "multi_agent_coordination": {
+      "passed": false,
+      "details": {
+        "error": "attempted relative import with no known parent package",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/opsvi/master_root/apps/dpo/test_dpo_comprehensive.py\", line 340, in test_multi_agent_coordination\n    from dpo_main_controller import DevelopmentProcessOrchestrator\n  File \"/home/opsvi/master_root/apps/agent-orchestrator/src/dpo_main_controller.py\", line 39, in <module>\n    from .context_injection import ContextInjectionSystem, get_context_system\nImportError: attempted relative import with no known parent package\n"
+      }
+    },
+    "error_handling": {
+      "passed": false,
+      "details": {
+        "error": "attempted relative import with no known parent package",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/opsvi/master_root/apps/dpo/test_dpo_comprehensive.py\", line 382, in test_error_handling\n    from dpo_main_controller import DevelopmentProcessOrchestrator\n  File \"/home/opsvi/master_root/apps/agent-orchestrator/src/dpo_main_controller.py\", line 39, in <module>\n    from .context_injection import ContextInjectionSystem, get_context_system\nImportError: attempted relative import with no known parent package\n"
+      }
+    },
+    "workflow_validation": {
+      "passed": false,
+      "details": {
+        "error": "attempted relative import with no known parent package",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/opsvi/master_root/apps/dpo/test_dpo_comprehensive.py\", line 454, in test_workflow_validation\n    from intelligence_review_engine_enhanced import IntelligenceReviewEngine\n  File \"/home/opsvi/master_root/apps/agent-orchestrator/src/intelligence_review_engine_enhanced.py\", line 28, in <module>\n    from .generic_orchestrator import AgentTask, GenericOrchestrator\nImportError: attempted relative import with no known parent package\n"
+      }
+    },
+    "context_injection": {
+      "passed": false,
+      "details": {
+        "error": "ContextAwareOrchestrator.__init__() missing 1 required positional argument: 'orchestrator_class'",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/opsvi/master_root/apps/dpo/test_dpo_comprehensive.py\", line 531, in test_context_injection\n    context_injector = ContextAwareOrchestrator()\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: ContextAwareOrchestrator.__init__() missing 1 required positional argument: 'orchestrator_class'\n"
+      }
+    },
+    "performance_test": {
+      "passed": false,
+      "details": {
+        "error": "attempted relative import with no known parent package",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/opsvi/master_root/apps/dpo/test_dpo_comprehensive.py\", line 578, in test_performance\n    from dpo_main_controller import DevelopmentProcessOrchestrator\n  File \"/home/opsvi/master_root/apps/agent-orchestrator/src/dpo_main_controller.py\", line 39, in <module>\n    from .context_injection import ContextInjectionSystem, get_context_system\nImportError: attempted relative import with no known parent package\n"
+      }
+    },
+    "edge_cases": {
+      "passed": false,
+      "details": {
+        "error": "attempted relative import with no known parent package",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/opsvi/master_root/apps/dpo/test_dpo_comprehensive.py\", line 632, in test_edge_cases\n    from dpo_main_controller import DevelopmentProcessOrchestrator\n  File \"/home/opsvi/master_root/apps/agent-orchestrator/src/dpo_main_controller.py\", line 39, in <module>\n    from .context_injection import ContextInjectionSystem, get_context_system\nImportError: attempted relative import with no known parent package\n"
+      }
+    },
+    "create_example_workflows": {
+      "passed": false,
+      "details": {
+        "error": "attempted relative import with no known parent package",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/opsvi/master_root/apps/dpo/test_dpo_comprehensive.py\", line 711, in create_example_workflows\n    from dpo_main_controller import DevelopmentProcessOrchestrator\n  File \"/home/opsvi/master_root/apps/agent-orchestrator/src/dpo_main_controller.py\", line 39, in <module>\n    from .context_injection import ContextInjectionSystem, get_context_system\nImportError: attempted relative import with no known parent package\n"
+      }
+    }
+  }
+}

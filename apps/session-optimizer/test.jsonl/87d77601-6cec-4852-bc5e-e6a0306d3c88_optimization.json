@@ -1,0 +1,29 @@
+{
+  "session_id": "87d77601-6cec-4852-bc5e-e6a0306d3c88",
+  "success": true,
+  "processing_stats": {
+    "processing_time_seconds": 0.06,
+    "original_tokens": 37613,
+    "optimized_tokens": 32248,
+    "compression_ratio": 0.9882163234929298,
+    "chunk_count": 2,
+    "payload_count": 2,
+    "strategy_used": "conversation",
+    "cost_savings": 0.758675,
+    "conversion_stats": {
+      "total_records": 455,
+      "converted_messages": 455,
+      "tool_calls_extracted": 157,
+      "tool_results_extracted": 0,
+      "errors_encountered": 0,
+      "size_reduction_percent": 86.88,
+      "conversion_time_seconds": 0.01
+    }
+  },
+  "optimization_analysis": {
+    "cost_savings": 0.758675,
+    "savings_percent": 57.62927514764807,
+    "optimization_score": 45.0,
+    "size_category": "medium"
+  }
+}

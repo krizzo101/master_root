@@ -15,8 +15,8 @@ from .dpo_intelligence_integration import (
     EnhancedDPOWorkflow,
 )
 from .dpo_main_controller import (
+    DevelopmentProcessOrchestrator,
     DPOConfiguration,
-    DPOMainController,
     RequestAnalysis,
     RequestType,
 )
@@ -27,17 +27,17 @@ from .dpo_orchestrator_integration import (
 )
 from .intelligence_review_engine_enhanced import (
     EnhancementIntelligenceEngine,
-    IntelligenceReview,
-    ReviewCategory,
+    EnhancementNode,
+    EnhancementScore,
 )
-from .sdlc_template_system import SDLCTemplate, SDLCTemplateSystem, TemplatePhase
+from .sdlc_template_system import BaseTemplate, SDLCTemplateSystem, WorkflowPhase
 
 __all__ = [
     # Version
     "__version__",
     "__author__",
     # Main Controller
-    "DPOMainController",
+    "DevelopmentProcessOrchestrator",
     "DPOConfiguration",
     "RequestType",
     "RequestAnalysis",
@@ -51,18 +51,25 @@ __all__ = [
     "WorkflowSubmission",
     # Template System
     "SDLCTemplateSystem",
-    "SDLCTemplate",
-    "TemplatePhase",
+    "WorkflowPhase",
+    "BaseTemplate",
     # Intelligence Engine
     "EnhancementIntelligenceEngine",
-    "IntelligenceReview",
-    "ReviewCategory",
+    "EnhancementScore",
+    "EnhancementNode",
 ]
 
 # Module initialization
 import logging
 import sys
 from pathlib import Path
+
+# Setup import paths before any other imports
+try:
+    from ._path_setup import setup_paths
+except ImportError:
+    from _path_setup import setup_paths
+setup_paths()
 
 # Configure module logger
 logger = logging.getLogger(__name__)
@@ -77,7 +84,7 @@ if str(module_path) not in sys.path:
 DEFAULT_CONFIG = DPOConfiguration()
 
 
-def initialize(config_path: str = None) -> DPOMainController:
+def initialize(config_path: str = None) -> DevelopmentProcessOrchestrator:
     """
     Initialize the DPO system with optional configuration file.
 
@@ -85,14 +92,14 @@ def initialize(config_path: str = None) -> DPOMainController:
         config_path: Path to configuration file (optional)
 
     Returns:
-        Initialized DPOMainController instance
+        Initialized DevelopmentProcessOrchestrator instance
     """
     if config_path:
         config = DPOConfiguration.from_file(config_path)
     else:
         config = DEFAULT_CONFIG
 
-    controller = DPOMainController(config)
+    controller = DevelopmentProcessOrchestrator(config)
     logger.info(f"DPO System initialized (v{__version__})")
 
     return controller

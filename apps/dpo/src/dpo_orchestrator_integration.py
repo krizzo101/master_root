@@ -28,16 +28,33 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from .dpo_intelligence_integration import (
-    DPOIntelligenceIntegration,
-    DPORequest,
-    EnhancedDPOWorkflow,
-)
+# Import DPO components - handle both relative and absolute
+try:
+    from .dpo_intelligence_integration import (
+        DPOIntelligenceIntegration,
+        DPORequest,
+        EnhancedDPOWorkflow,
+    )
+    from .sdlc_template_system import SDLCTemplateSystem
+    from .specialist_agent_templates import SpecialistAgentTemplates
+except ImportError:
+    from dpo_intelligence_integration import (
+        DPOIntelligenceIntegration,
+        DPORequest,
+        EnhancedDPOWorkflow,
+    )
+    from sdlc_template_system import SDLCTemplateSystem
+    from specialist_agent_templates import SpecialistAgentTemplates
 
-# Import core components
-from .generic_orchestrator import AgentTask, GenericOrchestrator
-from .sdlc_template_system import SDLCTemplateSystem
-from .specialist_agent_templates import SpecialistAgentTemplates
+# Setup import paths
+try:
+    from ._path_setup import setup_paths
+except ImportError:
+    from _path_setup import setup_paths
+setup_paths()
+
+# Import from agent-orchestrator
+from generic_orchestrator import AgentTask, GenericOrchestrator
 
 # Try to import WebSocket support
 try:
@@ -186,9 +203,11 @@ class DPOOrchestrator:
         self.websocket_clients: List[WebSocketServerProtocol] = []
         self.websocket_server = None
 
-        # Start WebSocket server if enabled
+        # Start WebSocket server if enabled (deferred until event loop is running)
         if self.enable_websocket:
-            asyncio.create_task(self._start_websocket_server())
+            # asyncio.create_task(self._start_websocket_server())
+            # WebSocket server will be started when needed
+            pass
 
         logger.info(
             f"DPO Orchestrator initialized with output dir: {self.output_base_dir}"

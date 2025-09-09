@@ -25,6 +25,17 @@ except ImportError:
     create_execution_plan_from_json = None
     ENHANCED_AVAILABLE = False
 
+try:
+    from src.unified.enhanced_agent_task import EnhancedAgentTask
+    from src.unified.unified_orchestrator import UnifiedConfig, UnifiedOrchestrator
+
+    UNIFIED_AVAILABLE = True
+except ImportError:
+    UnifiedConfig = None
+    UnifiedOrchestrator = None
+    EnhancedAgentTask = None
+    UNIFIED_AVAILABLE = False
+
 
 def load_tasks_from_file(file_path: str) -> list:
     """Load task definitions from a JSON file"""
@@ -73,6 +84,12 @@ async def main():
         "--use-enhanced",
         action="store_true",
         help="Use EnhancedOrchestrator with quality gates and monitoring",
+    )
+
+    parser.add_argument(
+        "--use-unified",
+        action="store_true",
+        help="Use UnifiedOrchestrator with all advanced features enabled",
     )
 
     parser.add_argument(
@@ -195,7 +212,34 @@ async def main():
 
             dashboard_callback = simple_dashboard_callback
 
-        if args.use_enhanced and ENHANCED_AVAILABLE:
+        if args.use_unified and UNIFIED_AVAILABLE:
+            # Create UnifiedConfig with all features enabled
+            from src.unified.unified_orchestrator import FeatureFlag
+
+            # Find master MCP registry
+            master_mcp_path = Path("./master_mcp_registry.json")
+            if not master_mcp_path.exists():
+                master_mcp_path = None
+
+            config = UnifiedConfig(
+                output_dir=Path(args.output_dir),
+                max_parallel=args.max_parallel,
+                use_optimizations=True,
+                master_mcp_registry_path=master_mcp_path,
+                enabled_features={
+                    FeatureFlag.ENHANCED_METRICS,
+                    FeatureFlag.BACKGROUND_EXECUTION,
+                    FeatureFlag.AUTO_RECOVERY,
+                    FeatureFlag.STATE_PERSISTENCE,
+                },
+                enable_monitoring=True,
+                enable_auto_recovery=True,
+                enable_state_persistence=True,
+            )
+            orchestrator = UnifiedOrchestrator(config)
+            orchestrator.workflow_name = workflow_name
+            orchestrator.dashboard_callback = dashboard_callback
+        elif args.use_enhanced and ENHANCED_AVAILABLE:
             orchestrator = EnhancedOrchestrator(
                 output_dir=Path(args.output_dir),
                 max_parallel=args.max_parallel,
