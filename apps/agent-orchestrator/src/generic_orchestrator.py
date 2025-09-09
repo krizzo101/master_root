@@ -22,6 +22,9 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import psutil
 
+# Import async FileIOManager
+from .io.file_io_manager import FileIOManager
+
 # Multi-provider support
 try:
     from .providers.openai_provider import OpenAIProvider
@@ -274,6 +277,7 @@ class MessageBus:
             "message": message,
             "timestamp": datetime.now().isoformat(),
         }
+        # Use synchronous write for now - will be migrated to async in execute_agents
         msg_file.write_text(json.dumps(msg_data, indent=2))
 
     async def receive(self, agent_id: str) -> List[Dict]:
@@ -358,6 +362,8 @@ class GenericOrchestrator:
                 f"workflow_{self.workflow_source}_{self.workflow_timestamp}"
             )
 
+        # Ensure output_dir is absolute to avoid path issues
+        self.output_dir = self.output_dir.resolve()
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         # Always create essential workflow directories (not just for isolated workflows)
@@ -389,6 +395,9 @@ class GenericOrchestrator:
         self.workflow_start_time = None
         self.total_tasks = 0
         self.task_completion_times = []  # For ETA calculations
+
+        # Initialize FileIOManager for async operations
+        self.io_manager = FileIOManager(base_dir=self.output_dir)
 
         # Initialize resource tracking
         self.process = psutil.Process()
@@ -470,6 +479,7 @@ class GenericOrchestrator:
 
                 # Write filtered config
                 research_config = Path(self.output_dir) / "research_mcp.json"
+                # Use synchronous write in __init__
                 research_config.write_text(json.dumps(mcp_config, indent=2))
             else:
                 # Existing minimal research config
@@ -497,6 +507,7 @@ class GenericOrchestrator:
                     }
                 }
 
+                # Use synchronous write in __init__
                 research_config.write_text(
                     json.dumps(minimal_research_config, indent=2)
                 )
@@ -706,7 +717,7 @@ class GenericOrchestrator:
         except Exception as e:
             logger.warning(f"Failed to scan for deliverables: {e}")
 
-    def _generate_workflow_completion_report(self) -> Dict[str, Any]:
+    async def _generate_workflow_completion_report(self) -> Dict[str, Any]:
         """Generate comprehensive workflow completion report."""
         end_time = datetime.now()
         start_time_dt = (
@@ -784,14 +795,15 @@ class GenericOrchestrator:
 
         return report
 
-    def _save_completion_report(self, report: Dict[str, Any]):
+    async def _save_completion_report(self, report: Dict[str, Any]):
         """Save the workflow completion report to the deliverables directory."""
         try:
             deliverables_dir = self.output_dir / "deliverables"
             deliverables_dir.mkdir(parents=True, exist_ok=True)
 
             report_file = deliverables_dir / "workflow_completion_report.json"
-            report_file.write_text(json.dumps(report, indent=2, default=str))
+            # Async write for report
+            await self.io_manager.write_json(report_file, report, default=str)
 
             # Also create a summary report
             summary = {
@@ -808,7 +820,8 @@ class GenericOrchestrator:
             }
 
             summary_file = deliverables_dir / "workflow_summary.json"
-            summary_file.write_text(json.dumps(summary, indent=2))
+            # Async write for summary
+            await self.io_manager.write_json(summary_file, summary)
 
             # Track these reports as deliverables
             self._track_deliverable(str(report_file), "created")
@@ -855,6 +868,7 @@ class GenericOrchestrator:
         }
 
         metadata_file = self.output_dir / "metadata" / "workflow_info.json"
+        # Use synchronous write for non-async method
         metadata_file.write_text(json.dumps(metadata, indent=2))
 
     def _update_workflow_metadata(self, updates: Dict):
@@ -870,11 +884,12 @@ class GenericOrchestrator:
             metadata.update(updates)
             metadata["last_updated"] = datetime.now().isoformat()
 
+            # Use synchronous write for non-async method
             metadata_file.write_text(json.dumps(metadata, indent=2))
         except Exception as e:
             logger.warning(f"Failed to update workflow metadata: {e}")
 
-    def _create_checkpoint(self, task: AgentTask):
+    async def _create_checkpoint(self, task: AgentTask):
         """Create checkpoint for resume capability."""
         try:
             checkpoint_data = {
@@ -895,13 +910,13 @@ class GenericOrchestrator:
                 / "checkpoints"
                 / f"checkpoint_{task.task_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
             )
-            checkpoint_file.write_text(json.dumps(checkpoint_data, indent=2))
+            await self.io_manager.write_json(checkpoint_file, checkpoint_data)
 
             # Also create latest checkpoint
             latest_checkpoint = (
                 self.output_dir / "checkpoints" / "latest_checkpoint.json"
             )
-            latest_checkpoint.write_text(json.dumps(checkpoint_data, indent=2))
+            await self.io_manager.write_json(latest_checkpoint, checkpoint_data)
 
         except Exception as e:
             logger.warning(f"Failed to create checkpoint: {e}")
@@ -1508,7 +1523,7 @@ To ensure proper organization:
             return True
         return False
 
-    def _generate_agent_mcp_config(self, task: AgentTask, config_path: Path):
+    async def _generate_agent_mcp_config(self, task: AgentTask, config_path: Path):
         """Generate agent-specific MCP configuration based on task requirements."""
 
         # Start with base config
@@ -1579,7 +1594,8 @@ To ensure proper organization:
             server_config["env"]["AGENT_TASK_TYPE"] = task.task_type
 
         # Write to config file
-        config_path.write_text(json.dumps(mcp_config, indent=2))
+        # Async write for MCP config
+        await self.io_manager.write_json(config_path, mcp_config)
 
         logger.debug(f"Generated MCP config for {task.task_id}: {config_path}")
 
@@ -1603,7 +1619,7 @@ To ensure proper organization:
 
             # Generate agent-specific MCP config
             agent_mcp_config = agent_work_dir / "mcp_config.json"
-            self._generate_agent_mcp_config(task, agent_mcp_config)
+            await self._generate_agent_mcp_config(task, agent_mcp_config)
 
             # Create symlinks to shared resources if needed
             shared_data = self.output_dir / "shared_data"
@@ -1620,7 +1636,8 @@ To ensure proper organization:
                 f"WORKSPACE_ROOT={agent_work_dir}",
                 f"OUTPUT_DIR={self.output_dir}",
             ]
-            env_file.write_text("\n".join(env_content))
+            # Async write for env file
+            await self.io_manager.write_text(env_file, "\n".join(env_content))
 
             logger.debug(f"Setup workspace for {task.task_id}: {agent_work_dir}")
         else:
@@ -1899,7 +1916,7 @@ To ensure proper organization:
                             )
 
                             # Create checkpoint
-                            self._create_checkpoint(task)
+                            await self._create_checkpoint(task)
 
                             logger.info(
                                 f"✓ {task.task_id} completed in {duration:.2f}s"
@@ -1975,7 +1992,7 @@ To ensure proper organization:
                                 )
 
                                 # Create checkpoint
-                                self._create_checkpoint(task)
+                                await self._create_checkpoint(task)
 
                                 logger.info(
                                     f"✓ {task.task_id} completed in {duration:.2f}s (non-JSON output)"
@@ -2109,7 +2126,7 @@ To ensure proper organization:
                     )
 
                     # Create checkpoint for failed task too
-                    self._create_checkpoint(task)
+                    await self._create_checkpoint(task)
 
                     logger.error(f"✗ {task.task_id} failed: {task.error}")
 
@@ -2209,7 +2226,7 @@ To ensure proper organization:
                 self._update_workflow_metadata({"failed_tasks": self.metrics["failed"]})
 
                 # Create checkpoint for exception too
-                self._create_checkpoint(task)
+                await self._create_checkpoint(task)
 
                 logger.error(f"✗ {task.task_id} exception: {task.error}")
 
@@ -2228,7 +2245,8 @@ To ensure proper organization:
         # Save task state to agents directory
         task_file = self.output_dir / "agents" / f"{task.task_id}.json"
         task_file.parent.mkdir(exist_ok=True)
-        task_file.write_text(json.dumps(task.to_dict(), indent=2))
+        # Async write for task file
+        await self.io_manager.write_json(task_file, task.to_dict())
 
         # Track the task file as a deliverable
         self._track_deliverable(str(task_file), "created")
@@ -2321,7 +2339,8 @@ To ensure proper organization:
                         self.output_dir / "agents" / f"{failed_task.task_id}.json"
                     )
                     task_file.parent.mkdir(exist_ok=True)
-                    task_file.write_text(json.dumps(failed_task.to_dict(), indent=2))
+                    # Async write for failed task
+                    await self.io_manager.write_json(task_file, failed_task.to_dict())
 
                     # Add failed task result to results
                     results.append(failed_task.to_dict())
@@ -2344,8 +2363,8 @@ To ensure proper organization:
         self.metrics["end_time"] = datetime.now().isoformat()
 
         # Generate and save workflow completion report
-        completion_report = self._generate_workflow_completion_report()
-        self._save_completion_report(completion_report)
+        completion_report = await self._generate_workflow_completion_report()
+        await self._save_completion_report(completion_report)
 
         # Log audit entry for batch completion
         self._log_audit_action(

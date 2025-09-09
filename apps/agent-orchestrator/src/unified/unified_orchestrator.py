@@ -224,6 +224,11 @@ class UnifiedOrchestrator(GenericOrchestrator):
             "checkpoint_saves": 0,
         }
 
+        # Initialize FileIOManager for async operations
+        from ..io.file_io_manager import FileIOManager
+
+        self.io_manager = FileIOManager(base_dir=self.output_dir)
+
         # Setup directories
         self._setup_directories()
 
@@ -426,7 +431,8 @@ class UnifiedOrchestrator(GenericOrchestrator):
 
         # Save enhanced task state
         task_file = self.output_dir / "tasks" / f"{task.task_id}_enhanced.json"
-        task_file.write_text(json.dumps(task.to_dict(), indent=2, default=str))
+        # Async write for task file
+        await self.io_manager.write_json(task_file, task.to_dict(), default=str)
 
         return result or task.to_dict()
 
@@ -521,7 +527,8 @@ class UnifiedOrchestrator(GenericOrchestrator):
             / "checkpoints"
             / f"checkpoint_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         )
-        checkpoint_file.write_text(json.dumps(checkpoint, indent=2, default=str))
+        # Async write for checkpoint
+        await self.io_manager.write_json(checkpoint_file, checkpoint, default=str)
 
         self.enhanced_metrics["checkpoint_saves"] += 1
         logger.info(f"Saved checkpoint: {checkpoint_file}")
@@ -534,7 +541,8 @@ class UnifiedOrchestrator(GenericOrchestrator):
             return False
 
         try:
-            checkpoint = json.loads(checkpoint_file.read_text())
+            # Async read for checkpoint
+            checkpoint = await self.io_manager.read_json(checkpoint_file)
 
             # Restore metrics
             self.metrics = checkpoint.get("metrics", {})
@@ -641,7 +649,8 @@ class UnifiedOrchestrator(GenericOrchestrator):
                 self.output_dir
                 / f"unified_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
             )
-            report_file.write_text(json.dumps(result, indent=2, default=str))
+            # Async write for report
+            await self.io_manager.write_json(report_file, result, default=str)
 
             return result
 
