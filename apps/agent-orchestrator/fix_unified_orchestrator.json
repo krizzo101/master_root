@@ -1,0 +1,172 @@
+{
+  "workflow_name": "fix_unified_orchestrator_complete",
+  "description": "Enable and fix all UnifiedOrchestrator functionality including modules, quality gates, monitoring, collaboration, execution plans, and DPO integration",
+  "max_parallel": 10,
+  "enhancement_level": 4,
+  "tasks": [
+    {
+      "task_id": "001_analyze_module_loading",
+      "task_type": "code-analyzer",
+      "prompt": "CRITICAL BUG: Module loading returns empty dict. Analyze why modules in src/unified/unified_orchestrator.py aren't loading. Check _load_modules() method at line 246, examine imports at lines 273, 298, 319, 343. The module_registry.initialize_all() returns {} but should have quality_gates, monitoring, collaboration modules. Find the root cause - are module files missing? Import errors? Registration failing?",
+      "context": {
+        "files": [
+          "src/unified/unified_orchestrator.py",
+          "src/unified/orchestrator_module.py",
+          "src/modules/quality_gates_module.py",
+          "src/modules/monitoring_module.py",
+          "src/modules/collaboration_module.py",
+          "src/modules/execution_plan_module.py"
+        ],
+        "critical": true
+      },
+      "dependencies": []
+    },
+    {
+      "task_id": "002_fix_module_imports",
+      "task_type": "development-specialist",
+      "prompt": "Fix module import issues in UnifiedOrchestrator. The imports at lines 273, 298, 319, 343 are trying to import from src.modules but failing silently. Create the missing module files if they don't exist: src/modules/quality_gates_module.py (QualityGatesModule class), src/modules/monitoring_module.py (MonitoringModule class), src/modules/collaboration_module.py (CollaborationModule class), src/modules/execution_plan_module.py (ExecutionPlanModule class). Each module must inherit from OrchestratorModule and implement required methods.",
+      "context": {
+        "target_dir": "src/modules",
+        "base_class": "OrchestratorModule from src/unified/orchestrator_module.py",
+        "required_methods": ["initialize", "process", "cleanup", "get_status"]
+      },
+      "dependencies": ["001_analyze_module_loading"]
+    },
+    {
+      "task_id": "003_implement_quality_gates",
+      "task_type": "development-specialist",
+      "prompt": "Implement QualityGatesModule in src/modules/quality_gates_module.py. It needs to: 1) Inherit from OrchestratorModule, 2) Register quality gate validators (database, http, file_exists, code_quality, test_results), 3) Provide validate_task() method to check task outputs, 4) Store results in gate_results dict. Reference the quality gate types in src/execution_plan_schema.py lines 75-87.",
+      "context": {
+        "feature": "quality_gates",
+        "integration_point": "UnifiedOrchestrator._load_quality_gates_module()",
+        "config_params": "timeout, require_all from UnifiedConfig"
+      },
+      "dependencies": ["002_fix_module_imports"]
+    },
+    {
+      "task_id": "004_implement_monitoring",
+      "task_type": "development-specialist",
+      "prompt": "Implement MonitoringModule in src/modules/monitoring_module.py. Must track: 1) Agent health status, 2) Task execution metrics, 3) Performance data per agent type, 4) Resource usage. Integrate with enhanced_metrics dict in UnifiedOrchestrator. Provide real-time status updates via get_agent_status() method.",
+      "context": {
+        "feature": "agent_monitoring",
+        "metrics_location": "UnifiedOrchestrator.enhanced_metrics",
+        "update_interval": "config.status_check_interval"
+      },
+      "dependencies": ["002_fix_module_imports"]
+    },
+    {
+      "task_id": "005_implement_collaboration",
+      "task_type": "development-specialist",
+      "prompt": "Implement CollaborationModule in src/modules/collaboration_module.py. Enable: 1) Team creation and management (UnifiedOrchestrator.teams dict), 2) Shared workspace for agents, 3) Task handoffs between agents, 4) Workspace synchronization. Use EnhancedAgentTask fields: team_id, assigned_agents, collaboration_mode.",
+      "context": {
+        "feature": "collaboration",
+        "team_size": "config.max_team_size",
+        "sync_interval": "config.workspace_sync_interval"
+      },
+      "dependencies": ["002_fix_module_imports"]
+    },
+    {
+      "task_id": "006_fix_execution_plan",
+      "task_type": "development-specialist",
+      "prompt": "Add from_dict() classmethod to ExecutionPlan class in src/execution_plan_schema.py (around line 308). It must: 1) Take a dict parameter, 2) Convert nested dicts to proper dataclass instances (TaskDefinition, QualityGate, ExecutionPhase, ResourceRequirements), 3) Handle enum conversions (TaskType, ExecutionMode, etc), 4) Return ExecutionPlan instance. This is REQUIRED for --execution-plan flag to work.",
+      "context": {
+        "file": "src/execution_plan_schema.py",
+        "class": "ExecutionPlan",
+        "similar_method": "to_dict() exists at line 465, create inverse"
+      },
+      "dependencies": []
+    },
+    {
+      "task_id": "007_integrate_dpo",
+      "task_type": "api-integration-specialist",
+      "prompt": "Integrate DPO with UnifiedOrchestrator. The DPO system in src/dpo/ needs to work with UnifiedOrchestrator. Modify main.py to: 1) Import DPOOrchestrator, 2) Add --dpo-level argument (0-5), 3) When --use-unified is set, wrap orchestrator with DPO enhancement. The enhancement_level field already exists in AgentTask.",
+      "context": {
+        "dpo_location": "src/dpo/dpo_orchestrator_integration.py",
+        "config_class": "DPOEnhancementConfig",
+        "integration_point": "main.py lines 215-240"
+      },
+      "dependencies": []
+    },
+    {
+      "task_id": "008_enable_all_features",
+      "task_type": "development-specialist",
+      "prompt": "Update UnifiedConfig initialization in main.py to enable ALL features. Currently only 4 FeatureFlags are enabled. Add: FeatureFlag.QUALITY_GATES, FeatureFlag.AGENT_MONITORING, FeatureFlag.COLLABORATION, FeatureFlag.EXECUTION_PLAN to the enabled_features set. Also set enable_quality_gates=True, enable_collaboration=True, enable_monitoring=True.",
+      "context": {
+        "file": "main.py",
+        "location": "lines 229-237",
+        "all_flags": "QUALITY_GATES, AGENT_MONITORING, EXECUTION_PLAN, COLLABORATION, ENHANCED_METRICS, BACKGROUND_EXECUTION, AUTO_RECOVERY, STATE_PERSISTENCE"
+      },
+      "dependencies": []
+    },
+    {
+      "task_id": "009_test_quality_gates",
+      "task_type": "qa-testing-guru",
+      "prompt": "Create comprehensive tests for quality gates functionality. Test that: 1) Gates are properly registered, 2) Validation runs on task completion, 3) Failed gates prevent dependent tasks, 4) Gate results are stored. Create test file tests/test_unified_quality_gates.py",
+      "context": {
+        "test_scenarios": ["database validation", "http endpoint check", "file existence", "code quality metrics"],
+        "validation_levels": "NONE, BASIC, STANDARD, STRICT, CRITICAL"
+      },
+      "dependencies": ["003_implement_quality_gates"]
+    },
+    {
+      "task_id": "010_test_monitoring",
+      "task_type": "qa-testing-guru",
+      "prompt": "Test monitoring functionality. Verify: 1) Agent health tracking works, 2) Metrics are collected correctly, 3) Performance data is accurate, 4) Status updates are real-time. Create tests/test_unified_monitoring.py",
+      "context": {
+        "metrics_to_test": "tasks_by_type, tasks_by_status, average_duration_by_type, team_performance",
+        "monitoring_interval": "30 seconds default"
+      },
+      "dependencies": ["004_implement_monitoring"]
+    },
+    {
+      "task_id": "011_test_collaboration",
+      "task_type": "qa-testing-guru",
+      "prompt": "Test collaboration features. Verify: 1) Teams can be created, 2) Agents can share workspaces, 3) Task handoffs work, 4) Synchronization happens correctly. Create tests/test_unified_collaboration.py",
+      "context": {
+        "collaboration_modes": "shared, handoff, review",
+        "max_team_size": "5 default"
+      },
+      "dependencies": ["005_implement_collaboration"]
+    },
+    {
+      "task_id": "012_create_integration_test",
+      "task_type": "qa-testing-guru",
+      "prompt": "Create full integration test that uses ALL UnifiedOrchestrator features together: quality gates, monitoring, collaboration, execution plans, DPO enhancement. Test file: tests/test_unified_integration.py. Include test workflow that demonstrates all features working in concert.",
+      "context": {
+        "test_workflow": "Multi-phase execution plan with teams, quality gates, and monitoring",
+        "success_criteria": "All features active and functional"
+      },
+      "dependencies": ["009_test_quality_gates", "010_test_monitoring", "011_test_collaboration"]
+    },
+    {
+      "task_id": "013_document_features",
+      "task_type": "technical-writer",
+      "prompt": "Create comprehensive documentation for all UnifiedOrchestrator features. Document: 1) How to enable each feature, 2) Configuration options, 3) Usage examples, 4) Troubleshooting guide. Create docs/UNIFIED_ORCHESTRATOR_GUIDE.md",
+      "context": {
+        "features_to_document": "quality_gates, monitoring, collaboration, execution_plans, DPO_integration",
+        "include_examples": true
+      },
+      "dependencies": ["008_enable_all_features"]
+    },
+    {
+      "task_id": "014_create_example_workflows",
+      "task_type": "technical-writer",
+      "prompt": "Create example workflow files demonstrating each UnifiedOrchestrator feature: 1) examples/unified_quality_gates.json, 2) examples/unified_monitoring.json, 3) examples/unified_collaboration.json, 4) examples/unified_execution_plan.json, 5) examples/unified_complete.json (all features)",
+      "context": {
+        "format": "JSON workflow definitions",
+        "working_examples": true
+      },
+      "dependencies": ["013_document_features"]
+    },
+    {
+      "task_id": "015_final_validation",
+      "task_type": "reviewer-critic",
+      "prompt": "Review all changes and validate that UnifiedOrchestrator is fully functional. Check: 1) All modules load correctly, 2) All FeatureFlags work, 3) Tests pass, 4) Documentation is complete, 5) Example workflows execute successfully. Provide detailed report of what works and any remaining issues.",
+      "context": {
+        "acceptance_criteria": "100% feature functionality",
+        "deliverable": "Final validation report"
+      },
+      "dependencies": ["012_create_integration_test", "014_create_example_workflows"]
+    }
+  ]
+}

@@ -492,6 +492,100 @@ class ExecutionPlan:
             "metadata": self.metadata,
         }
 
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "ExecutionPlan":
+        """Create ExecutionPlan from dictionary format
+
+        Args:
+            data: Dictionary containing ExecutionPlan data
+
+        Returns:
+            ExecutionPlan instance
+        """
+        # Convert task dicts to TaskDefinition instances
+        tasks = []
+        for task_data in data.get("tasks", []):
+            # Convert task_type string to enum if needed
+            if "task_type" in task_data and isinstance(task_data["task_type"], str):
+                task_data["task_type"] = TaskType(task_data["task_type"])
+
+            # Convert nested quality gates if present
+            if "quality_gates" in task_data:
+                task_gates = []
+                for gate_data in task_data["quality_gates"]:
+                    if isinstance(gate_data, dict):
+                        if "gate_type" in gate_data and isinstance(
+                            gate_data["gate_type"], str
+                        ):
+                            gate_data["gate_type"] = QualityGateType(
+                                gate_data["gate_type"]
+                            )
+                        task_gates.append(QualityGate(**gate_data))
+                    else:
+                        task_gates.append(gate_data)
+                task_data["quality_gates"] = task_gates
+
+            tasks.append(TaskDefinition(**task_data))
+
+        # Convert quality gates to QualityGate instances
+        quality_gates = []
+        for gate_data in data.get("quality_gates", []):
+            if isinstance(gate_data, dict):
+                if "gate_type" in gate_data and isinstance(gate_data["gate_type"], str):
+                    gate_data["gate_type"] = QualityGateType(gate_data["gate_type"])
+                quality_gates.append(QualityGate(**gate_data))
+            else:
+                quality_gates.append(gate_data)
+
+        # Convert phases to ExecutionPhase instances
+        phases = []
+        for phase_data in data.get("phases", []):
+            if isinstance(phase_data, dict):
+                phases.append(ExecutionPhase(**phase_data))
+            else:
+                phases.append(phase_data)
+
+        # Convert resource requirements if present
+        resource_requirements = None
+        if "resource_requirements" in data and data["resource_requirements"]:
+            res_data = data["resource_requirements"]
+            if isinstance(res_data, dict):
+                resource_requirements = ResourceRequirements(**res_data)
+            else:
+                resource_requirements = res_data
+
+        # Convert execution_mode string to enum if needed
+        execution_mode = data.get("execution_mode", "parallel")
+        if isinstance(execution_mode, str):
+            execution_mode = ExecutionMode(execution_mode)
+
+        # Build ExecutionPlan with converted components
+        return cls(
+            plan_id=data["plan_id"],
+            name=data["name"],
+            description=data["description"],
+            tasks=tasks,
+            version=data.get("version", "1.0"),
+            execution_mode=execution_mode,
+            max_parallel_tasks=data.get("max_parallel_tasks", 5),
+            enable_quality_gates=data.get("enable_quality_gates", True),
+            enable_monitoring=data.get("enable_monitoring", True),
+            use_optimizations=data.get("use_optimizations", True),
+            quality_gates=quality_gates,
+            phases=phases,
+            resource_requirements=resource_requirements,
+            output_directory=data.get("output_directory", "./output"),
+            estimated_total_duration_minutes=data.get(
+                "estimated_total_duration_minutes"
+            ),
+            fallback_strategy=data.get("fallback_strategy", "continue"),
+            max_plan_retries=data.get("max_plan_retries", 1),
+            created_by=data.get("created_by"),
+            created_at=data.get("created_at"),
+            tags=data.get("tags", []),
+            metadata=data.get("metadata", {}),
+        )
+
     def to_json(self, indent: int = 2) -> str:
         """Convert to JSON string"""
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)

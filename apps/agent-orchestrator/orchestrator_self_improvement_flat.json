@@ -1,0 +1,161 @@
+{
+  "workflow_name": "orchestrator_self_improvement",
+  "description": "Orchestrator self-refactoring to fix performance bottlenecks and architectural anti-patterns",
+  "tasks": [
+    {
+      "task_id": "001_create_backup",
+      "task_type": "devops-automation",
+      "prompt": "Create comprehensive backup of the orchestrator codebase. Create tar.gz archive of src/, docs/, and test/ directories. Store in backups/pre_refactor_$(date +%Y%m%d_%H%M%S).tar.gz. Verify backup integrity.",
+      "context": {"backup_dirs": ["src", "docs", "test"], "verification_required": true},
+      "dependencies": [],
+      "quality_gates": ["backup_verification"]
+    },
+    {
+      "task_id": "002_git_branch",
+      "task_type": "devops-automation",
+      "prompt": "Create new git branch 'refactor/performance-improvements' and commit current state with message 'feat: start orchestrator self-improvement refactor'. Ensure clean working tree.",
+      "dependencies": ["001_create_backup"]
+    },
+    {
+      "task_id": "003_performance_baseline",
+      "task_type": "performance-optimizer",
+      "prompt": "Run performance benchmarks on current orchestrator. Measure: task throughput, memory usage per agent, token pool contention metrics, file I/O latency. Create baseline_metrics.json with all measurements.",
+      "context": {"benchmark_tasks": ["simple_workflow", "parallel_10_agents", "dependency_chain"], "metrics_output": "metrics/baseline_metrics.json"},
+      "dependencies": ["002_git_branch"]
+    },
+    {
+      "task_id": "004_refactor_token_pool",
+      "task_type": "development-specialist",
+      "prompt": "Refactor TokenPool class to eliminate contention. Implement: 1) Lock-free token distribution using asyncio.Queue, 2) Token reservation system with timeout, 3) Batch token allocation for multi-agent tasks. Maintain backward compatibility.",
+      "context": {"target_file": "src/token_pool.py", "patterns_to_implement": ["producer-consumer", "resource-pool", "async-queue"]},
+      "dependencies": ["003_performance_baseline"],
+      "quality_gates": ["unit_tests", "backwards_compatibility"]
+    },
+    {
+      "task_id": "005_async_file_operations",
+      "task_type": "development-specialist",
+      "prompt": "Replace synchronous file I/O with async operations using aiofiles. Focus on: checkpoint saves, log writes, result storage. Create FileIOManager class to centralize async file operations.",
+      "context": {"files_to_refactor": ["src/generic_orchestrator.py", "src/unified/unified_orchestrator.py"], "new_class": "src/utils/file_io_manager.py"},
+      "dependencies": ["004_refactor_token_pool"]
+    },
+    {
+      "task_id": "006_connection_pooling",
+      "task_type": "api-integration-specialist",
+      "prompt": "Implement connection pooling for AI provider APIs. Create ProviderConnectionPool class with: keep-alive connections, automatic retry with exponential backoff, connection health monitoring. Support Claude and OpenAI providers.",
+      "context": {"providers": ["claude", "openai"], "pool_size": 20, "keepalive_timeout": 300},
+      "dependencies": ["005_async_file_operations"]
+    },
+    {
+      "task_id": "007_test_concurrency_fixes",
+      "task_type": "qa-testing-guru",
+      "prompt": "Create comprehensive test suite for concurrency improvements. Test: token pool under load (100 concurrent requests), async file I/O performance, connection pool failover. All tests must pass.",
+      "dependencies": ["006_connection_pooling"],
+      "quality_gates": ["all_tests_pass", "no_performance_regression"]
+    },
+    {
+      "task_id": "008_commit_concurrency",
+      "task_type": "devops-automation",
+      "prompt": "Commit concurrency improvements with message 'perf: eliminate concurrency bottlenecks in token pool and file I/O'. Include performance metrics showing improvements in commit message.",
+      "dependencies": ["007_test_concurrency_fixes"]
+    },
+    {
+      "task_id": "009_memory_optimization",
+      "task_type": "performance-optimizer",
+      "prompt": "Optimize memory usage: 1) Implement task result streaming instead of loading all in memory, 2) Add memory-mapped file support for large outputs, 3) Implement garbage collection hints after task completion. Target: reduce memory per agent by 50%.",
+      "context": {"memory_target": "25MB per agent", "techniques": ["streaming", "mmap", "gc.collect()"]},
+      "dependencies": ["008_commit_concurrency"]
+    },
+    {
+      "task_id": "010_multiprocessing_support",
+      "task_type": "development-specialist",
+      "prompt": "Add multiprocessing support for CPU-intensive operations. Create ProcessPoolExecutor wrapper for: JSON parsing, file compression, metrics calculation. Maintain async interface.",
+      "context": {"cpu_bound_operations": ["json_parsing", "compression", "metrics"], "max_processes": "os.cpu_count()"},
+      "dependencies": ["009_memory_optimization"]
+    },
+    {
+      "task_id": "011_resource_monitoring",
+      "task_type": "development-specialist",
+      "prompt": "Implement ResourceMonitor class to track and limit resource usage. Features: memory limits per task, CPU throttling, automatic task suspension when limits exceeded. Integrate with monitoring module.",
+      "dependencies": ["010_multiprocessing_support"]
+    },
+    {
+      "task_id": "012_test_resource_fixes",
+      "task_type": "qa-testing-guru",
+      "prompt": "Test resource optimizations: Run 15 parallel agents and verify memory stays under 400MB total, CPU usage scales across cores, no memory leaks after 100 task executions.",
+      "dependencies": ["011_resource_monitoring"],
+      "quality_gates": ["memory_limits_enforced", "cpu_scaling_verified"]
+    },
+    {
+      "task_id": "013_commit_resources",
+      "task_type": "devops-automation",
+      "prompt": "Commit resource optimizations with message 'perf: reduce memory usage by 50% and add multiprocessing support'.",
+      "dependencies": ["012_test_resource_fixes"]
+    },
+    {
+      "task_id": "014_break_god_object",
+      "task_type": "solution-architect",
+      "prompt": "Refactor GenericOrchestrator god object. Extract responsibilities into: TaskScheduler, WorkflowEngine, MetricsCollector, StateManager. Each class under 500 lines. Maintain public API compatibility.",
+      "context": {"target_classes": {"TaskScheduler": "Handle task queue and dependencies", "WorkflowEngine": "Execute workflow logic", "MetricsCollector": "Gather and report metrics", "StateManager": "Checkpoint and recovery"}},
+      "dependencies": ["013_commit_resources"]
+    },
+    {
+      "task_id": "015_dependency_injection",
+      "task_type": "development-specialist",
+      "prompt": "Replace singleton pattern with dependency injection. Create OrchestratorFactory with configurable providers. Implement interfaces for TokenProvider, FileHandler, MessageBus. Enable testing with mock implementations.",
+      "context": {"interfaces": ["ITokenProvider", "IFileHandler", "IMessageBus"], "factory_pattern": "OrchestratorFactory"},
+      "dependencies": ["014_break_god_object"]
+    },
+    {
+      "task_id": "016_domain_driven_design",
+      "task_type": "solution-architect",
+      "prompt": "Add behavior to data classes following DDD principles. Enhance AgentTask with: validate(), execute(), retry() methods. Create TaskResult value object with success/failure factory methods. Implement Task aggregate root.",
+      "dependencies": ["015_dependency_injection"]
+    },
+    {
+      "task_id": "017_integration_tests",
+      "task_type": "qa-testing-guru",
+      "prompt": "Create integration test suite for refactored architecture. Test: all workflows still execute correctly, backwards compatibility maintained, new components integrate properly. Must achieve 90% code coverage.",
+      "dependencies": ["016_domain_driven_design"],
+      "quality_gates": ["coverage_90_percent", "backwards_compatible"]
+    },
+    {
+      "task_id": "018_commit_architecture",
+      "task_type": "devops-automation",
+      "prompt": "Commit architectural improvements with message 'refactor: eliminate god object and singleton anti-patterns using SOLID principles'.",
+      "dependencies": ["017_integration_tests"]
+    },
+    {
+      "task_id": "019_performance_comparison",
+      "task_type": "performance-optimizer",
+      "prompt": "Run comprehensive benchmarks comparing refactored vs baseline. Generate comparison report showing: throughput improvement %, memory reduction %, CPU utilization improvement. Must show 2x improvement in at least 2 metrics.",
+      "context": {"comparison_file": "metrics/improvement_report.md"},
+      "dependencies": ["018_commit_architecture"],
+      "quality_gates": ["performance_improved"]
+    },
+    {
+      "task_id": "020_update_documentation",
+      "task_type": "technical-writer",
+      "prompt": "Update all documentation to reflect new architecture. Update: ARCHITECTURE.md with new component design, API_REFERENCE.md with new classes, DEVELOPER_GUIDE.md with new patterns. Include migration guide for existing users.",
+      "dependencies": ["019_performance_comparison"]
+    },
+    {
+      "task_id": "021_security_audit",
+      "task_type": "security-architect",
+      "prompt": "Perform security audit on refactored code. Check: no new vulnerabilities introduced, token handling remains secure, file permissions properly set, no sensitive data logged.",
+      "dependencies": ["020_update_documentation"],
+      "quality_gates": ["security_scan_pass"]
+    },
+    {
+      "task_id": "022_final_validation",
+      "task_type": "reviewer-critic",
+      "prompt": "Final review of all changes. Verify: all tests pass, documentation complete, performance targets met, backwards compatibility maintained. Create final approval report.",
+      "dependencies": ["021_security_audit"]
+    },
+    {
+      "task_id": "023_merge_to_main",
+      "task_type": "devops-automation",
+      "prompt": "Create pull request from refactor/performance-improvements to main branch. Include: performance metrics, test results, breaking changes (if any). Merge after all checks pass.",
+      "dependencies": ["022_final_validation"]
+    }
+  ]
+}

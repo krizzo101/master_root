@@ -1,0 +1,52 @@
+{
+  "tasks": [
+    {
+      "task_id": "phase1_discovery",
+      "task_type": "analysis",
+      "prompt": "Phase 1: Discovery - Analyze the src/ directory structure and identify all Python modules",
+      "context": {
+        "phase": "discovery",
+        "target_dir": "./src"
+      },
+      "dependencies": []
+    },
+    {
+      "task_id": "phase1_inventory",
+      "task_type": "analysis",
+      "prompt": "Phase 1: Discovery - Create inventory of orchestrator classes (Generic, Enhanced, Unified)",
+      "context": {
+        "phase": "discovery",
+        "focus": "orchestrators"
+      },
+      "dependencies": []
+    },
+    {
+      "task_id": "phase2_analysis",
+      "task_type": "analysis",
+      "prompt": "Phase 2: Analysis - Compare features of all three orchestrator types",
+      "context": {
+        "phase": "analysis"
+      },
+      "dependencies": ["phase1_discovery", "phase1_inventory"]
+    },
+    {
+      "task_id": "phase2_modules",
+      "task_type": "analysis",
+      "prompt": "Phase 2: Analysis - Examine module system capabilities",
+      "context": {
+        "phase": "analysis",
+        "target": "modules"
+      },
+      "dependencies": ["phase1_discovery"]
+    },
+    {
+      "task_id": "phase3_synthesis",
+      "task_type": "synthesis",
+      "prompt": "Phase 3: Synthesis - Create comprehensive summary report of findings",
+      "context": {
+        "phase": "synthesis"
+      },
+      "dependencies": ["phase2_analysis", "phase2_modules"]
+    }
+  ]
+}

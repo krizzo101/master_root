@@ -1,0 +1,88 @@
+{
+  "name": "System Analysis Execution Plan",
+  "description": "Comprehensive system analysis with structured phases",
+  "phases": [
+    {
+      "phase_id": "discovery",
+      "name": "Discovery Phase",
+      "tasks": [
+        {
+          "task_id": "inventory_code",
+          "task_type": "analysis",
+          "prompt": "Create an inventory of all Python files in src/ directory, count them, and identify the main modules",
+          "context": {
+            "target_dir": "./src",
+            "focus": "structure"
+          },
+          "dependencies": []
+        },
+        {
+          "task_id": "analyze_architecture",
+          "task_type": "analysis",
+          "prompt": "Analyze the overall architecture pattern - identify if it's modular, layered, or service-oriented",
+          "context": {
+            "target_dir": "./src"
+          },
+          "dependencies": ["inventory_code"]
+        }
+      ]
+    },
+    {
+      "phase_id": "deep_analysis",
+      "name": "Deep Analysis Phase",
+      "tasks": [
+        {
+          "task_id": "examine_orchestrators",
+          "task_type": "analysis",
+          "prompt": "Examine all orchestrator implementations (Generic, Enhanced, Unified) and compare their features",
+          "context": {
+            "files": ["src/generic_orchestrator.py", "src/enhanced_orchestrator.py", "src/unified/unified_orchestrator.py"]
+          },
+          "dependencies": ["analyze_architecture"]
+        },
+        {
+          "task_id": "analyze_modules",
+          "task_type": "analysis",
+          "prompt": "Analyze the module system in src/modules/ and src/unified/modules/ - what capabilities do they provide?",
+          "context": {
+            "target_dirs": ["./src/modules", "./src/unified/modules"]
+          },
+          "dependencies": ["analyze_architecture"]
+        }
+      ]
+    },
+    {
+      "phase_id": "synthesis",
+      "name": "Synthesis Phase",
+      "tasks": [
+        {
+          "task_id": "create_summary",
+          "task_type": "synthesis",
+          "prompt": "Create a comprehensive summary of the orchestrator system including architecture, capabilities, and recommendations",
+          "context": {
+            "include": ["strengths", "weaknesses", "recommendations"]
+          },
+          "dependencies": ["examine_orchestrators", "analyze_modules"]
+        },
+        {
+          "task_id": "generate_diagram",
+          "task_type": "generation",
+          "prompt": "Generate a text-based architecture diagram showing the relationship between orchestrators and modules",
+          "context": {
+            "format": "ascii_art"
+          },
+          "dependencies": ["create_summary"]
+        }
+      ]
+    }
+  ],
+  "execution_config": {
+    "max_parallel_per_phase": 2,
+    "phase_execution": "sequential",
+    "enable_checkpoints": true,
+    "quality_gates": {
+      "enabled": true,
+      "fail_fast": false
+    }
+  }
+}

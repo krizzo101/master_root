@@ -36,14 +36,28 @@ except ImportError:
     EnhancedAgentTask = None
     UNIFIED_AVAILABLE = False
 
+try:
+    from src.dpo import DPOOrchestrator
+    from src.dpo.enhancement_config import DPOEnhancementConfig, EnhancementLevel
 
-def load_tasks_from_file(file_path: str) -> list:
+    DPO_AVAILABLE = True
+except ImportError:
+    DPOOrchestrator = None
+    DPOEnhancementConfig = None
+    EnhancementLevel = None
+    DPO_AVAILABLE = False
+
+
+def load_tasks_from_file(file_path: str, enhancement_level: int = 2) -> list:
     """Load task definitions from a JSON file"""
     with open(file_path, "r") as f:
         data = json.load(f)
 
     tasks = []
     for task_data in data.get("tasks", []):
+        # Set enhancement_level if not already specified
+        if "enhancement_level" not in task_data:
+            task_data["enhancement_level"] = enhancement_level
         tasks.append(AgentTask(**task_data))
 
     return tasks
@@ -104,6 +118,14 @@ async def main():
         help="Enable dashboard reporting and workflow tracking",
     )
 
+    parser.add_argument(
+        "--dpo-level",
+        type=int,
+        default=2,
+        choices=[0, 1, 2, 3, 4, 5],
+        help="DPO enhancement level (0=off, 1=minimal, 2=essential, 3=balanced, 4=comprehensive, 5=maximum, default: 2)",
+    )
+
     args = parser.parse_args()
 
     # Prepare tasks and orchestrator
@@ -145,22 +167,25 @@ async def main():
                 task_id="research",
                 task_type="research",
                 prompt="Research best practices for Python async programming",
+                enhancement_level=args.dpo_level,
             ),
             AgentTask(
                 task_id="design",
                 task_type="design",
                 prompt="Design an async web server architecture based on the research",
                 dependencies=["research"],
+                enhancement_level=args.dpo_level,
             ),
             AgentTask(
                 task_id="implement",
                 task_type="code",
                 prompt="Implement a simple async web server based on the design",
                 dependencies=["design"],
+                enhancement_level=args.dpo_level,
             ),
         ]
     elif args.tasks_file:
-        tasks = load_tasks_from_file(args.tasks_file)
+        tasks = load_tasks_from_file(args.tasks_file, enhancement_level=args.dpo_level)
     else:
         print(
             "Error: Must specify one of: --execution-plan, --tasks-file, or --example"
@@ -231,14 +256,35 @@ async def main():
                     FeatureFlag.BACKGROUND_EXECUTION,
                     FeatureFlag.AUTO_RECOVERY,
                     FeatureFlag.STATE_PERSISTENCE,
+                    FeatureFlag.QUALITY_GATES,
+                    FeatureFlag.AGENT_MONITORING,
+                    FeatureFlag.COLLABORATION,
+                    FeatureFlag.EXECUTION_PLAN,
                 },
                 enable_monitoring=True,
                 enable_auto_recovery=True,
                 enable_state_persistence=True,
+                enable_quality_gates=True,
+                enable_collaboration=True,
             )
             orchestrator = UnifiedOrchestrator(config)
             orchestrator.workflow_name = workflow_name
             orchestrator.dashboard_callback = dashboard_callback
+
+            # Set DPO enhancement level on orchestrator
+            orchestrator.dpo_enhancement_level = args.dpo_level
+            if args.dpo_level > 0:
+                level_names = [
+                    "off",
+                    "minimal",
+                    "essential",
+                    "balanced",
+                    "comprehensive",
+                    "maximum",
+                ]
+                print(
+                    f"🔧 DPO Enhancement enabled at level {args.dpo_level} ({level_names[args.dpo_level]})"
+                )
         elif args.use_enhanced and ENHANCED_AVAILABLE:
             orchestrator = EnhancedOrchestrator(
                 output_dir=Path(args.output_dir),
@@ -249,6 +295,21 @@ async def main():
                 enable_dashboard_reporting=args.enable_dashboard,
                 dashboard_state_callback=dashboard_callback,
             )
+
+            # Set DPO enhancement level on orchestrator
+            orchestrator.dpo_enhancement_level = args.dpo_level
+            if args.dpo_level > 0:
+                level_names = [
+                    "off",
+                    "minimal",
+                    "essential",
+                    "balanced",
+                    "comprehensive",
+                    "maximum",
+                ]
+                print(
+                    f"🔧 DPO Enhancement enabled at level {args.dpo_level} ({level_names[args.dpo_level]})"
+                )
         else:
             orchestrator = GenericOrchestrator(
                 output_dir=Path(args.output_dir),
@@ -259,6 +320,21 @@ async def main():
                 enable_dashboard_reporting=args.enable_dashboard,
                 dashboard_state_callback=dashboard_callback,
             )
+
+            # Set DPO enhancement level on orchestrator
+            orchestrator.dpo_enhancement_level = args.dpo_level
+            if args.dpo_level > 0:
+                level_names = [
+                    "off",
+                    "minimal",
+                    "essential",
+                    "balanced",
+                    "comprehensive",
+                    "maximum",
+                ]
+                print(
+                    f"🔧 DPO Enhancement enabled at level {args.dpo_level} ({level_names[args.dpo_level]})"
+                )
 
     # Execute tasks
     if execution_plan:

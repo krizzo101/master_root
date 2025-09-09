@@ -52,6 +52,9 @@ class AgentTask:
     raw_output: Optional[str] = None  # Store raw stdout for debugging
     error_details: Optional[Dict] = None  # Detailed error information
     work_dir_name: Optional[str] = None  # Custom working directory name
+    system_prompt: Optional[str] = None  # Custom system prompt for agent specialization
+    system_prompt_file: Optional[str] = None  # File to load system prompt from
+    enhancement_level: Optional[int] = None  # DPO enhancement level (0-5)
 
     # Project organization fields
     project_location: Optional[
@@ -1671,16 +1674,31 @@ To ensure proper organization:
             else:
                 cmd.extend(["--mcp-config", str(agent_mcp_config)])
 
-        # Add system prompt based on task type for better specialization
-        system_prompts = {
-            "analysis": "You are a specialized analysis agent. Focus on thorough, data-driven analysis. Provide clear, structured summaries with key metrics.",
-            "monitoring": "You are a system monitoring agent. Focus on performance metrics, resource usage, and system health indicators. Be concise and actionable.",
-            "research": "You are a research specialist. Focus on comprehensive information gathering, accurate citations, and structured findings.",
-            "strategic_research_lead": "You are a strategic research commander. Plan and coordinate research operations. Focus on leadership, strategy, and optimal orchestration patterns.",
-        }
+        # Add system prompt using the enhanced prompt manager
+        from src.agent_system_prompts import get_prompt_manager
 
-        if task.task_type in system_prompts:
-            cmd.extend(["--append-system-prompt", system_prompts[task.task_type]])
+        prompt_manager = get_prompt_manager()
+
+        # Determine enhancement level (from task, DPO, or default)
+        enhancement_level = getattr(task, "enhancement_level", None)
+        if enhancement_level is None:
+            # Check if DPO is configured
+            enhancement_level = getattr(self, "dpo_enhancement_level", 2)
+
+        # Get the appropriate system prompt
+        system_prompt = prompt_manager.get_system_prompt(
+            agent_type=task.task_type,
+            enhancement_level=enhancement_level,
+            custom_prompt=getattr(task, "system_prompt", None),
+            load_from_file=getattr(task, "system_prompt_file", None),
+        )
+
+        # Apply the system prompt
+        if system_prompt:
+            cmd.extend(["--append-system-prompt", system_prompt])
+            logger.debug(
+                f"Applied system prompt for {task.task_type} with enhancement level {enhancement_level}"
+            )
 
         # Validate directory usage and provide guidance
         project_name = self._detect_new_project_creation(task)

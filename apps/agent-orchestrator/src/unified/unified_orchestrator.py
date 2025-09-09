@@ -74,6 +74,10 @@ class UnifiedConfig:
     # Feature flags
     enabled_features: Set[FeatureFlag] = field(
         default_factory=lambda: {
+            FeatureFlag.QUALITY_GATES,
+            FeatureFlag.AGENT_MONITORING,
+            FeatureFlag.COLLABORATION,
+            FeatureFlag.EXECUTION_PLAN,
             FeatureFlag.ENHANCED_METRICS,
             FeatureFlag.BACKGROUND_EXECUTION,
         }
