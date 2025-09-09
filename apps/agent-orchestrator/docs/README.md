@@ -1,39 +1,52 @@
-# Agent Orchestrator
+# Development Process Orchestrator
 
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
 [![Status](https://img.shields.io/badge/status-production%20ready-green.svg)](https://github.com)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**Production-ready multi-agent orchestration framework for coordinating AI agents in parallel execution workflows.**
+**Production-ready multi-agent orchestration framework for coordinating AI agents in complex development workflows.**
 
 ## Overview
 
-Agent Orchestrator is a comprehensive system designed to coordinate multiple AI agents for complex task execution. Built with production-grade reliability patterns, it provides intelligent task distribution, dependency management, and advanced monitoring capabilities for enterprise-scale AI workflows.
+Development Process Orchestrator (DPO) is an enterprise-grade system designed to coordinate multiple AI agents for complex software development tasks. Built with production-grade reliability patterns, it provides intelligent task distribution, dependency management, and advanced monitoring capabilities for large-scale AI-driven development workflows.
 
-### Key Capabilities
+The system serves as the core execution engine for multi-agent coordination, enabling sophisticated workflows through automatic dependency resolution, checkpoint-based recovery, and real-time monitoring.
 
+## Key Features
+
+### 🚀 Core Capabilities
 - **Multi-Agent Coordination**: Execute up to 15+ agents simultaneously with intelligent resource management
 - **Advanced Token Management**: Robust 4-strategy token loading system with failover mechanisms
 - **Dependency Resolution**: Automatic dependency tracking and execution ordering
 - **State Persistence**: Checkpoint system for recovery and resumption of long-running workflows
 - **Quality Gates**: Built-in validation and quality assurance pipelines
 - **Real-time Monitoring**: WebSocket-based dashboard with performance tracking
+
+### 🔧 Advanced Features
 - **Background Execution**: Long-running task support with status monitoring
 - **Multi-Provider Support**: Extensible provider system (Claude, OpenAI, etc.)
+- **Session Analytics**: Comprehensive execution pattern analysis
+- **Collaborative Orchestration**: Multi-agent collaboration patterns
+- **Production Dashboard**: Real-time workflow visualization and monitoring
+- **Docker Support**: Containerized deployment with Docker Compose and Kubernetes
 
 ## Quick Start
+
+### Prerequisites
+- Python 3.8+
+- 4GB+ RAM (recommended for 15 parallel agents)
+- Stable internet connection for API calls
 
 ### Installation
 
 ```bash
-# Clone and setup
+# Clone and navigate to the project
 cd /home/opsvi/master_root/apps/agent-orchestrator
+
+# Install dependencies
 pip install -r requirements.txt
 
-# Development installation
-pip install -e .
-
-# With development dependencies
+# Development installation with extras
 pip install -e ".[dev]"
 ```
 
@@ -51,6 +64,12 @@ python main.py --tasks-file my_tasks.json --max-parallel 10
 
 # Enhanced orchestrator with quality gates
 python main.py --use-enhanced --enable-dashboard --tasks-file tasks.json
+
+# Production dashboard server (port 8765)
+python production_dashboard.py
+
+# Interactive chat interface
+python chat_interface.py
 ```
 
 ### Python API
@@ -59,19 +78,25 @@ python main.py --use-enhanced --enable-dashboard --tasks-file tasks.json
 import asyncio
 from src.generic_orchestrator import AgentTask, GenericOrchestrator
 
-# Define tasks
+# Define tasks with dependencies
 tasks = [
     AgentTask(
-        task_id="analyze_code",
+        task_id="analyze_codebase",
         task_type="code-analyzer",
-        prompt="Analyze the codebase for patterns and quality",
+        prompt="Analyze the codebase for patterns and quality issues",
         context={"target_dir": "/path/to/analyze"}
     ),
     AgentTask(
-        task_id="generate_docs",
+        task_id="generate_documentation",
         task_type="documentation",
-        prompt="Generate comprehensive documentation",
-        dependencies=["analyze_code"]  # Runs after code analysis
+        prompt="Generate comprehensive documentation based on analysis",
+        dependencies=["analyze_codebase"]  # Runs after analysis
+    ),
+    AgentTask(
+        task_id="create_tests",
+        task_type="testing",
+        prompt="Create unit tests for critical components",
+        dependencies=["analyze_codebase"]
     )
 ]
 
@@ -79,156 +104,131 @@ tasks = [
 async def main():
     orchestrator = GenericOrchestrator(
         max_parallel=10,
-        output_dir="./outputs"
+        output_dir="./outputs",
+        use_optimizations=True
     )
 
     results = await orchestrator.execute_batch(tasks)
 
     for task_id, result in results.items():
         print(f"{task_id}: {result['status']}")
+        if result['status'] == 'failed':
+            print(f"  Error: {result.get('error', 'Unknown error')}")
 
 asyncio.run(main())
 ```
 
 ## Architecture
 
+### System Overview
+
+```
+development-process-orchestrator/
+├── src/                                    # Core source code
+│   ├── generic_orchestrator.py            # Main orchestration engine
+│   ├── enhanced_orchestrator.py           # Advanced features with quality gates
+│   ├── token_loader.py                    # Multi-strategy token management
+│   ├── session_analytics_engine.py       # Session analytics and tracking
+│   ├── collaborative_orchestrator.py     # Multi-agent collaboration
+│   ├── providers/                         # Multi-provider support
+│   │   ├── openai_provider.py            # OpenAI integration
+│   │   └── base_provider.py              # Provider interface
+│   ├── workflows/                         # Workflow management
+│   │   ├── resumable_orchestrator.py     # Checkpoint/resume functionality
+│   │   ├── documentation_workflow.py     # Documentation generation
+│   │   └── execution_plans.py            # Execution plan management
+│   ├── monitoring/                        # Real-time monitoring
+│   │   └── dashboard_server.py           # Dashboard server implementation
+│   ├── collaboration/                     # Collaboration system
+│   ├── dpo_main_controller.py            # DPO main controller
+│   ├── intelligence_review_engine.py     # Intelligence review system
+│   └── specialist_agent_templates.py     # Specialist agent templates
+├── docs/                                  # Documentation
+│   ├── ARCHITECTURE.md                   # System architecture
+│   ├── API_REFERENCE.md                  # API documentation
+│   ├── DEPLOYMENT.md                     # Deployment guide
+│   ├── DEVELOPER_GUIDE.md                # Developer documentation
+│   └── USER_GUIDE.md                     # User guide
+├── main.py                               # CLI entry point
+├── production_dashboard.py               # Production dashboard server
+├── run_orchestrator_task.py              # Task runner with resume capability
+├── run_apps_audit.py                     # Apps ecosystem audit runner
+├── run_system_analysis.py                # System analysis runner
+├── chat_interface.py                     # Interactive chat interface
+├── setup.py                              # Package configuration
+├── requirements.txt                       # Python dependencies
+└── outputs/                              # Execution results and logs
+    ├── logs/                             # Execution logs
+    ├── checkpoints/                      # State checkpoints
+    └── results/                          # Task results
+```
+
 ### Core Components
 
-```
-agent-orchestrator/
-├── src/
-│   ├── generic_orchestrator.py          # Core orchestration engine
-│   ├── enhanced_orchestrator.py         # Advanced features with quality gates
-│   ├── token_loader.py                  # Multi-strategy token management
-│   ├── providers/                       # Multi-provider support
-│   │   └── openai_provider.py          # OpenAI integration
-│   ├── workflows/                       # Workflow management
-│   │   └── resumable_orchestrator.py   # Checkpoint/resume functionality
-│   ├── message_bus/                     # Event system
-│   ├── quality_gates/                   # Validation pipelines
-│   └── monitoring/                      # Real-time monitoring
-├── main.py                              # CLI entry point
-├── run_orchestrator_task.py            # Task runner with resume
-├── orchestrator_with_dashboard.py      # Dashboard-enabled runner
-└── outputs/                             # Execution results and logs
-```
+#### 1. Generic Orchestrator (`generic_orchestrator.py`)
+The main orchestration engine that handles task scheduling, dependency resolution, and parallel execution.
 
-### Token Management System
+#### 2. Enhanced Orchestrator (`enhanced_orchestrator.py`)
+Advanced orchestrator with quality gates, performance monitoring, and optimization features.
 
-The orchestrator uses a robust 4-strategy token loading system:
+#### 3. Token Management (`token_loader.py`)
+Robust token loading system with multiple fallback strategies:
+- Relative import (when called from orchestrator directory)
+- Absolute import (when called from other applications)
+- Environment variables
+- Configuration files
 
-1. **Relative Import**: When called from orchestrator directory
-2. **Absolute Import**: When called from other applications
-3. **Environment Variables**: Fallback to environment configuration
-4. **Configuration Files**: Load from JSON/YAML configuration
+#### 4. Quality Gates System
+Built-in validation ensures task quality and compliance with development standards.
 
-```python
-# Automatic token loading
-orchestrator = GenericOrchestrator()  # Loads tokens automatically
+#### 5. Dashboard & Monitoring
+Real-time WebSocket-based dashboard for workflow visualization and performance tracking.
 
-# Explicit token provision
-orchestrator = GenericOrchestrator(tokens=["token1", "token2"])
-```
+## Directory Structure
 
-### Quality Gates System
+| Directory | Description |
+|-----------|-------------|
+| `src/` | Core source code and modules |
+| `docs/` | Comprehensive documentation |
+| `outputs/` | Execution results, logs, and checkpoints |
+| `tests/` | Test files and performance benchmarks |
+| `*.json` | Task definition files and configuration |
+| `*.py` | Main executables and utilities |
 
-Built-in validation ensures task quality:
+### Key Executables
 
-```python
-task = AgentTask(
-    task_id="critical_analysis",
-    task_type="analysis",
-    prompt="Perform security analysis",
-    quality_gates=["code_quality", "security_check", "performance"]
-)
-```
-
-## Features
-
-### Enhanced Orchestrator
-
-The `EnhancedOrchestrator` provides advanced capabilities:
-
-- **Quality Gates**: Automated validation pipelines
-- **Performance Monitoring**: Real-time metrics and alerting
-- **Resource Optimization**: Dynamic load balancing
-- **Error Recovery**: Automatic retry with backoff
-
-```python
-from src.enhanced_orchestrator import EnhancedOrchestrator
-
-orchestrator = EnhancedOrchestrator(
-    max_parallel=15,
-    enable_quality_gates=True,
-    enable_monitoring=True,
-    use_optimizations=True
-)
-```
-
-### Dashboard Integration
-
-Real-time monitoring via WebSocket dashboard:
-
-```bash
-# Run with dashboard enabled
-python main.py --enable-dashboard --tasks-file tasks.json
-
-# Dedicated dashboard server
-python orchestrator_with_dashboard.py --port 8080
-```
-
-### Checkpoint and Resume
-
-For long-running workflows:
-
-```bash
-# Resume from checkpoint
-python run_orchestrator_task.py --resume-checkpoint checkpoint_20250908_143022
-
-# List available checkpoints
-python run_orchestrator_task.py --list-checkpoints --app-name my-app
-```
+| File | Purpose |
+|------|---------|
+| `main.py` | CLI entry point for orchestrator |
+| `production_dashboard.py` | Production dashboard server |
+| `run_apps_audit.py` | Apps ecosystem audit |
+| `run_system_analysis.py` | System analysis workflows |
+| `chat_interface.py` | Interactive chat interface |
+| `resume_orchestrator.py` | Resume from checkpoints |
 
 ## Configuration
 
 ### Environment Variables
 
 ```bash
-# Token configuration
-export ANTHROPIC_API_KEY="your-token"
+# API Configuration
+export ANTHROPIC_API_KEY="your-anthropic-key"
+export OPENAI_API_KEY="your-openai-key"
+
+# Orchestrator Settings
 export ORCHESTRATOR_MAX_PARALLEL=15
 export ORCHESTRATOR_OUTPUT_DIR="./outputs"
+export ORCHESTRATOR_TOKEN_POOL_SIZE=20
 
-# Dashboard configuration
+# Dashboard Configuration
 export DASHBOARD_HOST="0.0.0.0"
-export DASHBOARD_PORT=8080
+export DASHBOARD_PORT=8765
+export DASHBOARD_HEALTH_PORT=8766
 ```
 
-### Configuration File
+### Task Definition Format
 
-Create `production_config.json`:
-
-```json
-{
-    "max_parallel": 15,
-    "token_pool_size": 20,
-    "enable_quality_gates": true,
-    "enable_monitoring": true,
-    "dashboard": {
-        "enabled": true,
-        "host": "0.0.0.0",
-        "port": 8080
-    },
-    "logging": {
-        "level": "INFO",
-        "file": "orchestrator.log"
-    }
-}
-```
-
-## Task Definition Format
-
-Tasks are defined in JSON format:
+Tasks are defined in JSON format with support for dependencies and quality gates:
 
 ```json
 {
@@ -247,12 +247,73 @@ Tasks are defined in JSON format:
         {
             "task_id": "generate_report",
             "task_type": "documentation",
-            "prompt": "Generate a comprehensive analysis report based on system analysis",
+            "prompt": "Generate a comprehensive analysis report",
             "dependencies": ["analyze_system"],
             "quality_gates": ["format", "clarity"]
         }
     ]
 }
+```
+
+## Advanced Features
+
+### Dashboard Integration
+
+Start the production dashboard:
+
+```bash
+# Default configuration (port 8765)
+python production_dashboard.py
+
+# Custom configuration
+python production_dashboard.py --config production_config.json
+
+# Health check endpoint (port 8766)
+curl http://localhost:8766/health
+```
+
+Dashboard features:
+- Real-time task execution monitoring
+- WebSocket-based live updates
+- Performance metrics tracking
+- Workflow visualization
+- Session analytics integration
+
+### Checkpoint and Resume
+
+For long-running workflows:
+
+```bash
+# Resume from checkpoint
+python run_orchestrator_task.py --resume-checkpoint checkpoint_20250908_143022
+
+# List available checkpoints
+python run_orchestrator_task.py --list-checkpoints --app-name my-app
+```
+
+### Quality Gates
+
+Built-in validation system:
+
+```python
+task = AgentTask(
+    task_id="critical_analysis",
+    task_type="analysis",
+    prompt="Perform security analysis",
+    quality_gates=["code_quality", "security_check", "performance"]
+)
+```
+
+### Session Analytics
+
+Track and analyze execution patterns:
+
+```python
+from src.session_analytics_engine import SessionAnalyticsEngine
+
+analytics = SessionAnalyticsEngine()
+analytics.track_execution(task_id, execution_time, status)
+report = analytics.generate_session_report()
 ```
 
 ## Docker Deployment
@@ -262,7 +323,7 @@ Tasks are defined in JSON format:
 ```yaml
 version: '3.8'
 services:
-  agent-orchestrator:
+  development-process-orchestrator:
     build:
       context: .
       dockerfile: Dockerfile
@@ -271,7 +332,8 @@ services:
       - TOKEN_POOL_SIZE=20
       - DASHBOARD_ENABLED=true
     ports:
-      - "8080:8080"
+      - "8765:8765"  # Dashboard
+      - "8766:8766"  # Health check
     volumes:
       - ./outputs:/app/outputs
       - ./checkpoints:/app/checkpoints
@@ -284,22 +346,23 @@ services:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: agent-orchestrator
+  name: development-process-orchestrator
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: agent-orchestrator
+      app: development-process-orchestrator
   template:
     metadata:
       labels:
-        app: agent-orchestrator
+        app: development-process-orchestrator
     spec:
       containers:
       - name: orchestrator
-        image: agent-orchestrator:latest
+        image: development-process-orchestrator:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 8765
+        - containerPort: 8766
         env:
         - name: MAX_PARALLEL
           value: "15"
@@ -314,212 +377,38 @@ spec:
           claimName: orchestrator-outputs
 ```
 
-## Monitoring and Observability
-
-### Performance Metrics
-
-The orchestrator tracks comprehensive metrics:
-
-- **Execution Metrics**: Task completion rates, execution times
-- **Resource Usage**: Memory consumption, token utilization
-- **Error Tracking**: Failure rates, error patterns
-- **Quality Metrics**: Quality gate pass rates
-
-### Logging
-
-Structured logging with multiple output formats:
-
-```python
-import logging
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('orchestrator.log')
-    ]
-)
-```
-
-### Health Checks
-
-Built-in health check endpoints:
-
-```bash
-# Health status
-curl http://localhost:8080/health
-
-# Metrics endpoint
-curl http://localhost:8080/metrics
-
-# Task status
-curl http://localhost:8080/status
-```
-
 ## Testing
 
-### Unit Tests
+### Running Tests
 
 ```bash
-# Run all tests
-python -m pytest tests/ -v
+# Core functionality tests
+python test_session_analytics.py
+python test_task_organization.py
+python test_claude_sessions.py
 
-# Run with coverage
-python -m pytest tests/ --cov=src --cov-report=html
+# Performance testing
+python realistic_load_test.py --agents 15 --duration 300
+python continuous_metrics_test.py
 
-# Run specific test categories
-python -m pytest tests/test_orchestrator.py -k "test_parallel_execution"
-```
-
-### Integration Tests
-
-```bash
-# Integration test with live agents
-python test_orchestrator_integration.py
+# Dashboard testing
+python final_dashboard_test.py
+python ui_performance_test.py
 
 # Load testing
-python realistic_load_test.py --agents 15 --duration 300
-
-# WebSocket stress testing
-python stress_test_websockets.py --connections 100
+python load_test_metrics_feeder.py
+python websocket_load_test.py
 ```
 
-### Performance Benchmarks
+### Test Categories
 
-```bash
-# Performance benchmarks
-python benchmark_orchestrator.py --agents 15 --tasks 100
-
-# Memory usage analysis
-python -m memory_profiler orchestrator_memory_test.py
-```
-
-## Production Deployment
-
-### System Requirements
-
-- **Python**: 3.8+
-- **Memory**: 4GB+ recommended for 15 parallel agents
-- **CPU**: 4+ cores recommended
-- **Storage**: SSD recommended for checkpoint/resume performance
-- **Network**: Stable internet for API calls
-
-### Performance Tuning
-
-```python
-# Optimize for throughput
-orchestrator = GenericOrchestrator(
-    max_parallel=15,           # Adjust based on available resources
-    token_pool_size=20,        # Pool size > max_parallel
-    use_optimizations=True,    # Enable performance optimizations
-    checkpoint_interval=300    # Checkpoint every 5 minutes
-)
-```
-
-### Security Considerations
-
-- Store API tokens securely (environment variables, secrets management)
-- Validate all task inputs to prevent injection attacks
-- Use least-privilege principles for file system access
-- Monitor for unusual patterns in task execution
-- Implement rate limiting for API calls
-
-## Integrations
-
-### Ecosystem Integration Points
-
-- **WBS Documenter**: Parallel documentation generation
-- **Autonomous Coder**: Self-coding capabilities
-- **Multi-Agent Monitor**: Safety layer for operations
-- **OpsVI Monitoring**: Consolidated observability
-
-### Custom Provider Integration
-
-```python
-from src.providers.base_provider import BaseProvider
-
-class CustomProvider(BaseProvider):
-    async def execute_task(self, task: AgentTask) -> Dict:
-        # Custom provider implementation
-        return {"status": "completed", "result": "..."}
-
-# Register provider
-orchestrator.register_provider("custom", CustomProvider())
-```
-
-## Troubleshooting
-
-### Common Issues
-
-#### Token Loading Failures
-
-```bash
-# Check token availability
-python -c "from src.token_loader import load_tokens; print(f'Loaded {len(load_tokens())} tokens')"
-
-# Verify environment variables
-echo $ANTHROPIC_API_KEY
-```
-
-#### Memory Issues
-
-```bash
-# Monitor memory usage
-python -c "
-import psutil
-process = psutil.Process()
-print(f'Memory: {process.memory_info().rss / 1024 / 1024:.2f} MB')
-"
-```
-
-#### Dashboard Connection Issues
-
-```bash
-# Check WebSocket connectivity
-python -c "
-import asyncio
-import websockets
-
-async def test_connection():
-    try:
-        async with websockets.connect('ws://localhost:8080/ws') as ws:
-            print('Dashboard connection: OK')
-    except Exception as e:
-        print(f'Dashboard connection failed: {e}')
-
-asyncio.run(test_connection())
-"
-```
-
-### Debugging
-
-Enable debug logging:
-
-```python
-import logging
-logging.getLogger('agent_orchestrator').setLevel(logging.DEBUG)
-```
-
-Check execution logs:
-
-```bash
-# View real-time logs
-tail -f orchestrator_*.log
-
-# Search for specific errors
-grep -r "ERROR" outputs/logs/
-
-# Analyze checkpoint data
-python -c "
-import json
-with open('outputs/checkpoints/latest.json') as f:
-    checkpoint = json.load(f)
-    print(f'Tasks: {len(checkpoint[\"tasks\"])}')
-    print(f'Status: {checkpoint[\"status\"]}')
-"
-```
+| Test File | Purpose |
+|-----------|---------|
+| `test_session_analytics.py` | Session analytics functionality |
+| `test_multi_provider.py` | Multi-provider support |
+| `test_enhanced_task_validation.py` | Task validation |
+| `realistic_load_test.py` | Performance benchmarking |
+| `stress_test_websockets.py` | WebSocket stress testing |
 
 ## Performance
 
@@ -533,13 +422,98 @@ Recent performance metrics (15 parallel agents):
 - **API Costs**: <$2.00 per task execution
 - **Recovery Time**: <30 seconds from checkpoint
 
-### Optimization Tips
+### Optimization Guidelines
 
-1. **Tune Parallel Limits**: Balance between throughput and resource usage
-2. **Use Checkpoints**: Enable for long-running workflows
-3. **Monitor Token Usage**: Ensure adequate token pool size
+1. **Parallel Limits**: Balance throughput vs. resource usage
+2. **Checkpoint Frequency**: Enable for workflows >30 minutes
+3. **Token Pool Size**: Maintain pool size > max_parallel
 4. **Quality Gates**: Use selectively to avoid bottlenecks
-5. **Output Management**: Clean up old outputs regularly
+5. **Output Management**: Regular cleanup of old outputs
+
+## Production Deployment
+
+### System Requirements
+
+- **Python**: 3.8+
+- **Memory**: 4GB+ recommended for 15 parallel agents
+- **CPU**: 4+ cores recommended
+- **Storage**: SSD recommended for checkpoint performance
+- **Network**: Stable internet for API calls
+
+### Security Considerations
+
+- Store API tokens securely (environment variables, secrets management)
+- Validate all task inputs to prevent injection attacks
+- Use least-privilege principles for file system access
+- Monitor for unusual patterns in task execution
+- Implement rate limiting for API calls
+
+## Troubleshooting
+
+### Common Issues
+
+#### Token Loading Failures
+```bash
+# Check token availability
+python -c "from src.token_loader import load_tokens; print(f'Loaded {len(load_tokens())} tokens')"
+
+# Verify environment variables
+echo $ANTHROPIC_API_KEY
+```
+
+#### Memory Issues
+```bash
+# Monitor memory usage
+python -c "
+import psutil
+process = psutil.Process()
+print(f'Memory: {process.memory_info().rss / 1024 / 1024:.2f} MB')
+"
+```
+
+#### Dashboard Connection Issues
+```bash
+# Test WebSocket connectivity
+python -c "
+import asyncio
+import websockets
+
+async def test_connection():
+    try:
+        async with websockets.connect('ws://localhost:8765/ws') as ws:
+            print('Dashboard connection: OK')
+    except Exception as e:
+        print(f'Dashboard connection failed: {e}')
+
+asyncio.run(test_connection())
+"
+```
+
+### Debugging
+
+Enable debug logging:
+```python
+import logging
+logging.getLogger('agent_orchestrator').setLevel(logging.DEBUG)
+```
+
+Check execution logs:
+```bash
+# View real-time logs
+tail -f outputs/logs/orchestrator_*.log
+
+# Search for errors
+grep -r "ERROR" outputs/logs/
+
+# Analyze checkpoint data
+python -c "
+import json
+with open('outputs/checkpoints/latest.json') as f:
+    checkpoint = json.load(f)
+    print(f'Tasks: {len(checkpoint[\"tasks\"])}')
+    print(f'Status: {checkpoint[\"status\"]}')
+"
+```
 
 ## Contributing
 
@@ -548,23 +522,23 @@ Recent performance metrics (15 parallel agents):
 ```bash
 # Clone repository
 git clone <repository-url>
-cd agent-orchestrator
+cd development-process-orchestrator
 
-# Setup development environment
+# Setup virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 pip install -e ".[dev]"
 
-# Install pre-commit hooks
+# Install pre-commit hooks (if available)
 pre-commit install
 ```
 
 ### Code Style
 
-We use Black, flake8, and isort for code formatting:
+We follow PEP 8 standards with these tools:
 
 ```bash
 # Format code
@@ -581,21 +555,18 @@ mypy src/
 1. **Fork** the repository
 2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
 3. **Add** comprehensive tests for new functionality
-4. **Ensure** all tests pass (`python -m pytest`)
+4. **Ensure** all tests pass
 5. **Update** documentation as needed
 6. **Commit** changes (`git commit -m 'Add amazing feature'`)
 7. **Push** to branch (`git push origin feature/amazing-feature`)
 8. **Create** a Pull Request
 
-### Issue Reporting
+### Testing Requirements
 
-When reporting issues, include:
-
-- Python version and operating system
-- Orchestrator version and configuration
-- Complete error messages and stack traces
-- Minimal reproduction case
-- Expected vs. actual behavior
+- Add unit tests for new functionality
+- Ensure integration tests pass
+- Include performance tests for core features
+- Update documentation for API changes
 
 ## License
 
@@ -605,19 +576,21 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### Documentation
 
-- **Architecture Guide**: `/docs/ARCHITECTURE.md`
-- **API Reference**: `/docs/API_REFERENCE.md`
-- **Deployment Guide**: `/PRODUCTION_DEPLOYMENT_GUIDE.md`
-- **Dashboard Guide**: `/DASHBOARD_INTEGRATION_GUIDE.md`
+- **Architecture Guide**: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- **API Reference**: [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md)
+- **Deployment Guide**: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
+- **Developer Guide**: [`docs/DEVELOPER_GUIDE.md`](docs/DEVELOPER_GUIDE.md)
+- **User Guide**: [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md)
 
 ### Getting Help
 
 - **Issues**: Check `outputs/logs/` for execution logs
-- **Debugging**: Use `BashOutput` tool for background process monitoring
+- **Debugging**: Use debug logging and monitor background processes
 - **Checkpoints**: Review `outputs/checkpoints/` for state information
-- **Community**: Join discussions in project issues
+- **Dashboard**: Monitor workflows at http://localhost:8765
+- **Health Check**: Verify system status at http://localhost:8766/health
 
-### Status
+### Project Status
 
 🟢 **PRODUCTION READY** - Currently serving as the foundation for:
 
@@ -626,7 +599,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Cross-app integration projects
 - Documentation generation pipelines
 - Enterprise AI workflow coordination
+- Multi-agent development processes
 
 ---
 
-*This is the core execution engine for multi-agent coordination. Changes should be thoroughly tested as they impact the entire ecosystem.*
+*Development Process Orchestrator is the core execution engine for multi-agent coordination in development workflows. Changes should be thoroughly tested as they impact the entire development ecosystem.*

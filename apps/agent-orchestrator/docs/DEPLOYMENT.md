@@ -17,6 +17,29 @@
 
 The Agent Orchestrator is a production-ready distributed system for managing AI agents and workflows. This guide provides comprehensive deployment instructions for various environments from local development to production enterprise deployments.
 
+## Quick Start (5 Minutes)
+
+```bash
+# 1. Clone and setup
+git clone <repository-url> agent-orchestrator
+cd agent-orchestrator
+python3.11 -m venv venv
+source venv/bin/activate
+
+# 2. Install dependencies
+pip install -r requirements.txt
+pip install anthropic openai
+
+# 3. Configure API keys
+export ANTHROPIC_API_KEY="your-key-here"
+export OPENAI_API_KEY="your-key-here"
+
+# 4. Start the dashboard
+python production_dashboard.py --config production_config.json
+
+# 5. Open browser to http://localhost:8765
+```
+
 ### Architecture Components
 - **Core Orchestrator**: Main workflow execution engine
 - **Dashboard Server**: Real-time monitoring and management interface
@@ -109,7 +132,13 @@ ENABLE_PROMETHEUS_METRICS=true
 
 ## Database Setup
 
-### PostgreSQL Installation & Configuration
+### Database Options
+The system supports multiple database configurations:
+1. **SQLite** (Default): Automatic, no setup required
+2. **PostgreSQL**: For production deployments with high concurrency
+3. **No Database**: System can run with in-memory storage for testing
+
+### PostgreSQL Installation & Configuration (Optional)
 
 #### Ubuntu/Debian
 ```bash
@@ -139,20 +168,15 @@ sudo -u postgres psql -c "ALTER USER orchestrator PASSWORD 'your_secure_password
 
 #### Database Schema Creation
 ```bash
-# The system will automatically create tables on first run
-# Or manually trigger schema creation:
-cd /path/to/agent-orchestrator
-python -c "
-import asyncio
-from src.persistence.database import initialize_database
-async def create_schema():
-    db_manager = await initialize_database()
-    await db_manager.create_tables()
-asyncio.run(create_schema())
-"
+# The system automatically creates tables on first run
+# Database initialization is handled by src/persistence/database.py
+# No manual setup required
+
+# To verify database connection:
+python -c "from src.persistence.database import DatabaseManager; print('Database module loaded')"
 ```
 
-### Redis Installation & Configuration
+### Redis Installation & Configuration (Optional)
 
 #### Ubuntu/Debian
 ```bash
@@ -190,6 +214,17 @@ save 900 1
 save 300 10
 save 60 10000
 ```
+
+## Available Run Scripts
+
+The orchestrator includes several specialized run scripts:
+
+- **`production_dashboard.py`**: Main dashboard server with WebSocket monitoring
+- **`run_orchestrator_task.py`**: Execute specific orchestration tasks
+- **`run_system_analysis.py`**: Analyze system capabilities and generate reports
+- **`run_parallel_doc_update.py`**: Update documentation in parallel
+- **`run_apps_audit.py`**: Audit applications for issues
+- **`run_with_live_chat.py`**: Run with interactive chat interface
 
 ## Deployment Methods
 
@@ -1107,26 +1142,43 @@ lazyfree-lazy-server-del yes
 
 ## Troubleshooting
 
+### Quick Diagnostics
+```bash
+# Check Python version
+python --version  # Should be 3.11+
+
+# Verify dependencies
+pip list | grep -E "aiohttp|websockets|watchdog"
+
+# Test configuration
+python -c "import production_config; print('Config OK')"
+
+# Check API keys
+python -c "import os; print('API keys set:', bool(os.getenv('ANTHROPIC_API_KEY')))"
+```
+
 ### Common Issues and Solutions
 
 #### Service Won't Start
 ```bash
 # Check logs
-sudo journalctl -u dashboard.service -f
+tail -f logs/dashboard_production.log
 docker-compose logs agent-orchestrator
 
 # Common fixes
 # 1. Port already in use
-sudo netstat -tlnp | grep :8765
-sudo fuser -k 8765/tcp
+lsof -i :8765  # Check what's using the port
+kill -9 $(lsof -t -i:8765)  # Kill the process
 
 # 2. Permission issues
-sudo chown -R orchestrator:orchestrator /opt/agent-orchestrator
-sudo chmod +x /opt/agent-orchestrator/venv/bin/python
+chmod -R 755 logs outputs checkpoints
 
-# 3. Database connection issues
-psql collaboration -c "SELECT 1;"
-redis-cli ping
+# 3. Missing dependencies
+pip install -r requirements.txt
+pip install anthropic openai
+
+# 4. Configuration issues
+python production_dashboard.py --config production_config.json --debug
 ```
 
 #### High Memory Usage
@@ -1169,13 +1221,18 @@ REINDEX DATABASE collaboration;
 # Check dashboard service
 curl -f http://localhost:8765/api/health
 
-# Check static files
-ls -la /opt/agent-orchestrator/web/
-nginx -t && sudo systemctl reload nginx
+# Check if web directory exists
+ls -la web/  # Should contain index.html and other static files
 
-# WebSocket connection issues
-netstat -an | grep 8765
-ufw allow 8765/tcp
+# Test WebSocket connection
+python -c "import websockets; print('WebSocket module OK')"
+
+# Check firewall
+sudo ufw status | grep 8765
+sudo ufw allow 8765/tcp  # If needed
+
+# Browser console errors
+# Open browser developer tools (F12) and check Console tab for errors
 ```
 
 ### Debugging Procedures
@@ -1211,6 +1268,23 @@ def profile_endpoint():
     stats = pstats.Stats(profiler)
     stats.sort_stats('cumulative')
     stats.print_stats()
+```
+
+### Quick Recovery Steps
+```bash
+# 1. Stop everything
+pkill -f production_dashboard
+docker-compose down
+
+# 2. Clean up
+rm -rf logs/*.log
+rm -rf outputs/temp_*
+
+# 3. Reset configuration
+cp .env.production .env
+
+# 4. Restart services
+python production_dashboard.py --config production_config.json
 ```
 
 ### Emergency Procedures
@@ -1325,6 +1399,53 @@ fi
 
 echo "=== Health check completed ==="
 ```
+
+## Deployment Verification
+
+### Post-Deployment Checklist
+
+```bash
+# 1. Verify service is running
+curl http://localhost:8765/api/health
+# Expected: {"status": "healthy", ...}
+
+# 2. Check WebSocket connectivity
+python -c "
+import asyncio
+import websockets
+async def test():
+    async with websockets.connect('ws://localhost:8765/ws') as ws:
+        print('WebSocket connected successfully')
+asyncio.run(test())
+"
+
+# 3. Verify logs are being written
+ls -la logs/
+tail -f logs/dashboard_production.log
+
+# 4. Test a simple workflow
+python run_orchestrator_task.py \
+  --app-name "test-app" \
+  --app-root "." \
+  --task-type "system-documentation"
+
+# 5. Monitor resource usage
+ps aux | grep production_dashboard
+df -h outputs/
+```
+
+### Production Readiness Checklist
+
+- [ ] API keys configured (ANTHROPIC_API_KEY, OPENAI_API_KEY)
+- [ ] Appropriate resource limits set (MAX_PARALLEL, TOKEN_POOL_SIZE)
+- [ ] Log rotation configured
+- [ ] Backup strategy in place
+- [ ] Monitoring endpoints accessible
+- [ ] SSL/TLS configured (for production)
+- [ ] Firewall rules configured
+- [ ] Health checks passing
+- [ ] Error alerting configured
+- [ ] Documentation updated
 
 ## Support and Documentation
 

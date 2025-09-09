@@ -16,26 +16,36 @@
 
 This developer guide provides comprehensive information for contributors, maintainers, and developers working on the Agent Orchestrator system. It covers development setup, coding standards, testing practices, and contribution workflows.
 
+### Current Project State
+
+The Agent Orchestrator is a production-ready multi-agent orchestration framework with:
+- **Active Development**: Located at `/home/opsvi/master_root/apps/agent-orchestrator`
+- **Python 3.8+**: Compatible with Python 3.8 through 3.12
+- **Modular Architecture**: Plugin-based provider system, workflow management, and dashboard
+- **Production Dashboard**: Web-based monitoring and control interface on port 8765
+- **Task Resumption**: Checkpoint-based recovery for interrupted workflows
+
 ### Development Philosophy
 
 The Agent Orchestrator follows these core development principles:
 
 - **Production-First Design**: All features are built with production reliability in mind
 - **Async-First Architecture**: Leveraging Python's asyncio for high concurrency
-- **Comprehensive Testing**: Unit, integration, and load testing for all components
-- **Documentation-Driven Development**: Code changes must include documentation updates
-- **Security by Design**: Security considerations are integrated from the start
+- **Incremental Testing**: Tests are added as features are developed
+- **Practical Documentation**: Focus on working examples and real usage patterns
+- **Resilient Design**: Built-in error handling and workflow resumption
 
 ## Getting Started
 
 ### Development Environment Setup
 
 #### Prerequisites
-- Python 3.11+ (recommended)
+- Python 3.8+ (3.11+ recommended)
 - Git 2.0+
 - PostgreSQL 13+ (for development database)
 - Redis 6.0+ (for caching and message bus)
 - Docker 20.10+ (optional, for containerized development)
+- Miniconda or Python virtual environment
 
 #### Quick Setup Script
 ```bash
@@ -46,40 +56,40 @@ set -e
 
 echo "Setting up Agent Orchestrator development environment..."
 
-# Create project directory
-mkdir -p ~/projects/agent-orchestrator
-cd ~/projects/agent-orchestrator
+# Navigate to project directory
+cd /home/opsvi/master_root/apps/agent-orchestrator
 
-# Clone repository
-git clone <repository-url> .
+# Create virtual environment (if using system Python)
+# python3 -m venv venv
+# source venv/bin/activate
 
-# Create virtual environment
-python3.11 -m venv venv
-source venv/bin/activate
+# Or use existing Miniconda environment
+source /home/opsvi/miniconda/bin/activate
 
 # Install dependencies
 pip install --upgrade pip
 pip install -r requirements.txt
-pip install -e ".[dev]"
+pip install -e .
 
-# Install pre-commit hooks
-pre-commit install
+# Install development dependencies
+pip install pytest pytest-asyncio
 
-# Create development directories
-mkdir -p {logs,outputs,checkpoints,test-data}
+# Create required directories
+mkdir -p output logs temp_docs_cleanup web/static web/templates
 
-# Setup development database
+# Setup development database (if not exists)
 createdb orchestrator_dev || echo "Database already exists"
 
-# Copy configuration templates
-cp .env.example .env.development
-cp production_config.json dev_config.json
+# Create basic configuration if needed
+if [ ! -f production_config.json ]; then
+    echo '{"max_parallel": 10, "output_dir": "./output"}' > production_config.json
+fi
 
 echo "Development environment setup complete!"
 echo "Next steps:"
-echo "1. Edit .env.development with your API keys"
-echo "2. Run: python -m pytest tests/ to verify setup"
-echo "3. Run: python main.py --example to test basic functionality"
+echo "1. Configure .env.production with your API keys"
+echo "2. Run: python main.py --example to test basic functionality"
+echo "3. Run: python production_dashboard.py to start the dashboard"
 ```
 
 #### IDE Configuration
@@ -115,36 +125,81 @@ echo "3. Run: python main.py --example to test basic functionality"
 ### Development Dependencies
 
 ```txt
-# requirements-dev.txt
+# requirements-dev.txt (additional development dependencies)
 # Testing
 pytest>=7.0.0
 pytest-asyncio>=0.21.0
 pytest-cov>=4.0.0
 pytest-mock>=3.10.0
 
-# Code Quality
+# Code Quality (optional but recommended)
 black>=23.0.0
 isort>=5.12.0
 flake8>=5.0.0
 mypy>=1.0.0
-pre-commit>=3.0.0
 
 # Development Tools
 ipython>=8.0.0
 ipdb>=0.13.0
-watchdog>=3.0.0
-
-# Documentation
-sphinx>=5.0.0
-sphinx-rtd-theme>=1.2.0
-myst-parser>=1.0.0
 
 # Performance Testing
 locust>=2.14.0
 memory-profiler>=0.60.0
+psutil>=5.9.0
+
+# Note: Core dependencies are in requirements.txt:
+# - watchdog>=3.0.0
+# - aiofiles>=23.0.0
+# - pydantic>=2.0.0
+# - websockets>=12.0
+# - aiohttp>=3.9.0
+# - psycopg2-binary>=2.9.0
+# - redis>=4.5.0
+# - anthropic>=0.3.0 (in setup.py)
 ```
 
 ## Development Workflow
+
+### Running the System
+
+#### Starting the Orchestrator
+```bash
+# Basic execution with example tasks
+python main.py --example
+
+# Run with specific task file
+python main.py --tasks-file system_analysis_tasks.json --output-dir ./output
+
+# Run with enhanced features
+python main.py --use-enhanced --enable-dashboard --max-parallel 10
+
+# Run specific workflows
+python run_orchestrator_task.py --app-name "your-app" \
+  --app-root "/path/to/app" \
+  --task-type "system-documentation"
+
+# Resume interrupted workflow
+python resume_orchestrator.py output/workflow_*/checkpoints/checkpoint_*.json
+```
+
+#### Starting the Dashboard
+```bash
+# Start production dashboard (Port 8765)
+python production_dashboard.py
+
+# Or use the integrated orchestrator with dashboard
+python orchestrator_with_dashboard.py
+
+# Access dashboard at: http://localhost:8765
+```
+
+#### Running Parallel Documentation Updates
+```bash
+# Update multiple documentation files in parallel
+python run_parallel_doc_update.py
+
+# This runs tasks defined in parallel_doc_update_tasks.json
+```
 
 ### Branch Strategy
 
@@ -232,46 +287,32 @@ due to lack of ping/pong heartbeat mechanism.
 Fixes #156
 ```
 
-### Pre-commit Hooks
+### Code Quality Tools (Optional)
 
-Our pre-commit configuration (`.pre-commit-config.yaml`):
+While pre-commit hooks are not currently configured, you can manually run code quality tools:
 
-```yaml
-repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
-    hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
-      - id: check-added-large-files
-      - id: check-merge-conflict
-      - id: debug-statements
+```bash
+# Format code with black (if installed)
+black src/ --line-length=88
 
-  - repo: https://github.com/psf/black
-    rev: 23.1.0
-    hooks:
-      - id: black
-        language_version: python3.11
+# Sort imports with isort (if installed)
+isort src/ --profile black
 
-  - repo: https://github.com/pycqa/isort
-    rev: 5.12.0
-    hooks:
-      - id: isort
-        args: ["--profile", "black"]
+# Check code style with flake8 (if installed)
+flake8 src/ --max-line-length=88 --extend-ignore=E203,W503
 
-  - repo: https://github.com/pycqa/flake8
-    rev: 5.0.4
-    hooks:
-      - id: flake8
-        args: ["--max-line-length=88", "--extend-ignore=E203,W503"]
+# Type checking with mypy (if installed)
+mypy src/ --ignore-missing-imports
+```
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.0.1
-    hooks:
-      - id: mypy
-        args: [--strict]
-        additional_dependencies: [types-requests, types-PyYAML]
+To set up pre-commit hooks (optional):
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Create .pre-commit-config.yaml with desired hooks
+# Then install the git hooks
+pre-commit install
 ```
 
 ## Code Architecture
@@ -282,48 +323,50 @@ repos:
 agent-orchestrator/
 ├── src/                              # Core source code
 │   ├── __init__.py
-│   ├── generic_orchestrator.py       # Main orchestrator
+│   ├── generic_orchestrator.py       # Main orchestrator (101KB)
 │   ├── enhanced_orchestrator.py      # Advanced orchestrator
 │   ├── enhanced_token_pool.py        # Token management
 │   ├── session_analytics_engine.py   # Analytics system
 │   ├── gpt5_payload_generator.py     # Payload generation
 │   ├── providers/                    # AI provider integrations
 │   │   ├── __init__.py
-│   │   ├── base_provider.py         # Abstract base provider
 │   │   └── openai_provider.py       # OpenAI integration
 │   ├── workflows/                    # Workflow management
 │   │   ├── __init__.py
-│   │   └── resumable_orchestrator.py
+│   │   └── resumable.py             # Resumable workflow support
+│   ├── validators/                   # Input validation
+│   │   └── task_validator.py        # Task validation logic
 │   ├── persistence/                  # Database layer
-│   │   ├── __init__.py
-│   │   ├── database.py              # Database management
-│   │   └── models.py                # Data models
 │   ├── monitoring/                   # Monitoring components
-│   │   ├── __init__.py
-│   │   └── dashboard_server.py      # Dashboard backend
-│   └── utils/                       # Utility functions
-│       ├── __init__.py
-│       ├── logging.py              # Logging configuration
-│       └── config.py               # Configuration management
-├── tests/                           # Test suite
-│   ├── unit/                       # Unit tests
-│   ├── integration/                # Integration tests
-│   ├── performance/                # Performance tests
-│   └── fixtures/                   # Test fixtures
-├── docs/                           # Documentation
-│   ├── README.md                   # Project overview
-│   ├── ARCHITECTURE.md             # System architecture
-│   ├── USER_GUIDE.md               # User documentation
-│   ├── API_REFERENCE.md            # API documentation
-│   ├── DEPLOYMENT.md               # Deployment guide
-│   └── DEVELOPER_GUIDE.md          # This file
-├── web/                            # Dashboard frontend
-│   ├── index.html                  # Main dashboard
-│   ├── css/                        # Styles
-│   └── js/                         # JavaScript
-├── scripts/                        # Utility scripts
-├── config/                         # Configuration files
-└── docker/                         # Docker configurations
+│   ├── collaboration/               # Multi-agent collaboration
+│   ├── load_balancing/              # Load distribution
+│   ├── message_bus/                 # Inter-agent communication
+│   ├── execution_plan/              # Execution planning
+│   └── events/                      # Event system
+├── output/                          # Task execution outputs
+│   └── [task_outputs]/              # Timestamped output directories
+├── docs/                            # Documentation
+│   ├── README.md                    # Project overview
+│   ├── ARCHITECTURE.md              # System architecture
+│   ├── USER_GUIDE.md                # User documentation
+│   ├── API_REFERENCE.md             # API documentation
+│   ├── DEPLOYMENT.md                # Deployment guide
+│   └── DEVELOPER_GUIDE.md           # This file
+├── web/                             # Dashboard frontend
+│   ├── static/                      # Static assets
+│   └── templates/                   # HTML templates
+├── archive/                         # Archived components
+├── tools/                           # Development tools
+├── *.py                             # Main entry points and utilities
+│   ├── main.py                      # Primary CLI entry point
+│   ├── production_dashboard.py      # Production dashboard server
+│   ├── run_orchestrator_task.py     # Task runner utility
+│   ├── resume_orchestrator.py       # Resume interrupted tasks
+│   └── [various test files]         # Test and demo scripts
+└── *.json                           # Task definitions and configs
+    ├── production_config.json        # Production configuration
+    ├── logging_config.json           # Logging settings
+    └── [task definition files]      # Various task JSON files
 ```
 
 ### Coding Standards
@@ -537,26 +580,56 @@ class EventBus:
 ### Test Structure
 
 ```
+# Current test files (scattered in project root and src/):
+├── test_multi_provider.py           # Provider testing
+├── test_session_analytics.py        # Analytics testing
+├── test_task_organization.py        # Task organization
+├── test_claude_sessions.py          # Session handling
+├── test_enhanced_task_validation.py # Task validation
+├── src/
+│   ├── test_debug_logging.py       # Debug logging tests
+│   ├── test_enhanced_quality_gates.py # Quality gates
+│   └── collaboration/
+│       └── test_collaboration_system.py # Collaboration tests
+
+# Recommended test organization (to be implemented):
 tests/
 ├── unit/                    # Unit tests (isolated, fast)
-│   ├── test_orchestrator.py
-│   ├── test_token_pool.py
-│   └── test_providers.py
-├── integration/             # Integration tests (components together)
-│   ├── test_workflow_execution.py
-│   ├── test_database_integration.py
-│   └── test_dashboard_api.py
-├── performance/             # Performance and load tests
-│   ├── test_load_balancing.py
-│   ├── test_memory_usage.py
-│   └── test_concurrent_execution.py
+├── integration/             # Integration tests
+├── performance/             # Performance tests
 ├── fixtures/               # Test data and fixtures
-│   ├── sample_tasks.json
-│   └── test_responses.py
 └── conftest.py            # Pytest configuration
 ```
 
+**Note:** Tests are currently scattered throughout the project. Consider reorganizing them into a dedicated `tests/` directory for better organization.
+
 ### Testing Guidelines
+
+#### Current Testing Approach
+
+The project currently has test files scattered throughout the codebase rather than in a dedicated tests directory. When writing new tests:
+
+1. **Naming Convention**: Use `test_*.py` for test files
+2. **Location**: Place tests near the code they test or in project root
+3. **Async Tests**: Use `pytest-asyncio` for async test functions
+4. **Mocking**: Mock external dependencies (API calls, database)
+
+#### Running Existing Tests
+```bash
+# Set up environment
+cd /home/opsvi/master_root/apps/agent-orchestrator
+export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
+
+# Run specific test files that exist
+python -m pytest test_session_analytics.py -v
+python -m pytest test_multi_provider.py -v
+python -m pytest test_task_organization.py -v
+
+# Run performance tests
+python continuous_metrics_test.py
+python realistic_load_test.py
+python websocket_load_test.py
+```
 
 #### Unit Tests
 ```python
@@ -772,16 +845,20 @@ class TestPerformance:
 ### Running Tests
 
 ```bash
-# Run all tests
-python -m pytest
+# Run tests from project root
+cd /home/opsvi/master_root/apps/agent-orchestrator
 
-# Run with coverage
+# Set Python path to include src/
+export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
+
+# Run all test files
+python -m pytest test_*.py -v
+
+# Run specific test file
+python -m pytest test_multi_provider.py -v
+
+# Run with coverage (if pytest-cov installed)
 python -m pytest --cov=src --cov-report=html
-
-# Run specific test categories
-python -m pytest tests/unit/          # Unit tests only
-python -m pytest tests/integration/   # Integration tests only
-python -m pytest tests/performance/   # Performance tests only
 
 # Run tests matching pattern
 python -m pytest -k "test_orchestrator"
@@ -789,20 +866,26 @@ python -m pytest -k "test_orchestrator"
 # Run with verbose output
 python -m pytest -v
 
-# Run with performance profiling
-python -m pytest --profile --profile-svg
+# Common test files to run:
+python -m pytest test_session_analytics.py    # Session analytics
+python -m pytest test_task_organization.py     # Task organization
+python -m pytest test_enhanced_task_validation.py  # Validation
 
-# Parallel test execution
-python -m pytest -n auto  # Requires pytest-xdist
+# Note: Some tests may require API keys or database setup
 ```
 
 ### Test Configuration
 
 ```python
-# tests/conftest.py
+# conftest.py (create in project root)
 import pytest
 import asyncio
+import sys
+from pathlib import Path
 from unittest.mock import AsyncMock
+
+# Add src to path for test imports
+sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 @pytest.fixture(scope="session")
 def event_loop():
@@ -897,8 +980,23 @@ All code changes must include appropriate documentation updates:
 
 ```python
 # Example custom provider implementation
-from src.providers.base_provider import BaseProvider
+# Note: base_provider.py is not currently in the project
+# This is a template for creating new providers
+from abc import ABC, abstractmethod
 from typing import Dict, Any
+
+class BaseProvider(ABC):
+    """Abstract base class for AI providers."""
+
+    @abstractmethod
+    async def execute_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute a task using this provider."""
+        pass
+
+    @abstractmethod
+    async def validate_credentials(self) -> bool:
+        """Validate provider credentials."""
+        pass
 
 class CustomAIProvider(BaseProvider):
     """Custom AI provider implementation."""
@@ -955,8 +1053,8 @@ class CustomAIProvider(BaseProvider):
             return False
 
 # Register the custom provider
-from src.factory import ProviderFactory
-ProviderFactory._providers['custom'] = CustomAIProvider
+# Note: You'll need to integrate this with the orchestrator's provider system
+# Currently, providers are managed in src/providers/openai_provider.py
 ```
 
 ### Custom Quality Gates
@@ -1142,16 +1240,23 @@ We follow Semantic Versioning (SemVer):
 
 #### Version Update Process
 ```bash
-# Update version in setup.py and __init__.py
+# Update version in setup.py
+vim setup.py  # Update version="1.2.3"
+
+# Update version in src/__init__.py if present
+vim src/__init__.py  # Update __version__ = "1.2.3"
+
 # Commit version bump
-git add .
+git add setup.py src/__init__.py
 git commit -m "chore: bump version to v1.2.3"
 
 # Create and push tag
 git tag v1.2.3
 git push origin v1.2.3
 
-# Trigger release workflow
+# Build and distribute (if publishing to PyPI)
+python setup.py sdist bdist_wheel
+# twine upload dist/*  # If publishing to PyPI
 ```
 
 ### Release Checklist
@@ -1218,11 +1323,19 @@ https://github.com/org/agent-orchestrator/compare/v1.2.2...v1.2.3
 
 #### Import Errors
 ```python
-# Problem: ModuleNotFoundError
-# Solution: Ensure PYTHONPATH includes src/
-export PYTHONPATH="${PYTHONPATH}:/path/to/agent-orchestrator/src"
+# Problem: ModuleNotFoundError or ImportError with relative imports
+# Solution: The project uses sys.path manipulation in main entry points
 
-# Or use development installation
+# In your Python scripts, add at the top:
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent / "src"))
+
+# Or set PYTHONPATH environment variable:
+export PYTHONPATH="${PYTHONPATH}:/home/opsvi/master_root/apps/agent-orchestrator/src"
+
+# Or use development installation:
+cd /home/opsvi/master_root/apps/agent-orchestrator
 pip install -e .
 ```
 
@@ -1241,7 +1354,17 @@ asyncio_mode = auto
 # Problem: Cannot connect to PostgreSQL
 # Solution: Check service status and configuration
 sudo systemctl status postgresql
-psql -h localhost -U orchestrator -d collaboration -c "SELECT 1;"
+# Or if using Docker:
+docker ps | grep postgres
+
+# Test connection
+psql -h localhost -U orchestrator -d orchestrator_dev -c "SELECT 1;"
+
+# Create database if needed
+createdb orchestrator_dev
+
+# Check Redis connection (for message bus)
+redis-cli ping  # Should return PONG
 ```
 
 #### Memory Leaks in Development
@@ -1307,15 +1430,53 @@ python -m memory_profiler script.py
 
 # Use py-spy for live profiling
 py-spy top --pid <pid>
+
+# Monitor dashboard performance
+python ui_performance_test.py  # UI performance testing
+python websocket_load_test.py  # WebSocket load testing
+python realistic_load_test.py  # Realistic load scenarios
 ```
 
 ---
 
 This developer guide provides comprehensive information for contributing to the Agent Orchestrator project. For additional help or questions, please:
 
-1. Check the other documentation files
-2. Review existing issues and pull requests
-3. Create a new issue with detailed information
-4. Join the development discussions
+1. Check the other documentation files in `/docs`
+2. Review task JSON files for workflow examples
+3. Examine the `/output` directory for execution results
+4. Check `/src` for implementation details
+
+### Quick Reference
+
+#### Key Files and Their Purpose
+- `main.py` - Primary CLI entry point
+- `production_dashboard.py` - Web dashboard server
+- `src/generic_orchestrator.py` - Core orchestration engine
+- `src/enhanced_orchestrator.py` - Advanced features
+- `run_orchestrator_task.py` - Task execution utility
+- `resume_orchestrator.py` - Resume interrupted workflows
+
+#### Common Commands
+```bash
+# Check system status
+python main.py --example
+
+# Start dashboard
+python production_dashboard.py
+
+# Run documentation generation
+python run_orchestrator_task.py --task-type system-documentation
+
+# View logs
+tail -f orchestrator_*.log
+
+# Check output
+ls -la output/
+```
+
+#### Environment Variables
+- `PYTHONPATH` - Should include `src/` directory
+- API keys configured in `.env.production`
+- Database URLs in configuration files
 
 Happy coding! 🚀

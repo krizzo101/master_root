@@ -1,0 +1,143 @@
+{
+  "name": "backend-api",
+  "category": "backend",
+  "description": "RESTful API backend with database integration",
+  "version": "1.0.0",
+  "technologies": ["python", "fastapi", "postgresql", "redis"],
+  "quality_gates": {
+    "code_coverage": 80,
+    "performance_threshold": 200,
+    "security_scan": true,
+    "documentation_required": true
+  },
+  "workflow": {
+    "phases": [
+      {
+        "name": "requirements_analysis",
+        "agents": ["requirements_analyst"],
+        "duration_estimate": "30m",
+        "deliverables": ["requirements.md", "api_spec.yaml"]
+      },
+      {
+        "name": "architecture_design",
+        "agents": ["system_architect", "database_designer"],
+        "duration_estimate": "45m",
+        "deliverables": ["architecture.md", "database_schema.sql"]
+      },
+      {
+        "name": "api_development",
+        "agents": ["backend_developer", "api_specialist"],
+        "duration_estimate": "2h",
+        "deliverables": ["src/api/", "src/models/", "src/services/"]
+      },
+      {
+        "name": "database_implementation",
+        "agents": ["database_developer"],
+        "duration_estimate": "1h",
+        "deliverables": ["migrations/", "src/database/"]
+      },
+      {
+        "name": "testing",
+        "agents": ["test_engineer", "qa_specialist"],
+        "duration_estimate": "1h",
+        "deliverables": ["tests/", "test_report.md"]
+      },
+      {
+        "name": "documentation",
+        "agents": ["technical_writer"],
+        "duration_estimate": "45m",
+        "deliverables": ["docs/", "README.md", "API.md"]
+      },
+      {
+        "name": "deployment_setup",
+        "agents": ["devops_engineer"],
+        "duration_estimate": "30m",
+        "deliverables": ["Dockerfile", "docker-compose.yml", ".github/workflows/"]
+      }
+    ]
+  },
+  "structure": {
+    "directories": [
+      "src/api",
+      "src/models",
+      "src/services",
+      "src/database",
+      "src/utils",
+      "tests/unit",
+      "tests/integration",
+      "tests/e2e",
+      "migrations",
+      "docs",
+      "config",
+      "scripts"
+    ],
+    "files": [
+      "requirements.txt",
+      "setup.py",
+      "README.md",
+      "API.md",
+      ".env.example",
+      ".gitignore",
+      "Dockerfile",
+      "docker-compose.yml",
+      "Makefile"
+    ]
+  },
+  "dependencies": {
+    "core": [
+      "fastapi>=0.100.0",
+      "uvicorn>=0.23.0",
+      "pydantic>=2.0.0",
+      "sqlalchemy>=2.0.0",
+      "alembic>=1.11.0",
+      "asyncpg>=0.28.0",
+      "redis>=4.6.0"
+    ],
+    "dev": [
+      "pytest>=7.4.0",
+      "pytest-asyncio>=0.21.0",
+      "pytest-cov>=4.1.0",
+      "black>=23.0.0",
+      "flake8>=6.0.0",
+      "mypy>=1.4.0"
+    ]
+  },
+  "configuration": {
+    "environment_variables": [
+      "DATABASE_URL",
+      "REDIS_URL",
+      "SECRET_KEY",
+      "API_VERSION",
+      "DEBUG",
+      "LOG_LEVEL"
+    ],
+    "config_files": [
+      "config/default.yaml",
+      "config/development.yaml",
+      "config/production.yaml",
+      "config/testing.yaml"
+    ]
+  },
+  "quality_checks": [
+    {
+      "name": "lint",
+      "command": "flake8 src tests",
+      "threshold": 0
+    },
+    {
+      "name": "type_check",
+      "command": "mypy src",
+      "threshold": 0
+    },
+    {
+      "name": "test",
+      "command": "pytest tests/ --cov=src --cov-report=term-missing",
+      "threshold": 80
+    },
+    {
+      "name": "security",
+      "command": "bandit -r src/",
+      "threshold": 0
+    }
+  ]
+}

@@ -1,10 +1,7 @@
+NOTE TO THE REVIEWING AGENT: Don't take anything in this document as gospel or my final decision on anything and some of it I've alrady changed my mind on.  You are supposed to take away the spirt of what is in this, not anything specific.
+
+
 WHEN RESPONDING if CONFIDENCE < 0.85, then CONFIRM.  ALL DECISIONS must be based on EVIDENCE BASED FACTS"
-
-
-
-
-
-
 
 
 Local improvements:
@@ -178,9 +175,9 @@ Agents:
 
 
 
-
-
-
+^***********************
+SEE BELOW:  This is from a conversation I had with another agent about a knowledge management system.  I'm showing it to you so you can see what I've been thinking and building, not because I want you to know about this particular thing I was trying to build.
+************************
 
 User's note: I tend to take small ideas and run with them and before you know it we're talking about huge complex solutions because my brain wants to
 constantly improve and design and automate things. Even though we've dramatically expanded the scope, don't forget we need to also figure

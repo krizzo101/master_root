@@ -1,6 +1,14 @@
 {
   "hooks": {
     "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/opsvi/master_root/.claude/hooks/display-reminders.sh"
+          }
+        ]
+      }
     ],
     "Stop": [
     ],
@@ -29,14 +37,6 @@
       }
     ],
     "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo 'Session started: '$(date '+%Y-%m-%d %H:%M:%S')"
-          }
-        ]
-      }
     ],
     "PreCompact": [
       {

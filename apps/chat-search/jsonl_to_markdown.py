@@ -24,6 +24,8 @@ class JSONLToMarkdownConverter:
         include_tools: bool = True,
         max_response_length: Optional[int] = None,
         filter_content_type: Optional[str] = None,
+        compact_mode: bool = False,
+        compact_length: int = 1000,
     ) -> str:
         """
         Convert a single JSONL file to markdown
@@ -65,13 +67,21 @@ class JSONLToMarkdownConverter:
             messages = self._filter_messages(messages, filter_content_type)
 
         # Convert to markdown
-        markdown_content = self._convert_to_markdown(
-            messages,
-            input_path.name,
-            include_metadata,
-            include_tools,
-            max_response_length,
-        )
+        if compact_mode:
+            markdown_content = self._convert_to_compact_markdown(
+                messages,
+                input_path.name,
+                include_metadata,
+                compact_length,
+            )
+        else:
+            markdown_content = self._convert_to_markdown(
+                messages,
+                input_path.name,
+                include_metadata,
+                include_tools,
+                max_response_length,
+            )
 
         # Write markdown file
         with open(output_file, "w", encoding="utf-8") as f:
@@ -158,6 +168,321 @@ class JSONLToMarkdownConverter:
 
         return markdown
 
+    def _convert_to_compact_markdown(
+        self,
+        messages: List[Dict[str, Any]],
+        session_name: str,
+        include_metadata: bool,
+        compact_length: int,
+    ) -> str:
+        """Convert messages to compact markdown format optimized for agent consumption"""
+
+        # Count total interactions first
+        total_interactions = 0
+        temp_i = 0
+        while temp_i < len(messages):
+            temp_message = messages[temp_i]
+            temp_message_obj = temp_message.get("message", {})
+            temp_role = temp_message_obj.get("role", "")
+            temp_content = temp_message_obj.get("content", "")
+
+            if temp_role == "user":
+                # Check if this is actually a user message (not a tool result)
+                is_tool_result = False
+                if isinstance(temp_content, list):
+                    for item in temp_content:
+                        if isinstance(item, dict) and item.get("type") == "tool_result":
+                            is_tool_result = True
+                            break
+                if not is_tool_result:
+                    total_interactions += 1
+            temp_i += 1
+
+        # Header optimized for agent understanding
+        markdown = f"# AGENT BRIEFING: Session Analysis\n"
+        markdown += f"**Session ID**: `{messages[0].get('sessionId', 'unknown') if messages else 'unknown'}`\n"
+        markdown += (
+            f"**Interactions**: {total_interactions} user requests with responses\n"
+        )
+
+        # Session context for agent understanding
+        if messages and include_metadata:
+            first_msg = messages[0]
+            if "cwd" in first_msg:
+                markdown += f"**Working Directory**: `{first_msg['cwd']}`\n"
+            if "gitBranch" in first_msg:
+                markdown += f"**Git Branch**: `{first_msg['gitBranch']}`\n"
+            timestamp = first_msg.get("timestamp", "")
+            if timestamp:
+                try:
+                    dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+                    formatted_time = dt.strftime("%Y-%m-%d %H:%M:%S UTC")
+                    markdown += f"**Session Started**: {formatted_time}\n"
+                except Exception:
+                    markdown += f"**Session Started**: {timestamp}\n"
+
+        markdown += f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+        markdown += "\n# CONVERSATION FLOW\n\n"
+
+        # Process messages in compact mode
+        interaction_num = 0
+        i = 0
+        while i < len(messages):
+            message = messages[i]
+            message_obj = message.get("message", {})
+            role = message_obj.get("role", "")
+            content = message_obj.get("content", "")
+
+            # Skip tool results and other non-user messages
+            if role != "user":
+                i += 1
+                continue
+
+            # Check if this is actually a user message (not a tool result)
+            is_tool_result = False
+            if isinstance(content, list):
+                for item in content:
+                    if isinstance(item, dict) and item.get("type") == "tool_result":
+                        is_tool_result = True
+                        break
+
+            if is_tool_result:
+                i += 1
+                continue
+
+            interaction_num += 1
+
+            # Extract user content
+            user_content = ""
+            if isinstance(content, str):
+                user_content = content
+            elif isinstance(content, list):
+                for item in content:
+                    if isinstance(item, dict) and item.get("type") == "text":
+                        user_content += item.get("text", "")
+
+            # Look for the next assistant response
+            i += 1
+            assistant_content = ""
+            assistant_tools_used = []
+
+            while i < len(messages):
+                next_message = messages[i]
+                next_message_obj = next_message.get("message", {})
+                next_role = next_message_obj.get("role", "")
+                next_content = next_message_obj.get("content", "")
+
+                if next_role == "assistant":
+                    # Extract assistant response text
+                    if isinstance(next_content, str):
+                        assistant_content += next_content
+                    elif isinstance(next_content, list):
+                        for item in next_content:
+                            if isinstance(item, dict):
+                                if item.get("type") == "text":
+                                    assistant_content += item.get("text", "") + " "
+                                elif item.get("type") == "tool_use":
+                                    assistant_tools_used.append(
+                                        item.get("name", "unknown_tool")
+                                    )
+
+                    # If we have content, break and show it
+                    if assistant_content.strip():
+                        break
+
+                i += 1
+
+            # Compact format - everything on fewer lines
+            tools_info = (
+                f" [Tools: {', '.join(assistant_tools_used)}]"
+                if assistant_tools_used
+                else ""
+            )
+
+            markdown += (
+                f"## {interaction_num}/{total_interactions}. USER: {user_content}\n"
+            )
+
+            if assistant_content.strip():
+                response_text = (
+                    assistant_content[:compact_length].strip() + "..."
+                    if len(assistant_content) > compact_length
+                    else assistant_content.strip()
+                )
+                markdown += f"ASSISTANT{tools_info}: {response_text}\n"
+            else:
+                markdown += f"ASSISTANT{tools_info}: *(No text response found)*\n"
+
+            # Add separator only between interactions
+            if interaction_num < total_interactions:
+                markdown += "\n"
+
+            i += 1
+
+        # Analyze session for handoff elements
+        all_tools_used = set()
+        files_accessed = set()
+        last_user_request = ""
+        session_start = None
+        session_end = None
+        total_input_tokens = 0
+        total_output_tokens = 0
+        models_used = set()
+        tool_success_count = 0
+        tool_failure_count = 0
+        interrupted_responses = 0
+        cache_hits = 0
+
+        # Extract additional context
+        for msg in messages:
+            timestamp = msg.get("timestamp", "")
+            if timestamp:
+                try:
+                    dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+                    if session_start is None or dt < session_start:
+                        session_start = dt
+                    if session_end is None or dt > session_end:
+                        session_end = dt
+                except:
+                    pass
+
+            msg_obj = msg.get("message", {})
+            content = msg_obj.get("content", "")
+            role = msg_obj.get("role", "")
+
+            # Extract performance metrics
+            usage = msg_obj.get("usage", {})
+            if usage:
+                total_input_tokens += usage.get("input_tokens", 0)
+                total_output_tokens += usage.get("output_tokens", 0)
+                if usage.get("cache_read_input_tokens", 0) > 0:
+                    cache_hits += 1
+
+            # Track model usage
+            model = msg_obj.get("model", "")
+            if model:
+                models_used.add(model)
+
+            # Track stop reasons for interruptions
+            stop_reason = msg_obj.get("stop_reason")
+            if stop_reason and stop_reason != "end_turn":
+                interrupted_responses += 1
+
+            # Track last real user request
+            if (
+                role == "user"
+                and isinstance(content, str)
+                and not any(
+                    isinstance(item, dict) and item.get("type") == "tool_result"
+                    for item in (content if isinstance(content, list) else [])
+                )
+            ):
+                last_user_request = (
+                    content[:200] + "..." if len(content) > 200 else content
+                )
+
+            # Track tool results for success/failure analysis
+            tool_use_result = msg.get("toolUseResult")
+            if tool_use_result:
+                # Simple heuristic: if result contains error indicators, count as failure
+                result_str = str(tool_use_result).lower()
+                if any(
+                    word in result_str
+                    for word in ["error", "failed", "exception", "not found"]
+                ):
+                    tool_failure_count += 1
+                else:
+                    tool_success_count += 1
+
+            # Extract tools and files
+            if isinstance(content, list):
+                for item in content:
+                    if isinstance(item, dict):
+                        if item.get("type") == "tool_use":
+                            tool_name = item.get("name", "")
+                            all_tools_used.add(tool_name)
+
+                            # Extract file paths from common tools
+                            tool_input = item.get("input", {})
+                            if "file_path" in tool_input:
+                                files_accessed.add(tool_input["file_path"])
+                            elif "input" in tool_input and isinstance(
+                                tool_input["input"], str
+                            ):
+                                # Try to find file paths in input strings
+                                import re
+
+                                file_matches = re.findall(
+                                    r"[/\w\.-]+\.[a-zA-Z]{1,4}", tool_input["input"]
+                                )
+                                for match in file_matches:
+                                    if "/" in match:
+                                        files_accessed.add(match)
+
+        # Calculate duration
+        duration_str = "Unknown"
+        if session_start and session_end:
+            duration = session_end - session_start
+            hours = int(duration.total_seconds() // 3600)
+            minutes = int((duration.total_seconds() % 3600) // 60)
+            if hours > 0:
+                duration_str = f"{hours}h {minutes}m"
+            else:
+                duration_str = f"{minutes}m"
+
+        # Calculate token efficiency
+        total_tools = tool_success_count + tool_failure_count
+        tool_success_rate = (
+            (tool_success_count / total_tools * 100) if total_tools > 0 else 0
+        )
+
+        # Add enhanced summary section
+        markdown += f"\n# AGENT HANDOFF ANALYSIS\n"
+        markdown += f"**Session Duration**: {duration_str} ({total_interactions} interactions)\n"
+        markdown += f"**Last User Request**: {last_user_request}\n"
+
+        # Performance metrics
+        if total_input_tokens > 0 or total_output_tokens > 0:
+            markdown += f"\n**Performance Metrics**:\n"
+            markdown += f"- **Token Usage**: {total_input_tokens:,} input + {total_output_tokens:,} output = {total_input_tokens + total_output_tokens:,} total\n"
+            if cache_hits > 0:
+                markdown += f"- **Cache Efficiency**: {cache_hits} cache hits\n"
+            if interrupted_responses > 0:
+                markdown += f"- **Interrupted Responses**: {interrupted_responses}\n"
+
+        # Model tracking
+        if models_used:
+            markdown += f"**Models Used**: {', '.join(sorted(models_used))}\n"
+
+        # Tool analysis
+        if all_tools_used:
+            markdown += f"**Tools Used**: {', '.join(sorted(all_tools_used))}\n"
+            if total_tools > 0:
+                markdown += f"**Tool Success Rate**: {tool_success_rate:.1f}% ({tool_success_count}/{total_tools})\n"
+
+        # File access
+        if files_accessed:
+            markdown += f"**Files Accessed**: {len(files_accessed)} files\n"
+            # Show first few files as examples
+            file_list = sorted(files_accessed)[:5]
+            for f in file_list:
+                markdown += f"  - {f}\n"
+            if len(files_accessed) > 5:
+                markdown += f"  - ... and {len(files_accessed) - 5} more\n"
+
+        markdown += f"\n**Context for Continuation**:\n"
+        markdown += f"- This session contains {total_interactions} user-assistant interactions\n"
+        markdown += (
+            f"- Tool calls, tool results, and system messages filtered for clarity\n"
+        )
+        markdown += f"- Each response truncated to {compact_length} characters\n"
+        markdown += f"- Review final interactions for current task state\n"
+
+        if interrupted_responses > 0:
+            markdown += f"- **Note**: {interrupted_responses} responses were interrupted - check for incomplete tasks\n"
+
+        return markdown
+
     def _format_message(
         self,
         message: Dict[str, Any],
@@ -184,8 +509,18 @@ class JSONLToMarkdownConverter:
         content = message_obj.get("content", "")
         timestamp = message.get("timestamp", "")
 
+        # Detect tool result messages (they have "user" role but contain tool_use_id)
+        is_tool_result = False
+        if role == "user" and isinstance(content, list):
+            for item in content:
+                if isinstance(item, dict) and item.get("type") == "tool_result":
+                    is_tool_result = True
+                    break
+
         # Message header
-        if role == "user":
+        if is_tool_result:
+            header = f"## {message_num}. Tool Result"
+        elif role == "user":
             header = f"## {message_num}. User Message"
         elif role == "assistant":
             header = f"## {message_num}. Assistant Response"
@@ -267,8 +602,14 @@ class JSONLToMarkdownConverter:
                 elif item_type == "tool_result" and include_tools:
                     tool_result = item.get("content", "")
                     is_error = item.get("is_error", False)
+                    tool_use_id = item.get("tool_use_id", "")
 
-                    markdown += f"**Tool Result** {'(Error)' if is_error else ''}:\n"
+                    if tool_use_id:
+                        markdown += f"**Tool Result** {'(Error)' if is_error else ''} for `{tool_use_id}`:\n"
+                    else:
+                        markdown += (
+                            f"**Tool Result** {'(Error)' if is_error else ''}:\n"
+                        )
 
                     # Try to format as JSON if it looks like JSON
                     if isinstance(tool_result, str) and tool_result.strip().startswith(
@@ -366,6 +707,9 @@ Examples:
 
   # Convert only user messages
   python jsonl_to_markdown.py session_123.jsonl --filter user
+
+  # Compact mode - user requests and response previews only
+  python jsonl_to_markdown.py session_123.jsonl --compact --compact-length 200
         """,
     )
 
@@ -394,6 +738,17 @@ Examples:
         "--filter",
         choices=["user", "assistant", "tools"],
         help="Only include specific content types",
+    )
+    parser.add_argument(
+        "--compact",
+        action="store_true",
+        help="Compact mode: show only user messages and first part of assistant responses",
+    )
+    parser.add_argument(
+        "--compact-length",
+        type=int,
+        default=1000,
+        help="Number of characters to show from assistant responses in compact mode (default: 1000)",
     )
 
     args = parser.parse_args()
@@ -432,6 +787,8 @@ Examples:
                 include_tools=not args.no_tools,
                 max_response_length=args.max_length,
                 filter_content_type=args.filter,
+                compact_mode=args.compact,
+                compact_length=args.compact_length,
             )
 
             print(f"Converted: {args.input} -> {output_file}")

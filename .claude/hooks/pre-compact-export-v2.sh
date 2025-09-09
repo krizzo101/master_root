@@ -19,7 +19,8 @@ INPUT=$(cat)
 # Try to get transcript path from environment or input
 TRANSCRIPT_PATH="${TRANSCRIPT_PATH:-}"
 if [ -z "$TRANSCRIPT_PATH" ] && command -v jq >/dev/null 2>&1; then
-    TRANSCRIPT_PATH=$(echo "$INPUT" | jq -r '.transcriptPath // empty' 2>/dev/null)
+    # Try both possible field names
+    TRANSCRIPT_PATH=$(echo "$INPUT" | jq -r '.transcript_path // .transcriptPath // empty' 2>/dev/null)
 fi
 
 # Create header

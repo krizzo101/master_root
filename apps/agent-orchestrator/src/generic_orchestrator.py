@@ -357,13 +357,15 @@ class GenericOrchestrator:
 
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Create workflow-specific subdirectories only if using isolated structure
+        # Always create essential workflow directories (not just for isolated workflows)
+        (self.output_dir / "metadata").mkdir(exist_ok=True)
+        (self.output_dir / "agents").mkdir(exist_ok=True)
+        (self.output_dir / "deliverables").mkdir(exist_ok=True)
+        (self.output_dir / "checkpoints").mkdir(exist_ok=True)
+
+        # Create workflow-specific subdirectories if using isolated structure
         if self.use_isolated_workflow:
-            (self.output_dir / "metadata").mkdir(exist_ok=True)
             (self.output_dir / "orchestrator.log").touch()
-            (self.output_dir / "agents").mkdir(exist_ok=True)
-            (self.output_dir / "deliverables").mkdir(exist_ok=True)
-            (self.output_dir / "checkpoints").mkdir(exist_ok=True)
 
         # Store all parameters including existing ones
         self.use_optimizations = use_optimizations

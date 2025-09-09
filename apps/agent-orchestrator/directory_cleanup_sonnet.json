@@ -1,0 +1,44 @@
+{
+  "workflow_name": "Agent Orchestrator Directory Cleanup - Sonnet",
+  "description": "Comprehensive cleanup using Sonnet agents for efficiency",
+  "max_parallel": 8,
+  "model": "claude-3-5-sonnet-20241022",
+  "tasks": [
+    {
+      "task_id": "directory_structure_analysis",
+      "task_type": "code-analyzer",
+      "model": "claude-3-5-sonnet-20241022",
+      "prompt": "Analyze the complete directory structure of /home/opsvi/master_root/apps/agent-orchestrator to understand the current state and identify organizational issues.\n\nANALYSIS SCOPE:\n1. **Catalog all files and directories** - Create comprehensive inventory\n2. **Identify file types and purposes** - Code, configs, docs, outputs, tests, etc.\n3. **Detect patterns** - Naming conventions, directory structures, file relationships\n4. **Flag potential issues** - Duplicates, temp files, abandoned experiments, mixed purposes\n5. **Assess legitimacy** - Core app files vs experimental/obsolete content\n\nFOCUS AREAS:\n- Core orchestrator system files (src/, README.md, main scripts)\n- Configuration files and templates\n- Output directories and their contents (especially old workflow outputs)\n- Experimental or development files\n- Documentation and reference materials\n- Test files and validation scripts\n\nDELIVERABLE: Complete directory inventory with categorization of each file/directory by purpose, legitimacy, and recommended action (keep, archive, delete, reorganize).",
+      "dependencies": [],
+      "context": {
+        "analysis_type": "inventory",
+        "target_directory": "/home/opsvi/master_root/apps/agent-orchestrator",
+        "focus_areas": ["file_classification", "legitimacy_assessment", "organization_analysis"]
+      }
+    },
+    {
+      "task_id": "cleanup_execution_plan",
+      "task_type": "development-specialist",
+      "model": "claude-3-5-sonnet-20241022",
+      "prompt": "Create a comprehensive cleanup execution plan for the agent-orchestrator directory.\n\nBASED ON ANALYSIS: Use the directory structure analysis to create actionable cleanup plan.\n\nCLEANUP STRATEGY:\n1. **Archive Old Outputs**:\n   - Move old workflow outputs to archive directory\n   - Preserve recent (last 7 days) outputs\n   - Compress archived content\n\n2. **Remove Obsolete Files**:\n   - Delete temporary files\n   - Remove abandoned experiments\n   - Clean up duplicate files\n\n3. **Reorganize Structure**:\n   - Move misplaced files to correct locations\n   - Create proper directory structure\n   - Consolidate related files\n\n4. **Safety Measures**:\n   - Create backup before cleanup\n   - Log all actions taken\n   - Provide rollback capability\n\nEXECUTION STEPS:\n- Generate cleanup script\n- Create archive structure\n- Build safety checks\n- Provide dry-run option\n\nDELIVERABLE: Executable cleanup script with safety measures and clear documentation of what will be cleaned.",
+      "dependencies": ["directory_structure_analysis"],
+      "context": {
+        "analysis_type": "cleanup_plan",
+        "safety_first": true,
+        "preserve_recent": true
+      }
+    },
+    {
+      "task_id": "execute_cleanup",
+      "task_type": "development-specialist",
+      "model": "claude-3-5-sonnet-20241022",
+      "prompt": "Execute the cleanup plan for the agent-orchestrator directory with careful safety measures.\n\nBASED ON CLEANUP PLAN: Implement the cleanup strategy developed.\n\nEXECUTION REQUIREMENTS:\n1. **Safety First**:\n   - Create timestamped backup\n   - Test cleanup script in dry-run mode\n   - Log all actions\n\n2. **Archive Old Outputs**:\n   - Create /archive directory\n   - Move outputs older than 7 days\n   - Compress archives\n\n3. **Clean Obsolete Content**:\n   - Remove identified obsolete files\n   - Clean temporary directories\n   - Remove duplicate files\n\n4. **Final Verification**:\n   - Verify core functionality intact\n   - Test orchestrator still works\n   - Document changes made\n\nDELIVERABLE: Cleaned agent-orchestrator directory with comprehensive log of changes and verification that core functionality remains intact.",
+      "dependencies": ["cleanup_execution_plan"],
+      "context": {
+        "execution_mode": "safe",
+        "backup_required": true,
+        "verification_needed": true
+      }
+    }
+  ]
+}

@@ -5,18 +5,20 @@ This document provides comprehensive API reference documentation for the Agent O
 ## Table of Contents
 
 1. [API Overview](#api-overview)
-2. [HTTP/REST API](#httprest-api)
-3. [WebSocket API](#websocket-api)
-4. [Python API](#python-api)
-5. [Command Line Interface](#command-line-interface)
-6. [Configuration API](#configuration-api)
-7. [Error Handling](#error-handling)
-8. [Examples](#examples)
+2. [DPO (Development Process Orchestrator) API](#dpo-development-process-orchestrator-api)
+3. [HTTP/REST API](#httprest-api)
+4. [WebSocket API](#websocket-api)
+5. [Python API](#python-api)
+6. [Command Line Interface](#command-line-interface)
+7. [Configuration API](#configuration-api)
+8. [Error Handling](#error-handling)
+9. [Examples](#examples)
 
 ## API Overview
 
 The Agent Orchestrator system provides multiple API layers:
 
+- **DPO API**: Advanced development process orchestration with AI-powered intelligence
 - **HTTP/REST API**: Web-based endpoints for dashboard integration and remote management
 - **WebSocket API**: Real-time communication for live monitoring and updates
 - **Python API**: Core library classes and functions for direct integration
@@ -32,6 +34,139 @@ The system follows several key architectural patterns:
 - **Factory Pattern**: Dynamic orchestrator and provider creation
 - **Strategy Pattern**: Multiple execution modes and optimization strategies
 - **Circuit Breaker**: Fault tolerance and error recovery
+- **Intelligence Enhancement**: AI-powered request analysis and optimization
+
+## DPO (Development Process Orchestrator) API
+
+The DPO system provides advanced development process orchestration with AI-powered intelligence enhancement. It coordinates specialist agents to analyze, enhance, and execute development requests using SDLC templates and context injection.
+
+### DevelopmentProcessOrchestrator
+
+**Description**: Main controller for DPO system that coordinates intelligence, templates, and orchestration
+
+```python
+from src.dpo_main_controller import (
+    DevelopmentProcessOrchestrator,
+    DPOConfiguration,
+    RequestType
+)
+
+# Initialize DPO
+config = DPOConfiguration(
+    intelligence_level="enhanced",
+    sdlc_template="enterprise",
+    output_directory="./dpo_outputs",
+    max_parallel_agents=10
+)
+
+dpo = DevelopmentProcessOrchestrator(config)
+
+# Process development request
+result = await dpo.process_request(
+    request="Add user authentication with OAuth2",
+    request_type=RequestType.FEATURE,
+    context={
+        "project_type": "web_api",
+        "framework": "fastapi",
+        "database": "postgresql"
+    }
+)
+
+# Check status
+status = await dpo.get_workflow_status(result.workflow_id)
+print(f"Status: {status.current_stage}, Progress: {status.progress_percentage}%")
+
+# Get results
+if status.is_complete:
+    final_result = await dpo.get_workflow_results(result.workflow_id)
+    print(f"Generated files: {len(final_result.deliverables)}")
+```
+
+### EnhancementIntelligenceEngine
+
+**Description**: AI-powered intelligence engine for enhancing development requests
+
+```python
+from src.intelligence_review_engine_enhanced import EnhancementIntelligenceEngine
+
+# Initialize intelligence engine
+engine = EnhancementIntelligenceEngine(
+    specialist_agents=[
+        "performance-optimizer",
+        "security-architect",
+        "api-integration-specialist"
+    ]
+)
+
+# Enhance basic request
+enhanced_request = await engine.enhance_request(
+    original_request="Add login page",
+    context={"tech_stack": "react", "backend": "nodejs"}
+)
+
+print(f"Enhanced opportunities: {len(enhanced_request.enhancement_categories)}")
+for category in enhanced_request.enhancement_categories:
+    print(f"- {category.name}: {len(category.opportunities)} opportunities")
+```
+
+### SDLCTemplateSystem
+
+**Description**: Template system for SDLC workflow generation
+
+```python
+from src.sdlc_template_system import SDLCTemplateSystem
+
+# Initialize template system
+template_system = SDLCTemplateSystem()
+
+# Generate workflow from template
+workflow = await template_system.generate_workflow(
+    template_name="enterprise-development",
+    request_context={
+        "complexity": "high",
+        "team_size": "large",
+        "timeline": "3_months"
+    }
+)
+
+print(f"Generated {len(workflow.phases)} SDLC phases")
+for phase in workflow.phases:
+    print(f"- {phase.name}: {len(phase.tasks)} tasks")
+```
+
+### ContextInjectionSystem
+
+**Description**: Dynamic context management for AI agents
+
+```python
+from src.context_injection import ContextInjectionSystem, get_context_system
+
+# Get global context system
+context_system = get_context_system()
+
+# Inject project context
+context_system.inject_context(
+    "project_metadata",
+    {
+        "name": "MyApp",
+        "version": "2.1.0",
+        "dependencies": ["fastapi", "sqlalchemy", "redis"]
+    }
+)
+
+# Inject file context
+context_system.inject_file_context(
+    "/app/models.py",
+    include_content=True,
+    analysis_depth="comprehensive"
+)
+
+# Get enriched context for agent
+enriched_context = await context_system.get_enriched_context(
+    agent_type="development-specialist",
+    task_type="code_generation"
+)
+```
 
 ## HTTP/REST API
 
@@ -40,6 +175,8 @@ The system follows several key architectural patterns:
 - **Development**: `http://localhost:8765`
 - **Production**: `http://0.0.0.0:8765` (configurable)
 - **Health Check**: Port 8766 (configurable)
+- **Management API**: `http://localhost:8888`
+- **DPO API Server**: Port 8080 (configurable)
 
 ### Authentication
 
@@ -77,6 +214,7 @@ curl http://localhost:8765/
   "total_tasks": 15,
   "completed_tasks": 8,
   "failed_tasks": 1,
+  "dpo_requests_processing": 2,
   "uptime_seconds": 3600,
   "last_updated": "2025-09-08T15:00:00Z"
 }
@@ -100,7 +238,9 @@ curl http://localhost:8765/api/summary
   "requests_per_second": 15.7,
   "average_response_time": 0.85,
   "error_rate": 0.02,
-  "websocket_connections": 5
+  "websocket_connections": 5,
+  "dpo_intelligence_requests": 3,
+  "agent_pool_utilization": 0.7
 }
 ```
 
@@ -143,6 +283,27 @@ curl http://localhost:8765/api/summary
     }
   ],
   "total_active": 5
+}
+```
+
+#### GET /api/dpo-workflows
+
+**Description**: List all DPO workflows
+
+**Response**:
+```json
+{
+  "workflows": [
+    {
+      "workflow_id": "dpo_wf_12345",
+      "request_type": "feature",
+      "current_stage": "intelligence_enhancement",
+      "progress_percentage": 65,
+      "enhancements_found": 8,
+      "estimated_completion": "2025-09-08T16:00:00Z"
+    }
+  ],
+  "total_active": 2
 }
 ```
 
@@ -251,11 +412,36 @@ curl http://localhost:8765/api/summary
 
 ## WebSocket API
 
-### Connection
+### Dashboard WebSocket (Port 8765)
 
 **Endpoint**: `ws://localhost:8765/ws`
 
 **Protocol**: Standard WebSocket with JSON message format
+
+### Message Bus WebSocket Gateway (Port 8767)
+
+**Endpoint**: `ws://localhost:8767/gateway`
+
+**Protocol**: Agent-to-agent communication gateway
+
+```python
+from src.message_bus.gateway.websocket_gateway import WebSocketGateway
+from src.message_bus.core.message_bus import MessageBus
+
+# Initialize message bus and gateway
+message_bus = MessageBus()
+gateway = WebSocketGateway(
+    message_bus=message_bus,
+    host="localhost",
+    port=8767,
+    max_connections=1000
+)
+
+# Start gateway
+await gateway.start()
+```
+
+### Connection
 
 ### Message Types
 
@@ -267,6 +453,41 @@ curl http://localhost:8765/api/summary
     "cpu_usage": 45.2,
     "memory_usage": 512.3,
     "active_tasks": 5,
+    "active_workflows": 3,
+    "dpo_requests_processing": 2,
+    "websocket_connections": 12,
+    "timestamp": "2025-09-08T15:00:00Z"
+  }
+}
+```
+
+#### DPO Workflow Updates
+```json
+{
+  "type": "dpo_workflow_update",
+  "data": {
+    "workflow_id": "dpo_wf_12345",
+    "stage": "intelligence_enhancement",
+    "progress": 65,
+    "current_agent": "security-architect",
+    "enhancements_found": 8,
+    "timestamp": "2025-09-08T15:00:00Z"
+  }
+}
+```
+
+#### Agent Communication (Message Bus)
+```json
+{
+  "type": "agent_message",
+  "data": {
+    "from_agent": "agent_001",
+    "to_agent": "agent_002",
+    "message_type": "task_delegation",
+    "payload": {
+      "task_id": "subtask_123",
+      "requirements": "Generate API documentation"
+    },
     "timestamp": "2025-09-08T15:00:00Z"
   }
 }
@@ -511,6 +732,62 @@ provider = OpenAIProvider(
 response = await provider.execute_task(task)
 ```
 
+### Module System
+
+#### ModuleRegistry and OrchestratorModule
+
+**Description**: Modular feature loading system for unified orchestrator
+
+```python
+from src.unified.orchestrator_module import (
+    ModuleRegistry,
+    OrchestratorModule,
+    ModuleConfig
+)
+
+# Create module registry
+registry = ModuleRegistry()
+
+# Register modules
+registry.register("quality_gates", QualityGatesModule())
+registry.register("monitoring", MonitoringModule())
+registry.register("collaboration", CollaborationModule())
+
+# Load modules with config
+config = ModuleConfig(
+    enabled=True,
+    priority=10,
+    settings={"timeout": 300}
+)
+await registry.load_module("quality_gates", config)
+
+# Get loaded modules
+loaded = registry.get_loaded_modules()
+available = registry.get_available_modules()
+```
+
+#### Quality Gates Module
+
+```python
+from src.quality_gates import QualityGateManager, GateStatus, ValidationResult
+
+# Initialize quality gate manager
+manager = QualityGateManager(output_dir=Path("./outputs"))
+
+# Register quality gates
+manager.register_gate("security_check", security_validator)
+manager.register_gate("performance_review", performance_validator)
+
+# Check gate status
+status = await manager.check_quality_gates("security_check")
+if status == GateStatus.PASSED:
+    print("Security check passed")
+
+# Validate deliverable
+result = await manager.validate_deliverable("task_001", deliverable_data)
+print(f"Valid: {result.is_valid}, Message: {result.message}")
+```
+
 ### Exception Handling
 
 ```python
@@ -529,9 +806,77 @@ except TokenPoolError as e:
     print(f"Token pool exhausted: {e}")
 except DependencyError as e:
     print(f"Dependency error: {e}")
+except RuntimeError as e:
+    # TokenPool raises RuntimeError for catastrophic failures
+    print(f"Critical token failure: {e}")
 ```
 
 ## Command Line Interface
+
+### DPO CLI (dpo_cli.py)
+
+**Description**: Comprehensive CLI for the Development Process Orchestrator system
+
+#### Available Commands
+
+```bash
+# Process a development request
+dpo build --request "Add user authentication" \
+  --type feature \
+  --context-file project.json \
+  --output-dir ./outputs
+
+# Check workflow status
+dpo status --workflow-id wf_12345
+dpo status --all  # List all workflows
+
+# Get workflow results
+dpo results --workflow-id wf_12345 --format json
+dpo results --workflow-id wf_12345 --format yaml
+
+# List workflows with filtering
+dpo list --status running
+dpo list --type feature --limit 10
+
+# Cancel running workflow
+dpo cancel --workflow-id wf_12345
+
+# Configuration management
+dpo configure --set intelligence_level=enhanced
+dpo configure --list  # Show current config
+dpo configure --reset  # Reset to defaults
+
+# Template management
+dpo templates list
+dpo templates create --name custom-template --file template.json
+dpo templates validate --file template.json
+
+# System metrics and monitoring
+dpo metrics --live  # Real-time metrics
+dpo metrics --export --format json
+
+# Start DPO API server
+dpo server --host 0.0.0.0 --port 8080 --config production
+```
+
+#### Command Parameters
+
+| Command | Parameter | Type | Description |
+|---------|-----------|------|-------------|
+| `build` | `--request` | string | Development request description |
+| `build` | `--type` | string | Request type (feature/bugfix/refactor/analysis) |
+| `build` | `--context-file` | string | JSON file with project context |
+| `build` | `--intelligence-level` | string | Intelligence level (basic/standard/enhanced) |
+| `build` | `--priority` | string | Priority level (low/medium/high/critical) |
+| `status` | `--workflow-id` | string | Specific workflow ID |
+| `status` | `--all` | flag | Show all workflows |
+| `results` | `--format` | string | Output format (json/yaml/text) |
+| `list` | `--status` | string | Filter by status |
+| `list` | `--type` | string | Filter by request type |
+| `list` | `--limit` | int | Maximum results |
+| `server` | `--host` | string | Server host |
+| `server` | `--port` | int | Server port |
+| `server` | `--config` | string | Configuration profile |
 
 ### Main CLI (main.py)
 
@@ -583,15 +928,20 @@ python run_orchestrator_task.py \
   --output-dir /custom/docs/path
 ```
 
-#### System Analysis Workflow
-```bash
-# Comprehensive system analysis
-python run_system_analysis.py --target /path/to/analyze
+#### System Analysis CLI (run_system_analysis.py)
 
-# Analysis with specific focus
-python run_system_analysis.py \
-  --target /path/to/analyze \
-  --focus security,performance
+```bash
+# Run comprehensive system analysis
+python run_system_analysis.py
+# Automatically loads from system_analysis_tasks.json
+# Creates timestamped output directory
+# Supports parallel agent execution based on task configuration
+
+# The script:
+# - Loads task definitions with multi-agent support
+# - Creates UnifiedOrchestrator with advanced features
+# - Executes parallel analysis agents
+# - Generates comprehensive reports
 ```
 
 #### Checkpoint Management
@@ -623,6 +973,8 @@ python run_orchestrator_task.py --clean-checkpoints --older-than 7
 
 ### Production Dashboard CLI (production_dashboard.py)
 
+**Description**: Enterprise-ready dashboard deployment with health checks, auto-restart, and production logging
+
 ```bash
 # Start with default config
 python production_dashboard.py
@@ -638,6 +990,28 @@ python production_dashboard.py \
 
 # Environment variable overrides
 DASHBOARD_HOST=0.0.0.0 DASHBOARD_PORT=8080 python production_dashboard.py
+
+# The production dashboard includes:
+# - Graceful shutdown handling
+# - Health check endpoint on separate port
+# - Log rotation with configurable size/count
+# - WebSocket connection management
+# - Automatic workflow detection
+```
+
+### Management API CLI (orchestrator_api.py)
+
+```bash
+# Start the Management API server
+python orchestrator_api.py
+# Starts on http://localhost:8888
+
+# The API provides:
+# - Real-time orchestrator status monitoring
+# - Dynamic task injection
+# - Dependency updates
+# - Force continuation triggers
+# - CORS support for web integration
 ```
 
 ### GPT-5 Payload CLI (tools/payload_cli.py)
@@ -781,6 +1155,9 @@ python tools/size_reporter.py \
 | `DASHBOARD_MAX_CONNECTIONS` | Max connections | `100` |
 | `ORCHESTRATOR_OUTPUT_DIR` | Default output directory | `./outputs` |
 | `ORCHESTRATOR_MAX_PARALLEL` | Default max parallel | `5` |
+| `CLAUDE_CODE_TOKEN` | Single API token fallback | None |
+| `CLAUDE_CODE_TOKENS` | Comma-separated API tokens | None |
+| `OPENAI_API_KEY` | OpenAI API key for provider | None |
 
 ## Error Handling
 
@@ -829,6 +1206,70 @@ class DependencyError(OrchestratorError):
 
 class ValidationError(OrchestratorError):
     """Configuration validation issues"""
+```
+
+## Additional APIs
+
+### Monitoring and Metrics
+
+#### MetricsCollector
+
+```python
+from src.monitoring.metrics_collector import MetricsCollector, get_global_collector
+
+# Get global collector instance
+collector = get_global_collector()
+
+# Update metrics
+collector.update_workflow_metrics({
+    "workflow_id": "wf_123",
+    "tasks_completed": 10,
+    "tasks_failed": 1
+})
+
+# Get current metrics
+metrics = collector.get_current_metrics()
+workflow_metrics = collector.get_workflow_metrics("wf_123")
+```
+
+#### DashboardServer
+
+```python
+from src.monitoring.dashboard_server import DashboardServer
+
+# Create dashboard server
+server = DashboardServer(
+    host="localhost",
+    port=8765,
+    collector=metrics_collector,
+    static_dir="web"
+)
+
+# The server provides:
+# - WebSocket connections at /ws
+# - API endpoints at /api/*
+# - Static file serving
+# - Health checks at /health
+```
+
+### Collaboration System
+
+```python
+from src.collaboration.collaboration_orchestrator import CollaborationOrchestrator
+from src.collaboration.workspace_manager import WorkspaceManager
+
+# Initialize collaboration
+workspace = WorkspaceManager(base_path=Path("./workspaces"))
+orchestrator = CollaborationOrchestrator(
+    workspace_manager=workspace,
+    max_team_size=5
+)
+
+# Create team workspace
+team_workspace = await workspace.create_workspace("team-001")
+
+# Sync workspaces
+await workspace.sync_workspaces(["team-001", "team-002"])
 ```
 
 ## Examples
@@ -1012,4 +1453,55 @@ class WorkflowMonitor {
 const monitor = new WorkflowMonitor();
 ```
 
+## API Versioning and Stability
+
+### Stable APIs
+- GenericOrchestrator core methods
+- AgentTask data class
+- TokenPool interface
+- Dashboard HTTP/WebSocket APIs
+- CLI interfaces
+
+### Experimental APIs
+- UnifiedOrchestrator (subject to change)
+- CollaborationOrchestrator (in development)
+- Background job execution
+- Dynamic MCP configuration
+
+### Deprecated APIs
+- Single token environment variable fallback (use TokenPool)
+- Legacy task format without project organization fields
+
+## Error Codes and Troubleshooting
+
+### Common Error Codes
+
+| Code | Description | Solution |
+|------|-------------|----------|
+| TOKEN_EXHAUSTED | No tokens available in pool | Add more tokens or reduce parallelism |
+| DEPENDENCY_CYCLE | Circular dependency detected | Review task dependencies |
+| GATE_TIMEOUT | Quality gate validation timeout | Increase gate_timeout or optimize validators |
+| MCP_INIT_FAILED | MCP server initialization failed | Check MCP configuration and server availability |
+| WORKSPACE_CONFLICT | Workspace sync conflict | Resolve conflicts manually or use force sync |
+
+### Debugging
+
+```python
+# Enable debug logging
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Check orchestrator state
+print(orchestrator.audit_log)
+print(orchestrator.file_operations)
+print(orchestrator.peak_memory)
+
+# Monitor token pool
+print(f"Available tokens: {orchestrator.token_pool.available}")
+print(f"Total tokens: {orchestrator.token_pool.size()}")
+```
+
 This API reference provides comprehensive documentation for all public interfaces of the Agent Orchestrator system. For additional examples and advanced usage patterns, refer to the project's example files and test suite.
+
+**Last Updated**: Based on codebase analysis performed on 2025-09-09
+**Version**: Reflects current implementation in /home/opsvi/master_root/apps/agent-orchestrator

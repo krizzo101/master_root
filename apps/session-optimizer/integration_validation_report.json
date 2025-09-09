@@ -1,0 +1,71 @@
+{
+  "test_timestamp": "2025-09-09 00:41:56",
+  "test_summary": {
+    "session_87d77601_analytics_success": true,
+    "session_47b30416_analytics_success": true,
+    "session_87d77601_gpt5_success": true,
+    "session_47b30416_gpt5_success": true,
+    "cli_tools_tested": {
+      "payload_cli": true,
+      "size_reporter": false
+    }
+  },
+  "phase1_expected_results": {
+    "compression_ratio_range": {
+      "min": 2.23,
+      "max": 3.14
+    }
+  },
+  "actual_results": {
+    "session_87d77601": {
+      "analytics": {
+        "success": true,
+        "session_name": "87d77601 (293K tokens)",
+        "session_id": "87d77601-6cec-4852-bc5e-e6a0306d3c88",
+        "total_messages": 455,
+        "total_tool_calls": 157,
+        "file_operations_count": 22,
+        "optimization_score": 75.0,
+        "complexity_rating": "Very High",
+        "analysis_time_seconds": 0.022531747817993164
+      },
+      "gpt5_optimization": {
+        "success": true,
+        "session_name": "87d77601",
+        "compression_ratio": 1.4685120837074923,
+        "original_tokens": 37613,
+        "optimized_tokens": 25613,
+        "chunks_created": 2,
+        "processing_time": 0.07007145881652832
+      }
+    },
+    "session_47b30416": {
+      "analytics": {
+        "success": true,
+        "session_name": "47b30416 (4.5M tokens)",
+        "session_id": "47b30416-32c6-438d-b905-2d71442efb4b",
+        "total_messages": 580,
+        "total_tool_calls": 240,
+        "file_operations_count": 59,
+        "optimization_score": 75.0,
+        "complexity_rating": "Very High",
+        "analysis_time_seconds": 0.1681962013244629
+      },
+      "gpt5_optimization": {
+        "success": true,
+        "session_name": "47b30416",
+        "compression_ratio": 2.0017554125219426,
+        "original_tokens": 20526,
+        "optimized_tokens": 10254,
+        "chunks_created": 1,
+        "processing_time": 0.26918482780456543
+      }
+    }
+  },
+  "validation_status": {
+    "sessionanalytics_functional": true,
+    "gpt5_payload_functional": true,
+    "compression_ratios_in_range": false,
+    "cli_tools_functional": true
+  }
+}

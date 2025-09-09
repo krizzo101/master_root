@@ -1,0 +1,95 @@
+{
+  "workflow_name": "Agent Orchestrator Directory Cleanup",
+  "description": "Comprehensive analysis and cleanup of agent-orchestrator directory to identify legitimate app files vs obsolete/misplaced content",
+  "max_parallel": 8,
+  "tasks": [
+    {
+      "task_id": "directory_structure_analysis",
+      "task_type": "code-analyzer",
+      "prompt": "Analyze the complete directory structure of /home/opsvi/master_root/apps/agent-orchestrator to understand the current state and identify organizational issues.\n\nANALYSIS SCOPE:\n1. **Catalog all files and directories** - Create comprehensive inventory\n2. **Identify file types and purposes** - Code, configs, docs, outputs, tests, etc.\n3. **Detect patterns** - Naming conventions, directory structures, file relationships\n4. **Flag potential issues** - Duplicates, temp files, abandoned experiments, mixed purposes\n5. **Assess legitimacy** - Core app files vs experimental/obsolete content\n\nFOCUS AREAS:\n- Core orchestrator system files (src/, README.md, main scripts)\n- Configuration files and templates\n- Output directories and their contents\n- Experimental or development files\n- Documentation and reference materials\n- Test files and validation scripts\n\nDELIVERABLE: Complete directory inventory with categorization of each file/directory by purpose, legitimacy, and recommended action (keep, archive, delete, reorganize).",
+      "dependencies": [],
+      "context": {
+        "analysis_type": "inventory",
+        "target_directory": "/home/opsvi/master_root/apps/agent-orchestrator",
+        "focus_areas": ["file_classification", "legitimacy_assessment", "organization_analysis"]
+      }
+    },
+    {
+      "task_id": "core_application_identification",
+      "task_type": "solution-architect",
+      "prompt": "Identify the core, legitimate agent-orchestrator application components and define what constitutes the production system.\n\nBASED ON DIRECTORY ANALYSIS: Use the directory structure analysis to understand current state.\n\nCORE IDENTIFICATION CRITERIA:\n1. **Essential System Files**:\n   - Main orchestrator engine (src/generic_orchestrator.py)\n   - Configuration and template systems\n   - API and interface definitions\n   - Documentation (README, guides)\n   - Test suites and validation\n\n2. **Supporting Infrastructure**:\n   - Deployment scripts and configurations\n   - Example workflows and templates\n   - Integration helpers and utilities\n   - Development tools and scripts\n\n3. **Legitimacy Assessment**:\n   - Files actively used by the production system\n   - Files required for system functionality\n   - Files needed for development and testing\n   - Files that provide value to users\n\nEXCLUSION CRITERIA:\n- Experimental code not integrated into main system\n- Abandoned development efforts\n- Temporary files and outputs\n- Duplicate or obsolete versions\n- Files that don't serve the core mission\n\nDELIVERABLE: Clear definition of legitimate core application with file-by-file assessment and rationale for inclusion/exclusion decisions.",
+      "dependencies": ["directory_structure_analysis"],
+      "context": {
+        "analysis_type": "core_identification",
+        "target_system": "agent-orchestrator-production",
+        "focus_areas": ["system_boundaries", "legitimacy_criteria", "production_readiness"]
+      }
+    },
+    {
+      "task_id": "obsolete_content_identification",
+      "task_type": "reviewer-critic",
+      "prompt": "Identify obsolete, experimental, and misplaced content that should be archived, moved, or removed from the agent-orchestrator directory.\n\nBASED ON ANALYSIS: Use directory analysis and core application definition to make informed decisions.\n\nOBSOLETE CONTENT CATEGORIES:\n1. **Abandoned Experiments**:\n   - Prototype implementations not integrated\n   - Failed approaches and dead-end development\n   - Superseded versions of functionality\n   - Development scaffolding no longer needed\n\n2. **Temporary and Generated Content**:\n   - Build artifacts and cache files\n   - Temporary outputs and logs\n   - Generated files that can be recreated\n   - Debug and development dumps\n\n3. **Misplaced Content**:\n   - Files that belong in different directories\n   - Personal notes or scratch files\n   - Content specific to other projects\n   - Configuration for different environments\n\n4. **Redundant Content**:\n   - Duplicate files and directories\n   - Multiple versions of same functionality\n   - Backup files no longer needed\n   - Obsolete documentation\n\nRECOMMENDATIONS:\n- **Archive**: Move to archive directory with clear labels\n- **Delete**: Remove completely (with justification)\n- **Relocate**: Move to appropriate location\n- **Preserve**: Keep but organize better\n\nDELIVERABLE: Comprehensive list of obsolete content with specific recommendations and detailed rationale for each decision.",
+      "dependencies": ["core_application_identification"],
+      "context": {
+        "analysis_type": "obsolete_identification",
+        "target_system": "cleanup-assessment",
+        "focus_areas": ["content_classification", "removal_criteria", "preservation_decisions"]
+      }
+    },
+    {
+      "task_id": "archive_strategy_design",
+      "task_type": "sdlc-production",
+      "prompt": "Design a comprehensive archiving and organization strategy for obsolete and experimental content.\n\nBASED ON OBSOLETE ANALYSIS: Use the obsolete content identification to create targeted preservation strategy.\n\nARCHIVE STRATEGY COMPONENTS:\n1. **Archive Directory Structure**:\n   - Create `/archive/` directory with logical organization\n   - Subdirectories by content type and time period\n   - Clear labeling and documentation\n   - Preservation of context and history\n\n2. **Categorization System**:\n   - `archive/experiments/` - Failed/abandoned prototypes\n   - `archive/superseded/` - Replaced implementations\n   - `archive/development/` - Development artifacts\n   - `archive/temp-outputs/` - Generated content\n   - `archive/documentation/` - Obsolete docs\n\n3. **Metadata and Documentation**:\n   - Archive manifest with descriptions\n   - Reason for archiving each item\n   - Original location and context\n   - Restoration instructions if needed\n\n4. **Cleanup Process**:\n   - Step-by-step execution plan\n   - Safety checks and backups\n   - Validation procedures\n   - Rollback capabilities\n\nSAFETY MEASURES:\n- Create backup before any moves/deletions\n- Incremental approach with validation\n- Clear documentation of all changes\n- Ability to restore if mistakes are made\n\nDELIVERABLE: Complete archiving strategy with directory structure, process steps, and safety procedures.",
+      "dependencies": ["obsolete_content_identification"],
+      "context": {
+        "analysis_type": "archive_design",
+        "target_system": "cleanup-strategy",
+        "focus_areas": ["preservation", "organization", "safety", "process_design"]
+      }
+    },
+    {
+      "task_id": "production_organization_plan",
+      "task_type": "sdlc-deployment",
+      "prompt": "Design the optimal organization structure for the legitimate core application files.\n\nBASED ON CORE IDENTIFICATION: Use core application analysis to create ideal production structure.\n\nORGANIZATION OBJECTIVES:\n1. **Clear Structure**:\n   - Intuitive directory layout\n   - Logical grouping of related files\n   - Consistent naming conventions\n   - Easy navigation and discovery\n\n2. **Production Standards**:\n   - Standard project layout patterns\n   - Separation of concerns (src, docs, tests, config)\n   - Developer experience optimization\n   - Deployment and packaging readiness\n\n3. **Proposed Structure**:\n   ```\n   agent-orchestrator/\n   ├── src/                 # Core source code\n   ├── docs/                # Documentation\n   ├── tests/               # Test suites\n   ├── config/              # Configuration files\n   ├── templates/           # Workflow templates\n   ├── examples/            # Example workflows\n   ├── scripts/             # Utility scripts\n   ├── deployment/          # Deployment configs\n   └── outputs/             # Generated content\n   ```\n\n4. **File Reorganization**:\n   - Move files to appropriate directories\n   - Standardize naming conventions\n   - Consolidate related functionality\n   - Remove redundancy\n\nIMPLEMENTATION PLAN:\n- Incremental reorganization steps\n- Validation at each stage\n- Update references and imports\n- Test system functionality after changes\n\nDELIVERABLE: Complete reorganization plan with target structure, file movements, and implementation steps.",
+      "dependencies": ["core_application_identification"],
+      "context": {
+        "analysis_type": "organization_design",
+        "target_system": "production-structure",
+        "focus_areas": ["structure_design", "file_organization", "standards_compliance"]
+      }
+    },
+    {
+      "task_id": "cleanup_execution_plan",
+      "task_type": "sdlc-planning",
+      "prompt": "Create a detailed execution plan for implementing the directory cleanup and reorganization.\n\nBASED ON ALL ANALYSES: Integrate findings from all previous tasks to create comprehensive action plan.\n\nEXECUTION PHASES:\n1. **Preparation Phase**:\n   - Create complete backup of current directory\n   - Set up archive directory structure\n   - Prepare rollback procedures\n   - Validate all dependencies and references\n\n2. **Archive Phase**:\n   - Move obsolete content to appropriate archive locations\n   - Create archive documentation and manifests\n   - Verify content preservation and accessibility\n   - Clean up empty directories\n\n3. **Reorganization Phase**:\n   - Implement new directory structure\n   - Move legitimate files to target locations\n   - Update import paths and references\n   - Standardize naming conventions\n\n4. **Validation Phase**:\n   - Test core orchestrator functionality\n   - Verify all workflows still execute\n   - Check documentation accuracy\n   - Validate system integrity\n\n5. **Documentation Phase**:\n   - Update README and documentation\n   - Create change log and migration notes\n   - Document new structure and conventions\n   - Provide guidance for future maintenance\n\nRISK MITIGATION:\n- Comprehensive backups before changes\n- Incremental execution with checkpoints\n- Automated testing at each phase\n- Clear rollback procedures\n\nSUCCESS CRITERIA:\n- All core functionality preserved\n- Clean, organized directory structure\n- Complete documentation of changes\n- No loss of valuable content\n\nDELIVERABLE: Step-by-step execution plan with commands, validations, and safety procedures.",
+      "dependencies": ["archive_strategy_design", "production_organization_plan"],
+      "context": {
+        "analysis_type": "execution_planning",
+        "target_system": "cleanup-implementation",
+        "focus_areas": ["step_by_step", "risk_management", "validation", "documentation"]
+      }
+    },
+    {
+      "task_id": "safety_validation_system",
+      "task_type": "qa-testing-guru",
+      "prompt": "Design comprehensive safety and validation procedures to ensure no valuable content is lost during cleanup.\n\nBASED ON EXECUTION PLAN: Create safeguards for the proposed cleanup process.\n\nSAFETY VALIDATION COMPONENTS:\n1. **Pre-Cleanup Validation**:\n   - Complete inventory of current state\n   - Identification of critical dependencies\n   - Backup verification procedures\n   - System functionality baseline\n\n2. **Content Preservation Checks**:\n   - Automated scanning for valuable content\n   - Pattern recognition for important files\n   - Cross-reference validation\n   - Content integrity verification\n\n3. **Functionality Testing**:\n   - Core orchestrator operation tests\n   - Workflow execution validation\n   - API endpoint verification\n   - Integration testing suite\n\n4. **Recovery Procedures**:\n   - Detailed rollback instructions\n   - Selective restoration capabilities\n   - Emergency recovery protocols\n   - State verification after recovery\n\nVALIDATION CHECKPOINTS:\n- Before: Complete system snapshot\n- During: Incremental validation at each step\n- After: Comprehensive functionality testing\n- Final: User acceptance validation\n\nAUTOMATED SAFEGUARDS:\n- Prevent deletion of files matching critical patterns\n- Verify archive integrity before cleanup\n- Automatic backup creation\n- Rollback triggers on validation failures\n\nDELIVERABLE: Complete safety framework with automated checks, manual procedures, and recovery protocols.",
+      "dependencies": ["cleanup_execution_plan"],
+      "context": {
+        "analysis_type": "safety_design",
+        "target_system": "validation-framework",
+        "focus_areas": ["content_preservation", "functionality_testing", "recovery_procedures"]
+      }
+    },
+    {
+      "task_id": "cleanup_coordination_report",
+      "task_type": "reviewer-critic",
+      "prompt": "Synthesize all analyses into a comprehensive cleanup coordination report with final recommendations.\n\nBASED ON ALL ANALYSES: Integrate findings from all specialized agents to create unified action plan.\n\nCOORDINATION REPORT SECTIONS:\n1. **Executive Summary**:\n   - Current directory state assessment\n   - Cleanup objectives and scope\n   - Risk assessment and mitigation\n   - Expected benefits and outcomes\n\n2. **Detailed Findings**:\n   - Directory analysis results\n   - Core application definition\n   - Obsolete content identification\n   - Organization recommendations\n\n3. **Implementation Strategy**:\n   - Phased execution approach\n   - Resource requirements\n   - Timeline and milestones\n   - Success metrics\n\n4. **Risk Management**:\n   - Potential issues and complications\n   - Mitigation strategies\n   - Contingency plans\n   - Recovery procedures\n\n5. **Final Recommendations**:\n   - Go/no-go decision framework\n   - Priority actions\n   - Alternative approaches\n   - Long-term maintenance strategy\n\nQUALITY ASSURANCE:\n- Cross-validation of all agent findings\n- Consistency checking across recommendations\n- Feasibility assessment of proposed changes\n- Impact analysis on system functionality\n\nDELIVERABLE: Comprehensive coordination report with executive summary, detailed analysis, implementation plan, and final go/no-go recommendation.",
+      "dependencies": ["safety_validation_system"],
+      "context": {
+        "analysis_type": "synthesis_report",
+        "target_system": "cleanup-coordination",
+        "focus_areas": ["synthesis", "decision_support", "risk_assessment", "implementation_guidance"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,279 @@
+{
+  "workflow_name": "dpo_workflow_cli_tool",
+  "description": "Build a CLI tool for automated file organization",
+  "max_parallel": 1,
+  "checkpoint_interval": 3,
+  "analysis": {
+    "original_request": "Build a CLI tool for automated file organization",
+    "project_type": "cli_tool",
+    "complexity": "simple",
+    "tech_stack": {
+      "languages": [
+        "python"
+      ],
+      "frameworks": [],
+      "databases": [],
+      "tools": [],
+      "integrations": []
+    },
+    "phases": [
+      "requirements",
+      "architecture",
+      "implementation",
+      "testing",
+      "documentation"
+    ],
+    "estimated_agents": 5,
+    "focus_areas": [
+      "performance"
+    ],
+    "requirements": {
+      "functional": [],
+      "non_functional": [],
+      "features": [],
+      "constraints": []
+    },
+    "constraints": [
+      "scope: single developer",
+      "limitation: no enterprise complexity"
+    ],
+    "implicit_requirements": [
+      "Command-line argument parsing",
+      "Help documentation",
+      "Error messages and exit codes",
+      "Configuration file support",
+      "Type hints and docstrings"
+    ],
+    "ecosystem_context": {
+      "environment": "master_root ecosystem",
+      "optimization_focus": "solo developer efficiency",
+      "available_tools": [
+        "agent-orchestrator",
+        "knowledge_system (mcp__knowledge)",
+        "monitoring-dashboard",
+        "claude-monitor"
+      ],
+      "integration_opportunities": [],
+      "performance_targets": {
+        "response_time": "< 100ms for API calls",
+        "startup_time": "< 2 seconds",
+        "memory_usage": "< 500MB",
+        "cpu_usage": "minimal background processing"
+      },
+      "reusable_components": [
+        "TokenPool from orchestrator",
+        "AsyncIO patterns",
+        "Logging infrastructure",
+        "Configuration management"
+      ]
+    },
+    "confidence_score": 0.8500000000000001
+  },
+  "tasks": [
+    {
+      "task_id": "task_001_requirements",
+      "task_type": "requirements-analyst",
+      "prompt": "Analyze and document comprehensive requirements for: Build a CLI tool for automated file organization\n\nProject Type: cli_tool\nTech Stack: {\n  \"languages\": [\n    \"python\"\n  ],\n  \"frameworks\": [],\n  \"databases\": [],\n  \"tools\": [],\n  \"integrations\": []\n}\nFocus Areas: performance\n\nDeliverables:\n1. Functional requirements specification\n2. Non-functional requirements\n3. User stories and acceptance criteria\n4. Technical constraints and assumptions\n5. Success metrics and KPIs\n\nContext: {\n  \"environment\": \"master_root ecosystem\",\n  \"optimization_focus\": \"solo developer efficiency\",\n  \"available_tools\": [\n    \"agent-orchestrator\",\n    \"knowledge_system (mcp__knowledge)\",\n    \"monitoring-dashboard\",\n    \"claude-monitor\"\n  ],\n  \"integration_opportunities\": [],\n  \"performance_targets\": {\n    \"response_time\": \"< 100ms for API calls\",\n    \"startup_time\": \"< 2 seconds\",\n    \"memory_usage\": \"< 500MB\",\n    \"cpu_usage\": \"minimal background processing\"\n  },\n  \"reusable_components\": [\n    \"TokenPool from orchestrator\",\n    \"AsyncIO patterns\",\n    \"Logging infrastructure\",\n    \"Configuration management\"\n  ]\n}\n",
+      "context": {
+        "project_type": "cli_tool",
+        "tech_stack": {
+          "languages": [
+            "python"
+          ],
+          "frameworks": [],
+          "databases": [],
+          "tools": [],
+          "integrations": []
+        },
+        "requirements": {
+          "functional": [],
+          "non_functional": [],
+          "features": [],
+          "constraints": []
+        }
+      },
+      "dependencies": [],
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "start_time": null,
+      "end_time": null,
+      "quality_gates": [],
+      "raw_output": null,
+      "error_details": null,
+      "work_dir_name": null,
+      "project_location": null,
+      "deliverable_structure": {},
+      "directory_permissions": [],
+      "output_validation": {}
+    },
+    {
+      "task_id": "task_002_architecture",
+      "task_type": "solution-architect",
+      "prompt": "Design the system architecture for: Build a CLI tool for automated file organization\n\nProject Type: cli_tool\nComplexity: simple\nTech Stack: {\n  \"languages\": [\n    \"python\"\n  ],\n  \"frameworks\": [],\n  \"databases\": [],\n  \"tools\": [],\n  \"integrations\": []\n}\n\nDeliverables:\n1. High-level architecture diagram\n2. Component breakdown and responsibilities\n3. Data flow and storage design\n4. Integration points and APIs\n5. Security and performance considerations\n\nFocus on: performance\n",
+      "context": {
+        "project_type": "cli_tool",
+        "complexity": "simple",
+        "tech_stack": {
+          "languages": [
+            "python"
+          ],
+          "frameworks": [],
+          "databases": [],
+          "tools": [],
+          "integrations": []
+        }
+      },
+      "dependencies": [
+        "task_001_requirements"
+      ],
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "start_time": null,
+      "end_time": null,
+      "quality_gates": [],
+      "raw_output": null,
+      "error_details": null,
+      "work_dir_name": null,
+      "project_location": null,
+      "deliverable_structure": {},
+      "directory_permissions": [],
+      "output_validation": {}
+    },
+    {
+      "task_id": "task_003_implementation_1",
+      "task_type": "development-specialist",
+      "prompt": "Implement part 1 of 2 for: Build a CLI tool for automated file organization\n\nTech Stack: {\n  \"languages\": [\n    \"python\"\n  ],\n  \"frameworks\": [],\n  \"databases\": [],\n  \"tools\": [],\n  \"integrations\": []\n}\nComponent: Part 1/2 of the implementation\n\nDeliverables:\n1. Working code implementation\n2. Unit tests for your component\n3. Integration with other components\n4. Error handling and logging\n5. Performance optimization\n\nFocus on clean, maintainable code following best practices.\n",
+      "context": {
+        "tech_stack": {
+          "languages": [
+            "python"
+          ],
+          "frameworks": [],
+          "databases": [],
+          "tools": [],
+          "integrations": []
+        },
+        "component": "component_1"
+      },
+      "dependencies": [
+        "task_002_architecture"
+      ],
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "start_time": null,
+      "end_time": null,
+      "quality_gates": [],
+      "raw_output": null,
+      "error_details": null,
+      "work_dir_name": null,
+      "project_location": null,
+      "deliverable_structure": {},
+      "directory_permissions": [],
+      "output_validation": {}
+    },
+    {
+      "task_id": "task_004_implementation_2",
+      "task_type": "development-specialist",
+      "prompt": "Implement part 2 of 2 for: Build a CLI tool for automated file organization\n\nTech Stack: {\n  \"languages\": [\n    \"python\"\n  ],\n  \"frameworks\": [],\n  \"databases\": [],\n  \"tools\": [],\n  \"integrations\": []\n}\nComponent: Part 2/2 of the implementation\n\nDeliverables:\n1. Working code implementation\n2. Unit tests for your component\n3. Integration with other components\n4. Error handling and logging\n5. Performance optimization\n\nFocus on clean, maintainable code following best practices.\n",
+      "context": {
+        "tech_stack": {
+          "languages": [
+            "python"
+          ],
+          "frameworks": [],
+          "databases": [],
+          "tools": [],
+          "integrations": []
+        },
+        "component": "component_2"
+      },
+      "dependencies": [
+        "task_002_architecture"
+      ],
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "start_time": null,
+      "end_time": null,
+      "quality_gates": [],
+      "raw_output": null,
+      "error_details": null,
+      "work_dir_name": null,
+      "project_location": null,
+      "deliverable_structure": {},
+      "directory_permissions": [],
+      "output_validation": {}
+    },
+    {
+      "task_id": "task_005_testing",
+      "task_type": "qa-testing-guru",
+      "prompt": "Create comprehensive test suite for: Build a CLI tool for automated file organization\n\nTech Stack: {\n  \"languages\": [\n    \"python\"\n  ],\n  \"frameworks\": [],\n  \"databases\": [],\n  \"tools\": [],\n  \"integrations\": []\n}\nTest Types: Unit, Integration, End-to-End\n\nDeliverables:\n1. Unit test suite with >80% coverage\n2. Integration tests for all APIs\n3. End-to-end test scenarios\n4. Performance test benchmarks\n5. Test documentation and CI/CD integration\n",
+      "context": {
+        "test_types": [
+          "unit",
+          "integration",
+          "e2e"
+        ],
+        "tech_stack": {
+          "languages": [
+            "python"
+          ],
+          "frameworks": [],
+          "databases": [],
+          "tools": [],
+          "integrations": []
+        }
+      },
+      "dependencies": [
+        "task_003_implementation_1",
+        "task_004_implementation_2"
+      ],
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "start_time": null,
+      "end_time": null,
+      "quality_gates": [],
+      "raw_output": null,
+      "error_details": null,
+      "work_dir_name": null,
+      "project_location": null,
+      "deliverable_structure": {},
+      "directory_permissions": [],
+      "output_validation": {}
+    },
+    {
+      "task_id": "task_006_documentation",
+      "task_type": "technical-writer",
+      "prompt": "Create complete documentation for: Build a CLI tool for automated file organization\n\nProject Type: cli_tool\nTarget Audience: Developers and End Users\n\nDeliverables:\n1. README with quick start guide\n2. API documentation (if applicable)\n3. User guide with examples\n4. Developer documentation\n5. Deployment and operations guide\n",
+      "context": {
+        "doc_types": [
+          "user_guide",
+          "api_docs",
+          "developer_guide"
+        ],
+        "project_type": "cli_tool"
+      },
+      "dependencies": [
+        "task_003_implementation_1",
+        "task_004_implementation_2"
+      ],
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "start_time": null,
+      "end_time": null,
+      "quality_gates": [],
+      "raw_output": null,
+      "error_details": null,
+      "work_dir_name": null,
+      "project_location": null,
+      "deliverable_structure": {},
+      "directory_permissions": [],
+      "output_validation": {}
+    }
+  ]
+}

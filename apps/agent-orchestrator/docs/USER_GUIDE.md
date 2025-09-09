@@ -1,457 +1,653 @@
-# Agent Orchestrator User Guide
+# Development Process Orchestrator - User Guide
 
-**A comprehensive guide to using the Agent Orchestrator system for multi-agent coordination and task automation.**
-
----
-
-## Table of Contents
-
-1. [Getting Started](#getting-started)
-2. [Core Features](#core-features)
-3. [Common Tasks](#common-tasks)
-4. [Configuration](#configuration)
-5. [Troubleshooting](#troubleshooting)
-6. [Best Practices](#best-practices)
-7. [FAQ](#faq)
-8. [Advanced Usage](#advanced-usage)
+**Your Complete Guide to AI-Powered Development Workflow Automation**
 
 ---
 
-## Getting Started
+## 🚀 Quick Start
 
-### What is Agent Orchestrator?
+### What You'll Accomplish
+In 5 minutes, you'll be running your first AI agent workflow that can:
+- Generate complete project documentation
+- Analyze system architecture
+- Coordinate multiple AI agents simultaneously
+- Resume work from interruptions automatically
 
-Agent Orchestrator is a production-ready system designed to coordinate multiple AI agents to execute complex tasks in parallel. Think of it as a command center that intelligently distributes work across multiple AI assistants, manages dependencies between tasks, and ensures reliable execution with built-in recovery capabilities.
+### Prerequisites Check
+✅ **Python 3.8+** (Check: `python --version`)
+✅ **Claude API access** (Get from [Anthropic Console](https://console.anthropic.com/))
+✅ **Basic command line familiarity**
 
-### Prerequisites
-
-Before you begin, ensure you have:
-- Python 3.8 or higher installed
-- Access to Claude API tokens (for agent execution)
-- Basic familiarity with command-line interfaces
-- Understanding of your project structure
-
-### Quick Installation
-
-1. **Navigate to the orchestrator directory:**
-   ```bash
-   cd /home/opsvi/master_root/apps/agent-orchestrator
-   ```
-
-2. **Verify the installation:**
-   ```bash
-   python main.py --help
-   ```
-
-### Your First Orchestration
-
-Let's start with a simple example to get familiar with the system:
-
+### 30-Second Setup
 ```bash
-# Run the built-in example tasks
-python main.py --example --max-parallel 3
+# 1. Navigate to the orchestrator
+cd /home/opsvi/master_root/apps/agent-orchestrator
 
-# Or run a comprehensive system analysis
-python run_system_analysis.py --target /path/to/your/project
+# 2. Test the system (creates example workflow)
+python run.py
+
+# 3. Choose option 1 for your first workflow
 ```
 
-**What happens:** The orchestrator will create multiple AI agents that work together to analyze your system, each focusing on different aspects like architecture, code quality, and documentation.
+**What just happened?** The orchestrator created 3 AI agents:
+1. **Research Agent** → Studied Python async programming
+2. **Design Agent** → Created a web server architecture
+3. **Implementation Agent** → Wrote actual FastAPI code
+
+All working together, automatically, with intelligent coordination.
 
 ---
 
-## Core Features
+## 📋 Table of Contents
 
-### 🎯 Multi-Agent Coordination
-Execute up to 15 agents simultaneously, each working on different parts of your task while the orchestrator manages coordination and prevents conflicts.
-
-### 🔄 Smart Dependency Management
-Define task dependencies and let the orchestrator automatically determine the optimal execution order. For example, "analyze code" can run before "write documentation" which depends on the analysis results.
-
-### 💾 Checkpoint & Recovery
-Never lose work again. The system automatically creates checkpoints and can resume from any point if execution is interrupted.
-
-### 📊 Real-time Monitoring
-Track progress with built-in dashboard integration, real-time status updates, and detailed execution logs.
-
-### 🔧 Quality Gates
-Built-in validation ensures tasks meet quality standards before proceeding to dependent tasks.
-
-### 🚀 Background Execution
-Long-running tasks continue in the background while you work on other things.
+1. [Core Features Overview](#core-features-overview)
+2. [Common Workflows](#common-workflows)
+3. [Configuration Guide](#configuration-guide)
+4. [Troubleshooting](#troubleshooting)
+5. [Best Practices](#best-practices)
+6. [Advanced Usage](#advanced-usage)
+7. [FAQ](#faq)
 
 ---
 
-## Common Tasks
+## 🎯 Core Features Overview
 
-### Task 1: Generate Complete Documentation for Your Project
+### Multi-Agent Coordination
+**What it does:** Runs up to 15 AI agents simultaneously, each working on different parts of your task.
 
-**Use Case:** You have a software project and want comprehensive documentation generated automatically.
+**Real example:** Generate documentation for your entire project:
+```bash
+python run_orchestrator_task.py \
+  --task-type system-documentation \
+  --app-name "my-project" \
+  --app-root "/path/to/project"
+```
+**Result:** 6 agents create README, API docs, user guide, deployment guide, and architecture docs **simultaneously**.
+
+### Smart Dependency Management
+**What it does:** Automatically figures out what order tasks should run in.
+
+**Real example:** "Write tests" runs **after** "analyze code" but **before** "generate report".
+
+**Your benefit:** No manual task ordering - the system is intelligent enough to understand dependencies.
+
+### Checkpoint & Recovery
+**What it does:** Never lose work again. Resume from exactly where you left off.
+
+**Real example:**
+```bash
+# Your internet cut out during a 30-minute workflow
+python resume_orchestrator.py --list-checkpoints
+
+# Resume from the last checkpoint
+python resume_orchestrator.py checkpoint_abc123
+```
+
+### Real-Time Monitoring
+**What it does:** Watch your agents work in real-time with a web dashboard.
+
+**How to use:**
+```bash
+# Start the dashboard server
+python production_dashboard.py --host 0.0.0.0 --port 8765
+
+# Visit: http://localhost:8765
+```
+**What you see:** Live agent status, progress bars, resource usage, and completion times.
+
+---
+
+## 🔄 Common Workflows
+
+### Workflow 1: Complete Project Documentation
+**Perfect for:** Any software project that needs professional documentation.
 
 ```bash
-# Generate complete documentation suite
 python run_orchestrator_task.py \
   --task-type system-documentation \
   --app-name "my-awesome-app" \
-  --app-root "/path/to/my/project" \
+  --app-root "/Users/me/projects/my-app" \
   --template comprehensive
 ```
 
-**What you get:**
-- `README.md` - Project overview and quick start
-- `ARCHITECTURE.md` - System design and components
-- `API_REFERENCE.md` - Complete API documentation
-- `USER_GUIDE.md` - End-user documentation
-- `DEVELOPER_GUIDE.md` - Development setup and workflows
-- `DEPLOYMENT.md` - Deployment and operations guide
+**What happens:**
+- 🔍 **Architecture Agent** maps your system structure
+- 📖 **API Agent** generates complete API documentation
+- 👤 **User Guide Agent** writes end-user instructions
+- 🛠️ **Developer Agent** creates setup and contribution guides
+- 🚀 **Deployment Agent** documents deployment procedures
+- 📋 **README Agent** creates an engaging project overview
 
-### Task 2: Analyze System Architecture
+**Time:** 15-30 minutes | **Cost:** ~$2-4 | **Output:** Professional-grade documentation suite
 
-**Use Case:** Understand the structure and health of an existing codebase.
+### Workflow 2: System Health Analysis
+**Perfect for:** Understanding your codebase's current state and getting improvement recommendations.
 
 ```bash
-# Run comprehensive system analysis
-python run_system_analysis.py --target "/path/to/analyze"
+python run_system_analysis.py
 ```
 
-**What you get:**
-- Code quality assessment
-- Architecture analysis
-- Dependency mapping
-- Security audit
-- Performance recommendations
+**What happens:**
+- 🏗️ **Architecture Analyst** examines system design patterns
+- ⚡ **Performance Analyst** identifies optimization opportunities
+- 🔒 **Security Analyst** checks for vulnerabilities
+- 📊 **Metrics Analyst** evaluates code quality
+- 🔧 **Integration Analyst** reviews component relationships
 
-### Task 3: Custom Multi-Step Workflow
+**Time:** 20-40 minutes | **Cost:** ~$3-6 | **Output:** Comprehensive analysis report with actionable recommendations
 
-**Use Case:** You have a complex workflow that needs multiple specialized agents.
-
-1. **Create a task definition file (`my_workflow.json`):**
-   ```json
-   {
-     "tasks": [
-       {
-         "task_id": "research_phase",
-         "task_type": "research",
-         "prompt": "Research best practices for Python web development"
-       },
-       {
-         "task_id": "design_phase",
-         "task_type": "design",
-         "prompt": "Design an API based on the research findings",
-         "dependencies": ["research_phase"]
-       },
-       {
-         "task_id": "implementation",
-         "task_type": "code",
-         "prompt": "Implement the API design",
-         "dependencies": ["design_phase"]
-       }
-     ]
-   }
-   ```
-
-2. **Execute the workflow:**
-   ```bash
-   python main.py --tasks-file my_workflow.json --max-parallel 5
-   ```
-
-### Task 4: Resume Interrupted Work
-
-**Use Case:** Your workflow was interrupted and you want to continue where you left off.
+### Workflow 3: Parallel Documentation Updates
+**Perfect for:** Keeping multiple docs in sync across a large project.
 
 ```bash
-# List available checkpoints
-python run_orchestrator_task.py --list-checkpoints --app-name "my-project"
+python run_parallel_doc_update.py
+```
 
-# Resume from a specific checkpoint
-python run_orchestrator_task.py --resume-checkpoint checkpoint_id_here
+**What happens:**
+- Multiple specialist agents update different documentation files simultaneously
+- Changes are coordinated to maintain consistency
+- Cross-references between documents are validated
+- Style and format consistency is enforced
+
+**Time:** 10-20 minutes | **Cost:** ~$1-3 | **Output:** Synchronized documentation suite
+
+### Workflow 4: Custom Multi-Step Process
+**Perfect for:** Complex workflows that need multiple specialized agents.
+
+**Step 1:** Create your workflow file (`my_workflow.json`):
+```json
+{
+  "tasks": [
+    {
+      "task_id": "security_audit",
+      "task_type": "security-expert",
+      "prompt": "Perform security analysis focusing on authentication and data protection"
+    },
+    {
+      "task_id": "performance_analysis",
+      "task_type": "performance-expert",
+      "prompt": "Analyze performance bottlenecks and optimization opportunities"
+    },
+    {
+      "task_id": "integration_report",
+      "task_type": "integration-expert",
+      "prompt": "Create integration strategy based on security and performance findings",
+      "dependencies": ["security_audit", "performance_analysis"]
+    }
+  ]
+}
+```
+
+**Step 2:** Execute your workflow:
+```bash
+python main.py --tasks-file my_workflow.json --max-parallel 5
 ```
 
 ---
 
-## Configuration
+## ⚙️ Configuration Guide
 
-### Basic Configuration
+### Basic Settings
 
-The orchestrator uses intelligent defaults but can be customized:
-
-**Maximum Parallel Agents:**
+**Control Parallel Execution:**
 ```bash
-python main.py --max-parallel 10  # Run up to 10 agents simultaneously
+# Conservative (good for testing)
+python main.py --max-parallel 3
+
+# Balanced (recommended for most workflows)
+python main.py --max-parallel 8
+
+# Aggressive (for powerful systems)
+python main.py --max-parallel 15
 ```
 
-**Output Directory:**
+**Choose Output Location:**
 ```bash
-python main.py --output-dir "/custom/output/path"
+python main.py --output-dir "/custom/results/path"
 ```
 
-**Enable Dashboard Integration:**
+**Enable Real-Time Dashboard:**
 ```bash
 python main.py --enable-dashboard
+# Then visit: http://localhost:8765
 ```
 
-### Token Management
+### Token Management (Automatic)
+The system automatically:
+- Loads tokens from multiple sources
+- Distributes requests across available tokens
+- Handles rate limits gracefully
+- Falls back to alternative providers if needed
 
-The system automatically manages Claude API tokens with multiple fallback strategies:
+**No manual token configuration required** - the orchestrator handles everything.
 
-1. **Automatic Token Loading** - Tries multiple token loading methods
-2. **Token Pool Management** - Distributes requests across available tokens
-3. **Rate Limit Handling** - Automatically manages API rate limits
-4. **Fallback Systems** - Switches to alternative providers if needed
+### Advanced Configuration
 
-### Configuration Files
-
-**Production Settings (`production_config.json`):**
+**Production Settings:**
+Create `production_config.json`:
 ```json
 {
   "host": "0.0.0.0",
   "port": 8765,
   "max_connections": 500,
   "max_parallel": 15,
-  "enable_monitoring": true
+  "enable_monitoring": true,
+  "checkpoint_interval": 5,
+  "quality_gates_enabled": true
 }
 ```
 
-**Logging Configuration (`logging_config.json`):**
-- Centralized logging setup
-- Different log levels for development vs. production
-- Automatic log rotation and cleanup
+**Use it:**
+```bash
+python production_dashboard.py --config production_config.json
+```
+
+### Templates Available
+
+| Template | Best For | Agents Used | Time |
+|----------|----------|-------------|------|
+| `minimal` | Small utilities, scripts | 2-3 agents | 5-10 min |
+| `standard` | Most projects | 4-6 agents | 15-25 min |
+| `comprehensive` | Large applications | 6-8 agents | 25-40 min |
+| `api-focused` | Libraries, services | 3-5 agents | 10-20 min |
+
+**Usage:**
+```bash
+python run_orchestrator_task.py \
+  --task-type system-documentation \
+  --template api-focused \
+  --app-name "my-api"
+```
 
 ---
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
-### Common Issues and Solutions
+### "No tokens available"
+**What it means:** The orchestrator can't access Claude API tokens.
 
-#### ❌ "No tokens available" Error
-**Problem:** The orchestrator can't find Claude API tokens.
-**Solution:**
-1. Verify your tokens are properly configured
-2. Check the token loading logs for specific errors
-3. Ensure tokens have sufficient quota remaining
+**Solutions:**
+1. **Check token status:**
+   ```bash
+   python -c "from src.token_loader import load_tokens; print(f'Found {len(load_tokens())} tokens')"
+   ```
 
+2. **Verify token sources:** The orchestrator tries these in order:
+   - Enhanced token loader (typically 19 tokens)
+   - Environment variables
+   - Configuration files
+   - Default token files
+
+3. **Check logs for details:**
+   ```bash
+   tail -f outputs/logs/orchestrator_*.log
+   ```
+
+### "Task failed with dependency error"
+**What it means:** A task couldn't run because something it depends on failed.
+
+**Solutions:**
+1. **Check what failed:**
+   ```bash
+   # Look at the most recent logs
+   ls -la outputs/logs/ | tail -5
+   cat outputs/logs/orchestrator_LATEST.log | grep ERROR
+   ```
+
+2. **Resume from last working point:**
+   ```bash
+   python resume_orchestrator.py --list-checkpoints
+   python resume_orchestrator.py checkpoint_ID_HERE
+   ```
+
+3. **Modify dependencies:** Edit your JSON task file to remove problematic dependencies.
+
+### "Max parallel limit reached"
+**What it means:** Too many agents trying to run at once.
+
+**Solutions:**
+1. **Reduce parallel limit:**
+   ```bash
+   python main.py --max-parallel 5  # Instead of 15
+   ```
+
+2. **Check system resources:**
+   ```bash
+   # Monitor memory usage
+   python agent_background_monitor.py
+   ```
+
+3. **Optimize task design:** Break large tasks into smaller, more focused ones.
+
+### "Dashboard not updating"
+**What it means:** The web dashboard isn't showing real-time updates.
+
+**Solutions:**
+1. **Ensure dashboard is enabled:**
+   ```bash
+   python main.py --enable-dashboard
+   ```
+
+2. **Check the dashboard port:**
+   ```bash
+   # Default is 8765
+   curl http://localhost:8765/health
+   ```
+
+3. **Restart with explicit configuration:**
+   ```bash
+   python production_dashboard.py --host 0.0.0.0 --port 8765
+   ```
+
+### Getting Detailed Help
+
+**Enable verbose logging:**
 ```bash
-# Check token status
-python -c "from src.token_loader import load_tokens; print(f'Loaded {len(load_tokens())} tokens')"
+python main.py --debug --verbose
 ```
 
-#### ❌ "Task failed with dependency error"
-**Problem:** A task is waiting for a dependency that failed.
-**Solution:**
-1. Check the logs for the specific failure reason
-2. Resume from the last successful checkpoint
-3. Review task dependencies in your JSON file
-
+**Check specific checkpoint details:**
 ```bash
-# Check detailed logs
-tail -f outputs/logs/orchestrator_*.log
+python resume_orchestrator.py --details checkpoint_abc123
 ```
 
-#### ❌ "Max parallel limit reached"
-**Problem:** Too many agents trying to run simultaneously.
-**Solution:**
-1. Reduce the `--max-parallel` setting
-2. Check system resources (RAM, CPU)
-3. Review task definitions for unnecessary parallelism
-
-#### ❌ "Dashboard not updating"
-**Problem:** Real-time updates aren't showing in the dashboard.
-**Solution:**
-1. Ensure `--enable-dashboard` flag is used
-2. Check network connectivity on the dashboard port
-3. Review browser console for WebSocket connection errors
-
-### Getting Help
-
-1. **Check the logs first:** Most issues have detailed information in the log files
-2. **Use verbose mode:** Add `--verbose` or `--debug` flags for more detailed output
-3. **Review checkpoints:** Use `--list-checkpoints` to see execution history
-
----
-
-## Best Practices
-
-### 🎯 Task Design
-
-**DO:**
-- Keep individual task prompts focused and specific
-- Use clear, descriptive task IDs
-- Define dependencies explicitly
-- Include context information in task definitions
-
-**DON'T:**
-- Create overly broad tasks that try to do everything
-- Skip dependency definitions when tasks rely on each other
-- Use vague prompts that could be interpreted multiple ways
-
-### 🔄 Workflow Organization
-
-**Start Small:**
-Begin with 2-3 tasks to understand the orchestrator behavior before scaling to complex workflows.
-
-**Use Templates:**
-Leverage built-in templates like `system-documentation` before creating custom workflows.
-
-**Plan Dependencies:**
-Map out your workflow dependencies before creating the JSON file:
-```
-Research → Analysis → Design → Implementation → Testing
-```
-
-### 💾 Resource Management
-
-**Optimal Parallel Settings:**
-- For documentation: 3-5 parallel agents
-- For analysis: 5-8 parallel agents
-- For complex workflows: 8-12 parallel agents
-- Never exceed 15 without careful resource monitoring
-
-**Checkpoint Strategy:**
-- Enable checkpointing for any workflow longer than 30 minutes
-- Use checkpoint interval of 3-5 tasks for most workflows
-- Keep workspaces for important workflows until completion confirmed
-
-### 📊 Monitoring and Maintenance
-
-**Regular Monitoring:**
+**Monitor active processes:**
 ```bash
-# Monitor active processes
 python agent_background_monitor.py
-
-# Check system health
-python production_dashboard.py
 ```
 
-**Log Management:**
-- Regularly review logs for performance patterns
-- Archive old logs to prevent disk space issues
-- Monitor token usage to avoid quota exhaustion
+---
+
+## 🎯 Best Practices
+
+### Workflow Design
+
+**✅ DO:**
+- Start with 3-5 agents for your first workflows
+- Use clear, specific task descriptions
+- Define dependencies explicitly when tasks depend on each other
+- Test with `--max-parallel 3` before scaling up
+
+**❌ DON'T:**
+- Create overly broad tasks ("Analyze everything")
+- Skip dependency definitions when order matters
+- Run more than 15 agents without monitoring resources
+- Ignore checkpoint warnings
+
+### Resource Management
+
+**Optimal Parallel Settings by Use Case:**
+- **Documentation:** 3-6 agents
+- **Code Analysis:** 5-8 agents
+- **Complex Workflows:** 8-12 agents
+- **Production Systems:** Monitor at 12+ agents
+
+**Memory Guidelines:**
+- **4GB RAM:** Max 5 parallel agents
+- **8GB RAM:** Max 10 parallel agents
+- **16GB+ RAM:** Up to 15 parallel agents
+
+### Cost Optimization
+
+**Typical Costs:**
+- Simple documentation: $1-2
+- System analysis: $2-5
+- Complex workflows: $3-8
+
+**Cost-saving tips:**
+- Use focused, specific prompts (reduces token usage)
+- Start with smaller agent counts to test workflows
+- Use checkpoints for long workflows (avoid re-running work)
+- Monitor token usage in dashboard
+
+### Quality Assurance
+
+**Enable quality gates for production:**
+```bash
+python main.py --use-enhanced --enable-dashboard
+```
+
+**Review outputs systematically:**
+1. Check logs for any errors or warnings
+2. Verify all expected outputs were created
+3. Review checkpoint status for completeness
+4. Test any generated code or configurations
 
 ---
 
-## FAQ
+## 🚀 Advanced Usage
 
-### Q: How many agents can I run simultaneously?
-**A:** The orchestrator supports up to 15 parallel agents, but the optimal number depends on your system resources and task complexity. Start with 5-8 agents and adjust based on performance.
+### Available Scripts Quick Reference
 
-### Q: What happens if my internet connection is interrupted?
-**A:** The orchestrator automatically creates checkpoints every few completed tasks. You can resume from the last checkpoint using the `--resume-checkpoint` command.
+| Script | Purpose | When to Use |
+|--------|---------|-------------|
+| `main.py` | Core orchestrator | Custom workflows, JSON task files |
+| `run_orchestrator_task.py` | Template workflows | System documentation, standard tasks |
+| `run_system_analysis.py` | Self-analysis | Understanding orchestrator capabilities |
+| `run_parallel_doc_update.py` | Documentation sync | Keeping multiple docs synchronized |
+| `resume_orchestrator.py` | Checkpoint management | Resuming interrupted work |
+| `production_dashboard.py` | Monitoring dashboard | Real-time workflow monitoring |
+| `agent_background_monitor.py` | Process monitoring | Checking background agent status |
 
-### Q: Can I modify tasks while they're running?
-**A:** No, running tasks cannot be modified. However, you can add new tasks to the queue or create follow-up workflows based on intermediate results.
+### Custom Agent Development
 
-### Q: How much does it cost to run the orchestrator?
-**A:** API costs vary based on task complexity. Typical documentation workflows cost $1-3. Analysis workflows cost $2-5. The orchestrator optimizes token usage to minimize costs.
-
-### Q: Can I run multiple orchestrations simultaneously?
-**A:** Yes, but each should use different output directories to avoid conflicts. Monitor system resources when running multiple orchestrations.
-
-### Q: What's the difference between main.py and run_orchestrator_task.py?
-**A:**
-- `main.py` is for custom task definitions and JSON workflows
-- `run_orchestrator_task.py` is for built-in workflows like system documentation
-
-### Q: How do I know if my tasks are high quality?
-**A:** The orchestrator includes built-in quality gates that validate outputs. Enable them with the `--use-enhanced` flag for additional quality assurance.
-
-### Q: Can I integrate with other tools?
-**A:** Yes, the orchestrator supports MCP (Model Context Protocol) integrations and can work with various external tools and APIs.
-
----
-
-## Advanced Usage
-
-### Custom Agent Types
-
-Create specialized agents for specific domains:
+**Create specialized agents for your domain:**
 
 ```python
 from src.generic_orchestrator import AgentTask
 
-# Create a specialized security audit task
+# Create a specialized security audit agent
 security_task = AgentTask(
     task_id="security_audit",
-    task_type="security-expert",
-    prompt="Perform comprehensive security audit focusing on authentication and data protection",
-    quality_gates=["security_checklist", "vulnerability_scan"]
+    task_type="security-specialist",
+    prompt="Analyze authentication security and data protection measures",
+    quality_gates=["security_checklist", "vulnerability_scan"],
+    context={"focus_areas": ["auth", "data_protection", "encryption"]}
 )
 ```
 
-### Enhanced Orchestrator Features
+### Production Monitoring
 
-Enable advanced capabilities for production workflows:
-
+**Real-time Dashboard:**
 ```bash
-python main.py \
-  --use-enhanced \
-  --enable-dashboard \
-  --tasks-file complex_workflow.json \
-  --max-parallel 10
+# Start production dashboard with custom config
+python production_dashboard.py --config production_config.json --log-level INFO
+
+# Access at: http://localhost:8765
 ```
 
-**Enhanced features include:**
-- Advanced quality gates and validation
-- Real-time performance monitoring
-- Automatic optimization recommendations
-- Integration with external monitoring systems
+**Background Process Monitoring:**
+```bash
+# Monitor all background agents
+python agent_background_monitor.py
+
+# Check specific orchestration status
+python agent_background_monitor.py --orchestration-id abc123
+```
 
 ### Integration with External Systems
 
-**Dashboard Integration:**
+**Webhook Integration:**
 ```python
-# Custom dashboard callback
 def dashboard_callback(state_data):
-    # Send updates to your dashboard
-    webhook_url = "https://your-dashboard.com/api/updates"
-    requests.post(webhook_url, json=state_data)
+    # Send updates to your monitoring system
+    requests.post("https://your-dashboard.com/api/updates", json=state_data)
 
 orchestrator = GenericOrchestrator(
     dashboard_state_callback=dashboard_callback
 )
 ```
 
-**MCP Tool Integration:**
-The orchestrator can use MCP tools for specialized capabilities:
-- Web scraping and research
-- File system operations
-- Database interactions
-- External API integrations
+**Custom Quality Gates:**
+```python
+# Add custom validation rules
+custom_gates = {
+    "code_security": "Check for security vulnerabilities",
+    "performance_standards": "Verify performance requirements",
+    "documentation_completeness": "Ensure all sections covered"
+}
+```
 
 ### Performance Optimization
 
+**Memory Optimization:**
+- Monitor with `agent_background_monitor.py`
+- Adjust `--max-parallel` based on available RAM
+- Use checkpoints for long-running workflows
+
 **Token Efficiency:**
-- Use specific, focused prompts to minimize token usage
+- Use specific, focused prompts
 - Enable context sharing between related tasks
 - Leverage built-in optimization features
 
-**Resource Optimization:**
-- Monitor memory usage with background monitor
-- Adjust parallel limits based on system performance
-- Use checkpoint intervals appropriate for your workflow length
-
-**Cost Management:**
-- Track API costs using built-in metrics
-- Use test runs with smaller agent counts before full execution
-- Leverage token pools effectively across multiple workflows
+**Network Optimization:**
+- Multiple token pools distribute API load
+- Automatic rate limit handling
+- Built-in retry mechanisms with exponential backoff
 
 ---
 
-## Support and Updates
+## ❓ FAQ
 
-### Getting Help
-- Check logs first: `outputs/logs/orchestrator_*.log`
-- Use debug mode: `--debug` for detailed troubleshooting
-- Review checkpoint status: `--list-checkpoints`
+### General Usage
 
-### Best Resources
-- **Documentation:** `/docs/` directory for technical references
-- **Examples:** Built-in examples via `--example` flag
-- **Templates:** Pre-built workflows for common use cases
+**Q: How many agents can I run at once?**
+A: Up to 15 agents simultaneously. Start with 5-8 and monitor system performance. The orchestrator automatically manages resources and prevents system overload.
+
+**Q: What happens if my internet disconnects?**
+A: The orchestrator creates automatic checkpoints every few completed tasks. Use `resume_orchestrator.py --list-checkpoints` to see recovery points and resume exactly where you left off.
+
+**Q: Can I run multiple orchestrations simultaneously?**
+A: Yes, but use different output directories: `--output-dir /path/1` and `--output-dir /path/2`. Monitor system resources when running multiple orchestrations.
+
+### Cost and Performance
+
+**Q: How much does it cost to run workflows?**
+A: Typical costs:
+- Documentation generation: $1-3
+- System analysis: $2-5
+- Complex multi-step workflows: $3-8
+The orchestrator optimizes token usage to minimize costs.
+
+**Q: How long do workflows take?**
+A: Timing varies by complexity:
+- Simple documentation: 10-20 minutes
+- System analysis: 20-40 minutes
+- Complex workflows: 30-60+ minutes
+Parallel execution significantly reduces total time.
+
+**Q: Can I speed up workflows?**
+A: Yes:
+- Increase `--max-parallel` (up to system limits)
+- Use more focused, specific prompts
+- Enable optimizations with `--use-enhanced`
+- Use templates instead of custom workflows
+
+### Technical Questions
+
+**Q: What's the difference between the various scripts?**
+A:
+- **`main.py`** - Core engine for custom JSON workflows
+- **`run_orchestrator_task.py`** - Template-based workflows (system docs, etc.)
+- **`run_system_analysis.py`** - Pre-configured system analysis
+- **`resume_orchestrator.py`** - Checkpoint and recovery management
+- **`production_dashboard.py`** - Web-based monitoring interface
+
+**Q: How do I know if my workflow succeeded?**
+A: Check multiple indicators:
+- All tasks show "completed" status in logs
+- No errors in `outputs/logs/orchestrator_*.log`
+- Expected output files created in results directory
+- Dashboard shows 100% completion (if enabled)
+
+**Q: Can I modify running workflows?**
+A: No, but you can:
+- Add new follow-up tasks after completion
+- Resume with modifications from checkpoints
+- Create dependent workflows that build on results
+
+### Troubleshooting
+
+**Q: What if a task keeps failing?**
+A: Common solutions:
+1. Check logs for specific error details
+2. Simplify the task prompt (may be too complex)
+3. Remove dependencies that might be causing issues
+4. Try running the task individually to isolate the problem
+
+**Q: How do I optimize for my specific use case?**
+A:
+- **Documentation:** Use `api-focused` or `comprehensive` templates
+- **Analysis:** Start with `run_system_analysis.py`
+- **Custom workflows:** Begin with simple 3-task examples
+- **Production:** Enable `--use-enhanced` and monitoring
+
+---
+
+## 📚 Additional Resources
+
+### Output Structure
+When you run any workflow, results are organized clearly:
+
+```
+outputs/
+├── system-documentation_20240115_143022/    # Timestamped workflow results
+│   ├── README.md                            # Generated documentation
+│   ├── ARCHITECTURE.md
+│   ├── API_REFERENCE.md
+│   └── logs/                                # Detailed execution logs
+├── checkpoints/                             # Recovery points
+│   └── checkpoint_abc123.json
+└── logs/                                    # Global orchestrator logs
+    └── orchestrator_20240115.log
+```
 
 ### System Requirements
-- **Minimum:** Python 3.8, 4GB RAM, Claude API access
-- **Recommended:** Python 3.10+, 8GB RAM, multiple API tokens
-- **Optimal:** 16GB RAM for large-scale orchestrations
+
+**Minimum:**
+- Python 3.8+
+- 4GB RAM
+- Claude API access
+- Internet connection
+
+**Recommended:**
+- Python 3.10+
+- 8GB RAM
+- Multiple API tokens
+- 16GB+ RAM for large-scale workflows
+
+**Optimal:**
+- 16GB+ RAM
+- SSD storage
+- Multiple API providers configured
+- Dedicated network connection
+
+### Integration Examples
+
+**CI/CD Integration:**
+```bash
+# Add to your pipeline
+python run_orchestrator_task.py \
+  --task-type system-documentation \
+  --app-name "$CI_PROJECT_NAME" \
+  --app-root "$CI_PROJECT_DIR" \
+  --output-dir "$CI_PROJECT_DIR/docs"
+```
+
+**Development Workflow:**
+```bash
+# Daily documentation updates
+python run_parallel_doc_update.py
+
+# Weekly system health check
+python run_system_analysis.py
+
+# Before major releases
+python main.py --tasks-file release_preparation.json
+```
 
 ---
 
-*This guide covers the essential usage patterns for Agent Orchestrator. For technical implementation details, see the [Developer Guide](DEVELOPER_GUIDE.md) and [Architecture Documentation](ARCHITECTURE.md).*
+*For technical implementation details, see [Developer Guide](DEVELOPER_GUIDE.md). For system architecture, see [Architecture Documentation](ARCHITECTURE.md).*
+
+**Need help?** Check the logs first, then use `--debug` mode for detailed troubleshooting information.
