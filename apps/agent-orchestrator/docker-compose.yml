@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  agent-orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - MAX_PARALLEL=15
+      - TOKEN_POOL_SIZE=20
+      - PYTHONPATH=/app/src
+    volumes:
+      - ./outputs:/app/outputs
+      - ./src:/app/src:ro
+      - ./tasks:/app/tasks:ro
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "from src.generic_orchestrator import GenericOrchestrator; print('Health check passed')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  orchestrator-monitor:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    restart: unless-stopped
+
+  orchestrator-dashboard:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./monitoring/grafana:/var/lib/grafana
+      - ./monitoring/dashboards:/etc/grafana/provisioning/dashboards:ro
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

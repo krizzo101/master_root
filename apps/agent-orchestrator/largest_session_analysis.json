@@ -1,0 +1,89 @@
+{
+  "report_metadata": {
+    "generated_at": "2025-09-08T13:28:53.875124",
+    "total_files": 1,
+    "analysis_version": "1.0"
+  },
+  "file_analyses": [
+    {
+      "file_path": "/home/opsvi/.claude/projects/-home-opsvi-em7-disk/47b30416-32c6-438d-b905-2d71442efb4b.jsonl",
+      "file_name": "47b30416-32c6-438d-b905-2d71442efb4b.jsonl",
+      "file_size_mb": 15.346868515014648,
+      "token_count": 4576598,
+      "estimated_cost": 114.41495,
+      "context_efficiency_score": 3.9480653052888766,
+      "recommended_chunks": 654,
+      "processing_time_estimate": 457.6598,
+      "structure_analysis": {
+        "message_composition": {
+          "user": 0,
+          "assistant": 0,
+          "system": 0,
+          "tool": 0
+        },
+        "total_messages": 580,
+        "tool_usage_breakdown": {},
+        "total_tool_calls": 0,
+        "unique_tools_used": 0,
+        "file_operation_types": {},
+        "total_file_operations": 0,
+        "content_diversity_score": 0.0
+      },
+      "size_category": "Extra Large",
+      "optimization_potential": {
+        "optimization_score": 80,
+        "optimization_level": "Very High",
+        "optimization_reasons": [
+          "Low context efficiency detected",
+          "Large size suitable for chunking",
+          "Low content diversity",
+          "High chunk count indicates optimization opportunity"
+        ]
+      }
+    }
+  ],
+  "aggregate_statistics": {
+    "total_files": 1,
+    "total_tokens": 4576598,
+    "total_estimated_cost": 114.41495,
+    "average_tokens_per_file": 4576598.0,
+    "average_file_size_mb": 15.346868515014648,
+    "token_statistics": {
+      "min": 4576598,
+      "max": 4576598,
+      "median": 4576598,
+      "std_deviation": 0.0
+    },
+    "size_categories": {
+      "Extra Large": 1
+    },
+    "optimization_summary": {
+      "average_optimization_score": 80.0,
+      "optimization_level_distribution": {
+        "Very High": 1,
+        "High": 0,
+        "Medium": 0,
+        "Low": 0
+      },
+      "high_potential_files": 1
+    }
+  },
+  "size_distribution": {
+    "bin_size": 4576598,
+    "distribution": {
+      "4576598": 1
+    },
+    "percentiles": {
+      "25th": 4576598,
+      "50th": 4576598,
+      "75th": 4576598,
+      "90th": 4576598
+    }
+  },
+  "recommendations": [
+    "High optimization potential detected in 1 files - consider implementing chunking and context compression",
+    "High total estimated cost ($114.41) - prioritize optimization for cost reduction",
+    "1 extra-large files detected - consider session summarization before GPT-5 submission",
+    "Many files with low context efficiency - review content for redundancy and repetitive patterns"
+  ]
+}

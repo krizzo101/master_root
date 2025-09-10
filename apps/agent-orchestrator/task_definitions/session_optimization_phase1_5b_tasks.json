@@ -1,0 +1,120 @@
+{
+  "tasks": [
+    {
+      "task_id": "implement_gpt5_payload_generator",
+      "task_type": "development-specialist",
+      "prompt": "Implement GPT-5 payload generation system based on Phase 1 testing results showing 2.23x-3.14x compression ratios. Build: TokenCountAnalyzer (tiktoken for GPT-5), ChunkingEngine (3 strategies: conversation, tool_usage, adaptive), PayloadGenerator (structured prompts), and SizeAnalyzer (cost estimation). Reference GPT5_PAYLOAD_TESTING_REPORT.md for exact specifications. Must handle sessions up to 4.5M tokens with memory-efficient streaming. Include format adapter for Claude .jsonl files. The SessionAnalyticsEngine is already implemented in /home/opsvi/master_root/apps/session-optimizer/session_analytics_engine.py - integrate with it.",
+      "dependencies": [],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/session-optimizer/src",
+        "reference_specs": "/home/opsvi/master_root/apps/session-optimizer/GPT5_PAYLOAD_TESTING_REPORT.md",
+        "existing_component": "/home/opsvi/master_root/apps/session-optimizer/session_analytics_engine.py",
+        "proven_performance": {
+          "conversation_chunking": "2.36x compression",
+          "tool_usage_chunking": "3.14x compression",
+          "adaptive_chunking": "2.23x compression"
+        },
+        "target_models": ["gpt-5", "gpt-5-mini", "gpt-5-chat-latest"],
+        "max_input_tokens": 200000,
+        "target_output_tokens": 1500
+      }
+    },
+    {
+      "task_id": "build_cli_tools",
+      "task_type": "development-specialist",
+      "prompt": "Create CLI tools referenced in Phase 1 reports: payload_cli.py (command-line payload generation with chunking strategies) and size_reporter.py (session size analysis and reporting). Include batch processing for multiple sessions, HTML/JSON output formats, and integration with existing SessionAnalyticsEngine at /home/opsvi/master_root/apps/session-optimizer/session_analytics_engine.py and the GPT5PayloadGenerator to be created. Support size categories (Small/Medium/Large/Extra Large) and optimization scoring (0-100 scale) as documented in testing results.",
+      "dependencies": ["implement_gpt5_payload_generator"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/session-optimizer/tools",
+        "existing_components": [
+          "/home/opsvi/master_root/apps/session-optimizer/session_analytics_engine.py",
+          "/home/opsvi/master_root/apps/session-optimizer/src/gpt5_payload_generator.py"
+        ],
+        "required_features": [
+          "Batch session processing",
+          "Multiple output formats (JSON, HTML)",
+          "Size categorization and optimization scoring",
+          "Cost estimation with GPT-5 pricing",
+          "Chunking strategy selection"
+        ]
+      }
+    },
+    {
+      "task_id": "create_claude_jsonl_adapter",
+      "task_type": "development-specialist",
+      "prompt": "Build format adapter to handle Claude .jsonl session files, addressing the compatibility issue identified in Phase 1 testing. The SessionAnalyticsEngine at /home/opsvi/master_root/apps/session-optimizer/session_analytics_engine.py may already handle this, but ensure robust .jsonl parsing. Analyze Claude .jsonl structure from /home/opsvi/.claude/projects/ and create/enhance translator to convert to SessionAnalyticsEngine compatible format. Must handle all message types, tool calls, file operations, and system messages correctly.",
+      "dependencies": ["implement_gpt5_payload_generator"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/session-optimizer/src",
+        "existing_component": "/home/opsvi/master_root/apps/session-optimizer/session_analytics_engine.py",
+        "critical_issue": "Format compatibility - requires adapter for Claude .jsonl files",
+        "claude_session_directory": "/home/opsvi/.claude/projects/-home-opsvi-master-root/",
+        "test_session_files": [
+          "87d77601-6cec-4852-bc5e-e6a0306d3c88.jsonl",
+          "47b30416-32c6-438d-b905-2d71442efb4b.jsonl"
+        ],
+        "adapter_requirements": [
+          "Parse Claude message format",
+          "Extract tool calls and results",
+          "Handle file operations and system messages",
+          "Convert to SessionAnalyticsEngine format",
+          "Preserve all critical metadata"
+        ]
+      }
+    },
+    {
+      "task_id": "integrate_and_test_system",
+      "task_type": "qa-testing-guru",
+      "prompt": "Integration testing of complete session optimization system using real Claude session data. Test SessionAnalyticsEngine (existing) + GPT5PayloadGenerator + CLI tools + Claude adapter with the current session (87d77601, 293K tokens) and largest session (47b30416, 4.5M tokens). Validate compression ratios match Phase 1 results (2.23x-3.14x), verify cost calculations, test all chunking strategies, and ensure end-to-end functionality. Generate validation report comparing actual vs. expected performance.",
+      "dependencies": ["build_cli_tools", "create_claude_jsonl_adapter"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/session-optimizer/testing",
+        "existing_components": [
+          "/home/opsvi/master_root/apps/session-optimizer/session_analytics_engine.py",
+          "/home/opsvi/master_root/apps/session-optimizer/src/gpt5_payload_generator.py",
+          "/home/opsvi/master_root/apps/session-optimizer/tools/payload_cli.py",
+          "/home/opsvi/master_root/apps/session-optimizer/tools/size_reporter.py"
+        ],
+        "test_sessions": [
+          "87d77601-6cec-4852-bc5e-e6a0306d3c88",
+          "47b30416-32c6-438d-b905-2d71442efb4b"
+        ],
+        "validation_criteria": [
+          "Compression ratios: 2.23x-3.14x achieved",
+          "Token counting accuracy: within 5% of GPT-5",
+          "Cost estimation accuracy",
+          "Memory efficiency for large sessions",
+          "Claude .jsonl format compatibility",
+          "All CLI tools functional"
+        ],
+        "reference_benchmarks": "/home/opsvi/master_root/apps/session-optimizer/session_size_analysis_summary.json"
+      }
+    },
+    {
+      "task_id": "create_implementation_documentation",
+      "task_type": "technical-writer",
+      "prompt": "Create comprehensive implementation documentation for the complete session optimization system. Include: API reference for all classes and methods, usage guide for CLI tools, integration examples with existing chat parsing infrastructure, deployment instructions, troubleshooting guide, and Phase 2 preparation roadmap for slash commands (/session-optimize, /session-import). Document all components created in Phase 1.5 and their relationship to Phase 1 analysis results. Reference the existing SessionAnalyticsEngine and all newly created components.",
+      "dependencies": ["integrate_and_test_system"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/session-optimizer/docs",
+        "all_components": [
+          "/home/opsvi/master_root/apps/session-optimizer/session_analytics_engine.py",
+          "/home/opsvi/master_root/apps/session-optimizer/src/gpt5_payload_generator.py",
+          "/home/opsvi/master_root/apps/session-optimizer/src/claude_jsonl_adapter.py",
+          "/home/opsvi/master_root/apps/session-optimizer/tools/payload_cli.py",
+          "/home/opsvi/master_root/apps/session-optimizer/tools/size_reporter.py"
+        ],
+        "documentation_scope": [
+          "Complete API reference",
+          "CLI tools usage guide",
+          "Integration examples",
+          "Deployment and setup",
+          "Troubleshooting guide",
+          "Phase 2 roadmap"
+        ],
+        "target_audience": "developers implementing Phase 2 slash commands",
+        "phase1_reference": "/home/opsvi/master_root/apps/session-optimizer/GPT5_PAYLOAD_TESTING_REPORT.md"
+      }
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "chat_id": "orchestrator_live",
+  "messages": [
+    {
+      "id": "msg_1757288382_0",
+      "agent_id": "system",
+      "content": "\ud83e\udd16 orchestrator (unified-orchestrator) joined the chat",
+      "timestamp": 1757288382.38093,
+      "message_type": "system",
+      "thread_id": null,
+      "reply_to": null,
+      "token_count": 13,
+      "dedupe_hash": "97f8a336171c5c70"
+    },
+    {
+      "id": "msg_1757288394_1",
+      "agent_id": "system",
+      "content": "\ud83e\udd16 orchestrator (unified-orchestrator) joined the chat",
+      "timestamp": 1757288394.1090503,
+      "message_type": "system",
+      "thread_id": null,
+      "reply_to": null,
+      "token_count": 13,
+      "dedupe_hash": "97f8a336171c5c70"
+    },
+    {
+      "id": "msg_1757288713_2",
+      "agent_id": "system",
+      "content": "\ud83e\udd16 orchestrator (unified-orchestrator) joined the chat",
+      "timestamp": 1757288713.7067344,
+      "message_type": "system",
+      "thread_id": null,
+      "reply_to": null,
+      "token_count": 13,
+      "dedupe_hash": "97f8a336171c5c70"
+    },
+    {
+      "id": "msg_1757288713_3",
+      "agent_id": "orchestrator",
+      "content": "\ud83c\udf9b\ufe0f Orchestrator online! Ready to coordinate 0 agents.",
+      "timestamp": 1757288713.7076266,
+      "message_type": "chat",
+      "thread_id": null,
+      "reply_to": null,
+      "token_count": 13,
+      "dedupe_hash": "5a4ad641973fd2eb"
+    },
+    {
+      "id": "msg_1757288773_4",
+      "agent_id": "system",
+      "content": "\ud83e\udd16 orchestrator (unified-orchestrator) joined the chat",
+      "timestamp": 1757288773.9263623,
+      "message_type": "system",
+      "thread_id": null,
+      "reply_to": null,
+      "token_count": 13,
+      "dedupe_hash": "97f8a336171c5c70"
+    },
+    {
+      "id": "msg_1757289678_5",
+      "agent_id": "system",
+      "content": "\ud83e\udd16 orchestrator (unified-orchestrator) joined the chat",
+      "timestamp": 1757289678.8668873,
+      "message_type": "system",
+      "thread_id": null,
+      "reply_to": null,
+      "token_count": 13,
+      "dedupe_hash": "97f8a336171c5c70"
+    },
+    {
+      "id": "msg_1757289683_6",
+      "agent_id": "system",
+      "content": "\ud83e\udd16 orchestrator (unified-orchestrator) joined the chat",
+      "timestamp": 1757289683.7094476,
+      "message_type": "system",
+      "thread_id": null,
+      "reply_to": null,
+      "token_count": 13,
+      "dedupe_hash": "97f8a336171c5c70"
+    },
+    {
+      "id": "msg_1757289745_7",
+      "agent_id": "system",
+      "content": "\ud83e\udd16 orchestrator (unified-orchestrator) joined the chat",
+      "timestamp": 1757289745.6367958,
+      "message_type": "system",
+      "thread_id": null,
+      "reply_to": null,
+      "token_count": 13,
+      "dedupe_hash": "97f8a336171c5c70"
+    },
+    {
+      "id": "msg_1757289753_8",
+      "agent_id": "system",
+      "content": "\ud83e\udd16 orchestrator (unified-orchestrator) joined the chat",
+      "timestamp": 1757289753.101435,
+      "message_type": "system",
+      "thread_id": null,
+      "reply_to": null,
+      "token_count": 13,
+      "dedupe_hash": "97f8a336171c5c70"
+    },
+    {
+      "id": "msg_1757289994_9",
+      "agent_id": "system",
+      "content": "\ud83e\udd16 orchestrator (unified-orchestrator) joined the chat",
+      "timestamp": 1757289994.626729,
+      "message_type": "system",
+      "thread_id": null,
+      "reply_to": null,
+      "token_count": 13,
+      "dedupe_hash": "97f8a336171c5c70"
+    },
+    {
+      "id": "msg_1757290001_10",
+      "agent_id": "system",
+      "content": "\ud83e\udd16 orchestrator (unified-orchestrator) joined the chat",
+      "timestamp": 1757290001.3501184,
+      "message_type": "system",
+      "thread_id": null,
+      "reply_to": null,
+      "token_count": 13,
+      "dedupe_hash": "97f8a336171c5c70"
+    },
+    {
+      "id": "msg_1757290187_11",
+      "agent_id": "system",
+      "content": "\ud83e\udd16 orchestrator (unified-orchestrator) joined the chat",
+      "timestamp": 1757290187.5324016,
+      "message_type": "system",
+      "thread_id": null,
+      "reply_to": null,
+      "token_count": 13,
+      "dedupe_hash": "97f8a336171c5c70"
+    }
+  ],
+  "agents": {
+    "orchestrator": {
+      "agent_id": "orchestrator",
+      "agent_type": "unified-orchestrator",
+      "status": "active",
+      "last_seen": 1757290187.532382,
+      "token_budget": 100000,
+      "tokens_used": 0,
+      "context_window": 8000
+    }
+  },
+  "threads": {},
+  "saved_at": 1757290187.532724
+}

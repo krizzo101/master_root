@@ -1,0 +1,46 @@
+{
+  "tasks": [
+    {
+      "task_id": "chat-components-analysis",
+      "task_type": "solution-architect",
+      "prompt": "Analyze the existing chat log parsing infrastructure components. Focus on: 1) Core Components Analysis - examine chat_taxonomy_parser.py, chat_report_generator.py, postgres_chat_ingester.py, chat_log_watcher.py, and chat_web_dashboard.py. Document their individual capabilities, data structures, and PostgreSQL/SQLite integration patterns. 2) Map the complete data flow from JSONL parsing to database storage. 3) Identify the taxonomy schema including sessions, nodes, tool_calls, tool_results, and file_operations tables. 4) Document key relationships, indexes, and content hashing mechanisms.",
+      "dependencies": [],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/output",
+        "analysis_scope": "chat-parsing-infrastructure",
+        "focus_areas": ["core-components", "data-structures", "schema-analysis", "integration-patterns"]
+      }
+    },
+    {
+      "task_id": "integration-mapping",
+      "task_type": "research",
+      "prompt": "Document integration points and communication patterns between chat parsing components. Focus on: 1) How components connect and communicate with each other. 2) Queue-based processing patterns and AsyncIO implementation. 3) Real-time vs batch processing capabilities. 4) Database dual-access patterns (SQLite legacy + PostgreSQL real-time). 5) File system monitoring and event-driven processing workflows. Map the complete integration architecture.",
+      "dependencies": ["chat-components-analysis"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/output",
+        "analysis_type": "integration-architecture"
+      }
+    },
+    {
+      "task_id": "extension-opportunities",
+      "task_type": "analysis",
+      "prompt": "Identify extension opportunities for session context optimization. Focus on: 1) Reusable parsing components that can be extended. 2) Extension points for new data sources beyond JSONL files. 3) Current context extraction capabilities and enhancement possibilities. 4) Integration patterns for session optimization workflows. 5) Recommend specific technical approaches for extending the system for advanced session context optimization use cases.",
+      "dependencies": ["chat-components-analysis", "integration-mapping"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/output",
+        "analysis_type": "extension-opportunities"
+      }
+    },
+    {
+      "task_id": "architectural-documentation",
+      "task_type": "technical-writer",
+      "prompt": "Create comprehensive architectural documentation showing how the chat parsing components form a complete analytics ecosystem. The documentation should include: 1) System architecture diagrams and component relationships. 2) Data flow documentation from parsing to storage. 3) API and extension point specifications. 4) Integration patterns for session context optimization. 5) Technical recommendations for extending the system. Format as detailed technical documentation suitable for developers implementing session optimization features.",
+      "dependencies": ["chat-components-analysis", "integration-mapping", "extension-opportunities"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/output",
+        "documentation_type": "technical-architecture",
+        "target_audience": "developers-implementing-session-optimization"
+      }
+    }
+  ]
+}

@@ -1,0 +1,282 @@
+{
+  "timestamp": "2025-09-09T06:00:00Z",
+  "status": "examples_ready",
+  "note": "These are example workflow structures that DPO can generate when properly configured with templates",
+  "examples": [
+    {
+      "id": "example_001",
+      "name": "User Authentication System",
+      "type": "feature",
+      "description": "Implement complete user authentication with login, registration, and password reset",
+      "workflow": {
+        "phases": [
+          {
+            "name": "Planning",
+            "tasks": [
+              "Define authentication requirements",
+              "Design database schema for users",
+              "Create API endpoint specifications",
+              "Design UI/UX mockups"
+            ]
+          },
+          {
+            "name": "Backend Development",
+            "tasks": [
+              "Set up user model and database",
+              "Implement password hashing",
+              "Create registration endpoint",
+              "Create login endpoint",
+              "Implement JWT token generation",
+              "Add password reset functionality",
+              "Write unit tests"
+            ]
+          },
+          {
+            "name": "Frontend Development",
+            "tasks": [
+              "Create registration form",
+              "Create login form",
+              "Implement form validation",
+              "Add password reset flow",
+              "Handle authentication state",
+              "Add protected routes"
+            ]
+          },
+          {
+            "name": "Testing & Deployment",
+            "tasks": [
+              "Integration testing",
+              "Security testing",
+              "Performance testing",
+              "Documentation",
+              "Deployment preparation"
+            ]
+          }
+        ],
+        "quality_gates": [
+          "Code review completed",
+          "All tests passing",
+          "Security audit passed",
+          "Documentation complete"
+        ],
+        "agents_required": ["backend_developer", "frontend_developer", "qa_engineer", "security_analyst"]
+      }
+    },
+    {
+      "id": "example_002",
+      "name": "Microservices Architecture",
+      "type": "architecture",
+      "description": "Design and implement microservices architecture with API gateway, service mesh, and monitoring",
+      "workflow": {
+        "phases": [
+          {
+            "name": "Architecture Design",
+            "tasks": [
+              "Define service boundaries",
+              "Design API gateway architecture",
+              "Plan service mesh configuration",
+              "Design monitoring strategy",
+              "Create architecture diagrams"
+            ]
+          },
+          {
+            "name": "Infrastructure Setup",
+            "tasks": [
+              "Set up Kubernetes cluster",
+              "Deploy API gateway (Kong/Traefik)",
+              "Configure service mesh (Istio/Linkerd)",
+              "Set up monitoring stack (Prometheus/Grafana)",
+              "Configure CI/CD pipelines"
+            ]
+          },
+          {
+            "name": "Service Implementation",
+            "tasks": [
+              "Create service templates",
+              "Implement user service",
+              "Implement product service",
+              "Implement order service",
+              "Implement payment service",
+              "Add inter-service communication"
+            ]
+          },
+          {
+            "name": "Integration & Testing",
+            "tasks": [
+              "Service integration testing",
+              "Load testing",
+              "Chaos engineering tests",
+              "Security scanning",
+              "Performance optimization"
+            ]
+          }
+        ],
+        "quality_gates": [
+          "Architecture review approved",
+          "All services deployed",
+          "Integration tests passing",
+          "Performance benchmarks met",
+          "Security scan passed"
+        ],
+        "agents_required": ["architect", "devops_engineer", "backend_developer", "qa_engineer", "security_analyst"]
+      }
+    },
+    {
+      "id": "example_003",
+      "name": "Critical Production Bug Fix",
+      "type": "bugfix",
+      "description": "Fix memory leak in payment processing service affecting production",
+      "workflow": {
+        "phases": [
+          {
+            "name": "Investigation",
+            "tasks": [
+              "Analyze memory dumps",
+              "Review recent code changes",
+              "Identify leak source",
+              "Document root cause"
+            ]
+          },
+          {
+            "name": "Fix Development",
+            "tasks": [
+              "Implement memory leak fix",
+              "Add memory monitoring",
+              "Write regression tests",
+              "Code review"
+            ]
+          },
+          {
+            "name": "Testing",
+            "tasks": [
+              "Unit testing",
+              "Memory profiling",
+              "Load testing",
+              "Staging deployment test"
+            ]
+          },
+          {
+            "name": "Deployment",
+            "tasks": [
+              "Prepare hotfix release",
+              "Deploy to production",
+              "Monitor metrics",
+              "Verify fix effectiveness"
+            ]
+          }
+        ],
+        "quality_gates": [
+          "Root cause identified",
+          "Fix verified in staging",
+          "Memory tests passing",
+          "Production metrics normal"
+        ],
+        "agents_required": ["senior_developer", "qa_engineer", "devops_engineer"]
+      }
+    },
+    {
+      "id": "example_004",
+      "name": "Database Query Optimization",
+      "type": "refactoring",
+      "description": "Refactor database queries for better performance",
+      "workflow": {
+        "phases": [
+          {
+            "name": "Analysis",
+            "tasks": [
+              "Profile slow queries",
+              "Analyze query execution plans",
+              "Identify optimization opportunities",
+              "Document current performance"
+            ]
+          },
+          {
+            "name": "Optimization",
+            "tasks": [
+              "Create database indexes",
+              "Optimize complex queries",
+              "Implement query caching",
+              "Add connection pooling",
+              "Refactor ORM usage"
+            ]
+          },
+          {
+            "name": "Testing",
+            "tasks": [
+              "Benchmark improvements",
+              "Load testing",
+              "Regression testing",
+              "Monitor query performance"
+            ]
+          }
+        ],
+        "quality_gates": [
+          "Performance baseline established",
+          "50% improvement achieved",
+          "No regression in functionality",
+          "Tests passing"
+        ],
+        "agents_required": ["database_admin", "backend_developer", "performance_engineer"]
+      }
+    },
+    {
+      "id": "example_005",
+      "name": "API Documentation",
+      "type": "documentation",
+      "description": "Create comprehensive API documentation with examples",
+      "workflow": {
+        "phases": [
+          {
+            "name": "Documentation Planning",
+            "tasks": [
+              "Audit existing APIs",
+              "Define documentation structure",
+              "Choose documentation tools",
+              "Create documentation template"
+            ]
+          },
+          {
+            "name": "Documentation Creation",
+            "tasks": [
+              "Document authentication endpoints",
+              "Document resource endpoints",
+              "Add request/response examples",
+              "Document error codes",
+              "Create SDK examples",
+              "Add integration guides"
+            ]
+          },
+          {
+            "name": "Review & Publishing",
+            "tasks": [
+              "Technical review",
+              "Test all examples",
+              "Set up documentation site",
+              "Configure auto-generation",
+              "Publish documentation"
+            ]
+          }
+        ],
+        "quality_gates": [
+          "All endpoints documented",
+          "Examples tested and working",
+          "Review completed",
+          "Documentation site live"
+        ],
+        "agents_required": ["technical_writer", "developer", "qa_engineer"]
+      }
+    }
+  ],
+  "usage_instructions": {
+    "to_generate_workflow": "await dpo.process_development_request(request_description)",
+    "to_use_template": "await dpo.process_development_request(request, project_type='web_app')",
+    "to_enhance_with_ai": "await dpo.process_development_request(request, complexity='complex')",
+    "to_check_status": "await dpo.get_workflow_status(workflow_id)",
+    "to_get_results": "await dpo.get_workflow_results(workflow_id)"
+  },
+  "configuration_needed": {
+    "templates": "Add these workflow structures to sdlc_template_system.py",
+    "api_keys": "Set OPENAI_API_KEY environment variable for AI enhancement",
+    "output_dir": "Configure output directory in DPOConfiguration"
+  }
+}

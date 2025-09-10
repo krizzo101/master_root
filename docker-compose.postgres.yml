@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: timescale/timescaledb:latest-pg15
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM timescale/timescaledb:latest-pg15
+        RUN apt-get update && apt-get install -y \
+            postgresql-15-pgvector \
+            && rm -rf /var/lib/apt/lists/*
+    container_name: unified_context_postgres
+    environment:
+      POSTGRES_DB: unified_context
+      POSTGRES_USER: opsvi
+      POSTGRES_PASSWORD: opsvi_secure_password
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U opsvi -d unified_context"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - context_network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: unified_context_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@opsvi.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - "5433:80"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - context_network
+
+volumes:
+  postgres_data:
+    name: unified_context_postgres_data
+
+networks:
+  context_network:
+    name: unified_context_network
+    driver: bridge

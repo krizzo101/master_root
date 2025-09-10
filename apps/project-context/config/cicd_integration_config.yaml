@@ -1,0 +1,329 @@
+# CI/CD Integration Configuration for Unified Context System
+
+# Global webhook processing settings
+webhook_processor:
+  # Worker configuration
+  num_workers: 10
+  queue_maxsize: 10000
+  processing_timeout: 30
+
+  # Retry settings
+  max_retries: 3
+  retry_delay: 5
+
+  # Rate limiting (requests per minute per IP)
+  rate_limit_per_minute: 1000
+  rate_limit_window: 60
+
+# Platform-specific adapter configurations
+adapters:
+  github_actions:
+    enabled: true
+    platform: "github_actions"
+
+    # API Configuration
+    base_url: "https://api.github.com"
+    api_token: "${GITHUB_TOKEN}"  # Environment variable
+    webhook_secret: "${GITHUB_WEBHOOK_SECRET}"
+
+    # Repository filtering
+    repositories:
+      - "your-org/repo1"
+      - "your-org/repo2"
+      - "your-org/frontend-app"
+      - "your-org/backend-api"
+
+    # Event filtering
+    event_types:
+      - "WORKFLOW_STARTED"
+      - "WORKFLOW_COMPLETED"
+      - "JOB_STARTED"
+      - "JOB_COMPLETED"
+      - "DEPLOYMENT_STARTED"
+      - "DEPLOYMENT_COMPLETED"
+      - "CHECK_RUN_COMPLETED"
+
+    # Branch filtering
+    track_branches:
+      - "main"
+      - "master"
+      - "develop"
+      - "staging"
+      - "production"
+
+    # API settings
+    api_rate_limit: 5000  # GitHub has higher limits
+    concurrent_requests: 20
+    request_timeout: 30
+
+    # Historical sync
+    historical_sync_enabled: true
+    historical_sync_days: 90
+    sync_batch_size: 100
+
+    # Correlation settings
+    enable_commit_correlation: true
+    enable_temporal_correlation: true
+    temporal_window_hours: 2
+
+  gitlab_ci:
+    enabled: true
+    platform: "gitlab_ci"
+
+    # API Configuration
+    base_url: "https://gitlab.com"  # Or your GitLab instance
+    api_token: "${GITLAB_TOKEN}"
+    webhook_secret: "${GITLAB_WEBHOOK_SECRET}"
+
+    # Project filtering (GitLab uses project IDs)
+    projects:
+      - "123"  # Project ID
+      - "456"
+      - "789"
+
+    # Event filtering
+    event_types:
+      - "WORKFLOW_STARTED"
+      - "WORKFLOW_COMPLETED"
+      - "JOB_STARTED"
+      - "JOB_COMPLETED"
+      - "DEPLOYMENT_STARTED"
+      - "DEPLOYMENT_COMPLETED"
+
+    # Branch filtering
+    track_branches:
+      - "main"
+      - "master"
+      - "develop"
+      - "staging"
+      - "production"
+
+    # API settings
+    api_rate_limit: 2000  # GitLab rate limits
+    concurrent_requests: 15
+    request_timeout: 30
+
+    # Historical sync
+    historical_sync_enabled: true
+    historical_sync_days: 60
+    sync_batch_size: 50
+
+    # Correlation settings
+    enable_commit_correlation: true
+    enable_temporal_correlation: true
+    temporal_window_hours: 2
+
+  jenkins:
+    enabled: false  # Enable when Jenkins is configured
+    platform: "jenkins"
+
+    # API Configuration
+    base_url: "${JENKINS_URL}"  # e.g., https://jenkins.company.com
+    api_token: "${JENKINS_API_TOKEN}"
+    username: "${JENKINS_USERNAME}"
+
+    # Job filtering
+    job_patterns:
+      - "*/main"  # All main branch builds
+      - "*/develop"
+      - "deploy-*"  # All deployment jobs
+      - "test-*"    # All test jobs
+
+    # Event filtering
+    event_types:
+      - "BUILD_STARTED"
+      - "BUILD_COMPLETED"
+      - "DEPLOYMENT_COMPLETED"
+
+    # API settings
+    api_rate_limit: 100  # Conservative for Jenkins
+    concurrent_requests: 5
+    request_timeout: 60   # Jenkins can be slow
+
+    # Historical sync
+    historical_sync_enabled: true
+    historical_sync_days: 30
+    sync_batch_size: 25
+
+    # Correlation settings
+    enable_commit_correlation: true
+    enable_temporal_correlation: true
+    temporal_window_hours: 4  # Jenkins builds can take longer
+
+  azure_devops:
+    enabled: false  # Enable when Azure DevOps is configured
+    platform: "azure_devops"
+
+    # API Configuration
+    organization: "${AZURE_DEVOPS_ORG}"
+    base_url: "https://dev.azure.com/${AZURE_DEVOPS_ORG}"
+    personal_access_token: "${AZURE_DEVOPS_PAT}"
+
+    # Project filtering
+    projects:
+      - "ProjectName1"
+      - "ProjectName2"
+
+    # Build definition filtering
+    definition_ids:
+      - 123
+      - 456
+      - 789
+
+    # Event filtering
+    event_types:
+      - "BUILD_STARTED"
+      - "BUILD_COMPLETED"
+      - "DEPLOYMENT_STARTED"
+      - "DEPLOYMENT_COMPLETED"
+      - "RELEASE_CREATED"
+
+    # API settings
+    api_rate_limit: 300
+    concurrent_requests: 10
+    request_timeout: 30
+
+    # Historical sync
+    historical_sync_enabled: true
+    historical_sync_days: 60
+    sync_batch_size: 50
+
+    # Correlation settings
+    enable_commit_correlation: true
+    enable_temporal_correlation: true
+    temporal_window_hours: 3
+
+  circleci:
+    enabled: false
+    platform: "circleci"
+
+    # API Configuration
+    base_url: "https://circleci.com/api/v2"
+    api_token: "${CIRCLECI_TOKEN}"
+
+    # Project filtering (org-name/project-name format)
+    projects:
+      - "gh/your-org/repo1"
+      - "gh/your-org/repo2"
+
+    # Event filtering
+    event_types:
+      - "WORKFLOW_COMPLETED"
+      - "JOB_COMPLETED"
+
+    # API settings
+    api_rate_limit: 1000
+    concurrent_requests: 15
+    request_timeout: 30
+
+    # Historical sync
+    historical_sync_enabled: true
+    historical_sync_days: 30
+    sync_batch_size: 50
+
+    # Correlation settings
+    enable_commit_correlation: true
+    enable_temporal_correlation: true
+    temporal_window_hours: 2
+
+# Database schema extensions for CI/CD data
+database:
+  # Connection settings
+  url: "${DATABASE_URL}"
+  pool_size: 20
+
+  # CI/CD specific table settings
+  cicd_extensions:
+    enable_performance_indexes: true
+    enable_correlation_views: true
+    retention_days: 365
+
+  # Batch processing settings
+  batch_size: 1000
+  commit_interval: 30  # seconds
+
+# Monitoring and alerting
+monitoring:
+  # Metrics collection
+  enable_detailed_metrics: true
+  metrics_retention_days: 90
+
+  # Performance thresholds
+  processing_time_warning_ms: 5000
+  processing_time_error_ms: 30000
+  queue_size_warning: 1000
+  queue_size_error: 5000
+
+  # Health checks
+  health_check_interval: 60
+  health_check_timeout: 10
+
+  # Alerting
+  enable_alerts: true
+  alert_channels:
+    - type: "webhook"
+      url: "${ALERT_WEBHOOK_URL}"
+    - type: "email"
+      recipients:
+        - "ops@company.com"
+        - "dev@company.com"
+
+# Security settings
+security:
+  # Webhook signature validation
+  require_signature_validation: true
+
+  # API authentication
+  require_api_authentication: true
+
+  # Rate limiting
+  enable_rate_limiting: true
+
+  # IP allowlisting (optional)
+  allowed_ips: []
+    # - "140.82.112.0/20"  # GitHub webhooks
+    # - "35.231.147.226/32" # GitLab.com webhooks
+
+# Feature flags
+features:
+  # Core features
+  webhook_processing: true
+  historical_sync: true
+  relationship_detection: true
+
+  # Advanced features
+  ml_pattern_detection: false    # Coming in Phase 3
+  predictive_analytics: false   # Coming in Phase 3
+  auto_incident_correlation: false  # Coming in Phase 3
+
+# Performance tuning
+performance:
+  # Memory management
+  max_memory_usage_mb: 2048
+  gc_interval_seconds: 300
+
+  # Connection pooling
+  max_connections_per_adapter: 10
+  connection_timeout_seconds: 30
+
+  # Queue management
+  queue_processing_batch_size: 10
+  queue_flush_interval_seconds: 5
+
+  # Caching
+  enable_response_caching: true
+  cache_ttl_seconds: 300
+
+# Development and testing
+development:
+  # Debug settings
+  enable_debug_logging: false
+  log_webhook_payloads: false  # Security risk in production
+
+  # Testing
+  enable_test_endpoints: false  # Disable in production
+  mock_external_apis: false
+
+  # Data validation
+  strict_payload_validation: true
+  validate_timestamps: true

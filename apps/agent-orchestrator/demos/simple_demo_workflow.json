@@ -1,0 +1,47 @@
+{
+  "tasks": [
+    {
+      "task_id": "demo_script_creator",
+      "task_type": "demo-builder",
+      "prompt": "Create a comprehensive demonstration script that showcases the Agent Orchestrator system. The script should include: 1) A Python CLI tool that demonstrates multi-agent coordination, 2) Sample tasks that show different agent types working together, 3) Real-time progress monitoring, 4) A README explaining how to run the demo. Build a working example that proves the orchestrator can coordinate multiple specialized agents effectively.",
+      "context": {
+        "demo_type": "orchestrator_capabilities",
+        "target_audience": "developers_and_stakeholders",
+        "complexity": "moderate",
+        "deliverables": ["python_script", "sample_tasks", "documentation"]
+      },
+      "dependencies": [],
+      "quality_gates": ["functionality_check", "documentation_completeness"]
+    },
+    {
+      "task_id": "agent_examples",
+      "task_type": "example-generator",
+      "prompt": "Create 5 different example agent types that demonstrate the orchestrator's versatility: 1) Code Analyzer agent, 2) Documentation Writer agent, 3) Test Generator agent, 4) Performance Optimizer agent, 5) Security Reviewer agent. Each should have clear prompts, expected outputs, and demonstrate different capabilities. Show how they can work independently and collaboratively.",
+      "context": {
+        "agent_types": ["analyzer", "writer", "tester", "optimizer", "security"],
+        "coordination_mode": "both_independent_and_collaborative"
+      },
+      "dependencies": ["demo_script_creator"],
+      "quality_gates": ["agent_diversity", "clear_examples"]
+    },
+    {
+      "task_id": "integration_demo",
+      "task_type": "integration-specialist",
+      "prompt": "Create a working demonstration that shows the Agent Orchestrator integrated with real tools and producing actual results. Build a script that runs multiple agents in sequence and parallel, shows dependency management, checkpoint/recovery, and real-time monitoring. Include measurable outcomes that prove the system works as intended.",
+      "context": {
+        "integration_points": ["file_system", "real_tools", "monitoring", "checkpoints"],
+        "proof_of_work": "measurable_outcomes"
+      },
+      "dependencies": ["agent_examples"],
+      "quality_gates": ["integration_success", "measurable_results"]
+    }
+  ],
+  "metadata": {
+    "workflow_name": "Simple_Orchestrator_Demo",
+    "description": "Quick demonstration of orchestrator capabilities with working examples",
+    "created_by": "AI_Agent",
+    "estimated_duration": "30_minutes",
+    "complexity": "moderate",
+    "deliverable": "Working demonstration with proof of orchestrator capabilities"
+  }
+}

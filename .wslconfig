@@ -1,0 +1,26 @@
+[wsl2]
+# Memory allocation for 40GB system
+memory=28GB
+
+# Swap configuration
+swap=8GB
+swapfile=C:\\temp\\wsl-swap.vhdx
+
+# CPU configuration (adjust based on your CPU)
+processors=8
+
+# Disk settings
+localhostForwarding=true
+kernelCommandLine=systemd.unified_cgroup_hierarchy=1
+
+# Network settings
+networkingMode=mirrored
+dnsTunneling=true
+firewall=false
+autoProxy=true
+
+# Performance optimizations
+pageReporting=true
+guiApplications=true
+nestedVirtualization=true
+vpnkit=true

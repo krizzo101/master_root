@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-09-09T02:10:29.020537",
+  "dry_run": false,
+  "base_directory": "/home/opsvi/master_root/apps/agent-orchestrator",
+  "actions_taken": [
+    "Created backup: /home/opsvi/master_root/apps/agent-orchestrator/backups/agent_orchestrator_backup_20250909_021027.tar.gz",
+    "Deleted: orchestrator_20250908_121637.log",
+    "Deleted: orchestrator_20250908_121932.log",
+    "Deleted: orchestrator_20250908_122028.log",
+    "Deleted: orchestrator_20250908_125406.log",
+    "Deleted: orchestrator_20250908_130457.log",
+    "Deleted: orchestrator_20250908_130547.log",
+    "Deleted: orchestrator_20250908_133238.log",
+    "Deleted: orchestrator_20250908_133244.log",
+    "Deleted: orchestrator_20250908_133251.log",
+    "Deleted: orchestrator_20250908_140458.log",
+    "Deleted: orchestrator_20250908_145849.log",
+    "Deleted: orchestrator_20250908_214056.log",
+    "Deleted: orchestrator_20250908_214305.log",
+    "Deleted: orchestrator_20250909_004256.log",
+    "Deleted: orchestrator_20250909_004306.log",
+    "Deleted: orchestrator_20250909_004704.log",
+    "Deleted: mcp-shell.log",
+    "Deleted: temp_orchestrator_output_spec.md",
+    "Deleted: test_report.html",
+    "Deleted: system_analysis_tasks.broken.json",
+    "Deleted: system_analysis_tasks.json.original"
+  ],
+  "space_freed_bytes": 48135,
+  "space_freed_mb": 0.05
+}

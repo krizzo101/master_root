@@ -1,0 +1,151 @@
+{
+  "name": "cli-tool",
+  "category": "cli",
+  "description": "Command-line interface tool with rich features",
+  "version": "1.0.0",
+  "technologies": ["python", "click", "rich"],
+  "quality_gates": {
+    "code_coverage": 85,
+    "documentation_required": true,
+    "type_checking": true
+  },
+  "workflow": {
+    "phases": [
+      {
+        "name": "requirements_analysis",
+        "agents": ["requirements_analyst"],
+        "duration_estimate": "30m",
+        "deliverables": ["requirements.md", "cli_spec.md"]
+      },
+      {
+        "name": "design",
+        "agents": ["system_architect"],
+        "duration_estimate": "30m",
+        "deliverables": ["architecture.md", "command_structure.md"]
+      },
+      {
+        "name": "core_development",
+        "agents": ["backend_developer", "cli_specialist"],
+        "duration_estimate": "2h",
+        "deliverables": ["src/cli/", "src/core/", "src/utils/"]
+      },
+      {
+        "name": "command_implementation",
+        "agents": ["backend_developer"],
+        "duration_estimate": "1.5h",
+        "deliverables": ["src/commands/", "src/handlers/"]
+      },
+      {
+        "name": "testing",
+        "agents": ["test_engineer"],
+        "duration_estimate": "1h",
+        "deliverables": ["tests/", "test_report.md"]
+      },
+      {
+        "name": "documentation",
+        "agents": ["technical_writer"],
+        "duration_estimate": "45m",
+        "deliverables": ["docs/", "README.md", "USAGE.md"]
+      },
+      {
+        "name": "packaging",
+        "agents": ["devops_engineer"],
+        "duration_estimate": "30m",
+        "deliverables": ["setup.py", "Makefile", ".github/workflows/"]
+      }
+    ]
+  },
+  "structure": {
+    "directories": [
+      "src/cli",
+      "src/commands",
+      "src/core",
+      "src/utils",
+      "src/handlers",
+      "tests/unit",
+      "tests/integration",
+      "docs",
+      "examples",
+      "scripts"
+    ],
+    "files": [
+      "setup.py",
+      "requirements.txt",
+      "README.md",
+      "USAGE.md",
+      "CHANGELOG.md",
+      ".gitignore",
+      "Makefile",
+      "pyproject.toml"
+    ]
+  },
+  "dependencies": {
+    "core": [
+      "click>=8.1.0",
+      "rich>=13.0.0",
+      "pydantic>=2.0.0",
+      "pyyaml>=6.0",
+      "requests>=2.28.0"
+    ],
+    "dev": [
+      "pytest>=7.4.0",
+      "pytest-cov>=4.1.0",
+      "black>=23.0.0",
+      "flake8>=6.0.0",
+      "mypy>=1.4.0",
+      "sphinx>=5.0.0"
+    ]
+  },
+  "configuration": {
+    "config_files": [
+      "~/.config/{name}/config.yaml",
+      "/etc/{name}/config.yaml"
+    ],
+    "environment_variables": [
+      "{NAME}_CONFIG",
+      "{NAME}_LOG_LEVEL",
+      "{NAME}_OUTPUT_FORMAT"
+    ]
+  },
+  "commands": {
+    "structure": "hierarchical",
+    "main_commands": [
+      "init",
+      "config",
+      "run",
+      "status",
+      "list",
+      "help"
+    ],
+    "features": [
+      "auto-completion",
+      "colored output",
+      "progress bars",
+      "interactive prompts",
+      "config management",
+      "plugin system"
+    ]
+  },
+  "quality_checks": [
+    {
+      "name": "lint",
+      "command": "flake8 src tests",
+      "threshold": 0
+    },
+    {
+      "name": "type_check",
+      "command": "mypy src",
+      "threshold": 0
+    },
+    {
+      "name": "test",
+      "command": "pytest tests/ --cov=src --cov-report=term-missing",
+      "threshold": 85
+    },
+    {
+      "name": "docs",
+      "command": "sphinx-build -b html docs docs/_build",
+      "threshold": 100
+    }
+  ]
+}

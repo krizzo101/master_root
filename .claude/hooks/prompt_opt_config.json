@@ -1,0 +1,31 @@
+{
+  "mode": "opt-in",
+  "modes": {
+    "always": "Always optimize unless bypassed with --raw, raw:, or [RAW] tags",
+    "opt-in": "Only optimize when prompt starts with ++, +opt, or opt:",
+    "opt-out": "Optimize by default, skip with --skip, --noopt, or skip:",
+    "disabled": "Never optimize (hook still runs but passes through)"
+  },
+  "opt_in_triggers": [
+    "++",
+    "+opt",
+    "+optimize",
+    "opt:",
+    "optimize:"
+  ],
+  "opt_out_triggers": [
+    "--skip",
+    "--noopt",
+    "--pass",
+    "skip:",
+    "noopt:"
+  ],
+  "bypass_triggers": [
+    "--raw",
+    "--exact",
+    "--verbatim",
+    "raw:",
+    "exact:"
+  ],
+  "description": "Configure prompt optimizer behavior. Change 'mode' to one of: always, opt-in, opt-out, disabled"
+}

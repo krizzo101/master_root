@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Orchestrator Dashboard - Demo</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .demo-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .demo-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-width: 200px;
+        }
+
+        .demo-controls h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        .demo-controls button {
+            width: 100%;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 0.25rem;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .demo-controls button:hover {
+            background: #e9ecef;
+        }
+
+        .demo-data-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-banner">
+        <h2>🚀 Agent Orchestrator Dashboard - Demo Mode</h2>
+        <p>This is a demonstration of the dashboard interface with sample data</p>
+    </div>
+
+    <!-- Main Dashboard Container -->
+    <div id="dashboard-container" class="dashboard-container">
+        <div class="demo-data-indicator">Demo Data Active</div>
+
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1 class="dashboard-title">
+                    <span class="title-icon">🤖</span>
+                    Agent Orchestrator Dashboard
+                </h1>
+                <div class="connection-status" id="connection-status">
+                    <span class="status-indicator connected" id="status-indicator"></span>
+                    <span class="status-text" id="status-text">Demo Mode</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="header-btn active" id="auto-refresh-toggle" title="Toggle Auto-refresh">
+                    <span class="btn-icon">🔄</span>
+                    <span class="btn-text">Auto-refresh</span>
+                </button>
+                <button class="header-btn" id="settings-btn" title="Settings">
+                    <span class="btn-icon">⚙️</span>
+                    <span class="btn-text desktop-only">Settings</span>
+                </button>
+                <button class="header-btn" id="help-btn" title="Help">
+                    <span class="btn-icon">❓</span>
+                    <span class="btn-text desktop-only">Help</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Toolbar -->
+        <div class="dashboard-toolbar">
+            <div class="toolbar-left">
+                <button class="primary-btn" id="new-workflow-btn">
+                    <span class="btn-icon">➕</span>
+                    <span class="btn-text">New Workflow</span>
+                </button>
+                <div class="dropdown" id="bulk-actions-dropdown">
+                    <button class="secondary-btn dropdown-toggle">
+                        <span class="btn-text">Bulk Actions</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <button class="dropdown-item" data-action="pause-all">Pause All</button>
+                        <button class="dropdown-item" data-action="resume-all">Resume All</button>
+                        <button class="dropdown-item" data-action="cancel-selected">Cancel Selected</button>
+                        <button class="dropdown-item" data-action="export-selected">Export Selected</button>
+                    </div>
+                </div>
+            </div>
+            <div class="toolbar-right">
+                <div class="filter-controls">
+                    <select class="filter-select" id="status-filter">
+                        <option value="all">All Status</option>
+                        <option value="running">Running</option>
+                        <option value="paused">Paused</option>
+                        <option value="completed">Completed</option>
+                        <option value="failed">Failed</option>
+                        <option value="queued">Queued</option>
+                    </select>
+                    <select class="filter-select" id="sort-select">
+                        <option value="recent">Recent</option>
+                        <option value="name">Name</option>
+                        <option value="progress">Progress</option>
+                        <option value="duration">Duration</option>
+                    </select>
+                </div>
+                <button class="secondary-btn" id="compare-btn">
+                    <span class="btn-icon">📊</span>
+                    <span class="btn-text">Compare</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- System Overview Panel (desktop only) -->
+            <aside class="system-overview desktop-only" id="system-overview">
+                <div class="overview-header">
+                    <h3>System Overview</h3>
+                    <button class="icon-btn" id="refresh-overview" title="Refresh">🔄</button>
+                </div>
+                <div class="overview-content">
+                    <div class="metric-row">
+                        <span class="metric-label">Active Workflows:</span>
+                        <span class="metric-value" id="active-count">4</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Queued:</span>
+                        <span class="metric-value" id="queued-count">1</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">CPU Usage:</span>
+                        <span class="metric-value" id="cpu-usage">58%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Memory:</span>
+                        <span class="metric-value" id="memory-usage">4.2GB / 16GB</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Disk:</span>
+                        <span class="metric-value" id="disk-usage">127GB / 500GB</span>
+                    </div>
+                    <div class="overview-actions">
+                        <button class="small-btn" id="view-details-btn">View Details</button>
+                        <button class="small-btn" id="system-health-btn">System Health</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Workflows Grid -->
+            <div class="workflows-container">
+                <div class="workflows-grid" id="workflows-grid">
+                    <!-- Demo workflow cards will be inserted here by JavaScript -->
+                </div>
+                <div class="loading-state" id="loading-state" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Loading workflows...</p>
+                </div>
+                <div class="empty-state" id="empty-state" style="display: none;">
+                    <div class="empty-icon">🎯</div>
+                    <h3>No workflows yet</h3>
+                    <p>Create your first workflow to get started.</p>
+                    <button class="primary-btn" id="create-first-workflow">Create Workflow</button>
+                </div>
+                <div class="error-state" id="error-state" style="display: none;">
+                    <div class="error-icon">⚠️</div>
+                    <h3>Unable to load workflows</h3>
+                    <p id="error-message">Connection lost. Check your network and try again.</p>
+                    <div class="error-actions">
+                        <button class="primary-btn" id="retry-btn">Retry</button>
+                        <button class="secondary-btn" id="offline-mode-btn">Offline Mode</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Demo workflow modals (same as main index.html) -->
+    <div class="modal" id="workflow-detail-modal" style="display: none;">
+        <div class="modal-backdrop" id="modal-backdrop"></div>
+        <div class="modal-content workflow-detail">
+            <div class="modal-header">
+                <button class="back-btn" id="back-to-dashboard">
+                    <span class="btn-icon">←</span>
+                    <span class="btn-text">Back to Dashboard</span>
+                </button>
+                <div class="modal-title">
+                    <h2 id="workflow-title">System Documentation</h2>
+                    <div class="workflow-status-badge running" id="workflow-status-badge">Running</div>
+                </div>
+                <div class="modal-actions">
+                    <button class="secondary-btn" id="clone-workflow">
+                        <span class="btn-icon">📋</span>
+                        <span class="btn-text">Clone</span>
+                    </button>
+                    <button class="secondary-btn" id="export-workflow">
+                        <span class="btn-icon">📤</span>
+                        <span class="btn-text">Export</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="workflow-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Status:</span>
+                    <span class="meta-value" id="detail-status">Running</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Started:</span>
+                    <span class="meta-value" id="detail-started">2025-01-15 14:23:45</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">ETA:</span>
+                    <span class="meta-value" id="detail-eta">8 min</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">CPU:</span>
+                    <span class="meta-value" id="detail-cpu">12%</span>
+                </div>
+            </div>
+
+            <div class="workflow-detail-content">
+                <div class="detail-panels desktop-only">
+                    <div class="left-panel">
+                        <div class="panel-section">
+                            <h3>Progress & Stats</h3>
+                            <div class="progress-display">
+                                <div class="progress-label">Overall: <span id="detail-progress">67%</span></div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="detail-progress-fill" style="width: 67%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="center-panel">
+                        <div class="panel-section">
+                            <h3>Live Log Stream</h3>
+                            <div class="log-controls">
+                                <button class="small-btn active" id="auto-scroll-toggle">Auto-scroll</button>
+                                <button class="small-btn" id="pause-logs">Pause</button>
+                                <button class="small-btn" id="download-logs">Download</button>
+                                <select class="small-select" id="log-filter">
+                                    <option value="all">All Levels</option>
+                                    <option value="error">Errors</option>
+                                    <option value="warning">Warnings</option>
+                                    <option value="info">Info</option>
+                                </select>
+                            </div>
+                            <div class="log-stream" id="log-stream">
+                                <div class="log-entry info">
+                                    <span class="log-time">[14:31:22]</span>
+                                    <span class="log-level">INFO:</span>
+                                    <span class="log-message">Starting documentation generation...</span>
+                                </div>
+                                <div class="log-entry info">
+                                    <span class="log-time">[14:31:23]</span>
+                                    <span class="log-level">INFO:</span>
+                                    <span class="log-message">Analyzing project structure</span>
+                                </div>
+                                <div class="log-entry warning">
+                                    <span class="log-time">[14:31:31]</span>
+                                    <span class="log-level">WARN:</span>
+                                    <span class="log-message">Missing docstring in TokenPool.allocate</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-panel">
+                        <div class="panel-section">
+                            <h3>Output Preview</h3>
+                            <div class="output-tabs">
+                                <button class="tab-btn active" data-file="README.md">README.md</button>
+                                <button class="tab-btn" data-file="ARCHITECTURE.md">ARCHITECTURE.md</button>
+                                <button class="tab-btn" data-file="API_REFERENCE.md">API_REFERENCE.md</button>
+                            </div>
+                            <div class="output-content" id="output-content">
+                                <pre><code># Agent Orchestrator
+
+A sophisticated multi-agent workflow orchestration system.
+
+## Quick Start
+
+```bash
+pip install -r requirements.txt
+python main.py --mode dashboard
+```</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Controls -->
+    <div class="demo-controls">
+        <h4>Demo Controls</h4>
+        <button onclick="loadDemoData()">Load Sample Data</button>
+        <button onclick="simulateUpdate()">Simulate Update</button>
+        <button onclick="showRandomDetail()">Show Detail View</button>
+        <button onclick="showComparison()">Show Comparison</button>
+        <button onclick="toggleTheme()">Toggle Theme</button>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script>
+        // Demo-specific functionality
+        let demoWorkflows = [];
+
+        function generateDemoWorkflows() {
+            const workflows = [
+                {
+                    id: 'workflow-1',
+                    name: 'system-docs',
+                    status: 'running',
+                    progress: 67,
+                    startTime: new Date(Date.now() - 8 * 60000),
+                    duration: 480,
+                    eta: new Date(Date.now() + 8 * 60000),
+                    resourceUsage: { cpu: 12, memory: '1.2GB', diskIO: '45MB/s' },
+                    deliverables: [{ name: 'README.md' }, { name: 'ARCHITECTURE.md' }],
+                    lastUpdated: new Date()
+                },
+                {
+                    id: 'workflow-2',
+                    name: 'api-analysis',
+                    status: 'paused',
+                    progress: 34,
+                    startTime: new Date(Date.now() - 15 * 60000),
+                    duration: 750,
+                    resourceUsage: { cpu: 0, memory: '2.1GB', diskIO: '0MB/s' },
+                    deliverables: [{ name: 'api-spec.json' }],
+                    lastUpdated: new Date(Date.now() - 2 * 60000)
+                },
+                {
+                    id: 'workflow-3',
+                    name: 'user-guide',
+                    status: 'completed',
+                    progress: 100,
+                    startTime: new Date(Date.now() - 20 * 60000),
+                    duration: 720,
+                    resourceUsage: { cpu: 0, memory: '0GB', diskIO: '0MB/s' },
+                    deliverables: [
+                        { name: 'user-guide.md' },
+                        { name: 'screenshots.zip' },
+                        { name: 'tutorial.md' }
+                    ],
+                    lastUpdated: new Date(Date.now() - 8 * 60000)
+                },
+                {
+                    id: 'workflow-4',
+                    name: 'deployment-test',
+                    status: 'failed',
+                    progress: 23,
+                    startTime: new Date(Date.now() - 60 * 60000),
+                    duration: 1800,
+                    error: 'Connection timeout on line 45',
+                    resourceUsage: { cpu: 0, memory: '0GB', diskIO: '0MB/s' },
+                    deliverables: [],
+                    lastUpdated: new Date(Date.now() - 60 * 60000)
+                },
+                {
+                    id: 'workflow-5',
+                    name: 'security-audit',
+                    status: 'queued',
+                    progress: 0,
+                    resourceUsage: { cpu: 0, memory: '0GB', diskIO: '0MB/s' },
+                    deliverables: [],
+                    lastUpdated: new Date()
+                }
+            ];
+
+            return workflows;
+        }
+
+        function loadDemoData() {
+            demoWorkflows = generateDemoWorkflows();
+            renderDemoWorkflows();
+            UI.showToast('Demo data loaded', 'success');
+        }
+
+        function renderDemoWorkflows() {
+            const grid = document.getElementById('workflows-grid');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+
+            demoWorkflows.forEach(workflow => {
+                const card = createDemoWorkflowCard(workflow);
+                grid.appendChild(card);
+            });
+        }
+
+        function createDemoWorkflowCard(workflow) {
+            const card = document.createElement('div');
+            card.className = `workflow-card ${workflow.status}`;
+            card.dataset.workflowId = workflow.id;
+            card.dataset.status = workflow.status;
+
+            const statusIcon = {
+                running: '●',
+                paused: '⏸',
+                completed: '✓',
+                failed: '⚠',
+                queued: '⏳'
+            }[workflow.status] || '○';
+
+            const statusText = {
+                running: 'RUNNING',
+                paused: 'PAUSED',
+                completed: 'COMPLETED',
+                failed: 'FAILED',
+                queued: 'QUEUED'
+            }[workflow.status] || 'UNKNOWN';
+
+            const progressBar = '█'.repeat(Math.floor(workflow.progress / 10)) +
+                               '░'.repeat(10 - Math.floor(workflow.progress / 10));
+
+            let infoLeft = '', infoRight = '';
+
+            if (workflow.status === 'running' && workflow.eta) {
+                infoLeft = `<div class="info-item">
+                    <div class="info-label">ETA</div>
+                    <div class="info-value">${Math.ceil((workflow.eta - new Date()) / 60000)} min</div>
+                </div>`;
+                infoRight = `<div class="info-item">
+                    <div class="info-label">CPU</div>
+                    <div class="info-value">${workflow.resourceUsage.cpu}%</div>
+                </div>`;
+            } else if (workflow.status === 'completed') {
+                infoLeft = `<div class="info-item">
+                    <div class="info-label">Duration</div>
+                    <div class="info-value">${Math.floor(workflow.duration / 60)}m</div>
+                </div>`;
+                infoRight = `<div class="info-item">
+                    <div class="info-label">Files</div>
+                    <div class="info-value">${workflow.deliverables.length}</div>
+                </div>`;
+            } else if (workflow.status === 'failed') {
+                infoLeft = `<div class="info-item">
+                    <div class="info-label">Error</div>
+                    <div class="info-value">Line 45</div>
+                </div>`;
+                infoRight = `<div class="info-item">
+                    <div class="info-label">Last</div>
+                    <div class="info-value">1h ago</div>
+                </div>`;
+            }
+
+            let actions = '';
+            if (workflow.status === 'running') {
+                actions = `
+                    <button class="btn secondary-btn small-btn">View</button>
+                    <button class="btn secondary-btn small-btn">Pause</button>
+                `;
+            } else if (workflow.status === 'paused') {
+                actions = `
+                    <button class="btn secondary-btn small-btn">Resume</button>
+                    <button class="btn secondary-btn small-btn">Cancel</button>
+                `;
+            } else if (workflow.status === 'completed') {
+                actions = `
+                    <button class="btn secondary-btn small-btn">Download</button>
+                    <button class="btn secondary-btn small-btn">▶</button>
+                `;
+            } else if (workflow.status === 'failed') {
+                actions = `
+                    <button class="btn danger-btn small-btn">Retry</button>
+                    <button class="btn secondary-btn small-btn">Logs</button>
+                `;
+            } else if (workflow.status === 'queued') {
+                actions = `
+                    <button class="btn secondary-btn small-btn">Priority</button>
+                    <button class="btn secondary-btn small-btn">▶</button>
+                `;
+            }
+
+            card.innerHTML = `
+                <input type="checkbox" class="checkbox-input workflow-checkbox">
+                <div class="checkbox-custom"></div>
+                <div class="workflow-header">
+                    <div class="workflow-status">
+                        <span class="status-dot ${workflow.status}">${statusIcon}</span>
+                        ${statusText}
+                    </div>
+                </div>
+                <h3 class="workflow-name">${workflow.name}</h3>
+                <div class="workflow-progress">
+                    <div class="progress-label">
+                        <span class="progress-text">Progress</span>
+                        <span class="progress-percent">${workflow.progress}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill ${workflow.status}" style="width: ${workflow.progress}%"></div>
+                    </div>
+                    <div class="progress-visual">${progressBar}</div>
+                </div>
+                <div class="workflow-info">
+                    ${infoLeft}
+                    ${infoRight}
+                </div>
+                <div class="workflow-card-actions">
+                    ${actions}
+                </div>
+            `;
+
+            // Add click handler for demo
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('.workflow-card-actions')) {
+                    showWorkflowDetail(workflow);
+                }
+            });
+
+            return card;
+        }
+
+        function showWorkflowDetail(workflow) {
+            document.getElementById('workflow-title').textContent = workflow.name;
+            document.getElementById('workflow-status-badge').textContent = statusText;
+            document.getElementById('workflow-status-badge').className = `workflow-status-badge ${workflow.status}`;
+            UI.showModal('workflow-detail-modal');
+        }
+
+        function simulateUpdate() {
+            if (demoWorkflows.length === 0) {
+                loadDemoData();
+                return;
+            }
+
+            // Simulate progress update
+            const runningWorkflow = demoWorkflows.find(w => w.status === 'running');
+            if (runningWorkflow) {
+                runningWorkflow.progress = Math.min(100, runningWorkflow.progress + Math.floor(Math.random() * 10) + 5);
+                runningWorkflow.lastUpdated = new Date();
+
+                if (runningWorkflow.progress >= 100) {
+                    runningWorkflow.status = 'completed';
+                }
+
+                renderDemoWorkflows();
+                UI.showToast('Workflow updated', 'info');
+            }
+        }
+
+        function showRandomDetail() {
+            if (demoWorkflows.length === 0) {
+                loadDemoData();
+                return;
+            }
+
+            const randomWorkflow = demoWorkflows[Math.floor(Math.random() * demoWorkflows.length)];
+            showWorkflowDetail(randomWorkflow);
+        }
+
+        function showComparison() {
+            UI.showToast('Comparison view - Select workflows and click Compare', 'info');
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            UI.showToast(`Theme switched to ${newTheme}`, 'info');
+        }
+
+        // Initialize demo
+        document.addEventListener('DOMContentLoaded', function() {
+            UI.init();
+            loadDemoData();
+
+            // Show welcome message
+            setTimeout(() => {
+                UI.showToast('Welcome to the Agent Orchestrator Dashboard Demo!', 'info', {
+                    duration: 5000,
+                    actions: [
+                        {
+                            text: 'Load Sample Data',
+                            handler: loadDemoData
+                        }
+                    ]
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,412 @@
+NOTE TO THE REVIEWING AGENT: Don't take anything in this document as gospel or my final decision on anything and some of it I've alrady changed my mind on.  You are supposed to take away the spirt of what is in this, not anything specific.
+
+
+WHEN RESPONDING if CONFIDENCE < 0.85, then CONFIRM.  ALL DECISIONS must be based on EVIDENCE BASED FACTS"
+
+
+Local improvements:
+- add hooks to each mcp tool
+- add hooks to read, write, edit, etc tools
+- add 'mode' commands to set agent focus and operating behavior
+      - design, develop,
+
+At startup:
+
+- Who you are and the role you play
+- Operating Rules + Behavior
+      - How much can we insert at runtime when applicable
+      - What things need to be known to make good decisions?
+- project structure and contents
+    - directory tree
+    - configs
+    - virtual env's
+    -
+- Running config
+    - .claude/
+    - hooks
+    - commands
+    - CLAUDE.md
+    -
+- Env details
+    - env variables
+    - terminal settings
+    - path awareness
+    - system resource usage
+    - available cli commands
+
+- Tools available
+  - Use cases for tools
+
+- Operating rules and behavior
+   -
+
+
+Sources of Knowledge / Information
+- KB + context pool
+- .claude/knowledge
+      - core knowledge
+      - env details
+- proj-intel/
+- docs/
+- mcp tools
+- session logs
+- Internet
+
+
+Maximize capabilities:
+- THINK rather than just reacting.  Context matters.
+- Seek validation via KB, web, or other sources
+   - KB is a faster option for known good info
+   - Context7 is 2nd option, fast and comprehensive
+   - Web should always be used if no other option to confirm
+- <add storage of knowledge>
+
+Cognitive Methods
+- CoT, ToT, self refinement, etc
+- determine which to apply and when
+- THINKING tool
+
+
+
+
+At a high level:
+- know that you are an AI agent operating within a development environment
+- understand the overall project purpose and goals
+- understand current state of development, outstanding tasks
+- understand the long term goals and vision
+
+Tools:
+- MCP
+- custom local
+- native
+- custom
+- cli
+- IDE
+- Tool Chains
+- Use Cases
+
+
+
+1. startup - know who you are, where, why, how
+2. user prompt
+      - consume the content
+      - determine what is being communicated and for what purpose?
+            - question (What does X do?)
+            - instructions (commit the changes to git)
+            - permission (proceed, stop)
+            - information ()
+            -
+
+
+
+ORCHESTRATOR GUIDANCE:
+- maximize parallel workstreams, not 3 max, up to 7
+- plan out the tasks to be completed, identify dependencies, identify which can run at the same time
+- for longest workflows, identify if further parallel actions can shorten the time
+
+PLAN GUIDANCE:
+First stage:
+- research general topic (mcp tools)
+- develop requirements
+- determine the stack
+- research stack and methods
+- present plan + get signoff from user
+
+Second stage:
+Rules: python, modules, contracts, independent functions, DRY principle, best practice
+- design and create architecture
+      - research each component/technology
+      - create knowledge pack for each
+      - document
+- refine design
+- build specs
+- build the dev and test plan for agents
+- present design and plan, get sign off from user
+
+Third stage:
+- execute dev plan
+- scaffold and skeletons
+- build
+      - builders must be given applicable knowledge packs
+- testing
+      - testers + knowledge?
+      - linters, other tools
+- remediation loop
+- documentation
+- package for delivery to user
+
+
+AGENTS CONFIG
+
+MCP TOOLS:
+Master config is .mcp.json: thinking, time, web_search, firecrawl, tech_docs, consult_suite, knowledge
+- agents get custom mcp.json configs based on their access and needs
+
+Agents:
+- manager?
+- system: config env, scaffold, package install, etc
+- researchers: time, web_search, firecrawl, tech_docs
+- architect: thinking, consult_suite, knowledge + knowledge packs + templates?
+- builders: tech_docs + knowledge pacs + build specs + dev best practices
+- testers: tech_docs + tools (what's our feedback loop to dev?)
+- documenters: ?? + templates
+- what else?
+---------
+- optimize the headless agents:
+      - which tools?
+      - system message append option - Yes
+      - @claude-headless-agents
+      - deterministic session id's for monitoring
+      - configure orchestrator to create x-forward 'chat-monitor' for swarm and start it
+            /home/opsvi/master_root/apps/chat-monitor
+
+            /home/opsvi/master_root/multi-agent-reference/claude_headless_agents/claude_headless_complete_guide.md
+            /home/opsvi/master_root/multi-agent-reference/claude_headless_agents/claude_headless_guide.md
+            /home/opsvi/master_root/multi-agent-reference/claude_headless_agents/claude_testing_report.md
+            /home/opsvi/master_root/multi-agent-reference/claude_headless_agents/PROJECT_STRUCTURE.md
+            /home/opsvi/master_root/multi-agent-reference/claude_headless_agents/readme.md
+
+      - dangerously = YES, let them run :)
+      - custom system message
+      - tool access as needed
+      - model: sonnet or opus
+      - session-id: required for monitoring
+      - git worktrees: need to discuss
+
+
+
+^***********************
+SEE BELOW:  This is from a conversation I had with another agent about a knowledge management system.  I'm showing it to you so you can see what I've been thinking and building, not because I want you to know about this particular thing I was trying to build.
+************************
+
+User's note: I tend to take small ideas and run with them and before you know it we're talking about huge complex solutions because my brain wants to
+constantly improve and design and automate things. Even though we've dramatically expanded the scope, don't forget we need to also figure
+out what we have today, and how to incrementally add things and what we can do NOW quickly and easily to make it better while working on the
+rest.  Don't let my bad habits and tendencies derail you please. KR
+
+
+ DEEP SYNTHESIS: Multi-Agent Knowledge Management System
+
+  After reflecting on our entire conversation, I can see we've evolved from a simple "where should I put files?" question into designing a
+  sophisticated multi-agent intelligence coordination system. Let me break down my understanding and questions.
+
+  - correct, and see my first note regarding the dramatic expansion in scope.  KR
+
+  🎯 CORE PROBLEM STATEMENT (My Understanding)
+
+  We're building an environment where:
+  - Multiple main Claude agents work on different parts of a large project
+
+  - correct, I am running the Claude Code dev app in WSL1 (Ubuntu) on Win11, and starting sessions with 'claude' just like this one.  We've
+  established a project named master_root that is intended to become a shared workspace/ecosystem for dev agents to work in where they can
+  design and dev applications and capabilities for me and all share the various tools, configs, libraries and other things that are added to this
+  space to help make them more effective, powerful, capable, etc.  The focus so far has primarily been on developing apps, configs, and tools
+  IN the space for the agents to use and leverage.  Some are in progress, some work, some have been abandoned or aren't yet started.  The space
+  and plans and ecosystem have been morphing constantly and likely will continue to do so.  The apps, tools, etc that we're building are meant
+  to be standalone and exportable to other projects and environments but also configured to work together in this space so that we can combine
+  them in novel and interesting ways to give ourselves the maximum advantages and capabilities possible.  There is much going on here that we
+  haven't even touched on yet.  A key challenge I've had is how to YOU as aware and knowledgeable about the core things you need to know every
+  time and without going through a long process of bringing you up to speed every time.  Our project-context effort (see apps/project-context/)
+  should go a long way towards helping that but is not yet done.  This knowledge space I was talking to you about is maybe a precursor or bandaid
+  to use until we finish that, or maybe it's still important and has a place.  I really like the idea of you having your own library and core
+  knowledge that is certified and walled off from the rest but maybe I'm over complicating it or adding things we don't need, I don't know.
+  When this session started, you didn't know how to use the orchestrator, or that it even existed, even though I had several other sessions
+  actively using it and I thought "I need the agent to know certain things inherently as soon as they come online" which is what the KB is for
+  but like I said I started that and then kind of got frustrated and haven't been messing with it lately, although I should def revisit it.
+  There are other capabilities in this ecosystem you don't even know about yet but if I tell you to start exploring those then we'll end up
+  on some other tangent and never get back to addressing this one.  I DO want you to start leveraging the orchestrator to so we can have MANY
+  agents working on whatever we're focused on at the same time so development time and time to production is shortened significantly.
+
+  I will often start 2-4 different sessions simultaneously and bounce around between them when agents are working on whatever I've assigned
+  and while I wait for them to finish so one might be working on testing the orchestrator, and one might be developing knowledge, and one might
+  be researching stuff, etc.  They don't know what the others are doing, they gain knowledge that is no longer "in context" when those sessions
+  end and I spend a lot of time trying to explain to agents when we start a new session what exists and what they can use and how to leverage it.
+  Even if I can get the agents to record knowledge from their session into the KB, like I said they rarely use it or don't seem to be able to
+  find what they need to know, or often even know what they should be looking for.  Plus if they all make updates independently, the guidance is
+  fragmented and can be contradictory, and they don't understand how this affects that or that a change was made over there and now this works
+  differently than before.  Sometimes agents do the wrong things and make mistakes or change things I don't know about so I'll tell them to do
+  things a certain way not realizing that things aren't as I thought and they believe me and try an do it how I said with what is available and
+  do their best to make it work and I have no idea they are missing something or misunderstanding something or whatever and later when nothing
+  turns out as expected I'm confused and frustrated and they don't understand why, and it becomes a problem.  Especially when I don't notice for
+  a long time because the change is minor enough that things still work (or appear to) but because of the variance the path we take diverges
+  and by the time I realize it much time, effort and investment has been put into something that isn't what I intended and then we have to spend
+  a lot of time going back and trying to figure out what changed that I didn't know, what the agents were thinking based on their trusting me
+  that what was in the project is right and what I meant it to be and I end up working with agents that are trying to help me figure out what is
+  wrong that have a completely different understanding of what I want and why and how because they've been consuming incorrect information or
+  whatever and both of us are frustrated because I assume they understand me based on what I've said and they are like "what you said + plus what
+  you gave me == this, but you're saying you wanted THAT"???  Anyways, I digress. :)  Yes, multiple claude agents work in different parts of a
+  large project - KR
+
+  - Each can spawn 5-10+ sub-agents via orchestrator for specialized tasks - true/KR
+  - All agents need shared situational awareness and knowledge - yes
+  - Without this, we get: duplicated work, repeated mistakes, knowledge conflicts, chaos - see my notes above
+
+  The fundamental challenge: How do 50+ concurrent agents share knowledge effectively without destroying data integrity or creating
+  contradictions?
+
+  🔍 CRITICAL QUESTIONS I NEED ANSWERED
+
+  Scale & Context:
+
+  1. What is this project actually building? Is this a research environment, product development, or something else?
+  2. What kinds of tasks are the agents doing? Software development? Data analysis? Research? All of the above?
+  3. How long do work sessions last? Hours? Days? Weeks? - depends.  but all sessions are logged so we can review them and have tools to do so.
+  a key thing to understand is that there is no formal process where we start a session, work to a specific target, and then end it.  First of all,
+  sessions have a 200K token limit. So I'll often have to start a new session to continue one that has run out of space.  I can "compact' sessions
+  which summarizes the session and frees up space but if I do so then all those details of what we just worked on gets lost and since we maintain
+  session logs in /home/opsvi/.claude/projects/<project root written with hyphen for slash>/*.jsonl then summarizing the session means we won't have
+  the details to go back and read later which I want, so I'll start a new session and tell the agent to use @.claude/commands/handoff.md and follow
+  the instructions for getting up to speed on the last agent's session. Then we continue.  Btw, for this project it would be -home-opsvi-master_root-/
+  for the last part of the path to the session logs.  if agents are started in a sub-dir or git worktree, the location of their session logs changes
+  to whatever their root path is at the time they start.  All agents if invoked using the 'claude' binary, whether in interactive mode or headless
+  will write session logs we can review, watch, analyze and use.  Agents invoked within the interactive mode using the Task tool, either don't
+  write session logs or I don't know where they do.  We have 'chat-monitor' that let's me 'tail' and monitor session logs to include multiple ones
+  at the same time so I can see if the swarms started with agent-orchestrator are working, we have 'chat-search' that agents can use to pull info
+  from prior sessions to learn what has happened and how other agents did stuff, primarly used for handoff sessions where I am continuing an existing one
+  I also am not very disciplined about sessions.  I may start one, work on something, then work on other stuff before abandonding it completely
+  midstream, or I may do 5 sessions, continuing it each time and focused on the same thing.  They often have tangents in them as far as focus goes
+  and I may start other sessions to quickly do something to help an agent in the main session and then abandon that side session once I got what I wanted.
+  As part of project-context, we've developed a pipeline to read session logs in realtime and save them into a db for reference and analysis via
+  and mcp tool.  That work is almost done, but not quite there yet.  Once it is, agents should be able to reference session info much easier.
+  project-context will combine 'proj-intel' (you'll read about it in the docs, custom app generates project structure and file details for referenece)
+  + chat sessions info + KB + a few other things into a consolidated and converged "whole project, all session, all knowledge, etc situational awareness"
+  "thing" (I don't know what to call it) that agents will access via mcp tool and can know whatever about everything anytime. KR
+
+  4. What's the timeline for implementing this knowledge system?  - all of this is active an ongoing.  it's been taking a long time and I want
+  things to start moving faster.  We need to start figuring out what we've built that works, and leveraging it to make all of it go more quickly.
+  and continue adding more functionality we can use to make it even faster. -KR
+
+  Environment & Integration:
+
+  5. How does this relate to the "project-context" effort you mentioned? Is that a competing or complementary system? - see above
+  6. Are there humans in the loop, or is this fully automated? Do humans need to access/review this knowledge? - I'm in the loop, that is all
+  7. What happens to the knowledge when agents finish a project? Archive? Persist? Delete?  - DING you've hit on a core question.  we want to
+  persist all of it that is related to tools, or configs, or capabilities that we're building for this environment and agents. Later when They
+  are working on stuff that's for outside purposes, we'll want that knowledge captured in a different area for that project and separate from the
+  the rest.  That does bring up a good question though, if we do capture it separately for other things, can/should we export that knowledge and
+  make it part of the package when we give it to others to use in different environments? should we have all of our tools setup this way so we
+  have tool/config/app specific knowledge segmented that agents can see combined for the env they are working in but also access individually for
+  specific purposes or reasons?   if we have certain tools or capabilities enabled sometimes but not others, should that knowledge be taken offline
+  so it's not adding to the confusion and overload?  agents could have knowledge something exists and could be enabled but not the details unless
+  it is active and they are using it? - KR
+
+  Success Metrics:
+
+  8. What does success look like? Faster development? Fewer repeated mistakes? Better coordination?  - all of it, I want a super environment where
+  agents are as capable, smart, intelligent, enabled, and given everything they need to be super agents that eventually can operate almost autonomously. - KR
+  9. What are acceptable failure modes? Some knowledge loss? Occasional conflicts?  - TBD
+  10. How do we measure if agents are actually USING the knowledge effectively?  - I don't know.  KR
+
+  🏗️ MY CURRENT UNDERSTANDING OF THE ARCHITECTURE
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │ HUMAN OVERSIGHT & PROJECT MANAGEMENT                        │
+  └─────────────────────┬───────────────────────────────────────┘
+                        │
+  ┌─────────────────────▼───────────────────────────────────────┐
+  │ MASTER KNOWLEDGE BASE (Shared, Certified Truth)             │
+  │ - Verified capabilities & patterns                          │
+  │ - Current system state & environment info                   │
+  │ - Critical procedures & troubleshooting                     │
+  └─────┬─────────────┬─────────────┬─────────────┬─────────────┘
+        │             │             │             │
+  ┌─────▼─────┐ ┌─────▼─────┐ ┌─────▼─────┐ ┌─────▼─────┐
+  │ AGENT 1   │ │ AGENT 2   │ │ AGENT 3   │ │ AGENT 4   │
+  │ Workspace │ │ Workspace │ │ Workspace │ │ Workspace │
+  │           │ │           │ │           │ │           │
+  │ Local     │ │ Local     │ │ Local     │ │ Local     │
+  │ Cache +   │ │ Cache +   │ │ Cache +   │ │ Cache +   │
+  │ Synthesis │ │ Synthesis │ │ Synthesis │ │ Synthesis │
+  └─────┬─────┘ └─────┬─────┘ └─────┬─────┘ └─────┬─────┘
+        │             │             │             │
+  ┌─────▼─────────────▼─────────────▼─────────────▼─────┐
+  │ SUB-AGENT ORCHESTRATION LAYER                       │
+  │ - Session logs & temporary findings                 │
+  │ - No direct master KB access                       │
+  │ - Results harvested by main agents                 │
+  └─────────────────────────────────────────────────────┘
+
+  - I think that architecture is probably what we SHOULD have maybe, but mostly it's all a mish-mash that everyone can use, update, and reference
+  if they even bother to do so.  I don't know if what you outlined is the true end goal but it's probably better than what we're doing and also to
+  some degree the answer is I don't know, because agents do a lot of stuff that I don't see or know about and that's why I'm trying to build tools
+  to help me have more visibility and understanding of what is happening. KR
+
+  💡 SYNTHESIS OF SOLUTIONS
+
+  Three-Layer Knowledge Strategy:
+
+  Layer 1: Local Agent Cache (.claude/knowledge/)
+  - Fast access critical reference info
+  - Environment status, working patterns, trusted basics
+  - Updated automatically, agent-specific
+
+  Layer 2: Master Knowledge Base (Shared MCP KB)
+  - Cross-agent verified knowledge
+  - Trust levels: unverified → validated → certified
+  - Write access limited to main agents only
+
+  Layer 3: Session Intelligence (Orchestrator logs)
+  - Sub-agent findings and discoveries
+  - Harvested by main agents for knowledge extraction
+  - Temporary, session-specific
+
+  Key Innovation: Usage-Driven Trust
+
+  Instead of bureaucratic approval processes:
+  - Knowledge gains trust through successful usage
+  - Session logs provide audit trails for validation
+  - Automated background verification via cursor agents
+
+  🚨 CONCERNS & UNKNOWNS
+
+  What I'm Worried About:
+
+  1. Complexity Overhead: Are we building a system more complex than the problems it solves? - Probably, I struggle with this often.  KR
+  2. Performance Impact: Will knowledge lookups slow down agent work? - another great question.
+  3. Maintenance Burden: Who keeps the system running when things break? - you. and your brethren.  We should develop agents that work in the background
+  and it is their fulltime job?  KR
+  4. Adoption: Will agents actually use this, or work around it? - We have to make them, and we have to make it easy enough and intuitive enough that
+  they WANT to or default to it, but also anywhere we can take the choice out of their hands and have it happen automatically without them even
+  needing to DO anything or choose to, the better.  For example, we could do RAG knowledge injections on UserPrompt submission via .claude hooks
+  (and kind of do that a little bit already) or various other ways that should all be explored.
+
+  What I Don't Fully Understand:
+
+  1. Human Role: How much human oversight/intervention is expected? - I'm involved and guiding this to the degree I have to be which so far has been
+  quite a lot.  The better things get and the more capable the agents become based on what we give them, the less I want to be needed. KR
+  2. Failure Recovery: What happens when the knowledge system itself fails? - We can't let it, need persistence and disaster recovery
+  3. Cross-Project Knowledge: Does knowledge persist across different projects? - see prior answers
+  4. Resource Constraints: Are there limits on storage, processing, or access? - we're operating on a single PC at the moment but if more is needed
+  I can procure it or leverage cloud resources
+
+  🎯 MY PROPOSED IMPLEMENTATION APPROACH
+
+  Phase 1: Foundation (Week 1)
+
+  - Implement local agent knowledge cache system
+  - Create basic KB access patterns with evidence requirements
+  - Test with 2-3 agents to validate core concepts
+
+  Phase 2: Coordination (Week 2)
+
+  - Add main agent KB write coordination
+  - Implement sub-agent KB access restrictions
+  - Build session log analysis for knowledge extraction
+
+  Phase 3: Intelligence (Week 3+)
+
+  - Automated knowledge validation via background agents
+  - Trust level progression based on usage
+  - Cross-agent knowledge synthesis
+
+  ❓ QUESTIONS FOR YOU
+
+  1. Am I understanding the scope correctly? Is this for a specific project or a general development environment?
+  2. What's the relationship to project-context? Should I design this to complement or replace parts of that system?
+  3. What's the urgency? Do you need a basic version working soon, or can we build this thoughtfully over time?
+  4. What are the most important knowledge types? Environment state? Code patterns? Troubleshooting info? All of the above?
+  5. How autonomous should this be? Should it self-manage, or require human oversight for quality control?
+  6. What happens when I'm wrong? How do we handle the inevitable cases where my knowledge is incorrect or outdated?
+
+  I suspect I'm still missing some crucial context about the bigger picture you're building. What am I not seeing? - let me know after reading
+  everything I added what questions remain and which ones I didn't answer.  KR

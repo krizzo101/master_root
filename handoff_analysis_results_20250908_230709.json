@@ -1,0 +1,106 @@
+{
+  "timestamp": "2025-09-08T23:07:09.926615",
+  "total_files": 20,
+  "results": [
+    {
+      "file": "chat_logs/d76456f5-2d29-4c42-9ede-ed13f7a2a4b7.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/5bf5f085-53bd-4bab-8245-721e417e94e3.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/6010818e-35cb-47d9-b33b-82cac9fc64bd.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/f4edd35a-86d5-413d-8f1d-574901a391e0.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/2fbc3aaf-4365-4155-a59a-3b95c18959f0.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/c0846985-c066-4293-867a-1af7a50b7984.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/10c67da3-2884-4fad-b47a-58a1b3e8552c.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/7696db5c-cd72-452c-9bda-e11c60ffd2c5.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/1fd265db-dd7a-4482-acaf-872d4a0e19c1.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/b21f3bba-20a2-4b9a-b2ee-e0999091dc4b.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/02b2cf03-1acb-4916-85d3-b4b81338ec19.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/b0075c2f-7577-4836-8085-2de3a6b6dd75.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/d08fb6a3-6638-403b-8a61-4ec04b44a6bd.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/476b169b-a894-4063-aab2-27fa42e7fc58.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/efeb8086-e7c2-4a55-af31-cf4f0e4dd73c.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/61f069d4-a6d3-4e7e-894b-87aab6e35602.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/3b080dd8-c621-4452-9ae3-60aca752bbb5.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/14d10927-6718-41a7-a183-328c5aba1a5e.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/b14a02d2-0336-4e1a-8fb4-7c2944060e91.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    },
+    {
+      "file": "chat_logs/76586d9b-d166-4c7b-8c9b-103ea8a18052.jsonl",
+      "status": "error",
+      "error": "handoff command not found"
+    }
+  ]
+}

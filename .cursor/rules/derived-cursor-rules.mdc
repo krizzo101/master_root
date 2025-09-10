@@ -47,6 +47,13 @@ This document outlines the rules, guidelines, and best practices for the AI codi
 *   The agent needs to check the current timestamps on project intelligence data versus the date/time they observed at startup and determine whether they need to run 'project-intelligence full-package' from the project root in order to refresh the data. It should do this every time to ensure it has the very latest information.
 *   The `.mcp.json` file in the project root of this project defines the tools the claude code app has available and is located at: `/home/opsvi/master_root/.mcp.json`.
 *   When asked to perform online research regarding the 'claude code' application, focus on understanding its command-line usage, capabilities, and functionality.
+*   `tech_docs` is also a useful research tool.
+*   The AI should load the `CLAUDE.md` instructions and use them to help with operational behavior and instructions moving forward.
+*   The AI should use the enhanced versions of the tools over the others when available.
+*   The AI should read the `mcp.json` to understand where the enhanced versions point to as entry points and that you are using the right code if you make any updates.
+*   The AI should analyze the new enhanced thinking tool code in detail to make sure you understand it and the new knowledge tool as well.
+*   The AI should make use of the KB to help you get up to speed and understand what's been going on.
+*   The tools are only referred to as "enhanced" in the `mcp.json` configs, so searching the codebase or KB for "enhanced" might not yield results. Remember that the code is local, not remote MCP servers.
 
 ## 🔄 MANDATORY: GIT COMMIT REQUIREMENTS (DEFAULT BEHAVIOR - CANNOT BE IGNORED)
 
@@ -174,6 +181,47 @@ The system will automatically trigger commits when:
 *   The AI should use parallel operations as a default behavior.
 *   When using `grep` or `find` commands, the AI should use project intel methods as a primary behavior. If the project intel methods don't return anything but it is convinced what they are looking for exists then they should fall back to grep/find. If the grep/find they need to use isn't applicable to the information in the project intel cache then this does not apply which may often be the case for grep, but shouldn't usually be for find if it's a project code file.
 *   Any testing of the tool after code changes needs to be done with direct modules calls as the tool loaded in this session and available to you as an mcp tool will not include any changes until the tool is manually restarted by the user. If you need this done, ask me to do so otherwise tests from the command line to verify your changes.
+*   The Git safety rules indicate that I should avoid force-pushing to the main branch, even when it's necessary to remove a secret.
+*   When force-pushing is necessary:
+    *   Get approval from the user.
+    *   If force-pushing to `main` is not allowed, create a new branch with a cleaned history and open a PR to merge into `main`.
+*   When asked to run 'project-intelligence full-package', ensure you read the `AGENT_ONBOARDING.md` file afterward to familiarize yourself with the project. This includes understanding the manifest and indexing files.
+*   After running 'project-intelligence full-package', validate the timestamps of the data against the current time to ensure you have the latest information.
+*   When running commands, log "pwd; ls -a; git status" to comply with the Shell Safety Rules.
+*   When presented with a multi-step task, consider using a todo list to keep everything organized. Reconcile the todo list before making any edits.
+*   It is recommended to run smaller tasks in parallel. However, be mindful that asynchronous tool execution can make logging commands harder afterward. Consider running commands in the foreground without background mode if logging is a priority.
+*   When asked to add enhanced versions of existing tools to the `.cursor/mcp.json` file, ensure the new tools are named distinctly (e.g., `thinking-enhanced`, `knowledge-enhanced`). Also, when the consult suite tool requires a migrated consult suite, create a new entry for that too.
+*   When asked to commit outstanding changes to git, first check the current branch. If the current branch is "main" or "master", create a new feature branch named "feature/enhanced-thinking-prep-(date +%Y%m%d-%H%M%S)". Then, add all changes using `git add -A`. Check if there are any staged changes using `git diff --cached --quiet`. If there are staged changes, commit them with the message "chore: commit outstanding changes before enhanced thinking updates [prep]". Finally, print the current working directory (`pwd`), list all files (`ls -a | cat`), show the git status (`git status`), show the current branch (`git branch --show-current`), show the last 5 commits (`git log --oneline -5`), and list git worktrees (`git worktree list`).
+*   When pre-commit hooks prevent a commit, and the user instructs to proceed, use the `--no-verify` flag with the `git commit` command.
+*   When updating the `.cursor/mcp.json` config to match the `.mcp.json` config in the project root for a specific tool, ensure all relevant environment variables and configurations are included.
+*   When implementing concrete improvements to the thinking system:
+    *   The key issues identified are: 1) Progress agent returning "unknown" status, 2) Coaching tone still too enforcement-heavy, 3) Risk scoring system needs refinement, 4) Missing firecrawl configuration. Focus on the most impactful fix first: improving the progress agent's status detection logic.
+*   When the progress agent is returning "unknown" status, implement the following:
+    1.  Add a `serialize_or_validate(input)` -> `str` function that does: if `isinstance(input, str)`: return input; if `isinstance(input, ThoughtData)`: return `str(input)` or `input.to_string()`; else raise `TypeError` with a clear message.
+    2.  Replace direct inputs to the progress agent with `serialize_or_validate(thought_output)`.
+    3.  Add unit tests: `ThoughtData` -> string, string -> string, invalid types raise `TypeError`, edge cases (empty, long, non-ASCII).
+    4.  Run tests (prefer parallel).
+    5.  Add a lightweight runtime sanity flag after each thought (e.g., `sanity_check_pass = True/False` with a timestamp) to prevent silent regressions.
+    6.  Document the `ThoughtData` schema and serializer contract in the knowledge base and reference it in code comments and tests.
+*   When implementing performance improvements to the metacognitive agents:
+    *   Ensure that each agent is operating in parallel.
+    *   Track the time each agent takes to respond.
+    *   Consider the use of `reasoning_effort="low"` in the agent's configuration.
+    *   Reduce the prompt length to reduce the processing time.
+    *   Ensure that you run your tests after all changes are implemented.
+*   When implementing fixes related to `ThoughtData` objects, ensure that all inputs are properly serialized to strings. Use a `_serialize_or_validate(item: Any) -> str` function to achieve this. The function should:
+    *   If `isinstance(item, str)`: return the item.
+    *   If `hasattr(item, 'thought')`: (i.e., it's a `ThoughtData` object), create a structured string representation including thought number, content, trigger, and action.
+    *   Otherwise: try to convert the item to a string, and fallback to JSON serialization.
+*   When optimizing the violations agent:
+    *   Reduce prompt length.
+    *   Use lower `reasoning_effort` for faster response times.
+*   When optimizing the patterns agent:
+    *   Reduce the pattern window size.
+    *   Simplify the prompt.
+*   When optimizing the coaching agent:
+    *   Simplify the prompt.
+    *   Reduce the amount of context it processes.
 
 ## DEBUGGING
 
@@ -187,7 +235,7 @@ The system will automatically trigger commits when:
 *   Format code blocks with proper syntax highlighting.
 *   Keep lines concise for readability.
 *   When presenting the chat name in the matrix, strip off the date and file extension for cleaner presentation.
-*   **CRITICAL CONTRAST RULE**: Dark text must be overlaid on a light background or vice versa. NEVER light on light or dark on dark.
+*   **CRITICAL CONTRAST RULE**: Dark text must be overlaid on a light background or vice versa. NEVER light on light or dark.
 *   **MANDATORY CONTRAST CHECK**: Always verify all text-background combinations for sufficient contrast.
 
 ## CHAT LOG PROCESSING SCRIPTS
@@ -275,7 +323,7 @@ Phase 3 (Medium-term):
 intake/custom/agent_world/src/shared/openai_interfaces/
   → libs/opsvi-llm/opsvi_llm/providers/openai_provider.py
 
-# HTTP Client → opsvi-http  
+# HTTP Client → opsvi-http
 intake/custom/agent_world/src/shared/interfaces/http/
   → libs/opsvi-http/opsvi_http/client/base.py
 
@@ -554,166 +602,4 @@ Date awareness is important to understand the amount of time that has elapsed si
 - **RESEARCH CURRENT API VERSIONS**: OpenAI API changes frequently (2025 updates)
 - **VERIFY MODEL AVAILABILITY**: Confirm model names and capabilities
 - **CHECK SYNTAX UPDATES**: API syntax evolves rapidly (Responses API vs Chat Completions)
-- **VALIDATE PRICING**: Confirm current token costs and limits
-- **PROMPTING BEST PRACTICES**: Research latest model-specific optimization techniques
-
-#### 3. EVIDENCE-BASED API SELECTION
-- Base model choices on CURRENT documentation
-- Verify feature availability through research
-- No assumptions about API capabilities
-- Test model-specific prompting strategies
-
-### Model Selection (2025 Current Standards)
-
-**APPROVED MODELS ONLY**: o3, o4 series, GPT-5 series
-**gpt-4o series models are FORBIDDEN**
-**NO GPT-3.5 MODELS**
-
-| Use‑Case                   | Primary Model                  | Alternative         | Notes                               |
-| ----- | --- | ---- | ----- |
-| **Reasoning/Planning**     | `o4-mini`                      | `o3`                | MANDATORY for reasoning workflows   |
-| **Agent Execution**        | `gpt-5-mini`                   | `gpt-5`             | MANDATORY for agent implementation  |
-| **Structured Outputs**     | `gpt-5`                        | `gpt-5-mini`        | Required for JSON schema compliance |
-| **Complex reasoning/code** | `gpt-5`, `o3`                  | `o4-mini`           | Context-dependent selection         |
-| **Fast responses**         | `gpt-5-nano`, `gpt-5-mini`     | Efficiency priority |
-
-**CRITICAL MODEL CONSTRAINTS**:
-- **OAMAT-SD Application**: MUST use `o4-mini` (reasoning) and `gpt-5-mini` (agents)
-- **Structured Outputs**: Use `gpt-5-mini` or `gpt-5` for JSON schema compliance
-- **NO GPT-4O VARIANTS**: Only o3, o4, and GPT-5 series approved for use
-- **NO GPT-3.5 MODELS**
-- **Resolution**: Use appropriate model for specific requirements, document conflicts
-
-### Latest Responses API Patterns (2025 PREFERRED)
-
-#### Standard Responses API with Structured Outputs
-```python
-# ✅ CURRENT STANDARD - Responses API (2025)
-from openai import OpenAI
-from pydantic import BaseModel
-from typing import List, Optional
-
-client = OpenAI()
-
-# Structured Output with Pydantic
-class ResponseSchema(BaseModel):
-    analysis: str
-    confidence: float
-    recommendations: List[str]
-    metadata: Optional[dict] = None
-
-response = client.responses.create(
-    model="gpt-5-mini",  # or "o4-mini" for reasoning
-    instructions="You are a helpful assistant that provides structured analysis.",
-    input="Analyze this data and provide recommendations...",
-    text_format=ResponseSchema
-)
-
-# Access parsed response
-result = response.output_parsed
-```
-
-#### Advanced Role Hierarchy (2025 BEST PRACTICE)
-```python
-# ✅ PRIORITY ORDER: developer > user > assistant
-messages = [
-    {
-        "role": "developer",  # HIGHEST PRIORITY
-        "content": """
-        ## SYSTEM CONSTRAINTS
-        - Output must be valid Python code
-        - Use type hints for all functions
-        - Include comprehensive error handling
-        - Follow PEP 8 standards strictly
-
-        ## FORBIDDEN ACTIONS
-        - Do not use deprecated libraries
-        - Do not hardcode sensitive data
-        - Do not skip input validation
-        """
-    },
-    {
-        "role": "user",       # MEDIUM PRIORITY
-        "content": "Create a FastAPI endpoint for user authentication with JWT tokens"
-    },
-    {
-        "role": "assistant",  # CONTEXT ONLY
-        "content": "I'll help you create a secure authentication endpoint..."
-    }
-]
-
-response = client.responses.create(
-    model="gpt-5-mini",
-    input=messages,
-    text_format=CodeResponseSchema
-)
-```
-
-### Model-Specific Optimization Patterns
-
-#### **For O3/o4-mini Models (Reasoning Focus)**
-```python
-# ✅ O3-OPTIMIZED PATTERN - Minimal, clear prompts
-response = client.responses.create(
-    model="o4-mini",
-    instructions="You are a system architect. Design a scalable microservices architecture.",
-    input="Requirements: 100k users, real-time chat, file sharing, mobile support",
-    text_format=ArchitectureSchema,
-    # O3-specific parameters
-    reasoning_effort="high",  # thorough analysis
-    verbosity="concise"       # controlled output length
-)
-
-# ✅ NO CHAIN-OF-THOUGHT for O3 - they reason internally
-# ❌ AVOID: "Think step by step...", "Let's break this down..."
-```
-
-#### **For GPT-5 Models (Execution Focus)**
-```python
-# ✅ GPT-5-OPTIMIZED PATTERN - Detailed, explicit guidance
-response = client.responses.create(
-    model="gpt-5-mini",
-    instructions="""
-    ## PERSISTENCE
-    Continue until the user's query is completely resolved.
-
-    ## REASONING STRATEGY
-    First, analyze the requirements systematically.
-    Then, consider edge cases and error conditions.
-    Finally, implement with comprehensive validation.
-
-    ## OUTPUT STANDARDS
-    - Include step-by-step reasoning
-    - Provide code with error handling
-    - Explain design decisions
-    """,
-    input="Build a robust API endpoint with caching and rate limiting",
-    text_format=DetailedCodeSchema
-)
-```
-
-### Prompt Templates and Caching (2025 OPTIMIZATION)
-```python
-# ✅ REUSABLE PROMPT TEMPLATES
-response = client.responses.create(
-    model="gpt-5-mini",
-    prompt={
-        "id": "pmpt_code_generator_v2",
-        "version": "2.1",
-        "cache": True,  # Enable prompt caching
-        "variables": {
-            "language": "Python",
-            "framework": "FastAPI",
-            "task_type": "API endpoint",
-            "requirements": "authentication, validation, error handling"
-        }
-    },
-    input="Create secure user registration endpoint",
-    text_format=CodeResponseSchema
-)
-
-# ✅ DYNAMIC PROMPT GENERATION
-def generate_prompt_variables(task_context: dict) -> dict:
-    """Generate prompt variables dynamically based on context"""
-    return {
-        "complexity": analyze
+- **VALIDATE PRICING

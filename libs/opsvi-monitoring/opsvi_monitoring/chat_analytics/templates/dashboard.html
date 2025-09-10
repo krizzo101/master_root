@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Logs Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .tab-active {
+            border-bottom: 3px solid #3B82F6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold text-gray-800">📊 Chat Logs Analytics</h1>
+                <div class="flex space-x-4">
+                    <button onclick="switchTab('overview')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500 tab-active" data-tab="overview">Overview</button>
+                    <button onclick="switchTab('productivity')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="productivity">Productivity</button>
+                    <button onclick="switchTab('tools')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="tools">Tools</button>
+                    <button onclick="switchTab('files')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="files">Files</button>
+                    <button onclick="switchTab('cognitive')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="cognitive">Cognitive</button>
+                    <button onclick="switchTab('timeline')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="timeline">Timeline</button>
+                    <button onclick="switchTab('sessions')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="sessions">Sessions</button>
+                    <button onclick="switchTab('response')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="response">Response Times</button>
+                    <button onclick="switchTab('activity')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="activity">Activity</button>
+                    <button onclick="switchTab('config')" class="tab-btn px-4 py-2 text-gray-700 hover:text-blue-500" data-tab="config">Config</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-8">
+        <!-- Search Bar -->
+        <div class="mb-8">
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="flex">
+                    <input type="text" id="searchInput" placeholder="Search messages, files, or sessions..."
+                           class="flex-1 px-4 py-2 border rounded-l-lg focus:outline-none focus:border-blue-500">
+                    <button onclick="performSearch()" class="px-6 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600">
+                        Search
+                    </button>
+                </div>
+                <div id="searchResults" class="mt-4 hidden"></div>
+            </div>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview-tab" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="stat-card bg-white rounded-lg shadow p-6">
+                    <div class="text-gray-500 text-sm">Total Sessions</div>
+                    <div class="text-3xl font-bold text-blue-600" id="stat-sessions">-</div>
+                </div>
+                <div class="stat-card bg-white rounded-lg shadow p-6">
+                    <div class="text-gray-500 text-sm">Total Messages</div>
+                    <div class="text-3xl font-bold text-green-600" id="stat-messages">-</div>
+                </div>
+                <div class="stat-card bg-white rounded-lg shadow p-6">
+                    <div class="text-gray-500 text-sm">Tool Calls</div>
+                    <div class="text-3xl font-bold text-purple-600" id="stat-tools">-</div>
+                </div>
+                <div class="stat-card bg-white rounded-lg shadow p-6">
+                    <div class="text-gray-500 text-sm">Files Touched</div>
+                    <div class="text-3xl font-bold text-orange-600" id="stat-files">-</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">Message Distribution</h3>
+                    <canvas id="messageDistChart"></canvas>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">Activity Timeline</h3>
+                    <canvas id="activityTimelineChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Productivity Tab -->
+        <div id="productivity-tab" class="tab-content hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">Hourly Activity Pattern</h3>
+                    <canvas id="hourlyActivityChart"></canvas>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">Files Per Session</h3>
+                    <canvas id="filesPerSessionChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 mt-6">
+                <h3 class="text-lg font-semibold mb-4">Task Management Trends</h3>
+                <canvas id="todoTrendsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Tools Tab -->
+        <div id="tools-tab" class="tab-content hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">Top Tools Usage</h3>
+                    <canvas id="toolUsageChart"></canvas>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">Tool Categories</h3>
+                    <canvas id="toolCategoriesChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 mt-6">
+                <h3 class="text-lg font-semibold mb-4">Tool Usage Over Time</h3>
+                <div style="position: relative; height: 400px; overflow: hidden;">
+                    <canvas id="toolTimelineChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 mt-6">
+                <h3 class="text-lg font-semibold mb-4">Common Tool Sequences</h3>
+                <div id="toolSequences" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- Files Tab -->
+        <div id="files-tab" class="tab-content hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">File Type Distribution</h3>
+                    <canvas id="fileTypesChart"></canvas>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">Directory Heat Map</h3>
+                    <canvas id="directoryHeatChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 mt-6">
+                <h3 class="text-lg font-semibold mb-4">Most Edited Files</h3>
+                <div id="hotFiles" class="overflow-x-auto"></div>
+            </div>
+        </div>
+
+        <!-- Cognitive Tab -->
+        <div id="cognitive-tab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">Thinking Tool Usage Over Time</h3>
+                <div style="position: relative; height: 400px; overflow: hidden;">
+                    <canvas id="thinkingPatternsChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 mt-6">
+                <h3 class="text-lg font-semibold mb-4">Session Complexity Analysis</h3>
+                <div style="position: relative; height: 400px; overflow: hidden;">
+                    <canvas id="complexityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Tab -->
+        <div id="timeline-tab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">Daily Activity Trend</h3>
+                <canvas id="dailyActivityChart"></canvas>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 mt-6">
+                <h3 class="text-lg font-semibold mb-4">Recent Sessions</h3>
+                <div id="recentSessions" class="space-y-4"></div>
+            </div>
+        </div>
+
+        <!-- Sessions Tab -->
+        <div id="sessions-tab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">Session Summaries</h3>
+                <div id="sessionSummaries" class="space-y-4">
+                    <div class="text-center py-4">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                        <p class="mt-2 text-gray-500">Loading sessions...</p>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-center space-x-4">
+                    <button onclick="loadSessionSummaries(Math.max(0, currentSessionOffset - 50))"
+                            id="prevSessionBtn" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50" disabled>
+                        Previous
+                    </button>
+                    <span id="sessionPageInfo" class="px-4 py-2 text-gray-600"></span>
+                    <button onclick="loadSessionSummaries(currentSessionOffset + 50)"
+                            id="nextSessionBtn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Response Times Tab -->
+        <div id="response-tab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">Response Time Analysis</h3>
+
+                <!-- Metrics Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="stat-card bg-blue-50 p-4 rounded-lg">
+                        <h4 class="text-sm text-gray-600">Average Response Time</h4>
+                        <p class="text-2xl font-bold text-blue-600" id="avgResponseTime">-</p>
+                    </div>
+                    <div class="stat-card bg-green-50 p-4 rounded-lg">
+                        <h4 class="text-sm text-gray-600">Median Response Time</h4>
+                        <p class="text-2xl font-bold text-green-600" id="medianResponseTime">-</p>
+                    </div>
+                    <div class="stat-card bg-yellow-50 p-4 rounded-lg">
+                        <h4 class="text-sm text-gray-600">Shortest Response</h4>
+                        <p class="text-2xl font-bold text-yellow-600" id="shortestResponse">-</p>
+                    </div>
+                    <div class="stat-card bg-red-50 p-4 rounded-lg">
+                        <h4 class="text-sm text-gray-600">Longest Response</h4>
+                        <p class="text-2xl font-bold text-red-600" id="longestResponse">-</p>
+                    </div>
+                </div>
+
+                <!-- Response Time Chart -->
+                <div class="chart-container">
+                    <canvas id="responseTimeChart"></canvas>
+                </div>
+
+                <!-- Details -->
+                <div class="mt-6">
+                    <h4 class="text-md font-semibold mb-3">Response Details</h4>
+                    <div id="responseDetails" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Tab -->
+        <div id="activity-tab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">Activity vs Dead Space Analysis</h3>
+
+                <!-- Activity Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="stat-card bg-green-50 p-4 rounded-lg">
+                        <h4 class="text-sm text-gray-600">Total Active Time</h4>
+                        <p class="text-2xl font-bold text-green-600" id="totalActiveTime">-</p>
+                        <p class="text-sm text-gray-500" id="activePercentage">-</p>
+                    </div>
+                    <div class="stat-card bg-gray-50 p-4 rounded-lg">
+                        <h4 class="text-sm text-gray-600">Total Dead Time</h4>
+                        <p class="text-2xl font-bold text-gray-600" id="totalDeadTime">-</p>
+                        <p class="text-sm text-gray-500" id="deadPercentage">-</p>
+                    </div>
+                    <div class="stat-card bg-blue-50 p-4 rounded-lg">
+                        <h4 class="text-sm text-gray-600">Max Gap</h4>
+                        <p class="text-2xl font-bold text-blue-600" id="maxGap">-</p>
+                    </div>
+                </div>
+
+                <!-- Activity Timeline -->
+                <div class="chart-container">
+                    <canvas id="activityChart"></canvas>
+                </div>
+
+                <!-- Session Selector -->
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Session for Timeline</label>
+                    <select id="sessionSelector" class="w-full p-2 border rounded-lg">
+                        <option value="">Loading sessions...</option>
+                    </select>
+                </div>
+
+                <!-- Timeline Visualization -->
+                <div id="activityTimeline" class="mt-6"></div>
+            </div>
+        </div>
+
+        <!-- Config Tab -->
+        <div id="config-tab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">Application Configuration</h3>
+
+                <!-- Database Info -->
+                <div class="mb-6">
+                    <h4 class="text-md font-semibold mb-3">Database</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="mb-2"><span class="font-medium">Path:</span> <code id="dbPath">-</code></p>
+                        <p class="mb-2"><span class="font-medium">Size:</span> <span id="dbSize">-</span> MB</p>
+                        <p><span class="font-medium">Status:</span> <span id="dbStatus" class="px-2 py-1 rounded text-xs">-</span></p>
+                    </div>
+                </div>
+
+                <!-- Cache Info -->
+                <div class="mb-6">
+                    <h4 class="text-md font-semibold mb-3">Cache</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="mb-2"><span class="font-medium">Directory:</span> <code id="cacheDir">-</code></p>
+                        <p class="mb-2"><span class="font-medium">TTL:</span> <span id="cacheTTL">-</span> seconds</p>
+                        <p><span class="font-medium">Cached Summaries:</span> <span id="cachedCount">-</span></p>
+                    </div>
+                </div>
+
+                <!-- Project Info -->
+                <div class="mb-6">
+                    <h4 class="text-md font-semibold mb-3">Project</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="mb-2"><span class="font-medium">Root:</span> <code id="projRoot">-</code></p>
+                        <p class="mb-2"><span class="font-medium">Logs Directory:</span> <code id="logsDir">-</code></p>
+                        <p><span class="font-medium">Project Intelligence:</span> <span id="projIntel" class="px-2 py-1 rounded text-xs">-</span></p>
+                    </div>
+                </div>
+
+                <!-- Server Info -->
+                <div class="mb-6">
+                    <h4 class="text-md font-semibold mb-3">Server</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="mb-2"><span class="font-medium">Host:</span> <span id="serverHost">-</span></p>
+                        <p class="mb-2"><span class="font-medium">Port:</span> <span id="serverPort">-</span></p>
+                        <p><span class="font-medium">Debug Mode:</span> <span id="debugMode" class="px-2 py-1 rounded text-xs">-</span></p>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex space-x-4">
+                    <button onclick="clearCache()" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                        Clear Cache
+                    </button>
+                    <button onclick="refreshData()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        Refresh Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global chart instances
+        let charts = {};
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            loadOverview();
+        });
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+            });
+
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+
+            // Add active class to button
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('tab-active');
+
+            // Load tab data
+            switch(tabName) {
+                case 'overview':
+                    loadOverview();
+                    break;
+                case 'productivity':
+                    loadProductivity();
+                    break;
+                case 'tools':
+                    loadTools();
+                    break;
+                case 'files':
+                    loadFiles();
+                    break;
+                case 'cognitive':
+                    loadCognitive();
+                    break;
+                case 'timeline':
+                    loadTimeline();
+                    break;
+                case 'sessions':
+                    loadSessionSummaries(0);
+                    break;
+                case 'response':
+                    loadResponseTimes();
+                    break;
+                case 'activity':
+                    loadActivityAnalysis();
+                    break;
+                case 'config':
+                    loadConfig();
+                    break;
+            }
+        }
+
+        // Load Overview
+        async function loadOverview() {
+            try {
+                const response = await axios.get('/api/overview');
+                const data = response.data;
+
+                // Update stats
+                document.getElementById('stat-sessions').textContent = data.total_sessions.toLocaleString();
+                document.getElementById('stat-messages').textContent = data.total_nodes.toLocaleString();
+                document.getElementById('stat-tools').textContent = data.total_tool_calls.toLocaleString();
+                document.getElementById('stat-files').textContent = data.unique_files.toLocaleString();
+
+                // Message distribution pie chart
+                if (charts.messageDistChart) charts.messageDistChart.destroy();
+                const ctx1 = document.getElementById('messageDistChart').getContext('2d');
+                charts.messageDistChart = new Chart(ctx1, {
+                    type: 'pie',
+                    data: {
+                        labels: ['User Messages', 'Assistant Messages'],
+                        datasets: [{
+                            data: [data.user_messages, data.assistant_messages],
+                            backgroundColor: ['#3B82F6', '#10B981']
+                        }]
+                    }
+                });
+
+                // Activity timeline (placeholder - would need more data)
+                if (charts.activityTimelineChart) charts.activityTimelineChart.destroy();
+                const ctx2 = document.getElementById('activityTimelineChart').getContext('2d');
+                charts.activityTimelineChart = new Chart(ctx2, {
+                    type: 'line',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        datasets: [{
+                            label: 'Activity',
+                            data: [120, 150, 180, 200],
+                            borderColor: '#8B5CF6',
+                            tension: 0.4
+                        }]
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading overview:', error);
+            }
+        }
+
+        // Load Productivity
+        async function loadProductivity() {
+            try {
+                const response = await axios.get('/api/productivity');
+                const data = response.data;
+
+                // Hourly activity chart
+                if (charts.hourlyActivityChart) charts.hourlyActivityChart.destroy();
+                const ctx1 = document.getElementById('hourlyActivityChart').getContext('2d');
+                charts.hourlyActivityChart = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: data.hourly_activity.map(h => `${h.hour}:00`),
+                        datasets: [{
+                            label: 'Activity Count',
+                            data: data.hourly_activity.map(h => h.activity_count),
+                            backgroundColor: '#3B82F6'
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+
+                // Files per session
+                if (charts.filesPerSessionChart) charts.filesPerSessionChart.destroy();
+                const ctx2 = document.getElementById('filesPerSessionChart').getContext('2d');
+                charts.filesPerSessionChart = new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: data.sessions.slice(0, 10).map((s, i) => `Session ${i+1}`),
+                        datasets: [{
+                            label: 'Files Touched',
+                            data: data.sessions.slice(0, 10).map(s => s.files_touched),
+                            backgroundColor: '#10B981'
+                        }]
+                    }
+                });
+
+                // Todo trends
+                if (charts.todoTrendsChart) charts.todoTrendsChart.destroy();
+                const ctx3 = document.getElementById('todoTrendsChart').getContext('2d');
+
+                if (data.todo_patterns && data.todo_patterns.length > 0) {
+                    charts.todoTrendsChart = new Chart(ctx3, {
+                        type: 'line',
+                        data: {
+                            labels: data.todo_patterns.map(t => t.date),
+                            datasets: [{
+                                label: 'Todos Created',
+                                data: data.todo_patterns.map(t => t.todos_written),
+                                borderColor: '#F59E0B',
+                                tension: 0.4,
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                } else {
+                    ctx3.canvas.parentNode.innerHTML = '<p class="text-gray-500 text-center">No todo pattern data available</p>';
+                }
+            } catch (error) {
+                console.error('Error loading productivity:', error);
+            }
+        }
+
+        // Load Tools
+        async function loadTools() {
+            try {
+                const response = await axios.get('/api/tools');
+                const data = response.data;
+
+                // Tool usage chart
+                if (charts.toolUsageChart) charts.toolUsageChart.destroy();
+                const ctx1 = document.getElementById('toolUsageChart').getContext('2d');
+                charts.toolUsageChart = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: data.frequency.slice(0, 10).map(t => t.tool_name.split('__').pop()),
+                        datasets: [{
+                            label: 'Usage Count',
+                            data: data.frequency.slice(0, 10).map(t => t.usage_count),
+                            backgroundColor: '#8B5CF6'
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        scales: {
+                            x: { beginAtZero: true }
+                        }
+                    }
+                });
+
+                // Tool categories
+                if (charts.toolCategoriesChart) charts.toolCategoriesChart.destroy();
+                const ctx2 = document.getElementById('toolCategoriesChart').getContext('2d');
+                charts.toolCategoriesChart = new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(data.categories),
+                        datasets: [{
+                            data: Object.values(data.categories),
+                            backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
+                        }]
+                    }
+                });
+
+                // Tool usage timeline
+                if (data.timeline) {
+                    if (charts.toolTimelineChart) charts.toolTimelineChart.destroy();
+                    const ctx3 = document.getElementById('toolTimelineChart').getContext('2d');
+
+                    // Get all unique dates
+                    const allDates = new Set();
+                    Object.values(data.timeline).forEach(toolData => {
+                        toolData.forEach(d => allDates.add(d.date));
+                    });
+                    const sortedDates = Array.from(allDates).sort();
+
+                    // Create datasets for each tool
+                    const datasets = Object.keys(data.timeline).map((tool, i) => {
+                        const dateMap = {};
+                        data.timeline[tool].forEach(d => {
+                            dateMap[d.date] = d.count;
+                        });
+                        const dataPoints = sortedDates.map(date => dateMap[date] || 0);
+
+                        const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+                        return {
+                            label: tool,
+                            data: dataPoints,
+                            borderColor: colors[i % colors.length],
+                            backgroundColor: colors[i % colors.length] + '20',
+                            tension: 0.4
+                        };
+                    });
+
+                    if (sortedDates.length > 0) {
+                        charts.toolTimelineChart = new Chart(ctx3, {
+                            type: 'line',
+                            data: {
+                                labels: sortedDates.map(d => {
+                                    const parts = d.split('-');
+                                    return parts.length === 3 ? `${parts[1]}/${parts[2]}` : d;
+                                }),
+                                datasets: datasets
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    x: {
+                                        title: { display: true, text: 'Date' },
+                                        ticks: {
+                                            maxRotation: 45,
+                                            minRotation: 45,
+                                            autoSkip: true,
+                                            maxTicksLimit: 20
+                                        }
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                        title: { display: true, text: 'Usage Count' }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'top'
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+
+                // Tool sequences
+                const sequencesHtml = data.sequences && data.sequences.length > 0
+                    ? data.sequences.slice(0, 10).map(s => `
+                        <div class="flex justify-between p-2 bg-gray-50 rounded">
+                            <span class="font-mono text-sm">${s.sequence}</span>
+                            <span class="text-gray-600">${s.count} times</span>
+                        </div>
+                    `).join('')
+                    : '<p class="text-gray-500">No common sequences found</p>';
+                document.getElementById('toolSequences').innerHTML = sequencesHtml;
+            } catch (error) {
+                console.error('Error loading tools:', error);
+            }
+        }
+
+        // Load Files
+        async function loadFiles() {
+            try {
+                const response = await axios.get('/api/files');
+                const data = response.data;
+
+                // File types chart
+                if (charts.fileTypesChart) charts.fileTypesChart.destroy();
+                const ctx1 = document.getElementById('fileTypesChart').getContext('2d');
+                charts.fileTypesChart = new Chart(ctx1, {
+                    type: 'pie',
+                    data: {
+                        labels: data.file_types.map(f => f.file_type),
+                        datasets: [{
+                            data: data.file_types.map(f => f.count),
+                            backgroundColor: [
+                                '#3B82F6', '#10B981', '#F59E0B', '#EF4444',
+                                '#8B5CF6', '#EC4899', '#6366F1', '#14B8A6'
+                            ]
+                        }]
+                    }
+                });
+
+                // Directory heat map
+                if (charts.directoryHeatChart) charts.directoryHeatChart.destroy();
+                const ctx2 = document.getElementById('directoryHeatChart').getContext('2d');
+                charts.directoryHeatChart = new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: data.directories.map(d => d.directory.split('/').pop() || 'root'),
+                        datasets: [{
+                            label: 'Operations',
+                            data: data.directories.map(d => d.operations),
+                            backgroundColor: '#EF4444'
+                        }]
+                    }
+                });
+
+                // Hot files table
+                const hotFilesHtml = `
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-4 py-2 text-left">File Path</th>
+                                <th class="px-4 py-2 text-center">Total</th>
+                                <th class="px-4 py-2 text-center">Read</th>
+                                <th class="px-4 py-2 text-center">Write</th>
+                                <th class="px-4 py-2 text-center">Edit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.hot_files.slice(0, 20).map(f => `
+                                <tr class="border-b">
+                                    <td class="px-4 py-2 font-mono text-sm">${f.file_path}</td>
+                                    <td class="px-4 py-2 text-center">${f.edit_count}</td>
+                                    <td class="px-4 py-2 text-center">${f.reads}</td>
+                                    <td class="px-4 py-2 text-center">${f.writes}</td>
+                                    <td class="px-4 py-2 text-center">${f.edits}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                document.getElementById('hotFiles').innerHTML = hotFilesHtml;
+            } catch (error) {
+                console.error('Error loading files:', error);
+            }
+        }
+
+        // Load Cognitive
+        async function loadCognitive() {
+            try {
+                const response = await axios.get('/api/cognitive');
+                const data = response.data;
+
+                // Thinking patterns chart
+                if (charts.thinkingPatternsChart) charts.thinkingPatternsChart.destroy();
+                const ctx1 = document.getElementById('thinkingPatternsChart').getContext('2d');
+
+                // Prepare data for the chart
+                const thinkingData = data.thinking_patterns || {};
+
+                // Get all unique dates across all tools
+                const allDates = new Set();
+                Object.values(thinkingData).forEach(toolData => {
+                    toolData.forEach(d => allDates.add(d.date));
+                });
+                const sortedDates = Array.from(allDates).sort();
+
+                // Create datasets for each thinking tool
+                const datasets = Object.keys(thinkingData).map((tool, i) => {
+                    // Create a map for quick lookup
+                    const dateMap = {};
+                    thinkingData[tool].forEach(d => {
+                        dateMap[d.date] = d.count;
+                    });
+
+                    // Fill in data for all dates (0 if no data)
+                    const dataPoints = sortedDates.map(date => dateMap[date] || 0);
+
+                    return {
+                        label: tool.split('__').pop().replace('thinking', ''),
+                        data: dataPoints,
+                        borderColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'][i % 4],
+                        backgroundColor: ['#3B82F620', '#10B98120', '#F59E0B20', '#EF444420'][i % 4],
+                        tension: 0.4,
+                        fill: true
+                    };
+                });
+
+                if (sortedDates.length > 0 && datasets.length > 0) {
+                    charts.thinkingPatternsChart = new Chart(ctx1, {
+                        type: 'line',
+                        data: {
+                            labels: sortedDates.map(d => {
+                                // Format date for display
+                                const parts = d.split('-');
+                                return parts.length === 3 ? `${parts[1]}/${parts[2]}` : d;
+                            }),
+                            datasets: datasets
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    title: { display: true, text: 'Date' },
+                                    ticks: {
+                                        maxRotation: 45,
+                                        minRotation: 45,
+                                        autoSkip: true,
+                                        maxTicksLimit: 20
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    title: { display: true, text: 'Usage Count' }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    ctx1.canvas.parentNode.innerHTML = '<p class="text-gray-500 text-center">No thinking pattern data available</p>';
+                }
+
+                // Complexity chart
+                if (charts.complexityChart) charts.complexityChart.destroy();
+                const ctx2 = document.getElementById('complexityChart').getContext('2d');
+
+                if (data.session_complexity && data.session_complexity.length > 0) {
+                    charts.complexityChart = new Chart(ctx2, {
+                        type: 'scatter',
+                        data: {
+                            datasets: [{
+                                label: 'Session Complexity',
+                                data: data.session_complexity.map(s => ({
+                                    x: s.node_count || 0,
+                                    y: s.tool_diversity || 0
+                                })),
+                                backgroundColor: '#8B5CF6'
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                x: { title: { display: true, text: 'Node Count' } },
+                                y: { title: { display: true, text: 'Tool Diversity' } }
+                            }
+                        }
+                    });
+                } else {
+                    ctx2.canvas.parentNode.innerHTML = '<p class="text-gray-500 text-center">No complexity data available</p>';
+                }
+            } catch (error) {
+                console.error('Error loading cognitive:', error);
+            }
+        }
+
+        // Load Timeline
+        async function loadTimeline() {
+            try {
+                const response = await axios.get('/api/timeline');
+                const data = response.data;
+
+                // Daily activity chart
+                if (charts.dailyActivityChart) charts.dailyActivityChart.destroy();
+                const ctx = document.getElementById('dailyActivityChart').getContext('2d');
+                charts.dailyActivityChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.daily_activity.map(d => d.date),
+                        datasets: [{
+                            label: 'Total Nodes',
+                            data: data.daily_activity.map(d => d.total_nodes),
+                            borderColor: '#3B82F6',
+                            tension: 0.4
+                        }, {
+                            label: 'Sessions',
+                            data: data.daily_activity.map(d => d.sessions * 10),
+                            borderColor: '#10B981',
+                            tension: 0.4
+                        }]
+                    }
+                });
+
+                // Recent sessions
+                const sessionsHtml = data.recent_sessions.map(s => `
+                    <div class="p-4 bg-gray-50 rounded">
+                        <div class="font-mono text-sm text-gray-600">${s.session_id}</div>
+                        <div class="mt-2 text-sm">
+                            <span class="font-semibold">Start:</span> ${new Date(s.start_time).toLocaleString()}<br>
+                            <span class="font-semibold">End:</span> ${new Date(s.end_time).toLocaleString()}<br>
+                            <span class="font-semibold">Nodes:</span> ${s.node_count}<br>
+                            <span class="font-semibold">CWD:</span> ${s.cwd}
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('recentSessions').innerHTML = sessionsHtml;
+            } catch (error) {
+                console.error('Error loading timeline:', error);
+            }
+        }
+
+        // Session summaries pagination
+        let currentSessionOffset = 0;
+        let totalSessions = 0;
+
+        // Load Session Summaries
+        async function loadSessionSummaries(offset = 0) {
+            try {
+                currentSessionOffset = offset;
+                const response = await axios.get(`/api/sessions/summaries?limit=50&offset=${offset}`);
+                const data = response.data;
+
+                totalSessions = data.total;
+
+                // Update pagination buttons
+                document.getElementById('prevSessionBtn').disabled = offset === 0;
+                document.getElementById('nextSessionBtn').disabled = offset + 50 >= totalSessions;
+                document.getElementById('sessionPageInfo').textContent =
+                    `Showing ${offset + 1}-${Math.min(offset + 50, totalSessions)} of ${totalSessions}`;
+
+                // Render sessions
+                const sessionsHtml = data.sessions.map(session => {
+                    const startTime = session.start_time ? new Date(session.start_time).toLocaleString() : 'Unknown';
+                    const highlightsHtml = session.highlights.map(h => `<span class="text-sm">${h}</span>`).join('<br>');
+
+                    return `
+                        <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-lg text-gray-900 mb-1">${session.title || session.summary}</h4>
+                                    ${session.summary && session.title ? `
+                                        <p class="text-sm text-gray-700 mb-2">${session.summary}</p>
+                                    ` : ''}
+                                    ${session.bullets && session.bullets.length > 0 ? `
+                                        <ul class="list-disc list-inside text-sm text-gray-600 mb-2">
+                                            ${session.bullets.map(b => `<li>${b}</li>`).join('')}
+                                        </ul>
+                                    ` : ''}
+                                    <p class="text-sm text-gray-500">${startTime}</p>
+                                    <p class="text-xs text-gray-400 mt-1 font-mono">${session.session_id}</p>
+                                </div>
+                                <div class="text-right text-sm text-gray-500">
+                                    <span>${session.total_nodes} nodes</span><br>
+                                    <span>${session.duration_minutes || 0}m</span>
+                                </div>
+                            </div>
+                            ${session.highlights.length > 0 ? `
+                                <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t">
+                                    ${session.highlights.map(h => `
+                                        <span class="inline-block px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">
+                                            ${h}
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+
+                document.getElementById('sessionSummaries').innerHTML = sessionsHtml ||
+                    '<p class="text-gray-500 text-center">No sessions found</p>';
+
+            } catch (error) {
+                console.error('Error loading session summaries:', error);
+                document.getElementById('sessionSummaries').innerHTML =
+                    '<p class="text-red-500 text-center">Error loading sessions</p>';
+            }
+        }
+
+        // Search functionality
+        async function performSearch() {
+            const query = document.getElementById('searchInput').value;
+            if (!query) return;
+
+            try {
+                const response = await axios.get('/api/search', {
+                    params: { q: query, type: 'all' }
+                });
+
+                const resultsDiv = document.getElementById('searchResults');
+                if (response.data.results.length === 0) {
+                    resultsDiv.innerHTML = '<p class="text-gray-500">No results found</p>';
+                } else {
+                    const resultsHtml = response.data.results.map(r => {
+                        if (r.type === 'message') {
+                            return `
+                                <div class="p-3 border-b">
+                                    <div class="text-sm text-gray-600">${r.timestamp} - ${r.node_type}</div>
+                                    <div class="font-mono text-xs mt-1">${r.snippet}</div>
+                                </div>
+                            `;
+                        } else {
+                            return `
+                                <div class="p-3 border-b">
+                                    <div class="font-mono text-sm">${r.file_path}</div>
+                                    <div class="text-xs text-gray-600">${r.operation_count} operations</div>
+                                </div>
+                            `;
+                        }
+                    }).join('');
+                    resultsDiv.innerHTML = resultsHtml;
+                }
+                resultsDiv.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error searching:', error);
+            }
+        }
+
+        // Load Response Time History as line graph
+        async function loadResponseTimeHistory() {
+            try {
+                const response = await axios.get('/api/response-times-history');
+                const history = response.data;
+
+                if (!history || history.length === 0) return;
+
+                // Group by day and calculate average
+                const dailyData = {};
+                history.forEach(item => {
+                    const date = item.timestamp.split('T')[0];
+                    if (!dailyData[date]) {
+                        dailyData[date] = [];
+                    }
+                    dailyData[date].push(item.response_seconds);
+                });
+
+                // Calculate daily averages
+                const dates = Object.keys(dailyData).sort();
+                const averages = dates.map(date => {
+                    const times = dailyData[date];
+                    return times.reduce((a, b) => a + b, 0) / times.length;
+                });
+
+                if (charts.responseTimeChart) {
+                    charts.responseTimeChart.destroy();
+                }
+
+                const ctx = document.getElementById('responseTimeChart').getContext('2d');
+                charts.responseTimeChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Average Response Time (seconds)',
+                            data: averages,
+                            borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.1,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Response Time Trend Over Time'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'day',
+                                    displayFormats: {
+                                        day: 'MMM dd'
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Response Time (seconds)'
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading response time history:', error);
+            }
+        }
+
+        // Load Response Times
+        async function loadResponseTimes() {
+            try {
+                const response = await axios.get('/api/response-times');
+                const data = response.data;
+
+                // Update metrics
+                document.getElementById('avgResponseTime').textContent = data.average || '-';
+                document.getElementById('medianResponseTime').textContent = data.median || '-';
+                document.getElementById('shortestResponse').textContent = data.shortest.time || '-';
+                document.getElementById('longestResponse').textContent = data.longest.time || '-';
+
+                // Update details
+                const detailsDiv = document.getElementById('responseDetails');
+                detailsDiv.innerHTML = `
+                    <div class="p-3 bg-gray-50 rounded">
+                        <p class="font-medium">Shortest Response:</p>
+                        <p class="text-sm text-gray-600">${data.shortest.prompt || 'N/A'}</p>
+                        <p class="text-xs text-gray-500">${data.shortest.timestamp || ''}</p>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded">
+                        <p class="font-medium">Longest Response:</p>
+                        <p class="text-sm text-gray-600">${data.longest.prompt || 'N/A'}</p>
+                        <p class="text-xs text-gray-500">${data.longest.timestamp || ''}</p>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded">
+                        <p class="font-medium">Total Prompts Analyzed:</p>
+                        <p class="text-lg font-bold">${data.total_prompts || 0}</p>
+                    </div>
+                `;
+
+                // Load response time history for line graph
+                loadResponseTimeHistory();
+            } catch (error) {
+                console.error('Error loading response times:', error);
+            }
+        }
+
+        // Load Activity Analysis
+        async function loadActivityAnalysis() {
+            try {
+                const response = await axios.get('/api/activity-summary');
+                const data = response.data;
+
+                // Calculate totals
+                let totalActive = 0;
+                let totalDead = 0;
+                let maxGapVal = 0;
+
+                Object.values(data).forEach(session => {
+                    totalActive += session.active_time_seconds || 0;
+                    totalDead += session.dead_time_seconds || 0;
+                    maxGapVal = Math.max(maxGapVal, session.max_gap_seconds || 0);
+                });
+
+                const totalTime = totalActive + totalDead;
+
+                // Update summary
+                document.getElementById('totalActiveTime').textContent = formatDuration(totalActive);
+                document.getElementById('activePercentage').textContent =
+                    totalTime > 0 ? `${(totalActive / totalTime * 100).toFixed(1)}%` : '-';
+                document.getElementById('totalDeadTime').textContent = formatDuration(totalDead);
+                document.getElementById('deadPercentage').textContent =
+                    totalTime > 0 ? `${(totalDead / totalTime * 100).toFixed(1)}%` : '-';
+                document.getElementById('maxGap').textContent = formatDuration(maxGapVal);
+
+                // Create activity chart
+                const sessions = Object.keys(data).slice(0, 10);
+                const activeData = sessions.map(s => data[s].active_percentage || 0);
+                const deadData = sessions.map(s => data[s].dead_percentage || 0);
+
+                if (charts.activityChart) {
+                    charts.activityChart.destroy();
+                }
+
+                const ctx = document.getElementById('activityChart').getContext('2d');
+                charts.activityChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: sessions.map(s => s.substring(0, 8) + '...'),
+                        datasets: [
+                            {
+                                label: 'Active %',
+                                data: activeData,
+                                backgroundColor: 'rgba(34, 197, 94, 0.5)',
+                                borderColor: 'rgb(34, 197, 94)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Dead %',
+                                data: deadData,
+                                backgroundColor: 'rgba(156, 163, 175, 0.5)',
+                                borderColor: 'rgb(156, 163, 175)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { stacked: true },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: 'Percentage'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Populate session selector
+                const selector = document.getElementById('sessionSelector');
+                selector.innerHTML = '<option value="">Select a session...</option>' +
+                    sessions.map(s => `<option value="${s}">${s}</option>`).join('');
+
+                selector.addEventListener('change', async (e) => {
+                    if (e.target.value) {
+                        await loadActivityTimeline(e.target.value);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading activity analysis:', error);
+            }
+        }
+
+        // Load activity timeline for a specific session
+        async function loadActivityTimeline(sessionId) {
+            try {
+                const response = await axios.get(`/api/activity-timeline/${sessionId}`);
+                const timeline = response.data;
+
+                const timelineDiv = document.getElementById('activityTimeline');
+
+                if (!timeline || timeline.length === 0) {
+                    timelineDiv.innerHTML = '<p class="text-gray-500">No timeline data available</p>';
+                    return;
+                }
+
+                // Prepare data for timeline chart
+                const activityData = [];
+                const deadSpaceData = [];
+
+                timeline.forEach(item => {
+                    const point = {
+                        x: new Date(item.start),
+                        y: item.type === 'activity' ? 1 : 0
+                    };
+
+                    if (item.type === 'activity') {
+                        activityData.push(point);
+                    } else {
+                        deadSpaceData.push({
+                            x: new Date(item.start),
+                            y: item.duration
+                        });
+                    }
+                });
+
+                // Create timeline chart container
+                timelineDiv.innerHTML = '<canvas id="sessionTimelineChart" style="height: 200px;"></canvas>';
+
+                const ctx = document.getElementById('sessionTimelineChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Activity',
+                                data: activityData,
+                                backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                                pointRadius: 5
+                            },
+                            {
+                                label: 'Dead Space (seconds)',
+                                data: deadSpaceData,
+                                backgroundColor: 'rgba(156, 163, 175, 0.6)',
+                                pointRadius: 3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Session Activity Timeline'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'time',
+                                title: {
+                                    display: true,
+                                    text: 'Time'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Activity (1) / Dead Space Duration (s)'
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading activity timeline:', error);
+            }
+        }
+
+        // Load Config
+        async function loadConfig() {
+            try {
+                const response = await axios.get('/api/config');
+                const config = response.data;
+
+                // Database info
+                document.getElementById('dbPath').textContent = config.database.path;
+                document.getElementById('dbSize').textContent = config.database.size_mb.toFixed(2);
+                const dbStatus = document.getElementById('dbStatus');
+                dbStatus.textContent = config.database.exists ? 'Connected' : 'Not Found';
+                dbStatus.className = config.database.exists ?
+                    'px-2 py-1 rounded text-xs bg-green-100 text-green-800' :
+                    'px-2 py-1 rounded text-xs bg-red-100 text-red-800';
+
+                // Cache info
+                document.getElementById('cacheDir').textContent = config.cache.directory;
+                document.getElementById('cacheTTL').textContent = config.cache.summary_ttl_seconds;
+                document.getElementById('cachedCount').textContent = config.cache.cached_summaries;
+
+                // Project info
+                document.getElementById('projRoot').textContent = config.project.root;
+                document.getElementById('logsDir').textContent = config.project.logs_directory;
+                const projIntel = document.getElementById('projIntel');
+                projIntel.textContent = config.project.proj_intel_exists ? 'Available' : 'Not Found';
+                projIntel.className = config.project.proj_intel_exists ?
+                    'px-2 py-1 rounded text-xs bg-green-100 text-green-800' :
+                    'px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-800';
+
+                // Server info
+                document.getElementById('serverHost').textContent = config.server.host;
+                document.getElementById('serverPort').textContent = config.server.port;
+                const debugMode = document.getElementById('debugMode');
+                debugMode.textContent = config.server.debug ? 'Enabled' : 'Disabled';
+                debugMode.className = config.server.debug ?
+                    'px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-800' :
+                    'px-2 py-1 rounded text-xs bg-gray-100 text-gray-800';
+            } catch (error) {
+                console.error('Error loading config:', error);
+            }
+        }
+
+        // Helper function to format duration
+        function formatDuration(seconds) {
+            if (seconds < 1) return `${(seconds * 1000).toFixed(0)}ms`;
+            if (seconds < 60) return `${seconds.toFixed(1)}s`;
+            if (seconds < 3600) return `${(seconds / 60).toFixed(1)}m`;
+            return `${(seconds / 3600).toFixed(1)}h`;
+        }
+
+        // Clear cache action
+        function clearCache() {
+            if (confirm('Are you sure you want to clear the cache?')) {
+                // In a real implementation, this would call an API endpoint
+                alert('Cache cleared (not implemented yet)');
+            }
+        }
+
+        // Refresh data action
+        function refreshData() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+{
+  "report_metadata": {
+    "generated_at": "2025-09-08T13:25:18.958511",
+    "total_files": 1,
+    "analysis_version": "1.0"
+  },
+  "file_analyses": [
+    {
+      "file_path": "/home/opsvi/.claude/projects/-home-opsvi-master-root-apps-agent-orchestrator-docs-audit-results-agent-workspaces-content-categorization/2abc782c-418c-4247-a043-16f3e27c6d24.jsonl",
+      "file_name": "2abc782c-418c-4247-a043-16f3e27c6d24.jsonl",
+      "file_size_mb": 0.02876758575439453,
+      "token_count": 9666,
+      "estimated_cost": 0.24165000000000003,
+      "context_efficiency_score": 22.696476964769648,
+      "recommended_chunks": 2,
+      "processing_time_estimate": 0.9666,
+      "structure_analysis": {
+        "message_composition": {
+          "user": 0,
+          "assistant": 0,
+          "system": 0,
+          "tool": 0
+        },
+        "total_messages": 11,
+        "tool_usage_breakdown": {},
+        "total_tool_calls": 0,
+        "unique_tools_used": 0,
+        "file_operation_types": {},
+        "total_file_operations": 0,
+        "content_diversity_score": 0.0
+      },
+      "size_category": "Medium",
+      "optimization_potential": {
+        "optimization_score": 45,
+        "optimization_level": "Medium",
+        "optimization_reasons": [
+          "Low context efficiency detected",
+          "Low content diversity"
+        ]
+      }
+    }
+  ],
+  "aggregate_statistics": {
+    "total_files": 1,
+    "total_tokens": 9666,
+    "total_estimated_cost": 0.24165000000000003,
+    "average_tokens_per_file": 9666.0,
+    "average_file_size_mb": 0.02876758575439453,
+    "token_statistics": {
+      "min": 9666,
+      "max": 9666,
+      "median": 9666,
+      "std_deviation": 0.0
+    },
+    "size_categories": {
+      "Medium": 1
+    },
+    "optimization_summary": {
+      "average_optimization_score": 45.0,
+      "optimization_level_distribution": {
+        "Very High": 0,
+        "High": 0,
+        "Medium": 1,
+        "Low": 0
+      },
+      "high_potential_files": 0
+    }
+  },
+  "size_distribution": {
+    "bin_size": 9666,
+    "distribution": {
+      "9666": 1
+    },
+    "percentiles": {
+      "25th": 9666,
+      "50th": 9666,
+      "75th": 9666,
+      "90th": 9666
+    }
+  },
+  "recommendations": [
+    "Many files with low context efficiency - review content for redundancy and repetitive patterns"
+  ]
+}

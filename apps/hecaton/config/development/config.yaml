@@ -1,0 +1,39 @@
+# HECATON Development Configuration
+
+environment: development
+debug: true
+
+orchestration:
+  max_parallel_agents: 2  # Start with 2 for Phase 0
+  send_api:
+    timeout: 300
+    retry_count: 3
+
+resources:
+  token_pool:
+    size: 2
+    rotation_strategy: round_robin
+  worktree:
+    base_path: /home/opsvi/hecaton_worktrees
+    cleanup_on_exit: true
+
+agents:
+  registry:
+    auto_discover: true
+    base_path: templates/agents
+  sdlc_phases:
+    - discovery
+    - design
+    - development
+    - testing
+    - deployment
+
+monitoring:
+  enabled: true
+  metrics_port: 9090
+  log_level: DEBUG
+
+storage:
+  checkpoints: runtime/checkpoints
+  outputs: runtime/outputs
+  cache: data/cache

@@ -1,0 +1,264 @@
+{
+  "demo_task_library": {
+    "description": "Comprehensive library of demonstration tasks for the Agent Orchestrator",
+    "categories": {
+      "basic_agents": {
+        "description": "Simple single-purpose agents for basic demonstrations",
+        "tasks": [
+          {
+            "task_id": "code_analyzer_demo",
+            "task_type": "code_analysis",
+            "prompt": "You are a Code Analysis Agent. Analyze the provided Python codebase for:\n1. Code quality metrics (complexity, maintainability)\n2. Security vulnerabilities and best practices\n3. Performance optimization opportunities\n4. Documentation coverage and quality\n\nProvide your analysis in JSON format with specific examples and recommendations.",
+            "context": {
+              "analysis_depth": "comprehensive",
+              "focus_areas": ["quality", "security", "performance", "documentation"],
+              "output_format": "structured_json"
+            },
+            "expected_output": "Detailed code analysis report with actionable insights"
+          },
+          {
+            "task_id": "documentation_writer_demo",
+            "task_type": "documentation",
+            "prompt": "You are a Documentation Writer Agent. Create comprehensive user documentation for a software system including:\n1. Quick start guide for new users\n2. Detailed feature explanations with examples\n3. Troubleshooting section with common issues\n4. API reference if applicable\n\nStructure the documentation in a clear, user-friendly format with proper sections and examples.",
+            "context": {
+              "audience": "developers_and_users",
+              "documentation_type": "comprehensive_user_guide",
+              "format": "structured_markdown"
+            },
+            "expected_output": "Complete user documentation with examples and guides"
+          },
+          {
+            "task_id": "test_generator_demo",
+            "task_type": "test_generation",
+            "prompt": "You are a Test Generator Agent. Create comprehensive test suites including:\n1. Unit tests for core functionality\n2. Integration tests for system components\n3. Edge case and error condition tests\n4. Performance and load test specifications\n\nGenerate test cases with clear descriptions, input data, and expected outcomes.",
+            "context": {
+              "test_types": ["unit", "integration", "edge_case", "performance"],
+              "coverage_target": "comprehensive",
+              "framework_agnostic": true
+            },
+            "expected_output": "Complete test suite specifications with test cases"
+          },
+          {
+            "task_id": "performance_optimizer_demo",
+            "task_type": "performance_optimization",
+            "prompt": "You are a Performance Optimizer Agent. Analyze system performance and provide:\n1. Performance bottleneck identification\n2. Resource utilization analysis\n3. Optimization recommendations with priorities\n4. Performance monitoring strategies\n\nFocus on actionable improvements with measurable impact.",
+            "context": {
+              "optimization_areas": ["cpu", "memory", "io", "network"],
+              "analysis_approach": "data_driven",
+              "priority_focus": "high_impact_changes"
+            },
+            "expected_output": "Performance optimization plan with specific recommendations"
+          },
+          {
+            "task_id": "security_reviewer_demo",
+            "task_type": "security_review",
+            "prompt": "You are a Security Reviewer Agent. Conduct comprehensive security assessment covering:\n1. Vulnerability identification and risk assessment\n2. Security best practices compliance\n3. Access control and authorization review\n4. Data protection and privacy considerations\n\nProvide security recommendations with risk levels and remediation steps.",
+            "context": {
+              "security_domains": ["authentication", "authorization", "data_protection", "input_validation"],
+              "compliance_frameworks": ["owasp", "nist"],
+              "risk_assessment": "comprehensive"
+            },
+            "expected_output": "Security assessment report with risk analysis and recommendations"
+          }
+        ]
+      },
+      "collaborative_scenarios": {
+        "description": "Multi-agent scenarios demonstrating collaboration",
+        "scenarios": [
+          {
+            "scenario_name": "code_review_pipeline",
+            "description": "Complete code review process with multiple specialized agents",
+            "agents": [
+              {
+                "task_id": "code_quality_analysis",
+                "task_type": "quality_analyst",
+                "prompt": "Analyze code quality metrics, complexity, and maintainability. Focus on technical debt identification.",
+                "dependencies": []
+              },
+              {
+                "task_id": "security_analysis",
+                "task_type": "security_analyst",
+                "prompt": "Perform security analysis focusing on vulnerabilities, secure coding practices, and potential attack vectors.",
+                "dependencies": []
+              },
+              {
+                "task_id": "performance_analysis",
+                "task_type": "performance_analyst",
+                "prompt": "Analyze performance characteristics, identify bottlenecks, and suggest optimizations.",
+                "dependencies": []
+              },
+              {
+                "task_id": "review_synthesis",
+                "task_type": "review_synthesizer",
+                "prompt": "Synthesize all analysis results into comprehensive code review with prioritized recommendations.",
+                "dependencies": ["code_quality_analysis", "security_analysis", "performance_analysis"]
+              }
+            ]
+          },
+          {
+            "scenario_name": "system_design_workflow",
+            "description": "Complete system design process from requirements to implementation plan",
+            "agents": [
+              {
+                "task_id": "requirements_gathering",
+                "task_type": "requirements_analyst",
+                "prompt": "Gather and analyze system requirements, constraints, and success criteria.",
+                "dependencies": []
+              },
+              {
+                "task_id": "architecture_design",
+                "task_type": "architect",
+                "prompt": "Design system architecture based on requirements with component specifications and interfaces.",
+                "dependencies": ["requirements_gathering"]
+              },
+              {
+                "task_id": "database_design",
+                "task_type": "database_designer",
+                "prompt": "Design database schema and data management strategy based on requirements and architecture.",
+                "dependencies": ["requirements_gathering", "architecture_design"]
+              },
+              {
+                "task_id": "api_design",
+                "task_type": "api_designer",
+                "prompt": "Design APIs and service interfaces based on architecture and data design.",
+                "dependencies": ["architecture_design", "database_design"]
+              },
+              {
+                "task_id": "implementation_planning",
+                "task_type": "implementation_planner",
+                "prompt": "Create detailed implementation plan with timeline, milestones, and resource allocation.",
+                "dependencies": ["architecture_design", "database_design", "api_design"]
+              }
+            ]
+          }
+        ]
+      },
+      "stress_test_scenarios": {
+        "description": "High-load scenarios for testing orchestrator performance",
+        "scenarios": [
+          {
+            "scenario_name": "parallel_processing_stress",
+            "description": "High-volume parallel task processing",
+            "task_count": 20,
+            "parallelism": 10,
+            "task_template": {
+              "task_type": "computation_intensive",
+              "prompt": "Perform computational analysis task #{task_number}. Simulate complex processing with detailed reporting.",
+              "context": {
+                "computation_type": "intensive",
+                "expected_duration": "medium"
+              }
+            }
+          },
+          {
+            "scenario_name": "dependency_chain_stress",
+            "description": "Complex dependency chains with multiple levels",
+            "levels": 5,
+            "tasks_per_level": 4,
+            "task_template": {
+              "task_type": "dependency_chain_node",
+              "prompt": "Process level {level} task {task_number}. Build upon previous level results.",
+              "context": {
+                "chain_level": "{level}",
+                "depends_on_previous_level": true
+              }
+            }
+          }
+        ]
+      },
+      "real_world_examples": {
+        "description": "Practical real-world use cases",
+        "examples": [
+          {
+            "example_name": "software_project_analysis",
+            "description": "Comprehensive analysis of a software project",
+            "tasks": [
+              {
+                "task_id": "codebase_overview",
+                "task_type": "project_analyst",
+                "prompt": "Analyze project structure, technologies used, and architectural patterns. Provide comprehensive overview.",
+                "dependencies": []
+              },
+              {
+                "task_id": "dependency_analysis",
+                "task_type": "dependency_analyst",
+                "prompt": "Analyze project dependencies, identify potential security issues and update needs.",
+                "dependencies": ["codebase_overview"]
+              },
+              {
+                "task_id": "test_coverage_analysis",
+                "task_type": "test_analyst",
+                "prompt": "Analyze test coverage, identify gaps, and recommend testing improvements.",
+                "dependencies": ["codebase_overview"]
+              },
+              {
+                "task_id": "deployment_analysis",
+                "task_type": "deployment_analyst",
+                "prompt": "Analyze deployment configuration and recommend infrastructure improvements.",
+                "dependencies": ["codebase_overview", "dependency_analysis"]
+              },
+              {
+                "task_id": "project_health_report",
+                "task_type": "project_synthesizer",
+                "prompt": "Synthesize all analyses into comprehensive project health report with recommendations.",
+                "dependencies": ["codebase_overview", "dependency_analysis", "test_coverage_analysis", "deployment_analysis"]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "monitoring_examples": {
+    "description": "Tasks designed to showcase monitoring capabilities",
+    "examples": [
+      {
+        "task_id": "quick_health_check",
+        "task_type": "health_monitor",
+        "prompt": "Perform rapid system health assessment. Check critical components and report status.",
+        "context": {"duration": "short", "monitoring_type": "health_check"},
+        "expected_duration_seconds": 10
+      },
+      {
+        "task_id": "comprehensive_analysis",
+        "task_type": "deep_analyzer",
+        "prompt": "Conduct comprehensive system analysis including performance metrics, resource usage, and optimization opportunities.",
+        "context": {"duration": "long", "monitoring_type": "comprehensive"},
+        "expected_duration_seconds": 45
+      },
+      {
+        "task_id": "progress_reporter",
+        "task_type": "progress_tracker",
+        "prompt": "Generate detailed progress report with multiple checkpoints and status updates.",
+        "context": {"duration": "medium", "monitoring_type": "progress_tracking"},
+        "expected_duration_seconds": 25
+      }
+    ]
+  },
+  "customization_templates": {
+    "description": "Templates for creating custom demonstration tasks",
+    "templates": {
+      "basic_agent_template": {
+        "task_id": "custom_agent_{id}",
+        "task_type": "{agent_type}",
+        "prompt": "You are a {agent_type} agent. {custom_instructions}",
+        "context": {
+          "agent_role": "{agent_type}",
+          "customizable": true
+        },
+        "dependencies": []
+      },
+      "collaborative_template": {
+        "task_id": "collaborative_task_{id}",
+        "task_type": "collaborative_{role}",
+        "prompt": "As part of a collaborative workflow, you are responsible for {role_description}. Coordinate with other agents and build upon their work.",
+        "context": {
+          "collaboration_mode": true,
+          "role": "{role}",
+          "workflow_stage": "{stage}"
+        },
+        "dependencies": ["{previous_tasks}"]
+      }
+    }
+  }
+}

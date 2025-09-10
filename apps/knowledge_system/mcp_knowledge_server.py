@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 """
-MCP Server for Simplified Knowledge System Operations
+MCP Server for Knowledge System
 
-Provides MCP tools that eliminate Neo4j Cypher complexity:
-- knowledge_query: Search and retrieve knowledge
-- knowledge_store: Store new knowledge (handles JSON serialization)
-- knowledge_update: Update existing knowledge (success/failure tracking)
-- knowledge_relate: Create relationships between knowledge entries
-
-This prevents common Neo4j errors and makes knowledge operations simple.
+Complete knowledge management with:
+- Nano agent transformation
+- Auto-embedding
+- Direct execution
+- Knowledge superseding
+- Simple input format
 """
 
 import json
-import hashlib
+import logging
 import sys
-from datetime import datetime, timezone
-from typing import Optional, List
+from typing import Optional
 
 try:
     from fastmcp import FastMCP
@@ -24,287 +22,534 @@ except ImportError as e:
     print("Please install fastmcp: pip install fastmcp", file=sys.stderr)
     sys.exit(1)
 
-# Import our simplified tools
-from apps.knowledge_system.mcp_knowledge_tools import (
-    KnowledgeQueryTool,
-    KnowledgeStoreTool,
-    KnowledgeUpdateTool,
-    KnowledgeRelationshipTool,
-    EMBEDDINGS_AVAILABLE
-)
+# Import knowledge tools
+from apps.knowledge_system.mcp_knowledge_tools import get_enhanced_query as get_query
+from apps.knowledge_system.mcp_knowledge_tools import get_enhanced_store as get_store
+from apps.knowledge_system.query_nano_agent import get_smart_executor
 
-# Log embedding availability
-import logging
+# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-logger.info(f"MCP Server: Embeddings available = {EMBEDDINGS_AVAILABLE}")
 
 # Initialize FastMCP server
 mcp = FastMCP("knowledge-system")
 
 
 @mcp.tool()
-async def knowledge_query(
-    query_type: str,
-    query_text: Optional[str] = None,
-    knowledge_type: Optional[str] = None,
-    min_confidence: float = 0.7,
-    limit: int = 5
+async def knowledge_store(
+    content: str, knowledge_type: Optional[str] = None, tags: Optional[str] = None
 ) -> str:
     """
-    Query knowledge without writing Cypher
-    
+    Store knowledge with automatic processing.
+
+    Simply provide the content - everything else is handled automatically:
+    - Nano agent transforms to structured format
+    - Embeddings generated automatically
+    - Superseded knowledge detected and marked
+    - Direct storage to Neo4j
+
     Args:
-        query_type: 'search', 'by_type', 'high_confidence', 'recent', 'related'
-        query_text: Text to search for (for search and related queries)
-        knowledge_type: Filter by type (ERROR_SOLUTION, CODE_PATTERN, etc.)
-        min_confidence: Minimum confidence score (0-1)
-        limit: Maximum number of results
-        
+        content: The knowledge to store (any format)
+        knowledge_type: Optional hint (ERROR_SOLUTION, CODE_PATTERN, WORKFLOW, etc.)
+        tags: Optional comma-separated tags
+
     Returns:
-        JSON with Cypher query and params for mcp__db__read_neo4j_cypher
+        JSON with knowledge_id and status
+
+    Example:
+        knowledge_store(
+            content="To fix TypeError in Python, check variable types with isinstance()",
+            knowledge_type="ERROR_SOLUTION",
+            tags="python,error,type"
+        )
     """
     try:
-        result = KnowledgeQueryTool.execute(
-            query_type=query_type,
-            query_text=query_text,
-            knowledge_type=knowledge_type,
-            min_confidence=min_confidence,
-            limit=limit
+        store = get_store()
+
+        # Parse tags if provided
+        tag_list = None
+        if tags:
+            tag_list = [t.strip() for t in tags.split(",")]
+
+        # Store with complete pipeline
+        result = await store.store(
+            raw_input=content,
+            hint_type=knowledge_type,
+            hint_tags=tag_list,
+            direct_execute=True,
         )
-        
-        return json.dumps({
-            "success": True,
-            "cypher_query": result["query"],
-            "params": result["params"],
-            "instruction": "Execute via mcp__db__read_neo4j_cypher",
-            "example": f"mcp__db__read_neo4j_cypher(query=result['cypher_query'], params=result['params'])"
-        }, indent=2)
-        
+
+        if result.get("stored"):
+            # Successfully stored directly
+            return json.dumps(
+                {
+                    "success": True,
+                    "knowledge_id": result["knowledge_id"],
+                    "stored": True,
+                    "type": result.get("knowledge_type"),
+                    "tags": result.get("tags", []),
+                    "confidence": result.get("confidence"),
+                    "embedding_generated": result.get("embedding_generated", False),
+                    "superseded_count": result.get("superseded_count", 0),
+                    "message": "Knowledge stored successfully",
+                },
+                indent=2,
+            )
+        else:
+            # Return query for manual execution
+            return json.dumps(
+                {
+                    "success": True,
+                    "knowledge_id": result["knowledge_id"],
+                    "stored": False,
+                    "cypher_query": result.get("cypher_query"),
+                    "params": result.get("params"),
+                    "instruction": "Execute via mcp__db__write_neo4j_cypher",
+                    "message": "Query generated - manual execution required",
+                },
+                indent=2,
+            )
+
     except Exception as e:
-        return json.dumps({
-            "success": False,
-            "error": str(e)
-        }, indent=2)
+        logger.error(f"Knowledge store failed: {e}")
+        return json.dumps(
+            {"success": False, "error": str(e), "message": "Failed to store knowledge"},
+            indent=2,
+        )
 
 
 @mcp.tool()
-async def knowledge_store(
-    knowledge_type: str,
-    content: str,
-    context: Optional[dict] = None,
-    tags: Optional[list] = None,
-    confidence_score: float = 0.8,
-    knowledge_id: Optional[str] = None
+async def knowledge_query(
+    query_type: str = "recent",
+    search_text: Optional[str] = None,
+    knowledge_type: Optional[str] = None,
+    limit: int = 5,
 ) -> str:
     """
-    Store knowledge with automatic JSON serialization for complex objects
-    
+    Query knowledge with direct results.
+
     Args:
-        knowledge_type: ERROR_SOLUTION, CODE_PATTERN, WORKFLOW, USER_PREFERENCE, CONTEXT_PATTERN, TOOL_USAGE
-        content: The knowledge content/description
-        context: Any context dict (will be JSON serialized automatically)
-        tags: Tags for categorization
-        confidence_score: Initial confidence (0-1)
-        knowledge_id: Optional ID (will generate if not provided)
-        
+        query_type: Type of query (search, recent, by_type, high_confidence)
+        search_text: Text to search for (for 'search' query type)
+        knowledge_type: Filter by type (for 'by_type' query)
+        limit: Maximum results to return
+
     Returns:
-        JSON with generated knowledge_id and Cypher query
+        JSON with knowledge results
+
+    Example:
+        knowledge_query(
+            query_type="search",
+            search_text="python error",
+            limit=10
+        )
     """
     try:
-        # Explicitly enable auto-embedding
-        result = KnowledgeStoreTool.execute(
+        query = get_query()
+
+        result = query.query(
+            query_type=query_type,
+            query_text=search_text,
             knowledge_type=knowledge_type,
-            content=content,
-            context=context,
-            tags=tags,
-            confidence_score=confidence_score,
-            knowledge_id=knowledge_id,
-            auto_embed=True  # Explicitly enable
+            min_confidence=0.5,
+            limit=limit,
+            direct_execute=True,
         )
-        
-        # Log embedding status
-        if result.get("embedding_generated"):
-            logger.info(f"Successfully generated embedding for {result['knowledge_id']}")
+
+        if "results" in result:
+            # Direct execution succeeded
+            return json.dumps(
+                {
+                    "success": True,
+                    "results": result["results"],
+                    "count": result["count"],
+                    "query_type": query_type,
+                },
+                indent=2,
+            )
         else:
-            logger.warning(f"No embedding generated for {result['knowledge_id']}")
-        
-        # Create a clean copy of params without embedding for response
-        clean_params = dict(result["params"])
-        embedding_info = None
-        
-        # Remove embedding from params if present and capture info
-        if "embedding" in clean_params and clean_params["embedding"]:
-            embedding_dim = len(clean_params["embedding"])
-            embedding_info = {
-                "generated": True,
-                "dimensions": embedding_dim,
-                "model": clean_params.get("embedding_model", "unknown")
-            }
-            # Remove embedding fields from clean params
-            clean_params.pop("embedding", None)
-            clean_params.pop("embedding_model", None)
-        
-        # Create a compact response that excludes the embedding vector to save context
-        response = {
-            "success": True,
-            "knowledge_id": result["knowledge_id"],
-            "cypher_query": result["query"],
-            "params": clean_params,  # Clean params without embedding
-            "embedding_generated": result.get("embedding_generated", False),
-            "instruction": "Execute via mcp__db__write_neo4j_cypher",
-            "note": "Complex objects in context have been JSON serialized automatically. Embeddings generated automatically when available."
-        }
-        
-        # Add embedding info if it was generated
-        if embedding_info:
-            response["embedding_info"] = embedding_info
-            
-        return json.dumps(response, indent=2)
-        
+            # Return query for manual execution
+            return json.dumps(
+                {
+                    "success": True,
+                    "cypher_query": result["cypher_query"],
+                    "params": result["params"],
+                    "instruction": "Execute via mcp__db__read_neo4j_cypher",
+                },
+                indent=2,
+            )
+
     except Exception as e:
+        logger.error(f"Knowledge query failed: {e}")
+        return json.dumps({"success": False, "error": str(e)}, indent=2)
+
+
+@mcp.tool()
+async def knowledge_smart_query(
+    query: str,
+    limit: int = 5,
+    use_assistant: bool = True
+) -> str:
+    """
+    Smart knowledge query with AI assistance.
+    
+    This tool uses an AI assistant to translate vague or complex queries
+    into effective search strategies, trying multiple approaches to find
+    relevant knowledge.
+    
+    Args:
+        query: Natural language query (can be vague or complex)
+        limit: Maximum results to return
+        use_assistant: Whether to use AI translation (default: True)
+    
+    Returns:
+        JSON with knowledge results and search strategy used
+    
+    Example:
+        knowledge_smart_query(
+            query="recent work on that authentication thing",
+            limit=5
+        )
+    """
+    try:
+        if use_assistant:
+            # Use smart executor with nano agent
+            executor = get_smart_executor()
+            result = await executor.smart_query(
+                user_query=query,
+                limit=limit
+            )
+            
+            return json.dumps({
+                "success": result["success"],
+                "results": result["results"],
+                "count": len(result["results"]),
+                "original_query": query,
+                "strategy_used": result["strategy"],
+                "attempts": result["attempts"],
+                "message": "Smart query executed with AI assistance"
+            }, indent=2)
+        else:
+            # Fall back to regular search
+            query_tool = get_query()
+            result = query_tool.query(
+                query_type="search",
+                query_text=query,
+                limit=limit,
+                direct_execute=True
+            )
+            
+            if "results" in result:
+                return json.dumps({
+                    "success": True,
+                    "results": result["results"],
+                    "count": result["count"],
+                    "original_query": query,
+                    "message": "Direct search without AI assistance"
+                }, indent=2)
+            else:
+                return json.dumps({
+                    "success": False,
+                    "error": "Query failed",
+                    "original_query": query
+                }, indent=2)
+                
+    except Exception as e:
+        logger.error(f"Smart query failed: {e}")
         return json.dumps({
             "success": False,
             "error": str(e),
-            "hint": "Check that knowledge_type is valid and content is provided"
+            "original_query": query
         }, indent=2)
 
 
 @mcp.tool()
 async def knowledge_update(
-    knowledge_id: str,
-    update_type: str,
-    failure_reason: Optional[str] = None
+    knowledge_id: str, update_type: str, failure_reason: Optional[str] = None
 ) -> str:
     """
-    Update knowledge based on usage outcomes (success/failure)
-    
+    Update knowledge based on usage.
+
     Args:
         knowledge_id: ID of knowledge to update
         update_type: 'success', 'failure', or 'deprecate'
-        failure_reason: Reason for failure (if update_type is failure)
-        
+        failure_reason: Reason if update_type is 'failure'
+
     Returns:
-        JSON with Cypher query for updating knowledge
+        JSON with update status
     """
-    try:
-        result = KnowledgeUpdateTool.execute(
-            knowledge_id=knowledge_id,
-            update_type=update_type,
-            failure_reason=failure_reason
+    # Build the appropriate query
+    if update_type == "success":
+        query = """
+        MATCH (k:Knowledge {knowledge_id: $knowledge_id})
+        SET k.usage_count = k.usage_count + 1,
+            k.success_rate = ((k.success_rate * k.usage_count) + 1.0) / (k.usage_count + 1),
+            k.confidence_score = CASE
+                WHEN k.success_rate > 0.8 AND k.usage_count > 5
+                THEN CASE WHEN k.confidence_score + 0.05 > 1.0 THEN 1.0 ELSE k.confidence_score + 0.05 END
+                ELSE k.confidence_score
+            END,
+            k.updated_at = datetime(),
+            k.last_success = datetime()
+        RETURN k.knowledge_id as id, k.confidence_score as new_confidence
+        """
+        params = {"knowledge_id": knowledge_id}
+
+    elif update_type == "failure":
+        query = """
+        MATCH (k:Knowledge {knowledge_id: $knowledge_id})
+        SET k.usage_count = k.usage_count + 1,
+            k.success_rate = ((k.success_rate * k.usage_count) + 0.0) / (k.usage_count + 1),
+            k.confidence_score = CASE
+                WHEN k.success_rate < 0.3
+                THEN CASE WHEN k.confidence_score - 0.1 < 0.1 THEN 0.1 ELSE k.confidence_score - 0.1 END
+                ELSE k.confidence_score
+            END,
+            k.updated_at = datetime(),
+            k.last_failure = datetime(),
+            k.last_failure_reason = $failure_reason
+        RETURN k.knowledge_id as id, k.confidence_score as new_confidence
+        """
+        params = {
+            "knowledge_id": knowledge_id,
+            "failure_reason": failure_reason or "Unknown",
+        }
+
+    elif update_type == "deprecate":
+        query = """
+        MATCH (k:Knowledge {knowledge_id: $knowledge_id})
+        SET k.deprecated = true,
+            k.deprecated_at = datetime(),
+            k.confidence_score = 0.1
+        RETURN k.knowledge_id as id
+        """
+        params = {"knowledge_id": knowledge_id}
+
+    else:
+        return json.dumps(
+            {"success": False, "error": f"Invalid update_type: {update_type}"}, indent=2
         )
-        
-        return json.dumps({
-            "success": True,
-            "cypher_query": result["query"],
-            "params": result["params"],
-            "instruction": "Execute via mcp__db__write_neo4j_cypher"
-        }, indent=2)
-        
+
+    # Execute directly via Neo4j driver
+    try:
+        import os
+
+        from neo4j import GraphDatabase
+
+        uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+        user = os.getenv("NEO4J_USER", "neo4j")
+        password = os.getenv("NEO4J_PASSWORD", "opsvi@2025")
+
+        driver = GraphDatabase.driver(uri, auth=(user, password))
+
+        with driver.session() as session:
+            result = session.run(query, params)
+            record = result.single()
+
+            if record:
+                return json.dumps(
+                    {
+                        "success": True,
+                        "knowledge_id": record.get("id"),
+                        "new_confidence": record.get("new_confidence"),
+                        "status": f"Knowledge {knowledge_id} updated with {update_type}",
+                    },
+                    indent=2,
+                )
+            else:
+                return json.dumps(
+                    {"success": False, "error": f"Knowledge {knowledge_id} not found"},
+                    indent=2,
+                )
+
     except Exception as e:
-        return json.dumps({
-            "success": False,
-            "error": str(e)
-        }, indent=2)
+        logger.error(f"Direct update execution failed: {e}")
+        return json.dumps({"success": False, "error": str(e)}, indent=2)
+    finally:
+        if "driver" in locals():
+            driver.close()
 
 
 @mcp.tool()
-async def knowledge_relate(
-    source_id: str,
-    target_id: str,
-    relationship_type: str = "RELATED_TO",
-    properties: Optional[dict] = None
+async def knowledge_delete(
+    knowledge_id: Optional[str] = None,
+    delete_deprecated: bool = False,
+    delete_low_confidence: bool = False,
+    confidence_threshold: float = 0.3,
 ) -> str:
     """
-    Create relationships between knowledge entries
-    
+    Delete knowledge entries.
+
     Args:
-        source_id: Source knowledge ID
-        target_id: Target knowledge ID
-        relationship_type: SIMILAR_TO, DERIVED_FROM, REQUIRES, CONTRADICTS, ENHANCES
-        properties: Optional relationship properties
-        
+        knowledge_id: Specific ID to delete
+        delete_deprecated: Delete all deprecated entries
+        delete_low_confidence: Delete entries below threshold
+        confidence_threshold: Threshold for low confidence deletion
+
     Returns:
-        JSON with Cypher query for creating relationship
+        JSON with deletion status
     """
-    try:
-        result = KnowledgeRelationshipTool.execute(
-            source_id=source_id,
-            target_id=target_id,
-            relationship_type=relationship_type,
-            properties=properties
+    if knowledge_id:
+        # Delete specific entry
+        query = """
+        MATCH (k:Knowledge {knowledge_id: $knowledge_id})
+        DELETE k
+        RETURN count(k) as deleted_count
+        """
+        params = {"knowledge_id": knowledge_id}
+        description = f"Delete knowledge {knowledge_id}"
+
+    elif delete_deprecated:
+        # Delete all deprecated
+        query = """
+        MATCH (k:Knowledge)
+        WHERE k.deprecated = true
+        DELETE k
+        RETURN count(k) as deleted_count
+        """
+        params = {}
+        description = "Delete all deprecated knowledge"
+
+    elif delete_low_confidence:
+        # Delete low confidence
+        query = """
+        MATCH (k:Knowledge)
+        WHERE k.confidence_score < $threshold
+        DELETE k
+        RETURN count(k) as deleted_count
+        """
+        params = {"threshold": confidence_threshold}
+        description = f"Delete knowledge below {confidence_threshold} confidence"
+
+    else:
+        return json.dumps(
+            {"success": False, "error": "Must specify what to delete"}, indent=2
         )
-        
-        return json.dumps({
-            "success": True,
-            "cypher_query": result["query"],
-            "params": result["params"],
-            "instruction": "Execute via mcp__db__write_neo4j_cypher"
-        }, indent=2)
-        
+
+    # Execute directly via Neo4j driver
+    try:
+        import os
+
+        from neo4j import GraphDatabase
+
+        uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+        user = os.getenv("NEO4J_USER", "neo4j")
+        password = os.getenv("NEO4J_PASSWORD", "opsvi@2025")
+
+        driver = GraphDatabase.driver(uri, auth=(user, password))
+
+        with driver.session() as session:
+            result = session.run(query, params)
+            record = result.single()
+
+            deleted_count = record.get("deleted_count", 0) if record else 0
+
+            return json.dumps(
+                {
+                    "success": True,
+                    "deleted_count": deleted_count,
+                    "status": description,
+                },
+                indent=2,
+            )
+
     except Exception as e:
-        return json.dumps({
-            "success": False,
-            "error": str(e)
-        }, indent=2)
+        logger.error(f"Direct delete execution failed: {e}")
+        return json.dumps({"success": False, "error": str(e)}, indent=2)
+    finally:
+        if "driver" in locals():
+            driver.close()
 
 
 @mcp.tool()
-async def knowledge_read(
-    knowledge_ids: Optional[List[str]] = None,
-    limit: int = 10
+async def knowledge_supersede(
+    old_id: str, new_content: str, reason: Optional[str] = None
 ) -> str:
     """
-    Read specific knowledge entries WITHOUT embedding vectors
-    
+    Supersede old knowledge with new version.
+
+    This creates a new knowledge entry and marks the old one as deprecated.
+
     Args:
-        knowledge_ids: Optional list of specific IDs to read
-        limit: Maximum number to return if no IDs specified
-        
+        old_id: ID of knowledge to supersede
+        new_content: New knowledge content
+        reason: Optional reason for superseding
+
     Returns:
-        Clean JSON with knowledge content (no embeddings)
+        JSON with new knowledge_id and status
     """
     try:
-        if knowledge_ids:
-            # Read specific entries by ID
-            query = """
-            MATCH (k:Knowledge)
-            WHERE k.knowledge_id IN $ids
-            RETURN k.content as content, k.knowledge_type as type,
-                   k.confidence_score as confidence, k.success_rate as success_rate,
-                   k.knowledge_id as id
-            ORDER BY k.confidence_score DESC
-            """
-            params = {"ids": knowledge_ids}
-        else:
-            # Read most recent entries
-            query = """
-            MATCH (k:Knowledge)
-            RETURN k.content as content, k.knowledge_type as type,
-                   k.confidence_score as confidence, k.success_rate as success_rate
-            ORDER BY k.updated_at DESC
-            LIMIT $limit
-            """
-            params = {"limit": limit}
-        
-        return json.dumps({
-            "success": True,
-            "cypher_query": query,
-            "params": params,
-            "instruction": "Execute via mcp__db__read_neo4j_cypher",
-            "note": "Returns clean knowledge without embedding vectors"
-        }, indent=2)
-        
+        store = get_store()
+
+        # Store new knowledge with supersede hint
+        result = await store.store(
+            raw_input=new_content,
+            hint_type=None,  # Let nano agent determine
+            hint_tags=None,
+            direct_execute=True,
+        )
+
+        new_id = result.get("knowledge_id")
+
+        # Mark old as superseded - execute directly
+        deprecate_query = """
+        MATCH (k:Knowledge {knowledge_id: $old_id})
+        SET k.deprecated = true,
+            k.deprecated_at = datetime(),
+            k.superseded_by = $new_id,
+            k.supersede_reason = $reason
+        RETURN k.knowledge_id as id
+        """
+
+        # Execute deprecation directly
+        import os
+
+        from neo4j import GraphDatabase
+
+        uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+        user = os.getenv("NEO4J_USER", "neo4j")
+        password = os.getenv("NEO4J_PASSWORD", "opsvi@2025")
+
+        driver = GraphDatabase.driver(uri, auth=(user, password))
+
+        try:
+            with driver.session() as session:
+                deprecate_result = session.run(
+                    deprecate_query,
+                    {
+                        "old_id": old_id,
+                        "new_id": new_id,
+                        "reason": reason or "Updated with new information",
+                    },
+                )
+                deprecated = deprecate_result.single() is not None
+        except Exception as e:
+            logger.warning(f"Could not deprecate old knowledge: {e}")
+            deprecated = False
+        finally:
+            driver.close()
+
+        return json.dumps(
+            {
+                "success": True,
+                "new_knowledge_id": new_id,
+                "old_knowledge_id": old_id,
+                "stored": result.get("stored", False),
+                "deprecated_old": deprecated,
+                "status": f"New knowledge {new_id} created, old {old_id} {'deprecated' if deprecated else 'not found'}",
+            },
+            indent=2,
+        )
+
     except Exception as e:
-        return json.dumps({
-            "success": False,
-            "error": str(e)
-        }, indent=2)
+        logger.error(f"Knowledge supersede failed: {e}")
+        return json.dumps({"success": False, "error": str(e)}, indent=2)
 
 
 def main():
     """Run the MCP server"""
-    # FastMCP handles the server lifecycle
+    logger.info("Starting Knowledge System MCP Server")
+    logger.info("Features: Nano agent, auto-embedding, direct execution, superseding")
     mcp.run()
 
 

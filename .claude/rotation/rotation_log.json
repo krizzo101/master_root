@@ -1,0 +1,71 @@
+{
+  "entries": [
+    {
+      "rotation_id": "20250910_031928",
+      "timestamp": "2025-09-10T03:19:28.929331",
+      "rotations": [
+        {
+          "file": "/home/opsvi/master_root/apps/agent-orchestrator/CLAUDE.md",
+          "timestamp": "2025-09-10T03:19:28.929331",
+          "emphasis": "quality_emphasis",
+          "canary_deployed": null
+        },
+        {
+          "file": "/home/opsvi/master_root/apps/chat-search/CLAUDE.md",
+          "timestamp": "2025-09-10T03:19:28.929331",
+          "emphasis": "quality_emphasis",
+          "canary_deployed": null
+        },
+        {
+          "file": "/home/opsvi/master_root/CLAUDE.md",
+          "timestamp": "2025-09-10T03:19:28.929331",
+          "emphasis": "quality_emphasis",
+          "canary_deployed": null
+        }
+      ]
+    },
+    {
+      "rotation_id": "20250910_031943",
+      "timestamp": "2025-09-10T03:19:43.211808",
+      "rotations": [
+        {
+          "file": "/home/opsvi/master_root/apps/agent-orchestrator/CLAUDE.md",
+          "timestamp": "2025-09-10T03:19:43.211808",
+          "emphasis": "quality_emphasis",
+          "canary_deployed": "celebration_commits"
+        },
+        {
+          "file": "/home/opsvi/master_root/apps/chat-search/CLAUDE.md",
+          "timestamp": "2025-09-10T03:19:43.211808",
+          "emphasis": "quality_emphasis",
+          "canary_deployed": "haiku_mode"
+        },
+        {
+          "file": "/home/opsvi/master_root/.claude/knowledge/CLAUDE.md",
+          "timestamp": "2025-09-10T03:19:43.211808",
+          "emphasis": "quality_emphasis",
+          "canary_deployed": "question_everything"
+        },
+        {
+          "file": "/home/opsvi/master_root/CLAUDE.md",
+          "timestamp": "2025-09-10T03:19:43.211808",
+          "emphasis": "quality_emphasis",
+          "canary_deployed": "question_everything"
+        }
+      ]
+    },
+    {
+      "rotation_id": "20250910_034820",
+      "timestamp": "2025-09-10T03:48:20.307811",
+      "rotations": [
+        {
+          "file": "/home/opsvi/master_root/CLAUDE.md",
+          "timestamp": "2025-09-10T03:48:20.307811",
+          "emphasis": "performance_emphasis",
+          "canary_deployed": "question_everything"
+        }
+      ]
+    }
+  ],
+  "active_canaries": {}
+}

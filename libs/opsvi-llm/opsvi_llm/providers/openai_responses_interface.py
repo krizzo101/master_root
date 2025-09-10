@@ -15,29 +15,19 @@ Implements all core endpoints and features:
 Version: Referenced as of July 2024
 """
 
-from collections.abc import Generator
-from dataclasses import dataclass
 import functools
 import logging
 import os
 import time
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-)
+from collections.abc import Generator
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, List, Optional
 
 from openai import AsyncOpenAI, OpenAI
 
 try:
     from openai.types import SyncCursorPage
-    from openai.types.responses import (
-        Response,
-        ResponseItem,
-        ResponseItemList,
-    )
+    from openai.types.responses import Response, ResponseItem, ResponseItemList
 except ImportError:
     # Fallback for older OpenAI SDK versions
     SyncCursorPage = list
@@ -46,7 +36,7 @@ except ImportError:
     ResponseItemList = list
 
 try:
-    from openai import APITimeoutError, AsyncOpenAI, OpenAI, RateLimitError
+    from openai import APITimeoutError, RateLimitError
 except ImportError:
     raise ImportError("openai package is required. Install with `pip install openai`.")
 
@@ -362,15 +352,21 @@ class OpenAIResponsesInterface:
     >>> api = OpenAIResponsesInterface()
     >>> # Set timeout and version
     >>> api.set_timeout(30)
-    >>> api.set_api_version("2024-07-01")
+    >>> api.set_api_version("2025-01-01")
     >>> # Create a response with logging
-    >>> res = api.create_response_logged(model="gpt-4.1-mini", messages=[{"role": "user", "content": "Hello!"}])
+    >>> res = api.create_response_logged(
+    ...     model="gpt-5-mini", messages=[{"role": "user", "content": "Hello!"}]
+    ... )
     >>> # Call a new/experimental endpoint
     >>> api.call_endpoint("post", "/responses/experimental", json={...})
     >>> # Batch create
     >>> batch = [
-    ...     {"model": "gpt-4.1-mini", "messages": [{"role": "user", "content": "Hi 1"}]},
-    ...     {"model": "gpt-4.1-mini", "messages": [{"role": "user", "content": "Hi 2"}]},
+    ...     {"model": "gpt-5-mini", "messages": [
+    ...         {"role": "user", "content": "Hi 1"}
+    ...     ]},
+    ...     {"model": "gpt-5-mini", "messages": [
+    ...         {"role": "user", "content": "Hi 2"}
+    ...     ]},
     ... ]
     >>> results = api.batch_create_responses(batch)
     """
@@ -383,7 +379,7 @@ if __name__ == "__main__":
     try:
         # Create a response
         response = interface.create_response(
-            model="gpt-4.1-mini",
+            model="gpt-5-mini",
             input="Tell me a joke",
         )
         print("Response output_text:", interface.get_output_text(response))
@@ -394,7 +390,9 @@ if __name__ == "__main__":
         responses = interface.list_responses()
         print(f"Total responses: {len(responses)}")
         # Stream response (if supported)
-        # for chunk in interface.stream_response(model="gpt-4.1-mini", input="Stream a story", stream=True):
+        # for chunk in interface.stream_response(
+        #     model="gpt-5-mini", input="Stream a story", stream=True
+        # ):
         #     print("Chunk:", chunk)
     except Exception as e:
         print("Error:", e)

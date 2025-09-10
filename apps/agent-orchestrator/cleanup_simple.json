@@ -1,0 +1,25 @@
+{
+  "workflow_name": "orchestrator_cleanup",
+  "description": "Clean up old outputs and organize agent-orchestrator directory",
+  "max_parallel": 3,
+  "tasks": [
+    {
+      "task_id": "analyze_cleanup_targets",
+      "task_type": "code-analyzer",
+      "prompt": "Analyze /home/opsvi/master_root/apps/agent-orchestrator directory and identify cleanup targets.\n\nFOCUS ON:\n1. Old workflow outputs in output/ directory (keep only last 7 days)\n2. Temporary files and abandoned experiments\n3. Duplicate or obsolete files\n4. Misplaced files that should be reorganized\n\nCREATE:\n- List of directories/files to archive (old outputs)\n- List of files to delete (temp/obsolete)\n- List of files to reorganize\n\nBe conservative - preserve anything that might be important.",
+      "dependencies": []
+    },
+    {
+      "task_id": "create_cleanup_script",
+      "task_type": "development-specialist",
+      "prompt": "Create a safe cleanup script for the agent-orchestrator directory.\n\nBASED ON ANALYSIS: Use the cleanup targets identified.\n\nSCRIPT REQUIREMENTS:\n1. Create backup first (tar archive of current state)\n2. Archive old outputs (older than 7 days) to output/archive/\n3. Remove only clearly obsolete files\n4. Add --dry-run option to preview changes\n5. Log all actions taken\n\nCreate cleanup.py script that:\n- Has safety checks\n- Shows what will be done\n- Asks for confirmation\n- Can be reversed",
+      "dependencies": ["analyze_cleanup_targets"]
+    },
+    {
+      "task_id": "execute_cleanup",
+      "task_type": "development-specialist",
+      "prompt": "Execute the cleanup of agent-orchestrator directory.\n\nSTEPS:\n1. Run cleanup script in dry-run mode first\n2. Review what will be changed\n3. Create backup archive\n4. Execute actual cleanup\n5. Verify orchestrator still works\n6. Document changes made\n\nPRIORITIES:\n- Archive old workflow outputs\n- Remove clearly obsolete files only\n- Preserve all core functionality\n- Keep recent work (last 7 days)",
+      "dependencies": ["create_cleanup_script"]
+    }
+  ]
+}

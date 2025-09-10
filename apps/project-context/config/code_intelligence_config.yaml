@@ -1,0 +1,255 @@
+---
+# Code Intelligence Adapter Configuration
+# Integration of .proj-intel data with the unified context system
+
+pipeline:
+  adapters:
+    code_intelligence:
+      enabled: true
+      adapter_class: "project_context.ingestion.adapters.code_adapter.CodeAdapter"
+      priority: 2  # Run after base pipeline setup
+
+      config:
+        adapter_id: "code_intelligence"
+        source_type: "code"
+        batch_mode: "batch"
+        batch_size: 100
+        generate_embeddings: true
+        generate_summaries: true
+        extract_relationships: true
+
+        source_config:
+          # File system scanning
+          scan_directories:
+            - "."
+            - "../.."  # Scan parent directories for more .proj-intel data
+
+          include_patterns:
+            - "*.py"
+            - "*.js"
+            - "*.ts"
+            - "*.jsx"
+            - "*.tsx"
+            - "*.java"
+            - "*.cpp"
+            - "*.c"
+            - "*.h"
+            - "*.hpp"
+            - "*.rs"
+            - "*.go"
+            - "*.rb"
+            - "*.php"
+            - "*.swift"
+            - "*.kt"
+            - "*.scala"
+            - "*.sql"
+            - "*.html"
+            - "*.css"
+            - "*.json"
+            - "*.yaml"
+            - "*.yml"
+            - "*.xml"
+            - "*.md"
+
+          exclude_patterns:
+            - "node_modules/**"
+            - ".git/**"
+            - "__pycache__/**"
+            - "*.pyc"
+            - "*.pyo"
+            - "*.pyd"
+            - ".pytest_cache/**"
+            - "build/**"
+            - "dist/**"
+            - ".venv/**"
+            - "venv/**"
+            - ".env"
+            - "*.log"
+            - "*.tmp"
+            - "*.temp"
+
+          max_file_size_mb: 10
+
+          # Traditional code analysis
+          extract_functions: true
+          extract_classes: true
+          extract_imports: true
+          extract_comments: true
+          track_changes: true
+          use_git_tracking: true
+
+          # .proj-intel integration
+          enable_proj_intel: true
+          proj_intel_paths:
+            - ".proj-intel"
+            - "../.proj-intel"
+            - "../../.proj-intel"
+            - "../apps/*/.proj-intel"
+            - "../libs/.proj-intel"
+
+          # What .proj-intel data to ingest
+          ingest_file_elements: true
+          ingest_project_analysis: true
+          ingest_symbol_index: true
+
+          # Data freshness control
+          proj_intel_max_age_days: 7
+
+          # Performance tuning
+          proj_intel_batch_size: 50
+          cache_symbol_index: true
+          cache_analysis_index: true
+
+# Database schema enhancements for code intelligence
+database:
+  schema_enhancements:
+    # Add code intelligence specific columns
+    context_items:
+      additional_indexes:
+        - "CREATE INDEX IF NOT EXISTS idx_intel_data_type ON context_items((metrics->>'intel_data_type')) WHERE source_type = 'code_intelligence'"
+        - "CREATE INDEX IF NOT EXISTS idx_code_content_hash ON context_items((metrics->>'content_hash')) WHERE source_type IN ('code', 'code_intelligence')"
+        - "CREATE INDEX IF NOT EXISTS idx_function_count ON context_items(((metrics->>'code_analysis')::jsonb->>'function_count')::int) WHERE source_type = 'code_intelligence'"
+
+    # Enhanced code elements table for .proj-intel integration
+    code_elements_enhanced:
+      create: |
+        CREATE TABLE IF NOT EXISTS code_elements_enhanced (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          context_item_id UUID REFERENCES context_items(id) ON DELETE CASCADE,
+          file_path TEXT NOT NULL,
+          element_type VARCHAR(50), -- 'function', 'class', 'variable', 'import', 'symbol'
+          name VARCHAR(255),
+          signature TEXT,
+          docstring TEXT,
+          start_line INTEGER,
+          end_line INTEGER,
+          complexity_score FLOAT,
+
+          -- .proj-intel specific fields
+          proj_intel_hash VARCHAR(64), -- From .proj-intel content_hash
+          async_function BOOLEAN DEFAULT FALSE,
+          symbol_type VARCHAR(50), -- For symbol index data
+          symbol_data JSONB, -- Raw symbol data from .proj-intel
+          analysis_metadata JSONB, -- Additional analysis data
+
+          created_at TIMESTAMPTZ DEFAULT NOW(),
+          updated_at TIMESTAMPTZ DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_code_elements_enhanced_file ON code_elements_enhanced(file_path);
+        CREATE INDEX IF NOT EXISTS idx_code_elements_enhanced_type ON code_elements_enhanced(element_type);
+        CREATE INDEX IF NOT EXISTS idx_code_elements_enhanced_name ON code_elements_enhanced(name);
+        CREATE INDEX IF NOT EXISTS idx_code_elements_enhanced_hash ON code_elements_enhanced(proj_intel_hash);
+        CREATE INDEX IF NOT EXISTS idx_code_elements_enhanced_context ON code_elements_enhanced(context_item_id);
+
+# Relationship patterns for code intelligence
+relationships:
+  patterns:
+    # File analysis relationships
+    - name: "code_file_analyzed_by_intel"
+      source_criteria:
+        source_type: "code"
+      target_criteria:
+        source_type: "code_intelligence"
+        intel_data_type: "file_element"
+      relationship_type: "analyzed_by"
+      confidence: 0.95
+
+    # Symbol definition relationships
+    - name: "symbol_defined_in_file"
+      source_criteria:
+        source_type: "code_intelligence"
+        intel_data_type: "symbol"
+      target_criteria:
+        source_type: "code"
+      relationship_type: "symbol_defined_in"
+      confidence: 0.85
+
+    # Import analysis relationships
+    - name: "import_analysis_relationship"
+      source_criteria:
+        source_type: "code_intelligence"
+        intel_data_type: "file_element"
+      target_criteria:
+        source_type: "code_intelligence"
+        intel_data_type: "file_element"
+      relationship_type: "imports_analysis"
+      confidence: 0.8
+
+    # Project analysis relationships
+    - name: "project_analysis_mentions_file"
+      source_criteria:
+        source_type: "code_intelligence"
+        intel_data_type: "project_analysis"
+      target_criteria:
+        source_type: "code"
+      relationship_type: "analyzes_project"
+      confidence: 0.7
+
+# Monitoring and metrics
+monitoring:
+  metrics:
+    - name: "code_intelligence_items_ingested"
+      description: "Number of code intelligence items ingested"
+      type: "counter"
+      labels: ["intel_data_type", "collector"]
+
+    - name: "proj_intel_cache_hits"
+      description: "Cache hits for .proj-intel data"
+      type: "counter"
+      labels: ["cache_type"]
+
+    - name: "proj_intel_processing_time"
+      description: "Time to process .proj-intel files"
+      type: "histogram"
+      labels: ["file_type"]
+
+    - name: "code_relationships_detected"
+      description: "Code relationships automatically detected"
+      type: "counter"
+      labels: ["relationship_type", "source_intel_type"]
+
+# Quality assurance
+quality:
+  validation:
+    # Validate .proj-intel data freshness
+    - name: "proj_intel_freshness"
+      check: "generated_at_within_days"
+      max_age_days: 14
+      severity: "warning"
+
+    # Validate required fields for intelligence items
+    - name: "intel_item_completeness"
+      required_fields:
+        file_element: ["file_path", "content_hash", "functions", "classes"]
+        project_analysis: ["collector", "analysis_type", "analysis_data"]
+        symbol: ["symbol_type", "symbol_name", "symbol_data"]
+      severity: "error"
+
+    # Validate relationship quality
+    - name: "relationship_confidence"
+      min_confidence: 0.5
+      severity: "warning"
+
+# Performance optimization
+performance:
+  caching:
+    # Cache frequently accessed .proj-intel data
+    symbol_index_ttl: 3600  # 1 hour
+    analysis_index_ttl: 1800  # 30 minutes
+    manifest_ttl: 600  # 10 minutes
+
+  batch_processing:
+    # Optimize batch sizes for different data types
+    file_elements_batch_size: 100
+    project_analysis_batch_size: 50
+    symbol_data_batch_size: 200
+
+  indexing:
+    # Prioritize indexes for common queries
+    priority_indexes:
+      - "intel_data_type"
+      - "content_hash"
+      - "file_path"
+      - "function_count"
+      - "class_count"

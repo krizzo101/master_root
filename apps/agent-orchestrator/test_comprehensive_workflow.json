@@ -1,0 +1,46 @@
+{
+  "tasks": [
+    {
+      "task_id": "test_basic_functionality",
+      "task_type": "development-specialist",
+      "prompt": "Create a simple Python script that calculates the factorial of a number. The script should:\n1. Define a factorial function\n2. Include input validation\n3. Add basic error handling\n4. Include a main section that tests the function with numbers 1-5\n\nSave this as factorial_calculator.py in the current working directory.",
+      "context": {
+        "test_purpose": "Verify basic file creation and code generation works"
+      }
+    },
+    {
+      "task_id": "test_dependency_handling",
+      "task_type": "technical-writer",
+      "dependencies": ["test_basic_functionality"],
+      "prompt": "Create comprehensive documentation for the factorial calculator. Include:\n1. README.md with usage instructions\n2. Code comments explanation\n3. Example outputs\n4. Testing instructions\n\nReference the factorial_calculator.py file created in the previous task.",
+      "context": {
+        "test_purpose": "Verify dependency handling and file referencing works"
+      }
+    },
+    {
+      "task_id": "test_parallel_task_1",
+      "task_type": "development-specialist",
+      "prompt": "Create a simple unit test file for the factorial calculator. Include:\n1. Test for valid inputs (positive integers)\n2. Test for edge cases (0, 1)\n3. Test for error handling (negative numbers)\n\nSave as test_factorial.py",
+      "context": {
+        "test_purpose": "Verify parallel execution works - task 1"
+      }
+    },
+    {
+      "task_id": "test_parallel_task_2",
+      "task_type": "technical-writer",
+      "prompt": "Create a simple CHANGELOG.md file documenting the factorial calculator project. Include:\n1. Version 1.0.0 - Initial release\n2. Features implemented\n3. Future improvements planned\n\nThis should be independent of other tasks.",
+      "context": {
+        "test_purpose": "Verify parallel execution works - task 2"
+      }
+    },
+    {
+      "task_id": "test_final_integration",
+      "task_type": "development-specialist",
+      "dependencies": ["test_dependency_handling", "test_parallel_task_1", "test_parallel_task_2"],
+      "prompt": "Create a project summary report that references all the files created by previous tasks:\n1. List all created files\n2. Verify they exist and are accessible\n3. Create a simple project structure overview\n4. Add any final recommendations\n\nSave as PROJECT_SUMMARY.md",
+      "context": {
+        "test_purpose": "Verify complex dependency resolution and file integration"
+      }
+    }
+  ]
+}

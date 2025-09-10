@@ -1,0 +1,113 @@
+mission:
+  name: "Design Inter-Agent Communication System"
+  description: "The swarm designs its own nervous system for real-time coordination"
+  risk_level: "low"  # Just design work, no code changes yet
+  success_criteria:
+    - "Complete technical specification"
+    - "Consensus on architecture"
+    - "Implementation plan created"
+    - "Test scenarios defined"
+
+teams:
+  # Use 6-8 agents initially, not all 15
+  architecture_team:
+    size: 3
+    agents:
+      - solution-architect       # Overall system design
+      - api-integration-specialist # Protocol design
+      - database-specialist      # Message storage strategy
+    task: "Design the core communication architecture"
+    deliverables:
+      - "docs/comms/architecture.md"
+      - "docs/comms/protocol_spec.md"
+      - "docs/comms/data_model.md"
+
+  requirements_team:
+    size: 2
+    agents:
+      - requirements-analyst     # Gather needs
+      - business-analyst        # Define workflows
+    task: "Define what agents need from communication system"
+    deliverables:
+      - "docs/comms/requirements.md"
+      - "docs/comms/use_cases.md"
+
+  security_team:
+    size: 2
+    agents:
+      - security-architect      # Security model
+      - performance-optimizer   # Performance requirements
+    task: "Define security and performance constraints"
+    deliverables:
+      - "docs/comms/security_model.md"
+      - "docs/comms/performance_targets.md"
+
+  testing_team:
+    size: 1
+    agents:
+      - qa-testing-guru        # Test strategy
+    task: "Design testing approach for communication system"
+    deliverables:
+      - "docs/comms/test_plan.md"
+
+coordination:
+  # They'll use a simple file-based system to coordinate THIS design
+  method: "sequential_with_handoffs"
+  phases:
+    - name: "Requirements Gathering"
+      teams: ["requirements_team"]
+      duration: "1 hour"
+      output: "requirements.json"
+
+    - name: "Architecture Design"
+      teams: ["architecture_team"]
+      input: "requirements.json"
+      duration: "2 hours"
+      output: "architecture.json"
+
+    - name: "Security & Performance Review"
+      teams: ["security_team"]
+      input: "architecture.json"
+      duration: "1 hour"
+      output: "constraints.json"
+
+    - name: "Test Planning"
+      teams: ["testing_team"]
+      input: "architecture.json"
+      duration: "1 hour"
+      output: "test_plan.json"
+
+    - name: "Final Synthesis"
+      teams: ["architecture_team"]
+      input: "all_outputs"
+      duration: "1 hour"
+      output: "final_design.md"
+
+expected_design_output:
+  # What we expect them to come up with
+  possible_approaches:
+    - "Message Queue (Redis/RabbitMQ style)"
+    - "Shared Database (PostgreSQL/Neo4j)"
+    - "File-based pub/sub"
+    - "MCP server as message broker"
+    - "Git commits as messages"
+    - "Hybrid approach"
+
+  key_components:
+    - "Agent Registry - who's alive and working"
+    - "Message Format - standardized communication"
+    - "Topic/Channel System - organized conversations"
+    - "Priority Queue - urgent vs normal messages"
+    - "Heartbeat/Health checks"
+    - "Message persistence and replay"
+    - "Error handling and recovery"
+
+validation:
+  # How we'll know if the design is good
+  criteria:
+    - "Can handle 15+ simultaneous agents"
+    - "Sub-second message delivery"
+    - "Survives agent failures"
+    - "Supports both sync and async communication"
+    - "Has debugging/monitoring built in"
+    - "No single point of failure"

@@ -1,0 +1,93 @@
+{
+  "system": {
+    "name": "Development Process Orchestrator",
+    "version": "1.0.0",
+    "environment": "production"
+  },
+  "orchestration": {
+    "output_base_dir": "~/dpo_output",
+    "max_parallel_agents": 10,
+    "agent_timeout": 3600,
+    "checkpoint_interval": 300,
+    "auto_recovery": true,
+    "retry_attempts": 3,
+    "retry_delay": 30
+  },
+  "communication": {
+    "enable_websocket": true,
+    "websocket_port": 8765,
+    "websocket_host": "localhost",
+    "message_bus_port": 8767,
+    "enable_dashboard": true,
+    "dashboard_port": 8080
+  },
+  "intelligence": {
+    "enable_intelligence": true,
+    "intelligence_model": "gpt-4",
+    "enhancement_threshold": 0.7,
+    "context_window": 8192,
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "context_injection": {
+    "enable_context_injection": true,
+    "context_sources": [
+      "project_files",
+      "knowledge_base",
+      "session_history",
+      "ecosystem_state"
+    ],
+    "max_context_size": 16384,
+    "relevance_threshold": 0.6
+  },
+  "templates": {
+    "template_library_path": "~/.dpo/templates",
+    "custom_templates_enabled": true,
+    "template_validation": true,
+    "default_template": "backend-api"
+  },
+  "knowledge_base": {
+    "knowledge_base_path": "~/.dpo/knowledge",
+    "enable_learning": true,
+    "learning_threshold": 0.8,
+    "max_entries": 10000,
+    "cleanup_interval": 86400
+  },
+  "monitoring": {
+    "metrics_enabled": true,
+    "metrics_port": 9090,
+    "log_level": "INFO",
+    "log_format": "json",
+    "log_file": "~/.dpo/logs/dpo.log",
+    "enable_telemetry": false
+  },
+  "quality_gates": {
+    "enable_quality_checks": true,
+    "default_coverage_threshold": 80,
+    "default_performance_threshold": 200,
+    "security_scan_enabled": true,
+    "documentation_required": true
+  },
+  "integration": {
+    "orchestrator_path": "/home/opsvi/master_root/apps/agent-orchestrator",
+    "mcp_tools_enabled": true,
+    "knowledge_system_enabled": true,
+    "session_optimizer_enabled": true
+  },
+  "limits": {
+    "max_workflow_duration": 28800,
+    "max_deliverable_size": 104857600,
+    "max_concurrent_workflows": 5,
+    "max_queue_size": 100
+  },
+  "security": {
+    "enable_authentication": false,
+    "api_key_required": false,
+    "ssl_enabled": false,
+    "allowed_origins": ["*"],
+    "rate_limiting": {
+      "enabled": false,
+      "requests_per_minute": 60
+    }
+  }
+}

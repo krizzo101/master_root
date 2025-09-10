@@ -1,0 +1,17 @@
+{
+  "tasks": [
+    {
+      "task_id": "analyze_chat_infrastructure",
+      "task_type": "solution-architect",
+      "prompt": "Analyze the existing chat log parsing infrastructure components and create comprehensive documentation of current capabilities, data structures, and extension points for session context optimization. Focus on:\n\n1. Core Components Analysis:\n- chat_taxonomy_parser.py: JSONL parsing, data structures (Session, Node, ToolCall, ToolResult, FileOperation), PostgreSQL storage with taxonomy-based schema\n- chat_report_generator.py: Reporting capabilities, HTML/JSON export, session analytics, tool usage analysis\n- postgres_chat_ingester.py: Real-time ingestion pipeline, AsyncIO-based processing, TimescaleDB optimization\n- chat_log_watcher.py: File system monitoring, real-time file change detection, event-driven processing\n- chat_web_dashboard.py: Web interface for SQLite/PostgreSQL dual data access with search and details modal\n\n2. Data Structures & Schema:\n- Document the complete taxonomy schema (sessions, nodes, tool_calls, tool_results, file_operations)\n- Map data flow from JSONL parsing to PostgreSQL storage\n- Identify key relationships and indexes\n- Document content hashing and deduplication mechanisms\n\n3. Integration Points:\n- How components connect and communicate\n- Queue-based processing patterns\n- Real-time vs batch processing capabilities\n- Database dual-access patterns (SQLite legacy + PostgreSQL real-time)\n\n4. Extension Opportunities for Session Context Optimization:\n- Identify reusable parsing components\n- Document extension points for new data sources\n- Analyze current context extraction capabilities\n- Recommend integration patterns for session optimization workflows\n\nCreate detailed architectural documentation showing how these components form a complete chat analytics ecosystem and how they can be extended for advanced session context optimization use cases.",
+      "dependencies": [],
+      "context": {
+        "output_location": "/home/opsvi/master_root/.claude/knowledge/analysis",
+        "analysis_scope": "comprehensive",
+        "focus_area": "session_context_optimization",
+        "include_code_examples": true,
+        "include_integration_diagrams": true
+      }
+    }
+  ]
+}

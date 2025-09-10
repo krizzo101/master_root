@@ -1,0 +1,345 @@
+{
+  "task_throughput": [
+    {
+      "task_count": 10,
+      "parallelism": 1,
+      "total_time_sec": 0.502,
+      "throughput_tasks_per_sec": 19.92,
+      "memory_delta_mb": 0.0,
+      "metrics": {
+        "tasks_processed": 10,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 10,
+        "token_releases": 10
+      }
+    },
+    {
+      "task_count": 10,
+      "parallelism": 3,
+      "total_time_sec": 0.201,
+      "throughput_tasks_per_sec": 49.73,
+      "memory_delta_mb": 0.0,
+      "metrics": {
+        "tasks_processed": 10,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 10,
+        "token_releases": 10
+      }
+    },
+    {
+      "task_count": 10,
+      "parallelism": 5,
+      "total_time_sec": 0.101,
+      "throughput_tasks_per_sec": 99.39,
+      "memory_delta_mb": 0.0,
+      "metrics": {
+        "tasks_processed": 10,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 10,
+        "token_releases": 10
+      }
+    },
+    {
+      "task_count": 10,
+      "parallelism": 10,
+      "total_time_sec": 0.05,
+      "throughput_tasks_per_sec": 198.19,
+      "memory_delta_mb": 0.0,
+      "metrics": {
+        "tasks_processed": 10,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 10,
+        "token_releases": 10
+      }
+    },
+    {
+      "task_count": 50,
+      "parallelism": 1,
+      "total_time_sec": 2.509,
+      "throughput_tasks_per_sec": 19.93,
+      "memory_delta_mb": 0.0,
+      "metrics": {
+        "tasks_processed": 50,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 50,
+        "token_releases": 50
+      }
+    },
+    {
+      "task_count": 50,
+      "parallelism": 3,
+      "total_time_sec": 0.854,
+      "throughput_tasks_per_sec": 58.57,
+      "memory_delta_mb": 0.0,
+      "metrics": {
+        "tasks_processed": 50,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 50,
+        "token_releases": 50
+      }
+    },
+    {
+      "task_count": 50,
+      "parallelism": 5,
+      "total_time_sec": 0.502,
+      "throughput_tasks_per_sec": 99.51,
+      "memory_delta_mb": 0.0,
+      "metrics": {
+        "tasks_processed": 50,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 50,
+        "token_releases": 50
+      }
+    },
+    {
+      "task_count": 50,
+      "parallelism": 10,
+      "total_time_sec": 0.252,
+      "throughput_tasks_per_sec": 198.6,
+      "memory_delta_mb": 0.0,
+      "metrics": {
+        "tasks_processed": 50,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 50,
+        "token_releases": 50
+      }
+    },
+    {
+      "task_count": 100,
+      "parallelism": 1,
+      "total_time_sec": 5.019,
+      "throughput_tasks_per_sec": 19.92,
+      "memory_delta_mb": 0.12,
+      "metrics": {
+        "tasks_processed": 100,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 100,
+        "token_releases": 100
+      }
+    },
+    {
+      "task_count": 100,
+      "parallelism": 3,
+      "total_time_sec": 1.708,
+      "throughput_tasks_per_sec": 58.56,
+      "memory_delta_mb": 0.0,
+      "metrics": {
+        "tasks_processed": 100,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 100,
+        "token_releases": 100
+      }
+    },
+    {
+      "task_count": 100,
+      "parallelism": 5,
+      "total_time_sec": 1.005,
+      "throughput_tasks_per_sec": 99.49,
+      "memory_delta_mb": 0.0,
+      "metrics": {
+        "tasks_processed": 100,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 100,
+        "token_releases": 100
+      }
+    },
+    {
+      "task_count": 100,
+      "parallelism": 10,
+      "total_time_sec": 0.503,
+      "throughput_tasks_per_sec": 198.74,
+      "memory_delta_mb": 0.0,
+      "metrics": {
+        "tasks_processed": 100,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 100,
+        "token_releases": 100
+      }
+    },
+    {
+      "task_count": 200,
+      "parallelism": 1,
+      "total_time_sec": 10.037,
+      "throughput_tasks_per_sec": 19.93,
+      "memory_delta_mb": 0.12,
+      "metrics": {
+        "tasks_processed": 200,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 200,
+        "token_releases": 200
+      }
+    },
+    {
+      "task_count": 200,
+      "parallelism": 3,
+      "total_time_sec": 3.365,
+      "throughput_tasks_per_sec": 59.44,
+      "memory_delta_mb": 0.0,
+      "metrics": {
+        "tasks_processed": 200,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 200,
+        "token_releases": 200
+      }
+    },
+    {
+      "task_count": 200,
+      "parallelism": 5,
+      "total_time_sec": 2.01,
+      "throughput_tasks_per_sec": 99.5,
+      "memory_delta_mb": 0.0,
+      "metrics": {
+        "tasks_processed": 200,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 200,
+        "token_releases": 200
+      }
+    },
+    {
+      "task_count": 200,
+      "parallelism": 10,
+      "total_time_sec": 1.007,
+      "throughput_tasks_per_sec": 198.68,
+      "memory_delta_mb": 0.0,
+      "metrics": {
+        "tasks_processed": 200,
+        "tasks_queued": 0,
+        "active_tasks": 0,
+        "token_acquisitions": 200,
+        "token_releases": 200
+      }
+    }
+  ],
+  "memory_usage": {
+    "num_agents": 20,
+    "avg_memory_kb": 4.03,
+    "max_memory_kb": 80.41,
+    "min_memory_kb": -0.05,
+    "total_memory_mb": 0.08
+  },
+  "token_pool_contention": [
+    {
+      "tasks": 10,
+      "tokens": 5,
+      "contention_ratio": 2.0,
+      "total_time_sec": 0.088,
+      "avg_wait_time_ms": 14.87,
+      "max_wait_time_ms": 42.87,
+      "contention_events": 5,
+      "contention_rate": 50.0
+    },
+    {
+      "tasks": 20,
+      "tokens": 5,
+      "contention_ratio": 4.0,
+      "total_time_sec": 0.146,
+      "avg_wait_time_ms": 39.38,
+      "max_wait_time_ms": 97.3,
+      "contention_events": 15,
+      "contention_rate": 75.0
+    },
+    {
+      "tasks": 50,
+      "tokens": 5,
+      "contention_ratio": 10.0,
+      "total_time_sec": 0.35,
+      "avg_wait_time_ms": 150.45,
+      "max_wait_time_ms": 318.99,
+      "contention_events": 45,
+      "contention_rate": 90.0
+    },
+    {
+      "tasks": 50,
+      "tokens": 10,
+      "contention_ratio": 5.0,
+      "total_time_sec": 0.172,
+      "avg_wait_time_ms": 63.4,
+      "max_wait_time_ms": 140.71,
+      "contention_events": 40,
+      "contention_rate": 80.0
+    },
+    {
+      "tasks": 100,
+      "tokens": 10,
+      "contention_ratio": 10.0,
+      "total_time_sec": 0.314,
+      "avg_wait_time_ms": 137.54,
+      "max_wait_time_ms": 287.91,
+      "contention_events": 90,
+      "contention_rate": 90.0
+    }
+  ],
+  "file_io_latency": {
+    "1KB": {
+      "size_bytes": 1024,
+      "operations": 50,
+      "avg_write_ms": 3.441,
+      "avg_read_ms": 0.024,
+      "write_throughput_mb_s": 0.28,
+      "read_throughput_mb_s": 40.24
+    },
+    "10KB": {
+      "size_bytes": 10240,
+      "operations": 50,
+      "avg_write_ms": 3.438,
+      "avg_read_ms": 0.025,
+      "write_throughput_mb_s": 2.84,
+      "read_throughput_mb_s": 383.88
+    },
+    "100KB": {
+      "size_bytes": 102400,
+      "operations": 50,
+      "avg_write_ms": 5.002,
+      "avg_read_ms": 0.037,
+      "write_throughput_mb_s": 19.52,
+      "read_throughput_mb_s": 2655.6
+    },
+    "1MB": {
+      "size_bytes": 1048576,
+      "operations": 50,
+      "avg_write_ms": 7.861,
+      "avg_read_ms": 0.196,
+      "write_throughput_mb_s": 127.21,
+      "read_throughput_mb_s": 5092.89
+    }
+  },
+  "summary": {
+    "timestamp": "2025-09-09T10:21:53.025481",
+    "system": {
+      "cpus": 16,
+      "memory_gb": 31.3
+    },
+    "peak_performance": {
+      "throughput_tasks_per_sec": 198.74,
+      "optimal_parallelism": 10,
+      "at_task_count": 100
+    },
+    "memory": {
+      "avg_per_agent_kb": 4.03,
+      "total_20_agents_mb": 0.08
+    },
+    "token_pool": {
+      "max_contention_rate": 90.0,
+      "avg_wait_under_contention_ms": 81.128
+    },
+    "file_io": {
+      "best_write_throughput_mb_s": 127.21,
+      "best_read_throughput_mb_s": 5092.89
+    }
+  }
+}

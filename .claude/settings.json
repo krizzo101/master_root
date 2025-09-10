@@ -1,5 +1,19 @@
 {
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/opsvi/master_root/.claude/hooks/display-reminders.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+    ],
+    "SubagentStop": [
+    ],
     "PreToolUse": [
       {
         "matcher": "Write|Edit|MultiEdit",
@@ -17,27 +31,29 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -f \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit.sh\" ]; then $CLAUDE_PROJECT_DIR/.claude/hooks/post-edit.sh; fi"
+            "command": "if [ -f \"/home/opsvi/master_root/.claude/hooks/post-edit.sh\" ]; then /home/opsvi/master_root/.claude/hooks/post-edit.sh; fi"
           }
         ]
       }
     ],
     "SessionStart": [
+    ],
+    "PreCompact": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Session started: '$(date '+%Y-%m-%d %H:%M:%S')"
+            "command": "/home/opsvi/master_root/.claude/hooks/pre-compact-export-v2.sh"
           }
         ]
       }
     ],
-    "SessionStop": [
+    "SessionEnd": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -f \"$CLAUDE_PROJECT_DIR/.claude/hooks/export-session.sh\" ]; then $CLAUDE_PROJECT_DIR/.claude/hooks/export-session.sh $TRANSCRIPT_PATH SessionStop; fi"
+            "command": "if [ -f \"/home/opsvi/master_root/.claude/hooks/export-session.sh\" ]; then /home/opsvi/master_root/.claude/hooks/export-session.sh $TRANSCRIPT_PATH SessionEnd; fi"
           }
         ]
       }

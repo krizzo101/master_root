@@ -1,0 +1,206 @@
+name: System Design Workflow
+description: Architecture and system design for complex distributed systems
+version: "1.0"
+
+# Specialized team for system design
+team_structure:
+  core_architects:
+    - role: solution-architect
+      lead: true
+      responsibilities:
+        - High-level architecture
+        - Technology decisions
+        - Trade-off analysis
+
+    - role: security-architect
+      responsibilities:
+        - Security architecture
+        - Threat modeling
+        - Compliance requirements
+
+    - role: database-specialist
+      responsibilities:
+        - Data architecture
+        - Storage solutions
+        - Data flow design
+
+  specialists:
+    - role: api-integration-specialist
+      responsibilities:
+        - Service boundaries
+        - Integration patterns
+        - Protocol selection
+
+    - role: performance-optimizer
+      responsibilities:
+        - Scalability design
+        - Performance modeling
+        - Capacity planning
+
+    - role: devops-automation
+      responsibilities:
+        - Infrastructure design
+        - Deployment architecture
+        - Monitoring strategy
+
+  analysts:
+    - role: requirements-analyst
+      responsibilities:
+        - Non-functional requirements
+        - Constraint analysis
+        - Use case documentation
+
+    - role: business-analyst
+      responsibilities:
+        - Business domain modeling
+        - Cost-benefit analysis
+        - Risk assessment
+
+workflow:
+  phases:
+    - name: Requirements Analysis
+      parallel_groups:
+        - [requirements-analyst, business-analyst]
+      tasks:
+        - Gather non-functional requirements
+        - Define system constraints
+        - Identify quality attributes
+        - Document use cases
+      deliverables:
+        - requirements/functional.md
+        - requirements/non_functional.md
+        - requirements/constraints.md
+
+    - name: Domain Modeling
+      parallel_groups:
+        - [solution-architect, business-analyst, database-specialist]
+      tasks:
+        - Define bounded contexts
+        - Create domain models
+        - Identify aggregates
+        - Map business processes
+      deliverables:
+        - domain/model.md
+        - domain/bounded_contexts.md
+        - domain/process_flows.md
+
+    - name: Architecture Design
+      parallel_groups:
+        - [solution-architect, security-architect]
+        - [api-integration-specialist, database-specialist]
+      tasks:
+        - Design system components
+        - Define service boundaries
+        - Create data flow diagrams
+        - Design security layers
+      deliverables:
+        - architecture/system_design.md
+        - architecture/component_diagram.mermaid
+        - architecture/data_flow.mermaid
+        - architecture/security_architecture.md
+
+    - name: Technical Design
+      parallel_groups:
+        - [database-specialist, api-integration-specialist, performance-optimizer]
+      tasks:
+        - Design database schema
+        - Define API specifications
+        - Create caching strategy
+        - Design message queues
+      deliverables:
+        - technical/database_design.sql
+        - technical/api_spec.yaml
+        - technical/caching_strategy.md
+        - technical/messaging_design.md
+
+    - name: Infrastructure Design
+      parallel_groups:
+        - [devops-automation, security-architect, performance-optimizer]
+      tasks:
+        - Design deployment topology
+        - Define scaling policies
+        - Create disaster recovery plan
+        - Design monitoring strategy
+      deliverables:
+        - infrastructure/deployment.yaml
+        - infrastructure/scaling_policies.md
+        - infrastructure/dr_plan.md
+        - infrastructure/monitoring.md
+
+    - name: Review & Validation
+      parallel_groups:
+        - [solution-architect, security-architect]
+      tasks:
+        - Architecture review
+        - Security review
+        - Performance validation
+        - Cost analysis
+      deliverables:
+        - review/architecture_review.md
+        - review/security_assessment.md
+        - review/performance_analysis.md
+        - review/cost_estimate.md
+
+# Design patterns library
+design_patterns:
+  microservices:
+    - pattern: Service Mesh
+      when: "Multiple services with complex communication"
+    - pattern: API Gateway
+      when: "Single entry point needed"
+    - pattern: Event Sourcing
+      when: "Audit trail required"
+
+  data:
+    - pattern: CQRS
+      when: "Read/write workload separation needed"
+    - pattern: Saga
+      when: "Distributed transactions required"
+    - pattern: Database per Service
+      when: "Service isolation critical"
+
+  integration:
+    - pattern: Circuit Breaker
+      when: "Fault tolerance required"
+    - pattern: Retry with Backoff
+      when: "Transient failures expected"
+    - pattern: Bulkhead
+      when: "Resource isolation needed"
+
+# Decision criteria
+decision_framework:
+  technology_selection:
+    factors:
+      - Performance requirements
+      - Scalability needs
+      - Team expertise
+      - Cost constraints
+      - Time to market
+
+  trade_offs:
+    - consistency_vs_availability
+    - latency_vs_throughput
+    - complexity_vs_maintainability
+    - cost_vs_performance
+
+# Quality attributes
+quality_attributes:
+  performance:
+    - response_time: "<100ms p99"
+    - throughput: ">10000 rps"
+    - resource_utilization: "<70%"
+
+  scalability:
+    - horizontal: "Auto-scaling enabled"
+    - vertical: "Resource limits defined"
+    - geographic: "Multi-region capable"
+
+  reliability:
+    - availability: "99.99%"
+    - mtbf: ">720 hours"
+    - mttr: "<15 minutes"
+
+  security:
+    - authentication: "Multi-factor"
+    - authorization: "Role-based"
+    - encryption: "At rest and in transit"

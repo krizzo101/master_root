@@ -1,0 +1,23 @@
+{
+  "workflow_name": "simple_api_project",
+  "tasks": [
+    {
+      "task_id": "001_analyze",
+      "task_type": "requirements-analyst",
+      "prompt": "Analyze requirements for a simple user authentication API",
+      "dependencies": []
+    },
+    {
+      "task_id": "002_design",
+      "task_type": "solution-architect",
+      "prompt": "Design the API architecture based on requirements",
+      "dependencies": ["001_analyze"]
+    },
+    {
+      "task_id": "003_implement",
+      "task_type": "development-specialist",
+      "prompt": "Implement the authentication API",
+      "dependencies": ["002_design"]
+    }
+  ]
+}

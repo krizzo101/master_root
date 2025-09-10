@@ -1,0 +1,47 @@
+{
+  "tasks": [
+    {
+      "task_id": "A_fast_1",
+      "task_type": "analysis",
+      "prompt": "You are a CLI that must print ONLY strict JSON to stdout. Do not add text. Output exactly this object (no spaces): {\"status\":\"completed\",\"task_id\":\"A_fast_1\",\"ok\":true,\"data\":\"quick-1\"}"
+    },
+    {
+      "task_id": "A_fast_2",
+      "task_type": "analysis",
+      "prompt": "You are a CLI that must print ONLY strict JSON to stdout. Do not add text. Output exactly this object (no spaces): {\"status\":\"completed\",\"task_id\":\"A_fast_2\",\"ok\":true,\"data\":\"quick-2\"}"
+    },
+    {
+      "task_id": "A_slow_1",
+      "task_type": "analysis",
+      "prompt": "Think briefly, but then print ONLY strict JSON to stdout. No extra text. Output exactly: {\"status\":\"completed\",\"task_id\":\"A_slow_1\",\"ok\":true,\"data\":\"slow-1\"}"
+    },
+    {
+      "task_id": "A_slow_2",
+      "task_type": "analysis",
+      "prompt": "Think briefly, but then print ONLY strict JSON to stdout. No extra text. Output exactly: {\"status\":\"completed\",\"task_id\":\"A_slow_2\",\"ok\":true,\"data\":\"slow-2\"}"
+    },
+    {
+      "task_id": "B_join",
+      "task_type": "design",
+      "dependencies": ["A_fast_1", "A_fast_2", "A_slow_1", "A_slow_2"],
+      "prompt": "Print ONLY strict JSON with this exact object: {\"status\":\"completed\",\"task_id\":\"B_join\",\"ok\":true,\"joined\":[\"A_fast_1\",\"A_fast_2\",\"A_slow_1\",\"A_slow_2\"]}"
+    },
+    {
+      "task_id": "C_bad_json",
+      "task_type": "development",
+      "prompt": "IMPORTANT: Output EXACTLY the following characters with no quotes, no JSON, no code blocks: NOT_JSON"
+    },
+    {
+      "task_id": "D_after_bad",
+      "task_type": "testing",
+      "dependencies": ["C_bad_json"],
+      "prompt": "If you run (you should not), print: {\"status\":\"completed\",\"task_id\":\"D_after_bad\",\"ok\":true}"
+    },
+    {
+      "task_id": "E_deadlock",
+      "task_type": "testing",
+      "dependencies": ["NO_SUCH_TASK"],
+      "prompt": "Print ONLY JSON if you run: {\"status\":\"completed\",\"task_id\":\"E_deadlock\",\"ok\":true}"
+    }
+  ]
+}

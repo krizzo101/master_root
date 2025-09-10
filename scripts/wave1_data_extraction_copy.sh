@@ -72,4 +72,3 @@ git add "$NEW_LIB_DIR"
 git commit -m "feat(opsvi-data): copy Neo4j & Chroma adapters into new shared lib (wave1 safe copy)"
 
 echo "✅ opsvi-data package created with copied adapters. Next: wire consumers to use opsvi_data.* and add real tests."
-

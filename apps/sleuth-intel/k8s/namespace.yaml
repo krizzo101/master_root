@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sleuth-intel
+  labels:
+    app: sleuth-intel
+    environment: production

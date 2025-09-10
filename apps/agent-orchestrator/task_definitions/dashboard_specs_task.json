@@ -1,0 +1,64 @@
+{
+  "tasks": [
+    {
+      "task_id": "project_requirements_spec",
+      "task_type": "technical-writer",
+      "prompt": "Generate PROJECT_REQUIREMENTS.md for orchestrator dashboard monitoring system. Document current critical problems: 10+ workflows running simultaneously with all logs mixed in same directory making it impossible to monitor individual workflows. Define success criteria: monitor 10+ concurrent workflows with real-time tracking, workflow-specific log separation, progress tracking with ETAs, deliverable tracking with download links. Target output: docs/PROJECT_REQUIREMENTS.md",
+      "dependencies": [],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/docs/PROJECT_REQUIREMENTS.md",
+        "focus_areas": ["current_problems", "success_criteria", "user_stories", "acceptance_criteria"],
+        "key_requirements": [
+          "Real-time monitoring of 10+ concurrent workflows",
+          "Workflow-specific log separation and streaming",
+          "Progress tracking with ETAs and agent activity",
+          "Deliverable tracking with download links",
+          "Task pipeline visualization with dependencies",
+          "Multi-workflow comparison view"
+        ]
+      }
+    },
+    {
+      "task_id": "ui_specifications",
+      "task_type": "technical-writer",
+      "prompt": "Generate UI_SPECIFICATIONS.md with detailed interface mockups using ASCII art. Create mockups for: 1) Main dashboard grid showing 10+ concurrent workflows, 2) Workflow detail view with logs and progress, 3) Multi-workflow comparison interface. Include responsive design considerations, user interaction flows, and accessibility requirements. Target output: docs/UI_SPECIFICATIONS.md",
+      "dependencies": ["project_requirements_spec"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/docs/UI_SPECIFICATIONS.md",
+        "mockup_types": ["dashboard_grid", "workflow_detail", "comparison_view"],
+        "design_requirements": ["responsive", "real_time_updates", "accessibility", "usability"],
+        "ascii_art_required": true
+      }
+    },
+    {
+      "task_id": "technical_specifications",
+      "task_type": "solution-architect",
+      "prompt": "Generate TECHNICAL_SPECIFICATIONS.md for dashboard implementation using FastAPI + WebSocket stack. Define architecture for real-time monitoring, performance targets for 10+ concurrent workflows, integration constraints with existing orchestrator system. Include database schema, caching strategy, WebSocket event handling, and scalability considerations. Target output: docs/TECHNICAL_SPECIFICATIONS.md",
+      "dependencies": ["project_requirements_spec"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/docs/TECHNICAL_SPECIFICATIONS.md",
+        "stack": ["FastAPI", "WebSocket", "PostgreSQL", "Redis"],
+        "performance_targets": "10+ concurrent workflows with <100ms response times",
+        "integration_points": ["existing orchestrator logs", "file system monitoring", "task status tracking"]
+      }
+    },
+    {
+      "task_id": "api_specifications",
+      "task_type": "technical-writer",
+      "prompt": "Generate API_SPECIFICATIONS.md with complete REST endpoints and WebSocket event definitions. Document data models, request/response schemas, authentication, error handling, and rate limiting. Include OpenAPI/Swagger compatibility. Focus on workflow monitoring, log streaming, progress tracking, and deliverable management APIs. Target output: docs/API_SPECIFICATIONS.md",
+      "dependencies": ["technical_specifications"],
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/docs/API_SPECIFICATIONS.md",
+        "api_types": ["REST", "WebSocket", "SSE"],
+        "core_endpoints": [
+          "/workflows - list active workflows",
+          "/workflows/{id}/logs - stream workflow logs",
+          "/workflows/{id}/progress - get progress status",
+          "/workflows/{id}/deliverables - list/download outputs",
+          "WebSocket /ws/workflows - real-time updates"
+        ],
+        "schema_format": "OpenAPI 3.0"
+      }
+    }
+  ]
+}

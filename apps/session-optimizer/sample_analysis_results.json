@@ -1,0 +1,42 @@
+{
+  "summary": {
+    "total_sessions_analyzed": 5,
+    "avg_optimization_score": 95.0,
+    "total_estimated_cost": 8.03,
+    "sessions_needing_optimization": 0
+  },
+  "complexity_distribution": {
+    "Low": 4,
+    "Very High": 1
+  },
+  "top_patterns": {
+    "structured_planning": 2,
+    "task_oriented": 2,
+    "extended_development_session": 2,
+    "file_intensive": 1,
+    "moderate_editing": 1
+  },
+  "tool_usage": {
+    "top_tools": {
+      "Bash": 46,
+      "TodoWrite": 23,
+      "Read": 23,
+      "Edit": 18,
+      "Grep": 9,
+      "mcp__mcp_web_search__brave_web_search": 4,
+      "mcp__firecrawl__firecrawl_scrape": 3,
+      "Glob": 3,
+      "mcp__thinking__metacognitivethinking": 2,
+      "Write": 2
+    },
+    "mcp_tools_discovered": 3,
+    "unique_mcp_tools": [
+      "mcp__mcp_web_search__brave_web_search",
+      "mcp__firecrawl__firecrawl_scrape",
+      "mcp__thinking__metacognitivethinking"
+    ]
+  },
+  "optimization_recommendations": [
+    "Consider chunking 1 high-cost sessions (avg chunks: 14.0)"
+  ]
+}

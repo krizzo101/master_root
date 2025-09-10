@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "task_id": "test_apps_directory_creation",
+      "task_type": "development-specialist",
+      "prompt": "Test if the orchestrator permission fix works by creating a new project directory in /apps/.\n\nCreate: /home/opsvi/master_root/apps/test-directory-fix/\n\nInside this directory, create:\n- README.md with basic project info\n- src/ subdirectory\n- docs/ subdirectory  \n- A simple test file: test_success.txt with content 'Directory permission fix successful!'\n\nThis will verify that agents can now create project directories outside the orchestrator scope using the new --add-dir parameter.",
+      "context": {
+        "test_purpose": "Verify --add-dir /home/opsvi/master_root/apps parameter works",
+        "target_directory": "/home/opsvi/master_root/apps/test-directory-fix/",
+        "success_indicator": "Successfully creates directory and files"
+      }
+    }
+  ]
+}

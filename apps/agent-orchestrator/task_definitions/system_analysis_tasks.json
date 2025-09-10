@@ -1,0 +1,318 @@
+{
+  "agent_execution_config": {
+    "claude_code_fallback": {
+      "enabled": false,
+      "status": "DISABLED",
+      "path": "../claude-code-clone/",
+      "description": "OpenAI-powered Claude Code alternative",
+      "models": {
+        "premium": "o4-mini",
+        "standard": "gpt-5",
+        "fallback": "gpt-5-mini"
+      },
+      "token_limits": {
+        "daily_premium": 1000000,
+        "daily_standard": 10000000
+      }
+    },
+    "agent_requirements": {
+      "max_parallel_agents": 13,
+      "token_resilience": true,
+      "checkpoint_interval": 300,
+      "auto_recovery_enabled": true,
+      "quality_gates_enabled": true
+    },
+    "system_message_append": "CRITICAL CONTEXT: You are working on a solo developer's most badass AI automation system. Focus on practical, maintainable solutions that maximize automation efficiency. System handles Anthropic 5-hour token limits with OpenAI fallback capability (1M premium + 10M regular daily tokens). Prioritize token efficiency and production system protection."
+  },
+  "tasks": [
+    {
+      "task_id": "system_discovery_agent_1",
+      "task_type": "research-genius",
+      "prompt": "COMPREHENSIVE SYSTEM DISCOVERY WITH LATEST RESEARCH\n\nCRITICAL CONTEXT: This codebase contains a LOT of old, disconnected, experimental, and legacy code mixed with working production code. You MUST determine what's actually being used vs what's just sitting there taking up space.\n\nBefore analyzing the current system, conduct online research on the latest agent orchestration and AI automation trends for 2025:\n\n1. Latest Technology Research (CRITICAL FIRST STEP):\n   - Research latest agent orchestration frameworks and patterns (2024-2025)\n   - Investigate current best practices in AI agent coordination\n   - Study modern Claude Code alternatives and OpenAI integration patterns\n   - Research token optimization and rate limiting strategies\n   - Analyze parallel execution and resilience patterns in modern systems\n\n2. Current System Analysis - SEPARATE WORKING FROM LEGACY:\n   - CRITICAL: Map which Python files are actually imported/used vs orphaned\n   - Trace execution paths from main entry points (main.py, run.py)\n   - Identify which orchestrator classes are actually instantiated vs just defined\n   - Document which features are fully implemented vs partially implemented vs just placeholder\n   - Find code that's imported nowhere and used by nothing\n   - Separate 'unified orchestrator' (current) from old experimental orchestrators\n\n3. Legacy Code Identification:\n   - Look for files with no imports pointing to them\n   - Find classes/functions that are defined but never instantiated/called\n   - Identify experimental features that were started but never finished\n   - Document code that appears to be from different development phases\n   - Flag potentially outdated patterns or deprecated approaches\n\n4. Reality Check Assessment:\n   - This is a solo developer project, not enterprise software\n   - Goal: Most badass AI agent automation system possible\n   - Must handle Anthropic 5-hour token limits gracefully\n   - Must maximize OpenAI token allocation (1M premium, 10M regular daily)\n   - System currently works well - don't break what's working\n\n5. Integration Points Discovery:\n   - Document current MCP integrations\n   - Identify Claude Code dependencies\n   - Map token management systems\n   - Find any existing OpenAI integration code (may be in archive)\n   - NOTE: Claude Code clone exists at ../claude-code-clone/ but needs validation before use\n   - EXPLORE ECOSYSTEM: Investigate other apps and tools in the project space for integration opportunities\n\nGenerate a comprehensive system map that clearly separates:\n- 'DEFINITELY WORKING AND CRITICAL'\n- 'WORKING BUT MAYBE LEGACY'\n- 'EXPERIMENTAL/INCOMPLETE'\n- 'DEAD CODE THAT CAN BE REMOVED'\nInclude latest industry knowledge for informed enhancement recommendations.",
+      "dependencies": [],
+      "agent_config": {
+        "agent_count": 1,
+        "tools": [
+          "WebSearch",
+          "WebFetch",
+          "Read",
+          "Glob",
+          "Grep",
+          "Task"
+        ],
+        "permissions": [
+          "read_all_files",
+          "web_search",
+          "mcp_integration"
+        ],
+        "priority": "high",
+        "fallback_to_openai": true,
+        "estimated_tokens": 60000
+      }
+    },
+    {
+      "task_id": "system_discovery_agent_2",
+      "task_type": "research-genius",
+      "prompt": "COMPREHENSIVE SYSTEM DISCOVERY WITH LATEST RESEARCH\n\nCRITICAL CONTEXT: This codebase contains a LOT of old, disconnected, experimental, and legacy code mixed with working production code. You MUST determine what's actually being used vs what's just sitting there taking up space.\n\nBefore analyzing the current system, conduct online research on the latest agent orchestration and AI automation trends for 2025:\n\n1. Latest Technology Research (CRITICAL FIRST STEP):\n   - Research latest agent orchestration frameworks and patterns (2024-2025)\n   - Investigate current best practices in AI agent coordination\n   - Study modern Claude Code alternatives and OpenAI integration patterns\n   - Research token optimization and rate limiting strategies\n   - Analyze parallel execution and resilience patterns in modern systems\n\n2. Current System Analysis - SEPARATE WORKING FROM LEGACY:\n   - CRITICAL: Map which Python files are actually imported/used vs orphaned\n   - Trace execution paths from main entry points (main.py, run.py)\n   - Identify which orchestrator classes are actually instantiated vs just defined\n   - Document which features are fully implemented vs partially implemented vs just placeholder\n   - Find code that's imported nowhere and used by nothing\n   - Separate 'unified orchestrator' (current) from old experimental orchestrators\n\n3. Legacy Code Identification:\n   - Look for files with no imports pointing to them\n   - Find classes/functions that are defined but never instantiated/called\n   - Identify experimental features that were started but never finished\n   - Document code that appears to be from different development phases\n   - Flag potentially outdated patterns or deprecated approaches\n\n4. Reality Check Assessment:\n   - This is a solo developer project, not enterprise software\n   - Goal: Most badass AI agent automation system possible\n   - Must handle Anthropic 5-hour token limits gracefully\n   - Must maximize OpenAI token allocation (1M premium, 10M regular daily)\n   - System currently works well - don't break what's working\n\n5. Integration Points Discovery:\n   - Document current MCP integrations\n   - Identify Claude Code dependencies\n   - Map token management systems\n   - Find any existing OpenAI integration code (may be in archive)\n   - NOTE: Claude Code clone exists at ../claude-code-clone/ but needs validation before use\n   - EXPLORE ECOSYSTEM: Investigate other apps and tools in the project space for integration opportunities\n\nGenerate a comprehensive system map that clearly separates:\n- 'DEFINITELY WORKING AND CRITICAL'\n- 'WORKING BUT MAYBE LEGACY'\n- 'EXPERIMENTAL/INCOMPLETE'\n- 'DEAD CODE THAT CAN BE REMOVED'\nInclude latest industry knowledge for informed enhancement recommendations.",
+      "dependencies": [],
+      "agent_config": {
+        "agent_count": 1,
+        "tools": [
+          "WebSearch",
+          "WebFetch",
+          "Read",
+          "Glob",
+          "Grep",
+          "Task"
+        ],
+        "permissions": [
+          "read_all_files",
+          "web_search",
+          "mcp_integration"
+        ],
+        "priority": "high",
+        "fallback_to_openai": true,
+        "estimated_tokens": 60000
+      }
+    },
+    {
+      "task_id": "system_discovery_agent_3",
+      "task_type": "research-genius",
+      "prompt": "COMPREHENSIVE SYSTEM DISCOVERY WITH LATEST RESEARCH\n\nCRITICAL CONTEXT: This codebase contains a LOT of old, disconnected, experimental, and legacy code mixed with working production code. You MUST determine what's actually being used vs what's just sitting there taking up space.\n\nBefore analyzing the current system, conduct online research on the latest agent orchestration and AI automation trends for 2025:\n\n1. Latest Technology Research (CRITICAL FIRST STEP):\n   - Research latest agent orchestration frameworks and patterns (2024-2025)\n   - Investigate current best practices in AI agent coordination\n   - Study modern Claude Code alternatives and OpenAI integration patterns\n   - Research token optimization and rate limiting strategies\n   - Analyze parallel execution and resilience patterns in modern systems\n\n2. Current System Analysis - SEPARATE WORKING FROM LEGACY:\n   - CRITICAL: Map which Python files are actually imported/used vs orphaned\n   - Trace execution paths from main entry points (main.py, run.py)\n   - Identify which orchestrator classes are actually instantiated vs just defined\n   - Document which features are fully implemented vs partially implemented vs just placeholder\n   - Find code that's imported nowhere and used by nothing\n   - Separate 'unified orchestrator' (current) from old experimental orchestrators\n\n3. Legacy Code Identification:\n   - Look for files with no imports pointing to them\n   - Find classes/functions that are defined but never instantiated/called\n   - Identify experimental features that were started but never finished\n   - Document code that appears to be from different development phases\n   - Flag potentially outdated patterns or deprecated approaches\n\n4. Reality Check Assessment:\n   - This is a solo developer project, not enterprise software\n   - Goal: Most badass AI agent automation system possible\n   - Must handle Anthropic 5-hour token limits gracefully\n   - Must maximize OpenAI token allocation (1M premium, 10M regular daily)\n   - System currently works well - don't break what's working\n\n5. Integration Points Discovery:\n   - Document current MCP integrations\n   - Identify Claude Code dependencies\n   - Map token management systems\n   - Find any existing OpenAI integration code (may be in archive)\n   - NOTE: Claude Code clone exists at ../claude-code-clone/ but needs validation before use\n   - EXPLORE ECOSYSTEM: Investigate other apps and tools in the project space for integration opportunities\n\nGenerate a comprehensive system map that clearly separates:\n- 'DEFINITELY WORKING AND CRITICAL'\n- 'WORKING BUT MAYBE LEGACY'\n- 'EXPERIMENTAL/INCOMPLETE'\n- 'DEAD CODE THAT CAN BE REMOVED'\nInclude latest industry knowledge for informed enhancement recommendations.",
+      "dependencies": [],
+      "agent_config": {
+        "agent_count": 1,
+        "tools": [
+          "WebSearch",
+          "WebFetch",
+          "Read",
+          "Glob",
+          "Grep",
+          "Task"
+        ],
+        "permissions": [
+          "read_all_files",
+          "web_search",
+          "mcp_integration"
+        ],
+        "priority": "high",
+        "fallback_to_openai": true,
+        "estimated_tokens": 60000
+      }
+    },
+    {
+      "task_id": "capability_analysis_agent_1",
+      "task_type": "solution-architect",
+      "prompt": "CAPABILITY GAP ANALYSIS & 2025 BENCHMARKING\n\nBased on the system discovery findings, conduct a comprehensive capability analysis:\n\n1. Current Capability Assessment:\n   - Evaluate existing orchestration patterns against 2025 industry standards\n   - Benchmark current token management vs modern efficiency techniques\n   - Assess parallel execution capabilities vs current best practices\n   - Review error handling and resilience patterns\n   - Analyze monitoring and observability features\n\n2. Modern Standards Comparison:\n   - Compare with CrewAI, LangGraph, AutoGen, OpenAI Agents SDK capabilities\n   - Evaluate against Plandex and Codai token optimization approaches\n   - Assess current vs. state-of-the-art multi-agent patterns\n   - Review integration patterns with modern AI development tools\n\n3. Gap Identification:\n   - Identify missing capabilities for 2025 competitive advantage\n   - Document technical debt that limits scalability\n   - Find integration opportunities with modern toolchains\n   - Assess security and reliability gaps\n\n4. Enhancement Opportunities:\n   - Prioritize capability additions based on impact and effort\n   - Identify quick wins vs. strategic long-term improvements\n   - Consider resource constraints (solo developer, token limits)\n   - Focus on automation and reduced maintenance overhead\n\nGenerate a comprehensive capability gap analysis with specific recommendations for achieving 2025-level AI automation capabilities.",
+      "dependencies": [
+        "system_discovery_agent_1"
+      ],
+      "agent_config": {
+        "agent_count": 1,
+        "tools": [
+          "WebSearch",
+          "Read",
+          "Glob",
+          "Grep"
+        ],
+        "permissions": [
+          "read_all_files",
+          "web_search"
+        ],
+        "priority": "medium",
+        "fallback_to_openai": true,
+        "estimated_tokens": 45000
+      }
+    },
+    {
+      "task_id": "capability_analysis_agent_2",
+      "task_type": "solution-architect",
+      "prompt": "CAPABILITY GAP ANALYSIS & 2025 BENCHMARKING\n\nBased on the system discovery findings, conduct a comprehensive capability analysis:\n\n1. Current Capability Assessment:\n   - Evaluate existing orchestration patterns against 2025 industry standards\n   - Benchmark current token management vs modern efficiency techniques\n   - Assess parallel execution capabilities vs current best practices\n   - Review error handling and resilience patterns\n   - Analyze monitoring and observability features\n\n2. Modern Standards Comparison:\n   - Compare with CrewAI, LangGraph, AutoGen, OpenAI Agents SDK capabilities\n   - Evaluate against Plandex and Codai token optimization approaches\n   - Assess current vs. state-of-the-art multi-agent patterns\n   - Review integration patterns with modern AI development tools\n\n3. Gap Identification:\n   - Identify missing capabilities for 2025 competitive advantage\n   - Document technical debt that limits scalability\n   - Find integration opportunities with modern toolchains\n   - Assess security and reliability gaps\n\n4. Enhancement Opportunities:\n   - Prioritize capability additions based on impact and effort\n   - Identify quick wins vs. strategic long-term improvements\n   - Consider resource constraints (solo developer, token limits)\n   - Focus on automation and reduced maintenance overhead\n\nGenerate a comprehensive capability gap analysis with specific recommendations for achieving 2025-level AI automation capabilities.",
+      "dependencies": [
+        "system_discovery_agent_1"
+      ],
+      "agent_config": {
+        "agent_count": 1,
+        "tools": [
+          "WebSearch",
+          "Read",
+          "Glob",
+          "Grep"
+        ],
+        "permissions": [
+          "read_all_files",
+          "web_search"
+        ],
+        "priority": "medium",
+        "fallback_to_openai": true,
+        "estimated_tokens": 45000
+      }
+    },
+    {
+      "task_id": "performance_optimization_agent_1",
+      "task_type": "performance-optimizer",
+      "prompt": "PERFORMANCE OPTIMIZATION & TOKEN EFFICIENCY ANALYSIS\n\nFocus on maximizing performance and token efficiency:\n\n1. Token Usage Optimization:\n   - Analyze current token consumption patterns\n   - Identify opportunities for intelligent provider routing (OpenAI vs Claude)\n   - Evaluate caching and redundancy elimination opportunities\n   - Design token pooling and rate limiting improvements\n\n2. Parallel Execution Optimization:\n   - Review current parallelism patterns and bottlenecks\n   - Identify opportunities for increased concurrent execution\n   - Analyze dependency resolution efficiency\n   - Design adaptive scaling based on available resources\n\n3. Memory and Resource Optimization:\n   - Profile memory usage patterns during orchestration\n   - Identify resource leaks or inefficient patterns\n   - Optimize checkpoint and state persistence mechanisms\n   - Review process management and cleanup procedures\n\n4. Throughput Maximization:\n   - Design strategies for maximum agent throughput\n   - Evaluate batch processing opportunities\n   - Optimize agent startup and teardown overhead\n   - Consider pipeline parallelism opportunities\n\nGenerate specific optimization recommendations with performance impact estimates and implementation complexity.",
+      "dependencies": [
+        "system_discovery_agent_1"
+      ],
+      "agent_config": {
+        "agent_count": 1,
+        "tools": [
+          "Read",
+          "Glob",
+          "Grep"
+        ],
+        "permissions": [
+          "read_all_files"
+        ],
+        "priority": "medium",
+        "fallback_to_openai": true,
+        "estimated_tokens": 40000
+      }
+    },
+    {
+      "task_id": "performance_optimization_agent_2",
+      "task_type": "performance-optimizer",
+      "prompt": "PERFORMANCE OPTIMIZATION & TOKEN EFFICIENCY ANALYSIS\n\nFocus on maximizing performance and token efficiency:\n\n1. Token Usage Optimization:\n   - Analyze current token consumption patterns\n   - Identify opportunities for intelligent provider routing (OpenAI vs Claude)\n   - Evaluate caching and redundancy elimination opportunities\n   - Design token pooling and rate limiting improvements\n\n2. Parallel Execution Optimization:\n   - Review current parallelism patterns and bottlenecks\n   - Identify opportunities for increased concurrent execution\n   - Analyze dependency resolution efficiency\n   - Design adaptive scaling based on available resources\n\n3. Memory and Resource Optimization:\n   - Profile memory usage patterns during orchestration\n   - Identify resource leaks or inefficient patterns\n   - Optimize checkpoint and state persistence mechanisms\n   - Review process management and cleanup procedures\n\n4. Throughput Maximization:\n   - Design strategies for maximum agent throughput\n   - Evaluate batch processing opportunities\n   - Optimize agent startup and teardown overhead\n   - Consider pipeline parallelism opportunities\n\nGenerate specific optimization recommendations with performance impact estimates and implementation complexity.",
+      "dependencies": [
+        "system_discovery_agent_1"
+      ],
+      "agent_config": {
+        "agent_count": 1,
+        "tools": [
+          "Read",
+          "Glob",
+          "Grep"
+        ],
+        "permissions": [
+          "read_all_files"
+        ],
+        "priority": "medium",
+        "fallback_to_openai": true,
+        "estimated_tokens": 40000
+      }
+    },
+    {
+      "task_id": "claude_clone_validation",
+      "task_type": "qa-testing-guru",
+      "prompt": "CLAUDE CODE CLONE VALIDATION & OPENAI INTEGRATION TESTING\n\nValidate the Claude Code clone for production readiness:\n\n1. Functionality Validation:\n   - Test basic agent execution capabilities\n   - Verify tool integration (MCP, file operations, web access)\n   - Validate streaming response handling\n   - Test error handling and recovery mechanisms\n\n2. OpenAI Integration Testing:\n   - Verify o4-mini, gpt-5, gpt-5-mini model access\n   - Test token limit handling (1M premium, 10M regular daily)\n   - Validate rate limiting and backoff mechanisms\n   - Test cost tracking and usage monitoring\n\n3. Compatibility Assessment:\n   - Compare output quality vs. Claude Code\n   - Test task execution reliability and consistency  \n   - Evaluate prompt compatibility across providers\n   - Assess tool integration compatibility\n\n4. Production Readiness:\n   - Test under high concurrency loads\n   - Validate error recovery and failover mechanisms\n   - Assess security and isolation capabilities\n   - Evaluate monitoring and logging features\n\nGenerate a comprehensive validation report with go/no-go recommendation for OpenAI integration activation.",
+      "dependencies": [
+        "system_discovery_agent_1"
+      ],
+      "agent_config": {
+        "agent_count": 1,
+        "tools": [
+          "Bash",
+          "Read",
+          "Write"
+        ],
+        "permissions": [
+          "execute_code",
+          "read_all_files",
+          "write_files"
+        ],
+        "priority": "medium",
+        "fallback_to_openai": true,
+        "estimated_tokens": 35000
+      }
+    },
+    {
+      "task_id": "integration_strategy",
+      "task_type": "api-integration-specialist",
+      "prompt": "INTEGRATION STRATEGY & ARCHITECTURE PLANNING\n\nDesign comprehensive integration strategy based on analysis findings:\n\n1. Multi-Provider Integration:\n   - Design seamless Claude/OpenAI provider switching\n   - Plan cost-optimized routing strategies\n   - Design fallback and recovery mechanisms\n   - Plan token pool management across providers\n\n2. Modern Toolchain Integration:\n   - Design MCP tool expansion strategy\n   - Plan Git worktree integration for parallel development\n   - Design monitoring and observability integration\n   - Plan CI/CD and automation integration\n\n3. Ecosystem Integration:\n   - Identify valuable integrations with existing project apps\n   - Design plugin and extension architecture\n   - Plan API and webhook integration capabilities\n   - Design collaboration and shared workspace features\n\n4. Architecture Modernization:\n   - Design migration path from current to target architecture\n   - Plan backward compatibility preservation\n   - Design feature flag and gradual rollout strategies\n   - Plan testing and validation frameworks\n\nGenerate a detailed integration roadmap with technical specifications and implementation timeline.",
+      "dependencies": [
+        "system_discovery_agent_1",
+        "capability_analysis_agent_1",
+        "claude_clone_validation"
+      ],
+      "agent_config": {
+        "agent_count": 1,
+        "tools": [],
+        "permissions": [],
+        "priority": "medium",
+        "fallback_to_openai": true,
+        "estimated_tokens": 40000
+      }
+    },
+    {
+      "task_id": "enhancement_prioritization",
+      "task_type": "business-analyst",
+      "prompt": "ENHANCEMENT PRIORITIZATION & ROADMAP DEVELOPMENT\n\nPrioritize enhancements for maximum impact with solo developer constraints:\n\n1. Impact vs. Effort Analysis:\n   - Score each enhancement opportunity for business impact\n   - Assess implementation complexity and time requirements\n   - Consider resource constraints and token limit impacts\n   - Evaluate maintenance overhead for each enhancement\n\n2. Strategic Roadmap Development:\n   - Design phased implementation approach\n   - Identify critical path dependencies\n   - Plan resource allocation across enhancement phases\n   - Design risk mitigation strategies\n\n3. Quick Wins Identification:\n   - Identify high-impact, low-effort improvements\n   - Plan immediate value delivery opportunities\n   - Design proof-of-concept validation approaches\n   - Plan early adoption and feedback collection\n\n4. Long-term Vision:\n   - Design sustainable growth architecture\n   - Plan scalability and extensibility features\n   - Consider future technology integration opportunities\n   - Design continuous improvement processes\n\nGenerate a prioritized enhancement roadmap with clear phases, timelines, and success metrics optimized for solo developer productivity.",
+      "dependencies": [
+        "capability_analysis_agent_1",
+        "performance_optimization_agent_1",
+        "integration_strategy"
+      ],
+      "agent_config": {
+        "agent_count": 1,
+        "tools": [],
+        "permissions": [],
+        "priority": "medium",
+        "fallback_to_openai": true,
+        "estimated_tokens": 35000
+      }
+    },
+    {
+      "task_id": "implementation_planning",
+      "task_type": "sdlc-planning",
+      "prompt": "IMPLEMENTATION PLANNING & EXECUTION STRATEGY\n\nCreate detailed implementation plan for prioritized enhancements:\n\n1. Technical Implementation Plan:\n   - Break down enhancements into specific development tasks\n   - Design technical architecture and component specifications\n   - Plan database schema changes and data migration strategies\n   - Design API and interface specifications\n\n2. Development Workflow:\n   - Plan Git workflow and branch management strategy\n   - Design testing strategy and validation frameworks\n   - Plan deployment and rollback procedures\n   - Design monitoring and alerting for new features\n\n3. Risk Management:\n   - Identify technical risks and mitigation strategies\n   - Plan backward compatibility preservation\n   - Design feature flags and gradual rollout approaches\n   - Plan recovery procedures for failed deployments\n\n4. Resource Planning:\n   - Estimate development time and token usage\n   - Plan milestone delivery schedules\n   - Identify external dependency requirements\n   - Design progress tracking and reporting mechanisms\n\nGenerate a comprehensive implementation plan with detailed tasks, timelines, and deliverables ready for immediate execution.",
+      "dependencies": [
+        "enhancement_prioritization"
+      ],
+      "agent_config": {
+        "agent_count": 1,
+        "tools": [],
+        "permissions": [],
+        "priority": "medium",
+        "fallback_to_openai": true,
+        "estimated_tokens": 35000
+      }
+    },
+    {
+      "task_id": "technical_documentation_agent_1",
+      "task_type": "technical-writer",
+      "prompt": "COMPREHENSIVE TECHNICAL DOCUMENTATION\n\nCreate complete technical documentation for the enhanced system:\n\n1. Architecture Documentation:\n   - Document system architecture and component relationships\n   - Create deployment and configuration guides\n   - Document API specifications and integration patterns\n   - Create troubleshooting and maintenance guides\n\n2. Developer Documentation:\n   - Create setup and development environment guides\n   - Document coding standards and contribution guidelines\n   - Create testing and validation procedures\n   - Document debugging and profiling techniques\n\n3. Operations Documentation:\n   - Create monitoring and alerting setup guides\n   - Document backup and recovery procedures\n   - Create scaling and performance tuning guides\n   - Document security configuration and best practices\n\n4. User Documentation:\n   - Create user guides for new features\n   - Document configuration options and customization\n   - Create examples and use case demonstrations\n   - Document migration procedures from current system\n\nGenerate comprehensive documentation that enables successful adoption and maintenance of the enhanced AI automation system.",
+      "dependencies": [
+        "implementation_planning"
+      ],
+      "agent_config": {
+        "agent_count": 1,
+        "tools": [
+          "Write",
+          "Read",
+          "Glob"
+        ],
+        "permissions": [
+          "write_files",
+          "read_all_files"
+        ],
+        "priority": "medium",
+        "fallback_to_openai": true,
+        "estimated_tokens": 40000
+      }
+    },
+    {
+      "task_id": "technical_documentation_agent_2",
+      "task_type": "technical-writer",
+      "prompt": "COMPREHENSIVE TECHNICAL DOCUMENTATION\n\nCreate complete technical documentation for the enhanced system:\n\n1. Architecture Documentation:\n   - Document system architecture and component relationships\n   - Create deployment and configuration guides\n   - Document API specifications and integration patterns\n   - Create troubleshooting and maintenance guides\n\n2. Developer Documentation:\n   - Create setup and development environment guides\n   - Document coding standards and contribution guidelines\n   - Create testing and validation procedures\n   - Document debugging and profiling techniques\n\n3. Operations Documentation:\n   - Create monitoring and alerting setup guides\n   - Document backup and recovery procedures\n   - Create scaling and performance tuning guides\n   - Document security configuration and best practices\n\n4. User Documentation:\n   - Create user guides for new features\n   - Document configuration options and customization\n   - Create examples and use case demonstrations\n   - Document migration procedures from current system\n\nGenerate comprehensive documentation that enables successful adoption and maintenance of the enhanced AI automation system.",
+      "dependencies": [
+        "implementation_planning"
+      ],
+      "agent_config": {
+        "agent_count": 1,
+        "tools": [
+          "Write",
+          "Read",
+          "Glob"
+        ],
+        "permissions": [
+          "write_files",
+          "read_all_files"
+        ],
+        "priority": "medium",
+        "fallback_to_openai": true,
+        "estimated_tokens": 40000
+      }
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "job_id": "CodeCounter_0ae4529a",
+  "name": "CodeCounter",
+  "task": "Count lines of code by language using find and wc commands for common extensions",
+  "status": "completed",
+  "return_code": 0,
+  "duration_seconds": 11.491294,
+  "stdout": "=== LINES OF CODE BY LANGUAGE ===\nPython: 151970 total\nJavaScript: 179523 total\nTypeScript: 210477 total\nShell: 84849 total\nJSON: 894750 total\nMarkdown: 478627 total",
+  "stderr": "",
+  "started_at": "2025-09-05T19:25:35.871100",
+  "completed_at": "2025-09-05T19:25:47.362405"
+}

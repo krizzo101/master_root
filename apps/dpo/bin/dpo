@@ -1,0 +1,622 @@
+#!/usr/bin/env python3
+"""
+DPO Command-Line Interface
+
+Main entry point for the Development Process Orchestrator system.
+"""
+
+import sys
+import os
+import click
+import json
+import asyncio
+from pathlib import Path
+from typing import Optional, Dict, Any
+from datetime import datetime
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from src.dpo_main_controller import DPOMainController, DPOConfiguration
+from src.dpo_intelligence_integration import DPORequest
+
+# Version information
+__version__ = "1.0.0"
+
+# Color scheme
+COLORS = {
+    'success': 'green',
+    'error': 'red',
+    'warning': 'yellow',
+    'info': 'blue',
+    'highlight': 'cyan',
+    'dim': 'bright_black'
+}
+
+def format_status(status: str) -> str:
+    """Format status with color"""
+    status_colors = {
+        'completed': 'green',
+        'in_progress': 'yellow',
+        'pending': 'cyan',
+        'failed': 'red',
+        'cancelled': 'bright_black'
+    }
+    color = status_colors.get(status.lower(), 'white')
+    return click.style(status.upper(), fg=color, bold=True)
+
+def print_header(text: str):
+    """Print a formatted header"""
+    click.echo()
+    click.echo(click.style("=" * 60, fg=COLORS['dim']))
+    click.echo(click.style(f"  {text}", fg=COLORS['highlight'], bold=True))
+    click.echo(click.style("=" * 60, fg=COLORS['dim']))
+    click.echo()
+
+def print_subheader(text: str):
+    """Print a formatted subheader"""
+    click.echo()
+    click.echo(click.style(f"▶ {text}", fg=COLORS['info'], bold=True))
+    click.echo(click.style("─" * 40, fg=COLORS['dim']))
+
+@click.group()
+@click.version_option(version=__version__)
+@click.option('--config', '-c', type=click.Path(exists=True),
+              help='Path to configuration file')
+@click.pass_context
+def cli(ctx, config):
+    """Development Process Orchestrator (DPO) - Intelligent Development Automation
+
+    The DPO system analyzes development requests and orchestrates intelligent
+    workflows using specialized AI agents. It handles everything from initial
+    requirements analysis to final deployment.
+
+    Examples:
+
+      # Build a new web application
+      dpo build "Create a REST API for user management"
+
+      # Check workflow status
+      dpo status
+
+      # List available templates
+      dpo templates list
+
+      # Configure the system
+      dpo configure --max-agents 15
+    """
+    ctx.ensure_object(dict)
+
+    # Load configuration
+    if config:
+        ctx.obj['config'] = DPOConfiguration.from_file(config)
+    else:
+        ctx.obj['config'] = DPOConfiguration()
+
+    # Initialize controller
+    ctx.obj['controller'] = DPOMainController(ctx.obj['config'])
+
+@cli.command()
+@click.argument('request', type=str)
+@click.option('--project-type', '-t', type=str, help='Project type (e.g., web-app, cli-tool, api)')
+@click.option('--tech-stack', '-s', type=str, help='Technology stack (comma-separated)')
+@click.option('--priority', '-p', type=click.Choice(['low', 'medium', 'high', 'critical']),
+              default='medium', help='Request priority')
+@click.option('--output-dir', '-o', type=click.Path(), help='Output directory for artifacts')
+@click.option('--template', type=str, help='Use specific template')
+@click.option('--no-intelligence', is_flag=True, help='Disable intelligence enhancement')
+@click.option('--dry-run', is_flag=True, help='Perform dry run without execution')
+@click.option('--async-mode', is_flag=True, help='Run in async mode (non-blocking)')
+@click.pass_context
+def build(ctx, request, project_type, tech_stack, priority, output_dir,
+          template, no_intelligence, dry_run, async_mode):
+    """Submit a new development request for processing
+
+    This command analyzes your request and creates an intelligent workflow
+    to fulfill it. The system will:
+
+    1. Analyze the request to understand requirements
+    2. Apply intelligence enhancements (unless disabled)
+    3. Generate an optimized SDLC workflow
+    4. Inject necessary context
+    5. Execute through the orchestrator
+
+    Examples:
+
+      # Simple web application
+      dpo build "Create a todo list app with React frontend"
+
+      # API with specific tech stack
+      dpo build "REST API for inventory management" -t api -s "python,fastapi,postgresql"
+
+      # Use a specific template
+      dpo build "E-commerce platform" --template full-stack-app
+    """
+    print_header("DPO Development Request Processing")
+
+    controller = ctx.obj['controller']
+    config = ctx.obj['config']
+
+    # Prepare request
+    dpo_request = DPORequest(
+        request_text=request,
+        project_type=project_type,
+        technologies=tech_stack.split(',') if tech_stack else [],
+        priority=priority,
+        metadata={
+            'template': template,
+            'output_dir': output_dir or config.output_base_dir,
+            'dry_run': dry_run,
+            'async_mode': async_mode,
+            'intelligence_enabled': not no_intelligence
+        }
+    )
+
+    # Display request summary
+    print_subheader("Request Summary")
+    click.echo(f"Request: {click.style(request, fg=COLORS['highlight'])}")
+    if project_type:
+        click.echo(f"Project Type: {project_type}")
+    if tech_stack:
+        click.echo(f"Tech Stack: {tech_stack}")
+    click.echo(f"Priority: {priority}")
+    click.echo(f"Intelligence: {click.style('Enabled' if not no_intelligence else 'Disabled',
+                                            fg='green' if not no_intelligence else 'yellow')}")
+
+    if dry_run:
+        click.echo()
+        click.echo(click.style("🔍 DRY RUN MODE - No actual execution", fg=COLORS['warning']))
+
+    # Process request
+    try:
+        click.echo()
+        with click.progressbar(length=100, label='Processing request') as bar:
+            # Simulate progress for async operations
+            bar.update(20)
+
+            # Run the controller
+            if async_mode:
+                workflow_id = asyncio.run(controller.process_request_async(dpo_request))
+                bar.update(80)
+
+                click.echo()
+                click.echo(click.style(f"✓ Workflow submitted successfully!", fg=COLORS['success']))
+                click.echo(f"Workflow ID: {click.style(workflow_id, fg=COLORS['highlight'], bold=True)}")
+                click.echo()
+                click.echo("Use 'dpo status' to monitor progress")
+            else:
+                result = asyncio.run(controller.process_request(dpo_request))
+                bar.update(80)
+
+                # Display results
+                click.echo()
+                print_subheader("Workflow Results")
+                click.echo(f"Status: {format_status(result['status'])}")
+                click.echo(f"Workflow ID: {result.get('workflow_id', 'N/A')}")
+
+                if result.get('deliverables'):
+                    click.echo()
+                    click.echo("Deliverables:")
+                    for deliverable in result['deliverables']:
+                        click.echo(f"  • {deliverable}")
+
+                if result.get('metrics'):
+                    click.echo()
+                    click.echo("Metrics:")
+                    metrics = result['metrics']
+                    click.echo(f"  • Duration: {metrics.get('duration', 'N/A')}")
+                    click.echo(f"  • Tasks Completed: {metrics.get('tasks_completed', 0)}")
+                    click.echo(f"  • Success Rate: {metrics.get('success_rate', 0):.1%}")
+
+    except Exception as e:
+        click.echo()
+        click.echo(click.style(f"✗ Error: {str(e)}", fg=COLORS['error']))
+        if ctx.obj['config'].log_level == 'DEBUG':
+            import traceback
+            click.echo(traceback.format_exc())
+        sys.exit(1)
+
+@cli.command()
+@click.option('--workflow-id', '-w', type=str, help='Specific workflow ID to check')
+@click.option('--all', 'show_all', is_flag=True, help='Show all workflows')
+@click.option('--json-output', is_flag=True, help='Output in JSON format')
+@click.option('--detailed', '-d', is_flag=True, help='Show detailed information')
+@click.pass_context
+def status(ctx, workflow_id, show_all, json_output, detailed):
+    """Check the status of workflows
+
+    Examples:
+
+      # Check latest workflow
+      dpo status
+
+      # Check specific workflow
+      dpo status -w abc123
+
+      # Show all workflows
+      dpo status --all
+    """
+    controller = ctx.obj['controller']
+
+    try:
+        if show_all:
+            workflows = asyncio.run(controller.list_workflows())
+
+            if json_output:
+                click.echo(json.dumps(workflows, indent=2))
+            else:
+                print_header("All Workflows")
+
+                if not workflows:
+                    click.echo("No workflows found.")
+                else:
+                    for wf in workflows:
+                        click.echo(f"ID: {click.style(wf['id'], fg=COLORS['highlight'])}")
+                        click.echo(f"  Status: {format_status(wf['status'])}")
+                        click.echo(f"  Created: {wf['created_at']}")
+                        if wf.get('request'):
+                            click.echo(f"  Request: {wf['request'][:50]}...")
+                        click.echo()
+
+        elif workflow_id:
+            status = asyncio.run(controller.get_workflow_status(workflow_id))
+
+            if json_output:
+                click.echo(json.dumps(status, indent=2))
+            else:
+                print_header(f"Workflow Status: {workflow_id}")
+
+                click.echo(f"Status: {format_status(status['status'])}")
+                click.echo(f"Progress: {status.get('progress', 0):.0%}")
+
+                if status.get('current_task'):
+                    click.echo(f"Current Task: {status['current_task']}")
+
+                if detailed and status.get('tasks'):
+                    click.echo()
+                    click.echo("Tasks:")
+                    for task in status['tasks']:
+                        status_icon = "✓" if task['status'] == 'completed' else "○"
+                        click.echo(f"  {status_icon} {task['name']} - {format_status(task['status'])}")
+
+        else:
+            # Get latest workflow
+            latest = asyncio.run(controller.get_latest_workflow())
+
+            if not latest:
+                click.echo("No workflows found. Use 'dpo build' to create one.")
+            else:
+                ctx.invoke(status, workflow_id=latest['id'], detailed=detailed)
+
+    except Exception as e:
+        click.echo(click.style(f"Error: {str(e)}", fg=COLORS['error']))
+        sys.exit(1)
+
+@cli.group()
+def templates():
+    """Manage workflow templates"""
+    pass
+
+@templates.command('list')
+@click.option('--category', '-c', type=str, help='Filter by category')
+@click.pass_context
+def list_templates(ctx, category):
+    """List available templates"""
+    controller = ctx.obj['controller']
+
+    templates = asyncio.run(controller.list_templates(category=category))
+
+    print_header("Available Templates")
+
+    if not templates:
+        click.echo("No templates found.")
+    else:
+        for template in templates:
+            click.echo(f"• {click.style(template['name'], fg=COLORS['highlight'], bold=True)}")
+            click.echo(f"  Category: {template['category']}")
+            click.echo(f"  Description: {template['description']}")
+            if template.get('technologies'):
+                click.echo(f"  Technologies: {', '.join(template['technologies'])}")
+            click.echo()
+
+@templates.command('show')
+@click.argument('template_name')
+@click.pass_context
+def show_template(ctx, template_name):
+    """Show details of a specific template"""
+    controller = ctx.obj['controller']
+
+    template = asyncio.run(controller.get_template(template_name))
+
+    if not template:
+        click.echo(click.style(f"Template '{template_name}' not found.", fg=COLORS['error']))
+        sys.exit(1)
+
+    print_header(f"Template: {template_name}")
+
+    click.echo(json.dumps(template, indent=2))
+
+@templates.command('validate')
+@click.argument('template_file', type=click.Path(exists=True))
+@click.pass_context
+def validate_template(ctx, template_file):
+    """Validate a template file"""
+    controller = ctx.obj['controller']
+
+    try:
+        with open(template_file, 'r') as f:
+            template = json.load(f)
+
+        is_valid = asyncio.run(controller.validate_template(template))
+
+        if is_valid:
+            click.echo(click.style("✓ Template is valid!", fg=COLORS['success']))
+        else:
+            click.echo(click.style("✗ Template validation failed.", fg=COLORS['error']))
+            sys.exit(1)
+
+    except Exception as e:
+        click.echo(click.style(f"Error: {str(e)}", fg=COLORS['error']))
+        sys.exit(1)
+
+@cli.command()
+@click.option('--max-agents', type=int, help='Maximum parallel agents')
+@click.option('--websocket-port', type=int, help='WebSocket server port')
+@click.option('--enable-dashboard/--disable-dashboard', default=None, help='Enable/disable dashboard')
+@click.option('--enable-intelligence/--disable-intelligence', default=None, help='Enable/disable intelligence')
+@click.option('--output-dir', type=click.Path(), help='Default output directory')
+@click.option('--log-level', type=click.Choice(['DEBUG', 'INFO', 'WARNING', 'ERROR']), help='Log level')
+@click.option('--show', is_flag=True, help='Show current configuration')
+@click.option('--reset', is_flag=True, help='Reset to default configuration')
+@click.pass_context
+def configure(ctx, max_agents, websocket_port, enable_dashboard, enable_intelligence,
+              output_dir, log_level, show, reset):
+    """Configure DPO system settings"""
+
+    config_file = Path.home() / '.dpo' / 'config.json'
+    config_file.parent.mkdir(parents=True, exist_ok=True)
+
+    if reset:
+        if config_file.exists():
+            config_file.unlink()
+        click.echo(click.style("✓ Configuration reset to defaults", fg=COLORS['success']))
+        return
+
+    if show:
+        if config_file.exists():
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+            click.echo(json.dumps(config, indent=2))
+        else:
+            click.echo("No custom configuration found. Using defaults.")
+        return
+
+    # Load existing config or create new
+    if config_file.exists():
+        with open(config_file, 'r') as f:
+            config = json.load(f)
+    else:
+        config = {}
+
+    # Update configuration
+    if max_agents is not None:
+        config['max_parallel_agents'] = max_agents
+    if websocket_port is not None:
+        config['websocket_port'] = websocket_port
+    if enable_dashboard is not None:
+        config['enable_dashboard'] = enable_dashboard
+    if enable_intelligence is not None:
+        config['enable_intelligence'] = enable_intelligence
+    if output_dir:
+        config['output_base_dir'] = output_dir
+    if log_level:
+        config['log_level'] = log_level
+
+    # Save configuration
+    with open(config_file, 'w') as f:
+        json.dump(config, f, indent=2)
+
+    click.echo(click.style("✓ Configuration updated successfully", fg=COLORS['success']))
+
+    # Show updated values
+    click.echo()
+    click.echo("Updated settings:")
+    for key, value in config.items():
+        click.echo(f"  • {key}: {value}")
+
+@cli.command()
+@click.pass_context
+def server(ctx):
+    """Start the DPO server for API access"""
+    print_header("Starting DPO Server")
+
+    config = ctx.obj['config']
+
+    click.echo(f"WebSocket Port: {config.websocket_port}")
+    click.echo(f"Dashboard: {click.style('Enabled' if config.enable_dashboard else 'Disabled',
+                                        fg='green' if config.enable_dashboard else 'yellow')}")
+    click.echo()
+
+    try:
+        from src.dpo_server import start_server
+        asyncio.run(start_server(config))
+    except KeyboardInterrupt:
+        click.echo()
+        click.echo("Server stopped.")
+    except Exception as e:
+        click.echo(click.style(f"Error: {str(e)}", fg=COLORS['error']))
+        sys.exit(1)
+
+@cli.command()
+@click.pass_context
+def dashboard(ctx):
+    """Open the DPO dashboard in browser"""
+    import webbrowser
+
+    dashboard_url = "http://localhost:8080"
+
+    click.echo(f"Opening dashboard at {click.style(dashboard_url, fg=COLORS['highlight'])}")
+    webbrowser.open(dashboard_url)
+
+@cli.command()
+@click.option('--format', type=click.Choice(['json', 'table', 'csv']), default='table',
+              help='Output format')
+@click.option('--period', type=click.Choice(['today', 'week', 'month', 'all']), default='today',
+              help='Time period')
+@click.pass_context
+def metrics(ctx, format, period):
+    """Display system metrics and statistics"""
+    controller = ctx.obj['controller']
+
+    metrics = asyncio.run(controller.get_metrics(period=period))
+
+    if format == 'json':
+        click.echo(json.dumps(metrics, indent=2))
+    elif format == 'csv':
+        # Convert to CSV format
+        import csv
+        import io
+        output = io.StringIO()
+        writer = csv.DictWriter(output, fieldnames=metrics.keys())
+        writer.writeheader()
+        writer.writerow(metrics)
+        click.echo(output.getvalue())
+    else:
+        # Table format
+        print_header(f"System Metrics ({period})")
+
+        click.echo("Workflow Statistics:")
+        click.echo(f"  • Total Workflows: {metrics.get('total_workflows', 0)}")
+        click.echo(f"  • Completed: {metrics.get('completed_workflows', 0)}")
+        click.echo(f"  • In Progress: {metrics.get('in_progress_workflows', 0)}")
+        click.echo(f"  • Failed: {metrics.get('failed_workflows', 0)}")
+
+        click.echo()
+        click.echo("Performance Metrics:")
+        click.echo(f"  • Average Duration: {metrics.get('avg_duration', 'N/A')}")
+        click.echo(f"  • Success Rate: {metrics.get('success_rate', 0):.1%}")
+        click.echo(f"  • Tasks Processed: {metrics.get('total_tasks', 0)}")
+
+        if metrics.get('top_templates'):
+            click.echo()
+            click.echo("Most Used Templates:")
+            for template, count in metrics['top_templates'].items():
+                click.echo(f"  • {template}: {count}")
+
+@cli.command()
+@click.argument('workflow_id')
+@click.pass_context
+def cancel(ctx, workflow_id):
+    """Cancel a running workflow"""
+    controller = ctx.obj['controller']
+
+    try:
+        result = asyncio.run(controller.cancel_workflow(workflow_id))
+
+        if result:
+            click.echo(click.style(f"✓ Workflow {workflow_id} cancelled successfully",
+                                 fg=COLORS['success']))
+        else:
+            click.echo(click.style(f"Failed to cancel workflow {workflow_id}",
+                                 fg=COLORS['error']))
+            sys.exit(1)
+    except Exception as e:
+        click.echo(click.style(f"Error: {str(e)}", fg=COLORS['error']))
+        sys.exit(1)
+
+@cli.command()
+@click.argument('workflow_id')
+@click.option('--output-dir', '-o', type=click.Path(), help='Output directory')
+@click.pass_context
+def results(ctx, workflow_id, output_dir):
+    """Retrieve workflow results and deliverables"""
+    controller = ctx.obj['controller']
+
+    try:
+        results = asyncio.run(controller.get_workflow_results(workflow_id))
+
+        if not results:
+            click.echo(click.style(f"No results found for workflow {workflow_id}",
+                                 fg=COLORS['warning']))
+            sys.exit(1)
+
+        print_header(f"Workflow Results: {workflow_id}")
+
+        # Status and metadata
+        click.echo(f"Status: {format_status(results['status'])}")
+        click.echo(f"Completed: {results.get('completed_at', 'N/A')}")
+        click.echo(f"Duration: {results.get('duration', 'N/A')}")
+
+        # Deliverables
+        if results.get('deliverables'):
+            print_subheader("Deliverables")
+
+            for deliverable in results['deliverables']:
+                click.echo(f"• {deliverable['name']}")
+                click.echo(f"  Type: {deliverable['type']}")
+                click.echo(f"  Path: {deliverable['path']}")
+
+                if output_dir and deliverable.get('content'):
+                    # Save deliverable to output directory
+                    output_path = Path(output_dir) / deliverable['name']
+                    output_path.parent.mkdir(parents=True, exist_ok=True)
+                    output_path.write_text(deliverable['content'])
+                    click.echo(f"  Saved to: {output_path}")
+
+        # Metrics
+        if results.get('metrics'):
+            print_subheader("Metrics")
+            for key, value in results['metrics'].items():
+                click.echo(f"  • {key}: {value}")
+
+        # Logs
+        if results.get('logs'):
+            print_subheader("Execution Logs")
+            for log in results['logs'][-10:]:  # Show last 10 log entries
+                click.echo(f"  [{log['timestamp']}] {log['message']}")
+
+    except Exception as e:
+        click.echo(click.style(f"Error: {str(e)}", fg=COLORS['error']))
+        sys.exit(1)
+
+@cli.command()
+@click.pass_context
+def version(ctx):
+    """Show version information"""
+    print_header("DPO System Information")
+
+    click.echo(f"Version: {click.style(__version__, fg=COLORS['highlight'], bold=True)}")
+    click.echo(f"Python: {sys.version.split()[0]}")
+    click.echo(f"Installation: {Path(__file__).parent.parent}")
+
+    # Check component versions
+    try:
+        from src import __version__ as src_version
+        click.echo(f"Core Library: {src_version}")
+    except:
+        pass
+
+    # Check dependencies
+    click.echo()
+    click.echo("Key Dependencies:")
+
+    try:
+        import aiohttp
+        click.echo(f"  • aiohttp: {aiohttp.__version__}")
+    except:
+        pass
+
+    try:
+        import websockets
+        click.echo(f"  • websockets: {websockets.__version__}")
+    except:
+        pass
+
+    try:
+        import redis
+        click.echo(f"  • redis: {redis.__version__}")
+    except:
+        pass
+
+if __name__ == "__main__":
+    cli()

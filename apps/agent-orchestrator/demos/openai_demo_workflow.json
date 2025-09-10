@@ -1,0 +1,104 @@
+{
+  "tasks": [
+    {
+      "task_id": "project_planning",
+      "task_type": "planning",
+      "prompt": "Plan a Personal Finance Dashboard web application. Define requirements, technology stack, and project structure. The app should track expenses, income, budgets, and provide visualizations. Use modern web technologies (FastAPI backend, React frontend, SQLite database). Create a comprehensive project plan with file structure and development phases.",
+      "context": {
+        "app_type": "web_application",
+        "complexity": "medium",
+        "technologies": ["FastAPI", "React", "SQLite", "Docker"]
+      },
+      "dependencies": [],
+      "quality_gates": ["completeness_check"]
+    },
+    {
+      "task_id": "database_design",
+      "task_type": "database-architect",
+      "prompt": "Design the database schema for the Personal Finance Dashboard. Create tables for users, transactions, categories, budgets, and accounts. Include SQL scripts for table creation, sample data insertion, and common queries. Ensure proper relationships, indexing, and data integrity constraints.",
+      "context": {
+        "database_type": "SQLite",
+        "focus": "personal_finance"
+      },
+      "dependencies": ["project_planning"],
+      "quality_gates": ["schema_validation"]
+    },
+    {
+      "task_id": "backend_api",
+      "task_type": "backend-developer",
+      "prompt": "Build a FastAPI backend for the Personal Finance Dashboard. Create REST API endpoints for transactions, budgets, categories, and financial reports. Include authentication, data validation, CRUD operations, and financial calculations (spending analysis, budget tracking). Implement proper error handling and API documentation.",
+      "context": {
+        "framework": "FastAPI",
+        "database": "SQLite",
+        "features": ["CRUD", "authentication", "financial_calculations"]
+      },
+      "dependencies": ["database_design"],
+      "quality_gates": ["api_completeness", "security_check"]
+    },
+    {
+      "task_id": "frontend_ui",
+      "task_type": "frontend-developer",
+      "prompt": "Create a React frontend for the Personal Finance Dashboard. Build components for transaction management, budget tracking, expense visualization, and financial reports. Include forms for data entry, charts/graphs for visualization, responsive design, and integration with the FastAPI backend. Use modern React patterns and clean UI design.",
+      "context": {
+        "framework": "React",
+        "features": ["forms", "charts", "responsive", "API_integration"],
+        "api_endpoint": "FastAPI_backend"
+      },
+      "dependencies": ["backend_api"],
+      "quality_gates": ["ui_completeness", "responsiveness_check"]
+    },
+    {
+      "task_id": "testing_suite",
+      "task_type": "qa-tester",
+      "prompt": "Create comprehensive tests for the Personal Finance Dashboard. Write unit tests for backend API endpoints, integration tests for database operations, and frontend component tests. Include test data setup, edge case testing, and automated test scripts. Ensure good test coverage and reliable test execution.",
+      "context": {
+        "test_types": ["unit", "integration", "component"],
+        "frameworks": ["pytest", "jest", "react-testing-library"]
+      },
+      "dependencies": ["frontend_ui"],
+      "quality_gates": ["test_coverage", "test_reliability"]
+    },
+    {
+      "task_id": "docker_containerization",
+      "task_type": "devops-engineer",
+      "prompt": "Create Docker configuration for the Personal Finance Dashboard. Build Dockerfiles for backend and frontend, docker-compose for full stack deployment, environment configuration, and production-ready setup. Include database initialization, networking, volume management, and deployment instructions.",
+      "context": {
+        "deployment_type": "docker",
+        "services": ["backend", "frontend", "database"],
+        "environment": "production_ready"
+      },
+      "dependencies": ["testing_suite"],
+      "quality_gates": ["deployment_validation"]
+    },
+    {
+      "task_id": "documentation",
+      "task_type": "technical-writer",
+      "prompt": "Create comprehensive documentation for the Personal Finance Dashboard. Include README with setup instructions, API documentation, user guide, developer guide, architecture overview, and deployment guide. Make it clear and easy to follow for both users and developers.",
+      "context": {
+        "doc_types": ["README", "API_docs", "user_guide", "developer_guide"],
+        "audience": ["users", "developers", "operators"]
+      },
+      "dependencies": ["docker_containerization"],
+      "quality_gates": ["documentation_completeness"]
+    },
+    {
+      "task_id": "demo_script",
+      "task_type": "demo-specialist",
+      "prompt": "Create a demonstration script that showcases the Personal Finance Dashboard. Include setup instructions, sample data loading, feature walkthrough, and test scenarios. Create a script that can be run to fully demonstrate all capabilities of the application, proving that the OpenAI-powered agents successfully built a working application.",
+      "context": {
+        "demo_type": "complete_walkthrough",
+        "includes": ["setup", "sample_data", "feature_demo", "test_scenarios"]
+      },
+      "dependencies": ["documentation"],
+      "quality_gates": ["demo_completeness"]
+    }
+  ],
+  "metadata": {
+    "workflow_name": "OpenAI_Clone_Demonstration_Build",
+    "description": "Demonstrates OpenAI-powered agents building a complete Personal Finance Dashboard web application",
+    "created_by": "AI_Agent",
+    "estimated_duration": "2-3_hours",
+    "complexity": "high",
+    "deliverable": "Complete web application with documentation and demo"
+  }
+}

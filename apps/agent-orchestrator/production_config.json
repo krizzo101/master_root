@@ -1,0 +1,45 @@
+{
+  "host": "0.0.0.0",
+  "port": 8765,
+  "health_port": 8766,
+  "max_connections": 500,
+  "keepalive_timeout": 30,
+  "client_timeout": 60,
+  "graceful_shutdown_timeout": 30,
+  "static_dir": "web",
+  "log_level": "INFO",
+  "log_file": "logs/dashboard_production.log",
+  "max_log_size": 52428800,
+  "backup_count": 10,
+  "metrics_retention_seconds": 7200,
+  "websocket_ping_interval": 30,
+  "websocket_timeout": 90,
+  "performance": {
+    "enable_compression": true,
+    "compression_level": 6,
+    "enable_keepalive": true,
+    "tcp_nodelay": true,
+    "backlog": 128
+  },
+  "monitoring": {
+    "enable_prometheus_metrics": false,
+    "metrics_port": 9090,
+    "health_check_interval": 30,
+    "auto_restart_threshold": 10
+  },
+  "security": {
+    "allowed_origins": ["*"],
+    "rate_limiting": {
+      "requests_per_minute": 300,
+      "burst_size": 50
+    },
+    "cors_enabled": true
+  },
+  "workflow_monitoring": {
+    "auto_detect_workflows": true,
+    "workflow_scan_interval": 10,
+    "max_workflow_history": 100,
+    "cleanup_old_workflows": true,
+    "workflow_retention_days": 30
+  }
+}

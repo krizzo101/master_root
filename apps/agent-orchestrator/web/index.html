@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Orchestrator Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Main Dashboard Container -->
+    <div id="dashboard-container" class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1 class="dashboard-title">
+                    <span class="title-icon">🤖</span>
+                    Agent Orchestrator Dashboard
+                </h1>
+                <div class="connection-status" id="connection-status">
+                    <span class="status-indicator" id="status-indicator"></span>
+                    <span class="status-text" id="status-text">Connecting...</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="header-btn" id="auto-refresh-toggle" title="Toggle Auto-refresh">
+                    <span class="btn-icon">🔄</span>
+                    <span class="btn-text">Auto-refresh</span>
+                </button>
+                <button class="header-btn" id="settings-btn" title="Settings">
+                    <span class="btn-icon">⚙️</span>
+                    <span class="btn-text desktop-only">Settings</span>
+                </button>
+                <button class="header-btn" id="help-btn" title="Help">
+                    <span class="btn-icon">❓</span>
+                    <span class="btn-text desktop-only">Help</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Toolbar -->
+        <div class="dashboard-toolbar">
+            <div class="toolbar-left">
+                <button class="primary-btn" id="new-workflow-btn">
+                    <span class="btn-icon">➕</span>
+                    <span class="btn-text">New Workflow</span>
+                </button>
+                <div class="dropdown" id="bulk-actions-dropdown">
+                    <button class="secondary-btn dropdown-toggle">
+                        <span class="btn-text">Bulk Actions</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <button class="dropdown-item" data-action="pause-all">Pause All</button>
+                        <button class="dropdown-item" data-action="resume-all">Resume All</button>
+                        <button class="dropdown-item" data-action="cancel-selected">Cancel Selected</button>
+                        <button class="dropdown-item" data-action="export-selected">Export Selected</button>
+                    </div>
+                </div>
+            </div>
+            <div class="toolbar-right">
+                <div class="filter-controls">
+                    <select class="filter-select" id="status-filter">
+                        <option value="all">All Status</option>
+                        <option value="running">Running</option>
+                        <option value="paused">Paused</option>
+                        <option value="completed">Completed</option>
+                        <option value="failed">Failed</option>
+                        <option value="queued">Queued</option>
+                    </select>
+                    <select class="filter-select" id="sort-select">
+                        <option value="recent">Recent</option>
+                        <option value="name">Name</option>
+                        <option value="progress">Progress</option>
+                        <option value="duration">Duration</option>
+                    </select>
+                </div>
+                <button class="secondary-btn" id="compare-btn" disabled>
+                    <span class="btn-icon">📊</span>
+                    <span class="btn-text">Compare</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- System Overview Panel (desktop only) -->
+            <aside class="system-overview desktop-only" id="system-overview">
+                <div class="overview-header">
+                    <h3>System Overview</h3>
+                    <button class="icon-btn" id="refresh-overview" title="Refresh">🔄</button>
+                </div>
+                <div class="overview-content">
+                    <div class="metric-row">
+                        <span class="metric-label">Active Workflows:</span>
+                        <span class="metric-value" id="active-count">0</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Queued:</span>
+                        <span class="metric-value" id="queued-count">0</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">CPU Usage:</span>
+                        <span class="metric-value" id="cpu-usage">0%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Memory:</span>
+                        <span class="metric-value" id="memory-usage">0GB / 0GB</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Disk:</span>
+                        <span class="metric-value" id="disk-usage">0GB / 0GB</span>
+                    </div>
+                    <div class="overview-actions">
+                        <button class="small-btn" id="view-details-btn">View Details</button>
+                        <button class="small-btn" id="system-health-btn">System Health</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Workflows Grid -->
+            <div class="workflows-container">
+                <div class="workflows-grid" id="workflows-grid">
+                    <!-- Workflow cards will be dynamically inserted here -->
+                </div>
+                <div class="loading-state" id="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading workflows...</p>
+                </div>
+                <div class="empty-state" id="empty-state" style="display: none;">
+                    <div class="empty-icon">🎯</div>
+                    <h3>No workflows yet</h3>
+                    <p>Create your first workflow to get started.</p>
+                    <button class="primary-btn" id="create-first-workflow">Create Workflow</button>
+                </div>
+                <div class="error-state" id="error-state" style="display: none;">
+                    <div class="error-icon">⚠️</div>
+                    <h3>Unable to load workflows</h3>
+                    <p id="error-message">Connection lost. Check your network and try again.</p>
+                    <div class="error-actions">
+                        <button class="primary-btn" id="retry-btn">Retry</button>
+                        <button class="secondary-btn" id="offline-mode-btn">Offline Mode</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Load More Button (mobile) -->
+        <div class="load-more mobile-only" id="load-more" style="display: none;">
+            <button class="secondary-btn" id="load-more-btn">
+                <span class="btn-text">Load More</span>
+                <span class="btn-count" id="load-more-count">(0 more)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Workflow Detail Modal -->
+    <div class="modal" id="workflow-detail-modal" style="display: none;">
+        <div class="modal-backdrop" id="modal-backdrop"></div>
+        <div class="modal-content workflow-detail">
+            <div class="modal-header">
+                <button class="back-btn" id="back-to-dashboard">
+                    <span class="btn-icon">←</span>
+                    <span class="btn-text">Back to Dashboard</span>
+                </button>
+                <div class="modal-title">
+                    <h2 id="workflow-title">Workflow Details</h2>
+                    <div class="workflow-status-badge" id="workflow-status-badge">Running</div>
+                </div>
+                <div class="modal-actions">
+                    <button class="secondary-btn" id="clone-workflow">
+                        <span class="btn-icon">📋</span>
+                        <span class="btn-text">Clone</span>
+                    </button>
+                    <button class="secondary-btn" id="export-workflow">
+                        <span class="btn-icon">📤</span>
+                        <span class="btn-text">Export</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="workflow-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Status:</span>
+                    <span class="meta-value" id="detail-status">Running</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Started:</span>
+                    <span class="meta-value" id="detail-started">2025-01-15 14:23:45</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">ETA:</span>
+                    <span class="meta-value" id="detail-eta">8 min</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">CPU:</span>
+                    <span class="meta-value" id="detail-cpu">12%</span>
+                </div>
+            </div>
+
+            <div class="workflow-detail-content">
+                <!-- Desktop: 3-panel layout -->
+                <div class="detail-panels desktop-only">
+                    <div class="left-panel">
+                        <div class="panel-section">
+                            <h3>Progress & Stats</h3>
+                            <div class="progress-display">
+                                <div class="progress-label">Overall: <span id="detail-progress">67%</span></div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="detail-progress-fill" style="width: 67%"></div>
+                                </div>
+                            </div>
+                            <div class="current-task">
+                                <h4>Current Task:</h4>
+                                <p id="detail-current-task">"API Documentation"</p>
+                            </div>
+                            <div class="files-processed">
+                                <h4>Files Processed:</h4>
+                                <ul id="detail-files-list">
+                                    <li class="file-completed">README.md ✓</li>
+                                    <li class="file-completed">ARCHITECTURE.md ✓</li>
+                                    <li class="file-in-progress">API_REFERENCE.md (67% complete)</li>
+                                    <li class="file-pending">USER_GUIDE.md</li>
+                                    <li class="file-pending">DEPLOYMENT.md</li>
+                                </ul>
+                            </div>
+                            <div class="resource-usage">
+                                <h4>Resource Usage:</h4>
+                                <div class="resource-metrics">
+                                    <div class="metric">CPU: <span id="detail-cpu-avg">12%</span> (avg)</div>
+                                    <div class="metric">Memory: <span id="detail-memory">1.2GB</span></div>
+                                    <div class="metric">Disk I/O: <span id="detail-disk-io">45MB/s</span></div>
+                                </div>
+                            </div>
+                            <div class="panel-actions">
+                                <button class="danger-btn" id="pause-workflow">Pause Workflow</button>
+                                <button class="secondary-btn" id="view-config">View Config</button>
+                                <button class="secondary-btn" id="download-progress">Download Progress</button>
+                            </div>
+                        </div>
+
+                        <div class="panel-section">
+                            <h3>Task Breakdown</h3>
+                            <div class="task-pipeline" id="task-pipeline">
+                                <div class="task-item completed">
+                                    <div class="task-status">✓</div>
+                                    <div class="task-info">
+                                        <h4>Project Analysis</h4>
+                                        <p>Duration: 2m 34s</p>
+                                    </div>
+                                </div>
+                                <div class="task-item running">
+                                    <div class="task-status">●</div>
+                                    <div class="task-info">
+                                        <h4>API Documentation</h4>
+                                        <p>Progress: 67% • ETA: 5m 12s</p>
+                                    </div>
+                                </div>
+                                <div class="task-item pending">
+                                    <div class="task-status">⏳</div>
+                                    <div class="task-info">
+                                        <h4>User Guide</h4>
+                                        <p>Queue position: 1</p>
+                                    </div>
+                                </div>
+                                <div class="task-item pending">
+                                    <div class="task-status">⏳</div>
+                                    <div class="task-info">
+                                        <h4>Deployment Guide</h4>
+                                        <p>Queue position: 2</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="checkpoint-info">
+                                <h4>Checkpoint:</h4>
+                                <p>Last saved: 14:30</p>
+                                <p>Auto-save: ON</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="center-panel">
+                        <div class="panel-section">
+                            <h3>Live Log Stream</h3>
+                            <div class="log-controls">
+                                <button class="small-btn" id="auto-scroll-toggle">Auto-scroll</button>
+                                <button class="small-btn" id="pause-logs">Pause</button>
+                                <button class="small-btn" id="download-logs">Download</button>
+                                <select class="small-select" id="log-filter">
+                                    <option value="all">All Levels</option>
+                                    <option value="error">Errors</option>
+                                    <option value="warning">Warnings</option>
+                                    <option value="info">Info</option>
+                                </select>
+                            </div>
+                            <div class="log-stream" id="log-stream">
+                                <div class="log-entry info">
+                                    <span class="log-time">[14:31:22]</span>
+                                    <span class="log-level">INFO:</span>
+                                    <span class="log-message">Starting documentation generation...</span>
+                                </div>
+                                <div class="log-entry info">
+                                    <span class="log-time">[14:31:23]</span>
+                                    <span class="log-level">INFO:</span>
+                                    <span class="log-message">Analyzing project structure</span>
+                                </div>
+                                <div class="log-entry info">
+                                    <span class="log-time">[14:31:24]</span>
+                                    <span class="log-level">INFO:</span>
+                                    <span class="log-message">Found 47 Python files</span>
+                                </div>
+                                <div class="log-entry warning">
+                                    <span class="log-time">[14:31:31]</span>
+                                    <span class="log-level">WARN:</span>
+                                    <span class="log-message">Missing docstring in TokenPool.allocate</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="right-panel">
+                        <div class="panel-section">
+                            <h3>Output Preview</h3>
+                            <div class="output-tabs">
+                                <button class="tab-btn active" data-file="README.md">README.md</button>
+                                <button class="tab-btn" data-file="ARCHITECTURE.md">ARCHITECTURE.md</button>
+                                <button class="tab-btn" data-file="API_REFERENCE.md">API_REFERENCE.md</button>
+                                <button class="tab-btn more-tabs">▼ More</button>
+                            </div>
+                            <div class="output-content" id="output-content">
+                                <pre><code># Agent Orchestrator
+
+A sophisticated multi-agent workflow orchestration system for managing concurrent AI tasks with advanced resource management and intelligent load balancing.
+
+## Quick Start
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run orchestrator
+python main.py --mode dashboard
+```</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile: Tabbed layout -->
+                <div class="detail-tabs mobile-only">
+                    <div class="tab-nav">
+                        <button class="tab-nav-btn active" data-tab="overview">Overview</button>
+                        <button class="tab-nav-btn" data-tab="logs">Logs</button>
+                        <button class="tab-nav-btn" data-tab="files">Files</button>
+                        <button class="tab-nav-btn" data-tab="settings">⚙️</button>
+                    </div>
+
+                    <div class="tab-content" id="mobile-overview" data-tab="overview">
+                        <div class="mobile-progress">
+                            <h3>📊 Progress</h3>
+                            <div class="progress-display">
+                                <div class="progress-label">Overall: 67%</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 67%"></div>
+                                </div>
+                            </div>
+                            <ul class="mobile-task-list">
+                                <li class="task-completed">✓ Project Analysis (2m 34s)</li>
+                                <li class="task-running">● API Documentation (67%)</li>
+                                <li class="task-queued">⏳ User Guide (queued)</li>
+                                <li class="task-queued">⏳ Deployment Guide (queued)</li>
+                            </ul>
+                        </div>
+
+                        <div class="mobile-resources">
+                            <h3>📈 Resources</h3>
+                            <div class="resource-grid">
+                                <div class="resource-item">CPU: 12% avg</div>
+                                <div class="resource-item">Memory: 1.2GB</div>
+                                <div class="resource-item">Disk I/O: 45MB/s</div>
+                            </div>
+                        </div>
+
+                        <div class="mobile-actions">
+                            <h3>⚡ Actions</h3>
+                            <button class="action-btn">Pause Workflow</button>
+                            <button class="action-btn">View Configuration</button>
+                            <button class="action-btn">Download Progress</button>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="mobile-logs" data-tab="logs" style="display: none;">
+                        <div class="mobile-log-stream" id="mobile-log-stream">
+                            <!-- Log entries will be populated here -->
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="mobile-files" data-tab="files" style="display: none;">
+                        <div class="mobile-file-list">
+                            <div class="file-item completed">
+                                <span class="file-icon">📄</span>
+                                <span class="file-name">README.md</span>
+                                <span class="file-status">✓</span>
+                            </div>
+                            <div class="file-item completed">
+                                <span class="file-icon">📄</span>
+                                <span class="file-name">ARCHITECTURE.md</span>
+                                <span class="file-status">✓</span>
+                            </div>
+                            <div class="file-item in-progress">
+                                <span class="file-icon">📄</span>
+                                <span class="file-name">API_REFERENCE.md</span>
+                                <span class="file-status">67%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison Modal -->
+    <div class="modal" id="comparison-modal" style="display: none;">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content comparison-view">
+            <div class="modal-header">
+                <button class="back-btn" id="back-to-dashboard-compare">
+                    <span class="btn-icon">←</span>
+                    <span class="btn-text">Dashboard</span>
+                </button>
+                <h2>Workflow Comparison</h2>
+                <div class="modal-actions">
+                    <button class="secondary-btn" id="export-comparison">Export</button>
+                    <button class="secondary-btn" id="save-comparison">Save</button>
+                </div>
+            </div>
+
+            <div class="comparison-content">
+                <div class="workflow-selector">
+                    <div id="selected-workflows" class="selected-workflows">
+                        <span class="workflow-tag">system-docs <button class="remove-tag">×</button></span>
+                        <span class="workflow-tag">api-analysis <button class="remove-tag">×</button></span>
+                    </div>
+                    <button class="add-workflow-btn" id="add-workflow-compare">+ Add</button>
+                </div>
+
+                <div class="comparison-table" id="comparison-table">
+                    <!-- Comparison table will be generated here -->
+                </div>
+
+                <div class="performance-chart desktop-only">
+                    <h3>Performance Trend</h3>
+                    <canvas id="performance-chart" width="800" height="200"></canvas>
+                    <div class="chart-legend">
+                        <span class="legend-item">● system-docs</span>
+                        <span class="legend-item">■ api-analysis</span>
+                        <span class="legend-item">▲ security-audit</span>
+                    </div>
+                </div>
+
+                <div class="comparative-analysis">
+                    <h3>Comparative Analysis</h3>
+                    <div class="analysis-insights">
+                        <div class="insight best">🏆 Best Performer: security-audit (100% complete, 0 errors)</div>
+                        <div class="insight warning">⚠️ Attention Needed: api-analysis (paused with warnings)</div>
+                        <div class="insight efficient">📈 Most Efficient: system-docs (lowest resource usage per MB output)</div>
+                        <div class="insight resource">🔄 Resource Intensive: security-audit (3.4GB peak memory)</div>
+                    </div>
+                    <div class="recommendations">
+                        <h4>Recommendations:</h4>
+                        <ul>
+                            <li>Resume api-analysis - paused for 45 minutes</li>
+                            <li>Monitor system-docs memory usage - trending upward</li>
+                            <li>Archive security-audit outputs to free disk space</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container">
+        <!-- Toast notifications will be dynamically inserted here -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/websocket.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/workflow-detail.js"></script>
+    <script src="js/comparison.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- Skip Navigation Link (accessibility) -->
+    <a class="skip-nav" href="#workflows-grid">Skip to main content</a>
+</body>
+</html>

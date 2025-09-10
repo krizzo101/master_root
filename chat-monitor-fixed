@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Quick fix for your issue - this creates a better UX for triple-pane when no sessions exist
+
+# Get recent sessions for selection
+get_recent_sessions() {
+    local sessions=()
+    local current_time=$(date +%s)
+
+    while IFS= read -r -d '' filepath; do
+        local last_modified=$(stat -c %Y "$filepath" 2>/dev/null || echo 0)
+        local age=$((current_time - last_modified))
+
+        if [[ $age -lt 14400 ]]; then  # 4 hours
+            local session_id=$(basename "$filepath" .jsonl)
+            local branch=$(tail -n 3 "$filepath" 2>/dev/null | jq -r 'select(.gitBranch) | .gitBranch' 2>/dev/null | tail -n 1 || echo "")
+            local display_name="${session_id:0:8}"
+            [[ -n "$branch" ]] && display_name="$display_name ($branch)"
+
+            sessions+=("$session_id|$filepath|$display_name")
+        fi
+    done < <(find "/home/opsvi/.claude/projects/-home-opsvi-master-root" -name "*.jsonl" -type f -print0 2>/dev/null)
+
+    printf '%s\n' "${sessions[@]}" | sort -t'|' -k3
+}
+
+# Check for sessions and give helpful advice
+main() {
+    local available_sessions=($(get_recent_sessions))
+
+    echo "🎯 Chat Monitor Session Check"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+    if [[ ${#available_sessions[@]} -eq 0 ]]; then
+        echo "❌ No active Claude Code sessions found"
+        echo ""
+        echo "💡 To fix this:"
+        echo "   1. Start some Claude Code sessions in other terminals"
+        echo "   2. Run: ./chat-monitor --all-agents    (monitor all active sessions)"
+        echo "   3. Or use: /home/opsvi/master_root/archive/old-chat-monitors/chat-monitor-enhanced lazy"
+        echo ""
+        echo "🔄 Want to start monitoring all active agents? (y/n): "
+        read -r choice
+        if [[ "$choice" == "y" || "$choice" == "Y" ]]; then
+            echo "⏰ Starting monitoring... (Ctrl+C to exit)"
+            ./chat-monitor --all-agents
+        fi
+    else
+        echo "✅ Found ${#available_sessions[@]} active sessions:"
+        for i in "${!available_sessions[@]}"; do
+            IFS='|' read -r session_id filepath display_name <<< "${available_sessions[$i]}"
+            echo "  $((i+1)). $display_name"
+        done
+        echo ""
+        echo "🚀 Ready to run: ./chat-monitor --all-agents"
+    fi
+}
+
+main "$@"

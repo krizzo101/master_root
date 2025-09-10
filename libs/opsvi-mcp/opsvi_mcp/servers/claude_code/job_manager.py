@@ -15,6 +15,7 @@ from typing import Any, Dict, List, Optional
 
 from .config import config
 from .models import ClaudeJob, DashboardData, JobStatus
+from .parallel_enhancement import MultiTokenManager
 from .parallel_logger import logger
 from .performance_monitor import PerformanceMonitor
 from .recursion_manager import RecursionManager
@@ -30,7 +31,20 @@ class JobManager:
         self.performance_monitor = PerformanceMonitor()
         self.job_lock = Lock()
 
-        # Load authentication token
+        # Initialize multi-token manager for parallel execution
+        try:
+            self.token_manager = MultiTokenManager()
+            logger.log_debug(
+                "SYSTEM",
+                f"MultiTokenManager initialized with {self.token_manager.get_token_count()} tokens",
+            )
+        except ValueError as e:
+            logger.log_debug(
+                "SYSTEM", f"MultiTokenManager failed: {e}, falling back to single token"
+            )
+            self.token_manager = None
+
+        # Load authentication token (fallback for single token)
         self.load_auth_token()
 
     def load_auth_token(self) -> None:
@@ -164,9 +178,23 @@ class JobManager:
 
         # Set up environment
         env = os.environ.copy()
-        if config.claude_code_token:
+
+        # Use multi-token manager if available for better parallel performance
+        if self.token_manager:
+            # Get a unique token for this job (round-robin distribution)
+            retry_count = getattr(job, "retry_count", 0)
+            token = self.token_manager.get_token_for_job(job.id, retry_count)
+            env["CLAUDE_CODE_TOKEN"] = token
+            logger.log_trace(
+                job.id,
+                f"Using token from pool (token #{self.token_manager.tokens.index(token)})",
+            )
+        elif config.claude_code_token:
+            # Fallback to single token
             env["CLAUDE_CODE_TOKEN"] = config.claude_code_token
-            logger.log_trace(job.id, "Auth token set in environment")
+            logger.log_trace(
+                job.id, "Auth token set in environment (single token mode)"
+            )
         else:
             logger.log_debug(job.id, "No auth token configured")
 

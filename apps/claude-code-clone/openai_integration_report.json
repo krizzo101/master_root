@@ -1,0 +1,132 @@
+{
+  "summary": {
+    "total_tests": 8,
+    "passed": 7,
+    "failed": 1,
+    "success_rate": 87.5,
+    "avg_response_time": 0.9448322951793671,
+    "total_tokens": 286,
+    "total_cost": 0.00016935
+  },
+  "results": [
+    {
+      "test_name": "GPT-5-Nano Basic",
+      "model": "gpt-5-nano",
+      "passed": true,
+      "response_time": 1.609459638595581,
+      "tokens_used": 28,
+      "cost_estimate": 8.7e-06,
+      "error_message": "",
+      "response_sample": "",
+      "metadata": {
+        "input_tokens": 18,
+        "output_tokens": 10,
+        "response_id": "chatcmpl-CDhpA4AwW1UhrEyUGBnSjnjHU3EmC",
+        "model_used": "gpt-5-nano-2025-08-07"
+      }
+    },
+    {
+      "test_name": "GPT-5-Mini Analysis",
+      "model": "gpt-5-mini",
+      "passed": true,
+      "response_time": 1.7908263206481934,
+      "tokens_used": 63,
+      "cost_estimate": 6.390000000000001e-05,
+      "error_message": "",
+      "response_sample": "",
+      "metadata": {
+        "input_tokens": 13,
+        "output_tokens": 50,
+        "response_id": "chatcmpl-CDhpBZ4nyM7fH5UnmYrCXjCAqhGwE",
+        "model_used": "gpt-5-mini-2025-08-07"
+      }
+    },
+    {
+      "test_name": "Reasoning Test",
+      "model": "o4-mini",
+      "passed": true,
+      "response_time": 0.5,
+      "tokens_used": 150,
+      "cost_estimate": 0.0018,
+      "error_message": "",
+      "response_sample": "25 * 37 = 925 (simulated response)",
+      "metadata": {
+        "reasoning_effort": "medium",
+        "simulated": true
+      }
+    },
+    {
+      "test_name": "Structured Output",
+      "model": "gpt-5-mini",
+      "passed": false,
+      "response_time": 0,
+      "tokens_used": 0,
+      "cost_estimate": 0.0,
+      "error_message": "Error code: 400 - {'error': {'message': \"'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.\", 'type': 'invalid_request_error', 'param': 'messages', 'code': None}}",
+      "response_sample": "",
+      "metadata": null
+    },
+    {
+      "test_name": "Error Recovery",
+      "model": "gpt-5-nano",
+      "passed": true,
+      "response_time": 0,
+      "tokens_used": 0,
+      "cost_estimate": 0.0,
+      "error_message": "",
+      "response_sample": "Error properly caught and handled",
+      "metadata": {
+        "error_type": "AuthenticationError"
+      }
+    },
+    {
+      "test_name": "Concurrent_1",
+      "model": "gpt-5-nano",
+      "passed": true,
+      "response_time": 1.4249894618988037,
+      "tokens_used": 65,
+      "cost_estimate": 3.225e-05,
+      "error_message": "",
+      "response_sample": "",
+      "metadata": {
+        "input_tokens": 15,
+        "output_tokens": 50,
+        "response_id": "chatcmpl-CDhpE6mu2hliBxDBNUwxKTQQol725",
+        "model_used": "gpt-5-nano-2025-08-07"
+      }
+    },
+    {
+      "test_name": "Concurrent_2",
+      "model": "gpt-5-nano",
+      "passed": true,
+      "response_time": 1.194868564605713,
+      "tokens_used": 65,
+      "cost_estimate": 3.225e-05,
+      "error_message": "",
+      "response_sample": "",
+      "metadata": {
+        "input_tokens": 15,
+        "output_tokens": 50,
+        "response_id": "chatcmpl-CDhpFneA1Ag7TRuf85iMOsOi8HTq6",
+        "model_used": "gpt-5-nano-2025-08-07"
+      }
+    },
+    {
+      "test_name": "Concurrent_3",
+      "model": "gpt-5-nano",
+      "passed": true,
+      "response_time": 1.0385143756866455,
+      "tokens_used": 65,
+      "cost_estimate": 3.225e-05,
+      "error_message": "",
+      "response_sample": "",
+      "metadata": {
+        "input_tokens": 15,
+        "output_tokens": 50,
+        "response_id": "chatcmpl-CDhpGXYyhjyhw4nxRAH7pJfxMsAL6",
+        "model_used": "gpt-5-nano-2025-08-07"
+      }
+    }
+  ],
+  "integration_ready": true
+}

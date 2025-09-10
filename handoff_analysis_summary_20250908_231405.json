@@ -1,0 +1,12 @@
+{
+  "analysis_timestamp": "2025-09-08T23:14:05.437566",
+  "total_files_analyzed": 851,
+  "success_rate": "100.0%",
+  "total_data_volume_mb": 607.41,
+  "pattern_analysis": {
+    "handoff_markers_percentage": "100.0%",
+    "todo_usage_percentage": "18.8%",
+    "tool_usage_percentage": "100.0%",
+    "knowledge_context_percentage": "100.0%"
+  }
+}

@@ -1,11 +1,21 @@
 version: "3.8"
 services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
   qdrant:
     image: qdrant/qdrant:v1.7.3
     ports:
       - "6335:6333"
     volumes:
       - qdrant_data:/qdrant/storage
+    restart: unless-stopped
   app:
     build: .
     ports:
@@ -17,4 +27,5 @@ services:
     depends_on:
       - qdrant
 volumes:
+  redis_data:
   qdrant_data:

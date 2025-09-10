@@ -1,0 +1,15 @@
+{
+  "entries": [],
+  "active_canaries": {},
+  "triggered_canaries": [
+    {
+      "canary_id": "question_everything",
+      "deployed_at": "2025-09-10T03:48:20.307979",
+      "instruction": "## \ud83e\udd14 SOCRATIC MODE ACTIVE\nYou must ask 'Is this really the best approach?' after every third action.",
+      "expected_reaction": "Agent questions own decisions periodically",
+      "reaction_observed": "2025-09-10T03:53:44.935841",
+      "reaction_time": null,
+      "lag_seconds": 324.627862
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+# Claude Chat Import Configuration for Unified Context System
+# Optimized settings for importing Claude conversation logs
+
+adapter_config:
+  adapter_id: "claude_chat_import"
+  source_type: "chat"
+  batch_mode: "streaming"
+  batch_size: 100
+  generate_embeddings: true
+  generate_summaries: false  # Disabled for bulk import performance
+  extract_relationships: true
+  skip_duplicates: true
+  max_concurrent_workers: 4
+
+source_config:
+  input_format: "jsonl"
+  watch_directories:
+    - "/home/opsvi/.claude/projects"
+  file_patterns:
+    - "*.jsonl"
+  include_system_messages: true
+  include_metadata: true
+  conversation_timeout_minutes: 60
+  extract_entities: true
+
+  # Claude-specific message parsing
+  claude_specific:
+    use_session_id_field: true
+    detect_tool_usage: true
+    preserve_conversation_threading: true
+    extract_working_directory: true
+    extract_git_branch: true
+    extract_claude_version: true
+
+  # Entity extraction optimized for code conversations
+  entity_extraction_config:
+    enable_url_detection: true
+    enable_code_detection: true
+    enable_mention_detection: true
+    enable_issue_detection: true
+    enable_tech_keyword_detection: true
+    enable_email_detection: true
+    enable_file_path_detection: true
+    enable_command_detection: true
+    enable_timestamp_detection: true
+    enable_named_entity_recognition: false  # Disabled for performance
+    max_entities_per_type: 100
+
+  # Embedding configuration
+  embedding_config:
+    service: "sentence_transformers"
+    model: "all-MiniLM-L6-v2"
+    api_key: null
+    max_tokens: 8192
+    batch_size: 64
+
+  # Relationship detection
+  relationship_detection_config:
+    enable_entity_relationships: true
+    enable_content_similarity: true
+    enable_actor_relationships: true
+    similarity_threshold: 0.3
+    entity_overlap_threshold: 0.4
+
+# Import phases configuration
+import_phases:
+  phase1_high_priority:
+    name: "High Priority Import"
+    description: "Recent, interactive, and code-heavy sessions"
+    criteria:
+      modified_within_days: 30
+      min_message_count: 10
+      priority_score_min: 0.7
+    estimated_files: 500
+    estimated_processing_hours: 6
+
+  phase2_medium_priority:
+    name: "Medium Priority Import"
+    description: "Substantial conversations and recent work"
+    criteria:
+      modified_within_days: 90
+      min_message_count: 5
+      priority_score_min: 0.4
+      priority_score_max: 0.7
+    estimated_files: 800
+    estimated_processing_hours: 12
+
+  phase3_bulk_import:
+    name: "Bulk Historical Import"
+    description: "Historical and short conversations"
+    criteria:
+      modified_within_days: null  # All remaining
+      min_message_count: 1
+      priority_score_min: 0.0
+      priority_score_max: 0.4
+    estimated_files: 600
+    estimated_processing_hours: 8
+
+# Processing configuration
+processing:
+  # Memory limits
+  max_memory_per_worker_mb: 1024
+  max_batch_memory_mb: 512
+
+  # Timeouts
+  message_processing_timeout_seconds: 30
+  batch_processing_timeout_seconds: 300
+  embedding_generation_timeout_seconds: 10
+
+  # Error handling
+  max_retries: 3
+  skip_on_parse_error: true
+  skip_on_processing_error: false
+  log_problematic_files: true
+
+  # Progress tracking
+  checkpoint_frequency: 100  # messages
+  progress_report_frequency: 1000  # messages
+
+  # Database optimization
+  use_bulk_inserts: true
+  commit_frequency: 500  # messages
+  optimize_indexes_after_import: true
+
+# Quality assurance
+quality_assurance:
+  enable_sampling_validation: true
+  sample_rate: 0.001  # 0.1% of messages
+  validate_entity_extraction: true
+  validate_relationships: true
+  validate_embeddings: true
+  min_embedding_dimensions: 300
+  max_acceptable_error_rate: 0.05
+
+# Monitoring
+monitoring:
+  enable_performance_metrics: true
+  enable_memory_monitoring: true
+  enable_progress_tracking: true
+  log_level: "INFO"
+  metrics_output_file: "chat_import_metrics.json"
+  progress_output_file: "chat_import_progress.json"
+
+# Database configuration
+database:
+  connection_string: "postgresql://opsvi:opsvi_secure_password@localhost:5432/unified_context"
+  pool_size: 10
+  max_overflow: 20
+  pool_timeout: 30
+  pool_recycle: 3600

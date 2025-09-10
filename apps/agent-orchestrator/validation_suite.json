@@ -1,0 +1,46 @@
+{
+  "suite_id": "unified_e2e_core",
+  "version": "1.0",
+  "description": "End-to-end validation suite for self-improving orchestrator",
+  "expectations": {
+    "system_discovery_agent_1": "completed",
+    "system_discovery_agent_2": "completed",
+    "system_discovery_agent_3": "completed",
+    "capability_analysis_agent_1": "completed",
+    "capability_analysis_agent_2": "completed",
+    "performance_optimization_agent_1": "completed",
+    "performance_optimization_agent_2": "completed",
+    "claude_clone_validation": "completed",
+    "integration_strategy": "completed",
+    "enhancement_prioritization": "completed",
+    "implementation_planning": "completed",
+    "technical_documentation_agent_1": "completed",
+    "technical_documentation_agent_2": "completed"
+  },
+  "failure_expectations": {
+    "test_bad_json": "failed",
+    "test_missing_dependency": "failed",
+    "test_invalid_task_type": "failed"
+  },
+  "hints": {
+    "json_parse_failed": "Enable UNIFIED_STRIP_FENCES=1 or tighten prompts to emit bare JSON.",
+    "schema_task_id_mismatch": "Add explicit task_id echo to prompt or relax schema.",
+    "dependencies_not_met": "Check upstream task failures; consider retry/backoff policy.",
+    "task_not_found": "Use inject_missing_tasks.py to create missing task files.",
+    "timeout_exceeded": "Consider reducing parallelism or increasing task timeout.",
+    "provider_rate_limited": "Implement exponential backoff or switch providers."
+  },
+  "performance_targets": {
+    "max_total_runtime_minutes": 30,
+    "min_success_rate": 0.95,
+    "max_avg_task_latency_seconds": 60,
+    "max_parallel_optimal": 10
+  },
+  "auto_tune_config": {
+    "enable_adaptive_parallelism": true,
+    "parallelism_range": [2, 16],
+    "adjustment_cooldown_seconds": 30,
+    "success_rate_threshold": 0.95,
+    "latency_threshold_seconds": 60
+  }
+}

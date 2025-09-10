@@ -1,0 +1,45 @@
+{
+  "timestamp": 1756930123.9222116,
+  "concurrent_requests": {
+    "total_requests": 15,
+    "successful_requests": 15,
+    "success_rate": 1.0,
+    "avg_response_time": 0.19798784873370703,
+    "p95_response_time": 0.5894336579949595,
+    "throughput": 19.899010267471393
+  },
+  "database_performance": {
+    "postgresql": {
+      "avg_time": 0.002286391647794517,
+      "min_time": 0.001897264999570325,
+      "max_time": 0.002855859012925066,
+      "errors": 0,
+      "success_rate": 1.0
+    },
+    "redis": {
+      "avg_time": 0.0002151929002138786,
+      "min_time": 0.0001982200046768412,
+      "max_time": 0.00035610300255939364,
+      "errors": 0,
+      "success_rate": 1.0
+    },
+    "neo4j": {
+      "avg_time": 0,
+      "min_time": 0,
+      "max_time": 0,
+      "errors": 0,
+      "success_rate": 0
+    }
+  },
+  "memory_metrics": {
+    "initial_memory_mb": 182.75,
+    "final_memory_mb": 183.0,
+    "total_delta_mb": 0.25,
+    "large_query_delta_mb": 0.25,
+    "bridge_delta_mb": 0.0
+  },
+  "performance_assessment": "good",
+  "issues": [
+    "Database connection issues detected"
+  ]
+}

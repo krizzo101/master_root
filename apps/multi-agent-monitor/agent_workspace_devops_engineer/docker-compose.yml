@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  task-api:
+    build: .
+    container_name: task-management-api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=production
+    restart: unless-stopped
+    networks:
+      - task-network
+    volumes:
+      - ./data:/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.task-api.rule=Host(`api.tasks.local`)"
+      - "traefik.http.services.task-api.loadbalancer.server.port=8000"
+
+  # Optional: Add database service
+  postgres:
+    image: postgres:15-alpine
+    container_name: task-db
+    environment:
+      POSTGRES_DB: tasks
+      POSTGRES_USER: taskuser
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - task-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskuser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  task-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

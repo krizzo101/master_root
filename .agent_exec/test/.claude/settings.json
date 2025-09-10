@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "Grep",
+      "mcp__shell_exec__shell_exec"
+    ]
+  },
+  "env": {}
+}

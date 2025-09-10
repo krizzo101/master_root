@@ -1,0 +1,54 @@
+{
+  "tasks": [
+    {
+      "task_id": "documentation_workflow_design",
+      "task_type": "solution-architect",
+      "prompt": "Design a standardized documentation workflow system for the agent-orchestrator. This system should:\n\n1. Define the 'system-documentation' task type that can be submitted to the orchestrator\n2. Create specialized agents for documentation tasks (technical-writer, api-documenter, architecture-analyst, etc.)\n3. Design a workflow that takes app_name, app_root_path, and generates standardized documentation in {app_root}/docs/\n4. Create execution plan templates for documentation workflows\n5. Define resume/checkpoint capabilities for interrupted documentation tasks\n\nThe goal is that users can simply run:\ncd /apps/agent-orchestrator\npython run_orchestrator_task.py --app-name 'my-app' --app-root '/path/to/app' --task-type 'system-documentation'\n\nAnd the orchestrator will automatically generate complete documentation without any further input.",
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/documentation_workflow_design",
+        "include_templates": true,
+        "include_agent_definitions": true
+      }
+    },
+    {
+      "task_id": "documentation_templates_creation",
+      "task_type": "technical-writer",
+      "dependencies": ["documentation_workflow_design"],
+      "prompt": "Create standardized documentation templates based on the workflow design. Create templates for:\n\n1. README.md - Project overview, quick start, basic usage\n2. ARCHITECTURE.md - System design, components, data flow\n3. API_REFERENCE.md - Complete API documentation\n4. USER_GUIDE.md - End-user documentation and tutorials\n5. DEVELOPER_GUIDE.md - Development setup, contribution guidelines\n6. DEPLOYMENT.md - Deployment and operations guide\n\nEach template should be comprehensive but adaptable to different types of applications. Include placeholders for dynamic content generation.",
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/documentation_templates",
+        "template_format": "markdown",
+        "include_examples": true
+      }
+    },
+    {
+      "task_id": "orchestrator_integration",
+      "task_type": "development-specialist",
+      "dependencies": ["documentation_workflow_design", "documentation_templates_creation"],
+      "prompt": "Integrate the documentation workflow system into the agent-orchestrator. Create:\n\n1. run_orchestrator_task.py script that accepts --app-name, --app-root, --task-type parameters\n2. Task definition parser for 'system-documentation' task type\n3. Agent registration for documentation-specialized agents\n4. Workflow execution engine that uses the templates\n5. Output management that creates docs in {app_root}/docs/ directory\n6. Integration with existing checkpoint/resume system\n\nEnsure the system works seamlessly with existing orchestrator capabilities.",
+      "context": {
+        "output_location": "/home/opsvi/master_root/apps/agent-orchestrator/src",
+        "create_executable_scripts": true,
+        "integrate_with_existing": true
+      }
+    },
+    {
+      "task_id": "system_test_validation",
+      "task_type": "qa-testing-guru",
+      "dependencies": ["orchestrator_integration"],
+      "prompt": "Test the complete documentation workflow system. Create test cases for:\n\n1. End-to-end documentation generation for a sample application\n2. Resume capability testing (interrupt and restart)\n3. Error handling and edge cases\n4. Template customization and adaptation\n5. Integration with existing orchestrator features\n\nProvide a comprehensive test plan and validate that the system works as designed.",
+      "context": {
+        "test_app_path": "/home/opsvi/master_root/apps/agent-orchestrator",
+        "create_test_suite": true,
+        "validate_outputs": true
+      }
+    }
+  ],
+  "orchestrator_config": {
+    "max_parallel": 2,
+    "timeout": 7200,
+    "quality_gates": true,
+    "state_persistence": true,
+    "output_base_dir": "outputs/documentation_workflow_creation"
+  }
+}

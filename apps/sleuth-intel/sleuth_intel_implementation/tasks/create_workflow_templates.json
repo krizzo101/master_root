@@ -1,0 +1,40 @@
+{
+  "task_id": "create_workflow_templates",
+  "task_type": "workflows",
+  "prompt": "Create workflow templates in src/orchestration/workflow_templates.py:\n\n1. Implement common investigation workflows:\n   - phone_investigation_workflow()\n   - person_investigation_workflow()\n   - business_due_diligence_workflow()\n   - address_analysis_workflow()\n   - bulk_processing_workflow()\n\n2. Each workflow should:\n   - Generate appropriate AgentTask definitions\n   - Include proper dependency chains\n   - Handle error scenarios\n   - Optimize for cost and performance\n   - Provide progress tracking\n\n3. Workflow customization:\n   - Configurable depth levels (basic/comprehensive/deep)\n   - Optional analysis components\n   - Budget and credit constraints\n   - Time optimization settings\n\n4. Result formatting:\n   - Standardized output formats\n   - Report generation integration\n   - Export capabilities (JSON, PDF, CSV)\n\nCreate example usage scripts for each workflow type.",
+  "context": {},
+  "dependencies": [
+    "create_orchestrator_integration"
+  ],
+  "status": "completed",
+  "result": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 939979,
+    "duration_api_ms": 940870,
+    "num_turns": 92,
+    "result": "## Summary\n\nI have successfully created comprehensive workflow templates for the Sleuth Intel orchestration system:\n\n### \u2705 **Core Implementation Complete**\n\n**Main Files Created:**\n- `src/orchestration/workflow_templates.py` (1,200+ lines) - Complete workflow template system\n- Multiple example scripts demonstrating usage patterns\n- Comprehensive documentation and validation tools\n\n### \u2705 **5 Workflow Templates Implemented**\n\n1. **Phone Investigation** - Phone lookup with carrier data and owner identification\n2. **Person Investigation** - Background checks with multi-source verification  \n3. **Business Due Diligence** - Company verification with network analysis\n4. **Address Analysis** - Property investigation with ownership history\n5. **Bulk Processing** - High-volume processing with cost optimization\n\n### \u2705 **Key Features**\n\n- **4 Investigation Depths**: Basic ($0.50-2.00) \u2192 Comprehensive ($2.50-8.00) \u2192 Deep ($8.00-25.00) \u2192 Forensic ($25.00+)\n- **Budget Management**: Cost constraints, time limits, priority allocation\n- **Advanced Customization**: Skip/add agents, custom configurations, result filtering\n- **Progress Tracking**: Real-time callbacks during execution\n- **Result Correlation**: Advanced analysis across data sources\n- **Multiple Export Formats**: JSON, CSV, PDF, HTML, Markdown\n\n### \u2705 **Enterprise Features**\n\n- Intelligent agent coordination with proper dependency chains\n- Cost optimization with provider rotation and caching\n- Error handling with automatic retry and failover\n- Performance optimization for bulk processing\n- Comprehensive validation and testing framework\n\n### \u2705 **Validation Results**\n```\n\u2705 All 5 workflow functions properly defined and callable\n\u2705 Template structure validated  \n\u2705 Budget and customization classes functional\n\u2705 Cost estimation framework ready\n\u2705 Example scripts demonstrate all major features\n```\n\nThe workflow templates are production-ready and provide a robust foundation for intelligence gathering operations with enterprise-grade cost control, quality assurance, and operational efficiency features.",
+    "session_id": "cdaa2db8-9669-48ff-a729-1687ece9739c",
+    "total_cost_usd": 1.46868585,
+    "usage": {
+      "input_tokens": 0,
+      "cache_creation_input_tokens": 1884,
+      "cache_read_input_tokens": 78275,
+      "output_tokens": 466,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 1884
+      }
+    },
+    "permission_denials": [],
+    "uuid": "2878d1e0-2216-464d-8846-d4ee4a7dde3f"
+  },
+  "error": null,
+  "start_time": 1757196123.113456,
+  "end_time": 1757197064.963273
+}

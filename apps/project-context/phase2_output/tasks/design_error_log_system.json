@@ -1,0 +1,15 @@
+{
+  "task_id": "design_error_log_system",
+  "task_type": "solution-architect",
+  "prompt": "TASK: Design error log ingestion system with structured parsing and correlation detection.\n\nSPECIALIST ROLE: You are acting as a solution-architect agent.\n\nCONTEXT:\n- Working Directory: /home/opsvi/master_root/apps/project-context\n- Error Sources: Application logs, system logs, CI/CD errors\n- Integration: Correlate with Git commits and chat conversations\n- Performance: Handle high-volume log ingestion\n\nREQUIREMENTS:\n1. Error Log Architecture:\n   - Multi-format log parser (JSON, text, structured)\n   - Stack trace extraction and analysis\n   - Error classification and severity scoring\n   - Frequency tracking and pattern detection\n   - Automatic correlation trigger system\n\n2. Integration Design:\n   - Correlation with Git commits (when errors appear)\n   - Connection to chat conversations (when errors discussed)\n   - Relationship with code intelligence data\n   - Temporal analysis for error trends\n\n3. Processing Pipeline:\n   - Real-time log ingestion capabilities\n   - Batch processing for historical logs\n   - Error deduplication and clustering\n   - Alert generation for critical errors\n\nDELIVERABLES: Provide detailed implementation, code, documentation, or analysis as appropriate for your specialist role.\n\nPROJECT CONTEXT: You are implementing Phase 2 of the Unified Context System - extending the temporal knowledge graph with error logs to provide comprehensive debugging and incident analysis.\n",
+  "context": {
+    "phase": "phase2_foundation",
+    "priority": "high"
+  },
+  "dependencies": [],
+  "status": "failed",
+  "result": null,
+  "error": "",
+  "start_time": 1757009893.321782,
+  "end_time": 1757010880.604867
+}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Response Times Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Response Times Test</h1>
+    <div id="result">Loading...</div>
+
+    <script>
+        axios.get('http://localhost:5000/api/response-times')
+            .then(response => {
+                const data = response.data;
+                document.getElementById('result').innerHTML = `
+                    <h2>Response Time Metrics</h2>
+                    <p><strong>Average:</strong> ${data.average}</p>
+                    <p><strong>Median:</strong> ${data.median}</p>
+                    <p><strong>Shortest:</strong> ${data.shortest.time} - ${data.shortest.prompt?.substring(0, 50)}...</p>
+                    <p><strong>Longest:</strong> ${data.longest.time} - ${data.longest.prompt?.substring(0, 50)}...</p>
+                    <p><strong>Total Prompts:</strong> ${data.total_prompts}</p>
+                    <h3>Raw Data:</h3>
+                    <pre>${JSON.stringify(data, null, 2).substring(0, 1000)}...</pre>
+                `;
+            })
+            .catch(error => {
+                document.getElementById('result').innerHTML = `Error: ${error}`;
+            });
+    </script>
+</body>
+</html>

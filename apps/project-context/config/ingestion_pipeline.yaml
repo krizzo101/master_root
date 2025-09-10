@@ -1,0 +1,381 @@
+# Unified Context System - Ingestion Pipeline Configuration
+# This file contains the complete configuration for all ingestion adapters
+
+pipeline:
+  # Global pipeline settings
+  max_concurrent_adapters: 10
+  batch_commit_size: 1000
+  health_check_interval: 60  # seconds
+  metrics_collection_interval: 30  # seconds
+  auto_restart_failed_adapters: true
+  adapter_failure_backoff_seconds: 300
+  pipeline_shutdown_timeout_seconds: 60
+
+# Adapter Configurations
+adapters:
+
+  chat:
+    # Chat/conversation data adapter
+    adapter_id: "chat"
+    source_type: "chat"
+    version: "1.0"
+    enabled: true
+
+    # Processing settings
+    batch_mode: "streaming"  # streaming, micro_batch, batch, bulk
+    batch_size: 50
+    batch_timeout_seconds: 30
+    max_items_per_second: 500
+    max_concurrent_batches: 3
+
+    # Retry configuration
+    max_retries: 3
+    retry_delay_seconds: 1.0
+    retry_backoff_factor: 2.0
+
+    # Health monitoring
+    health_check_interval_seconds: 60
+    error_threshold_count: 10
+    error_threshold_window_seconds: 300
+
+    # Data validation
+    strict_validation: true
+    skip_duplicates: true
+    content_hash_check: true
+
+    # AI features
+    generate_embeddings: true
+    generate_summaries: false
+    extract_relationships: true
+
+    # Chat-specific configuration
+    source_config:
+      input_format: "jsonl"  # jsonl, json, api, stream
+      file_patterns:
+        - "*.jsonl"
+        - "chat_*.json"
+      watch_directories:
+        - "./data/chat"
+        - "./logs/conversations"
+      api_endpoint: null  # Set for API-based ingestion
+      api_key: null
+      message_filters: []  # Optional message filtering
+      include_system_messages: true
+      include_metadata: true
+      conversation_timeout_minutes: 60
+
+    # Feature flags
+    enabled_features:
+      - "conversation_threading"
+      - "actor_classification"
+      - "temporal_relationships"
+    disabled_features: []
+
+  code:
+    # Source code and file system adapter
+    adapter_id: "code"
+    source_type: "code"
+    version: "1.0"
+    enabled: true
+
+    # Processing settings
+    batch_mode: "batch"
+    batch_size: 200
+    batch_timeout_seconds: 60
+    max_items_per_second: 200
+    max_concurrent_batches: 2
+
+    # Retry configuration
+    max_retries: 3
+    retry_delay_seconds: 2.0
+    retry_backoff_factor: 2.0
+
+    # Health monitoring
+    health_check_interval_seconds: 120
+    error_threshold_count: 5
+    error_threshold_window_seconds: 300
+
+    # Data validation
+    strict_validation: true
+    skip_duplicates: true
+    content_hash_check: true
+
+    # AI features
+    generate_embeddings: true
+    generate_summaries: true
+    extract_relationships: true
+
+    # Code-specific configuration
+    source_config:
+      scan_directories:
+        - "."
+        - "./src"
+        - "./lib"
+      include_patterns:
+        - "*.py"
+        - "*.js"
+        - "*.ts"
+        - "*.jsx"
+        - "*.tsx"
+        - "*.java"
+        - "*.cpp"
+        - "*.c"
+        - "*.h"
+        - "*.hpp"
+        - "*.rs"
+        - "*.go"
+        - "*.rb"
+        - "*.php"
+        - "*.swift"
+        - "*.kt"
+        - "*.scala"
+        - "*.sql"
+        - "*.html"
+        - "*.css"
+        - "*.json"
+        - "*.yaml"
+        - "*.yml"
+        - "*.xml"
+        - "*.md"
+      exclude_patterns:
+        - "node_modules/**"
+        - ".git/**"
+        - "__pycache__/**"
+        - "*.pyc"
+        - "*.pyo"
+        - "*.pyd"
+        - ".pytest_cache/**"
+        - "build/**"
+        - "dist/**"
+        - ".venv/**"
+        - "venv/**"
+        - ".env"
+        - "*.log"
+        - "*.tmp"
+        - "*.temp"
+      max_file_size_mb: 10
+      extract_functions: true
+      extract_classes: true
+      extract_imports: true
+      extract_comments: true
+      track_changes: true
+      use_git_tracking: true
+
+    # Feature flags
+    enabled_features:
+      - "language_detection"
+      - "syntax_parsing"
+      - "import_analysis"
+      - "change_tracking"
+    disabled_features: []
+
+  git:
+    # Git version control adapter
+    adapter_id: "git"
+    source_type: "git"
+    version: "1.0"
+    enabled: true
+
+    # Processing settings
+    batch_mode: "batch"
+    batch_size: 500
+    batch_timeout_seconds: 120
+    max_items_per_second: 1000
+    max_concurrent_batches: 1
+
+    # Retry configuration
+    max_retries: 2
+    retry_delay_seconds: 5.0
+    retry_backoff_factor: 2.0
+
+    # Health monitoring
+    health_check_interval_seconds: 300
+    error_threshold_count: 3
+    error_threshold_window_seconds: 600
+
+    # Data validation
+    strict_validation: true
+    skip_duplicates: true
+    content_hash_check: true
+
+    # AI features
+    generate_embeddings: true
+    generate_summaries: false
+    extract_relationships: true
+
+    # Git-specific configuration
+    source_config:
+      repository_path: "."
+      include_commits: true
+      include_branches: true
+      include_tags: true
+      include_file_changes: true
+      max_commit_age_days: null  # null = all history
+      exclude_merge_commits: false
+      include_diff_content: true
+      max_diff_size_kb: 100
+      author_filters: []  # empty = all authors
+      branch_filters: []  # empty = all branches
+
+    # Feature flags
+    enabled_features:
+      - "commit_analysis"
+      - "branch_tracking"
+      - "diff_parsing"
+      - "author_analysis"
+    disabled_features: []
+
+  error:
+    # Error and diagnostic data adapter
+    adapter_id: "error"
+    source_type: "error"
+    version: "1.0"
+    enabled: true
+
+    # Processing settings
+    batch_mode: "streaming"
+    batch_size: 100
+    batch_timeout_seconds: 30
+    max_items_per_second: 1000
+    max_concurrent_batches: 3
+
+    # Retry configuration
+    max_retries: 3
+    retry_delay_seconds: 1.0
+    retry_backoff_factor: 2.0
+
+    # Health monitoring
+    health_check_interval_seconds: 60
+    error_threshold_count: 20
+    error_threshold_window_seconds: 300
+
+    # Data validation
+    strict_validation: false  # Errors may have malformed data
+    skip_duplicates: true
+    content_hash_check: true
+
+    # AI features
+    generate_embeddings: true
+    generate_summaries: false
+    extract_relationships: true
+
+    # Error-specific configuration
+    source_config:
+      input_sources:
+        - "logs"
+        - "ide"
+        # - "test"     # Uncomment to enable
+        # - "monitor"  # Uncomment to enable
+      log_file_patterns:
+        - "*.log"
+        - "error*.log"
+        - "*.err"
+        - "app-*.log"
+      log_directories:
+        - "./logs"
+        - "./log"
+        - "/var/log/app"
+      ide_diagnostic_formats:
+        - "lsp"
+        - "eslint"
+        - "pylint"
+      severity_filters:
+        - "error"
+        - "warning"
+        # - "info"    # Uncomment to include info level
+        # - "debug"   # Uncomment to include debug level
+      stack_trace_parsing: true
+      extract_file_locations: true
+      group_similar_errors: true
+      similarity_threshold: 0.8
+      max_error_age_days: 30
+      exclude_patterns:
+        - ".*DEBUG.*"
+        - ".*INFO.*"
+        - ".*connection.*timeout.*"  # Common noise
+
+    # Feature flags
+    enabled_features:
+      - "stack_trace_parsing"
+      - "error_grouping"
+      - "location_extraction"
+      - "severity_classification"
+    disabled_features: []
+
+# Database Configuration
+database:
+  # PostgreSQL connection
+  postgresql:
+    host: "localhost"
+    port: 5432
+    database: "unified_context"
+    username: "postgres"
+    password: "${POSTGRES_PASSWORD}"  # Use environment variable
+    pool_size: 20
+    max_overflow: 30
+    pool_timeout: 30
+
+  # Neo4j connection (for relationships)
+  neo4j:
+    uri: "bolt://localhost:7687"
+    username: "neo4j"
+    password: "${NEO4J_PASSWORD}"  # Use environment variable
+    max_connection_pool_size: 10
+
+  # Redis connection (for caching)
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 0
+    password: "${REDIS_PASSWORD}"  # Use environment variable (optional)
+    max_connections: 20
+
+# Vector Search Configuration
+vector_search:
+  provider: "openai"  # openai, sentence_transformers, huggingface
+  model: "text-embedding-ada-002"
+  api_key: "${OPENAI_API_KEY}"  # Use environment variable
+  batch_size: 100
+  max_retries: 3
+  timeout_seconds: 30
+
+# Monitoring Configuration
+monitoring:
+  # Metrics collection
+  enable_metrics: true
+  metrics_retention_days: 30
+
+  # Health checks
+  enable_health_checks: true
+  health_check_timeout: 10  # seconds
+
+  # Logging
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  log_format: "structured"  # structured, text
+
+  # Alerting (optional)
+  alerts:
+    enable_alerts: false
+    webhook_url: null  # Set for Slack/Discord notifications
+    error_threshold: 10  # Errors per minute
+    throughput_threshold: 0.5  # Fraction of expected throughput
+
+# Performance Tuning
+performance:
+  # Processing
+  max_memory_usage_mb: 2048
+  max_cpu_usage_percent: 80
+
+  # Batch optimization
+  adaptive_batch_sizing: true
+  min_batch_size: 10
+  max_batch_size: 1000
+
+  # Connection pooling
+  database_pool_size: 20
+  max_concurrent_requests: 100
+
+  # Caching
+  enable_caching: true
+  cache_ttl_seconds: 3600
+  max_cache_size_mb: 512

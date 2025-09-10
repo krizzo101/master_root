@@ -11,7 +11,11 @@ class OpsviMonitoringSettings(BaseSettings):
     """Settings for opsvi-monitoring."""
 
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore"
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+        env_prefix="OPSVI_OPSVI_MONITORING__",
     )
 
     # Core settings
@@ -28,9 +32,6 @@ class OpsviMonitoringSettings(BaseSettings):
         if v.upper() not in valid_levels:
             raise ValueError(f"Invalid log level: {v}")
         return v.upper()
-
-    class Config:
-        env_prefix = "OPSVI_OPSVI_MONITORING__"
 
 
 # Convenience function

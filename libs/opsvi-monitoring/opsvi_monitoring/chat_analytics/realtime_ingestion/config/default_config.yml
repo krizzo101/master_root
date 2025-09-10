@@ -1,0 +1,124 @@
+# Default configuration for real-time chat log ingestion service
+# Copy this file and modify as needed for your environment
+
+service:
+  name: "realtime-chat-ingestion"
+  log_level: "INFO"
+  log_file: "/tmp/realtime_chat_ingestion.log"
+  pid_file: "/tmp/realtime_chat_ingestion.pid"
+  enable_monitoring: true
+  enable_fault_tolerance: true
+
+# File watching configuration
+watcher:
+  enabled: true
+  batch_size: 10
+  queue_size: 1000
+  health_check_interval: 60
+  watch_interval: 1
+  max_files_per_minute: 100
+  file_extensions:
+    - ".jsonl"
+  ignore_patterns:
+    - ".tmp"
+    - ".backup"
+    - ".swp"
+
+# Ingestion pipeline configuration
+ingestion:
+  buffer_max_size: 100
+  buffer_max_age_seconds: 30
+  correlation_enabled: true
+  dual_write_enabled: true
+
+# Database configuration
+database:
+  sqlite_path: "/home/opsvi/master_root/chat_logs.db"
+  postgres_url: "postgresql://opsvi:opsvi_secure_password@localhost:5432/unified_context"
+  connection_pool_size: 5
+  query_timeout_seconds: 30
+
+# Fault tolerance configuration
+fault_tolerance:
+  retry_max_attempts: 3
+  retry_base_delay_seconds: 1.0
+  retry_max_delay_seconds: 60.0
+  circuit_breaker_failure_threshold: 5
+  circuit_breaker_recovery_timeout_seconds: 60
+
+# Monitoring configuration
+monitoring:
+  metrics_collection_interval: 60
+  health_check_interval: 60
+  dashboard_enabled: true
+  prometheus_enabled: false
+  prometheus_port: 9090
+  alert_enabled: true
+
+  # Alert thresholds
+  alerts:
+    queue_full_threshold: 0.9
+    high_cpu_threshold: 85
+    high_memory_threshold: 85
+    no_activity_timeout: 600  # 10 minutes
+
+# Directory discovery configuration
+discovery:
+  claude_projects_enabled: true
+  additional_watch_dirs:
+    - "/home/opsvi/master_root"
+    - "/home/opsvi/master_root/apps"
+    - "/home/opsvi/master_root/workspace"
+    - "/home/opsvi/master_root/razer_workspace"
+  exclude_dirs:
+    - ".git"
+    - "__pycache__"
+    - "node_modules"
+    - ".venv"
+    - ".pytest_cache"
+    - ".coverage"
+
+# Performance tuning
+performance:
+  # Use uvloop for better async performance (Linux only)
+  use_uvloop: true
+
+  # Worker threads for CPU-intensive tasks
+  worker_threads: 2
+
+  # Memory limits
+  max_memory_mb: 512
+
+  # Processing limits
+  max_concurrent_files: 50
+  max_entries_per_batch: 1000
+
+# Integration settings
+integration:
+  # Correlator settings
+  correlator:
+    enable_caching: true
+    cache_size: 10000
+    symbol_index_refresh_interval: 300  # 5 minutes
+
+  # Database adapter settings
+  db_adapter:
+    enable_async_writes: true
+    batch_write_size: 100
+    write_timeout_seconds: 10
+
+# Development and testing settings
+development:
+  # Enable debug logging for specific components
+  debug_components:
+    - "watcher"
+    - "pipeline"
+    - "correlator"
+
+  # Test mode settings
+  test_mode: false
+  test_data_dir: "/tmp/test_chat_logs"
+
+  # Profiling
+  enable_profiling: false
+  profiling_output_dir: "/tmp/profiling"

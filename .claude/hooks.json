@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0",
+  "hooks": {
+    "pre-compact": {
+      "enabled": true,
+      "scripts": [
+        {
+          "path": "/home/opsvi/master_root/.claude/hooks/auto-export-on-compact.py",
+          "type": "python",
+          "description": "Auto-export session before compaction"
+        }
+      ]
+    },
+    "post-compact": {
+      "enabled": true,
+      "scripts": [
+        {
+          "path": "/home/opsvi/master_root/.claude/hooks/post-compact-notify.sh",
+          "type": "bash",
+          "description": "Notify after compaction completes"
+        }
+      ]
+    },
+    "pre-command": {
+      "enabled": true,
+      "filter": ["compact", "reset", "clear"],
+      "scripts": [
+        {
+          "path": "/home/opsvi/master_root/.claude/hooks/pre-destructive-command.sh",
+          "type": "bash",
+          "description": "Warn before destructive commands"
+        }
+      ]
+    }
+  },
+  "global": {
+    "log_hooks": true,
+    "log_path": "/tmp/claude-hooks.log",
+    "timeout_seconds": 30,
+    "fail_silently": true
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "dashboard": {
+    "title": "Sleuth Intel Application Dashboard",
+    "uid": "sleuth-intel-main",
+    "tags": ["sleuth-intel", "production"],
+    "timezone": "browser",
+    "refresh": "30s",
+    "panels": [
+      {
+        "title": "Request Rate",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total[5m])) by (method, status)",
+            "legendFormat": "{{method}} - {{status}}"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Error Rate",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))",
+            "legendFormat": "Error Rate"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Response Time (p95)",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "95th percentile"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Active Connections",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "sum(http_connections_active)",
+            "legendFormat": "Active Connections"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "CPU Usage",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "sum(rate(container_cpu_usage_seconds_total{pod=~\"sleuth-intel-.*\"}[5m])) by (pod)",
+            "legendFormat": "{{pod}}"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Memory Usage",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "sum(container_memory_usage_bytes{pod=~\"sleuth-intel-.*\"}) by (pod)",
+            "legendFormat": "{{pod}}"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Database Connections",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+        "targets": [
+          {
+            "expr": "database_connection_pool_size - database_connection_pool_available",
+            "legendFormat": "In Use"
+          },
+          {
+            "expr": "database_connection_pool_available",
+            "legendFormat": "Available"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Cache Hit Rate",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+        "targets": [
+          {
+            "expr": "sum(rate(cache_hits_total[5m])) / (sum(rate(cache_hits_total[5m])) + sum(rate(cache_misses_total[5m])))",
+            "legendFormat": "Hit Rate"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Enformion API Calls",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32},
+        "targets": [
+          {
+            "expr": "sum(rate(enformion_api_calls_total[5m])) by (endpoint, status)",
+            "legendFormat": "{{endpoint}} - {{status}}"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Background Jobs",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32},
+        "targets": [
+          {
+            "expr": "sum(background_jobs_active)",
+            "legendFormat": "Active"
+          },
+          {
+            "expr": "sum(rate(background_jobs_completed_total[5m]))",
+            "legendFormat": "Completed/sec"
+          },
+          {
+            "expr": "sum(rate(background_jobs_failed_total[5m]))",
+            "legendFormat": "Failed/sec"
+          }
+        ],
+        "type": "graph"
+      }
+    ]
+  }
+}

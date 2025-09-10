@@ -1,0 +1,21 @@
+{
+  "build_time": "2025-09-02T08:04:32.737502",
+  "duration_seconds": 1015.177327,
+  "phases": {
+    "phase1": [
+      "backend_service",
+      "console_ui",
+      "docker_monitor"
+    ],
+    "phase2": [
+      "data_collector",
+      "view_manager",
+      "main_app"
+    ],
+    "phase3": [
+      "test_suite",
+      "documentation"
+    ]
+  },
+  "output_dir": "/home/opsvi/master_root/apps/claude-monitor"
+}

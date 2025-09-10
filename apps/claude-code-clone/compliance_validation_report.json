@@ -1,0 +1,97 @@
+{
+  "summary": {
+    "total_tests": 5,
+    "passed": 5,
+    "failed": 0,
+    "success_rate": 100.0,
+    "total_time": 0.0001392364501953125
+  },
+  "results": [
+    {
+      "test_name": "Approved Models Only",
+      "passed": true,
+      "execution_time": 7.915496826171875e-05,
+      "error_message": "",
+      "details": {
+        "approved_models_tested": [
+          "gpt-5-nano",
+          "gpt-5-mini",
+          "gpt-5",
+          "o4-mini"
+        ],
+        "forbidden_models_tested": [
+          "gpt-4",
+          "gpt-4-turbo",
+          "gpt-3.5-turbo",
+          "o3",
+          "claude-3"
+        ]
+      }
+    },
+    {
+      "test_name": "Reasoning Model Routing",
+      "passed": true,
+      "execution_time": 1.621246337890625e-05,
+      "error_message": "",
+      "details": {
+        "model": "o4-mini",
+        "family": "o-series",
+        "reasoning_effort": "high"
+      }
+    },
+    {
+      "test_name": "Structured Output Enforcement",
+      "passed": true,
+      "execution_time": 2.09808349609375e-05,
+      "error_message": "",
+      "details": {
+        "default_schema_applied": true,
+        "custom_schema_applied": true
+      }
+    },
+    {
+      "test_name": "Responses API Format",
+      "passed": true,
+      "execution_time": 1.049041748046875e-05,
+      "error_message": "",
+      "details": {
+        "endpoint": "/v1/responses",
+        "request_fields": [
+          "model",
+          "input",
+          "max_output_tokens",
+          "response_format"
+        ],
+        "proof_blob": {
+          "api": "responses",
+          "model": "gpt-5-mini",
+          "family": "general",
+          "structured": true,
+          "schema_hash": 633532,
+          "reasoning_effort": null,
+          "previous_response_id": null,
+          "compliance_version": "2025-09-07",
+          "enforcement": "strict"
+        }
+      }
+    },
+    {
+      "test_name": "Audit Proof Blob",
+      "passed": true,
+      "execution_time": 1.239776611328125e-05,
+      "error_message": "",
+      "details": {
+        "api": "responses",
+        "model": "o4-mini",
+        "family": "o-series",
+        "structured": true,
+        "schema_hash": 633532,
+        "reasoning_effort": "high",
+        "previous_response_id": "prev-123",
+        "compliance_version": "2025-09-07",
+        "enforcement": "strict"
+      }
+    }
+  ],
+  "compliance_ready": true
+}

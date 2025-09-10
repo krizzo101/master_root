@@ -1,0 +1,7 @@
+# WBS Documenter Requirements
+
+# Core dependencies (minimal)
+aiofiles>=23.0.0  # Async file operations
+
+# Note: This app depends on the agent-orchestrator framework
+# Make sure to have agent-orchestrator installed or available in path

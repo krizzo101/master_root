@@ -1,0 +1,21 @@
+# ---- Hook pack configuration (add to your .env file; do NOT commit secrets) ----
+# Note: OPENAI_API_KEY should already be defined in your main .env
+
+# Knowledge freshness controls
+KNOWLEDGE_CUTOFF=2024-06-01          # ISO date
+RESEARCH_ENABLE=true                 # global on/off
+RESEARCH_SOURCES_REQUIRED=true       # require Sources:/Citations: or "no recent changes found"
+RESEARCH_UNSTABLE_TOPICS=latest,breaking,today,as of,price,cost,fee,exchange rate,version,api,sdk,library,release,changelog,cve,law,regulation,compliance,policy,election,medical,drug,dosage,availability,schedule,deadline,admission,calendar,travel,weather,market,stock,crypto,ceo,cfo,leadership,org change
+
+# OpenAI model tuning for hooks
+PROMPT_OPT_MODEL=gpt-5-nano
+PROMPT_OPT_MAX_TOK=400
+PROMPT_OPT_TEMPERATURE=0.2
+PROMPT_OPT_SEED=42
+
+REVIEW_MODEL=gpt-5-nano
+REVIEW_MODEL_ESCALATE=gpt-5-mini
+REVIEW_MAX_ATTEMPTS=3
+REVIEW_MAX_TOK=300
+REVIEW_TEMPERATURE=0.2
+REVIEW_SEED=42

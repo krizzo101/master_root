@@ -1,0 +1,40 @@
+{
+  "task_id": "create_orchestrator_integration",
+  "task_type": "orchestration",
+  "prompt": "Create orchestrator integration in src/orchestration/sleuth_orchestrator.py:\n\n1. Extend GenericOrchestrator for intelligence workflows\n2. Implement SleuthIntelOrchestrator class with:\n   - Agent registry and management\n   - Workflow pattern definitions\n   - Rate limit coordination across agents\n   - Credit usage optimization\n   - Result aggregation and correlation\n\n3. Predefined workflow patterns:\n   - Single-source lookup (direct agent)\n   - Multi-source enrichment (parallel agents)\n   - Investigation workflow (sequential chains)\n   - Bulk processing (batch coordination)\n\n4. Advanced features:\n   - Dynamic agent selection based on query type\n   - Load balancing across multiple API keys\n   - Intelligent caching and result reuse\n   - Performance optimization\n\n5. Integration with existing SecureAPILocker\n6. Comprehensive error handling and recovery\n\nDocument workflow patterns and usage examples.",
+  "context": {},
+  "dependencies": [
+    "implement_analysis_agent"
+  ],
+  "status": "completed",
+  "result": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 368097,
+    "duration_api_ms": 367209,
+    "num_turns": 34,
+    "result": "I've successfully created the SleuthIntelOrchestrator with comprehensive intelligence workflow management capabilities. Here's what has been implemented:\n\n## Core Implementation (`src/orchestration/sleuth_orchestrator.py`)\n\n### Key Features:\n1. **Advanced Agent Management**: Dynamic agent pools with rotation and load balancing\n2. **Five Workflow Patterns**:\n   - `SINGLE_SOURCE`: Direct single-agent queries\n   - `MULTI_SOURCE_PARALLEL`: Cross-provider validation\n   - `INVESTIGATION_CHAIN`: Sequential queries with context propagation  \n   - `BULK_PROCESSING`: Efficient large-batch processing\n   - `ADAPTIVE_ENRICHMENT`: Smart expansion based on initial results\n\n3. **Intelligent Agent Selection**: Based on performance metrics, cost optimization, and availability\n4. **Rate Limiting & Cost Optimization**: Global rate limiting with credit usage tracking across providers\n5. **Result Correlation**: Automatic pattern detection and connection analysis\n6. **Comprehensive Caching**: Multi-level caching with TTL management\n7. **Error Handling**: Robust recovery mechanisms for various failure scenarios\n\n### Integration Points:\n- **SecureAPILocker**: For credential management and provider rotation\n- **BaseIntelligenceAgent**: Extends existing agent framework\n- **Chat Monitor**: Real-time monitoring through OrchestratorIntegration\n- **Intelligence Models**: Uses IntelligenceQuery and IntelligenceResult\n\n### Advanced Capabilities:\n- **Dynamic Query Generation**: Automatic follow-up and enrichment queries\n- **Load Balancing**: Distributes workload across available agents\n- **Performance Optimization**: Smart caching and provider selection\n- **Comprehensive Metrics**: Detailed tracking of execution performance\n\n## Documentation (`.claude/knowledge/docs/sleuth_orchestrator_guide.md`)\n\nComprehensive guide covering:\n- Detailed workflow pattern explanations with examples\n- Agent pool management and configuration\n- Result correlation and analysis\n- Performance optimization strategies\n- Monitoring and metrics collection\n- Best practices and troubleshooting\n\nThe orchestrator is designed to handle everything from simple single queries to complex investigation workflows with hundreds of queries, providing intelligent resource management, cost optimization, and comprehensive result analysis.",
+    "session_id": "fdfc34ef-2a37-439c-9a9f-ecabfba8aa82",
+    "total_cost_usd": 0.5763839999999999,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 412,
+      "cache_read_input_tokens": 56672,
+      "output_tokens": 495,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 412
+      }
+    },
+    "permission_denials": [],
+    "uuid": "ecd4b9d8-2643-44dc-bbe2-f10bd706b44e"
+  },
+  "error": null,
+  "start_time": 1757195752.655048,
+  "end_time": 1757196122.611233
+}

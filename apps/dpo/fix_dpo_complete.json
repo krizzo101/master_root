@@ -1,0 +1,48 @@
+{
+  "workflow_name": "fix_dpo_complete",
+  "description": "Complete, high-quality fix for DPO system - no shortcuts",
+  "context": {
+    "issues_identified": [
+      "EnhancementIntelligenceEngine missing process_request() method",
+      "Import chain broken between DPO and agent-orchestrator",
+      "Integration flow incomplete from previous partial fix"
+    ],
+    "quality_requirements": [
+      "Implement ALL missing methods properly",
+      "Fix import chain comprehensively",
+      "Ensure full integration with GenericOrchestrator",
+      "Add proper error handling and validation",
+      "Test thoroughly before marking complete"
+    ]
+  },
+  "tasks": [
+    {
+      "task_id": "implement_process_request",
+      "task_type": "development-specialist",
+      "prompt": "Implement the missing process_request() method in EnhancementIntelligenceEngine:\n\n1. Read /home/opsvi/master_root/apps/dpo/src/intelligence_review_engine_enhanced.py\n2. Understand the class structure and existing methods\n3. Implement process_request(self, request: str, analysis: Any) -> Dict that:\n   - Processes the request string and analysis object\n   - Returns enhancements dictionary suitable for workflow generation\n   - Integrates with existing enhance_with_intelligence() if async needed\n   - Handles both sync and async contexts properly\n4. Add proper error handling and validation\n5. Test the implementation thoroughly",
+      "context": {
+        "file": "/home/opsvi/master_root/apps/dpo/src/intelligence_review_engine_enhanced.py",
+        "class": "EnhancementIntelligenceEngine",
+        "requirement": "Must return Dict compatible with _generate_workflow expectations"
+      }
+    },
+    {
+      "task_id": "fix_import_chain",
+      "task_type": "refactoring-master",
+      "prompt": "Fix the complete import chain between DPO and agent-orchestrator:\n\n1. Analyze all import statements in /home/opsvi/master_root/apps/dpo/src/\n2. Fix relative imports to use absolute imports with proper sys.path setup\n3. Ensure GenericOrchestrator and AgentTask import correctly from agent-orchestrator\n4. Fix IntelligenceReviewEngine imports from agent-orchestrator\n5. Test each module can be imported independently\n6. Document the import structure for future reference",
+      "dependencies": ["implement_process_request"]
+    },
+    {
+      "task_id": "complete_integration_flow",
+      "task_type": "development-specialist",
+      "prompt": "Complete the integration flow in dpo_main_controller.py:\n\n1. Ensure process_development_request() properly chains all components\n2. Fix async/await handling throughout the flow\n3. Implement proper workflow generation with all enhancements\n4. Ensure workflow format matches GenericOrchestrator expectations\n5. Add comprehensive error handling and recovery\n6. Test the complete flow end-to-end",
+      "dependencies": ["fix_import_chain"]
+    },
+    {
+      "task_id": "comprehensive_testing",
+      "task_type": "qa-testing-guru",
+      "prompt": "Create and run comprehensive tests for the fixed DPO system:\n\n1. Test standalone DPO components\n2. Test integration with GenericOrchestrator\n3. Test workflow generation for various request types\n4. Test error handling and edge cases\n5. Create example workflows demonstrating all features\n6. Document any remaining issues with solutions\n\nProvide detailed test results and ensure ALL tests pass before marking complete.",
+      "dependencies": ["complete_integration_flow"]
+    }
+  ]
+}

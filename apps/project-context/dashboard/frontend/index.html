@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Real-time monitoring dashboard for orchestrator processes">
+    <title>Orchestrator Monitoring Dashboard</title>
+
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="static/components.css">
+    <link rel="stylesheet" href="static/charts.css">
+    <link rel="stylesheet" href="static/animations.css">
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="static/styles.css" as="style">
+    <link rel="preload" href="static/components.css" as="style">
+
+    <!-- Theme Toggle Support -->
+    <script>
+        // Load theme preference early to prevent flash
+        const theme = localStorage.getItem('dashboard-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+    </script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header" role="banner">
+            <div class="header-title">
+                <div class="status-indicator" aria-label="System status: Active"></div>
+                <h1>Orchestrator Monitoring Dashboard</h1>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span>
+                </button>
+                <div class="connection-status" role="status" aria-live="polite">
+                    <span id="connection-status">Connecting...</span>
+                    <span id="last-update" class="sr-only">Last updated: Never</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Content -->
+        <main class="dashboard-main">
+            <!-- Executive Summary Section -->
+            <section class="executive-summary" aria-labelledby="summary-heading">
+                <h2 id="summary-heading">Executive Summary</h2>
+                <div class="summary-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="overall-progress" aria-label="Overall progress percentage">0%</div>
+                        <div class="metric-label">Overall Progress</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="current-phase" aria-label="Current execution phase">-</div>
+                        <div class="metric-label">Current Phase</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="elapsed-time" aria-label="Total elapsed time">0m</div>
+                        <div class="metric-label">Elapsed Time</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="active-tasks" aria-label="Number of active tasks">0</div>
+                        <div class="metric-label">Active Tasks</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="completed-tasks" aria-label="Number of completed tasks">0</div>
+                        <div class="metric-label">Completed</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="failed-tasks" aria-label="Number of failed tasks">0</div>
+                        <div class="metric-label">Failed</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Task Monitoring Grid -->
+            <section class="task-monitoring" aria-labelledby="tasks-heading">
+                <div class="task-monitoring-header">
+                    <h2 id="tasks-heading">Task Monitoring</h2>
+                    <div class="task-filters" role="tablist" aria-label="Task status filters">
+                        <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">All</button>
+                        <button class="filter-btn" data-filter="running" role="tab" aria-selected="false">Running</button>
+                        <button class="filter-btn" data-filter="completed" role="tab" aria-selected="false">Completed</button>
+                        <button class="filter-btn" data-filter="failed" role="tab" aria-selected="false">Failed</button>
+                        <button class="filter-btn" data-filter="pending" role="tab" aria-selected="false">Pending</button>
+                    </div>
+                </div>
+                <div class="task-table-container" role="tabpanel">
+                    <table class="task-table" role="table" aria-label="Task monitoring data">
+                        <thead>
+                            <tr>
+                                <th tabindex="0" data-sort="task_id" role="columnheader" aria-sort="none">
+                                    Task ID
+                                </th>
+                                <th tabindex="0" data-sort="type" role="columnheader" aria-sort="none">
+                                    Type
+                                </th>
+                                <th tabindex="0" data-sort="status" role="columnheader" aria-sort="none">
+                                    Status
+                                </th>
+                                <th tabindex="0" data-sort="duration" role="columnheader" aria-sort="none">
+                                    Duration
+                                </th>
+                                <th tabindex="0" data-sort="session_id" role="columnheader" aria-sort="none">
+                                    Session
+                                </th>
+                                <th tabindex="0" data-sort="phase_id" role="columnheader" aria-sort="none">
+                                    Phase
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="task-table-body">
+                            <!-- Task rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Sidebar -->
+            <aside class="sidebar" aria-label="Dashboard sidebar">
+                <!-- Real-time Status Indicators -->
+                <div class="sidebar-section">
+                    <div class="sidebar-header">Real-time Status</div>
+                    <div class="sidebar-content">
+                        <div id="realtime-indicators">
+                            <div class="metric-card">
+                                <div class="metric-value" id="parallel-utilization">0%</div>
+                                <div class="metric-label">Parallel Utilization</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="tasks-per-hour">0</div>
+                                <div class="metric-label">Tasks/Hour</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="success-rate">0%</div>
+                                <div class="metric-label">Success Rate</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alert Notifications -->
+                <div class="sidebar-section">
+                    <div class="sidebar-header">Alert Notifications</div>
+                    <div class="alert-notifications" id="alert-notifications" role="log" aria-label="System alerts" aria-live="polite">
+                        <!-- Alerts will be populated by JavaScript -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Performance Charts Area -->
+            <section class="performance-charts" aria-labelledby="charts-heading">
+                <h2 id="charts-heading">Performance Analytics</h2>
+                <div class="chart-grid">
+                    <div class="chart-container" aria-label="System performance metrics">
+                        <h3>System Performance</h3>
+                        <canvas id="performance-chart" role="img" aria-label="System performance chart">
+                            Your browser does not support charts.
+                        </canvas>
+                    </div>
+                    <div class="chart-container" aria-label="Task status distribution">
+                        <h3>Task Status Distribution</h3>
+                        <canvas id="task-status-chart" role="img" aria-label="Task status distribution chart">
+                            Your browser does not support charts.
+                        </canvas>
+                    </div>
+                    <div class="chart-container" aria-label="Progress timeline">
+                        <h3>Progress Timeline</h3>
+                        <canvas id="progress-chart" role="img" aria-label="Progress timeline chart">
+                            Your browser does not support charts.
+                        </canvas>
+                    </div>
+                    <div class="chart-container" aria-label="Real-time metrics">
+                        <h3>Real-time Metrics</h3>
+                        <canvas id="realtime-chart" role="img" aria-label="Real-time metrics chart">
+                            Your browser does not support charts.
+                        </canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Enhanced Dashboard JavaScript -->
+    <script>
+        // Dashboard functionality
+        console.log('Dashboard HTML structure loaded');
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize dashboard components
+            initializeThemeToggle();
+            initializeConnectionStatus();
+            initializeFilterButtons();
+            initializeSortableHeaders();
+            initializeAnimations();
+        });
+
+        // Theme Toggle Functionality
+        function initializeThemeToggle() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('.theme-icon');
+
+            // Set initial icon based on current theme
+            updateThemeIcon();
+
+            themeToggle.addEventListener('click', function() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('dashboard-theme', newTheme);
+                updateThemeIcon();
+
+                // Add animation class
+                themeToggle.classList.add('animate-bounce');
+                setTimeout(() => themeToggle.classList.remove('animate-bounce'), 500);
+            });
+
+            function updateThemeIcon() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+            }
+        }
+
+        // Connection Status
+        function initializeConnectionStatus() {
+            const statusElement = document.getElementById('connection-status');
+            const lastUpdateElement = document.getElementById('last-update');
+            const statusIndicator = document.querySelector('.status-indicator');
+
+            // Simulate connection sequence
+            statusElement.textContent = 'Connecting...';
+            statusIndicator.classList.add('status-connecting');
+
+            setTimeout(() => {
+                statusElement.textContent = 'Connected to monitoring service';
+                lastUpdateElement.textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+                lastUpdateElement.classList.remove('sr-only');
+
+                statusIndicator.classList.remove('status-connecting');
+                statusIndicator.classList.add('status-connected');
+
+                // Update timestamp every 30 seconds
+                setInterval(() => {
+                    lastUpdateElement.textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+                }, 30000);
+            }, 1500);
+        }
+
+        // Filter Buttons
+        function initializeFilterButtons() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.setAttribute('aria-selected', 'false');
+                    });
+
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    this.setAttribute('aria-selected', 'true');
+
+                    // Add animation
+                    this.classList.add('animate-scale-in');
+                    setTimeout(() => this.classList.remove('animate-scale-in'), 300);
+
+                    const filter = this.getAttribute('data-filter');
+                    console.log('Filter applied:', filter);
+                    // TODO: Implement actual filtering logic
+                });
+            });
+        }
+
+        // Sortable Headers
+        function initializeSortableHeaders() {
+            const headers = document.querySelectorAll('.task-table th[data-sort]');
+            let currentSort = { column: null, direction: 'asc' };
+
+            headers.forEach(header => {
+                header.addEventListener('click', function() {
+                    const column = this.getAttribute('data-sort');
+
+                    // Remove sort classes from all headers
+                    headers.forEach(h => {
+                        h.classList.remove('sort-asc', 'sort-desc');
+                        h.setAttribute('aria-sort', 'none');
+                    });
+
+                    // Toggle sort direction
+                    if (currentSort.column === column) {
+                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.direction = 'asc';
+                    }
+
+                    currentSort.column = column;
+
+                    // Apply sort class
+                    this.classList.add(`sort-${currentSort.direction}`);
+                    this.setAttribute('aria-sort', currentSort.direction === 'asc' ? 'ascending' : 'descending');
+
+                    console.log('Sort applied:', column, currentSort.direction);
+                    // TODO: Implement actual sorting logic
+                });
+
+                // Add keyboard support
+                header.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            });
+        }
+
+        // Initialize Animations
+        function initializeAnimations() {
+            // Add stagger animation to metric cards
+            const metricCards = document.querySelectorAll('.metric-card');
+            metricCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 100}ms`;
+                card.classList.add('animate-fade-in-up');
+            });
+
+            // Add fade-in animation to main sections
+            const sections = document.querySelectorAll('.executive-summary, .task-monitoring, .performance-charts');
+            sections.forEach((section, index) => {
+                section.style.animationDelay = `${index * 200}ms`;
+                section.classList.add('animate-fade-in');
+            });
+
+            // Animate sidebar sections
+            const sidebarSections = document.querySelectorAll('.sidebar-section');
+            sidebarSections.forEach((section, index) => {
+                section.style.animationDelay = `${(index + 3) * 150}ms`;
+                section.classList.add('animate-fade-in-right');
+            });
+        }
+
+        // Utility Functions
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `alert-banner ${type} notification-enter`;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '1000';
+            notification.style.minWidth = '300px';
+
+            notification.innerHTML = `
+                <div class="alert-banner-icon">
+                    ${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}
+                </div>
+                <div class="alert-banner-content">
+                    <div class="alert-banner-message">${message}</div>
+                </div>
+                <button class="alert-banner-dismiss" onclick="this.parentElement.remove()">×</button>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.add('notification-exit');
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, 5000);
+        }
+
+        function updateMetric(elementId, value, animated = true) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                if (animated) {
+                    element.classList.add('counter-animation');
+                    setTimeout(() => element.classList.remove('counter-animation'), 500);
+                }
+                element.textContent = value;
+            }
+        }
+
+        // Sample data update function (for demonstration)
+        function simulateDataUpdate() {
+            setTimeout(() => {
+                updateMetric('overall-progress', '45%');
+                updateMetric('current-phase', 'Phase 2');
+                updateMetric('elapsed-time', '12m');
+                updateMetric('active-tasks', '3');
+                updateMetric('completed-tasks', '18');
+                updateMetric('failed-tasks', '1');
+
+                updateMetric('parallel-utilization', '78%');
+                updateMetric('tasks-per-hour', '24');
+                updateMetric('success-rate', '94%');
+
+                showNotification('Dashboard data updated successfully', 'success');
+            }, 3000);
+        }
+
+    </script>
+
+    <!-- JavaScript Modules -->
+    <script src="static/js/dom-utils.js"></script>
+    <script src="static/js/api-client.js"></script>
+    <script src="static/js/websocket-manager.js"></script>
+    <script src="static/js/chart-manager.js"></script>
+    <script src="static/js/notification-system.js"></script>
+    <script src="static/js/dashboard.js"></script>
+
+    <!-- Initialize Dashboard -->
+    <script>
+        // Initialize dashboard when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing dashboard...');
+            window.dashboard = new Dashboard();
+        });
+    </script>
+</body>
+</html>

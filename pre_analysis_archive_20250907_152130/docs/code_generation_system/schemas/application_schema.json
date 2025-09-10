@@ -1,0 +1,280 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Application Generation Input Schema",
+  "description": "Standardized schema for generating new applications",
+  "type": "object",
+  "required": [
+    "project_metadata",
+    "requirements",
+    "architecture",
+    "technology_stack",
+    "quality_requirements"
+  ],
+  "properties": {
+    "project_metadata": {
+      "type": "object",
+      "required": ["name", "description", "version", "type", "priority"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9_-]+$",
+          "description": "Project name (lowercase, alphanumeric, hyphens/underscores only)"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 500,
+          "description": "Clear description of what the application does"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Semantic version (e.g., 1.0.0)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["web_app", "api", "cli", "library", "service", "desktop_app", "mobile_app"],
+          "description": "Type of application to generate"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"],
+          "description": "Business priority level"
+        },
+        "tags": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Categorization tags"
+        }
+      }
+    },
+    "requirements": {
+      "type": "object",
+      "required": ["functional", "non_functional"],
+      "properties": {
+        "functional": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "description", "priority", "acceptance_criteria"],
+            "properties": {
+              "id": {"type": "string", "pattern": "^FR-\\d+$"},
+              "description": {"type": "string", "minLength": 10},
+              "priority": {"type": "string", "enum": ["must_have", "should_have", "could_have"]},
+              "acceptance_criteria": {
+                "type": "array",
+                "items": {"type": "string"},
+                "minItems": 1
+              },
+              "dependencies": {
+                "type": "array",
+                "items": {"type": "string"}
+              }
+            }
+          }
+        },
+        "non_functional": {
+          "type": "object",
+          "properties": {
+            "performance": {
+              "type": "object",
+              "properties": {
+                "response_time": {"type": "string"},
+                "throughput": {"type": "string"},
+                "concurrent_users": {"type": "integer"}
+              }
+            },
+            "security": {
+              "type": "object",
+              "properties": {
+                "authentication_required": {"type": "boolean"},
+                "authorization_levels": {"type": "array", "items": {"type": "string"}},
+                "data_encryption": {"type": "boolean"},
+                "compliance_requirements": {"type": "array", "items": {"type": "string"}}
+              }
+            },
+            "scalability": {
+              "type": "object",
+              "properties": {
+                "expected_growth": {"type": "string"},
+                "horizontal_scaling": {"type": "boolean"},
+                "vertical_scaling": {"type": "boolean"}
+              }
+            },
+            "availability": {
+              "type": "object",
+              "properties": {
+                "uptime_requirement": {"type": "string"},
+                "disaster_recovery": {"type": "boolean"},
+                "backup_strategy": {"type": "string"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "architecture": {
+      "type": "object",
+      "required": ["pattern", "components", "data_flow"],
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "enum": ["monolith", "microservices", "serverless", "layered", "mvc", "mvp", "mvvm", "event_driven"],
+          "description": "Architectural pattern to follow"
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type", "responsibility"],
+            "properties": {
+              "name": {"type": "string"},
+              "type": {"type": "string", "enum": ["service", "controller", "model", "view", "utility", "middleware"]},
+              "responsibility": {"type": "string"},
+              "dependencies": {"type": "array", "items": {"type": "string"}},
+              "interfaces": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        },
+        "data_flow": {
+          "type": "object",
+          "properties": {
+            "data_sources": {"type": "array", "items": {"type": "string"}},
+            "data_stores": {"type": "array", "items": {"type": "string"}},
+            "data_transformations": {"type": "array", "items": {"type": "string"}},
+            "api_endpoints": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "deployment": {
+          "type": "object",
+          "properties": {
+            "environment": {"type": "string", "enum": ["development", "staging", "production"]},
+            "infrastructure": {"type": "string"},
+            "containerization": {"type": "boolean"},
+            "orchestration": {"type": "string"}
+          }
+        }
+      }
+    },
+    "technology_stack": {
+      "type": "object",
+      "required": ["backend", "frontend", "database", "infrastructure"],
+      "properties": {
+        "backend": {
+          "type": "object",
+          "required": ["language", "framework"],
+          "properties": {
+            "language": {"type": "string", "enum": ["python", "javascript", "typescript", "java", "csharp", "go", "rust"]},
+            "framework": {"type": "string"},
+            "version": {"type": "string"},
+            "additional_libraries": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "frontend": {
+          "type": "object",
+          "properties": {
+            "framework": {"type": "string", "enum": ["react", "vue", "angular", "svelte", "vanilla", "none"]},
+            "ui_library": {"type": "string"},
+            "styling": {"type": "string", "enum": ["css", "scss", "tailwind", "styled-components", "material-ui"]},
+            "build_tool": {"type": "string"}
+          }
+        },
+        "database": {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": {"type": "string", "enum": ["postgresql", "mysql", "mongodb", "redis", "sqlite", "none"]},
+            "version": {"type": "string"},
+            "orm": {"type": "string"},
+            "migration_strategy": {"type": "string"}
+          }
+        },
+        "infrastructure": {
+          "type": "object",
+          "properties": {
+            "cloud_provider": {"type": "string", "enum": ["aws", "azure", "gcp", "local", "hybrid"]},
+            "container_platform": {"type": "string"},
+            "monitoring": {"type": "array", "items": {"type": "string"}},
+            "logging": {"type": "string"},
+            "ci_cd": {"type": "string"}
+          }
+        }
+      }
+    },
+    "quality_requirements": {
+      "type": "object",
+      "required": ["testing", "documentation", "code_standards"],
+      "properties": {
+        "testing": {
+          "type": "object",
+          "required": ["coverage_threshold", "test_types"],
+          "properties": {
+            "coverage_threshold": {"type": "number", "minimum": 0, "maximum": 100},
+            "test_types": {"type": "array", "items": {"type": "string", "enum": ["unit", "integration", "e2e", "performance", "security"]}},
+            "testing_framework": {"type": "string"},
+            "test_data_strategy": {"type": "string"}
+          }
+        },
+        "documentation": {
+          "type": "object",
+          "required": ["required_sections"],
+          "properties": {
+            "required_sections": {"type": "array", "items": {"type": "string"}},
+            "format": {"type": "string", "enum": ["markdown", "rst", "html", "pdf"]},
+            "api_documentation": {"type": "boolean"},
+            "user_guides": {"type": "boolean"},
+            "developer_guides": {"type": "boolean"}
+          }
+        },
+        "code_standards": {
+          "type": "object",
+          "properties": {
+            "style_guide": {"type": "string"},
+            "linting_rules": {"type": "array", "items": {"type": "string"}},
+            "formatting": {"type": "string"},
+            "naming_conventions": {"type": "object"},
+            "complexity_limits": {"type": "object"}
+          }
+        },
+        "security": {
+          "type": "object",
+          "properties": {
+            "vulnerability_scanning": {"type": "boolean"},
+            "dependency_checking": {"type": "boolean"},
+            "secrets_management": {"type": "string"},
+            "access_control": {"type": "string"}
+          }
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "timeline": {
+          "type": "object",
+          "properties": {
+            "deadline": {"type": "string", "format": "date"},
+            "milestones": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "team_size": {"type": "integer"},
+            "budget": {"type": "string"},
+            "external_dependencies": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "compatibility": {
+          "type": "object",
+          "properties": {
+            "browser_support": {"type": "array", "items": {"type": "string"}},
+            "os_support": {"type": "array", "items": {"type": "string"}},
+            "legacy_systems": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  embedding-service:
+    build:
+      context: ./apps/embedding-service
+      dockerfile: Dockerfile
+    container_name: unified_context_embedding_service
+    environment:
+      DATABASE_URL: postgresql://opsvi:opsvi_secure_password@postgres:5432/unified_context
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      PORT: 8001
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      # Cache model downloads
+      - embedding_models:/root/.cache/torch
+      - embedding_models:/root/.cache/huggingface
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - context_network
+
+volumes:
+  embedding_models:
+    name: unified_context_embedding_models
+
+networks:
+  context_network:
+    name: unified_context_network
+    driver: bridge
+    external: true

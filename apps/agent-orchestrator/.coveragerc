@@ -1,0 +1,56 @@
+[run]
+source = src
+branch = True
+parallel = True
+omit =
+    */tests/*
+    */test_*.py
+    */__pycache__/*
+    */mocks/*
+    */examples/*
+    */demos/*
+    */migrations/*
+    */.venv/*
+    */venv/*
+
+[report]
+precision = 2
+show_missing = True
+skip_covered = False
+sort = Cover
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about missing debug-only code
+    def __repr__
+
+    # Don't complain if tests don't hit defensive assertion code
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run
+    if 0:
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+
+    # Don't complain about abstract methods
+    @abstractmethod
+    @abc.abstractmethod
+
+    # Don't complain about pass statements
+    pass
+
+    # Don't complain about ellipsis
+    ...
+
+[html]
+directory = coverage_report
+title = Agent Orchestrator Integration Test Coverage
+
+[json]
+output = coverage.json
+pretty_print = True
+
+[xml]
+output = coverage.xml

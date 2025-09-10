@@ -1,0 +1,96 @@
+{
+  "workflow_name": "parallel_documentation_update",
+  "description": "Update all documentation files in parallel by comparing current code state against existing docs",
+  "max_parallel": 8,
+  "checkpoint_interval": 2,
+  "tasks": [
+    {
+      "task_id": "update_readme",
+      "task_type": "technical-writer",
+      "prompt": "You are a technical documentation specialist. Your task is to update the README.md file in the agent-orchestrator project.\n\nSTEPS:\n1. Read the current README.md at /home/opsvi/master_root/apps/agent-orchestrator/docs/README.md\n2. Thoroughly analyze the current codebase structure in /home/opsvi/master_root/apps/agent-orchestrator/\n3. Compare the documented information against the actual code state\n4. Identify gaps, outdated information, or missing features\n5. Update the README.md to accurately reflect the current code reality\n\nFOCUS AREAS:\n- Verify all file paths and directory structure\n- Update feature lists based on actual capabilities\n- Check all code examples for accuracy\n- Ensure installation and setup instructions work\n- Validate performance metrics and specifications\n\nThe goal is to ensure the README.md perfectly matches the current state of the codebase.",
+      "dependencies": [],
+      "context": {
+        "target_file": "README.md",
+        "app_root": "/home/opsvi/master_root/apps/agent-orchestrator",
+        "focus": "overview, features, quick start, architecture summary"
+      }
+    },
+    {
+      "task_id": "update_api_reference",
+      "task_type": "technical-writer",
+      "prompt": "You are an API documentation specialist. Your task is to update the API_REFERENCE.md file in the agent-orchestrator project.\n\nSTEPS:\n1. Read the current API_REFERENCE.md at /home/opsvi/master_root/apps/agent-orchestrator/docs/API_REFERENCE.md\n2. Analyze all Python source files in /home/opsvi/master_root/apps/agent-orchestrator/src/\n3. Examine all public classes, methods, and functions\n4. Compare documented APIs against actual code implementation\n5. Update the API reference to reflect current code state\n\nFOCUS AREAS:\n- Verify all class definitions and method signatures\n- Check parameter types and return values\n- Update usage examples with working code\n- Document any new APIs or removed functionality\n- Ensure all endpoints and interfaces are covered\n\nThe goal is to provide a comprehensive, accurate API reference that developers can rely on.",
+      "dependencies": [],
+      "context": {
+        "target_file": "API_REFERENCE.md",
+        "app_root": "/home/opsvi/master_root/apps/agent-orchestrator",
+        "focus": "classes, methods, APIs, endpoints, interfaces"
+      }
+    },
+    {
+      "task_id": "update_architecture",
+      "task_type": "solution-architect",
+      "prompt": "You are a solution architect and documentation specialist. Your task is to update the ARCHITECTURE.md file in the agent-orchestrator project.\n\nSTEPS:\n1. Read the current ARCHITECTURE.md at /home/opsvi/master_root/apps/agent-orchestrator/docs/ARCHITECTURE.md\n2. Analyze the complete codebase architecture in /home/opsvi/master_root/apps/agent-orchestrator/\n3. Examine component relationships, data flows, and system patterns\n4. Compare documented architecture against actual implementation\n5. Update the architecture documentation to reflect current code reality\n\nFOCUS AREAS:\n- Verify system components and their relationships\n- Update architectural diagrams and descriptions\n- Check design patterns and implementation approaches\n- Validate technology stack and dependencies\n- Ensure scalability and deployment patterns are accurate\n\nThe goal is to provide an accurate architectural overview that reflects the current system design.",
+      "dependencies": [],
+      "context": {
+        "target_file": "ARCHITECTURE.md",
+        "app_root": "/home/opsvi/master_root/apps/agent-orchestrator",
+        "focus": "system design, components, patterns, data flows"
+      }
+    },
+    {
+      "task_id": "update_deployment",
+      "task_type": "sdlc-deployment",
+      "prompt": "You are a deployment specialist. Your task is to update the DEPLOYMENT.md file in the agent-orchestrator project.\n\nSTEPS:\n1. Read the current DEPLOYMENT.md at /home/opsvi/master_root/apps/agent-orchestrator/docs/DEPLOYMENT.md\n2. Examine all deployment-related files (Dockerfile, docker-compose.yml, etc.)\n3. Test and verify deployment procedures and configurations\n4. Compare documented deployment steps against actual working procedures\n5. Update the deployment documentation to reflect current reality\n\nFOCUS AREAS:\n- Verify Docker configurations and compose files\n- Check environment variables and configuration files\n- Update installation and setup procedures\n- Validate monitoring and health check configurations\n- Ensure production deployment guidelines are accurate\n\nThe goal is to provide deployment documentation that operators can follow successfully.",
+      "dependencies": [],
+      "context": {
+        "target_file": "DEPLOYMENT.md",
+        "app_root": "/home/opsvi/master_root/apps/agent-orchestrator",
+        "focus": "docker, production, monitoring, configuration"
+      }
+    },
+    {
+      "task_id": "update_developer_guide",
+      "task_type": "development-specialist",
+      "prompt": "You are a developer documentation specialist. Your task is to update the DEVELOPER_GUIDE.md file in the agent-orchestrator project.\n\nSTEPS:\n1. Read the current DEVELOPER_GUIDE.md at /home/opsvi/master_root/apps/agent-orchestrator/docs/DEVELOPER_GUIDE.md\n2. Examine the development setup, build process, and code organization\n3. Test development workflows and procedures\n4. Compare documented development practices against current reality\n5. Update the developer guide to reflect current development practices\n\nFOCUS AREAS:\n- Verify development environment setup\n- Check build processes and testing procedures\n- Update code contribution guidelines\n- Validate debugging and troubleshooting information\n- Ensure development tools and workflows are current\n\nThe goal is to provide developers with accurate guidance for working with the codebase.",
+      "dependencies": [],
+      "context": {
+        "target_file": "DEVELOPER_GUIDE.md",
+        "app_root": "/home/opsvi/master_root/apps/agent-orchestrator",
+        "focus": "development setup, build process, testing, debugging"
+      }
+    },
+    {
+      "task_id": "update_user_guide",
+      "task_type": "technical-writer",
+      "prompt": "You are a user experience documentation specialist. Your task is to update the USER_GUIDE.md file in the agent-orchestrator project.\n\nSTEPS:\n1. Read the current USER_GUIDE.md at /home/opsvi/master_root/apps/agent-orchestrator/docs/USER_GUIDE.md\n2. Test all user-facing functionality and workflows\n3. Examine command-line interfaces and usage patterns\n4. Compare documented user procedures against actual working procedures\n5. Update the user guide to reflect current user experience\n\nFOCUS AREAS:\n- Verify all command-line examples and usage patterns\n- Check step-by-step procedures and workflows\n- Update screenshots or examples if needed\n- Validate troubleshooting and FAQ sections\n- Ensure user onboarding experience is accurate\n\nThe goal is to provide users with clear, accurate guidance for using the system.",
+      "dependencies": [],
+      "context": {
+        "target_file": "USER_GUIDE.md",
+        "app_root": "/home/opsvi/master_root/apps/agent-orchestrator",
+        "focus": "user workflows, CLI usage, troubleshooting, onboarding"
+      }
+    },
+    {
+      "task_id": "update_index",
+      "task_type": "technical-writer",
+      "prompt": "You are a documentation organization specialist. Your task is to update the INDEX.md file in the agent-orchestrator project.\n\nSTEPS:\n1. Read the current INDEX.md at /home/opsvi/master_root/apps/agent-orchestrator/docs/INDEX.md\n2. Examine all documentation files in the docs/ directory\n3. Verify all links and cross-references between documents\n4. Compare the documented index against actual file structure\n5. Update the index to reflect current documentation organization\n\nFOCUS AREAS:\n- Verify all file references and links\n- Check document organization and navigation\n- Update descriptions and summaries of each document\n- Ensure logical flow between documents\n- Validate search and discovery patterns\n\nThe goal is to provide an accurate navigation index for the documentation.",
+      "dependencies": ["update_readme", "update_api_reference", "update_architecture", "update_deployment", "update_developer_guide", "update_user_guide"],
+      "context": {
+        "target_file": "INDEX.md",
+        "app_root": "/home/opsvi/master_root/apps/agent-orchestrator",
+        "focus": "navigation, organization, cross-references, links"
+      }
+    },
+    {
+      "task_id": "update_integration_report",
+      "task_type": "qa-testing-guru",
+      "prompt": "You are a quality assurance and integration testing specialist. Your task is to update the DOCUMENTATION_INTEGRATION_REPORT.md file in the agent-orchestrator project.\n\nSTEPS:\n1. Read the current DOCUMENTATION_INTEGRATION_REPORT.md\n2. Review all updated documentation files for consistency\n3. Test cross-references and links between documents\n4. Verify that all documentation updates are integrated properly\n5. Update the integration report to reflect current documentation state\n\nFOCUS AREAS:\n- Verify consistency across all documentation\n- Check that all cross-references work correctly\n- Validate that documentation reflects code reality\n- Ensure completeness of documentation coverage\n- Document any integration issues or recommendations\n\nThe goal is to provide a comprehensive integration report showing documentation quality and completeness.",
+      "dependencies": ["update_readme", "update_api_reference", "update_architecture", "update_deployment", "update_developer_guide", "update_user_guide", "update_index"],
+      "context": {
+        "target_file": "DOCUMENTATION_INTEGRATION_REPORT.md",
+        "app_root": "/home/opsvi/master_root/apps/agent-orchestrator",
+        "focus": "integration, consistency, quality, completeness"
+      }
+    }
+  ]
+}
