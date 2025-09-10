@@ -23,7 +23,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 import psutil
 
 # Import async FileIOManager
-from .io.file_io_manager import FileIOManager
+# from .io.file_io_manager import FileIOManager  # TODO: fix import
 
 # Multi-provider support
 try:
@@ -397,7 +397,8 @@ class GenericOrchestrator:
         self.task_completion_times = []  # For ETA calculations
 
         # Initialize FileIOManager for async operations
-        self.io_manager = FileIOManager(base_dir=self.output_dir)
+        # self.io_manager = FileIOManager(base_dir=self.output_dir)  # TODO: Implement FileIOManager
+        self.io_manager = None  # Placeholder until FileIOManager is implemented
 
         # Initialize resource tracking
         self.process = psutil.Process()

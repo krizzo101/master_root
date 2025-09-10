@@ -1,0 +1,9 @@
+{
+  "deployed_at": "2025-09-10T03:19:28.930856",
+  "locations": [
+    "/home/opsvi/master_root/apps/agent-orchestrator/CLAUDE.md",
+    "/home/opsvi/master_root/apps/chat-search/CLAUDE.md",
+    "/home/opsvi/master_root/CLAUDE.md"
+  ],
+  "canaries": []
+}

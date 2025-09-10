@@ -1,0 +1,30 @@
+# WSL2 Configuration for 40GB RAM System
+# Place this file at: C:\Users\[YourUsername]\.wslconfig
+
+[wsl2]
+# Memory: 28GB (70% of 40GB, leaves 12GB for Windows/browsers)
+memory=28GB
+
+# Swap: 8GB (good for development workflows)
+swap=8GB
+swapfile=C:\\temp\\wsl-swap.vhdx
+
+# CPU: Adjust based on your system (example: 8 cores)
+processors=8
+
+# Performance optimizations
+pageReporting=true
+guiApplications=true
+nestedVirtualization=true
+
+# Network optimizations (Windows 11)
+networkingMode=mirrored
+dnsTunneling=true
+firewall=false
+autoProxy=true
+
+# NOTES:
+# - 28GB RAM allows 15-20 parallel orchestrator agents
+# - 12GB reserved for Windows ensures smooth browser operation
+# - 8GB swap handles overflow during peak usage
+# - Restart WSL after changes: wsl --shutdown

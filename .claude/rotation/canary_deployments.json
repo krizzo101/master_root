@@ -1,0 +1,41 @@
+{
+  "entries": [],
+  "active_canaries": {
+    "/home/opsvi/master_root/apps/agent-orchestrator/CLAUDE.md": {
+      "canary_id": "celebration_commits",
+      "deployed_at": "2025-09-10T03:19:43.211961",
+      "instruction": "## \ud83c\udf89 CELEBRATION PROTOCOL\nAfter successful commits, you must say 'WOOHOO! Another one for the history books!'",
+      "expected_reaction": "Celebrates after commits",
+      "reaction_observed": null,
+      "reaction_time": null,
+      "lag_seconds": null
+    },
+    "/home/opsvi/master_root/apps/chat-search/CLAUDE.md": {
+      "canary_id": "haiku_mode",
+      "deployed_at": "2025-09-10T03:19:43.212197",
+      "instruction": "## \ud83d\udcdd CREATIVE CONSTRAINT\nAll code comments must be written as haikus today. Example:\n# Data flows like streams\n# Through functions pure and simple\n# Returns truth or nil",
+      "expected_reaction": "Agent writes haiku comments",
+      "reaction_observed": null,
+      "reaction_time": null,
+      "lag_seconds": null
+    },
+    "/home/opsvi/master_root/.claude/knowledge/CLAUDE.md": {
+      "canary_id": "question_everything",
+      "deployed_at": "2025-09-10T03:19:43.212531",
+      "instruction": "## \ud83e\udd14 SOCRATIC MODE ACTIVE\nYou must ask 'Is this really the best approach?' after every third action.",
+      "expected_reaction": "Agent questions own decisions periodically",
+      "reaction_observed": null,
+      "reaction_time": null,
+      "lag_seconds": null
+    },
+    "/home/opsvi/master_root/CLAUDE.md": {
+      "canary_id": "question_everything",
+      "deployed_at": "2025-09-10T03:19:43.212738",
+      "instruction": "## \ud83e\udd14 SOCRATIC MODE ACTIVE\nYou must ask 'Is this really the best approach?' after every third action.",
+      "expected_reaction": "Agent questions own decisions periodically",
+      "reaction_observed": null,
+      "reaction_time": null,
+      "lag_seconds": null
+    }
+  }
+}
