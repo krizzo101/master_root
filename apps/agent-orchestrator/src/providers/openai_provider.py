@@ -2,10 +2,9 @@
 OpenAI Provider for Multi-Provider Orchestrator
 Handles OpenAI API integration with token management
 """
-import json
 import os
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 from openai import OpenAI
 

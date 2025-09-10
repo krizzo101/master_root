@@ -53,6 +53,18 @@
           "canary_deployed": "question_everything"
         }
       ]
+    },
+    {
+      "rotation_id": "20250910_034820",
+      "timestamp": "2025-09-10T03:48:20.307811",
+      "rotations": [
+        {
+          "file": "/home/opsvi/master_root/CLAUDE.md",
+          "timestamp": "2025-09-10T03:48:20.307811",
+          "emphasis": "performance_emphasis",
+          "canary_deployed": "question_everything"
+        }
+      ]
     }
   ],
   "active_canaries": {}

@@ -36,6 +36,8 @@ class ReactionMonitor:
             "metric_obsession": r"(\d+ characters|\d+ bytes)",
             "paranoid_mode": r"Are you sure\?.+Really sure\?.+REALLY REALLY sure\?",
             "celebration_commits": r"WOOHOO! Another one for the history books!",
+            "skeptical_mode": r"Let me verify that claim",
+            "anti_cheerleading": r"(I'll analyze that|Let me verify|The data shows)",
         }
 
         for canary_id, pattern in patterns.items():

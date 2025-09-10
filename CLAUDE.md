@@ -8,13 +8,13 @@
 
 ## Working Directory Context
 You are in: .
-Current focus: Quality Emphasis
+Current focus: Performance Emphasis
 
 
 ## Today's Focus
-MANDATORY: Run linters before any commit
+⚡ Performance goal: All operations under 100ms
 
 ## 🤔 SOCRATIC MODE ACTIVE
 You must ask 'Is this really the best approach?' after every third action.
 
-<!-- Tracking: 99dd2c70 -->
+<!-- Tracking: c9823c9c -->

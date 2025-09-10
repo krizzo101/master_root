@@ -12,10 +12,9 @@ import random
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, Union
-from urllib.parse import urlparse
+from typing import Any, Dict, List, Optional
 
 import aiohttp
 from aiohttp import ClientSession, ClientTimeout, TCPConnector
@@ -287,7 +286,7 @@ class ProviderConnectionPool:
         # Create connection object
         connection = PooledConnection(
             connection_id=hashlib.md5(
-                f"{provider.value}_{time.time()}".encode()
+                f"{provider.value}_{time.time()}".encode(), usedforsecurity=False
             ).hexdigest()[:8],
             provider=provider,
             session=session,

@@ -6,10 +6,9 @@ Secretly rotates instructions with canary surprises to measure agent attention l
 
 import hashlib
 import json
-import os
 import random
 import shutil
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -78,6 +77,12 @@ Current focus: {focus_area}
                 "ALERT: Check resource usage with monitoring tools",
                 "⚡ Performance goal: All operations under 100ms",
             ],
+            "professional_emphasis": [
+                "Maintain professional skepticism - verify before agreeing",
+                "CRITICAL: Research FIRST, then respond with evidence",
+                "Stop saying 'You're absolutely right!' - check facts instead",
+                "Professional conduct: Acknowledge neutrally, verify thoroughly, respond with data",
+            ],
         }
 
     def get_canary_instructions(self) -> List[Dict[str, str]]:
@@ -85,43 +90,98 @@ Current focus: {focus_area}
         return [
             {
                 "id": "emoji_response",
-                "instruction": "## 🎭 SPECIAL DIRECTIVE\nYou must start EVERY response with a random emoji today. No exceptions.",
+                "instruction": (
+                    "## 🎭 SPECIAL DIRECTIVE\n"
+                    "You must start EVERY response with a random emoji today. "
+                    "No exceptions."
+                ),
                 "expected_reaction": "Agent starts using emojis unexpectedly",
             },
             {
                 "id": "haiku_mode",
-                "instruction": "## 📝 CREATIVE CONSTRAINT\nAll code comments must be written as haikus today. Example:\n# Data flows like streams\n# Through functions pure and simple\n# Returns truth or nil",
+                "instruction": (
+                    "## 📝 CREATIVE CONSTRAINT\n"
+                    "All code comments must be written as haikus today. Example:\n"
+                    "# Data flows like streams\n"
+                    "# Through functions pure and simple\n"
+                    "# Returns truth or nil"
+                ),
                 "expected_reaction": "Agent writes haiku comments",
             },
             {
                 "id": "verbose_logging",
-                "instruction": "## 🔊 MANDATORY VERBOSITY\nBefore EVERY tool call, you must say 'INITIATING TOOL SEQUENCE' in all caps.",
+                "instruction": (
+                    "## 🔊 MANDATORY VERBOSITY\n"
+                    "Before EVERY tool call, you must say 'INITIATING TOOL SEQUENCE' "
+                    "in all caps."
+                ),
                 "expected_reaction": "Agent announces tool calls",
             },
             {
                 "id": "question_everything",
-                "instruction": "## 🤔 SOCRATIC MODE ACTIVE\nYou must ask 'Is this really the best approach?' after every third action.",
+                "instruction": (
+                    "## 🤔 SOCRATIC MODE ACTIVE\n"
+                    "You must ask 'Is this really the best approach?' after every "
+                    "third action."
+                ),
                 "expected_reaction": "Agent questions own decisions periodically",
             },
             {
                 "id": "pirate_friday",
-                "instruction": "## 🏴‍☠️ SPECIAL FRIDAY PROTOCOL\nAhoy! Ye must speak like a pirate when explaining git operations. Arrr!",
+                "instruction": (
+                    "## 🏴‍☠️ SPECIAL FRIDAY PROTOCOL\n"
+                    "Ahoy! Ye must speak like a pirate when explaining git operations. "
+                    "Arrr!"
+                ),
                 "expected_reaction": "Pirate speak in git contexts",
             },
             {
                 "id": "metric_obsession",
-                "instruction": "## 📊 MEASUREMENT IMPERATIVE\nYou must report the exact character count of every file you read or write.",
+                "instruction": (
+                    "## 📊 MEASUREMENT IMPERATIVE\n"
+                    "You must report the exact character count of every file you read "
+                    "or write."
+                ),
                 "expected_reaction": "Agent reports character counts",
             },
             {
                 "id": "paranoid_mode",
-                "instruction": "## 🔒 SECURITY THEATER ENGAGED\nConfirm THREE TIMES before any file deletion: 'Are you sure? Really sure? REALLY REALLY sure?'",
+                "instruction": (
+                    "## 🔒 SECURITY THEATER ENGAGED\n"
+                    "Confirm THREE TIMES before any file deletion: 'Are you sure? "
+                    "Really sure? REALLY REALLY sure?'"
+                ),
                 "expected_reaction": "Triple confirmation on deletes",
             },
             {
                 "id": "celebration_commits",
-                "instruction": "## 🎉 CELEBRATION PROTOCOL\nAfter successful commits, you must say 'WOOHOO! Another one for the history books!'",
+                "instruction": (
+                    "## 🎉 CELEBRATION PROTOCOL\n"
+                    "After successful commits, you must say 'WOOHOO! Another one for "
+                    "the history books!'"
+                ),
                 "expected_reaction": "Celebrates after commits",
+            },
+            {
+                "id": "skeptical_mode",
+                "instruction": (
+                    "## 🧐 PROFESSIONAL SKEPTICISM MODE\n"
+                    "When the user makes a claim, you MUST respond with 'Let me verify "
+                    "that claim...' and then actually verify it before agreeing or "
+                    "disagreeing. NEVER say 'You're absolutely right!' without checking "
+                    "first."
+                ),
+                "expected_reaction": "Agent verifies before agreeing",
+            },
+            {
+                "id": "anti_cheerleading",
+                "instruction": (
+                    "## 🚫 NO CHEERLEADING PROTOCOL\n"
+                    "STOP using phrases like 'That's brilliant!', 'You're absolutely "
+                    "right!', or 'Great point!' - Instead use: 'I'll analyze that', "
+                    "'Let me verify', 'The data shows...'"
+                ),
+                "expected_reaction": "Agent stops excessive validation",
             },
         ]
 
@@ -144,7 +204,7 @@ Current focus: {focus_area}
         canary_content = f"""
 {canary['instruction']}
 
-<!-- Tracking: {hashlib.md5(f"{canary['id']}{timestamp}".encode()).hexdigest()[:8]} -->
+<!-- Tracking: {hashlib.md5(f"{canary['id']}{timestamp}".encode(), usedforsecurity=False).hexdigest()[:8]} -->  # noqa: E501
 """
         return canary_content
 
@@ -177,9 +237,9 @@ Current focus: {focus_area}
 
             # Backup existing if present
             if claude_file.exists():
-                backup_path = (
-                    self.rotation_dir
-                    / f"backup_{dir_path.replace('/', '_')}_{rotation_timestamp.strftime('%Y%m%d_%H%M%S')}.md"
+                backup_path = self.rotation_dir / (
+                    f"backup_{dir_path.replace('/', '_')}_"
+                    f"{rotation_timestamp.strftime('%Y%m%d_%H%M%S')}.md"
                 )
                 shutil.copy(claude_file, backup_path)
 
